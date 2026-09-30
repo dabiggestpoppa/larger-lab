@@ -1353,6 +1353,103 @@ class SelectorSnapshot:
     read_error: str
 
 
+def _classify_claim_coordinate(operation_id, probe_name, dir_fd):
+    """Census the canonical coordinate WITHOUT following redirections, BEFORE
+    any descriptor is opened (B4-CXR7U9R46R1).
+
+    Returns the stat of an existing regular, private, non-reparse claim, or
+    None when the coordinate simply does not exist. Every other shape - a
+    reparse point, a non-regular object, a widened mode, an unstattable
+    coordinate - fails closed HERE, before an authority decision can depend on
+    it.
+    """
+    try:
+        st = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return None
+    except OSError as e:
+        raise _selector_conflict(operation_id, f"lstat failed: {e}")
+    if os.name == "nt" and bool(getattr(st, "st_file_attributes", 0)
+                                & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _selector_conflict(
+            operation_id,
+            "the canonical claim is a reparse point; refusing to follow "
+            "a redirected selector")
+    if not stat.S_ISREG(st.st_mode):
+        raise _selector_conflict(
+            operation_id,
+            "the canonical claim is not a regular file; refusing a "
+            "malformed selector coordinate")
+    if os.name != "nt":
+        mode = stat.S_IMODE(st.st_mode)
+        if mode & 0o077:
+            raise _selector_conflict(
+                operation_id,
+                f"the canonical claim is not private (mode {mode:04o}); "
+                "refusing a widened selector")
+    return st
+
+
+def _open_claim_descriptor(operation_id, name, probe_name, dir_fd):
+    """Open the classified coordinate ONCE, without following redirections.
+
+    POSIX opens descriptor-relative to the bare canonical name. Windows has
+    no directory descriptor, so the full canonical path is opened there and
+    the no-follow, reparse-point and identity proofs carry the law instead.
+    A coordinate that disappears between the census and the open has MOVED:
+    it is refused, never reported as absent.
+    """
+    try:
+        if dir_fd is not None:
+            return os.open(name, _CLAIM_OPEN_FLAGS, dir_fd=dir_fd)
+        return os.open(probe_name, _CLAIM_OPEN_FLAGS)
+    except FileNotFoundError:
+        raise _selector_conflict(
+            operation_id,
+            "the canonical claim vanished between lstat and open")
+    except OSError as e:
+        raise _selector_conflict(
+            operation_id, f"the canonical claim could not be opened "
+            f"without following redirections: {e}")
+
+
+def _read_admitted_claim(operation_id, fd):
+    """Read and parse the claim from the ADMITTED descriptor, and nothing
+    else (B4-CXR7U9R46R1).
+
+    Raw descriptor reads only: the bytes never pass through a second open, a
+    path-based stream or a buffered text wrapper, because this descriptor IS
+    the admitted object. It is fstat'ed before and after the read, and any
+    mutation across that read is refused. The descriptor is NOT closed here:
+    the caller owns its lifetime and closes it before proving the canonical
+    pathname still names what was read.
+    """
+    try:
+        first = os.fstat(fd)
+        chunks = []
+        while True:
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                break
+            chunks.append(chunk)
+        mid = os.fstat(fd)
+        if (first.st_ino, first.st_dev, first.st_size,
+                first.st_mtime_ns) != (mid.st_ino, mid.st_dev, mid.st_size,
+                                       mid.st_mtime_ns):
+            raise _selector_conflict(
+                operation_id, "the claim changed while it was being read")
+        try:
+            return first, json.loads(b"".join(chunks).decode("utf-8"))
+        except (UnicodeDecodeError, ValueError) as e:
+            raise _selector_conflict(
+                operation_id, f"the claim is not valid JSON: {e}")
+    except _ExecutionAuthorityConflict:
+        raise
+    except OSError as e:
+        raise _selector_conflict(
+            operation_id, f"the claim could not be read: {e}")
+
+
 def _read_selector_snapshot(operation_id, transition_dir=None):
     """Read THIS operation's canonical claim as ONE FD-bound snapshot.
 
@@ -1361,9 +1458,9 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
     following redirections -> open the claim once with O_RDONLY|O_CLOEXEC|
     O_NOFOLLOW, descriptor-relative -> fstat it (regular, private,
     no foreign durable name, no mutation across admission) -> read and
-    parse the JSON
-    from that SAME descriptor -> fstat again (mutation during reading is
-    rejected) -> prove the canonical pathname still names the SAME device
+    parse the JSON from that SAME descriptor -> fstat again (a mutation
+    during reading is rejected) -> prove the canonical pathname still names
+    the SAME device
     and inode without following symlinks -> close the descriptor and return
     the immutable snapshot. No code may open(path) the claim after this
     admission.
@@ -1388,81 +1485,18 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
     probe_name = name if dir_fd is not None else canonical_path
     fd = None
     try:
-        try:
-            st = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
-        except FileNotFoundError:
+        if _classify_claim_coordinate(
+                operation_id, probe_name, dir_fd) is None:
             return SelectorSnapshot(
                 operation_id=operation_id, transition_dir=governed,
                 canonical_path=canonical_path, present=False, device=0,
                 inode=0, size=0, mode=0, link_count=0, claim=None,
                 read_error=None)
-        except OSError as e:
-            raise _selector_conflict(operation_id, f"lstat failed: {e}")
-        if os.name == "nt" and bool(getattr(st, "st_file_attributes", 0)
-                                    & stat.FILE_ATTRIBUTE_REPARSE_POINT):
-            raise _selector_conflict(
-                operation_id,
-                "the canonical claim is a reparse point; refusing to follow "
-                "a redirected selector")
-        if not stat.S_ISREG(st.st_mode):
-            raise _selector_conflict(
-                operation_id,
-                "the canonical claim is not a regular file; refusing a "
-                "malformed selector coordinate")
-        if os.name != "nt":
-            mode = stat.S_IMODE(st.st_mode)
-            if mode & 0o077:
-                raise _selector_conflict(
-                    operation_id,
-                    f"the canonical claim is not private (mode {mode:04o}); "
-                    "refusing a widened selector")
-        try:
-            if dir_fd is not None:
-                fd = os.open(name, _CLAIM_OPEN_FLAGS, dir_fd=dir_fd)
-            else:
-                fd = os.open(probe_name, _CLAIM_OPEN_FLAGS)
-        except FileNotFoundError:
-            # The name was removed between lstat and open: the coordinate
-            # moved under us. Fail closed, never describe this as absent.
-            raise _selector_conflict(
-                operation_id,
-                "the canonical claim vanished between lstat and open")
-        except OSError as e:
-            raise _selector_conflict(
-                operation_id, f"the canonical claim could not be opened "
-                f"without following redirections: {e}")
+        fd = _open_claim_descriptor(operation_id, name, probe_name, dir_fd)
         _admit_selector_descriptor(fd, dir_fd, probe_name, operation_id)
-        try:
-            # Raw descriptor reads only: the claim bytes never pass through a
-            # second open, a path-based stream, or a buffered text wrapper --
-            # this descriptor IS the admitted object.
-            first = os.fstat(fd)
-            chunks = []
-            while True:
-                chunk = os.read(fd, 65536)
-                if not chunk:
-                    break
-                chunks.append(chunk)
-            mid = os.fstat(fd)
-            if (first.st_ino, first.st_dev, first.st_size,
-                    first.st_mtime_ns) != (mid.st_ino, mid.st_dev,
-                                           mid.st_size, mid.st_mtime_ns):
-                raise _selector_conflict(
-                    operation_id,
-                    "the claim changed while it was being read")
-            try:
-                claim = json.loads(b"".join(chunks).decode("utf-8"))
-            except (UnicodeDecodeError, ValueError) as e:
-                raise _selector_conflict(
-                    operation_id, f"the claim is not valid JSON: {e}")
-        except _ExecutionAuthorityConflict:
-            raise
-        except OSError as e:
-            raise _selector_conflict(
-                operation_id, f"the claim could not be read: {e}")
-        finally:
-            os.close(fd)
-            fd = None
+        first, claim = _read_admitted_claim(operation_id, fd)
+        os.close(fd)
+        fd = None
         try:
             final = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
         except OSError as e:
@@ -1498,7 +1532,8 @@ def _load_claim(operation_id, transition_dir=None):
 
     B4-CXR7U9R46R1: the claim bytes are read from ONE FD-bound selector
     snapshot -- the same descriptor whose regular-file type, privacy,
-    link-count, non-mutation and pathname-identity properties were admitted.
+    durable-name, non-mutation and pathname-identity properties were
+    admitted.
     The old validate-pathname-then-reopen sequence, which left a replacement
     window between validation and open, no longer exists. A symlink,
     non-regular object, redirected, widened, replaced or unparseable claim
@@ -2353,8 +2388,8 @@ def _validated_resume_rollback_receipt(path, db, user, container,
             or record.get("commit_point") is not None:
         raise RuntimeError("rollback resume is forbidden after forward commit intent")
     floor = _floor_from_record(operation_id)
-    if not isinstance(floor, dict) or not floor.get("tables") \
-            or not isinstance(floor.get("rows"), dict):
+    if (not isinstance(floor, dict) or not floor.get("tables")
+            or not isinstance(floor.get("rows"), dict)):
         raise RuntimeError("rollback resume floor is missing or malformed")
     return promote, stamp, quarantine, staging, operation_id, floor, state
 
@@ -3037,6 +3072,66 @@ def _execute_rollback_by_catalog_state(catalog_state, container, user, db,
     raise RuntimeError("rollback catalog state is unreconciled")
 
 
+def _admit_rollback_transition(receipt_in_path, db, user, container,
+                               inventory_path, inventory_sha_path,
+                               execution_authority, resume_only):
+    """Admit the rollback branch and return its governed operation facts.
+
+    A resume reads the durable ROLLING_BACK record. A fresh rollback
+    validates the promote receipt, restores the durable pre-promotion floor,
+    and only then takes the ONE-TIME claim, with the non-authoritative
+    evidence already durable (B4-CXR7U9R40, B4-CXR7U9R44). Any refusal is
+    raised here for the caller to report as a truthful blocked receipt.
+    """
+    if resume_only:
+        return _validated_resume_rollback_receipt(
+            receipt_in_path, db, user, container, inventory_path,
+            inventory_sha_path)
+    promote, stamp, quarantine, staging, operation_id = (
+        _validated_transition_receipt(
+            receipt_in_path, db, user, container, inventory_path,
+            inventory_sha_path, "rollback"))
+    floor = _floor_from_record(operation_id)
+    if not isinstance(floor, dict) or not floor.get("tables") or \
+            not isinstance(floor.get("rows"), dict):
+        raise RuntimeError("rollback floor is missing or malformed")
+    execution_authority.activate()
+    _claim_transition(operation_id, "rollback", promote)
+    execution_authority.commit()
+    return (promote, stamp, quarantine, staging, operation_id, floor,
+            TRANSITION_STATE_ROLLING_BACK)
+
+
+def _advance_dead_claim_state(operation_id, promote, durable_state,
+                              resume_only):
+    """A claim can die before its state update. Complete that state advance
+    BEFORE any catalog mutation, never after it (B4-CXR7U9R41)."""
+    if resume_only and durable_state == TRANSITION_STATE_PROMOTED:
+        _record_transition(
+            operation_id, TRANSITION_STATE_ROLLING_BACK, promote,
+            extra={"selected_transition": "rollback"})
+        return TRANSITION_STATE_ROLLING_BACK
+    return durable_state
+
+
+def _execute_rollback_verdict(durable_state, catalog_state, container, user,
+                              db, quarantine, staging, inventory, probe, floor):
+    """The rollback decision table, selected by the DURABLE state (R46R6).
+
+    A ROLLED_BACK operation is admitted only when the catalog still holds
+    nothing but the old canonical name; anything else runs the named
+    catalog-state table. The authority law is unchanged by this extraction.
+    """
+    if durable_state == "ROLLED_BACK":
+        if catalog_state != "quarantine_renamed":
+            raise RuntimeError(
+                "ROLLED_BACK catalog does not contain only old canonical")
+        return _verify_against_floor(container, db, user, floor)
+    return _execute_rollback_by_catalog_state(
+        catalog_state, container, user, db, quarantine, staging, inventory,
+        probe, floor)
+
+
 def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
                            user, container, probe_spec, execution_authority,
                            resume_only=False):
@@ -3049,29 +3144,12 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
     durable_state = None
     floor = None
     try:
-        if resume_only:
-            (promote, stamp, quarantine, staging, operation_id,
-             floor, durable_state) = _validated_resume_rollback_receipt(
-                 receipt_in_path, db, user, container, inventory_path,
-                 inventory_sha_path)
-        else:
-            promote, stamp, quarantine, staging, operation_id = \
-                _validated_transition_receipt(
-                    receipt_in_path, db, user, container, inventory_path,
-                    inventory_sha_path, "rollback")
-            floor = _floor_from_record(operation_id)
-            if not isinstance(floor, dict) or not floor.get("tables") \
-                    or not isinstance(floor.get("rows"), dict):
-                raise RuntimeError("rollback floor is missing or malformed")
-            # Non-authoritative evidence is durable before the one-time branch
-            # claim. A failure here is cleaned while the coordinate remains held.
-            execution_authority.activate()
-            _claim_transition(operation_id, "rollback", promote)
-            execution_authority.commit()
-            durable_state = TRANSITION_STATE_ROLLING_BACK
+        (promote, stamp, quarantine, staging, operation_id,
+         floor, durable_state) = _admit_rollback_transition(
+             receipt_in_path, db, user, container, inventory_path,
+             inventory_sha_path, execution_authority, resume_only)
     except Exception as e:
         return _blocked(receipt, f"refusing recovery transition authority: {e}")
-
     if resume_only:
         execution_authority.activate()
         execution_authority.commit()
@@ -3090,13 +3168,8 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
         inventory = _load_protected_inventory(inventory_path, inventory_sha_path)
         probe = parse_probe_spec(probe_spec)
 
-        # A claim can die before its state update. Complete that state advance
-        # under the same lock before any catalog mutation.
-        if resume_only and durable_state == TRANSITION_STATE_PROMOTED:
-            _record_transition(
-                operation_id, TRANSITION_STATE_ROLLING_BACK, promote,
-                extra={"selected_transition": "rollback"})
-            durable_state = TRANSITION_STATE_ROLLING_BACK
+        durable_state = _advance_dead_claim_state(
+            operation_id, promote, durable_state, resume_only)
 
         catalog_state = _rollback_catalog_state(
             container, user, db, quarantine, staging)
@@ -3105,17 +3178,9 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
             receipt["verdict"] = "unreconciled"
             raise RuntimeError("rollback catalog state is unreconciled")
 
-        if durable_state == "ROLLED_BACK":
-            if catalog_state != "quarantine_renamed":
-                raise RuntimeError("ROLLED_BACK catalog does not contain only old canonical")
-            ok, problems, detail = _verify_against_floor(container, db, user, floor)
-        else:
-            # B4-CXR7U9R46R6: the catalog-state decision table is the named
-            # _execute_rollback_by_catalog_state helper; the authority law is
-            # unchanged.
-            ok, problems, detail = _execute_rollback_by_catalog_state(
-                catalog_state, container, user, db, quarantine, staging,
-                inventory, probe, floor)
+        ok, problems, detail = _execute_rollback_verdict(
+            durable_state, catalog_state, container, user, db, quarantine,
+            staging, inventory, probe, floor)
 
         detail.setdefault("rollback_succeeded", ok)
         detail.setdefault("rollback_failed", not ok)
@@ -3695,6 +3760,39 @@ def _validate_cli(phase, kw):
         sys.exit(2)
 
 
+def _run_recovery_phase(phase, kw, db, user, container, probe):
+    """Run the requested governed recovery phase and return its receipt.
+
+    This dispatcher only CHOOSES which named phase function to run: every
+    admission, decision and refusal belongs to that phase, and the
+    destination identity is the governed DB/USER/CONTAINER, never anything
+    from the command line (B4-CXR7U9R46X4).
+    """
+    if phase == "promote":
+        return phase_promote(kw["archive"], kw["inventory"],
+                             kw["inventory_sha"], db, user, container, probe)
+    if phase == "finalize":
+        return phase_finalize(kw["receipt_in"], kw["inventory"],
+                              kw["inventory_sha"], db, user, container, probe)
+    if phase == "resume-finalize":
+        return phase_resume_finalize(kw["receipt_in"], kw["inventory"],
+                                     kw["inventory_sha"], db, user, container,
+                                     probe)
+    if phase == "preintent-rollback":
+        return phase_preintent_rollback(kw["receipt_in"], kw["inventory"],
+                                        kw["inventory_sha"], db, user,
+                                        container, probe)
+    if phase == "resume-rollback":
+        return phase_resume_rollback(kw["receipt_in"], kw["inventory"],
+                                     kw["inventory_sha"], db, user, container,
+                                     probe)
+    if phase == "reconcile":
+        return phase_reconcile(kw["receipt_in"], kw["inventory"],
+                               kw["inventory_sha"], db, user, container, probe)
+    return phase_rollback(kw["receipt_in"], kw["inventory"],
+                          kw["inventory_sha"], db, user, container, probe)
+
+
 def main():
     phase, probe, kw = _parse_cli(sys.argv[1:])
     # Shell-support mode (B4-CXR7U9R41-R2): classify a durable transition
@@ -3721,32 +3819,7 @@ def main():
     # the destructive destination is the governed identity, full stop
     db, user, container = DB, USER, CONTAINER
     try:
-        if phase == "promote":
-            receipt = phase_promote(kw["archive"], kw["inventory"],
-                                    kw["inventory_sha"], db, user, container, probe)
-        elif phase == "finalize":
-            receipt = phase_finalize(kw["receipt_in"], kw["inventory"],
-                                     kw["inventory_sha"], db, user, container, probe)
-        elif phase == "resume-finalize":
-            receipt = phase_resume_finalize(
-                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
-                container, probe)
-        elif phase == "preintent-rollback":
-            receipt = phase_preintent_rollback(
-                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
-                container, probe)
-        elif phase == "resume-rollback":
-            receipt = phase_resume_rollback(
-                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
-                container, probe)
-        elif phase == "reconcile":
-            receipt = phase_reconcile(
-                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
-                container, probe)
-        else:
-            receipt = phase_rollback(
-                kw["receipt_in"], kw["inventory"], kw["inventory_sha"], db, user,
-                container, probe)
+        receipt = _run_recovery_phase(phase, kw, db, user, container, probe)
     except _ExecutionAuthorityConflict as e:
         # A refused contender must not write a phase receipt: it owns no
         # operation mutation interval and therefore owns no new evidence.

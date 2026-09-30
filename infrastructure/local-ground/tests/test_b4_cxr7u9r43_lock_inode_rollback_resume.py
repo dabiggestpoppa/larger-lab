@@ -488,10 +488,14 @@ def test_weakened_missing_resume_routes_back_to_fresh_and_fails(tmp_path):
     process = _spawn(h, _rollback_argv(h, h.root / "crash.json"))
     _kill_at_signal(process, h.signal)
     _clear(h)
+    # B4-CXR7U9R46X4: the dispatcher is now the named _run_recovery_phase
+    # helper, so the weakened control retargets ITS branch test. Disabling it
+    # still routes a resume request to the fresh-rollback branch, which is
+    # exactly the weakening this control proves the shipped engine resists.
     weak = _weakened_engine(
         tmp_path, lambda source: source.replace(
-            'elif phase == "resume-rollback":',
-            'elif phase == "disabled-resume-rollback":'))
+            '    if phase == "resume-rollback":',
+            '    if phase == "disabled-resume-rollback":'))
     args = _resume_rollback_argv(h, h.root / "weak.json")
     base = [sys.executable, "-c", recovery_cli._BOOTSTRAP, str(weak),
             str(h.root), "--test-bridge", str(h.bridge)]
