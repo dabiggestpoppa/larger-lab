@@ -271,3 +271,75 @@ concrete correctness defect.
 Offline deterministic kernel only — no live acquisition, RPC, CEX feeds,
 persistent DB, graph DB, production scheduler, Book 6 valuation, production
 pricing, or trading/execution authority.
+---
+
+# BOOK 5 HARDENING R3 — DERIVED-REFERENCE CLOSURE + NON-COMPONENT QUANTITATIVE CONTEXT SEAL (2026-09-29)
+
+- Trigger: four newly demonstrated defect classes on the R2 kernel —
+  R3-D1 forged `compose_path` stage refs produced `derived=True` paths
+  (only `len(...) > 0` was checked); R3-D2 forged `topology_view`
+  node/edge refs produced derived topologies; R3-D3
+  `observed_value_display` rendered without live validation (a
+  `model_copy(book2_claim_refs=())` fact displayed); R3-D4 the
+  flow/liability/observed-fact validators proved only claim existence —
+  `model_copy(unit="USDC")` on an ETH flow with identical canonical claim
+  refs passed 5G composition.
+- Closure: `QuantitativeRecordContextBinding` family (record kinds
+  FLOW / LIABILITY / OBSERVED_FACT; asset/realization/unit/site/subject/
+  reporter/numeraire dimensions; record-kind required-dimension table;
+  NO BINDING != CONTEXT VERIFIED at every 5G non-component boundary) +
+  `Book5CanonicalRecordRegistry` (in-memory, deterministic, offline;
+  typed-only fail-closed registration after Book 2 + context + identity
+  validation; UNKNOWN / DETACHED / WRONG-KIND resolution all REJECT) +
+  registry-bound `compose_path` / `topology_view` (every ref resolves;
+  duplicates REJECT; path order preserved; endpoint omissions carried as
+  explicit Gaps, never fabricated nodes/stages) + `observed_value_display`
+  live-validation seal (typed guard + Book 2 refs + context; display-only
+  preserved; kind stays OBSERVED_COMMON_VALUE_FACT).
+- model_copy R3 attack matrix (16 rows): P1–P3 path, T1–T4 topology,
+  F1–F4 flow, L1–L4 liability, O1–O4 observed — every authority-producing
+  path revalidates live state.
+- Preservation: R1 37/37, R2 44/44, blocs 25/25 (45-row stress
+  traceability + write-count-zero intact), adversarial 31/31 (T-1..T-14).
+  One side repair in the context-seal commit: `compose_snapshot` no longer
+  refuses facts-only inputs (an observed fact IS a canonical input; its
+  refs were already isolated out of `liability_refs`).
+- Counts: Book1=107, Book2=108, Book3=83, Book4=230 (all unchanged);
+  Book5 159 → 205 (R3 adds 46 rows: 27 reproductions A1–A5/B1–B5/C1–C5/
+  D1–D12 + 19 attack-matrix rows P/T/F/L/O); Total CSIA 687 → 733.
+- Ruff: PASS full Book 5 (44 source files + tests). mypy: 44 files clean.
+- Sensor: 2325 PASS / 14 FAIL / 4 SKIPPED — exact pre-existing
+  storage-evidence regen set (i05r2×3, i05r3×2, i05r4×3, i06×3, i06r1×3);
+  Book5-introduced Sensor failures = 0; Sensor mutations = 0.
+- Freeze vs `a2526e822…`: only Book 5 modules/tests and append-only CSIA
+  evidence/ledger files differ. Books 1–4 mutations = 0.
+- Matrix: `CSIA_BOOK_5_HARDENING_R3_MATRIX.json` (21 gates, all PASS).
+- Evidence: `CSIA_BOOK_5_HARDENING_R3_DERIVED_REFERENCE_CONTEXT_CLOSURE.md`.
+- Commits: `97270f92` failing reproductions → `869be159` context binding +
+  validator seal → `30bd16e5` registry → `ec2d5334` path/topology closure →
+  `ddce5186` display seal → `25949c64` attack matrix (this doc + matrix +
+  ledger in the final commit).
+
+## Status
+
+```text
+BOOK_5_HARDENING_R3 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (unchanged, still PROPOSED)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
+
+No R4 is started: another hardening round requires a newly demonstrated
+concrete correctness defect. Next action: operator acceptance review of
+Book 5.
+
+## Limitations (unchanged, still explicit)
+
+Offline deterministic kernel only — no live acquisition, RPC, CEX feeds,
+persistent DB, graph DB, production scheduler, Book 6 valuation, production
+pricing, or trading/execution authority. Context dimensions bound in R3 are
+Book 5-local typed interpretations of canonical Book 2 claims, not fields
+Book 2 natively encodes.

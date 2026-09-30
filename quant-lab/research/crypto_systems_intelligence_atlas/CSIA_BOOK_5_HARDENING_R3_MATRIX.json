@@ -1,0 +1,159 @@
+{
+  "atlas": "CSIA — Crypto Systems Intelligence Atlas",
+  "cycle": "BOOK 5 HARDENING R3 — DERIVED-REFERENCE CLOSURE + NON-COMPONENT QUANTITATIVE CONTEXT SEAL",
+  "branch": "agent/crypto-systems-intelligence-atlas-book5-build",
+  "starting_head": "9f5c0ea03a2c6975d5689dbc11d6145fa61a9ddb",
+  "final_head": "25949c6484e2106713aedb5025fb54470ee50f4a",
+  "book4_base": "a2526e8220513b34967ab11f227ddbddc14e7e4a",
+  "plan": "CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.3.md",
+  "generated": "2026-09-29",
+  "environment": "offline in-memory only; no database; no graph DB; single epistemic engine (Book 2)",
+  "baseline": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5_prior": 159,
+    "total_prior": 687,
+    "sensor": "2325 PASS / 14 FAIL / 4 SKIPPED (pre-existing storage-evidence regen baseline)"
+  },
+  "counts_after": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5": 205,
+    "r3_focused": 46,
+    "total": 733
+  },
+  "gates": [
+    {
+      "gate": "PATH_REFERENCE_CLOSURE",
+      "result": "PASS",
+      "evidence": "compose_path requires the canonical registry; every stage ref resolves as a canonical position record (UNKNOWN/WRONG-KIND/empty/duplicate REJECT). Rows A1-A5, P1-P3; test_book5_hardening_r3.py"
+    },
+    {
+      "gate": "TOPOLOGY_NODE_REFERENCE_CLOSURE",
+      "result": "PASS",
+      "evidence": "topology_view resolves every node ref as a canonical position record; unique nodes; flows/facts as nodes REJECT. Rows B1, B3, B4, T1, T3"
+    },
+    {
+      "gate": "TOPOLOGY_FLOW_REFERENCE_CLOSURE",
+      "result": "PASS",
+      "evidence": "topology_view resolves every edge_flow_ref as a canonical flow record; flow position endpoints must resolve; endpoints missing from the node set carried as explicit Gaps, never fabricated nodes. Rows B2, B5, T2, T4"
+    },
+    {
+      "gate": "OBSERVED_VALUE_DISPLAY_LIVE_VALIDATION",
+      "result": "PASS",
+      "evidence": "observed_value_display runs typed guard + Book 2 claim resolution + quantitative context seal on the LIVE fact before rendering. Rows C1-C5, O1-O4"
+    },
+    {
+      "gate": "FLOW_CONTEXT_CLOSURE",
+      "result": "PASS",
+      "evidence": "QuantitativeRecordContextBinding(record_kind=FLOW) agreement+establishment of asset/unit (+realization when present) at every 5G flow boundary. Rows D1-D4, F1-F4"
+    },
+    {
+      "gate": "LIABILITY_CONTEXT_CLOSURE",
+      "result": "PASS",
+      "evidence": "QuantitativeRecordContextBinding(record_kind=LIABILITY) agreement+establishment of asset/unit/site at every 5G liability boundary. Rows D5-D8, L1-L4"
+    },
+    {
+      "gate": "OBSERVED_VALUE_CONTEXT_CLOSURE",
+      "result": "PASS",
+      "evidence": "QuantitativeRecordContextBinding(record_kind=OBSERVED_FACT) agreement+establishment of subject/numeraire (+reporter when bound) at compose and display boundaries. Rows D9-D12, O1-O4"
+    },
+    {
+      "gate": "CANONICAL_BOOK5_RECORD_REGISTRY",
+      "result": "PASS",
+      "evidence": "Book5CanonicalRecordRegistry: in-memory deterministic offline resolver; typed records only, registered after Book 2 + context + identity validation; categories positions/flows/liabilities/observed facts/transformations/sites; no DB, no graph DB"
+    },
+    {
+      "gate": "DERIVED_REF_WRONG_KIND_REJECTION",
+      "result": "PASS",
+      "evidence": "registry.resolve(expected_kind=...) — WRONG-KIND REJECT: flow/fact as path stage or topology node; 5G_DERIVED_REF_UNKNOWN and DETACHED equally fail closed. Rows P3, T3"
+    },
+    {
+      "gate": "MODEL_COPY_NON_COMPONENT_REVALIDATION",
+      "result": "PASS",
+      "evidence": "16-row model_copy matrix: P1-P3 (path), T1-T4 (topology), F1-F4 (flow), L1-L4 (liability), O1-O4 (observed) — every authority-producing path revalidates live state"
+    },
+    {
+      "gate": "NO_FAKE_PATH_STAGE",
+      "result": "PASS",
+      "evidence": "fake refs ('fake:issuance', 'ghost:node') never become path stages; unknown stage can only be an explicit Gap, never a ref. Rows A1, A2, P2"
+    },
+    {
+      "gate": "NO_FAKE_TOPOLOGY_NODE",
+      "result": "PASS",
+      "evidence": "forged node/edge refs REJECT; absent-but-registered endpoints become explicit Gaps (FLOW_ENDPOINT_NOT_IN_TOPOLOGY), never fabricated nodes. Rows B1-B4, T1, T2, T4"
+    },
+    {
+      "gate": "R1_GATES_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_hardening_r1.py 37/37 PASS (typed raw-input errors, no-zero fabrication, flow-only gap semantics); only fixture change: kernel flow-context binding for the R1 flow corpus"
+    },
+    {
+      "gate": "R2_GATES_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_hardening_r2.py 44/44 PASS (mandatory provenance, ClaimContextBinding closure, S1-S10); zero changes to R2-sealed APIs"
+    },
+    {
+      "gate": "PRIOR_45_STRESS_ROWS_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_blocs.py 45-row STRESS_ROW_TRACEABILITY intact; 25/25 blocs tests PASS"
+    },
+    {
+      "gate": "PRIOR_T1_T14_PRESERVED",
+      "result": "PASS",
+      "evidence": "T-1..T-14 adversarial semantics rows PASS inside test_book5_adversarial.py 31/31"
+    },
+    {
+      "gate": "BOOK1_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 1 count 107 unchanged; git diff a2526e822..HEAD touches no Book 1 file (BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0)"
+    },
+    {
+      "gate": "BOOK2_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 2 count 108 unchanged; git diff a2526e822..HEAD touches no Book 2 file (BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0)"
+    },
+    {
+      "gate": "BOOK3_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 3 count 83 unchanged; git diff a2526e822..HEAD touches no Book 3 file (BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0)"
+    },
+    {
+      "gate": "BOOK4_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 4 count 230 unchanged; git diff a2526e822..HEAD touches no Book 4 file (BOOK_4_ACCEPTED_CONTRACT_MUTATIONS = 0)"
+    },
+    {
+      "gate": "SENSOR_BASELINE_EQUIVALENCE",
+      "result": "PASS",
+      "evidence": "Sensor re-run: 2325 PASS / 14 FAIL / 4 SKIPPED with the exact pre-existing failure set; BOOK5_INTRODUCED_SENSOR_FAILURES = 0; CRYPTO_SENSOR_MUTATIONS = 0"
+    }
+  ],
+  "r3_defect_closures": {
+    "R3-D1": "5G derived path references forgeable -> CLOSED (registry-bound compose_path)",
+    "R3-D2": "topology view references forgeable -> CLOSED (registry-bound topology_view)",
+    "R3-D3": "observed_value_display bypasses live validation -> CLOSED (display seal)",
+    "R3-D4": "non-component quantitative inputs lack context closure -> CLOSED (QuantitativeRecordContextBinding + validate_quantitative_record)"
+  },
+  "invariants": [
+    "NO ARBITRARY STRING -> DERIVED 5G AUTHORITY",
+    "NO PATH WITH UNRESOLVED CANONICAL REF",
+    "NO TOPOLOGY WITH UNRESOLVED CANONICAL REF",
+    "NO DISPLAY BYPASS OF LIVE VALIDATION",
+    "NO CONTEXTLESS FLOW AUTHORITY",
+    "NO CONTEXTLESS LIABILITY AUTHORITY",
+    "NO CONTEXTLESS OBSERVED-VALUE AUTHORITY",
+    "NO BINDING != CONTEXT VERIFIED",
+    "NO SECOND EPISTEMIC ENGINE",
+    "5G CANONICAL WRITE COUNT = 0 (by construction)"
+  ],
+  "quality": {
+    "ruff": "PASS full Book 5 (44 source files + tests)",
+    "mypy": "PASS (44 source files)"
+  },
+  "verdict": "BOOK_5_HARDENING_R3 = PASS"
+}

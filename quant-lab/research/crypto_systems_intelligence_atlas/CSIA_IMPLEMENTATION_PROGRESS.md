@@ -1148,3 +1148,67 @@ NEXT = OPERATOR ACCEPTANCE REVIEW OF THE HARDENED BOOK 5 KERNEL (proposed
 gate `PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL`); Book 6
 remains NOT STARTED; LIVE_ACQUISITION_AUTHORITY = FALSE. No R3 without a new
 demonstrated concrete correctness defect.
+
+---
+
+# CHECKPOINT — BOOK 5 HARDENING R3 (2026-09-29)
+
+Directive: BOOK 5 HARDENING R3 — DERIVED-REFERENCE CLOSURE +
+NON-COMPONENT QUANTITATIVE CONTEXT SEAL (narrow; NOT generic hardening).
+
+Trigger (newly demonstrated defects on the R2 kernel): R3-D1 forged
+`compose_path` stage refs yielded `derived=True` paths; R3-D2 forged
+`topology_view` node/edge refs yielded derived topologies; R3-D3
+`observed_value_display` bypassed live validation; R3-D4 non-component
+quantitative records (flow/liability/observed fact) passed 5G validation
+on claim existence alone — quantitative context was never verified.
+
+Seals landed (commit chain `97270f92` → `869be159` → `30bd16e5` →
+`ec2d5334` → `ddce5186` → `25949c64` + this commit):
+
+1. `QuantitativeRecordContextBinding` (typed, evidence-bound, Book 5-local
+   interpretation; record kinds FLOW/LIABILITY/OBSERVED_FACT) with
+   record-kind required dimensions; `bind_quantitative_record_context`
+   mirrors the R2 registration contract; `validate_quantitative_record`
+   enforces NO BINDING != CONTEXT VERIFIED at every non-component 5G
+   boundary.
+2. `Book5CanonicalRecordRegistry` — in-memory deterministic offline
+   resolver (no DB, no graph DB, no second epistemic engine); typed-only
+   registration after Book 2 + context + identity validation; resolution
+   UNKNOWN / DETACHED / WRONG-KIND all REJECT.
+3. `compose_path` / `topology_view` require the registry; every stage /
+   node / edge-flow ref resolves canonically; duplicates REJECT; order
+   preserved; endpoint omissions are explicit Gaps — never fabricated
+   stages or nodes; no economic causality inferred.
+4. `observed_value_display` validates the LIVE fact (typed guard, Book 2
+   refs, quantitative context) before rendering; display-only preserved
+   (OBSERVED_COMMON_VALUE_FACT != CSIA_DERIVED_COMMON_VALUE; valuation
+   stays NOT_AUTHORIZED).
+
+Verification: R3-focused 46/46 PASS (27 reproductions + 16-row model_copy
+matrix P/T/F/L/O + 3 supporting rows); Book1=107, Book2=108, Book3=83,
+Book4=230 unchanged; Book5 159 → 205; Total CSIA 687 → 733. Ruff PASS
+(full Book 5), mypy 44 files clean. Sensor 2325/14/4 with the exact
+pre-existing failure set (Book5-introduced = 0). Freeze vs `a2526e822…`:
+Books 1–4 mutations = 0; Sensor mutations = 0. Matrix:
+`CSIA_BOOK_5_HARDENING_R3_MATRIX.json` (21 gates PASS). Evidence:
+`CSIA_BOOK_5_HARDENING_R3_DERIVED_REFERENCE_CONTEXT_CLOSURE.md`.
+
+R1/R2 preservation: hardening_r1 37/37, hardening_r2 44/44, core 22/22,
+adversarial 31/31, blocs 25/25 (45-row stress traceability and the
+write-count-zero proof intact — the registry registers, it never mints).
+
+Exit state:
+
+```text
+BOOK_5_HARDENING_R3 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (still PROPOSED)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+No R4 without another newly demonstrated concrete correctness defect.
+Next: operator acceptance.
