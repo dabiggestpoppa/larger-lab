@@ -50,6 +50,49 @@ from .worker_contracts import utcnow_iso
 
 DEFAULT_ALLOWED_EXECUTABLES = ("python", "python3")
 
+# The three rlimit-backed RESOURCE boundaries, declared once so the preflight
+# probe and its verdict can never drift apart (B4-CXR7U9R46X2).
+# (rlimit attribute, reported boundary label, unavailability reason,
+#  the envelope field that makes the boundary MANDATORY)
+RLIMIT_BOUNDARIES = (
+    ("RLIMIT_CPU", "cpu", "RLIMIT_CPU unavailable", "cpu_limit"),
+    ("RLIMIT_AS", "memory", "RLIMIT_AS unavailable", "memory_bytes"),
+    ("RLIMIT_FSIZE", "disk", "RLIMIT_FSIZE unavailable", "disk_bytes"),
+)
+
+
+def probe_rlimit_availability(resource_module) -> dict:
+    """Which rlimit boundaries THIS host can actually enforce.
+
+    Probing is a ``getrlimit`` call only; nothing is changed here. A host that
+    refuses one boundary is reported, never silently treated as enforced.
+    """
+    available = {}
+    for attribute, _label, _reason, _mandatory in RLIMIT_BOUNDARIES:
+        try:
+            resource_module.getrlimit(getattr(resource_module, attribute))
+            available[attribute] = True
+        except (OSError, ValueError):
+            available[attribute] = False
+    return available
+
+
+def record_rlimit_verdicts(enforced, unavailable, mandatory_missing, envelope,
+                           available) -> None:
+    """Apply the probed verdicts to the preflight report, in one place.
+
+    A boundary this host can enforce is reported as enforced; one it cannot is
+    reported unavailable AND becomes MANDATORY-missing when the envelope
+    actually asked for it, so strict mode blocks before any job code runs.
+    """
+    for attribute, label, reason, mandatory_field in RLIMIT_BOUNDARIES:
+        if available.get(attribute):
+            enforced.append(label)
+            continue
+        unavailable[label] = reason
+        if getattr(envelope, mandatory_field, 0) > 0:
+            mandatory_missing.append(label)
+
 
 @dataclass(frozen=True)
 class SandboxPolicy:
@@ -301,43 +344,9 @@ class BoundedRunner:
         mandatory_missing: list[str] = []
         if self.resource_limits_available:
             import resource as _res
-            ok_cpu = False
-            ok_mem = False
-            ok_fsize = False
-            try:
-                _res.getrlimit(_res.RLIMIT_CPU)
-                ok_cpu = True
-            except (OSError, ValueError):
-                pass
-            try:
-                _res.getrlimit(_res.RLIMIT_AS)
-                ok_mem = True
-            except (OSError, ValueError):
-                pass
-            try:
-                _res.getrlimit(_res.RLIMIT_FSIZE)
-                ok_fsize = True
-            except (OSError, ValueError):
-                pass
             # disk bytes enforced via RLIMIT_FSIZE (bounded output/disk)
-            if ok_cpu:
-                enforced.append("cpu")
-            else:
-                unavailable["cpu"] = "RLIMIT_CPU unavailable"
-                if envelope.cpu_limit > 0:
-                    mandatory_missing.append("cpu")
-            if ok_mem:
-                enforced.append("memory")
-            else:
-                unavailable["memory"] = "RLIMIT_AS unavailable"
-                if envelope.memory_bytes > 0:
-                    mandatory_missing.append("memory")
-            if ok_fsize:
-                enforced.append("disk")
-            else:
-                unavailable["disk"] = "RLIMIT_FSIZE unavailable"
-                if envelope.disk_bytes > 0:
-                    mandatory_missing.append("disk")
+            record_rlimit_verdicts(enforced, unavailable, mandatory_missing,
+                                   envelope, probe_rlimit_availability(_res))
         else:
             unavailable["memory"] = (
                 "rlimit unavailable on this platform; applied strongest local "
