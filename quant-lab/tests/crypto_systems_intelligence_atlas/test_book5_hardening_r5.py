@@ -64,6 +64,7 @@ from crypto_systems_intelligence_atlas.book5_support import (
 )
 from crypto_systems_intelligence_atlas.book5_synthesis import CapitalFieldSynthesis
 from crypto_systems_intelligence_atlas.claims import ClaimState, same_proposition
+from crypto_systems_intelligence_atlas.evidence import EvidenceTier
 from crypto_systems_intelligence_atlas.promotion import ClaimStateEngine
 from crypto_systems_intelligence_atlas.sources import (
     AccessMethod,
@@ -206,6 +207,7 @@ def _restore_corroborated(provenance: Book5Provenance, claim_id: str) -> None:
         raw_snapshot_ref=f"snapshot://book5/{claim_id}-corroboration",
         extractor_version="test",
         parser_version="test",
+        evidence_tier=EvidenceTier.FIRST_PARTY_DOC,
     ).evidence_id
     corroborating_id = f"{claim_id}-corroborating"
     corroborating = provenance.claim_store.require(claim_id).model_copy(
@@ -557,3 +559,339 @@ def test_q4_flow_subject_current_basis_current_passes() -> None:
         observed_at=T1,
     )
     assert snapshot.input_record_refs == ("flow:q4",)
+
+# ---------------------------------------------------------------------------
+# Phase 6 — multi-basis weakest-link poisoning (M family)
+# ---------------------------------------------------------------------------
+
+
+def test_m1_component_second_basis_stale_rejects() -> None:
+    """M1: three-basis ClaimContextBinding, second basis STALE -> the binding
+    is only as current as its weakest required basis claim -> REJECT."""
+
+    provenance, subject, basis = _component_kernel("m1", basis_claims=3)
+    _decay(provenance, basis[1], ClaimState.STALE)
+    vectors = component_set(component(claim_ref=subject))
+    with pytest.raises(Book5ProvenanceError):
+        vectors.aggregate_same_unit("ETH", provenance=provenance)
+
+
+def test_m2_component_third_basis_superseded_rejects() -> None:
+    """M2: third basis SUPERSEDED (replacement current in store) -> the
+    binding still references the superseded claim -> REJECT."""
+
+    provenance, subject, basis = _component_kernel("m2", basis_claims=3)
+    _decay(provenance, basis[2], ClaimState.SUPERSEDED)
+    vectors = component_set(component(claim_ref=subject))
+    with pytest.raises(Book5ProvenanceError):
+        vectors.aggregate_same_unit("ETH", provenance=provenance)
+
+
+def test_m3_component_all_basis_current_passes() -> None:
+    """M3: all three basis claims current -> PASS."""
+
+    provenance, subject, _ = _component_kernel("m3", basis_claims=3)
+    vectors = component_set(component(claim_ref=subject))
+    assert vectors.aggregate_same_unit("ETH", provenance=provenance) == "3"
+
+
+def test_mq1_quantitative_second_basis_stale_rejects() -> None:
+    """MQ1 (independent family check): three-basis
+    QuantitativeRecordContextBinding, second basis STALE -> REJECT."""
+
+    provenance, subject, basis = _flow_kernel_with_basis("mq1", basis_claims=3)
+    _decay(provenance, basis[1], ClaimState.STALE)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:mq1",
+            flows=(_make_flow("flow:mq1", claim_ref=subject),),
+            valid_time=T0,
+            observed_at=T1,
+        )
+
+
+def test_mq2_quantitative_all_basis_current_passes() -> None:
+    """MQ2: all three basis claims current -> PASS."""
+
+    provenance, subject, _ = _flow_kernel_with_basis("mq2", basis_claims=3)
+    synthesis = CapitalFieldSynthesis(provenance)
+    snapshot = synthesis.compose_snapshot(
+        "snap:mq2",
+        flows=(_make_flow("flow:mq2", claim_ref=subject),),
+        valid_time=T0,
+        observed_at=T1,
+    )
+    assert snapshot.input_record_refs == ("flow:mq2",)
+
+
+# ---------------------------------------------------------------------------
+# Phase 1/2 restoration — the seal mirrors live state, it is not a tombstone
+# ---------------------------------------------------------------------------
+
+
+def test_a6_component_basis_stale_then_restored_observed_passes() -> None:
+    """A6: basis STALE -> REJECT; legally restored to OBSERVED -> the SAME
+    binding authorizes again (VALID NOW, not a remembered rejection)."""
+
+    provenance, subject, (basis,) = _component_kernel("a6")
+    _decay(provenance, basis, ClaimState.STALE)
+    vectors = component_set(component(claim_ref=subject))
+    with pytest.raises(Book5ProvenanceError):
+        vectors.aggregate_same_unit("ETH", provenance=provenance)
+    _transition_claim(provenance, basis, ClaimState.OBSERVED, at=T1)
+    assert vectors.aggregate_same_unit("ETH", provenance=provenance) == "3"
+
+
+def test_a7_component_basis_contested_then_corroborated_passes() -> None:
+    """A7: basis CONTESTED -> REJECT; legally CORROBORATED through the
+    accepted Book 2 P-4 route -> authority restored."""
+
+    provenance, subject, (basis,) = _component_kernel("a7")
+    _transition_claim(provenance, basis, ClaimState.CONTESTED)
+    vectors = component_set(component(claim_ref=subject))
+    with pytest.raises(Book5ProvenanceError):
+        vectors.aggregate_same_unit("ETH", provenance=provenance)
+    _restore_corroborated(provenance, basis)
+    assert vectors.aggregate_same_unit("ETH", provenance=provenance) == "3"
+
+
+def test_b5_fact_basis_current_display_passes() -> None:
+    """B5: OBSERVED_FACT basis current -> display PASS (the seal never
+    blocks live authority)."""
+
+    provenance, subject, (basis,) = _fact_kernel_with_basis("b5")
+    synthesis = CapitalFieldSynthesis(provenance)
+    payload = synthesis.observed_value_display(
+        _make_fact("fact:b5", claim_ref=subject)
+    )
+    assert payload["display"] == "OBSERVED_COMMON_VALUE_FACT"
+
+
+def test_b6_fact_basis_stale_then_restored_display_passes() -> None:
+    """B6: basis STALE -> display REJECT; restored OBSERVED -> display
+    PASS."""
+
+    provenance, subject, (basis,) = _fact_kernel_with_basis("b6")
+    _decay(provenance, basis, ClaimState.STALE)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.observed_value_display(_make_fact("fact:b6", claim_ref=subject))
+    _transition_claim(provenance, basis, ClaimState.OBSERVED, at=T1)
+    payload = synthesis.observed_value_display(
+        _make_fact("fact:b6", claim_ref=subject)
+    )
+    assert payload["display"] == "OBSERVED_COMMON_VALUE_FACT"
+
+
+def test_f2_flow_basis_restored_compose_passes() -> None:
+    """F2: FLOW basis STALE -> REJECT; restored -> compose PASS."""
+
+    provenance, subject, (basis,) = _flow_kernel_with_basis("f2")
+    _decay(provenance, basis, ClaimState.STALE)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:f2",
+            flows=(_make_flow("flow:f2", claim_ref=subject),),
+            valid_time=T0,
+            observed_at=T1,
+        )
+    _transition_claim(provenance, basis, ClaimState.OBSERVED, at=T1)
+    snapshot = synthesis.compose_snapshot(
+        "snap:f2-restored",
+        flows=(_make_flow("flow:f2", claim_ref=subject),),
+        valid_time=T0,
+        observed_at=T1,
+    )
+    assert snapshot.input_record_refs == ("flow:f2",)
+
+
+def test_l2_liability_basis_restored_compose_passes() -> None:
+    """L2: LIABILITY basis STALE -> REJECT; restored -> compose PASS."""
+
+    provenance, subject, (basis,) = _liability_kernel_with_basis("l2")
+    _decay(provenance, basis, ClaimState.STALE)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:l2",
+            liabilities=(_make_liability("liability:l2", claim_ref=subject),),
+            valid_time=T0,
+            observed_at=T1,
+        )
+    _transition_claim(provenance, basis, ClaimState.OBSERVED, at=T1)
+    snapshot = synthesis.compose_snapshot(
+        "snap:l2-restored",
+        liabilities=(_make_liability("liability:l2", claim_ref=subject),),
+        valid_time=T0,
+        observed_at=T1,
+    )
+    assert snapshot.liability_refs == ("liability:l2",)
+
+
+# ---------------------------------------------------------------------------
+# Phase 7 — superseded basis: NO AUTO-FOLLOW (D family)
+# ---------------------------------------------------------------------------
+
+
+def test_d1_superseded_basis_no_auto_follow_to_replacement() -> None:
+    """D1: basis B SUPERSEDED by B2 (B2 current in the store) — the frozen
+    binding still references B, so authority stays REJECTED: context
+    interpretation is an explicit recorded binding, not fuzzy lineage."""
+
+    provenance, subject, (basis,) = _component_kernel("d1")
+    replacement = _supersede(provenance, basis)
+    assert (
+        provenance.claim_store.require(replacement).claim_state
+        is ClaimState.OBSERVED
+    )
+    vectors = component_set(component(claim_ref=subject))
+    with pytest.raises(Book5ProvenanceError):
+        vectors.aggregate_same_unit("ETH", provenance=provenance)
+
+
+def test_d2_binding_rebind_for_same_subject_is_refused() -> None:
+    """D2: recovery is NEVER a silent rebinding — bindings are
+    registration-time facts; re-registering a binding for the same subject
+    claim is refused (immutability is the anti-forgery property)."""
+
+    provenance, subject, (basis,) = _component_kernel("d2")
+    _supersede(provenance, basis)
+    with pytest.raises(Book5ProvenanceError):
+        provenance.bind_claim_context(
+            ClaimContextBinding(
+                claim_id=subject,
+                basis_claim_refs=(f"{basis}-replacement",),
+                asset_ref="csia:token:eth",
+                unit="ETH",
+            )
+        )
+
+
+def test_d3_new_explicit_binding_over_replacement_authorizes() -> None:
+    """D3: the ratified recovery path is a NEW subject claim with a NEW
+    explicit binding over the replacement basis — explicit, not auto."""
+
+    provenance, subject, (basis,) = _component_kernel("d3")
+    replacement = _supersede(provenance, basis)
+    new_subject = _register_economics_claim(
+        provenance, "d3-subject-2", qualifier="PRINCIPAL_EXACT_FACT"
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(
+            claim_id=new_subject,
+            basis_claim_refs=(replacement,),
+            asset_ref="csia:token:eth",
+            unit="ETH",
+        )
+    )
+    vectors = component_set(component(claim_ref=new_subject))
+    assert vectors.aggregate_same_unit("ETH", provenance=provenance) == "3"
+
+
+# ---------------------------------------------------------------------------
+# Phase 10 — registry current resolution inherits the binding-basis seal
+# (S family: registry currentness -> record currentness -> binding
+# currentness -> binding basis currentness)
+# ---------------------------------------------------------------------------
+
+
+def _make_position(position_id: str, *, claim_ref: str) -> object:
+    from crypto_systems_intelligence_atlas.book5_records import (
+        CapitalPosition,
+        PositionKind,
+    )
+
+    return CapitalPosition(
+        position_id=position_id,
+        position_kind=PositionKind.CLAIM_SIDE,
+        asset_ref="csia:token:lp",
+        principal_components=component_set(component(claim_ref=claim_ref)),
+        holder_ref=None,
+        protocol_ref="csia:protocol:amm",
+        site_ref="csia:site:pool-1",
+        location=EconomicLocation(
+            location_type=LocationType.POOL, ref="loc:1"
+        ),
+        quantity="1",
+        unit="LP",
+        valid_from=T0,
+        observed_at=T0,
+        book2_claim_refs=(claim_ref,),
+    )
+
+
+def test_s1_registry_position_nested_basis_decay_rejects() -> None:
+    """S1: position registered while subject AND basis are current; the
+    basis decays; ``registry.resolve`` of the POSITION must REJECT through
+    the nested component's ClaimContextBinding (today it PASSES)."""
+
+    from crypto_systems_intelligence_atlas.book5_registry import (
+        Book5CanonicalRecordRegistry,
+    )
+
+    provenance, subject, (basis,) = _component_kernel("s1")
+    position = _make_position("pos:s1", claim_ref=subject)
+    registry = Book5CanonicalRecordRegistry()
+    registry.register(position, provenance=provenance)
+    _decay(provenance, basis, ClaimState.STALE)
+    with pytest.raises(Book5ProvenanceError):
+        registry.resolve(
+            position.position_id, expected_kind="position", provenance=provenance
+        )
+
+
+def test_s2_registry_flow_binding_basis_decay_rejects() -> None:
+    """S2: flow registered; its QuantitativeRecordContextBinding basis
+    decays; ``registry.resolve`` REJECTS (today it PASSES)."""
+
+    from crypto_systems_intelligence_atlas.book5_registry import (
+        Book5CanonicalRecordRegistry,
+    )
+
+    provenance, subject, (basis,) = _flow_kernel_with_basis("s2")
+    flow = _make_flow("flow:s2", claim_ref=subject)
+    registry = Book5CanonicalRecordRegistry()
+    registry.register(flow, provenance=provenance)
+    _decay(provenance, basis, ClaimState.STALE)
+    with pytest.raises(Book5ProvenanceError):
+        registry.resolve(flow.flow_id, expected_kind="flow", provenance=provenance)
+
+
+def test_s3_registry_liability_binding_basis_decay_rejects() -> None:
+    """S3: LIABILITY registry current resolution fails on binding-basis
+    decay."""
+
+    from crypto_systems_intelligence_atlas.book5_registry import (
+        Book5CanonicalRecordRegistry,
+    )
+
+    provenance, subject, (basis,) = _liability_kernel_with_basis("s3")
+    liability = _make_liability("liability:s3", claim_ref=subject)
+    registry = Book5CanonicalRecordRegistry()
+    registry.register(liability, provenance=provenance)
+    _decay(provenance, basis, ClaimState.STALE)
+    with pytest.raises(Book5ProvenanceError):
+        registry.resolve(
+            liability.liability_id, expected_kind="liability", provenance=provenance
+        )
+
+
+def test_s4_registry_fact_binding_basis_decay_rejects() -> None:
+    """S4: OBSERVED_FACT registry current resolution fails on binding-basis
+    decay."""
+
+    from crypto_systems_intelligence_atlas.book5_registry import (
+        Book5CanonicalRecordRegistry,
+    )
+
+    provenance, subject, (basis,) = _fact_kernel_with_basis("s4")
+    fact = _make_fact("fact:s4", claim_ref=subject)
+    registry = Book5CanonicalRecordRegistry()
+    registry.register(fact, provenance=provenance)
+    _decay(provenance, basis, ClaimState.STALE)
+    with pytest.raises(Book5ProvenanceError):
+        registry.resolve(
+            fact.fact_id, expected_kind="observed_fact", provenance=provenance
+        )
