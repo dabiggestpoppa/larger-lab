@@ -3178,3 +3178,74 @@ research                                             = FROZEN
 ```
 
 No self-ratification. I14 not started.
+
+## SENSOR-B4-I13R3-RATIFY — OPERATOR ACCEPTANCE OF THE COMPLETE EXPORT/RESTORE CHAIN; G4-11 PASSED; I14 AUTHORIZED (I14 ONLY)
+
+The operator accepted the complete I13 -> I13R1 -> I13R2 -> I13R3 lineage at
+ratification head 5d4985cc7f6f1cfe5a1c9d63ca6b8dd975d193c0 (ancestry from the
+I12 ratification 5cf64e7b6 verified strict; no rewritten history). Acceptance
+record: `evidence/bloc_04/BLOC_04_I13_CHAIN_OPERATOR_RATIFICATION.md`.
+Production diff at ratification: ZERO. The only new code is the narrow
+ratification microcheck `tests/crypto_sensor_fabric/storage/
+test_i13_ratify_boundary.py` (5 tests): export into NONEXISTENT children
+beneath every protected source family (T0A blob/catalog, T0B
+payload/projection/context/lineage/schema catalogs, revision registry)
+refuses ExportDestinationUnsafe — NOT ExportPackExists — proving the
+containment comparison fires independently of pre-existing-directory
+refusal; construction refuses ExportSourceBoundaryUnproven for a wired
+dependency that cannot prove its root; protected_source_roots is proven an
+EXTENSION ONLY (explicit roots add protection; derived T0A/T0B/revision
+boundaries cannot be disabled; external destinations still export).
+
+Verification highlights (full detail in the acceptance record): published
+DuckDB identity parity remains nonvacuous (v_t0_blobs 2/2, acquisitions
+2/2, partitions 2/2, revisions 2/2, projections 1/1, literal identity-set
+equality SOURCE(filtered)==PACK_EXPECTED==RESTORED); T0B artifact/context/
+lineage/schema 1/1 each with literal digest equality; three-way projection
+payload SHA recomputed = 5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d
+5112548fec251daa via public open_payload()/verify_physical() only; T0B
+query-result digests equal (0f53d9ba...); versioned manifest v1->v2 replay
+proven (predecessor REQUIRED_SUPPORT, (partition_key, manifest_version)
+order, previous-identity CAS expectation, T0B replayed before the v2
+referential gate); revision dual-layout divergence refuses
+DuckDBCatalogCorrupt; SUCCESS_PARITY 7 policies + REFUSAL_PARITY 3 rows;
+acquired_before/observed_before parity 4/4; bounded closure pack ==
+restored == expected with true_leakage_count = 0 and idempotent fixpoint
+(iterations 2 == 2); seal greps 0/0/0; atomicity and source independence
+carried by accepted I13/I13R1 evidence; external_ci = NONE_OBSERVED.
+
+Regression: full project `uv run -m pytest tests/ -q` after the
+ratification test = 3055 passed, 28 skipped (pre-existing), 0 failures
+(pre-ratification baseline 3050 + 5 new; first run surfaced the expected
+I11R2 audit drift, mechanically republished 981 -> 983 python files
+scanned — this also corrects a stale-by-one count left by the I13R3D
+republish, which ran before its test module was committed; no manual count
+edits). Focused: I13R3 + I13R2 + I13 + I13R1 + ratification microcheck =
+42 passed, 2 pre-existing skips. Ruff clean on changed scope; compileall
+OK; mypy 0 new findings (10 pre-existing providers/ baseline). Historical
+I13/I13R1/I13R2/I13R3 evidence untouched by this run; CRLF-only churn in
+old I03R1/I04 evidence remains unstaged (out of session scope).
+
+```
+SENSOR-B4-I13R3-RATIFY
+PASS_SENSOR_B4_I13_EXPORT_BACKUP_RESTORE_SEALED      = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I13R1_PUBLIC_AUTHORITY_ATOMIC_CLOSURE_SEALED = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I13R2_EVIDENCE_FIDELITY_RESOURCE_SEALED = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I13R3_NONVACUOUS_PARITY_BOUNDARY_SEALED = OPERATOR_ACCEPTED
+G4-11_EXPORT_RESTORE_GATE                            = PASS
+next_checkpoint_authorized                           = TRUE
+next_checkpoint                                      = SENSOR-B4-I14 BLOC 3 INTEGRATION
+authorized_scope                                     = I14 ONLY
+I15+                                                 = UNAUTHORIZED
+G4-12_BLOC3_HANDOFF_GATE                             = NOT_YET_IMPLEMENTED / PENDING_I14
+research                                             = FROZEN
+```
+
+I14 frozen contract recorded (NOT implemented in this run): wire production
+Bloc 3 adapter outputs (FetchBatch, RawPayloadEnvelope) into the accepted
+Bloc 4 storage writer; RESUME CHECKPOINT MUST NEVER ADVANCE BEFORE DURABLE
+MANIFEST COMMIT; restart-safe across all seven crash windows; no cursor
+skip, no silent event loss, no false checkpoint progress; I14 earns G4-12.
+I14 authorization does NOT authorize I15/I16/I17, research restart, provider
+redesign, or new storage/query/export semantics. STOP after this
+ratification; DO NOT START I14 in this run.
