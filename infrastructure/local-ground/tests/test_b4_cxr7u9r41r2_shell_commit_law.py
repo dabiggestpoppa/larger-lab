@@ -70,11 +70,17 @@ def test_postcommit_states_classify_three(tmp_path):
         assert _classify(record, tmp_path) == 3, state
 
 
-def test_terminal_states_classify_zero(tmp_path):
-    """ROLLED_BACK/FAILED are not rollback targets; the shell must treat them
-    as nothing left to restore rather than as an error."""
+def test_terminal_states_fail_closed_without_their_exact_selector(tmp_path):
+    """B4-CXR7U9R46R4: terminal and failed states are NEVER labelled fresh
+    authority. ROLLED_BACK keeps an idempotent verification path (6) only
+    with its EXACT rollback selector bound to the supplied promote receipt;
+    a bare terminal/failed record with no selector is unknowable authority
+    and fails closed (4). Nothing is left to restore either way: a 4 blocks
+    artifact-only rollback just as decisively as the old 0 did, and now the
+    shell classification agrees with the executable phase that refuses the
+    same authority."""
     for state in TERMINAL_STATES:
-        assert _classify({"state": state}, tmp_path) == 0, state
+        assert _classify({"state": state}, tmp_path) == 4, state
 
 
 def test_impossible_finalizing_commit_marker_fails_closed(tmp_path):

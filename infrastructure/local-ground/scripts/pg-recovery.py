@@ -1400,7 +1400,7 @@ def _load_claim(operation_id, transition_dir=None):
 
 
 def _valid_transition_claim(operation_id, transition, promote,
-                            transition_dir=None):
+                            transition_dir=None, snapshot=None):
     """EXACT binding of the canonical selector to this transition and THIS
     promote receipt (B4-CXR7U9R45R1). One semantic law, shared by the shell
     classifier, reconciliation and every resume path: the claim must pass its
@@ -1416,7 +1416,8 @@ def _valid_transition_claim(operation_id, transition, promote,
         return False
     expected = _receipt_digest(promote)
     try:
-        snapshot = _read_selector_snapshot(operation_id, transition_dir)
+        if snapshot is None:
+            snapshot = _read_selector_snapshot(operation_id, transition_dir)
         state = _classify_claim_content(operation_id, snapshot,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
@@ -1472,7 +1473,7 @@ def _receiptless_selector_agrees(operation_id, transition,
 
 
 def _selector_agrees_with_finalizing(operation_id, promote,
-                                     transition_dir=None):
+                                     transition_dir=None, snapshot=None):
     """ONE state/selector agreement law for FINALIZING (B4-CXR7U9R45R3,
     binding corrected B4-CXR7U9R46R3).
 
@@ -1497,7 +1498,8 @@ def _selector_agrees_with_finalizing(operation_id, promote,
             expected = record.get("receipt_sha256")
             if not isinstance(expected, str) or not SHA256_RE.match(expected):
                 return False
-        snapshot = _read_selector_snapshot(operation_id, transition_dir)
+        if snapshot is None:
+            snapshot = _read_selector_snapshot(operation_id, transition_dir)
         if not snapshot.present:
             return False
         state = _classify_claim_content(operation_id, snapshot,
@@ -3178,15 +3180,22 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     expected_digest = _receipt_digest(promote)
     state = record.get("state")
     receipt["durable_state"] = state
-    # ONE BRANCH-SELECTION LAW (B4-CXR7U9R44R1, bound in B4-CXR7U9R45R1): the
-    # durable selector name decides whether the one-time authority is spent,
-    # and a claim bound to different authority is NEVER reported as fresh.
-    # Any canonical claim that is not exactly bound to THIS promote receipt is
-    # a deterministic fail-closed verdict, never repaired by guessing.
-    claim_state = _claim_state(operation_id,
-                               expected_receipt_sha256=expected_digest)
-    receipt["claim_state"] = claim_state
-    if claim_state == "malformed":
+    # ONE BRANCH-SELECTION LAW (B4-CXR7U9R44R1, bound in B4-CXR7U9R45R1,
+    # ONE-snapshot-per-decision in B4-CXR7U9R46R2/R4): the ENTIRE reconcile
+    # decision -- existence, coordinate admission, structural validity,
+    # receipt binding, selected branch, state/selector agreement and the
+    # verdict itself -- is derived from ONE FD-bound selector snapshot. No
+    # consumer re-opens the coordinate to fetch the branch after classifying
+    # its binding.
+    try:
+        snapshot = _read_selector_snapshot(operation_id)
+        selector_state = _classify_claim_content(
+            operation_id, snapshot, expected_receipt_sha256=expected_digest)
+    except _ExecutionAuthorityConflict:
+        snapshot = None
+        selector_state = "malformed"
+    receipt["claim_state"] = selector_state
+    if selector_state == "malformed":
         receipt["verdict"] = "unreconciled"
         receipt["error"] = (
             "durable transition claim exists but is not a complete, "
@@ -3195,7 +3204,7 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         receipt["finished_at"] = now_iso()
         receipt["exit_status"] = 1
         return receipt
-    if claim_state == "unbound_or_mismatched":
+    if selector_state == "unbound_or_mismatched":
         receipt["verdict"] = "unreconciled"
         receipt["error"] = (
             "durable transition claim exists and is bound to different or "
@@ -3256,11 +3265,13 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_FINALIZING:
-        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3): the same
-        # state/selector agreement the shell classifier enforces. A FINALIZING
-        # record whose claim is wrong-branched or foreign-bound is
-        # unreconciled, never a governed abort.
-        if not _selector_agrees_with_finalizing(operation_id, promote):
+        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3, corrected
+        # B4-CXR7U9R46R3/R4): the same state/selector agreement the shell
+        # classifier enforces, decided from the SAME admitted snapshot. A
+        # FINALIZING record whose claim is missing, wrong-branched or
+        # foreign-bound is unreconciled, never a governed abort.
+        if not _selector_agrees_with_finalizing(operation_id, promote,
+                                                snapshot=snapshot):
             verdict = "unreconciled"
         elif observation["quarantine_present"] is True \
                 and observation["canonical_matches_inventory"] is True:
@@ -3269,7 +3280,8 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_ROLLING_BACK:
         valid_claim = record.get("selected_transition") == "rollback" \
-            and _valid_transition_claim(operation_id, "rollback", promote) \
+            and _valid_transition_claim(operation_id, "rollback", promote,
+                                        snapshot=snapshot) \
             and record.get("commit_intent") is None \
             and record.get("commit_point") is None
         catalog_state = _rollback_catalog_state(
@@ -3285,15 +3297,18 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         else:
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_PROMOTED:
-        if _valid_transition_claim(operation_id, "finalize", promote):
+        if _valid_transition_claim(operation_id, "finalize", promote,
+                                   snapshot=snapshot):
             verdict = "preintent_abort_required"
-        elif _valid_transition_claim(operation_id, "rollback", promote):
+        elif _valid_transition_claim(operation_id, "rollback", promote,
+                                     snapshot=snapshot):
             verdict = "resume_rollback_required"
         else:
             verdict = "fresh_rollback_available"
     elif state == "ROLLED_BACK":
         valid_claim = record.get("selected_transition") == "rollback" \
-            and _valid_transition_claim(operation_id, "rollback", promote)
+            and _valid_transition_claim(operation_id, "rollback", promote,
+                                        snapshot=snapshot)
         catalog_state = _rollback_catalog_state(
             container, user, db, quarantine, record.get("staging_database"))
         observation["rollback_catalog_state"] = catalog_state
@@ -3351,12 +3366,12 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
     if state == TRANSITION_STATE_FINALIZING:
         if record.get("commit_intent") is not None or record.get("commit_point") is not None:
             return 4
-        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3): a FINALIZING
-        # record names a durably selected finalize branch. A canonical claim
-        # that exists but is not EXACTLY bound to that finalize branch means
-        # the state and the selector DISAGREE: fail closed, never re-describe
-        # the spent selector as governed abort authority. A crash that lost
-        # the claim BEFORE the state advance keeps its governed abort (5).
+        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3, corrected
+        # B4-CXR7U9R46R3/R4): a FINALIZING record names a durably selected
+        # finalize branch. A canonical claim that is missing or is not
+        # EXACTLY bound to that finalize branch means the state and the
+        # selector DISAGREE: fail closed, never re-describe the spent or
+        # missing selector as governed abort authority.
         if not _selector_agrees_with_finalizing(operation_id, promote,
                                                 transition_dir):
             return 4
@@ -3364,21 +3379,44 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
             return 5
         return 4
     if state in ("CREATED", "STAGED"):
+        # B4-CXR7U9R46R4: a pre-promotion record offers no transition
+        # authority at all. With no promote receipt there is no exact binding
+        # to prove, so a canonical claim present at that coordinate is an
+        # impossible state/selector disagreement and fails closed. The
+        # documented pre-promotion disposition (0) exists ONLY for the
+        # absent-selector shape the engine itself produces.
+        if promote is None and isinstance(operation_id, str) \
+                and OPERATION_ID_RE.match(operation_id):
+            try:
+                if _claim_state(operation_id, transition_dir) != "absent":
+                    return 4
+            except _ExecutionAuthorityConflict:
+                return 4
         return 0
     if state == TRANSITION_STATE_PROMOTED:
-        if promote is not None and isinstance(operation_id, str):
+        # B4-CXR7U9R46R4: ONE admitted snapshot decides the whole PROMOTED
+        # verdict -- existence, coordinate admission, binding, branch and
+        # freshness. No consumer re-reads the coordinate between classifying
+        # its binding and selecting the branch.
+        if promote is not None and isinstance(operation_id, str) \
+                and OPERATION_ID_RE.match(operation_id):
+            try:
+                snap = _read_selector_snapshot(operation_id, transition_dir)
+            except _ExecutionAuthorityConflict:
+                return 4
             if _valid_transition_claim(operation_id, "rollback", promote,
-                                       transition_dir=transition_dir):
+                                       transition_dir=transition_dir,
+                                       snapshot=snap):
                 return 6
             if _valid_transition_claim(operation_id, "finalize", promote,
-                                       transition_dir=transition_dir):
+                                       transition_dir=transition_dir,
+                                       snapshot=snap):
                 return 5
-            # Defense in depth (and TOCTOU guard): if any canonical claim
-            # somehow survived both exact-binding checks above without being
-            # consumable, it is still never fresh.
-            if _claim_state(operation_id, transition_dir,
-                            expected_receipt_sha256=_receipt_digest(promote)) \
-                    != "absent":
+            # Defense in depth: if the admitted snapshot is not exactly
+            # consumable, the selector is spent -- never fresh.
+            if _classify_claim_content(
+                    operation_id, snap,
+                    expected_receipt_sha256=_receipt_digest(promote)) != "absent":
                 return 4
         elif isinstance(operation_id, str) \
                 and OPERATION_ID_RE.match(operation_id) \
@@ -3401,13 +3439,22 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
             return 4
         return 6
     if state == "ROLLED_BACK":
-        if promote is not None and isinstance(operation_id, str) \
-                and _valid_transition_claim(operation_id, "rollback", promote,
-                                            transition_dir=transition_dir):
-            return 6
-        return 0
+        # B4-CXR7U9R46R4: the terminal catalog truth is verified idempotently
+        # and is NEVER labelled fresh authority. Without the exact rollback
+        # selector bound to the supplied promote receipt, the terminal state
+        # is unknowable and fails closed; code 6 is an idempotent RESUME
+        # verification, not a fresh grant.
+        if promote is None or not isinstance(operation_id, str):
+            return 4
+        if not _valid_transition_claim(operation_id, "rollback", promote,
+                                       transition_dir=transition_dir):
+            return 4
+        return 6
     if state == "FAILED":
-        return 4 if promote is not None else 0
+        # B4-CXR7U9R46R4: a failed operation is ALWAYS fail-closed, with or
+        # without a receipt. Fresh transition authority is never returned
+        # merely because no receipt object was passed.
+        return 4
     if state == TRANSITION_STATE_COMMIT_INTENT:
         intent = record.get("commit_intent")
         if not isinstance(intent, dict) or intent.get("marker") != "forward_commit":
