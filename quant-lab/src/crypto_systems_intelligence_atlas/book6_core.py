@@ -29,7 +29,7 @@ from .book6_normalization import (
     validate_native_lineage,
 )
 from .book6_provenance import Book6Provenance
-from .book6_registry import Book6MeasurementRegistry
+from .book6_registry import Book6MeasurementRegistry, Book6RegistryError
 from .book6_states import (
     FundamentalStateVector,
     StateClass,
@@ -182,7 +182,13 @@ class Book6MeasurementEngine:
                 f"authorized: {exc}"
             ) from exc
         for native_ref in registered.input_measurement_refs:
-            self.registry.resolve_current(native_ref)
+            try:
+                self.registry.resolve_current(native_ref)
+            except Book6RegistryError as exc:
+                raise Book6EngineError(
+                    f"normalized product {product.normalized_measurement_id} cites "
+                    f"native input {native_ref} with no current authority: {exc}"
+                ) from exc
         return product
 
     # -- comparability gate ---------------------------------------------------
