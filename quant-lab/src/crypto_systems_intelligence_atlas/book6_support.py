@@ -169,6 +169,34 @@ def build_engine(
     return engine, claim_store, evidence_store, service
 
 
+def decay_claim(
+    service: ClaimService,
+    claim_store: ClaimStore,
+    claim_id: str,
+    new_state: str,
+    *,
+    at: datetime = T2,
+) -> object:
+    """Transition a claim through the ACCEPTED Book 2 machinery to a new state.
+
+    Book 6 never mutates epistemic state itself. A claim decays because Book 2's
+    ``ClaimStateEngine`` moved it, with triggering evidence, through the
+    ratified transition table — and Book 6's job is only to notice that the
+    authority it cited is no longer current.
+    """
+
+    from crypto_systems_intelligence_atlas.claims import ClaimState
+    from crypto_systems_intelligence_atlas.promotion import ClaimStateEngine
+
+    claim = claim_store.require(claim_id)
+    return ClaimStateEngine(service).transition(
+        claim_id,
+        ClaimState(new_state),
+        triggering_evidence_refs=claim.evidence_refs,
+        transitioned_at=at,
+    )
+
+
 def build_engine_with_definitions(
     *definitions: MetricDefinition,
     claim_ids: tuple[str, ...] = ("fixture:claim:measurement",),
@@ -347,6 +375,7 @@ __all__ = [
     "build_stores",
     "capture_evidence",
     "coverage",
+    "decay_claim",
     "definition",
     "make_claim",
     "MEASUREMENT_QUALIFIER",
