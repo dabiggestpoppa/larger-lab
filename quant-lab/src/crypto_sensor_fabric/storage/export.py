@@ -40,6 +40,7 @@ from .models import (
     EvidenceBlob,
     ExportManifest,
     ExportObjectRecord,
+    PartitionManifest,
     RawEvidenceQuery,
     RawEvidenceResult,
     canonical_json_bytes,
@@ -48,6 +49,27 @@ from .query import RawEvidenceQueryService
 
 PACK_SCHEMA_VERSION = "1"
 PACK_MANIFEST_NAME = "export_manifest.json"
+
+
+@dataclass(frozen=True)
+class EvidenceClosure:
+    """I13R2 formal evidence closure (debug/test structure only, §18/§19:
+    NOT a pack schema field).  QUERY_SELECTED = roots explicitly present
+    in RawEvidenceResult rows; REQUIRED_SUPPORT = transitive structural
+    dependencies (manifest refs, identity-domain acquisitions, revision
+    prefix chain); trace = ordered fixpoint additions with causal
+    reasons; iterations = fixpoint sweeps until stability."""
+
+    blob_shas: frozenset[str]
+    acquisition_ids: frozenset[str]
+    projection_ids: frozenset[str]
+    matched_manifests: tuple[PartitionManifest, ...]
+    query_selected_blob_shas: frozenset[str]
+    query_selected_acquisition_ids: frozenset[str]
+    support_blob_shas: frozenset[str]
+    support_acquisition_ids: frozenset[str]
+    trace: tuple[dict[str, str], ...]
+    iterations: int
 QUERY_SPEC_NAME = "query.json"
 STAGING_DIR_NAME = ".staging-export"
 
@@ -74,6 +96,9 @@ DEFAULT_MAX_OBJECT_BYTES = 1 << 33
 DEFAULT_MAX_MANIFEST_BYTES = 64 << 20
 DEFAULT_COPY_CHUNK = 1 << 20
 FREE_SPACE_MARGIN_BYTES = 64 << 20
+# I13R2 §4: conservative per-object overhead allowance for the pre-copy
+# free-space estimate (metadata records are small JSON documents).
+METADATA_OVERHEAD_BYTES = 64 << 10
 
 LOGICAL_SOURCE_ROOT = "logical://source-lake"
 
@@ -437,6 +462,7 @@ class EvidencePackExporter:
         export_id: str | None = None,
         clock: Any = None,
         disk_usage_provider: Any = None,
+        protected_source_roots: list[Path] | None = None,
     ) -> None:
         self._service = service
         self._store = blob_store
@@ -453,8 +479,9 @@ class EvidencePackExporter:
         self._export_id = export_id
         self._clock = clock or (lambda: datetime.now(tz=UTC))
         self._disk_usage = disk_usage_provider
-
-    # -- selection (query-driven only) ----------------------------------------
+        self._protected_source_roots = [
+            Path(p) for p in (protected_source_roots or [])
+        ]
 
     def export_query(
         self, query: RawEvidenceQuery, destination: Path
@@ -477,23 +504,49 @@ class EvidencePackExporter:
                 raise ExportDestinationUnsafe(
                     f"destination component is a symlink: {ancestor}"
                 )
-        # Refuse destination inside the immutable source trees.
+        # Refuse destination inside the immutable source trees.  The blob
+        # store and catalog repositories expose public ``root``; the I05/I06
+        # roots are private, so they arrive as explicit constructor-level
+        # ``protected_source_roots`` supplied by composition (I13R2 §23).
         store_root = Path(self._store.root).resolve()
         if resolved_dest == store_root or store_root in resolved_dest.parents:
             raise ExportDestinationUnsafe(
                 "destination lies inside the source blob store"
             )
-        for source_root in (self._blob_repo.root, self._acq_repo.root):
+        for source_root in self._protected_source_roots:
             src = Path(source_root).resolve()
             if resolved_dest == src or src in resolved_dest.parents:
                 raise ExportDestinationUnsafe(
-                    f"destination lies inside source catalog tree {src}"
+                    f"destination lies inside protected source tree {src}"
                 )
 
+    def _disk_usage_for(self, path: Path) -> tuple[int, int]:
+        """Real local disk usage by default; injected provider overrides.
+
+        I13R2 §3 law: NO silent production bypass.  When no provider is
+        injected, ``shutil.disk_usage`` measures the nearest existing
+        ancestor of ``path`` (the destination may not exist yet).
+        """
+        provider = self._disk_usage
+        if provider is None:
+            provider = shutil.disk_usage
+            probe = Path(path)
+            while not probe.exists():
+                if probe.parent == probe:
+                    break
+                probe = probe.parent
+            path = probe
+        usage = provider(path)
+        if isinstance(usage, tuple):
+            if len(usage) == 3:
+                # shutil.disk_usage protocol: (total, used, free)
+                return int(usage[0]), int(usage[2])
+            return int(usage[0]), int(usage[1])
+        return int(usage.total), int(usage.free)
+
     def _check_free_space(self, destination: Path, required: int) -> None:
-        if self._disk_usage is None:
-            return
-        total, free = self._disk_usage(destination)
+        # I13R2 §2: the free-space check NEVER silently disables itself.
+        total, free = self._disk_usage_for(destination)
         if free < required + FREE_SPACE_MARGIN_BYTES:
             raise PackResourceLimitExceeded(
                 f"destination free space {free} < required {required} "
@@ -532,6 +585,15 @@ class EvidencePackExporter:
         try:
             inventory: list[ExportObjectRecord] = []
             blob_shas = sorted({sha for r in results for sha in r.blob_refs})
+            # I13R2 formal evidence-closure law: the pack must equal the
+            # minimal transitive support closure of the query-selected
+            # roots.  Three classes: QUERY_SELECTED (A), REQUIRED_SUPPORT
+            # (B), UNRELATED (C); only C is leakage.  The closure is a
+            # monotone fixpoint over the finite source universe (every
+            # addition is traced; §18 debug structure only, NOT a pack
+            # schema field — §19).
+            closure = self._evidence_closure(results, query)
+            blob_shas = sorted(closure.blob_shas)
             projection_ids = sorted(
                 {pid for r in results for pid in r.projection_refs}
             )
@@ -561,11 +623,18 @@ class EvidencePackExporter:
                     )
                 blob_rows[sha] = rows[0]
 
-            # --- acquisitions linked to selected blobs ------------------------
-            acq_ids: set[str] = set()
-            for sha in blob_shas:
-                for rec in self._acq_repo.list_acquisitions_for_blob(sha):
-                    acq_ids.add(rec.acquisition_id)
+            # I13R2 §4: pre-copy free-space estimate from selected durable
+            # metadata (T0A byte lengths + bounded metadata overhead).  NEVER
+            # zero/meaningless: refuse before bulk copying when the real local
+            # disk cannot hold the pack.
+            estimated_bytes = sum(
+                blob_rows[sha].byte_length for sha in blob_shas
+            ) + len(blob_shas) * METADATA_OVERHEAD_BYTES
+            self._check_free_space(destination, estimated_bytes)
+
+            # --- acquisitions of the closed blob slice (identity-domain
+            # law, I13R2 §11 preferred acquisition closure) -----------------
+            acq_ids: set[str] = set(closure.acquisition_ids)
             for acq_id in sorted(acq_ids):
                 rec = self._acq_repo.get_acquisition(acq_id)
                 self._add_object(
@@ -589,6 +658,11 @@ class EvidencePackExporter:
                     raise ExportSourceInvalid(
                         f"duplicate logical blob identity {sha}"
                     )
+                # I13R2 §4: conservative progressive check before each
+                # physical payload (covers T0B sizes unknown pre-copy).
+                self._check_free_space(
+                    destination, blob_rows[sha].byte_length
+                )
                 with self._store.open_blob(sha, row.storage_encoding) as handle:
                     file_sha, size = _copy_into(
                         handle, target, chunk_size=self._chunk_size
@@ -615,20 +689,16 @@ class EvidencePackExporter:
                 )
 
             # --- partition manifests + current pointers ------------------------
-            current_manifests = sorted(
-                self._manifest_repo.list_all_current_manifests(),
-                key=lambda m: m.partition_manifest_id,
-            )
-            identity_set = {
-                (r.provider, r.venue, r.native_instrument) for r in results
-            }
-            for manifest in current_manifests:
-                if (
-                    manifest.provider,
-                    manifest.venue,
-                    manifest.native_instrument,
-                ) not in identity_set:
-                    continue
+            # Export EXACTLY the closure's matched manifest roots (unique
+            # result→manifest matching in ``_evidence_closure``).  Their
+            # full blob_refs are inside the closed slice by fixpoint
+            # construction; the fail-closed guard remains.
+            for manifest in closure.matched_manifests:
+                if not set(manifest.blob_refs) <= set(blob_shas):
+                    raise ExportSourceInvalid(
+                        f"manifest {manifest.partition_manifest_id} "
+                        "references blobs outside the closed pack slice"
+                    )
                 self._add_object(
                     inventory,
                     staging,
@@ -869,6 +939,324 @@ class EvidencePackExporter:
                     f"object {rec.pack_path!r} exceeds max_object_bytes"
                 )
 
+    def _unique_result_manifests(
+        self, results: list[RawEvidenceResult]
+    ) -> list[PartitionManifest]:
+        """I13R2 unique manifest-root matching law.
+
+        The I13R1 selection matched manifests on the broad
+        ``(provider, venue, native_instrument)`` tuple — which can pull in
+        UNRELATED current manifests sharing only those dimensions.  A
+        result's manifest root must be PROVEN, not guessed: match on the
+        strongest accepted fields (identity dimensions + granularity +
+        logical window containment + coverage/integrity agreement) AND
+        require evidence-binding agreement: ``result.blob_refs`` must be a
+        subset of the candidate manifest's ``blob_refs`` (T0A) or the
+        result's ``projection_refs`` a subset of the candidate's
+        ``projection_refs`` (T0B).
+
+        Exactly ONE current manifest must explain each result: 0 →
+        ``ExportSourceInvalid``; >1 → explicit ambiguity error.  Never
+        silently export every broad-dimension lookalike.
+        """
+        current = sorted(
+            self._manifest_repo.list_all_current_manifests(),
+            key=lambda m: m.partition_manifest_id,
+        )
+        matched: list[PartitionManifest] = []
+        seen_ids: set[str] = set()
+        for result in results:
+            candidates: list[PartitionManifest] = []
+            for manifest in current:
+                if (
+                    manifest.provider != result.provider
+                    or manifest.venue != result.venue
+                    or manifest.sensor_family != result.sensor_family
+                    or manifest.native_instrument
+                    != result.native_instrument
+                    or manifest.source_granularity
+                    != result.source_granularity
+                    or manifest.coverage_state != result.coverage_state
+                    or manifest.integrity_state != result.integrity_state
+                ):
+                    continue
+                if not (
+                    manifest.logical_date_start
+                    <= result.logical_time_start
+                    and result.logical_time_end
+                    <= manifest.logical_date_end
+                ):
+                    continue
+                # Evidence-binding agreement: the result's durable refs
+                # must live inside the candidate manifest's refs.
+                if result.blob_refs and not set(
+                    result.blob_refs
+                ) <= set(manifest.blob_refs):
+                    continue
+                if result.projection_refs and not set(
+                    result.projection_refs
+                ) <= set(manifest.projection_refs):
+                    continue
+                candidates.append(manifest)
+            if not candidates:
+                raise ExportSourceInvalid(
+                    f"no current manifest explains result "
+                    f"{result.provider}/{result.venue}/"
+                    f"{result.native_instrument} "
+                    f"({result.logical_time_start.isoformat()}.."
+                    f"{result.logical_time_end.isoformat()})"
+                )
+            if len(candidates) > 1:
+                ids = sorted(
+                    m.partition_manifest_id for m in candidates
+                )
+                raise ExportSourceInvalid(
+                    f"ambiguous manifest root for result "
+                    f"{result.provider}/{result.venue}/"
+                    f"{result.native_instrument}: {ids} all explain "
+                    "the selected evidence — manifest roots must be "
+                    "unique (I13R2 §4)"
+                )
+            if candidates[0].partition_manifest_id not in seen_ids:
+                seen_ids.add(candidates[0].partition_manifest_id)
+                matched.append(candidates[0])
+        return matched
+
+    def _evidence_closure(
+        self, results: list[RawEvidenceResult], query: RawEvidenceQuery
+    ) -> "EvidenceClosure":
+        """I13R2 formal three-class evidence closure (monotone fixpoint).
+
+        A. QUERY_SELECTED — acquisitions/blobs/projections/lineage refs
+           explicitly present in the RawEvidenceResult rows.
+        B. REQUIRED_SUPPORT — matched immutable manifest roots (with ALL
+           their blob_refs/projection_refs), acquisitions of closure blobs
+           within the exported identity domain, revision segments of
+           included acquisitions bounded by the policy-minimum revision
+           prefix, their bound first_acquisition_ids and blobs, and the
+           declarations of included keys.
+        C. UNRELATED — no transitive dependency path from A or B.  Only C
+           is leakage.
+
+        The fixpoint iterates until no object is added; termination is
+        guaranteed because the closure only grows inside a finite source
+        universe.  POLICY closure never SHRINKS below the structural
+        minimum and never manually overwrites an earned dependency
+        (§15/§16).
+        """
+        trace: list[dict[str, str]] = []
+        iterations = 0
+
+        def add(
+            bucket: set[str],
+            item: str,
+            classification: str,
+            reason: str,
+        ) -> bool:
+            if item in bucket:
+                return False
+            bucket.add(item)
+            trace.append(
+                {
+                    "object": item,
+                    "classification": classification,
+                    "reason": reason,
+                }
+            )
+            return True
+
+        # ---- seeds (A. QUERY_SELECTED + matched manifest roots) --------
+        selected_acq_ids: set[str] = set()
+        selected_blob_shas: set[str] = set()
+        for result in results:
+            for acq_id in result.acquisition_ids:
+                add(
+                    selected_acq_ids,
+                    acq_id,
+                    "QUERY_SELECTED",
+                    "QUERY_RESULT_ACQUISITION",
+                )
+            for sha in result.blob_refs:
+                add(
+                    selected_blob_shas,
+                    sha,
+                    "QUERY_SELECTED",
+                    "QUERY_RESULT_BLOB",
+                )
+        _matched_manifest_ids: set[str] = set()
+        matched_manifests = self._unique_result_manifests(results)
+        for manifest in matched_manifests:
+            add(
+                _matched_manifest_ids,
+                manifest.partition_manifest_id,
+                "REQUIRED_SUPPORT",
+                "MATCHED_MANIFEST",
+            )
+
+        selected_projection_ids = sorted(
+            {pid for r in results for pid in r.projection_refs}
+        )
+
+        policy_name = (
+            query.revision_policy.value
+            if hasattr(query.revision_policy, "value")
+            else str(query.revision_policy)
+        )
+
+        # ---- monotone fixpoint -------------------------------------------
+        blob_shas: set[str] = set(selected_blob_shas)
+        acq_ids: set[str] = set(selected_acq_ids)
+        support_blob_shas: set[str] = set()
+        support_acq_ids: set[str] = set()
+        revisions = self._revisions
+        while True:
+            iterations += 1
+            before = (len(blob_shas), len(acq_ids))
+
+            # 1. Manifest dependency expansion (§9): every matched
+            #    immutable manifest contributes ALL its blob_refs — the
+            #    accepted manifest writer requires referential integrity,
+            #    so these are REQUIRED_SUPPORT, never leakage.
+            for manifest in matched_manifests:
+                for sha in manifest.blob_refs:
+                    if sha not in blob_shas:
+                        blob_shas.add(sha)
+                        support_blob_shas.add(sha)
+                        trace.append(
+                            {
+                                "object": sha,
+                                "classification": "REQUIRED_SUPPORT",
+                                "reason": f"MANIFEST_BLOB_REF:"
+                                f"{manifest.partition_manifest_id}",
+                            }
+                        )
+
+            # 2. Blob -> acquisition expansion (§10/§11 preferred
+            #    acquisition law): ALL durable acquisition rows of each
+            #    closure blob within the exported identity domain join the
+            #    slice — dropping one would silently change
+            #    acquired_before/observed_before semantics.
+            identity_keys = {
+                (r.provider, r.venue, r.sensor_family, r.native_instrument)
+                for r in results
+            }
+            for sha in sorted(blob_shas):
+                for rec in self._acq_repo.list_acquisitions_for_blob(sha):
+                    identity = (
+                        rec.provider_id,
+                        rec.venue,
+                        rec.sensor_family,
+                        rec.native_instrument,
+                    )
+                    if identity not in identity_keys:
+                        continue
+                    if rec.acquisition_id not in acq_ids:
+                        acq_ids.add(rec.acquisition_id)
+                        support_acq_ids.add(rec.acquisition_id)
+                        trace.append(
+                            {
+                                "object": rec.acquisition_id,
+                                "classification": "REQUIRED_SUPPORT",
+                                "reason": f"BLOB_ACQUISITIONS:{sha}",
+                            }
+                        )
+
+            # 3. Revision closure following included acquisitions (§14):
+            #    every kept segment's bound first_acquisition_id and blob
+            #    must join the slice; iterate until stable.
+            if revisions is not None:
+                keys_touched: set[str] = set()
+                for key in revisions.list_source_revision_keys():
+                    segments = sorted(
+                        revisions.list_segment_records(key),
+                        key=lambda s: s.revision_number,
+                    )
+                    touched = [
+                        s
+                        for s in segments
+                        if s.first_acquisition_id in acq_ids
+                    ]
+                    if not touched:
+                        continue
+                    keys_touched.add(key)
+                    max_revision = max(
+                        s.revision_number for s in segments
+                    )
+                    if policy_name in ("ALL", "LATEST_SEEN"):
+                        keep = max_revision
+                    elif policy_name == "FIRST_SEEN":
+                        keep = 1
+                    elif policy_name == "EXACT_REVISION":
+                        keep = query.exact_revision_number or 1
+                    elif policy_name == "PROVIDER_DECLARED_CANONICAL":
+                        # Canonical closure: the declared revision is the
+                        # selection authority; the full prerequisite
+                        # chain 1..latest joins the slice.
+                        keep = max_revision
+                    else:  # ERROR_ON_AMBIGUITY (single-revision keys)
+                        keep = max(
+                            s.revision_number for s in touched
+                        )
+                    for segment in segments:
+                        if segment.revision_number > keep:
+                            continue
+                        if (
+                            segment.first_acquisition_id
+                            not in acq_ids
+                        ):
+                            acq_ids.add(
+                                segment.first_acquisition_id
+                            )
+                            support_acq_ids.add(
+                                segment.first_acquisition_id
+                            )
+                            trace.append(
+                                {
+                                    "object": (
+                                        segment.first_acquisition_id
+                                    ),
+                                    "classification": (
+                                        "REQUIRED_SUPPORT"
+                                    ),
+                                    "reason": (
+                                        f"REVISION_FIRST_ACQUISITION:"
+                                        f"{segment.segment_id}"
+                                    ),
+                                }
+                            )
+                        if segment.blob_sha256 not in blob_shas:
+                            blob_shas.add(segment.blob_sha256)
+                            support_blob_shas.add(segment.blob_sha256)
+                            trace.append(
+                                {
+                                    "object": segment.blob_sha256,
+                                    "classification": "REQUIRED_SUPPORT",
+                                    "reason": (
+                                        f"REVISION_SEGMENT_BLOB:"
+                                        f"{segment.segment_id}"
+                                    ),
+                                }
+                            )
+
+            if (len(blob_shas), len(acq_ids)) == before:
+                break
+
+        _ = keys_touched  # debug structure (kept for trace consumers)
+        return EvidenceClosure(
+            blob_shas=frozenset(blob_shas),
+            acquisition_ids=frozenset(acq_ids),
+            projection_ids=frozenset(selected_projection_ids),
+            matched_manifests=tuple(matched_manifests),
+            query_selected_blob_shas=frozenset(selected_blob_shas),
+            query_selected_acquisition_ids=frozenset(
+                selected_acq_ids
+            ),
+            support_blob_shas=frozenset(support_blob_shas),
+            support_acquisition_ids=frozenset(support_acq_ids),
+            trace=tuple(trace),
+            iterations=iterations,
+        )
+
     def _export_revisions(
         self,
         inventory: list[ExportObjectRecord],
@@ -913,9 +1301,10 @@ class EvidencePackExporter:
             elif policy_name == "EXACT_REVISION":
                 keep = exact_revision_number or 1
             elif policy_name == "PROVIDER_DECLARED_CANONICAL":
-                keep = max(
-                    s.revision_number for s in touched
-                )
+                # CANONICAL CLOSURE: keep the full chain 1..latest of the
+                # touched key — the declared revision (selection
+                # authority) and its prerequisites all join the pack.
+                keep = max_revision
             else:  # ERROR_ON_AMBIGUITY: single-revision key reached here
                 if len(segments) > 1:
                     # Ambiguity for the touched key: the SERVICE already
@@ -1170,10 +1559,36 @@ class EvidencePackRestorer:
                     f"restore destination component is a symlink: {ancestor}"
                 )
 
+    def _disk_usage_for(self, path: Path) -> tuple[int, int]:
+        """Real local disk usage by default; injected provider overrides.
+
+        I13R2 §3/§5 law: NO silent production bypass.  When no provider is
+        injected, ``shutil.disk_usage`` measures the nearest existing
+        ancestor of ``path``.
+        """
+        provider = self._disk_usage
+        if provider is None:
+            provider = shutil.disk_usage
+            probe = Path(path)
+            while not probe.exists():
+                if probe.parent == probe:
+                    break
+                probe = probe.parent
+            path = probe
+        usage = provider(path)
+        if isinstance(usage, tuple):
+            if len(usage) == 3:
+                # shutil.disk_usage protocol: (total, used, free)
+                return int(usage[0]), int(usage[2])
+            return int(usage[0]), int(usage[1])
+        return int(usage.total), int(usage.free)
+
     def _check_free_space(self, destination: Path, required: int) -> None:
-        if self._disk_usage is None:
-            return
-        _total, free = self._disk_usage(destination)
+        # I13R2 §2/§5: the free-space check NEVER silently disables itself.
+        # Restore writes a full staging copy before promotion, so the pack
+        # inventory sum is the conservative floor (staging multiplier 1x: the
+        # pack bytes are exactly what staging materializes).
+        _total, free = self._disk_usage_for(destination)
         if free < required + FREE_SPACE_MARGIN_BYTES:
             raise PackResourceLimitExceeded(
                 f"destination free space {free} < required {required} "
@@ -1476,10 +1891,26 @@ class EvidencePackRestorer:
             blob_metadata_repository=blob_repo,
             blob_store=store,
         )
-        for rec in by_role.get(PackObjectRole.ACQUISITION, []):
-            record = AcquisitionRecord.model_validate_json(
-                _read_pack_metadata_bytes(pack_root / rec.pack_path)
-            )
+        # I13R2 revision replay law: re-earn revisions in EXACT source
+        # observation order.  ``register_acquisition`` enforces monotonic
+        # ``seen_at`` (I06 §39/§40), so replaying in pack-inventory order
+        # could falsely raise ``RevisionObservationOrderConflict`` on a
+        # multi-revision key.  Pack acquisition objects carry their own
+        # canonical metadata; ordering by ``response_observed_at`` (the
+        # I06 seen_at source) reproduces the source registration order.
+        replay_records = sorted(
+            (
+                AcquisitionRecord.model_validate_json(
+                    _read_pack_metadata_bytes(pack_root / rec.pack_path)
+                )
+                for rec in by_role.get(PackObjectRole.ACQUISITION, [])
+            ),
+            key=lambda record: (
+                record.response_observed_at,
+                record.acquisition_id,
+            ),
+        )
+        for record in replay_records:
             registry.register_acquisition(record.acquisition_id)
         for rec in by_role.get(PackObjectRole.REVISION_DECLARATIONS, []):
             declaration = RevisionDeclarationRecord.model_validate(
