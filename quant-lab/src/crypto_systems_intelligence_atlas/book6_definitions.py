@@ -211,8 +211,28 @@ class CoverageSufficiencyRule(Book6FrozenModel):
     status: str = "UNRATIFIED"
 
 
+#: The five ratified metric families and their subject domains (plan v0.2 §28).
+#: This is SCHEMA capability only — there is no production collector, no
+#: acquisition path and no default metric in any family. A family is a slot for
+#: fully specified definitions, never a reason to invent one.
+METRIC_FAMILY_BY_SUBJECT_DOMAIN: Final[dict[SubjectDomain, str]] = {
+    SubjectDomain.CHAIN: "6A.1",
+    SubjectDomain.PROTOCOL: "6A.2",
+    SubjectDomain.TOKEN: "6A.3",
+    SubjectDomain.CAPITAL: "6A.4",
+    SubjectDomain.DEVELOPER: "6A.5",
+}
+
+#: The ratified family identifiers, for evidence and registry introspection.
+RATIFIED_METRIC_FAMILIES: Final[tuple[str, ...]] = tuple(
+    sorted(METRIC_FAMILY_BY_SUBJECT_DOMAIN.values())
+)
+
+
 #: The canonical invariant asserted by the accepted implementation.
 COVERAGE_OBSERVATION_IS_NOT_SUFFICIENCY: Final[bool] = True
+NO_DEFAULT_METRIC_EXISTS: Final[bool] = True
+NOT_SUPPORTED_IS_NOT_ZERO: Final[bool] = True
 
 
 __all__ = [
@@ -222,8 +242,12 @@ __all__ = [
     "CoverageObservation",
     "CoverageSufficiencyRule",
     "DenominatorRule",
+    "METRIC_FAMILY_BY_SUBJECT_DOMAIN",
     "MeasurementMethodology",
     "MetricDefinition",
     "MetricDefinitionError",
+    "NOT_SUPPORTED_IS_NOT_ZERO",
+    "NO_DEFAULT_METRIC_EXISTS",
+    "RATIFIED_METRIC_FAMILIES",
     "SourceFamily",
 ]
