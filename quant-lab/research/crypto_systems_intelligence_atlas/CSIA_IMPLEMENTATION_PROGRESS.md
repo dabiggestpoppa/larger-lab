@@ -1356,3 +1356,54 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 
 Next: operator acceptance. No R6 unless another newly demonstrated concrete
 correctness defect exists.
+
+---
+
+# CHECKPOINT 21 — BOOK 5 IMPLEMENTATION ACCEPTED (2026-09-30)
+
+Operator-authorized formal Book 5 implementation acceptance review completed.
+Acceptance only — no Book 6 implementation, no live acquisition.
+
+Verification summary (all gates PASS):
+
+```text
+BOOK_1 = 107 PASS   BOOK_2 = 108 PASS   BOOK_3 = 83 PASS
+BOOK_4 = 230 PASS   BOOK_5 = 293 PASS   TOTAL_CSIA = 821 PASS
+R1 = 37   R2 = 44   R3 = 46   R4 = 51   R5 = 37   (each run separately)
+STRESS_ROWS = 45 / 45        5G_T_TESTS = T-1..T-14 PASS
+SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED  (baseline failure set unchanged)
+BOOK5_INTRODUCED_SENSOR_FAILURES = 0
+RUFF = PASS                   MYPY = PASS (44 files clean)
+BOOK1/2/3/4_MUTATIONS = 0     SENSOR_MUTATIONS = 0
+```
+
+Lineage: strict ancestry verified from the accepted Book 4 base
+`a2526e8220513b34967ab11f227ddbddc14e7e4a` through the full Book 5 lineage;
+all 35 named implementation commits resolved to full SHAs and confirmed strict
+ancestors of the accepted anchor. Freeze diff touches only Book 5 source/tests
+and append-only CSIA evidence (28 files; zero Book 1–4, sensor, Book 6, or
+live-acquisition files).
+
+Acceptance record: `CSIA_BOOK_5_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md`
+(records the full gate ledger, the five hardening-lineage verdicts, the accepted
+limitations — including that Book 5 does **not** implement historical
+revoked-record point-in-time replay — and DOC-NOTE-1, a non-substantive
+documentation formatting artifact in the R5 matrix left unrewritten).
+
+Decision:
+
+```text
+PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL = ACCEPTED
+BOOK_5 = FROZEN_ACCEPTED
+BOOK_5_IMPLEMENTATION = FROZEN_ACCEPTED
+BOOK_5_HARDENING_R1..R5 = ACCEPTED_LINEAGE
+ACCEPTED_IMPLEMENTATION_ANCHOR = 50695ad4ea07b57105e71d04d4e32758849e55e3
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+NEXT = BOOK 6 PLANNING / GOVERNANCE REVIEW ONLY. This checkpoint does **not**
+authorize Book 6 implementation, live acquisition, RPC, database, graph
+database, production pricing, or trading/execution. Book 6 planning content
+starts only if governance explicitly authorizes it. No R6 exists or is
+authorized without a new concrete demonstrated defect.
