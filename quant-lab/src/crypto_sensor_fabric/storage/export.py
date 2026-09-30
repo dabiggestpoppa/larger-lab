@@ -103,6 +103,22 @@ METADATA_OVERHEAD_BYTES = 64 << 10
 LOGICAL_SOURCE_ROOT = "logical://source-lake"
 
 
+def _canonical_dict_bytes(payload: dict | list) -> bytes:  # type: ignore[type-arg]
+    """Canonical JSON for plain-dict records (I13R3 §7).
+
+    ``ProjectionCatalogRecord`` is repository catalog context (a plain
+    class with ``to_dict()``/``from_dict()``, NOT a pydantic model); its
+    durable fragment law is the same canonical JSON discipline — sorted
+    keys, compact separators, lossless ``from_dict`` round trip.
+    """
+    return json.dumps(
+        payload,
+        sort_keys=True,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
 # ---------------------------------------------------------------------------
 # Typed error vocabulary (I13 §40)
 # ---------------------------------------------------------------------------
@@ -122,6 +138,12 @@ class ExportPackExists(ExportError):
 
 class ExportSourceInvalid(ExportError):
     """Source state is unusable for export (missing/corrupt evidence)."""
+
+
+class ExportSourceBoundaryUnproven(ExportError):
+    """A wired source dependency cannot prove its filesystem boundary
+    (I13R3 §15): composition must fail closed rather than silently omit
+    a root from destination-overlap protection."""
 
 
 class PackVerificationError(ExportError):
@@ -482,6 +504,95 @@ class EvidencePackExporter:
         self._protected_source_roots = [
             Path(p) for p in (protected_source_roots or [])
         ]
+        # I13R3 §15 fail-closed boundary law: every wired source
+        # dependency must PROVE its filesystem root, either through a
+        # public read-only ``root``/``projection_root`` property or an
+        # explicit entry in ``protected_source_roots``.  Silent omission
+        # is the defect: a caller who forgets the T0B/revision roots
+        # must get a typed configuration failure here, not an
+        # unprotected export later.
+        self._wired_source_boundaries: list[Path] = []
+
+        def _boundary(obj: Any, *attrs: str, label: str) -> Path | None:
+            for attr in attrs:
+                value = getattr(obj, attr, None)
+                if value is not None:
+                    return Path(value).resolve()
+            return None
+
+        wired: list[tuple[str, Path | None]] = []
+        if self._artifacts is not None:
+            wired.append(
+                (
+                    "artifact_repository",
+                    _boundary(
+                        self._artifacts,
+                        "projection_root",
+                        "root",
+                        label="artifact_repository",
+                    ),
+                )
+            )
+        if self._contexts is not None:
+            wired.append(
+                (
+                    "context_repository",
+                    _boundary(
+                        self._contexts,
+                        "root",
+                        label="context_repository",
+                    ),
+                )
+            )
+        if self._lineage is not None:
+            wired.append(
+                (
+                    "lineage_repository",
+                    _boundary(
+                        self._lineage,
+                        "root",
+                        label="lineage_repository",
+                    ),
+                )
+            )
+        if self._schemas is not None:
+            wired.append(
+                (
+                    "schema_registry",
+                    _boundary(
+                        self._schemas,
+                        "root",
+                        label="schema_registry",
+                    ),
+                )
+            )
+        if self._revisions is not None:
+            wired.append(
+                (
+                    "revision_registry",
+                    _boundary(
+                        self._revisions,
+                        "root",
+                        label="revision_registry",
+                    ),
+                )
+            )
+        for label, boundary in wired:
+            if boundary is None:
+                raise ExportSourceBoundaryUnproven(
+                    f"{label} is wired but cannot prove its source "
+                    "filesystem boundary (no public root accessor and "
+                    "no explicit protected_source_roots entry); export "
+                    "composition refuses to run unprotected (I13R3 §15)"
+                )
+            self._wired_source_boundaries.append(boundary)
+
+        # Explicit roots EXTEND the derived set (callers may protect
+        # additional trees); they never substitute for the derived ones.
+        for extra in self._protected_source_roots:
+            resolved = Path(extra).resolve()
+            if resolved not in self._wired_source_boundaries:
+                self._wired_source_boundaries.append(resolved)
 
     def export_query(
         self, query: RawEvidenceQuery, destination: Path
@@ -504,16 +615,16 @@ class EvidencePackExporter:
                 raise ExportDestinationUnsafe(
                     f"destination component is a symlink: {ancestor}"
                 )
-        # Refuse destination inside the immutable source trees.  The blob
-        # store and catalog repositories expose public ``root``; the I05/I06
-        # roots are private, so they arrive as explicit constructor-level
-        # ``protected_source_roots`` supplied by composition (I13R2 §23).
-        store_root = Path(self._store.root).resolve()
-        if resolved_dest == store_root or store_root in resolved_dest.parents:
-            raise ExportDestinationUnsafe(
-                "destination lies inside the source blob store"
-            )
-        for source_root in self._protected_source_roots:
+        # Refuse destination inside the immutable source trees.
+        # I13R3 §15: the T0A blob-store root AND every wired dependency's
+        # proven boundary (T0B payload/catalog roots, revision registry
+        # root) are protected BY DEFAULT — no caller-specific override is
+        # required for safe composition (§16).
+        protected: list[Path] = [
+            Path(self._store.root).resolve(),
+            *self._wired_source_boundaries,
+        ]
+        for source_root in protected:
             src = Path(source_root).resolve()
             if resolved_dest == src or src in resolved_dest.parents:
                 raise ExportDestinationUnsafe(
@@ -693,6 +804,9 @@ class EvidencePackExporter:
             # result→manifest matching in ``_evidence_closure``).  Their
             # full blob_refs are inside the closed slice by fixpoint
             # construction; the fail-closed guard remains.
+            # I13R3: export exactly the closure's manifest chain (roots +
+            # REQUIRED_SUPPORT predecessors earned inside the fixpoint).
+            exported_pointer_keys: set[str] = set()
             for manifest in closure.matched_manifests:
                 if not set(manifest.blob_refs) <= set(blob_shas):
                     raise ExportSourceInvalid(
@@ -707,10 +821,17 @@ class EvidencePackExporter:
                     payload=canonical_json_bytes(manifest),
                     provenance_ref=manifest.partition_manifest_id,
                 )
+                # One CURRENT_POINTER per partition key: a superseded
+                # manifest shares its key with the successor, and the
+                # source pointer is a per-key operational fact, not a
+                # per-manifest one.
+                if manifest.partition_key in exported_pointer_keys:
+                    continue
                 pointer = self._manifest_repo.read_current_pointer(
                     manifest.partition_key
                 )
                 if pointer is not None:
+                    exported_pointer_keys.add(manifest.partition_key)
                     self._add_object(
                         inventory,
                         staging,
@@ -785,7 +906,7 @@ class EvidencePackExporter:
                             staging,
                             role=PackObjectRole.PROJECTION_CONTEXT,
                             object_id=f"context:{projection_id}",
-                            payload=canonical_json_bytes(context),
+                            payload=_canonical_dict_bytes(context.to_dict()),
                             provenance_ref=projection_id,
                         )
                 if self._lineage is not None:
@@ -798,7 +919,9 @@ class EvidencePackExporter:
                             object_id=(
                                 f"lineage:{entries[0].lineage_manifest_id}"
                             ),
-                            payload=canonical_json_bytes(entries),
+                            payload=_canonical_dict_bytes(
+                                [e.model_dump(mode="json") for e in entries]
+                            ),
                             provenance_ref=entries[0].lineage_manifest_id,
                         )
             # projection schemas referenced by exported artifacts
@@ -818,7 +941,9 @@ class EvidencePackExporter:
                             staging,
                             role=PackObjectRole.PROJECTION_SCHEMA,
                             object_id=schema_key,
-                            payload=canonical_json_bytes(definition),
+                            payload=_canonical_dict_bytes(
+                                definition.to_descriptor()
+                            ),
                             provenance_ref=definition.schema_identity,
                         )
 
@@ -1113,11 +1238,41 @@ class EvidencePackExporter:
             iterations += 1
             before = (len(blob_shas), len(acq_ids))
 
-            # 1. Manifest dependency expansion (§9): every matched
-            #    immutable manifest contributes ALL its blob_refs — the
-            #    accepted manifest writer requires referential integrity,
-            #    so these are REQUIRED_SUPPORT, never leakage.
-            for manifest in matched_manifests:
+            # 1. Manifest dependency expansion (§9 + I13R3): every
+            #    matched immutable manifest contributes ALL its blob_refs,
+            #    and a versioned manifest earns its supersedes-chain
+            #    predecessors (MANIFEST_PREDECESSOR edge) — the restore
+            #    writer re-appends immutable versions in CAS order, so
+            #    version N > 1 cannot replay without version N-1 (I04 §33
+            #    no-gap law).  The matched set therefore grows inside the
+            #    fixpoint, never shrinks (§8 monotone law).
+            manifest_cursor = 0
+            while manifest_cursor < len(matched_manifests):
+                manifest = matched_manifests[manifest_cursor]
+                manifest_cursor += 1
+                if (
+                    manifest.manifest_version > 1
+                    and manifest.supersedes_manifest_id is not None
+                    and all(
+                        m.partition_manifest_id
+                        != manifest.supersedes_manifest_id
+                        for m in matched_manifests
+                    )
+                ):
+                    predecessor = self._manifest_repo.get_manifest(
+                        manifest.supersedes_manifest_id
+                    )
+                    matched_manifests.append(predecessor)
+                    trace.append(
+                        {
+                            "object": predecessor.partition_manifest_id,
+                            "classification": "REQUIRED_SUPPORT",
+                            "reason": (
+                                f"MANIFEST_PREDECESSOR:"
+                                f"{manifest.partition_manifest_id}"
+                            ),
+                        }
+                    )
                 for sha in manifest.blob_refs:
                     if sha not in blob_shas:
                         blob_shas.add(sha)
@@ -1738,6 +1893,7 @@ class EvidencePackRestorer:
         )
         from .projections import ProjectionCatalogRecord
         from .projection_lineage import ProjectionLineageRepository
+        from .projection_resolver import ProjectionLineageResolver
         from .projection_schema import ProjectionSchemaRegistry
         from .projections import (
             ProjectionArtifactRepository,
@@ -1774,37 +1930,13 @@ class EvidencePackRestorer:
             record = AcquisitionRecord.model_validate_json(
                 _read_pack_metadata_bytes(pack_root / rec.pack_path)
             )
-            acq_repo.append_acquisition(record)
-
-        # 3. partition manifests + current pointers (accepted CAS law).
-        for rec in by_role.get(PackObjectRole.MANIFEST, []):
-            pm = PartitionManifest.model_validate_json(
-                _read_pack_metadata_bytes(pack_root / rec.pack_path)
-            )
-            pointer_rec = next(
-                (
-                    p
-                    for p in by_role.get(PackObjectRole.CURRENT_POINTER, [])
-                    if p.provenance_ref == pm.partition_manifest_id
-                ),
-                None,
-            )
-            expected = None
-            if pm.manifest_version != 1 and pointer_rec is not None:
-                from .manifests import PartitionCurrentPointer
-
-                pointer = PartitionCurrentPointer.from_canonical_json(
-                    (pack_root / pointer_rec.pack_path).read_text(
-                        encoding="utf-8"
-                    )
-                )
-                expected = (
-                    pointer.partition_manifest_id,
-                    pointer.manifest_version,
-                )
-            manifest_repo.append_partition_manifest(pm, expected)
-
-        # 4. T0B: schemas, artifact payloads, contexts, artifacts, lineage.
+            acq_repo.append_acquisition(record)        # 3. T0B replay BEFORE manifests: the manifest writer re-runs
+        # referential integrity, and a manifest carrying projection_refs
+        # requires a ProjectionLineageResolver (I04 §20 fail-closed), so
+        # the restored T0B catalogs must exist first.  Internal order:
+        # schemas -> payload files -> contexts -> artifacts -> lineage
+        # (payload digests verified during the file copy; the artifact
+        # commit then re-verifies the physical file written above).
         schemas = ProjectionSchemaRegistry(t0b / "catalogs" / "projection_schemas")
         for rec in by_role.get(PackObjectRole.PROJECTION_SCHEMA, []):
             from .projection_schema import ProjectionSchemaDefinition
@@ -1883,6 +2015,97 @@ class EvidencePackRestorer:
                 for entry in entries_data
             ]
             lineage.commit(entries[0].lineage_manifest_id, entries)
+
+        # 4. partition manifests + current pointers (accepted CAS law).
+        # I13R3 manifest replay law: version order per partition key.
+        # Append-only CAS requires v1 before v2 on the same key; pack
+        # inventory order is object-id (deterministic but NOT version
+        # order).  Sorting by (partition_key, manifest_version) is the
+        # source registration order — the same deterministic law the
+        # acquisition replay follows for I06 monotonic seen_at.
+        # The repository is wired with the restored T0B resolver so the
+        # I04 §20 referential-integrity gate can validate
+        # projection_refs against the replayed T0B graph.
+        manifest_repo = PartitionManifestRepository(
+            t0a,
+            blob_store=store,
+            blob_metadata_repository=blob_repo,
+            acquisition_repository=acq_repo,
+            projection_lineage_resolver=ProjectionLineageResolver(
+                root=t0b,
+                artifacts=artifacts,
+                contexts=contexts,
+                lineage=lineage,
+                schemas=schemas,
+            ),
+        )
+        manifest_records: list[tuple[Any, PartitionManifest]] = []
+        for rec in by_role.get(PackObjectRole.MANIFEST, []):
+            pm = PartitionManifest.model_validate_json(
+                _read_pack_metadata_bytes(pack_root / rec.pack_path)
+            )
+            manifest_records.append((rec, pm))
+        manifest_records.sort(
+            key=lambda item: (
+                item[1].partition_key,
+                item[1].manifest_version,
+            )
+        )
+        for rec, pm in manifest_records:
+            # One pointer per partition key (object-id match — the
+            # per-key operational fact is independent of which manifest
+            # exported it).
+            pointer_rec = next(
+                (
+                    p
+                    for p in by_role.get(PackObjectRole.CURRENT_POINTER, [])
+                    if p.object_id == f"pointer:{pm.partition_key}"
+                ),
+                None,
+            )
+            expected = None
+            if pm.manifest_version != 1:
+                # I13R3: CAS ``expected_current`` is the PRE-append
+                # current.  The pack pointer carries the SOURCE post-append
+                # current (pm itself) plus ``previous_manifest_id``; the
+                # no-gap version law (I04 §33) makes the previous version
+                # exactly ``pm.manifest_version - 1``.  (The v>=2 path was
+                # unreachable before I13R3 — no accepted fixture shipped a
+                # versioned manifest — so the previous derivation passed
+                # the post-append identity as the pre-append expectation.)
+                if pointer_rec is None:
+                    raise RestoreIntegrityFailure(
+                        f"manifest {pm.partition_manifest_id} version "
+                        f"{pm.manifest_version} has no current pointer "
+                        "in pack"
+                    )
+                from .manifests import PartitionCurrentPointer
+
+                pointer = PartitionCurrentPointer.from_canonical_json(
+                    (pack_root / pointer_rec.pack_path).read_text(
+                        encoding="utf-8"
+                    )
+                )
+                if (
+                    pointer.partition_manifest_id
+                    != pm.partition_manifest_id
+                    or pointer.manifest_version != pm.manifest_version
+                ):
+                    raise RestoreIntegrityFailure(
+                        f"pack current pointer diverges from manifest "
+                        f"{pm.partition_manifest_id}"
+                    )
+                if pointer.previous_manifest_id is None:
+                    raise RestoreIntegrityFailure(
+                        f"pack current pointer for "
+                        f"{pm.partition_manifest_id} has no previous "
+                        "manifest id; version chain is not replayable"
+                    )
+                expected = (
+                    pointer.previous_manifest_id,
+                    pm.manifest_version - 1,
+                )
+            manifest_repo.append_partition_manifest(pm, expected)
 
         # 5. revisions: replay registration from restored durable truth.
         registry = SourceRevisionRegistry(

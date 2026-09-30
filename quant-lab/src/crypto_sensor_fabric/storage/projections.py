@@ -893,6 +893,18 @@ class ProjectionArtifactRepository:
         self._cache: dict[str, RawProjectionArtifact] = {}
         self._load_all()
 
+    @property
+    def root(self) -> Path:
+        """Public read-only artifact catalog root (I13R3 §13: source
+        boundary visibility for fail-safe export composition; no write
+        surface is exposed)."""
+        return self._root
+
+    @property
+    def projection_root(self) -> Path:
+        """Public read-only T0B projection payload root (I13R3 §13)."""
+        return self._projection_root
+
     # -- loading -------------------------------------------------------------
 
     def _parse_payload(self, payload: dict[str, Any]) -> RawProjectionArtifact:
@@ -1109,6 +1121,11 @@ class ProjectionContextRepository:
             raise ProjectionArtifactCatalogCorrupt(str(exc)) from exc
         self._cache: dict[str, ProjectionCatalogRecord] = {}
         self._load_all()
+
+    @property
+    def root(self) -> Path:
+        """Public read-only context catalog root (I13R3 §13)."""
+        return self._root
 
     def _load_all(self) -> None:
         for logical_id in self._catalog.list_ids():

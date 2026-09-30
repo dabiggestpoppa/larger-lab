@@ -632,6 +632,13 @@ class SourceRevisionRegistry:
         self._acquisition_bindings: dict[str, tuple[str, int, str]] = {}
         self._load_all()
 
+    @property
+    def root(self) -> Path:
+        """Public read-only revision registry root (I13R3 §13: source
+        boundary visibility for fail-safe export composition; no write
+        surface is exposed)."""
+        return self._root
+
     # -- loading -------------------------------------------------------------
 
     def _load_segments(self) -> None:

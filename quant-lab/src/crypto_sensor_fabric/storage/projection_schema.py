@@ -589,6 +589,11 @@ class ProjectionSchemaRegistry:
             definition = self._definition_from_payload(payload)
             self._cache[definition.schema_key] = definition
 
+    @property
+    def root(self) -> Path:
+        """Public read-only schema catalog root (I13R3 §13)."""
+        return self._root
+
     # -- internals -----------------------------------------------------------
 
     def _catalog_items(self) -> list[tuple[str, dict[str, Any]]]:

@@ -354,6 +354,11 @@ class ProjectionLineageRepository:
         self._cache: dict[str, list[ProjectionLineage]] = {}
         self._load_all()
 
+    @property
+    def root(self) -> Path:
+        """Public read-only lineage catalog root (I13R3 §13)."""
+        return self._root
+
     # -- loading -------------------------------------------------------------
 
     def _parse_fragment(self, payload: dict[str, Any]) -> list[ProjectionLineage]:
