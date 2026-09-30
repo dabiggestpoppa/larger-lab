@@ -2611,3 +2611,195 @@ is $0. Book 5 and Atlas Program Block 4 remain untouched.
 **Status: IMPLEMENTATION CONVERGED — CLOSURE BLOCKED** (external blockers:
 SonarCloud quality-gate FAILURE and Kilo FAILURE on this head; no
 self-ratification).
+---
+
+## B4-CXR7U9R46 — FD-bound selector snapshot and final gate truth (superseding)
+
+Authorized start `35c13572c770a6c32d2b91fa97020a526de47a8d` (R45-EVIDENCE);
+append-only ladder on `oce-program-build`, every commit pushed, PR #4 never
+merged, no history rewritten, no LFS object migrated or deleted, no Sonar
+suppression of any kind, recurring cost $0.
+
+| Commit | Round | Content |
+|---|---|---|
+| `9fe4f96fc` | R46R1 | the claim is read through ONE FD-bound selector snapshot: the governed directory and the canonical name are opened without following redirections, the descriptor is admitted (regular, private, no foreign durable name, no mutation across admission), the bytes are read from that same descriptor with raw `os.read`, and the canonical pathname must still name the same device and inode. The validate-then-open reader is gone. |
+| `f6834470e` | R46R2 | one decision consumes one snapshot: classification and branch selection read the same admitted claim, so a replacement can no longer land between them. |
+| `db7be4ba2` | R46R3 | the receiptless law binds the durable transition record's own `receipt_sha256`; a foreign or malformed digest, or a record with no digest, is unknowable authority and fails closed. |
+| `c57b277a6` | R46R4 | the whole state/selector/action matrix corrected and proven row by row. |
+| `d8bf47124` | R46R5 | deterministic replacement races at exact boundaries, plus two executable weakened controls that restore the old reader and the old two-read decision and show them ACCEPTING a replacement. |
+| `58bdc5f2e` | R46R6 | the failure-level SonarCloud findings named by this ladder's own inventory (11) repaired at the sink. |
+| `0a9157ffa` | R46R7 | mandatory-runner selection proofs and registry regeneration from actual collection (905 mandatory ids, 19 categories, `validate_registry()` OK). |
+| `8da2ab532` | R46X1 | CI-exposed repair: the durable-name law corrected (see correction 7 below). |
+| `4be72cbce` | R46X2 | CI-exposed repair: the R46X1 side-effect proof asserted admission for two shapes that must refuse. |
+| `6613f995e` | R46X3 | `preflight_isolation`'s rlimit probe and its verdict extracted as one declared table. |
+| `35ad028d` | R46X4 | this gate's own functions brought under the complexity limit: the snapshot's census/open/read steps, the rollback admission, the dead-claim state advance, the durable-state verdict table, and the phase dispatcher out of `main()`. |
+
+### Superseding corrections to the R45 record (each proven, none asserted)
+
+1. **The R45 "double-lstat TOCTOU protection" claim was FALSE.** R45 performed
+   two `lstat()` calls and then reopened the pathname. A replacement landing
+   between the validation and the `open()` was accepted. The reviewer's own
+   reproduction (`validated_good_transition=rollback`,
+   `loaded_transition=finalize`, `replacement_accepted=True`) is correct, and
+   `test_b4_cxr7u9r46r5_selector_replacement_proofs.py` now proves it
+   executably: the restored pre-R46 reader prints `MIXED`/`ACCEPTED` in a child
+   process while the shipped reader prints `REFUSED` with `reads=1`.
+2. **R45 tested no replacement between validation and open.** R46R5 places
+   replacements at that exact boundary (and after admission, after parse, after
+   the identity proof, between classification and branch extraction, and between
+   shell classification and phase admission) and every one fails closed with
+   zero authority-side effects.
+3. **R45 tested no replacement between multiple reads.** R46R2 removed the
+   second read entirely: one immutable snapshot per decision.
+4. **A FINALIZING record with no claim was governed abort.** It is now a
+   fail-closed `4` (unreconciled) in both the shell classifier and
+   `phase_reconcile`, proven row by row in the R46R4 corrected matrix.
+5. **The receiptless law trusted a branch name, it did not bind a receipt.**
+   R46R3 binds it to the durable record's own receipt digest.
+6. **R45R4's "12 failure-level SonarCloud findings" was not an inventory.** It
+   was the single 50-annotation window GitHub exposes for one check run (see
+   the Sonar section below, where the same repository presents a different
+   50-annotation window at a different head). The R46R6 repairs remain valid
+   repairs; the COUNT was never a total and is not presented as one.
+7. **R46R1's own link-count law was wrong on POSIX and Linux CI proved it.**
+   The claim was published with `os.link(tmp, name)` followed by
+   `os.unlink(tmp)`, so a publisher that dies in that window — the exact
+   boundary the R44 law simulates — leaves a durably published claim with two
+   names, and a bare `st_nlink == 1` check refused a legitimately published,
+   fully fsynced selector, turning a recoverable crash into a permanent
+   authority lockout. The law is now stated over FOREIGN names and proven
+   rather than assumed: the governed directory is censused descriptor-relative,
+   the census must account for every `st_nlink` name (so a link placed outside
+   that directory cannot hide), and only the canonical coordinate and the
+   engine's own publisher temporary are admitted. Windows keeps the exact
+   strict count, because `os.rename` consumes the temporary name atomically.
+
+### CI truth on the final implementation head `35ad028d0248398a6f2e5934134a041f5a89b018`
+
+All five authoritative workflows SUCCESS at that exact head (tree
+`37bc6aa6067a39236bf3db427b7d439ecbc135b0`): b1 `36768503334`, b2
+`36768503165`, b3 `36768503180`, b4 `36768503174`, B1-I1R `36768510004`.
+
+- b1 evidence `b1-local-ground-evidence-545408ffd8c7` (OCE_RUN_ID
+  `545408ffd8c7`): 507 collected, 507 executed, 507 passed, 0 failed, 0
+  errors, **0 skipped** (`mandatory_skipped: 0`) — every R46 proof, including
+  the POSIX-only crash-residue proofs, RAN in authoritative Linux CI; 27/27
+  container-backed tests passed; independent gate 75 PASS / 0 FAIL
+  (`AUTHORITATIVE_CI`); adversarial 8 PASS / 0 FAIL; 37 manifest artifacts with
+  sha256 recorded; source clean before and after (dirty 0 / 0); stage
+  `LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW`; `cloud_mutations 0`,
+  `cloud_cost_state ZERO`, `cloud_activation_state DEFERRED_BY_OPERATOR`.
+- b2 independent gate PASS (run_id `83626fb4bd5f`): 905 collected, 905
+  executed, 905 passed, 0 skipped, against a registry whose expected total is
+  905 — b3/b4 run the same control-plane suite and their gates PASS.
+- B1-I1R SUCCESS on the same head.
+
+### Failed intermediate heads (recorded, not erased)
+
+- `0a9157ffa` (R46R7): b1 run `36759645882` FAILURE — six R44 crash-recovery
+  proofs refused by the withdrawn total-link-count law. Repaired in R46X1; the
+  next head proved the repair (all six pass, 507/507, zero skips).
+- `8da2ab532` (R46X1): b1 run `36763822266` FAILURE — one failure, and it was
+  in the new proof, not the engine: R46X1's side-effect proof asserted an
+  admitted snapshot for the two foreign-name shapes, which must refuse.
+  Repaired in R46X2.
+
+### SonarCloud Code Analysis: exact-head truth
+
+Check run `110069822193` on head `35ad028d` is COMPLETED / **FAILURE**, output
+"Quality Gate failed", with exactly two failed conditions: **C Reliability
+Rating on New Code** (required ≥ A) and **D Security Rating on New Code**
+(required ≥ A). Nothing is suppressed, excluded, re-severed or re-profiled;
+no NOSONAR was added anywhere in this ladder.
+
+The GitHub annotation surface for that check run returns exactly **50
+annotations — 14 failure-level, 36 warning-level — and a second page is
+empty**. Fifty is the maximum GitHub exposes for one check run, and the window
+is demonstrably not an inventory: the same repository presented a *different*
+50-annotation window (20 failure-level) at head `6613f995`, and the earlier
+R45 head's window (12 failure-level) differed again. Counts here are therefore
+reported as the window they are, never as a total. The complete issue list
+lives in SonarCloud's own issue view for pull request 4, which is not readable
+without authenticated SonarCloud access.
+
+Failure-level annotations visible in this exact-head window, each identified
+precisely (path:line, issue key, rule):
+
+| path:line | issue key | rule |
+|---|---|---|
+| `infrastructure/local-ground/scripts/pg-recovery.py:3533` | `AaDWHRwExjvAjhH7si_T` | cognitive complexity 84 in `_classify_record_for_shell` |
+| `infrastructure/local-ground/scripts/pg-recovery.py:1174` | `AaDzu9oLx5XiS1wmBwfA` | cognitive complexity 19 in `_assert_selector_authority_names` |
+| `infrastructure/local-ground/scripts/pg-recovery.py:395` | `AaB79zy1UzuNt_DKIcHj` | path-traversal security hot spot on `sha256_file` |
+| `infrastructure/local-ground/scripts/pg-recovery.py:1405` | `AaDz4YpuS-kZ3HEQnPPj` | path-traversal security hot spot on the no-follow open |
+| `infrastructure/cloud-ground/scripts/validate_engine.py:249` | `AaDzm7weP3fkdksBshG5` | cognitive complexity 26 |
+| `infrastructure/cloud-ground/scripts/validate_engine.py:483` | `AaB79zskUzuNt_DKIcEg` | duplicated literal `*.json` (4) |
+| `infrastructure/cloud-ground/scripts/validate_engine.py:617` | `AaB79zskUzuNt_DKIcEa` | duplicated literal `0 violations` (8) |
+| `infrastructure/control-plane/scripts/independent-gate-b2.py:135` | `AaB79zkDUzuNt_DKIcCF` | path-traversal security hot spot on `_parse_json` |
+| `infrastructure/control-plane/src/oce_control/execution_runtime.py:435` | `AaB79zZyUzuNt_DKIcAZ` | cognitive complexity 26 |
+| `infrastructure/control-plane/src/oce_control/pg_scheduler.py:239` | `AaB79zf1UzuNt_DKIcBI` | cognitive complexity 35 |
+| `infrastructure/local-ground/scripts/independent-gate.py:56` | `AaB79z1sUzuNt_DKIcJg` | duplicated literal `identity.json` (4) |
+| `infrastructure/local-ground/scripts/independent-gate.py:60` | `AaDfm8b0HGdXYMwa2_6c` | duplicated literal `source-clean.json` (3) |
+| `infrastructure/local-ground/scripts/backup.sh:166` | `AaB79zzTUzuNt_DKIcH3` | shellcheck: use `[[` instead of `[` |
+| `infrastructure/local-ground/scripts/restore.sh:333` | `AaDUyHP_C8VcJfdB6Juc` | shellcheck: use `[[` instead of `[` |
+
+The 36 warning-level annotations in this window are spread across 24 files:
+`adversarial-tests.sh` (1) and `test_regression.py` (3) in cloud-ground; one
+SQL migration; `migrate.py`, `oce_b3_worker.py`, `run_b2_validation.py` (1
+each); `config_startup.py` (3) and `pg_store.py` (1); twelve control-plane test
+modules (`test_b4_config_spine.py` 4, `test_b3_adversarial.py` 2,
+`test_b3_outbound_protocol_service.py` 2, `test_b4_startup_gate.py` 2, and one
+each in eight others); `restore.sh` (2); and four local-ground test modules
+(`test_b4_cxr7u9r35_recovery_authority.py` 2, and one each in three others).
+
+**Disposition, stated honestly.** The two path-traversal entries in
+`pg-recovery.py` and the one in `independent-gate-b2.py` are security HOT
+SPOTS, not confirmed defects: they fire on opening a coordinate that the CLI
+supplies, which is inherent to a CLI that accepts a transition directory, and
+the governed readers realpath-resolve, hold a directory descriptor and prove
+device/inode identity. Only an operator can adjudicate them in SonarCloud, and
+this ladder will not exclude or suppress them. The duplicated-literal and
+shellcheck entries are mechanically repairable; the complexity entries range
+from 19 to 84 in long-standing functions, several of them pre-B4 code outside
+this gate's surface (`pg_scheduler.tick`, `independent-gate-b2.run_gate`,
+`validate_engine.check_fail_closed`, `config_spine`, `migrate`, `pg-inventory`).
+R46R6, R46X3 and R46X4 repaired the findings that named this gate's own
+surface; the remainder are reported here as a backlog rather than dressed as
+resolved. **Consequence: the SonarCloud quality gate is FAILURE at this head
+and this ladder does not and cannot rate itself green.**
+
+### Kilo Code Review: exact-head truth
+
+Check run `110068627613` on head `35ad028d` is COMPLETED / **FAILURE**: the
+clone itself succeeded (1.89 GiB received), and the CHECKOUT then failed with
+exit 128 while smudging the 626 MB LFS object
+`quant-lab/research/crypto_foundry/alt_rotation/data_1/ALT_DATA_1_ASSET_MULTISCALE_FEATURES.parquet`
+(oid `41d47eec5330d12962eea14bb01a044b4d4910a5350e6f65bdb28616cf24e2a4`):
+"This repository exceeded its LFS budget. The account responsible for the
+budget should increase it to restore access." — `external filter 'git-lfs
+filter-process' failed`, `warning: Clone succeeded, but checkout failed`.
+
+**No repository-controlled, non-destructive repair exists.** The LFS-smudge
+skip R45X3 added applies to this project's OWN disposable adversarial worktree
+only; Kilo's clone is performed by the review provider, outside the repository
+and outside any script in it. Untracking or de-LFS-ing the parquet would be an
+LFS migration, which this gate is forbidden to perform. The exact operator
+actions are therefore: (1) restore or increase the GitHub LFS budget for this
+repository, or (2) configure the Kilo review provider's checkout to skip
+smudging (for example `GIT_LFS_SKIP_SMUDGE=1` in its clone environment). Until
+one of those happens, Kilo cannot produce a review at any head, and no
+in-repository change can make it do so.
+
+### Authorization boundary
+
+PR #4 is OPEN, unmerged, MERGEABLE, and UNSTABLE, head
+`35ad028d0248398a6f2e5934134a041f5a89b018`, base
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. `main` is untouched at
+`7c7816f3`. No merge was performed or authorized. Cloud, broker, capital and
+execution-authority mutations are 0; `cloud_cost_state` is ZERO; recurring cost
+is $0. Book 5 and Atlas Program Block 4 remain untouched. Prior sections above
+are preserved verbatim and are superseded only where this section says so.
+
+**Status: INTERNAL CI FULLY GREEN ON THE EVIDENCE HEAD; two external
+platform conditions remain, both named exactly above — SonarCloud quality-gate
+FAILURE on New Code (unsuppressed) and Kilo Code Review FAILURE on an
+exhausted Git LFS budget. No self-ratification.**

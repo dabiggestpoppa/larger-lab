@@ -460,3 +460,95 @@ broker, capital, or execution-authority mutation; recurring cost is $0;
 Book 5 and Atlas Program Block 4 untouched.
 
 **Exit-gate truth:** `BLOCKED_B4_CXR7U9R45: SonarCloud quality gate FAILURE (D Security / C Reliability on New Code) and Kilo Code Review FAILURE on head 1a662312 — operator-side adjudication required`.
+---
+
+## B4-CXR7U9R46 — SUPERSEDING SECTION (FD-bound selector snapshot and final gate truth)
+
+**Gate missions, and how each is discharged:**
+
+1. **No claim is read by validating a pathname and reopening it.** R46R1
+   replaced that reader with ONE FD-bound snapshot: no-follow directory and
+   coordinate, descriptor admission (regular, private, no foreign durable
+   name, no mutation across admission), raw `os.read` from that same
+   descriptor, then a device/inode identity proof of the canonical name.
+2. **One decision reads the claim once.** R46R2 removed the
+   classify-then-re-read shape; classification and branch selection consume the
+   same immutable snapshot.
+3. **A replacement at any boundary fails closed with zero authority-side
+   effects.** R46R5 places replacements at the pre-open stat, after admission,
+   after parse, after the identity proof, between classification and branch
+   extraction, and between shell classification and phase admission — all
+   deterministic (hooks, never sleeps), all denying, none mutating the claim,
+   the residue, the record or the catalog.
+4. **The refusals are proven non-vacuous.** Two executable weakened controls
+   restore the pre-R46 reader and the pre-R46 two-read decision in child
+   processes and show them ACCEPTING the deterministic replacement
+   (`MIXED` / `ACCEPTED`) while the shipped engine prints `REFUSED` with
+   `reads=1`.
+5. **The receiptless law binds a receipt, not a branch name.** R46R3 binds it
+   to the durable transition record's own `receipt_sha256`; foreign,
+   malformed or missing digests fail closed.
+6. **The state/selector matrix is corrected.** R46R4: CREATED/STAGED with any
+   claim → 4; ROLLED_BACK requires a receipt and the exact rollback selector
+   (6, else 4); FAILED is always 4; **FINALIZING without an exact claim → 4**,
+   not governed abort.
+7. **A crash in the publication window stays resumable.** R46X1 corrected the
+   law that Linux CI proved wrong: POSIX `os.link`-then-`os.unlink` leaves a
+   durably published claim with two names, and a bare `st_nlink == 1` check
+   refused it. The durable-name law now admits the engine's own publisher
+   residue, censuses the governed directory descriptor-relative, and refuses
+   any other durable name — including one placed outside that directory,
+   which cannot hide because the census must account for every `st_nlink`
+   name. Six R44 crash-recovery proofs that this had broken pass again.
+8. **Denial has zero authority-side effects.** R46X1 proof x6 asserts the
+   governed tree, the claim bytes, the publisher residue and any foreign name
+   are byte-identical after both an admitted read and a refused one.
+9. **Every mandatory proof runs in authoritative Linux CI with zero skips.**
+   b1 507 collected / 507 executed / 507 passed / **0 skipped**
+   (`mandatory_skipped: 0`), including the POSIX-only crash-residue proofs;
+   b2 905/905 with 0 skipped; b3/b4 gates PASS; I1R SUCCESS.
+10. **Evidence no longer claims double-lstat is TOCTOU-safe.** The R45 claim is
+    corrected in the evidence record, and the R46R5 weakened control makes the
+    old reader's acceptance executable rather than merely disputed.
+11. **SonarCloud exact-head truth is reported from the live check, with every
+    remaining issue in the reported window identified precisely** — 14
+    failure-level and 36 warning-level annotations, each named by path:line,
+    issue key and rule, together with the explicit caveat that GitHub caps the
+    annotation surface at 50 per check run and the window is not a total. The
+    gate is FAILURE (C Reliability and D Security on New Code) and is not
+    called green anywhere.
+12. **Kilo's LFS checkout failure is an exact operator blocker.** The clone
+    succeeds; the checkout exits 128 smudging a 626 MB parquet because the
+    account LFS budget is exhausted. No repository-controlled non-destructive
+    configuration can change a provider-side clone, and de-LFS-ing the object
+    is forbidden; the two operator actions are named in the record.
+
+**Implementation head:** `35ad028d0248398a6f2e5934134a041f5a89b018`
+(tree `37bc6aa6067a39236bf3db427b7d439ecbc135b0`).
+**Exact-head workflows:** b1 `36768503334`, b2 `36768503165`, b3
+`36768503180`, b4 `36768503174`, B1-I1R `36768510004` — all success.
+
+**Artifact truth:** b1 evidence `b1-local-ground-evidence-545408ffd8c7`,
+OCE_RUN_ID `545408ffd8c7`: 507/507 passed on Linux, zero
+failures/errors/skips, 27/27 container-backed, independent gate 75 PASS /
+0 FAIL (AUTHORITATIVE_CI), adversarial 8 PASS / 0 FAIL, 37 manifest artifacts
+with sha256 recorded, source clean before and after, `cloud_mutations 0`,
+`cloud_cost_state ZERO`, `cloud_activation_state DEFERRED_BY_OPERATOR`. b2 gate
+PASS (run_id `83626fb4bd5f`): 905/905 passed, 0 skipped, registry expected
+total 905. Failed intermediate heads (`0a9157ffa` b1 `36759645882`, and
+`8da2ab532` b1 `36763822266`) are recorded in the evidence record, not erased.
+Prior sections remain preserved verbatim above.
+
+**Current authorization boundary:** SonarCloud quality gate FAILURE on New
+Code, unsuppressed, at this head; Kilo Code Review FAILURE on an exhausted
+Git LFS budget; PR #4 OPEN, MERGEABLE, UNSTABLE, unmerged, head `35ad028d`;
+`main` at `7c7816f3`; no cloud, broker, capital, or execution-authority
+mutation; recurring cost is $0; Book 5 and Atlas Program Block 4 untouched.
+
+**Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW` — internal authoritative CI
+is fully green at the evidence head and every review criterion above is
+discharged by the implementation, its proofs, or an exactly named external
+operator action (SonarCloud adjudication of the New Code ratings and of the
+three path-traversal hot spots; restoring or skipping the LFS smudge for
+Kilo's checkout; and merge authorization). PR #4 is NOT merged and no merge
+authority is claimed or exercised.
