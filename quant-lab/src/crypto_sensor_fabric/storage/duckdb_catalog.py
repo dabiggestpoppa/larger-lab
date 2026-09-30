@@ -680,6 +680,27 @@ def _read_revisions(root: Path, blob_ids: set[str], acquisition_ids: set[str]) -
     from .revisions import RevisionSegmentRecord
 
     payloads = _read_json_catalog(root, "catalogs/source_revisions/segments", "segment_id")
+    # I13R3: the accepted I12/I13 registry wiring durably stores segments
+    # under ``<t0a>/revisions/segments`` (SourceRevisionRegistry root), a
+    # second canonical location the I10 unified-root discovery never
+    # covered — the v_t0_revisions view was structurally empty for that
+    # fixture family.  Read BOTH durable layouts (identity-keyed
+    # fragments; a segment present in both trees must agree or the
+    # rebuild fail-closes).
+    payloads += _read_json_catalog(root, "revisions/segments", "segment_id")
+    deduped: dict[str, dict[str, Any]] = {}
+    for payload in payloads:
+        segment_id = payload.get("segment_id")
+        if not isinstance(segment_id, str):
+            raise DuckDBCatalogCorrupt(
+                "revision segment fragment is missing a string segment_id"
+            )
+        if segment_id in deduped and deduped[segment_id] != payload:
+            raise DuckDBCatalogCorrupt(
+                f"revision segment {segment_id} diverges across durable layouts"
+            )
+        deduped[segment_id] = payload
+    payloads = list(deduped.values())
     rows = []
     for payload in payloads:
         try:
@@ -996,15 +1017,30 @@ def _validate_database(path: Path, expected_counts: dict[str, int]) -> None:
         con.close()
 
 
-def rebuild_duckdb_catalog(data_root: str | Path, catalog_path: str | Path) -> DuckDBCatalogBuild:
+def rebuild_duckdb_catalog(
+    data_root: str | Path,
+    catalog_path: str | Path,
+    *,
+    projection_root: str | Path | None = None,
+) -> DuckDBCatalogBuild:
     """Build and atomically publish a new discovery catalog from durable evidence.
 
     The candidate is built inside one explicit transaction (metadata, tables,
     rows, views) so the temporary file itself always has one coherent build;
     on any failure the candidate is rolled back, closed, deleted, and the
     previously published catalog is left byte-identical.
+
+    I13R3 root law: the discovery root is the T0A storage root.  When the
+    evidence lake stores T0B projection catalogs in the accepted sibling
+    tree (``<lake>/t0b``), pass that tree as ``projection_root`` — the
+    T0B lineage gate needs the T0A blob domain to validate source refs,
+    so a single-root rebuild fail-closes on T0B-bearing fixtures.  The
+    default (``projection_root=None``) reads EVERY catalog from
+    ``data_root`` — byte-identical to the pre-I13R3 unified-root
+    behavior (all accepted I10/I10R1/I10R2 fixtures).
     """
     root = Path(data_root)
+    proot = Path(projection_root) if projection_root is not None else root
     if not root.is_dir():
         raise DuckDBCatalogCorrupt(f"data root is not a directory: {root}")
     output = Path(catalog_path)
@@ -1015,7 +1051,7 @@ def rebuild_duckdb_catalog(data_root: str | Path, catalog_path: str | Path) -> D
         root, {row["blob_sha256"] for row in blobs}
     )
     projections = _read_projections(
-        root,
+        proot,
         blobs=blobs,
         acquisitions=acquisition_records,
     )
