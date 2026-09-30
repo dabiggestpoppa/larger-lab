@@ -1389,3 +1389,80 @@ NEXT = operator fills the four blocking selection fields in packet v0.3
   (D6M-1, D6M-2, D6M-3, D6M-4) and ratifies or returns Book 6 plan v0.2.
   Book 6 remains unratified and unimplemented.
 ```
+
+---
+
+# PLANNING LEDGER — BOOK 6 PLAN v0.2 RATIFIED (2026-09-30)
+
+Operator decision-closure and ratification review. Verified at start HEAD
+`cdec49ce746e59a653348b8243e6f822a45d600e` (clean, == origin). The operator's
+four selections were checked against the v0.3 decision packet and confirmed to
+be legal options with matching consequences; planning selected none of them.
+
+```text
+BOOK_6_PLAN = v0.2 RATIFIED
+BOOK_6_OPERATOR_RATIFIED = TRUE
+BOOK_6_PLAN_v0.1 = SUPERSEDED
+D6M_PACKET = v0.3 RATIFIED DECISION BASIS
+D6M-1 = CLOSED / A (BOOK6_LOCAL_DERIVED_RECORD)
+D6M-2 = CLOSED / B (SEPARATE_NORMALIZATION_RULE)
+D6M-3 = CLOSED / A (CENTRALIZED_OPERATOR_RATIFICATION)
+D6M-4 = CLOSED / A (PURPOSE_SPECIFIC_PRICE_AUTHORITY)
+D6M-5 = OPEN / DEFERRED_NOT_BLOCKING_PLAN_RATIFICATION
+OPEN_BLOCKING_D6M_DECISIONS = 0
+OPEN_DEFERRED_D6M_DECISIONS = 1
+INDIVIDUAL_STATE_RULES_RATIFIED = 0
+PRE_RATIFICATION_REVIEW = 35 / 35 PASS
+STRUCTURAL_FAILURE_COUNT = 0
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+USAGE_HEALTH_EMPIRICAL_EXECUTION_AUTHORITY = FALSE
+D2_6 = IN_FORCE / PARAMETERS_DEFERRED
+D8 = DEFERRED (untouched)
+```
+
+Binding consequences recorded in `CSIA_OPERATOR_DECISION_LOG.md`:
+
+- **D6M-1 = A** — a `MeasurementObservation` is a Book 6-local derived record
+  citing Book 2 authority; it is **not** a Book 2 claim; the Book 2 claim-state
+  machine is unchanged; `BOOK_2_AMENDMENT_REQUIRED = FALSE`;
+  `CONSTITUTION_AMENDMENT_REQUIRED = FALSE`; Book 2 remains the only epistemic
+  engine; no measurement-to-claim promotion path is implied.
+- **D6M-2 = B** — `NormalizationRule` is a separate first-class contract
+  (`NATIVE MeasurementObservation -> NormalizationRule -> NORMALIZED
+  MeasurementObservation`); `NORMALIZED_WITHOUT_NATIVE_LINEAGE = INVALID`
+  (type-level, mandatory); `PERCENTILE_WITHIN_COHORT` remains REJECTED; no
+  ranking normalization.
+- **D6M-3 = A** — the operator is the sole ratification authority for every
+  Class B and Class C `StateRule`; `DELEGATED_STATE_RULE_AUTHORITY = FALSE`;
+  `DELEGATION_REGISTER_REQUIRED = FALSE`; benchmark, coverage-sufficiency and
+  tolerance/volatility rules are each ratified individually; governance ratified
+  != rule ratified, so **no state becomes active** from this ratification.
+- **D6M-4 = A** — `PRICE_AUTHORITY = PURPOSE x SUBJECT x VALID_TIME x
+  METHODOLOGY`; no universal price-source class; Q34 remains valid; divergence
+  preserved, not averaged; Sensor retains market-state mechanics; D8 deferred.
+- **D6M-5 = DEFER** — the usage/health empirical research is designed, **not
+  authorized to execute**; no health/usage/adoption threshold is ratified;
+  closure requires a later empirical-phase authorization **and** a later recorded
+  parameter decision meeting the five emergence conditions; indefinite deferral
+  remains valid.
+
+Amendment audit: Books 1, 2, 3, 4, 5 and the Constitution all
+`AMENDMENT_REQUIRED = FALSE`; no accepted book and not the Constitution were
+touched by this session.
+
+Honest consequence: with `INDIVIDUAL_STATE_RULES_RATIFIED = 0`, only Class A
+availability states are available today, and `DATA_COMPLETE` cannot be
+affirmatively established while no coverage-sufficiency rule is ratified. Both
+are correct pre-implementation behaviour, not defects.
+
+Ratification record: `CSIA_BOOK_6_PLAN_RATIFICATION_RECORD_v0.1.md`. Ratified
+plan anchor: `fea27a5ea7988841dd0e30cacd35295a76a9f372`. All v0.1/v0.2/v0.3
+planning drafts preserved unmodified.
+
+```text
+NEXT = BOOK 6 OFFLINE IMPLEMENTATION AUTHORIZATION REVIEW
+```
+
+This NEXT does **not** grant implementation authority: Book 6 remains
+planning-ratified only, with no code, and live acquisition remains FALSE.

@@ -988,3 +988,244 @@ DECISION LOG ENTRY {
   binding_commit_sha:           (assigned at ratification commit)
 }
 ```
+
+---
+
+# BOOK 6 DECISIONS (D6M-1..D6M-5) — DECISION SESSION 2026-09-30
+
+**Decision session:** 2026-09-30
+
+**Operator authorization:** Book 6 D6M decision-closure and ratification-prep;
+recording the operator's selections. Planning records these decisions; planning
+selected none of them.
+
+**Reviewed at head:** `cdec49ce746e59a653348b8243e6f822a45d600e`
+
+**Decision packet:** `CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md`
+(decision-readiness review: 4/4 blocking ready, 1/1 deferred ready)
+
+---
+
+## D6M-1 — MEASUREMENT-OBJECT AUTHORITY BOUNDARY
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D6M-1
+  operator_selection:           A
+  operator_wording:             "MeasurementObservation is a BOOK 6-LOCAL DERIVED
+                                 RECORD. It cites Book 2 authority for its source
+                                 claims. It is NOT a Book 2 claim."
+  source_packet:                CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md
+                                 option A ("Book 6-local derived record")
+  selected_model:               BOOK6_LOCAL_DERIVED_RECORD
+  affected_book:                BOOK 6 (measurement layer)
+  affected_invariants:          single epistemic engine; Axiom 7 (discovery does
+                                 not imply promotion); no measurement-to-claim
+                                 promotion path
+  ratification_status:          RATIFIED / CLOSED
+  binding_consequences:         BOOK_2_AMENDMENT_REQUIRED = FALSE;
+                                CONSTITUTION_AMENDMENT_REQUIRED = FALSE;
+                                BOOK_2_REMAINS_ONLY_EPISTEMIC_ENGINE = TRUE;
+                                Book 2 claim-state machine UNCHANGED;
+                                measurement currentness is derived from live
+                                re-resolution of cited Book 2 authority plus
+                                Book 6-local methodology / missingness /
+                                supersession semantics
+  NOT_authorized_by_this_entry: any measurement-to-claim promotion path; any
+                                Book 2 vocabulary extension; any second epistemic
+                                engine
+  reversibility:                later recorded operator decision only (§5.4)
+  effective_timestamp:          2026-09-30
+  binding_plan_commit_sha:      fea27a5ea7988841dd0e30cacd35295a76a9f372
+                                (plan v0.2 introduction)
+  binding_commit_sha:           (assigned at ratification commit)
+}
+```
+
+---
+
+## D6M-2 — NORMALIZATION CONTRACT SHAPE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D6M-2
+  operator_selection:           B
+  operator_wording:             "NormalizationRule is a separate first-class
+                                 Book 6 contract... NORMALIZED_WITHOUT_NATIVE_
+                                 LINEAGE = INVALID"
+  source_packet:                CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md
+                                 option B ("separate NormalizationRule contract")
+  selected_model:               SEPARATE_NORMALIZATION_RULE
+  affected_book:                BOOK 6 (measurement layer)
+  affected_invariants:          Axiom 1 (native before normalization);
+                                 PERCENTILE_WITHIN_COHORT remains REJECTED;
+                                 no ranking normalization
+  binding_contract_shape:       NATIVE MeasurementObservation -> NormalizationRule
+                                 -> NORMALIZED MeasurementObservation
+  NormalizationRule fields:     normalization_rule_id;
+                                 input_metric_definition_ref;
+                                 input_measurement_refs;
+                                 normalization_type;
+                                 transformation / formula;
+                                 denominator_ref (when applicable);
+                                 cohort_ref (when applicable);
+                                 methodology_ref; valid_time; version;
+                                 output_metric_definition_ref
+  binding_invariant:            NORMALIZED_WITHOUT_NATIVE_LINEAGE = INVALID
+  enforcement_mechanism:        type-level and mandatory (native-source lineage
+                                 is part of the contract, not a validation step)
+  ratification_status:          RATIFIED / CLOSED
+  amendment_consequence:        none (Books 1-5 and Constitution unchanged)
+  NOT_authorized_by_this_entry: ranking or percentile normalization; any
+                                 normalized value without native lineage
+  reversibility:                later recorded operator decision only (§5.4)
+  effective_timestamp:          2026-09-30
+  binding_plan_commit_sha:      fea27a5ea7988841dd0e30cacd35295a76a9f372
+  binding_commit_sha:           (assigned at ratification commit)
+}
+```
+
+---
+
+## D6M-3 — STATE DERIVATION RULE GOVERNANCE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D6M-3
+  operator_selection:           A
+  operator_wording:             "CENTRALIZED_OPERATOR_RATIFICATION. The OPERATOR
+                                 is the sole ratification authority for every
+                                 Class B and Class C StateRule."
+  source_packet:                CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md
+                                 model A (CENTRALIZED_OPERATOR_RATIFICATION)
+  selected_model:               CENTRALIZED_OPERATOR_RATIFICATION
+  affected_book:                BOOK 6 (state layer)
+  affected_invariants:          governance ratified != rule ratified; no state may
+                                 be emitted without a ratified StateRule
+  state_rule_governance:        CENTRALIZED_OPERATOR_RATIFICATION
+  delegated_state_rule_authority: FALSE
+  delegation_register_required: FALSE
+  class_B_evidence_bar:         complete deterministic predicate; explicit input
+                                requirements; explicit unit / denominator / cohort /
+                                window compatibility; explicit precision / rounding
+                                semantics; no free empirical parameter; adversarial
+                                structural review passed; individual operator
+                                decision required
+  class_C_evidence_bar:         complete methodology; explicit benchmark /
+                                tolerance / volatility / decision-rule identity;
+                                robustness across declared methodology variants;
+                                empirical support where the rule contains empirical
+                                parameters; cohort/window/applicability scope
+                                explicit; adversarial structural review passed;
+                                individual operator decision required
+  benchmark_rules:              operator-ratified individually
+  coverage_sufficiency_rules:   operator-ratified individually
+  tolerance_volatility_rules:   operator-ratified individually
+  versioning:                   semantic / explicit per StateRule
+  supersession:                 a new rule version supersedes the old rule without
+                                rewriting historical states
+  review_cadence:               plan-revision cycles and operator-scheduled review
+  rollback:                     operator-recorded restoration of an earlier rule
+                                version; affected states recomputed; history
+                                preserved
+  d6m_3_does_NOT_govern:        health interpretation; usage sufficiency; adoption
+                                success; cross-subject quality bands; investment
+                                merit (D6M-5 remains separate)
+  ratification_status:          RATIFIED / CLOSED
+  INDIVIDUAL_STATE_RULES_RATIFIED: 0
+  auto_ratification:            NONE — choosing D6M-3=A ratifies NO Class B or
+                                Class C rule; INCREASING, DECREASING, UNCHANGED,
+                                STABLE, VOLATILE, HIGHER_THAN_OWN_HISTORY,
+                                LOWER_THAN_OWN_HISTORY all remain NOT RATIFIED
+  amendment_consequence:        none to accepted books; no delegation register is
+                                created
+  reversibility:                later recorded operator decision only (§5.4)
+  effective_timestamp:          2026-09-30
+  binding_plan_commit_sha:      fea27a5ea7988841dd0e30cacd35295a76a9f372
+  binding_commit_sha:           (assigned at ratification commit)
+}
+```
+
+---
+
+## D6M-4 — PRICE-AUTHORITY DOCTRINE
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D6M-4
+  operator_selection:           A
+  operator_wording:             "PRICE_AUTHORITY = PURPOSE x SUBJECT x VALID_TIME
+                                 x METHODOLOGY. There is no universal global
+                                 price-source class."
+  source_packet:                CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md
+                                 option A (purpose-specific price authority)
+  selected_model:               PURPOSE_SPECIFIC_PRICE_AUTHORITY
+  affected_book:                BOOK 6 (valuation layer), Book 2 (unchanged)
+  affected_invariants:          no universal price-source class; Book 2 remains
+                                 epistemic authority for source evidence; divergence
+                                 preserved not averaged; D8 untouched
+  binding_requirements:         Book 2 remains epistemic authority for source
+                                evidence; Book 6 methodology chooses the
+                                appropriate price-observation class; price source
+                                explicit; timestamp explicit; valid time explicit;
+                                staleness rule explicit; divergence preserved, not
+                                silently averaged; market price != redemption
+                                value != oracle mark != venue index != NAV by
+                                default; historical valid valuation remains
+                                historical even if the current price becomes
+                                unavailable; no trading "price of record";
+                                Sensor retains market-state mechanics
+  q34_guard:                    REMAINS VALID (no forced universal price
+                                authority)
+  d8_seam:                      DEFERRED (untouched)
+  ratification_status:          RATIFIED / CLOSED
+  amendment_consequence:        none (no Book 6 plan amendment required)
+  reversibility:                later recorded operator decision only (§5.4)
+  effective_timestamp:          2026-09-30
+  binding_plan_commit_sha:      fea27a5ea7988841dd0e30cacd35295a76a9f372
+  binding_commit_sha:           (assigned at ratification commit)
+}
+```
+
+---
+
+## D6M-5 — EMPIRICAL USAGE / HEALTH GOVERNANCE (DEFERRED, NOT CLOSED)
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D6M-5
+  operator_selection:           DEFER
+  operator_wording:             "DEFERRED_NOT_BLOCKING_PLAN_RATIFICATION. D2-6
+                                 remains IN FORCE. USAGE / HEALTH EMPIRICAL
+                                 RESEARCH: DESIGNED, NOT AUTHORIZED TO EXECUTE."
+  source_packet:                CSIA_BOOK_6_OPERATOR_DECISION_PACKET_D6M_v0.3.md
+                                 §5 deferral law
+  selected_model:               DEFERRED_NOT_BLOCKING_PLAN_RATIFICATION
+  open_status:                  OPEN_DEFERRED_EMPIRICAL_DECISION
+  ratification_status:          OPEN / DEFERRED_NOT_BLOCKING_PLAN_RATIFICATION
+                                (NOT closed by this session)
+  blocks:                       plan ratification = NO;
+                                health / adoption / usage-sufficiency state
+                                implementation = YES
+  D2_6:                         IN_FORCE / PARAMETERS_DEFERRED
+  health_interpretation:        UNAUTHORIZED
+  usage_health_empirical_execution_authority: FALSE
+  USED_state_parameters:        UNRATIFIED
+  not_ratified:                 no health threshold; no usage-sufficiency
+                                threshold; no adoption threshold; no USED cutoff;
+                                no HEALTHY state; no cross-subject adoption band
+  closure_requires:             (1) later explicit operator authorization of the
+                                empirical research phase; AND (2) a later recorded
+                                operator parameter decision satisfying the five
+                                emergence conditions: distribution-derived;
+                                methodology-robust; cohort-scoped;
+                                descriptive-only; reversible
+  may_not_be_closed_by:         planning activity; 6D validation runs; ratification
+                                of D6M-3; partial D2-6 action; the existence of
+                                descriptive usage metrics
+  indefinite_deferral:          VALID — an acceptable terminal state, not a defect
+  reversibility:                n/a (open)
+  effective_timestamp:          2026-09-30
+  binding_commit_sha:           (assigned at ratification commit)
+}
+```
