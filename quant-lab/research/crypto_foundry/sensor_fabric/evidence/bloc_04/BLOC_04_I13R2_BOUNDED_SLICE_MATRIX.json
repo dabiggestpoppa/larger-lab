@@ -1,0 +1,191 @@
+{
+  "cases": [
+    {
+      "case_id": "bounded_slice_blobs_equal_expected_closure",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ACTUAL_PACK_SET == EXPECTED_TRANSITIVE_CLOSURE_SET for blobs (pack == restored == closure)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "closure_acquisitions": 3,
+        "closure_blobs": 3,
+        "expected_closure": [
+          "096a6aceba5a8f26ae4e773bfd6052b4138d5ced8e830f274ca6ba8478fabfa9",
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05",
+          "bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0"
+        ],
+        "fixpoint_iterations": 2,
+        "pack": [
+          "096a6aceba5a8f26ae4e773bfd6052b4138d5ced8e830f274ca6ba8478fabfa9",
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05",
+          "bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0"
+        ],
+        "query_selected_acquisitions": 2,
+        "query_selected_blobs": 2,
+        "restored": [
+          "096a6aceba5a8f26ae4e773bfd6052b4138d5ced8e830f274ca6ba8478fabfa9",
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05",
+          "bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0"
+        ],
+        "support_acquisitions": 1,
+        "support_blobs": 1,
+        "unrelated_control_objects": 3
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "bounded_slice_acquisitions_equal_expected_closure",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ACTUAL_PACK_SET == EXPECTED_TRANSITIVE_CLOSURE_SET for acquisitions (pack == restored == closure)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "closure_acquisitions": 3,
+        "closure_blobs": 3,
+        "expected_closure": [
+          "acq-1",
+          "acq-2",
+          "acq-rev2"
+        ],
+        "fixpoint_iterations": 2,
+        "pack": [
+          "acq-1",
+          "acq-2",
+          "acq-rev2"
+        ],
+        "query_selected_acquisitions": 2,
+        "query_selected_blobs": 2,
+        "restored": [
+          "acq-1",
+          "acq-2",
+          "acq-rev2"
+        ],
+        "support_acquisitions": 1,
+        "support_blobs": 1,
+        "unrelated_control_objects": 3
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "bounded_slice_manifests_equal_matched_roots",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "pack manifests == restored manifests == uniquely matched manifest roots (no broad-dimension lookalikes)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "matched_roots": [
+          "m1"
+        ],
+        "pack": [
+          "m1"
+        ],
+        "restored": [
+          "m1"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "bounded_slice_revision_keys_exact",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "pack revision keys == restored keys == closure keys",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "closure_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ],
+        "closure_segment_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ],
+        "pack": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ],
+        "restored": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_selected_subset_of_pack",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "every QUERY_SELECTED blob and acquisition is present in the pack",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "query_selected_acquisitions": [
+          "acq-1",
+          "acq-2"
+        ],
+        "query_selected_blobs": [
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05",
+          "bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "true_unrelated_control_absent",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "unrelated control source (different partition/instrument/manifest, no dependency edge) absent from pack AND restored root; true leakage count = 0",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "control_blob": "4b4c8d855591e41e6496e4edfbf2dd301cb5c81d12a3b5d1cb1480a4c8d7e560",
+        "control_leaked_into_pack": false,
+        "control_leaked_into_restored": false,
+        "true_leakage_count": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "closure_fixpoint_idempotent",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "C1 == C2: the closure fixpoint is idempotent and deterministic (same sets, stable iteration count)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "acquisitions_stable": true,
+        "blobs_stable": true,
+        "iterations_first": 2,
+        "iterations_second": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "required_support_causal_trace",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": [
+        "every REQUIRED_SUPPORT object has a causal inclusion reason (MANIFEST_BLOB_REF / BLOB_ACQUISITIONS / REVISION_FIRST_ACQUISITION / REVISION_SEGMENT_BLOB)"
+      ],
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "reasons": [
+          "MATCHED_MANIFEST",
+          "REVISION_FIRST_ACQUISITION",
+          "REVISION_SEGMENT_BLOB"
+        ],
+        "trace_rows": 3
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_count_only_closure",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "count-only closure checks cannot detect an unrelated object substituted for a selected one",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "exact sets required (§22)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "BOUNDED_SLICE",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 8,
+  "rows_total": 9,
+  "synthetic_counterfactuals": 1
+}

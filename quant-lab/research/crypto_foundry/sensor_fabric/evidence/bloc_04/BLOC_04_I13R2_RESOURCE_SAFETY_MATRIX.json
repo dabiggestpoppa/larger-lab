@@ -1,0 +1,91 @@
+{
+  "cases": [
+    {
+      "case_id": "default_exporter_uses_real_disk_usage",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "exporter with NO injected provider still runs a real local disk-usage check (never silent bypass)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "disk_usage_calls": 4,
+        "probed": [
+          "<TMP>\\RESOURCE_SAFETY\\export_default",
+          "<TMP>\\RESOURCE_SAFETY\\export_default"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "default_restorer_uses_real_disk_usage",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "restorer with NO injected provider still runs a real local disk-usage check against pack inventory bytes",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "disk_usage_calls": 1,
+        "probed": [
+          "<TMP>\\RESOURCE_SAFETY\\restore_default"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "injected_provider_overrides_default",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "injected disk_usage_provider replaces local probing",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "injected_calls": 4
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "insufficient_free_export_refused",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "zero free space refuses export with typed error",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "raised": "PackResourceLimitExceeded"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "insufficient_free_restore_refused",
+      "category": "ADVERSARIAL_MUTATION",
+      "invariant": "zero free space refuses restore with typed error",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "raised": "PackResourceLimitExceeded"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "precopy_estimate_covers_selected_bytes",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "free-space checks see the selected T0A byte length (estimate >= 5 MiB blob) before/while copying",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checks": 5,
+        "max_required_bytes": 5439508,
+        "selected_blob_bytes": 5242880
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_silent_bypass",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "a skipped free-space check would leave no trace without call-count measurement",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "no silent bypass permitted by §2/§5"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "RESOURCE_SAFETY",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 6,
+  "rows_total": 7,
+  "synthetic_counterfactuals": 1
+}

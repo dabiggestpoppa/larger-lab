@@ -1,0 +1,315 @@
+{
+  "cases": [
+    {
+      "case_id": "revision_keys_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "exported source-revision key set literally equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ],
+        "source_keys": [
+          "34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae",
+          "e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "segment_records_parity_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "segment records equal excluding documented registered_at operational clock",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_digest": "b9103a2946b1bd8aadbcb1cc646c40c523c2abdcccdb9d6c7cd0c9c5f0f0ba7c",
+        "rows": 2,
+        "source_digest": "b9103a2946b1bd8aadbcb1cc646c40c523c2abdcccdb9d6c7cd0c9c5f0f0ba7c"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "observation_records_parity_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "public observations semantically identical",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_digest": "1dd88f61accab18eeac517d2257a93d8e7870d8cc023b91a994992199fe6fefa",
+        "rows": 2,
+        "source_digest": "1dd88f61accab18eeac517d2257a93d8e7870d8cc023b91a994992199fe6fefa"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "declaration_records_full_parity_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "declaration records FULL canonical equality (declaration_id, kind, key, revision_number, evidence_ref, declared_at, bound acquisition)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "rows": 0,
+        "source_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_ALL_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "ALL"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_FIRST_SEEN_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "FIRST_SEEN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_LATEST_SEEN_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "LATEST_SEEN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_EXACT_REVISION_1_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "EXACT_REVISION_1"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_EXACT_REVISION_2_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "EXACT_REVISION_2"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "segment_records_parity_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "segment records equal excluding documented registered_at operational clock",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_digest": "b9103a2946b1bd8aadbcb1cc646c40c523c2abdcccdb9d6c7cd0c9c5f0f0ba7c",
+        "rows": 2,
+        "source_digest": "b9103a2946b1bd8aadbcb1cc646c40c523c2abdcccdb9d6c7cd0c9c5f0f0ba7c"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "observation_records_parity_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "public observations semantically identical",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_digest": "1dd88f61accab18eeac517d2257a93d8e7870d8cc023b91a994992199fe6fefa",
+        "rows": 2,
+        "source_digest": "1dd88f61accab18eeac517d2257a93d8e7870d8cc023b91a994992199fe6fefa"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "declaration_records_full_parity_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "declaration records FULL canonical equality (declaration_id, kind, key, revision_number, evidence_ref, declared_at, bound acquisition)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "rows": 0,
+        "source_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_ALL_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "ALL"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_FIRST_SEEN_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "FIRST_SEEN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_LATEST_SEEN_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "LATEST_SEEN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_EXACT_REVISION_1_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "EXACT_REVISION_1"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_EXACT_REVISION_2_34d391db6ebf",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "EXACT_REVISION_2"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "segment_records_parity_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "segment records equal excluding documented registered_at operational clock",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_digest": "3cb9c0fa3263d6182e2bd658a0e89cfefc65458809fd974dee314cbd62e40281",
+        "rows": 1,
+        "source_digest": "3cb9c0fa3263d6182e2bd658a0e89cfefc65458809fd974dee314cbd62e40281"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "observation_records_parity_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "public observations semantically identical",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_digest": "fe6cb303341aecebbf6361a77aaa997f97ce25d76b9db214b5f4c8a8fe3f8d8b",
+        "rows": 1,
+        "source_digest": "fe6cb303341aecebbf6361a77aaa997f97ce25d76b9db214b5f4c8a8fe3f8d8b"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "declaration_records_full_parity_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "declaration records FULL canonical equality (declaration_id, kind, key, revision_number, evidence_ref, declared_at, bound acquisition)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "rows": 0,
+        "source_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_ALL_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "ALL"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_FIRST_SEEN_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "FIRST_SEEN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_LATEST_SEEN_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "LATEST_SEEN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_EXACT_REVISION_1_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "EXACT_REVISION_1"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resolution_parity_EXACT_REVISION_2_e591f8b8a9bb",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "registry resolution serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "equal": true,
+        "mode": "EXACT_REVISION_2"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_segments_only_claim",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "claiming 'segments and declarations equal' while only measuring segments would pass a shallow review",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "declarations measured separately (§10)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "REVISION_PARITY",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 25,
+  "rows_total": 26,
+  "synthetic_counterfactuals": 1
+}

@@ -1,0 +1,162 @@
+{
+  "cases": [
+    {
+      "case_id": "success_parity_ERROR_ON_AMBIGUITY_single",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides succeed and canonical result digests are literally equal (SUCCESS_PARITY; a raised exception on either side fails this row)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "ceb73637b1a1c090a365e87a0d75e607780013f7a8f72f0ed32cb6fa7c1158ac",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "ceb73637b1a1c090a365e87a0d75e607780013f7a8f72f0ed32cb6fa7c1158ac",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "success_parity_ALL_multi",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides succeed and canonical result digests are literally equal (SUCCESS_PARITY; a raised exception on either side fails this row)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "994217e6d9152ea4e31efc466960022eedb546d7d2db143a687ba137e03aff06",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "994217e6d9152ea4e31efc466960022eedb546d7d2db143a687ba137e03aff06",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "success_parity_FIRST_SEEN_multi",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides succeed and canonical result digests are literally equal (SUCCESS_PARITY; a raised exception on either side fails this row)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "f292664d316f1ea80fd287964e85c3e577a4988f88c1a4c044e2617d0e1c639a",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "f292664d316f1ea80fd287964e85c3e577a4988f88c1a4c044e2617d0e1c639a",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "success_parity_LATEST_SEEN_multi",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides succeed and canonical result digests are literally equal (SUCCESS_PARITY; a raised exception on either side fails this row)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "c1f02d982958fdc1d9fc4baaf5632c0ba6777ca24149bee4f13f8ffd6fed5ad8",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "c1f02d982958fdc1d9fc4baaf5632c0ba6777ca24149bee4f13f8ffd6fed5ad8",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "success_parity_EXACT_REVISION_1",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides succeed and canonical result digests are literally equal (SUCCESS_PARITY; a raised exception on either side fails this row)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "f292664d316f1ea80fd287964e85c3e577a4988f88c1a4c044e2617d0e1c639a",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "f292664d316f1ea80fd287964e85c3e577a4988f88c1a4c044e2617d0e1c639a",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "success_parity_EXACT_REVISION_2",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides succeed and canonical result digests are literally equal (SUCCESS_PARITY; a raised exception on either side fails this row)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "c1f02d982958fdc1d9fc4baaf5632c0ba6777ca24149bee4f13f8ffd6fed5ad8",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "c1f02d982958fdc1d9fc4baaf5632c0ba6777ca24149bee4f13f8ffd6fed5ad8",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "success_parity_PROVIDER_DECLARED_CANONICAL",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "canonical declaration survives restore; both sides resolve canonical revision with equal digests",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "SUCCESS_PARITY",
+        "restored_result_digest": "95a7d81ceba0068f3b299117c2220e1aa75d620e045ff6832fd05428c14a39cf",
+        "restored_status": "SUCCESS",
+        "source_result_digest": "95a7d81ceba0068f3b299117c2220e1aa75d620e045ff6832fd05428c14a39cf",
+        "source_status": "SUCCESS"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "refusal_parity_ERROR_ON_AMBIGUITY_multi",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides refuse with the same typed semantic error (REFUSAL_PARITY; never mixed with result parity)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "REFUSAL_PARITY",
+        "restored_exception": "RevisionAmbiguity",
+        "restored_status": "REFUSED",
+        "source_exception": "RevisionAmbiguity",
+        "source_status": "REFUSED"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "refusal_parity_EXACT_REVISION_missing",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides refuse with the same typed semantic error (REFUSAL_PARITY; never mixed with result parity)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "REFUSAL_PARITY",
+        "restored_exception": "NoMatchingEvidence",
+        "restored_status": "REFUSED",
+        "source_exception": "NoMatchingEvidence",
+        "source_status": "REFUSED"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "refusal_parity_PROVIDER_DECLARED_CANONICAL_no_declaration",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "BOTH sides refuse with the same typed semantic error (REFUSAL_PARITY; never mixed with result parity)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mode": "REFUSAL_PARITY",
+        "restored_exception": "RevisionCanonicalUnavailable",
+        "restored_status": "REFUSED",
+        "source_exception": "RevisionCanonicalUnavailable",
+        "source_status": "REFUSED"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_exception_as_result_parity",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "RAISED:RevisionAmbiguity == RAISED:RevisionAmbiguity must never be reported as successful result parity",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "SUCCESS/REFUSAL modes separated (§18)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "QUERY_POLICY_PARITY",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 10,
+  "rows_total": 11,
+  "synthetic_counterfactuals": 1
+}

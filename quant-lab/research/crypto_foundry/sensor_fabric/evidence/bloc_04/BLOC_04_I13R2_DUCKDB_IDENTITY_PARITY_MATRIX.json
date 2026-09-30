@@ -1,0 +1,97 @@
+{
+  "cases": [
+    {
+      "case_id": "duckdb_identity_parity_v_t0_blobs",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "sorted blob_sha256 identity tuples from rebuilt source slice == restored catalog identity tuples",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "counts": {
+          "restored": 0,
+          "source": 0
+        },
+        "identity_columns": "blob_sha256",
+        "restored_rows": [],
+        "source_rows": []
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_identity_parity_v_t0_acquisitions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "sorted acquisition_id, blob_sha256 identity tuples from rebuilt source slice == restored catalog identity tuples",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "counts": {
+          "restored": 0,
+          "source": 0
+        },
+        "identity_columns": "acquisition_id, blob_sha256",
+        "restored_rows": [],
+        "source_rows": []
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_identity_parity_v_t0_partitions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "sorted partition_manifest_id, partition_key, manifest_version identity tuples from rebuilt source slice == restored catalog identity tuples",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "counts": {
+          "restored": 0,
+          "source": 0
+        },
+        "identity_columns": "partition_manifest_id, partition_key, manifest_version",
+        "restored_rows": [],
+        "source_rows": []
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_identity_parity_v_t0_revisions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "sorted source_revision_key, revision_number, segment_id, first_acquisition_id identity tuples from rebuilt source slice == restored catalog identity tuples",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "counts": {
+          "restored": 0,
+          "source": 0
+        },
+        "identity_columns": "source_revision_key, revision_number, segment_id, first_acquisition_id",
+        "restored_rows": [],
+        "source_rows": []
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_identity_view_names_match",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "rebuilt catalogs expose the same view names",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_view": "v_t0_* (I10 accepted schema)",
+        "source_view": "v_t0_* (I10 accepted schema)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_count_only_parity",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "count-only parity cannot detect row substitution: two different acquisition sets can share a count",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "identity tuples required (§14)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "DUCKDB_IDENTITY_PARITY",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 5,
+  "rows_total": 6,
+  "synthetic_counterfactuals": 1
+}

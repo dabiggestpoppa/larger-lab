@@ -1,0 +1,110 @@
+{
+  "cases": [
+    {
+      "case_id": "time_filter_parity_acquired_before_cutoffA_excludes",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "selected acquisition IDs and canonical result digests literally equal across restore under the time filter",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "filter": "acquired_before_cutoffA_excludes",
+        "late_acq_selected_as_expected": true,
+        "restored_acquisition_ids": [
+          "acq-1",
+          "acq-2"
+        ],
+        "restored_result_digest": "ceb73637b1a1c090a365e87a0d75e607780013f7a8f72f0ed32cb6fa7c1158ac",
+        "source_acquisition_ids": [
+          "acq-1",
+          "acq-2"
+        ],
+        "source_result_digest": "ceb73637b1a1c090a365e87a0d75e607780013f7a8f72f0ed32cb6fa7c1158ac"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "time_filter_parity_acquired_before_cutoffB_includes",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "selected acquisition IDs and canonical result digests literally equal across restore under the time filter",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "filter": "acquired_before_cutoffB_includes",
+        "late_acq_selected_as_expected": true,
+        "restored_acquisition_ids": [
+          "acq-1",
+          "acq-2",
+          "acq-late"
+        ],
+        "restored_result_digest": "ec9b9c204a8dd291db5fd64bbafaba647b73eb2004e789e8b5fde81c9564bdec",
+        "source_acquisition_ids": [
+          "acq-1",
+          "acq-2",
+          "acq-late"
+        ],
+        "source_result_digest": "ec9b9c204a8dd291db5fd64bbafaba647b73eb2004e789e8b5fde81c9564bdec"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "time_filter_parity_observed_before_cutoffA_excludes",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "selected acquisition IDs and canonical result digests literally equal across restore under the time filter",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "filter": "observed_before_cutoffA_excludes",
+        "late_acq_selected_as_expected": true,
+        "restored_acquisition_ids": [
+          "acq-1",
+          "acq-2"
+        ],
+        "restored_result_digest": "ceb73637b1a1c090a365e87a0d75e607780013f7a8f72f0ed32cb6fa7c1158ac",
+        "source_acquisition_ids": [
+          "acq-1",
+          "acq-2"
+        ],
+        "source_result_digest": "ceb73637b1a1c090a365e87a0d75e607780013f7a8f72f0ed32cb6fa7c1158ac"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "time_filter_parity_observed_before_cutoffB_includes",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "selected acquisition IDs and canonical result digests literally equal across restore under the time filter",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "filter": "observed_before_cutoffB_includes",
+        "late_acq_selected_as_expected": true,
+        "restored_acquisition_ids": [
+          "acq-1",
+          "acq-2",
+          "acq-late"
+        ],
+        "restored_result_digest": "ec9b9c204a8dd291db5fd64bbafaba647b73eb2004e789e8b5fde81c9564bdec",
+        "source_acquisition_ids": [
+          "acq-1",
+          "acq-2",
+          "acq-late"
+        ],
+        "source_result_digest": "ec9b9c204a8dd291db5fd64bbafaba647b73eb2004e789e8b5fde81c9564bdec"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_time_filter_surrogate",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "metadata-digest-only parity would miss a corrupted ingested_at that shifts time-filter selection",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "literal query selection compared (§21)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "TIME_FILTER_PARITY",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 4,
+  "rows_total": 5,
+  "synthetic_counterfactuals": 1
+}

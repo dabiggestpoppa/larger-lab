@@ -1,0 +1,119 @@
+{
+  "cases": [
+    {
+      "case_id": "acquisition_record_exact_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "AcquisitionRecord canonical serialization literally equal INCLUDING ingested_at/response_observed_at/requested_* (query-semantic evidence per I12 acquired_before/observed_before law)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "query_semantic_fields_verified": [
+          "ingested_at",
+          "request_started_at",
+          "response_observed_at",
+          "requested_start",
+          "requested_end"
+        ],
+        "restored_digest": "26c708ece266d9153942dbd9b0ed72a7f4f1b23d75dc0f4dca12732bf01445cd",
+        "rows": 2,
+        "source_digest": "26c708ece266d9153942dbd9b0ed72a7f4f1b23d75dc0f4dca12732bf01445cd"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "evidence_blob_exact_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "EvidenceBlob canonical serialization literally equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "c3248c36018765f6f88aaea4b5ebe5b0c1de09987c00adbf3b313af411c2e9a8",
+        "rows": 2,
+        "source_digest": "c3248c36018765f6f88aaea4b5ebe5b0c1de09987c00adbf3b313af411c2e9a8"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "partition_manifest_exact_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "PartitionManifest canonical serialization literally equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "83ae691a7161f01941f84a34b6004099b631041c0a7a147ce838002c53ef4104",
+        "rows": 1,
+        "source_digest": "83ae691a7161f01941f84a34b6004099b631041c0a7a147ce838002c53ef4104"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "projection_artifact_exact_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "RawProjectionArtifact canonical serialization equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "rows": 0,
+        "source_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "projection_context_exact_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ProjectionCatalogRecord context equality",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "rows": 0,
+        "source_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "projection_lineage_exact_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ProjectionLineage rows literally equal",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [],
+        "restored_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+        "rows": 0,
+        "source_digest": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "exclusion_set_is_minimal_and_documented",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "excluded fields limited to I06 operational registration clock; no broad operational bucket",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "excluded_fields": [
+          "registered_at"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_timestamp_strip",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "stripping ingested_at/observed_at from parity would pass even if restore corrupted acquisition timestamps",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "timestamps are query-semantic (§6)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R1 operator-review blockers A-E (resource default, exact metadata, revision/declaration measurement, DuckDB identity, success/refusal parity)",
+  "mandate": "SENSOR-B4-I13R2",
+  "matrix": "EXACT_METADATA_PARITY",
+  "measured_at_checkpoint": "I13R2",
+  "rows_fail": 1,
+  "rows_ok": 7,
+  "rows_total": 8,
+  "synthetic_counterfactuals": 1
+}
