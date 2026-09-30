@@ -1,0 +1,115 @@
+{
+  "atlas": "CSIA — Crypto Systems Intelligence Atlas",
+  "cycle": "BOOK 5 HARDENING R4 — REGISTRY/DERIVED-REF AUTHORITY DECAY SEAL",
+  "branch": "agent/crypto-systems-intelligence-atlas-book5-build",
+  "starting_head": "2a455bcb01f8a2958913380b8164ba7c602c18a9",
+  "book4_base": "a2526e8220513b34967ab11f227ddbddc14e7e4a",
+  "plan": "CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.3.md",
+  "generated": "2026-09-30",
+  "environment": "offline in-memory only; no database; no graph DB; single epistemic engine (Book 2)",
+  "trigger": "Operator-reported defect, demonstrated failure-first at base 2a455bcb: a record registered while its Book 2 claim is OBSERVED keeps resolving through Book5CanonicalRecordRegistry.resolve (and through compose_path/topology_view) after the claim is transitioned to CONTESTED/STALE/REJECTED/SUPERSEDED — 5G mints a new derived=True artifact pointing at data whose Book 2 authority is no longer current. Demonstrated 40 failed / 11 passed on the E-matrix before the seal; after the seal 51/51 PASS.",
+  "baseline": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5_prior": 205,
+    "total_prior": 733
+  },
+  "counts_after": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5": 256,
+    "r4_focused": 51,
+    "total": 784
+  },
+  "gates": [
+    {
+      "gate": "REGISTRY_RESOLVE_LIVE_BOOK2_REVALIDATION",
+      "result": "PASS",
+      "evidence": "resolve() now requires an explicit Book5Provenance (explicit None fails closed, NO-AUTHORITY-CONTEXT) and re-runs claim-currentness (resolve_claim_refs -> resolve_claim -> can_promote_to_graph) against CURRENT Book 2 state at every resolution; a decayed claim (CONTESTED/STALE/REJECTED/SUPERSEDED) rejects its registered ref (STALE-AUTHORITY). Rows E1, E4, E5, E7, E9, E9b; test_book5_hardening_r4.py"
+    },
+    {
+      "gate": "PATH_STAGE_AUTHORITY_CURRENCY",
+      "result": "PASS",
+      "evidence": "compose_path forwards the engine's provenance into every stage resolution: a registered position whose claim decayed can never become a derived path stage. Row E2"
+    },
+    {
+      "gate": "TOPOLOGY_NODE_AUTHORITY_CURRENCY",
+      "result": "PASS",
+      "evidence": "topology_view forwards the engine's provenance into every node resolution: a decayed position can never become a derived topology node. Row E3"
+    },
+    {
+      "gate": "TOPOLOGY_EDGE_AND_ENDPOINT_AUTHORITY_CURRENCY",
+      "result": "PASS",
+      "evidence": "topology_view forwards provenance into edge-flow and endpoint resolutions: a decayed flow edge rejects, and an edge whose ENDPOINT position entry decayed rejects even though the flow's own claim is healthy. Rows E6, E16"
+    },
+    {
+      "gate": "SUPERSEDED_CLAIM_DECAY",
+      "result": "PASS",
+      "evidence": "SUPERSEDED decay driven through the canonical transition engine (mandatory replacement claim + reason, OBSERVED -> SUPERSEDED per LEGAL_TRANSITIONS); every surface (resolve, compose_path, topology_view) rejects the superseded authority. Parametrized ids [SUPERSEDED] of E1-E3, E5-E7, E9, E9b"
+    },
+    {
+      "gate": "MULTI_CLAIM_ENTRY_POISONING",
+      "result": "PASS",
+      "evidence": "an entry carrying TWO claim refs rejects when only its SECOND ref decays — the entry is only as current as its weakest claim. Row E4"
+    },
+    {
+      "gate": "WRONG_KIND_PRECEDENCE",
+      "result": "PASS",
+      "evidence": "WRONG-KIND stays a WRONG-KIND rejection even when the entry is also stale: kind identity never leaks authority across namespaces. Row E12"
+    },
+    {
+      "gate": "AUTHORITY_RESTORED_ON_BOOK2_RESHARPENING",
+      "result": "PASS",
+      "evidence": "the seal mirrors Book 2 state exactly, it does not remember a rejection: STALE -> OBSERVED (ratified transition) restores resolution, and CONTESTED -> CORROBORATED through the accepted engine (P-4 independent source/owner/mechanism, proposition equivalence) restores resolution of the same immutable record. Rows E13, E14"
+    },
+    {
+      "gate": "RECOVERY_FRESH_CLAIM_REBIND",
+      "result": "PASS",
+      "evidence": "after REJECTED, a fresh evidenced claim rebinds and its new canonical record registers and resolves; decay is per-claim, not per-registry — a sibling entry with current claims keeps resolving. Rows E15, E18"
+    },
+    {
+      "gate": "MANDATORY_AUTHORITY_CONTEXT_AT_RESOLVE",
+      "result": "PASS",
+      "evidence": "resolution without an explicit provenance resolver is refused outright (explicit None fails closed; no remembered-construction fallback, no default resolver, no second epistemic engine) — the R2 mandatory-authority pattern extended to the registry boundary. Row E19"
+    },
+    {
+      "gate": "SINGLE_ENGINE_CONTROLS",
+      "result": "PASS",
+      "evidence": "a decayed claim cannot ENTER the registry (register live-validates) and a decayed flow cannot compose through compose_snapshot — both already live-revalidate; pinned so the resolve seal never regresses into a registration-only check. Rows E10, E11"
+    },
+    {
+      "gate": "STRUCTURAL_ACCESSORS_STAY_NON_AUTHORITATIVE",
+      "result": "PASS",
+      "evidence": "registered_record returns the registered object even after decay (inspection only, never revalidated state — authority flows only through resolve/compose boundaries) and registered_refs stays a deterministic structural snapshot unchanged by decay. Rows E17, E20"
+    },
+    {
+      "gate": "DISPLAY_SEAL_PRESERVED",
+      "result": "PASS",
+      "evidence": "observed_value_display still live-revalidates claim currency for every decayed state (R3 seal intact against the decay engine). Row E8"
+    },
+    {
+      "gate": "R1_R2_R3_PRESERVATION",
+      "result": "PASS",
+      "evidence": "hardening_r1 37/37, hardening_r2 44/44, hardening_r3 46/46, core 22/22, adversarial 31/31, blocs 25/25; registry still never mints (SynthesisWriteLedger canonical_write_count = 0 by construction); no-second-engine doctrine intact (provenance-required resolve, no DB, no global state)"
+    },
+    {
+      "gate": "REGRESSION_AND_LINT",
+      "result": "PASS",
+      "evidence": "Books 1-4 unchanged (107/108/83/230); Book5 205 -> 256 (+51 R4 rows); Total CSIA 733 -> 784; ruff PASS (src + tests, crypto_systems_intelligence_atlas); mypy 44 files clean"
+    }
+  ],
+  "attack_matrix": {
+    "file": "test_book5_hardening_r4.py",
+    "rows": "E1-E9 (+E9b) parametrized decay x4 states per surface; E10-E11 single-engine controls; E12 WRONG-KIND precedence; E13-E14 resurrection/recovery; E15/E18 fresh-authority recovery; E16 endpoint isolation; E17/E20 structural-accessor contract; E19 mandatory authority context",
+    "failure_first_demonstration": "at base 2a455bcb (pre-seal): 40 failed / 11 passed — every decay row failed with the defect live (resolutions accepted stale entries, compose_path/topology_view emitted derived=True artifacts over decayed authority); single-engine controls and malformed-fixture rows excluded"
+  },
+  "doctrine": {
+    "no_second_engine": "registry resolution re-uses the accepted Book 2 engines (resolve_claim_refs / can_promote_to_graph / validate_quantitative_record); no parallel truth, no DB, no graph DB, no global state",
+    "registry_never_mints": "unchanged: the registry registers, it never mints; SynthesisWriteLedger canonical write count stays 0 by construction",
+    "epistemic_honesty": "the record is immutable so its entry is never 'fixed' — resolution rejects while Book 2 authority is non-current and restores when Book 2 restores it; NO STALE AUTHORITY THROUGH THE REGISTRY"
+  }
+}

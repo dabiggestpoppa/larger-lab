@@ -444,6 +444,12 @@ class CapitalFieldSynthesis:
         explicit ``Gap`` entries — never as a fabricated stage ref, and an
         unknown stage is never represented as a ref at all
         (NO PATH WITH UNRESOLVED CANONICAL REF).
+
+        R4 authority-decay seal: resolution is a live Book 2 boundary — each
+        stage ref revalidates its claims against current state through this
+        engine's provenance, so a registered position whose Book 2 authority
+        has decayed can never become a derived path stage (NO STALE
+        AUTHORITY THROUGH THE REGISTRY).
         """
 
         if registry is None:  # explicit None fails closed (R3 Phase 8)
@@ -460,7 +466,9 @@ class CapitalFieldSynthesis:
                 "multi-stage path the canonical records do not assert"
             )
         for ref in stage_record_refs:
-            resolved = registry.resolve(ref, expected_kind="position")
+            resolved = registry.resolve(
+                ref, expected_kind="position", provenance=self.provenance
+            )
             if resolved.record_kind != "position":
                 raise Book5ProvenanceError(
                     f"path stage {ref!r} is a canonical "
@@ -533,6 +541,13 @@ class CapitalFieldSynthesis:
         registered but NOT represented in the node set, the omission is
         carried as an explicit ``Gap`` — never a fabricated node
         (NO FAKE TOPOLOGY NODE; incomplete truth stays incomplete).
+
+        R4 authority-decay seal: node, edge, and endpoint resolution are a
+        live Book 2 boundary — each ref revalidates its claims against
+        current state through this engine's provenance, so a registered
+        record whose Book 2 authority has decayed can never become a
+        derived topology node, edge, or endpoint (NO STALE AUTHORITY
+        THROUGH THE REGISTRY).
         """
 
         if registry is None:  # explicit None fails closed (R3 Phase 8)
@@ -550,7 +565,9 @@ class CapitalFieldSynthesis:
             )
         node_set = set(node_record_refs)
         for ref in node_record_refs:
-            registry.resolve(ref, expected_kind="position")
+            registry.resolve(
+                ref, expected_kind="position", provenance=self.provenance
+            )
         if len(set(edge_flow_refs)) != len(edge_flow_refs):
             raise Book5ProvenanceError(
                 "topology edge flow refs must be unique; a repeated edge "
@@ -558,7 +575,7 @@ class CapitalFieldSynthesis:
             )
         computed_gaps: list[Gap] = list(gaps)
         for ref in edge_flow_refs:
-            registry.resolve(ref, expected_kind="flow")
+            registry.resolve(ref, expected_kind="flow", provenance=self.provenance)
             flow = registry.registered_record(ref)
             for endpoint_attr in (
                 "from_position",
@@ -567,7 +584,9 @@ class CapitalFieldSynthesis:
                 endpoint_ref = getattr(flow, endpoint_attr, None)
                 if endpoint_ref is None:
                     continue
-                registry.resolve(endpoint_ref, expected_kind="position")
+                registry.resolve(
+                    endpoint_ref, expected_kind="position", provenance=self.provenance
+                )
                 if endpoint_ref not in node_set:
                     computed_gaps.append(
                         Gap(

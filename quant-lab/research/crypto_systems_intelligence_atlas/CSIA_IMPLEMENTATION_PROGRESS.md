@@ -1212,3 +1212,66 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 
 No R4 without another newly demonstrated concrete correctness defect.
 Next: operator acceptance.
+
+---
+
+## CHECKPOINT - BOOK 5 HARDENING R4 (2026-09-30)
+
+Branch: `agent/crypto-systems-intelligence-atlas-book5-build`; base HEAD `2a455bcb0` (R3 final).
+
+Directive: BOOK 5 HARDENING R4 - REGISTRY/DERIVED-REF AUTHORITY DECAY SEAL (narrow; NOT generic hardening).
+
+Trigger (operator-reported defect, demonstrated failure-first at base `2a455bcb0`):
+`Book5CanonicalRecordRegistry.resolve` checked only membership + kind;
+`register()` validated Book 2 claims ONCE at registration time. A record
+registered while its claim was OBSERVED kept resolving through resolve() /
+compose_path() / topology_view() after the claim was transitioned (via the
+accepted `promotion.ClaimStateEngine`) to CONTESTED / STALE / REJECTED /
+SUPERSEDED - 5G minted a new `derived=True` artifact over decayed Book 2
+authority. E-matrix pre-seal: 40 failed / 11 passed.
+
+Seal landed (this commit):
+
+1. `resolve(ref, *, expected_kind=None, provenance=None)` - live Book 2
+   authority boundary: explicit-None provenance fails closed
+   (NO-AUTHORITY-CONTEXT, R2 mandatory-authority pattern); every resolve
+   re-runs claim currentness (`resolve_claim_refs` -> `resolve_claim` ->
+   `can_promote_to_graph`) against CURRENT state; flow/liability/fact kinds
+   re-run the R3 context seal live. Order preserved: UNKNOWN -> WRONG-KIND ->
+   NO-AUTHORITY-CONTEXT -> STALE-AUTHORITY (E12 precedence pin).
+2. `compose_path` / `topology_view` forward `self.provenance` into every
+   stage / node / edge / endpoint resolution (NO STALE AUTHORITY THROUGH THE
+   REGISTRY).
+3. The record is immutable, so its entry is never "fixed": resolution rejects
+   while authority is non-current and RESTORES when Book 2 restores it
+   (E13 STALE->OBSERVED; E14 CONTESTED->CORROBORATED via P-4 independent
+   source/owner/mechanism). Decay is per-claim, not per-registry (E18);
+   fresh claims rebind and resolve (E15).
+4. `registered_record` / `registered_refs` stay structural, never authority
+   (E17/E20); register()/compose_snapshot() controls pinned (E10/E11);
+   display seal intact (E8).
+
+Verification: R4-focused 51/51 PASS (E1-E20; decay x4 states x surfaces +
+attack matrix). Books 1-4 unchanged 107/108/83/230; Book5 205 -> 256;
+Total CSIA 733 -> 784. Ruff PASS (src+tests), mypy 44 files clean.
+R1/R2/R3 suites green (37/44/46; core 22, adversarial 31, blocs 25).
+Matrix: `CSIA_BOOK_5_HARDENING_R4_MATRIX.json` (15 gates PASS). Evidence:
+`CSIA_BOOK_5_HARDENING_R4_REGISTRY_AUTHORITY_DECAY_SEAL.md`.
+
+Doctrine: no second engine (the seal re-uses accepted Book 2 engines; no DB,
+no global state, no default resolver); registry still never mints
+(write-count zero by construction); resolution is a decision-time live check,
+never a remembered construction.
+
+Exit state:
+
+```text
+BOOK_5_HARDENING_R4 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED (R4)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Next: operator acceptance.

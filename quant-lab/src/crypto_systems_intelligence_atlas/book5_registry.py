@@ -21,6 +21,16 @@ already-canonical typed records only AFTER they pass:
 A record refused here can never be referenced by a 5G path or topology view:
 references resolve ONLY through this registry, and UNKNOWN, DETACHED, and
 WRONG-KIND references all fail closed.
+
+R4 authority-decay seal: registration-time validation alone is not
+authority. A registered entry whose Book 2 claims have since decayed out of
+the canonical current graph-promotable states (CONTESTED, STALE, REJECTED,
+SUPERSEDED) — or whose claims' evidence has since detached — is refused at
+RESOLUTION time: every resolve re-runs the live Book 2 validation against
+the explicit provenance resolver (NO STALE AUTHORITY THROUGH THE REGISTRY).
+The record itself is immutable, so its entry is never "fixed": the faithful
+resolution is to reject the ref the moment its Book 2 authority is no
+current, and to accept it again the moment Book 2 restores that authority.
 """
 
 from __future__ import annotations
@@ -115,6 +125,12 @@ class Book5CanonicalRecordRegistry:
       DETACHED (registered class cannot appear in the requested role), and
       WRONG-KIND (registered, but the API requires a different kind) — all
       three REJECT;
+    - R4: resolution is a LIVE Book 2 authority boundary — every resolve
+      requires an explicit ``provenance`` (explicit None fails closed) and
+      re-runs claim-currentness (plus the R3 context seal for the
+      flow/liability/observed-fact kinds) against CURRENT Book 2 state, so
+      an entry never outlives the authority of the claims that made it
+      canonical (NO STALE AUTHORITY THROUGH THE REGISTRY);
     - categories: positions, flows, liabilities, observed facts,
       transformations, economic sites (path/topology semantics only).
     """
@@ -196,14 +212,26 @@ class Book5CanonicalRecordRegistry:
         ref: str,
         *,
         expected_kind: str | None = None,
+        provenance: Book5Provenance | None = None,
     ) -> RegisteredRecord:
-        """Resolve a reference to a registered canonical record.
+        """Resolve a reference to a registered canonical record (R4-sealed).
 
         - UNKNOWN: the ref was never registered → REJECT;
         - WRONG-KIND: the ref is registered but ``expected_kind`` differs
           → REJECT (an API that requires a specific kind never accepts a
           canonical record of another kind);
-        - every resolution returns the typed entry.
+        - NO-AUTHORITY-CONTEXT: ``provenance`` is absent → REJECT (explicit
+          None fails closed, mirroring the R2 mandatory-authority seal —
+          there is no remembered-construction fallback and no default
+          resolver);
+        - STALE-AUTHORITY: the entry's Book 2 claims no longer resolve as
+          canonical, current, and evidenced (claim decayed to CONTESTED,
+          STALE, REJECTED, SUPERSEDED, or evidence detached) → REJECT; for
+          the flow/liability/observed-fact kinds the R3 quantitative
+          context seal re-runs live as well;
+        - every surviving resolution returns the typed entry, and restored
+          Book 2 authority (e.g. STALE → OBSERVED, CONTESTED →
+          CORROBORATED) restores resolution of the same immutable record.
         """
 
         from .book5_provenance import require_str_hashable
@@ -222,8 +250,24 @@ class Book5CanonicalRecordRegistry:
                 f"but the requested role requires {expected_kind} "
                 "(WRONG-KIND); refusing resolution"
             )
+        if provenance is None:  # explicit None fails closed (R4)
+            raise Book5RegistryError(
+                f"resolving derived reference {ref!r} requires an explicit "
+                "Book5Provenance resolver; a registry entry that cannot be "
+                "revalidated against live Book 2 state is not derived "
+                "authority (NO STALE AUTHORITY THROUGH THE REGISTRY)"
+            )
+        # R4 live revalidation: registration validated the claims ONCE;
+        # resolution revalidates them against CURRENT Book 2 state every
+        # time. Authority decays with its claims; it is never remembered.
+        record = self._records[ref]
+        claim_refs = getattr(record, "book2_claim_refs", None)
+        if isinstance(claim_refs, tuple) and len(claim_refs) > 0:
+            provenance.resolve_claim_refs(claim_refs)
+            if kind in {"flow", "liability", "observed_fact"}:
+                provenance.validate_quantitative_record(record)
         return RegisteredRecord(
-            record_ref=ref, record_kind=kind, record_class=type(self._records[ref]).__name__
+            record_ref=ref, record_kind=kind, record_class=type(record).__name__
         )
 
     def registered_refs(self, kind: str | None = None) -> tuple[str, ...]:
