@@ -32,6 +32,10 @@ from oce_control.worker_identity import WorkerAuthority, CapabilityRegistry, \
 from oce_control.worker_supervisor import (WorkerSupervisor,  # noqa: E402
                                            BOOTSTRAP_CAPABILITIES, _os_class)
 
+# The Principal Operator identity every PO-only governance action is bound
+# to (B3-R4 admission law; single definition per B4-CXR7U9R46R6).
+OPERATOR_PO = "operator:po"
+
 
 def _runtime_dir(args) -> Path:
     # B4-CXR5R6: the worker CLI runtime dir holds persistent state (logs,
@@ -67,7 +71,7 @@ def _runtime_dir(args) -> Path:
 def build_supervisor(runtime: Path) -> WorkerSupervisor:
     reg = CapabilityRegistry()
     for cap in BOOTSTRAP_CAPABILITIES:
-        reg.admit_capability(cap, "operator:po")
+        reg.admit_capability(cap, OPERATOR_PO)
     au = WorkerAuthority(reg)
     return WorkerSupervisor(runtime, au)
 
@@ -78,7 +82,7 @@ def _add_configure_parser(sub) -> None:
     conf.add_argument("worker_id")
     conf.add_argument("--cap", action="append", default=[],
                       help="capability (repeatable) — operator declaration")
-    conf.add_argument("--actor", default="operator:po")
+    conf.add_argument("--actor", default=OPERATOR_PO)
 
 
 def _add_admit_parser(sub) -> None:
@@ -87,7 +91,7 @@ def _add_admit_parser(sub) -> None:
     admit.add_argument("worker_id")
     admit.add_argument("--cap", action="append", default=[],
                        help="capability (repeatable)")
-    admit.add_argument("--actor", default="operator:po")
+    admit.add_argument("--actor", default=OPERATOR_PO)
     admit.add_argument("--confirm", action="store_true",
                        help="admission is a governance action; pass to confirm PO intent")
 

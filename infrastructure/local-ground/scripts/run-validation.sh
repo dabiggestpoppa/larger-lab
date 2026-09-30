@@ -60,7 +60,7 @@ EXPECTED_BRANCH="oce-program-build"
 FAILED_PHASE=""
 EVIDENCE=""
 
-if [ -z "${OCE_RUN_ID:-}" ]; then echo "FATAL: OCE_RUN_ID not set" >&2; exit 2; fi
+if [[ -z "${OCE_RUN_ID:-}" ]]; then echo "FATAL: OCE_RUN_ID not set" >&2; exit 2; fi
 echo "$OCE_RUN_ID" | grep -qE '^[0-9a-f]{12,}$' || { echo "FATAL: malformed OCE_RUN_ID" >&2; exit 2; }
 export OCE_RUN_ID
 export OCE_EXPECTED_REPO="$EXPECTED_REPO" OCE_EXPECTED_BRANCH="$EXPECTED_BRANCH"

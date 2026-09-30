@@ -58,6 +58,9 @@ RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
 STAGE_STATUS_NAME = "stage-status.json"
 MANIFEST_NAME = "evidence-manifest.json"
 LATE_ARTIFACTS = {STAGE_STATUS_NAME, MANIFEST_NAME}
+# Detail reported by every proof that cannot run because the junit evidence
+# itself is missing (single definition per B4-CXR7U9R46R6).
+NO_JUNIT = "no junit"
 # B4-CXR7U9R14: single definition of the repeated JUnit check label
 JUNIT_CHECK_NAME = "JUnit XML parses"
 
@@ -225,13 +228,13 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
             not missing, f"missing={len(missing)} {missing[:5]}")
         add("no-duplicates", "no duplicate test ids", not dupes, f"{dupes[:5]}")
     else:
-        add("collected-exact", "exact collected total", False, "no junit")
-        add("passed-exact", "exact passed total", False, "no junit")
-        add("failed-exact", "exact failed total", False, "no junit")
-        add("errors-exact", "exact error total", False, "no junit")
-        add("skipped-exact", "exact skipped total", False, "no junit")
-        add("mandatory-present", "every mandatory test executed", False, "no junit")
-        add("no-duplicates", "no duplicate test ids", False, "no junit")
+        add("collected-exact", "exact collected total", False, NO_JUNIT)
+        add("passed-exact", "exact passed total", False, NO_JUNIT)
+        add("failed-exact", "exact failed total", False, NO_JUNIT)
+        add("errors-exact", "exact error total", False, NO_JUNIT)
+        add("skipped-exact", "exact skipped total", False, NO_JUNIT)
+        add("mandatory-present", "every mandatory test executed", False, NO_JUNIT)
+        add("no-duplicates", "no duplicate test ids", False, NO_JUNIT)
 
     add("pytest-exit", "pytest exit code 0", int(pytest_rc or 0) == 0,
         f"rc={pytest_rc}")
@@ -240,7 +243,7 @@ def run_gate(evidence_dir: str | Path, pytest_rc: int | str, final: bool = False
     for cat, expected_n in expected_counts().items():
         cat_ids = {n for n in MANDATORY_TEST_IDS if category_of(n) == cat}
         if junit is None:
-            add(f"cat-{cat}", f"category {cat} executed", False, "no junit")
+            add(f"cat-{cat}", f"category {cat} executed", False, NO_JUNIT)
             continue
         ran = cat_ids & set(junit["ids"])
         not_skipped = ran - set(junit["skipped"])

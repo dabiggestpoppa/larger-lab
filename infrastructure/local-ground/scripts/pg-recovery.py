@@ -712,6 +712,52 @@ def _load_transition_record(operation_id, transition_dir=None):
         return json.load(f)
 
 
+def _merge_prior_transition_facts(path, record):
+    """Carry forward what earlier states recorded (B4-CXR7U9R46R6 helper).
+
+    The first-seen time (``created_at``) survives every state update, and
+    DURABLE keys recorded by earlier states (commit_point, rollback_floor,
+    selected_transition, ...) are carried forward: a state advance may not
+    silently erase facts the transaction still depends on. Returns
+    (record, created) where ``created`` is the prior first-seen time (None
+    when the record is new).
+    """
+    prior = None
+    if os.path.isfile(path):
+        try:
+            with open(path, encoding="utf-8") as f:
+                prior = json.load(f)
+        except (OSError, ValueError):
+            prior = None
+    created = prior.get("created_at") if isinstance(prior, dict) else None
+    record["created_at"] = created or record["updated_at"]
+    if isinstance(prior, dict):
+        for key, value in prior.items():
+            if key not in record:
+                record[key] = value
+    return record, created
+
+
+def _assert_transition_forward(operation_id, path, state):
+    """FORWARD-ONLY ladder guard (B4-CXR7U9R46R6 helper; authority law).
+
+    Reads the CURRENT durable state and refuses any regression before a
+    write: a same-state rewrite is idempotent; any move not permitted by the
+    ladder from the CURRENT durable state (FINALIZING -> PROMOTED, terminal
+    -> anything, etc.) raises RuntimeError.
+    """
+    try:
+        with open(path, encoding="utf-8") as f:
+            current = json.load(f).get("state")
+    except (OSError, ValueError):
+        current = None
+    if current is not None and state != current \
+            and state not in _TRANSITION_LADDER.get(current, set()):
+        raise RuntimeError(
+            f"refusing to move recovery operation {operation_id} backward: "
+            f"{current!r} -> {state!r}")
+
+
 def _record_transition(operation_id, state, receipt, extra=None) -> None:
     """Advance the operation record. `receipt` binds the record to the exact
     promote receipt whose content authorized it. The forward-only ladder is
@@ -739,42 +785,15 @@ def _record_transition(operation_id, state, receipt, extra=None) -> None:
                            if state == TRANSITION_STATE_PROMOTED else []),
         "updated_at": now_iso(),
     }
-    # first-seen time is carried forward across every state update
-    created = None
     path = _transition_record_path(operation_id)
-    prior = None
-    if os.path.isfile(path):
-        try:
-            with open(path, encoding="utf-8") as f:
-                prior = json.load(f)
-            created = prior.get("created_at")
-        except (OSError, ValueError):
-            prior = None
-    record["created_at"] = created or record["updated_at"]
-    # DURABLE keys recorded by earlier states (commit_point, rollback_floor,
-    # selected_transition, ...) are carried forward: a state advance may not
-    # silently erase facts the transaction still depends on.
-    if isinstance(prior, dict):
-        for key, value in prior.items():
-            if key not in record:
-                record[key] = value
+    record, created = _merge_prior_transition_facts(path, record)
     if extra:
         record.update(extra)
     # FORWARD-ONLY: read the durable record and refuse any regression before
-    # writing. A same-state rewrite is idempotent; any move not permitted by
-    # the ladder from the CURRENT durable state (FINALIZING -> PROMOTED,
-    # terminal -> anything, etc.) is refused.
+    # writing (B4-CXR7U9R46R6: the guard is the named
+    # _assert_transition_forward helper).
     if created is not None:
-        try:
-            with open(path, encoding="utf-8") as f:
-                current = json.load(f).get("state")
-        except (OSError, ValueError):
-            current = None
-        if current is not None and state != current \
-                and state not in _TRANSITION_LADDER.get(current, set()):
-            raise RuntimeError(
-                f"refusing to move recovery operation {operation_id} backward: "
-                f"{current!r} -> {state!r}")
+        _assert_transition_forward(operation_id, path, state)
     _write_transition_record(operation_id, record)
 
 
@@ -2890,6 +2909,39 @@ def _rollback_catalog_state(container, user, db, quarantine, staging):
     return "unreconciled"
 
 
+def _execute_rollback_by_catalog_state(catalog_state, container, user, db,
+                                       quarantine, staging, inventory, probe,
+                                       floor):
+    """The catalog-state decision table for the rollback phase
+    (B4-CXR7U9R46R6 helper; authority law preserved verbatim).
+
+    Returns (ok, problems, detail) for the durable catalog observation:
+      * ROLLED_BACK durable truth verifies against the floor only;
+      * before_mutation verifies the promoted canonical first, then rolls back;
+      * canonical_removed rolls back the still-present original;
+      * quarantine_renamed verifies the restored original against the floor;
+      * anything else is unreconciled.
+    """
+    if catalog_state == "before_mutation":
+        ok, problems, _rows, _fps = _verify_db(
+            container, db, user, inventory, probe)
+        if not ok:
+            raise RuntimeError("promoted canonical verification failed: "
+                               + "; ".join(problems))
+        return rollback_recovery(
+            container, user, db, quarantine, inventory, probe, floor=floor)
+    if catalog_state == "canonical_removed":
+        # The promoted canonical is already absent; rollback_recovery will
+        # only rename the still-present original and then verify it.
+        return rollback_recovery(
+            container, user, db, quarantine, inventory, probe, floor=floor)
+    if catalog_state == "quarantine_renamed":
+        # The old canonical is in place. Verify the durable pre-promotion
+        # floor directly; no catalog mutation is guessed or repeated.
+        return _verify_against_floor(container, db, user, floor)
+    raise RuntimeError("rollback catalog state is unreconciled")
+
+
 def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
                            user, container, probe_spec, execution_authority,
                            resume_only=False):
@@ -2962,26 +3014,13 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
             if catalog_state != "quarantine_renamed":
                 raise RuntimeError("ROLLED_BACK catalog does not contain only old canonical")
             ok, problems, detail = _verify_against_floor(container, db, user, floor)
-        elif catalog_state == "before_mutation":
-            ok, problems, _rows, _fps = _verify_db(
-                container, db, user, inventory, probe)
-            if not ok:
-                raise RuntimeError("promoted canonical verification failed: "
-                                   + "; ".join(problems))
-            ok, problems, detail = rollback_recovery(
-                container, user, db, quarantine, inventory, probe, floor=floor)
-        elif catalog_state == "canonical_removed":
-            # The promoted canonical is already absent; rollback_recovery will
-            # only rename the still-present original and then verify it.
-            ok, problems, detail = rollback_recovery(
-                container, user, db, quarantine, inventory, probe, floor=floor)
-        elif catalog_state == "quarantine_renamed":
-            # The old canonical is in place. Verify the durable pre-promotion
-            # floor directly; no catalog mutation is guessed or repeated.
-            ok, problems, detail = _verify_against_floor(
-                container, db, user, floor)
         else:
-            raise RuntimeError("rollback catalog state is unreconciled")
+            # B4-CXR7U9R46R6: the catalog-state decision table is the named
+            # _execute_rollback_by_catalog_state helper; the authority law is
+            # unchanged.
+            ok, problems, detail = _execute_rollback_by_catalog_state(
+                catalog_state, container, user, db, quarantine, staging,
+                inventory, probe, floor)
 
         detail.setdefault("rollback_succeeded", ok)
         detail.setdefault("rollback_failed", not ok)

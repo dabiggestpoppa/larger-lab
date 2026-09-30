@@ -50,6 +50,13 @@ POLICY_DIR = BASE_DIR / "policy"
 ANSIBLE_DIR = BASE_DIR / "ansible"
 IDENTITY_DATA = CONTRACTS_DIR / "checkpoint-identity-data.json"
 
+# B4-CXR7U9R46R6: single definitions for previously duplicated literals.
+EXPECTED_REPO_FULL = "dabiggestpoppa/larger-lab"
+COMPOSE_FOUNDATION_NAME = "compose.foundation.yml"
+ANSIBLE_CFG_NAME = "ansible.cfg"
+MSG_ANSIBLE_SYNTAX_OK = "Ansible playbook syntax valid"
+MSG_SCHEMA_FIXTURES_OK = "Schema fixture tests pass"
+
 
 def utc_now():
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -236,6 +243,42 @@ class Validator:
         return ""
 
     # ===== SOURCE-IDENTITY (CHECK 1 — MANDATORY FIRST) =====
+    # B4-CXR7U9R46R6 (S3776 extraction): the AUTHORITATIVE-mode decisions of
+    # check_source_identity, moved verbatim into a named helper so the
+    # identity law stays centralized without one oversized function.
+    def _authoritative_mismatches(self, actual_commit, actual_tree, gha_repo,
+                                  gha_sha, gha_ref, expected_base):
+        """AUTHORITATIVE-mode mismatch decisions, verbatim from
+        check_source_identity (B4-CXR7U9R46R6)."""
+        problems = []
+        if not self.target_commit or not self.target_commit.strip():
+            problems.append("AUTHORITATIVE: --target-commit is mandatory in authoritative mode")
+        if not self.target_tree or not self.target_tree.strip():
+            problems.append("AUTHORITATIVE: --target-tree is mandatory in authoritative mode")
+        if not self.target_branch or not self.target_branch.strip():
+            problems.append("AUTHORITATIVE: --target-branch is mandatory in authoritative mode")
+        if actual_commit and self.target_commit and actual_commit != self.target_commit:
+            problems.append(f"AUTHORITATIVE: HEAD {actual_commit[:12]} != target commit {self.target_commit[:12]}")
+        if actual_tree and self.target_tree and actual_tree != self.target_tree:
+            problems.append(f"AUTHORITATIVE: tree {actual_tree[:12]} != target tree {self.target_tree[:12]}")
+        if gha_repo:
+            if gha_sha and actual_commit and gha_sha != actual_commit:
+                problems.append(f"AUTHORITATIVE: GITHUB_SHA {gha_sha[:12]} != HEAD {actual_commit[:12]}")
+            if gha_ref and self.target_branch and gha_ref != self.target_branch:
+                problems.append(f"AUTHORITATIVE: GITHUB_REF_NAME '{gha_ref}' != '{self.target_branch}'")
+            if gha_repo != EXPECTED_REPO_FULL:
+                problems.append(f"AUTHORITATIVE: GITHUB_REPOSITORY '{gha_repo}' != '{EXPECTED_REPO_FULL}'")
+        if expected_base and expected_base.strip() and actual_commit:
+            if actual_commit != expected_base:
+                r = subprocess.run(
+                    ["git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor",
+                     expected_base, actual_commit],
+                    capture_output=True, text=True, timeout=10,
+                )
+                if r.returncode != 0:
+                    problems.append(f"AUTHORITATIVE: HEAD is not descendant of base {expected_base[:12]}")
+        return problems
+
     def check_source_identity(self):
         """Positively prove repository, branch, commit, tree, path, workflow identity.
         R3F: Separate observed vs expected. Never use contract value as observed."""
@@ -263,7 +306,7 @@ class Validator:
             errors.append(f"REPOSITORY_OWNER: expected dabiggestpoppa, got {expected_owner}")
         if expected_name != "larger-lab":
             errors.append(f"REPOSITORY_NAME: expected larger-lab, got {expected_name}")
-        if expected_full != "dabiggestpoppa/larger-lab":
+        if expected_full != EXPECTED_REPO_FULL:
             errors.append(f"REPOSITORY: expected dabiggestpoppa/larger-lab, got {expected_full}")
 
         remote_url = git.get("remote_url", "")
@@ -338,7 +381,7 @@ class Validator:
                    or os.environ.get("OCE_TRUSTED_REF", ""))
         gha_sha = os.environ.get("GITHUB_SHA", "")
         if gha_repo:
-            if gha_repo != "dabiggestpoppa/larger-lab":
+            if gha_repo != EXPECTED_REPO_FULL:
                 errors.append(f"GITHUB_REPOSITORY: expected dabiggestpoppa/larger-lab, got {gha_repo}")
             if gha_sha and actual_commit and gha_sha != actual_commit:
                 errors.append(f"GITHUB_SHA: {gha_sha[:12]} does not match HEAD {actual_commit[:12]}")
@@ -363,7 +406,7 @@ class Validator:
                     errors.append(f"AUTHORITATIVE: GITHUB_SHA {gha_sha[:12]} != HEAD {actual_commit[:12]}")
                 if gha_ref and self.target_branch and gha_ref != self.target_branch:
                     errors.append(f"AUTHORITATIVE: GITHUB_REF_NAME '{gha_ref}' != '{self.target_branch}'")
-                if gha_repo != "dabiggestpoppa/larger-lab":
+                if gha_repo != EXPECTED_REPO_FULL:
                     errors.append(f"AUTHORITATIVE: GITHUB_REPOSITORY '{gha_repo}' != 'dabiggestpoppa/larger-lab'")
             if expected_base and expected_base.strip() and actual_commit:
                 if actual_commit != expected_base:
@@ -484,12 +527,12 @@ class Validator:
     def check_schema_fixtures(self):
         fixtures_dir = BASE_DIR / "tests" / "fixtures"
         if not fixtures_dir.exists():
-            self.add("SCHEMA-FIXTURES", "Schema fixture tests pass", True, "BLOCKED", "No fixtures dir", "")
+            self.add("SCHEMA-FIXTURES", MSG_SCHEMA_FIXTURES_OK, True, "BLOCKED", "No fixtures dir", "")
             return
         try:
             import jsonschema
         except ImportError:
-            self.add("SCHEMA-FIXTURES", "Schema fixture tests pass", True, "BLOCKED",
+            self.add("SCHEMA-FIXTURES", MSG_SCHEMA_FIXTURES_OK, True, "BLOCKED",
                       "jsonschema not installed", "")
             return
         schemas = {s.stem.replace(".schema", ""): s for s in self._find_files(CONTRACTS_DIR, "*.schema.json")}
@@ -549,11 +592,11 @@ class Validator:
                     details.append(f"INVALID fixture {fixture_file.name} error: {e}")
         total = passed + failed
         if total == 0:
-            self.add("SCHEMA-FIXTURES", "Schema fixture tests pass", True, "BLOCKED", "No fixtures", "0 tested")
+            self.add("SCHEMA-FIXTURES", MSG_SCHEMA_FIXTURES_OK, True, "BLOCKED", "No fixtures", "0 tested")
         elif failed == 0:
-            self.add("SCHEMA-FIXTURES", "Schema fixture tests pass", True, "PASS", f"{passed}/{total}", "All pass")
+            self.add("SCHEMA-FIXTURES", MSG_SCHEMA_FIXTURES_OK, True, "PASS", f"{passed}/{total}", "All pass")
         else:
-            self.add("SCHEMA-FIXTURES", "Schema fixture tests pass", True, "FAIL", f"{passed}/{total}",
+            self.add("SCHEMA-FIXTURES", MSG_SCHEMA_FIXTURES_OK, True, "FAIL", f"{passed}/{total}",
                       "\n".join(details))
 
     def check_no_latest_tags(self):
@@ -617,7 +660,7 @@ class Validator:
             evidence_digests[img["name"]] = img.get("digest", "")
             if img.get("verified_digest", False):
                 verified_digests[img["name"]] = img.get("digest", "")
-        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        foundation = COMPOSE_DIR / COMPOSE_FOUNDATION_NAME
         if not foundation.exists():
             self.add("DIGEST-PROOF", "Image digests match registry evidence", True, "BLOCKED",
                       self.MSG_COMPOSE_NOT_FOUND, "")
@@ -741,7 +784,7 @@ class Validator:
         return resolved, failed_count, details
 
     def check_host_key_checking(self):
-        cfg_path = ANSIBLE_DIR / "ansible.cfg"
+        cfg_path = ANSIBLE_DIR / ANSIBLE_CFG_NAME
         if not cfg_path.exists():
             self.add("HOST-KEY-CHECKING", "Ansible host_key_checking is True", True, "BLOCKED",
                       "ansible.cfg not found", "")
@@ -766,7 +809,7 @@ class Validator:
                       "host_key_checking = True", "Verified")
 
     def check_no_published_ports(self):
-        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        foundation = COMPOSE_DIR / COMPOSE_FOUNDATION_NAME
         if not foundation.exists():
             self.add("NO-DB-PORTS", self.MSG_NO_DB_PORTS, True, "BLOCKED",
                       self.MSG_COMPOSE_NOT_FOUND, "")
@@ -852,7 +895,7 @@ class Validator:
 
     def check_health_checks(self):
         label = "Health checks on foundation services"
-        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        foundation = COMPOSE_DIR / COMPOSE_FOUNDATION_NAME
         if not foundation.exists():
             self.add("HEALTH-CHECKS", label, True, "BLOCKED",
                       self.MSG_COMPOSE_NOT_FOUND, "")
@@ -938,7 +981,7 @@ class Validator:
                       f"{found}/{total} rules", f"Missing: {', '.join(missing)}")
 
     def check_security_opts(self):
-        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        foundation = COMPOSE_DIR / COMPOSE_FOUNDATION_NAME
         if not foundation.exists():
             self.add("SECURITY-OPTS", "Security options present", True, "BLOCKED",
                       self.MSG_COMPOSE_NOT_FOUND, "")
@@ -952,7 +995,7 @@ class Validator:
                       f"{count} declarations", f"Need 2+, found {count}")
 
     def check_no_external_networks(self):
-        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        foundation = COMPOSE_DIR / COMPOSE_FOUNDATION_NAME
         if not foundation.exists():
             self.add("NO-EXTERNAL-NET", self.MSG_NO_EXTERNAL_NET, True, "BLOCKED",
                       self.MSG_COMPOSE_NOT_FOUND, "")
@@ -1022,7 +1065,7 @@ class Validator:
         site_yml = ANSIBLE_DIR / "playbooks" / "site.yml"
         hosts_yml = ANSIBLE_DIR / "inventories" / "example" / "hosts.yml"
         if not site_yml.exists():
-            self.add("ANSIBLE-SYNTAX", "Ansible playbook syntax valid", True, "BLOCKED",
+            self.add("ANSIBLE-SYNTAX", MSG_ANSIBLE_SYNTAX_OK, True, "BLOCKED",
                       "site.yml not found", "")
             return
         try:
@@ -1033,26 +1076,26 @@ class Validator:
             # discovered, and pin ANSIBLE_ROLES_PATH explicitly so local roles
             # resolve regardless of cwd/config-path semantics.
             env = os.environ.copy()
-            env["ANSIBLE_CONFIG"] = str(ANSIBLE_DIR / "ansible.cfg")
+            env["ANSIBLE_CONFIG"] = str(ANSIBLE_DIR / ANSIBLE_CFG_NAME)
             env["ANSIBLE_ROLES_PATH"] = str(ANSIBLE_DIR / "roles")
             r = subprocess.run(args, capture_output=True, text=True, timeout=60,
                                cwd=str(ANSIBLE_DIR), env=env)
             if r.returncode == 0:
-                self.add("ANSIBLE-SYNTAX", "Ansible playbook syntax valid", True, "PASS",
+                self.add("ANSIBLE-SYNTAX", MSG_ANSIBLE_SYNTAX_OK, True, "PASS",
                           "syntax-check passed", r.stdout[:200])
             else:
-                self.add("ANSIBLE-SYNTAX", "Ansible playbook syntax valid", True, "FAIL",
+                self.add("ANSIBLE-SYNTAX", MSG_ANSIBLE_SYNTAX_OK, True, "FAIL",
                           "syntax-check failed", (r.stdout + r.stderr)[:500])
         except FileNotFoundError:
-            self.add("ANSIBLE-SYNTAX", "Ansible playbook syntax valid", True, "BLOCKED",
+            self.add("ANSIBLE-SYNTAX", MSG_ANSIBLE_SYNTAX_OK, True, "BLOCKED",
                       "ansible-playbook not installed", "")
         except subprocess.TimeoutExpired:
-            self.add("ANSIBLE-SYNTAX", "Ansible playbook syntax valid", True, "BLOCKED", "timeout", "")
+            self.add("ANSIBLE-SYNTAX", MSG_ANSIBLE_SYNTAX_OK, True, "BLOCKED", "timeout", "")
 
     def check_ansible_lint(self):
         try:
             env = os.environ.copy()
-            env["ANSIBLE_CONFIG"] = str(ANSIBLE_DIR / "ansible.cfg")
+            env["ANSIBLE_CONFIG"] = str(ANSIBLE_DIR / ANSIBLE_CFG_NAME)
             env["ANSIBLE_ROLES_PATH"] = str(ANSIBLE_DIR / "roles")
             r = subprocess.run(
                 ["ansible-lint", str(ANSIBLE_DIR / "playbooks" / "site.yml")],
@@ -1069,7 +1112,7 @@ class Validator:
             self.add("ANSIBLE-LINT", self.MSG_ANSIBLE_LINT, True, "BLOCKED", "timeout", "")
 
     def check_compose_render(self):
-        foundation = COMPOSE_DIR / "compose.foundation.yml"
+        foundation = COMPOSE_DIR / COMPOSE_FOUNDATION_NAME
         if not foundation.exists():
             self.add("COMPOSE-RENDER", COMPOSE_RENDER_NAME, True, "BLOCKED",
                       self.MSG_COMPOSE_NOT_FOUND, "")
@@ -1452,7 +1495,7 @@ class Validator:
             errors.append(f"TREE: evidence={ev_tree[:12]} actual={actual_tree[:12]}")
         if ev_branch and actual_branch and ev_branch != actual_branch:
             errors.append(f"BRANCH: evidence={ev_branch} actual={actual_branch}")
-        if payload.get("repository", "") != "dabiggestpoppa/larger-lab":
+        if payload.get("repository", "") != EXPECTED_REPO_FULL:
             errors.append(f"REPOSITORY: {payload.get('repository', '')}")
         if payload.get("validator_version", "") != VERSION:
             errors.append(f"VERSION: {payload.get('validator_version', '')} != {VERSION}")
@@ -1493,7 +1536,7 @@ class Validator:
             "trusted_ci_ref": ident["trusted_ci_ref"],
             "checkout_state": ident["checkout_state"],
             "branch_provenance": ident["branch_provenance"],
-            "repository": "dabiggestpoppa/larger-lab",
+            "repository": EXPECTED_REPO_FULL,
             "remote_url": git_info.get("remote_url", "unknown"),
             "command": "validate_engine.py --all",
             "tools": {
@@ -1706,7 +1749,7 @@ class Validator:
             "tested_commit": git_info.get("commit", "unknown"),
             "tested_tree": git_info.get("tree", "unknown"),
             "tested_branch": self._identity_provenance()["observed_git_branch"],
-            "repository": "dabiggestpoppa/larger-lab",
+            "repository": EXPECTED_REPO_FULL,
             "command": "validate_engine.py --only",
             "tools": {
                 k: get_tool_version(v)

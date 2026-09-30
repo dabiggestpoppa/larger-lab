@@ -50,12 +50,13 @@ ADVERSARIAL_RESULTS_NAME = "adversarial-results.json"
 CLEANUP_EVIDENCE_NAME = "cleanup.json"
 LOCAL_AFTER_DENIED_NAME = "local-after-denied.json"
 RECOVERY_RECEIPT_NAME = "postgres-recovery-receipt.json"
+CLOUD_APPLY_DENIAL_NAME = "cloud-apply-denial.json"
 
 REQUIRED = [
     "identity.json", "environment-fingerprint.json", "junit.xml",
     TEST_SUMMARY_NAME, "test-mode.txt", ADVERSARIAL_RESULTS_NAME,
     "adversarial-output.txt", "cloud-plan.txt", "cloud-apply-denial.txt",
-    "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
+    CLOUD_APPLY_DENIAL_NAME, CLOUD_PLAN_DETERMINISTIC,
     LOCAL_AFTER_DENIED_NAME, "source-clean.json", CLEANUP_EVIDENCE_NAME,
     "stage-log.txt", STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME,
 ]
@@ -217,7 +218,7 @@ def main():
 
     # 2. Required JSON parses
     json_files = ["identity.json", TEST_SUMMARY_NAME, ADVERSARIAL_RESULTS_NAME,
-                  "cloud-apply-denial.json", CLOUD_PLAN_DETERMINISTIC,
+                  CLOUD_APPLY_DENIAL_NAME, CLOUD_PLAN_DETERMINISTIC,
                   LOCAL_AFTER_DENIED_NAME, "source-clean.json", CLEANUP_EVIDENCE_NAME,
                   STAGE_STATUS_NAME, EVIDENCE_MANIFEST_NAME]
     parse_ok = True
@@ -404,7 +405,7 @@ def main():
     add("gate-26-cloud-plan-zero-mutation", "cloud plan reports zero mutation", zero_mut)
 
     # 27-28. Cloud apply denial code + reason (machine-readable)
-    cad = ev.json("cloud-apply-denial.json")
+    cad = ev.json(CLOUD_APPLY_DENIAL_NAME)
     denial_ok = cad.get("exit_code", -1) == 5
     add("gate-27-cloud-apply-denied-code", "cloud apply returns expected nonzero denial code", denial_ok, cad)
     denial_txt = ev.text("cloud-apply-denial.txt")
