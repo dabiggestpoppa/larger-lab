@@ -22,6 +22,7 @@ from typing import Final
 from .book6_comparability import ComparabilityError, authorize_comparison
 from .book6_grammar import DenominatorState, MeasurementCategory
 from .book6_normalization import (
+    NormalizationRuleError,
     NormalizedMeasurement,
     NormalizationRule,
     check_normalization_admissibility,
@@ -170,10 +171,18 @@ class Book6MeasurementEngine:
         if registered.normalization_rule_id != rule.normalization_rule_id:
             raise Book6EngineError("normalization rule identity mismatch")
         input_definition = self.registry.definition(registered.input_metric_definition_ref)
-        check_normalization_admissibility(registered, input_category=input_definition.category)
+        try:
+            check_normalization_admissibility(
+                registered, input_category=input_definition.category
+            )
+            validate_native_lineage(product, registered)
+        except NormalizationRuleError as exc:
+            raise Book6EngineError(
+                f"normalized product {product.normalized_measurement_id} is not "
+                f"authorized: {exc}"
+            ) from exc
         for native_ref in registered.input_measurement_refs:
             self.registry.resolve_current(native_ref)
-        validate_native_lineage(product, registered)
         return product
 
     # -- comparability gate ---------------------------------------------------
@@ -309,6 +318,16 @@ class Book6MeasurementEngine:
         numeraire, price or common-value scalar back into a Book 5 record.
         """
 
+        if not valuation.numeraire:
+            raise ValuationError(
+                "a valuation requires an explicit numeraire at use: there is no "
+                "default and no implicit USD"
+            )
+        if not valuation.price.source_ref:
+            raise ValuationError(
+                "a valuation requires a cited price source; an unattributed "
+                "price carries no authority"
+            )
         admissible = PRICE_AUTHORITY_MATRIX[valuation.purpose]
         if valuation.price.price_class not in admissible:
             raise ValuationError(

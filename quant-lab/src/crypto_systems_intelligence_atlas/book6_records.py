@@ -63,16 +63,22 @@ class DenominatorRef(BaseModel):
         from .book6_grammar import DenominatorState
 
         state = DenominatorState(self.state)
-        if state is DenominatorState.PRESENT and self.value is None:
-            raise MeasurementRecordError(
-                "a PRESENT denominator must carry its observed value"
-            )
-        if state is DenominatorState.ZERO and self.value != 0.0:
-            raise MeasurementRecordError(
-                "a ZERO denominator must carry an observed 0.0, not a fabricated "
-                "non-zero value"
-            )
-        if state is not DenominatorState.PRESENT and self.value is not None:
+        if state is DenominatorState.PRESENT:
+            if self.value is None:
+                raise MeasurementRecordError(
+                    "a PRESENT denominator must carry its observed value"
+                )
+            if self.value == 0.0:
+                raise MeasurementRecordError(
+                    "an observed zero denominator is ZERO, not PRESENT"
+                )
+        elif state is DenominatorState.ZERO:
+            if self.value not in (None, 0.0):
+                raise MeasurementRecordError(
+                    "a ZERO denominator must carry an observed 0.0, not a "
+                    "fabricated non-zero value"
+                )
+        elif self.value is not None:
             raise MeasurementRecordError(
                 f"a {state.value} denominator may not carry a numeric value"
             )
@@ -179,11 +185,11 @@ class MeasurementObservation(BaseModel):
                     "a ratio measurement must carry its denominator as a measured "
                     "subject; a ratio has no implicit divisor"
                 )
-            if not self.denominator.is_divisible:
-                raise MeasurementRecordError(
-                    f"denominator state {self.denominator.state} forbids division "
-                    f"(never divide through missingness or through zero)"
-                )
+            # A non-divisible denominator (observed zero, unknown, unavailable,
+            # unstable) is NOT a construction error: the record is legitimate and
+            # the DENOMINATOR state is explicit. Division is what must fail
+            # closed, and it does so in the engine's typed quotient, which
+            # returns is_undefined rather than infinity, zero, or a drop.
         elif self.denominator is not None:
             raise MeasurementRecordError(
                 f"a {self.category.value} measurement may not declare a denominator"
