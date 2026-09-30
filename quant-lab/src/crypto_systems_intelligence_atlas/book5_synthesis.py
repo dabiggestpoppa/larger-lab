@@ -523,8 +523,9 @@ class CapitalFieldSynthesis:
         """Compose a derived topology view over canonical pointers (R3-D2).
 
         Phase 8/10 reference closure: EVERY node ref must resolve through the
-        canonical registry (any kind except flow — a flow is an edge, not a
-        node), and EVERY edge_flow_ref must resolve as a canonical flow
+        canonical registry as a canonical POSITION record (a flow is an edge,
+        not a node; an observed fact is never a capital node — WRONG-KIND),
+        and EVERY edge_flow_ref must resolve as a canonical flow
         record. Nodes are unique; edges are unique. For each edge flow whose
         canonical record asserts position endpoints (from_position/
         to_position), the endpoint ref must itself resolve in the registry
@@ -549,12 +550,7 @@ class CapitalFieldSynthesis:
             )
         node_set = set(node_record_refs)
         for ref in node_record_refs:
-            resolved = registry.resolve(ref)
-            if resolved.record_kind == "flow":
-                raise Book5ProvenanceError(
-                    f"topology node {ref!r} is a canonical flow record; "
-                    "flows are edges, not nodes (WRONG-KIND)"
-                )
+            registry.resolve(ref, expected_kind="position")
         if len(set(edge_flow_refs)) != len(edge_flow_refs):
             raise Book5ProvenanceError(
                 "topology edge flow refs must be unique; a repeated edge "

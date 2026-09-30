@@ -19,10 +19,10 @@ Central R3 invariant (Phases 5–12): NO BINDING != CONTEXT VERIFIED, and
 NO ARBITRARY STRING MAY BECOME DERIVED 5G AUTHORITY — every 5G pointer
 resolves through a canonical Book 5 record registry at decision time.
 
-Failure-first layout: the helpers that reference the R3 target APIs
-(``QuantitativeRecordContextBinding``, ``Book5CanonicalRecordRegistry``)
-import them lazily, so before the implementation commits land the rows
-fail at exactly the missing seal instead of at collection time.
+Phase 12 adds the model_copy R3 attack matrix (P/T/F/L/O): every
+authority-producing path revalidates live state, so a ``model_copy``-
+tampered artifact is inert data — its refs cannot re-enter the authority
+boundary that produced it.
 """
 
 from __future__ import annotations
@@ -109,12 +109,7 @@ def _bound_exact(
 
 
 def _bind_record_context(provenance: Book5Provenance, **dimensions: Any) -> str:
-    """Bind non-component quantitative context via the R3 target API.
-
-    Lazy import: before the R3 binding family exists this fails the calling
-    row (the kernel cannot yet express a flow/liability/fact context) —
-    which IS the failure-first demonstration of R3-D4.
-    """
+    """Bind non-component quantitative context via the R3 target API."""
 
     from crypto_systems_intelligence_atlas.book5_provenance import (
         QuantitativeRecordContextBinding,
@@ -321,12 +316,7 @@ def _make_position(position_id: str, *, claim_ref: str) -> CapitalPosition:
 
 
 def _registry_with(provenance: Book5Provenance, *records: object) -> Any:
-    """Build the R3 canonical registry and register validated records.
-
-    Lazy import: before the registry exists this fails the calling row —
-    5G cannot yet prove ANY referenced record is canonical, which IS the
-    failure-first demonstration of R3-D1/R3-D2.
-    """
+    """Build the R3 canonical registry and register validated records."""
 
     from crypto_systems_intelligence_atlas.book5_registry import (
         Book5CanonicalRecordRegistry,
@@ -837,3 +827,380 @@ def test_d12_valid_context_bound_fact_passes() -> None:
     assert snapshot.observed_value_fact_refs == (fact.fact_id,)
     payload = synthesis.observed_value_display(fact)
     assert payload["display"] == "OBSERVED_COMMON_VALUE_FACT"
+
+
+# ---------------------------------------------------------------------------
+# Phase 12 — model_copy R3 attack matrix (P/T/F/L/O): every authority-
+# producing path revalidates live state. A model_copy-tampered artifact is
+# inert data; the attack demonstrates that its refs cannot re-enter the
+# authority boundary that produced it.
+# ---------------------------------------------------------------------------
+
+
+def _path_fixture(tag: str):
+    _, _, provenance = kernel()
+    claim_id = _bound_exact(
+        provenance, f"{tag}-exact", asset_ref="csia:token:eth", unit="ETH"
+    )
+    position_a = _make_position(f"pos:{tag}-a", claim_ref=claim_id)
+    position_b = _make_position(f"pos:{tag}-b", claim_ref=claim_id)
+    synthesis = CapitalFieldSynthesis(provenance)
+    registry = _registry_with(provenance, position_a, position_b)
+    path = synthesis.compose_path(
+        f"path:{tag}",
+        stage_record_refs=(position_a.position_id, position_b.position_id),
+        valid_time=T0,
+        observed_at=T0,
+        registry=registry,
+    )
+    return provenance, synthesis, registry, path
+
+
+def test_p1_path_stage_ref_removed_rejected_on_reentry() -> None:
+    """P1: derived path → model_copy(stage_record_refs=()) → the stripped
+    artifact cannot re-enter the authority boundary: an empty stage tuple
+    still refuses composition."""
+
+    _, synthesis, _, path = _path_fixture("p1")
+    tampered = path.model_copy(update={"stage_record_refs": ()})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_path(
+            "path:p1-reentry",
+            stage_record_refs=tampered.stage_record_refs,
+            valid_time=T0,
+            observed_at=T0,
+            registry=_registry_with(_kernel_provenance()),
+        )
+
+
+def _kernel_provenance() -> Book5Provenance:
+    _, _, provenance = kernel()
+    return provenance
+
+
+def test_p2_path_stage_ref_replaced_by_fake_ref_rejected() -> None:
+    """P2: stage ref replaced by a fake ref → compose REJECT (UNKNOWN)."""
+
+    _, synthesis, registry, path = _path_fixture("p2")
+    tampered_refs = (path.stage_record_refs[0], "fake:exit")
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_path(
+            "path:p2-reentry",
+            stage_record_refs=tampered_refs,
+            valid_time=T0,
+            observed_at=T0,
+            registry=registry,
+        )
+
+
+def test_p3_path_stage_ref_replaced_by_wrong_kind_ref_rejected() -> None:
+    """P3: stage ref replaced by a canonical FLOW record id → compose REJECT
+    (path stages must be position records — WRONG-KIND)."""
+
+    _, _, provenance = kernel()
+    claim_id = _bound_exact(
+        provenance, "p3-exact", asset_ref="csia:token:eth", unit="ETH"
+    )
+    position = _make_position("pos:p3", claim_ref=claim_id)
+    flow_claim = _register_economics_claim(provenance, "p3-flow")
+    _bind_flow_context(provenance, flow_claim, asset_ref="csia:token:eth", unit="ETH")
+    flow = _make_flow("flow:p3", claim_ref=flow_claim)
+    registry = _registry_with(provenance, position, flow)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_path(
+            "path:p3",
+            stage_record_refs=(flow.flow_id,),
+            valid_time=T0,
+            observed_at=T0,
+            registry=registry,
+        )
+
+
+def _topology_fixture(tag: str):
+    _, _, provenance = kernel()
+    claim_id = _bound_exact(
+        provenance, f"{tag}-exact", asset_ref="csia:token:eth", unit="ETH"
+    )
+    position = _make_position(f"pos:{tag}", claim_ref=claim_id)
+    flow_claim = _register_economics_claim(provenance, f"{tag}-flow")
+    _bind_flow_context(provenance, flow_claim, asset_ref="csia:token:eth", unit="ETH")
+    flow = _make_flow(f"flow:{tag}", claim_ref=flow_claim)
+    synthesis = CapitalFieldSynthesis(provenance)
+    registry = _registry_with(provenance, position, flow)
+    view = synthesis.topology_view(
+        f"topo:{tag}",
+        node_record_refs=(position.position_id,),
+        edge_flow_refs=(flow.flow_id,),
+        valid_time=T0,
+        observed_at=T0,
+        registry=registry,
+    )
+    return provenance, synthesis, registry, view
+
+
+def test_t1_topology_node_ref_fake_rejected() -> None:
+    """T1: derived view → node ref replaced by fake ref → re-entry REJECT."""
+
+    _, synthesis, registry, view = _topology_fixture("t1")
+    tampered = view.model_copy(update={"node_record_refs": (GHOST_NODE,)})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.topology_view(
+            "topo:t1-reentry",
+            node_record_refs=tampered.node_record_refs,
+            valid_time=T0,
+            observed_at=T0,
+            registry=registry,
+        )
+
+
+def test_t2_topology_flow_ref_fake_rejected() -> None:
+    """T2: edge flow ref replaced by fake ref → re-entry REJECT."""
+
+    _, synthesis, registry, view = _topology_fixture("t2")
+    tampered = view.model_copy(update={"edge_flow_refs": (GHOST_FLOW,)})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.topology_view(
+            "topo:t2-reentry",
+            node_record_refs=tampered.node_record_refs,
+            edge_flow_refs=tampered.edge_flow_refs,
+            valid_time=T0,
+            observed_at=T0,
+            registry=registry,
+        )
+
+
+def test_t3_topology_node_swapped_to_unrelated_record_rejected() -> None:
+    """T3: node ref swapped to a canonical non-position record (a registered
+    observed fact) → REJECT (a fact is never a capital node — WRONG-KIND)."""
+
+    _, _, provenance = kernel()
+    claim_id = _bound_exact(
+        provenance, "t3-exact", asset_ref="csia:token:eth", unit="ETH"
+    )
+    position = _make_position("pos:t3", claim_ref=claim_id)
+    fact_claim = _register_economics_claim(provenance, "t3-fact")
+    _bind_fact_context(
+        provenance,
+        fact_claim,
+        subject_ref="csia:stablecoin:fxd",
+        numeraire="USD",
+    )
+    fact = _make_fact("fact:t3", claim_ref=fact_claim)
+    registry = _registry_with(provenance, position, fact)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.topology_view(
+            "topo:t3",
+            node_record_refs=(fact.fact_id,),
+            valid_time=T0,
+            observed_at=T0,
+            registry=registry,
+        )
+
+
+def test_t4_flow_endpoint_refs_mutated_rejected() -> None:
+    """T4: a canonical flow whose position endpoint ref does not resolve →
+    topology REJECT (endpoint consistency where deterministically possible;
+    no invented endpoints)."""
+
+    _, _, provenance = kernel()
+    claim_id = _bound_exact(
+        provenance, "t4-exact", asset_ref="csia:token:eth", unit="ETH"
+    )
+    position = _make_position("pos:t4", claim_ref=claim_id)
+    flow_claim = _register_economics_claim(provenance, "t4-flow")
+    _bind_flow_context(provenance, flow_claim, asset_ref="csia:token:eth", unit="ETH")
+    flow = _make_flow(
+        "flow:t4", claim_ref=flow_claim, from_position="pos:never-registered"
+    )
+    registry = _registry_with(provenance, position, flow)
+    synthesis = CapitalFieldSynthesis(provenance)
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.topology_view(
+            "topo:t4",
+            node_record_refs=(position.position_id,),
+            edge_flow_refs=(flow.flow_id,),
+            valid_time=T0,
+            observed_at=T0,
+            registry=registry,
+        )
+
+
+def test_f1_flow_unit_mutation_rejected() -> None:
+    """F1: canonical flow → model_copy unit → compose REJECT."""
+
+    provenance, claim_id = _flow_kernel("f1", asset_ref="csia:token:eth", unit="ETH")
+    synthesis = CapitalFieldSynthesis(provenance)
+    flow = _make_flow("flow:f1", claim_ref=claim_id)
+    tampered = flow.model_copy(update={"unit": "USDC"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:f1", flows=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_f2_flow_asset_mutation_rejected() -> None:
+    """F2: canonical flow → model_copy asset_ref → compose REJECT."""
+
+    provenance, claim_id = _flow_kernel("f2", asset_ref="csia:token:eth", unit="ETH")
+    synthesis = CapitalFieldSynthesis(provenance)
+    flow = _make_flow("flow:f2", claim_ref=claim_id)
+    tampered = flow.model_copy(update={"asset_ref": "csia:token:wbtc"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:f2", flows=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_f3_flow_realization_mutation_rejected() -> None:
+    """F3: flow with bound realization context → model_copy realization →
+    compose REJECT."""
+
+    provenance, claim_id = _flow_kernel(
+        "f3",
+        asset_ref="csia:token:eth",
+        unit="ETH",
+        realization_ref="realization:chain-a",
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    flow = _make_flow(
+        "flow:f3", claim_ref=claim_id, realization_ref="realization:chain-a"
+    )
+    tampered = flow.model_copy(update={"realization_ref": "realization:chain-b"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:f3", flows=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_f4_flow_claim_refs_stripped_rejected() -> None:
+    """F4: canonical flow → model_copy(book2_claim_refs=()) → compose REJECT
+    (no basis, no context)."""
+
+    provenance, claim_id = _flow_kernel("f4", asset_ref="csia:token:eth", unit="ETH")
+    synthesis = CapitalFieldSynthesis(provenance)
+    flow = _make_flow("flow:f4", claim_ref=claim_id)
+    tampered = flow.model_copy(update={"book2_claim_refs": ()})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:f4", flows=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_l1_liability_unit_mutation_rejected() -> None:
+    """L1: canonical liability → model_copy unit → compose REJECT."""
+
+    provenance, claim_id = _liability_kernel(
+        "l1", asset_ref="csia:token:usdc", unit="USDC", site_ref="csia:site:market-1"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    liability = _make_liability("liability:l1", claim_ref=claim_id)
+    tampered = liability.model_copy(update={"unit": "ETH"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:l1", liabilities=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_l2_liability_asset_mutation_rejected() -> None:
+    """L2: canonical liability → model_copy asset_ref → compose REJECT."""
+
+    provenance, claim_id = _liability_kernel(
+        "l2", asset_ref="csia:token:usdc", unit="USDC", site_ref="csia:site:market-1"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    liability = _make_liability("liability:l2", claim_ref=claim_id)
+    tampered = liability.model_copy(update={"asset_ref": "csia:token:wbtc"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:l2", liabilities=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_l3_liability_site_mutation_rejected() -> None:
+    """L3: canonical liability → model_copy market_site_id → compose REJECT."""
+
+    provenance, claim_id = _liability_kernel(
+        "l3", asset_ref="csia:token:usdc", unit="USDC", site_ref="csia:site:market-1"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    liability = _make_liability("liability:l3", claim_ref=claim_id)
+    tampered = liability.model_copy(update={"market_site_id": "csia:site:market-9"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:l3", liabilities=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_l4_liability_claim_refs_stripped_rejected() -> None:
+    """L4: canonical liability → model_copy(book2_claim_refs=()) → compose
+    REJECT (no basis, no context)."""
+
+    provenance, claim_id = _liability_kernel(
+        "l4", asset_ref="csia:token:usdc", unit="USDC", site_ref="csia:site:market-1"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    liability = _make_liability("liability:l4", claim_ref=claim_id)
+    tampered = liability.model_copy(update={"book2_claim_refs": ()})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.compose_snapshot(
+            "snap:l4", liabilities=(tampered,), valid_time=T0, observed_at=T0
+        )
+
+
+def test_o1_fact_numeraire_mutation_rejected() -> None:
+    """O1: canonical fact → model_copy numeraire → display REJECT."""
+
+    provenance, claim_id = _fact_kernel(
+        "o1", subject_ref="csia:stablecoin:fxd", numeraire="USD"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    fact = _make_fact("fact:o1", claim_ref=claim_id)
+    tampered = fact.model_copy(update={"numeraire": "BTC"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.observed_value_display(tampered)
+
+
+def test_o2_fact_subject_mutation_rejected() -> None:
+    """O2: canonical fact → model_copy subject_ref → display REJECT."""
+
+    provenance, claim_id = _fact_kernel(
+        "o2", subject_ref="csia:stablecoin:fxd", numeraire="USD"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    fact = _make_fact("fact:o2", claim_ref=claim_id)
+    tampered = fact.model_copy(update={"subject_ref": "csia:stablecoin:other"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.observed_value_display(tampered)
+
+
+def test_o3_fact_reporter_mutation_rejected() -> None:
+    """O3: canonical fact with bound reporter identity → model_copy
+    reporter_ref → display REJECT."""
+
+    provenance, claim_id = _fact_kernel(
+        "o3",
+        subject_ref="csia:stablecoin:fxd",
+        numeraire="USD",
+        reporter_ref="csia:entity:issuer",
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    fact = _make_fact("fact:o3", claim_ref=claim_id)
+    tampered = fact.model_copy(update={"reporter_ref": "csia:entity:imposter"})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.observed_value_display(tampered)
+
+
+def test_o4_fact_claim_refs_stripped_rejected() -> None:
+    """O4: canonical fact → model_copy(book2_claim_refs=()) → display REJECT
+    (no basis, no context)."""
+
+    provenance, claim_id = _fact_kernel(
+        "o4", subject_ref="csia:stablecoin:fxd", numeraire="USD"
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    fact = _make_fact("fact:o4", claim_ref=claim_id)
+    tampered = fact.model_copy(update={"book2_claim_refs": ()})
+    with pytest.raises(Book5ProvenanceError):
+        synthesis.observed_value_display(tampered)
