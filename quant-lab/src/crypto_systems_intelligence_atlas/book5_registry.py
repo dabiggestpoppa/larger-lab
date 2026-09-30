@@ -273,8 +273,11 @@ class Book5CanonicalRecordRegistry:
                 # boundary (single implementation, no duplicated logic):
                 # registry currentness -> record currentness -> binding
                 # currentness -> binding basis currentness.
-                for component in record.principal_components.components:
-                    provenance.validate_principal_component(component)
+                from .book5_records import CapitalPosition as _Position
+
+                if isinstance(record, _Position):
+                    for component in record.principal_components.components:
+                        provenance.validate_principal_component(component)
         return RegisteredRecord(
             record_ref=ref, record_kind=kind, record_class=type(record).__name__
         )
