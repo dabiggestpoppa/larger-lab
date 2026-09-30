@@ -343,3 +343,124 @@ persistent DB, graph DB, production scheduler, Book 6 valuation, production
 pricing, or trading/execution authority. Context dimensions bound in R3 are
 Book 5-local typed interpretations of canonical Book 2 claims, not fields
 Book 2 natively encodes.
+
+---
+
+# BOOK 5 HARDENING R5 — BINDING-BASIS LIVE CURRENTNESS SEAL (2026-09-30)
+
+## Trigger
+
+Narrow, operator-authorized cycle: the R4 contract stated
+**"BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY"** but no provenance-module
+code landed for binding-basis currentness. Both binding families validated their
+basis claims **only at registration**; a binding whose subject claim stayed
+current kept producing authority after its basis claim decayed through the
+accepted Book 2 transition engine (STALE/CONTESTED/REJECTED/SUPERSEDED).
+Demonstrated failure-first at base `a687268f`: 10 failed / 7 passed on the repro
+matrix (A1×4, B1–B4, C2, Q2 raised DID NOT RAISE) before the seal.
+
+## Doctrine — three independent dimensions
+
+```text
+REGISTRY MEMBERSHIP          != CURRENT AUTHORITY            (R4)
+BINDING REGISTRATION         != CURRENT BINDING AUTHORITY    (R5)
+SUBJECT CLAIM CURRENT        != BINDING BASIS CURRENT        (R5)
+```
+
+Central invariant: **BINDING EXISTS != BINDING CURRENTLY AUTHORITATIVE** —
+registration proves VALID THEN; decision-time resolution proves VALID NOW.
+Authority requires BOTH subject currentness AND binding-basis currentness.
+
+## Seal
+
+`Book5Provenance._validate_binding_basis_live(basis_claim_refs, *,
+binding_family)` loops every basis ref through `self.resolve_claim` (live
+currentness against CURRENT Book 2) and rejects non-current states with the
+`BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY — register a new explicit
+binding` message. Called from exactly the two authority chokepoints —
+`validate_principal_component` (ClaimContextBinding) and
+`validate_quantitative_record` (QuantitativeRecordContextBinding) — so all
+boundaries inherit it without caller duplication: `aggregate_same_unit`,
+`components_for`, `collapse_same_unit`, `lineage_view`, `compose_snapshot`,
+`collapse_request`, `observed_value_display`, registry `resolve`. The frozen
+binding object is never mutated; context interpretation is immutable, epistemic
+authority is not.
+
+Registry position extension (closes the R4 nested gap): `registry.resolve` now
+validates the nested `PrincipalComponent` set of a position entry through
+`validate_principal_component` (isinstance-narrowed `CapitalPosition`). Chain
+complete: registry currentness → record currentness → binding currentness →
+binding basis currentness (S1; flows/liabilities/facts S2–S4 via R4 routing).
+
+## Semantics pinned
+
+- **Empty basis (`basis_claim_refs = ()`) is LEGAL**: the subject claim is the
+  sole epistemic basis, already live-revalidated via the record/component's own
+  claim refs; invariant is IF basis refs are present, ALL must be current
+  (E1, E2 — empty basis does not disable subject live-validation).
+- **Multi-basis weakest link**: any single decayed basis ref rejects, both
+  families (M1–M3, MQ1–MQ2).
+- **Supersession no-auto-follow**: a frozen binding referencing a SUPERSEDED
+  basis stays REJECTED even though the replacement claim is current in the
+  store; same-subject re-binding is refused; recovery = NEW subject claim + NEW
+  explicit binding over the replacement (D1–D3).
+- **Restoration**: STALE→OBSERVED restores (A6, B6, F2, L2); CONTESTED→
+  CORROBORATED via the accepted P-4 route restores (A7) — the binding is not a
+  tombstone.
+- **Subject vs basis 2×2 distinct** for components (C1–C4) and flows (Q1–Q4).
+
+## Verification
+
+| Check | Prior | After R5 |
+|---|---|---|
+| Book 1 / 2 / 3 / 4 canonical | 107 / 108 / 83 / 230 | 107 / 108 / 83 / 230 (freeze intact) |
+| Book 5 | 256 | 293 (+37 R5 rows) |
+| Total CSIA | 784 | 821 |
+| R1 / R2 / R3 / R4 focused | 37 / 44 / 46 / 51 | all preserved |
+| 45 stress traceability rows | PASS | PASS (enforced by `test_stress_traceability_complete`) |
+| ruff (CSIA src+tests) | PASS | PASS |
+| mypy (CSIA module) | 44 files clean | 44 files clean |
+| Sensor | 2325 P / 14 F / 4 S | 2325 P / 14 F / 4 S — failure set byte-equivalent to baseline (i05r2 ×3, i05r3 ×2, i05r4 ×3, i06 ×3, i06r1 ×3); BOOK5_INTRODUCED_SENSOR_FAILURES = 0 |
+
+Freeze audit (`git diff --name-only a2526e822...HEAD`): only `book5_*` sources,
+`test_book5_*` tests, and append-only research artifacts. Books 1–4 mutations =
+0; Crypto Sensor mutations = 0.
+
+## R4 evidence reconciliation (honest, no history rewritten)
+
+R4's substantive results were correct and are not rewritten. R4's scope
+statement claimed "BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY" although
+no provenance-module code for binding-basis currentness landed in R4. Recorded
+explicitly: **R4 correctly closed registry-record currentness; R5 completes the
+separately authorized binding-basis currentness clause that R4 did not
+implement.**
+
+## Status
+
+```text
+BOOK_5_HARDENING_R5 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (unchanged, still PROPOSED)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+```
+
+No R6 is proposed; R6 requires another newly demonstrated concrete correctness
+defect. Next action: operator acceptance review of Book 5.
+
+Matrix: `CSIA_BOOK_5_HARDENING_R5_MATRIX.json` (27 gates, all PASS). Evidence:
+`CSIA_BOOK_5_HARDENING_R5_BINDING_BASIS_CURRENTNESS.md`.
+Commits: `b0778bb7f` failing repros → `dd183a414` seal → `ea4a81545` style →
+`6960ada51` restoration/supersession/multi-basis/registry rows → `0a7f83853`
+registry nested seal → `e181aa7e8` mypy narrowing → `7a347f34` E-rows (this
+append + matrix + evidence + ledger in the final commit).
+
+## Limitations (unchanged, still explicit)
+
+Offline deterministic kernel only — no live acquisition, RPC, CEX feeds,
+persistent DB, graph DB, production scheduler, Book 6 valuation, production
+pricing, or trading/execution authority. Binding context dimensions remain
+Book 5-local typed interpretations of canonical Book 2 claims, not fields Book 2
+natively encodes.

@@ -1,0 +1,182 @@
+{
+  "atlas": "CSIA — Crypto Systems Intelligence Atlas",
+  "cycle": "BOOK 5 HARDENING R5 — BINDING-BASIS LIVE CURRENTNESS SEAL",
+  "branch": "agent/crypto-systems-intelligence-atlas-book5-build",
+  "starting_head": "a687268ff0b00bd414b710345f186a2c44f11040",
+  "book4_base": "a2526e8220513b34967ab11f227ddbddc14e7e4a",
+  "plan": "CSIA_BOOK_5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_PLAN_v0.3.md",
+  "generated": "2026-09-30",
+  "environment": "offline in-memory only; no database; no graph DB; single epistemic engine (Book 2)",
+  "trigger": "Operator-reported omission within the authorized R4 contract: both Book 5 binding families (ClaimContextBinding, QuantitativeRecordContextBinding) validated their basis_claim_refs only at REGISTRATION time, never at authority-use time. A binding whose subject claim stayed current kept producing authority after its basis claim decayed through the accepted Book 2 transition engine (STALE/CONTESTED/REJECTED/SUPERSEDED) — BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY was stated by R4 but not implemented in the provenance module. Demonstrated failure-first at base a687268f: 10 failed / 7 passed on the R5 repro matrix (rows A1x4, B1-B4, C2, Q2 showed DID NOT RAISE) before the seal; after the seal 37/37 PASS.",
+  "baseline": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5_prior": 256,
+    "total_prior": 784
+  },
+  "counts_after": {
+    "book1": 107,
+    "book2": 108,
+    "book3": 83,
+    "book4": 230,
+    "book5": 293,
+    "r5_focused": 37,
+    "total": 821
+  },
+  "gates": [
+    {
+      "gate": "CLAIM_CONTEXT_BINDING_SUBJECT_CURRENTNESS",
+      "result": "PASS",
+      "evidence": "the binding subject claim_id is re-resolved through CURRENT Book 2 at every authority use (validate_principal_component -> resolve_claim -> can_promote_to_graph, unchanged from pre-R5 behavior and now pinned): a subject-only decay rejects even with basis refs healthy. Rows C1, C3; test_book5_hardening_r5.py"
+    },
+    {
+      "gate": "CLAIM_CONTEXT_BINDING_BASIS_CURRENTNESS",
+      "result": "PASS",
+      "evidence": "new _validate_binding_basis_live loops every ClaimContextBinding.basis_claim_refs entry through self.resolve_claim at decision time and rejects STALE/CONTESTED/REJECTED/SUPERSEDED; registered-while-current is no longer sufficient. Rows A1 (x4 states), C2, C4; test_book5_hardening_r5.py"
+    },
+    {
+      "gate": "QUANTITATIVE_BINDING_SUBJECT_CURRENTNESS",
+      "result": "PASS",
+      "evidence": "validate_quantitative_record continues to live-revalidate the record's own claim refs (subject currentness); pinned unchanged. Rows Q1, Q3; test_book5_hardening_r5.py"
+    },
+    {
+      "gate": "QUANTITATIVE_BINDING_BASIS_CURRENTNESS",
+      "result": "PASS",
+      "evidence": "the same live-basis seal runs inside validate_quantitative_record over QuantitativeRecordContextBinding.basis_claim_refs for FLOW / LIABILITY / OBSERVED_FACT records; compose_snapshot and observed_value_display inherit it. Rows B1, B2, B3, B4, Q2, Q4; test_book5_hardening_r5.py"
+    },
+    {
+      "gate": "MULTI_BASIS_WEAKEST_LINK_REJECTION",
+      "result": "PASS",
+      "evidence": "a binding carrying (B1, B2, B3) rejects when any single basis ref decays (B2 STALE, B3 SUPERSEDED) while the others stay current — the binding is only as current as its weakest required basis claim. Verified independently for ClaimContextBinding (M1, M2, M3) and QuantitativeRecordContextBinding (MQ1, MQ2)"
+    },
+    {
+      "gate": "SUPERSEDED_BASIS_NO_AUTO_FOLLOW",
+      "result": "D1: a frozen binding referencing a SUPERSEDED basis claim stays REJECTED even though the replacement claim is itself current in the store — no silent jump to the replacement. D2: re-binding the same subject while the original binding is still registered is refused (binding identity is unique). D3: recovery is explicit — a NEW subject claim plus a NEW binding registered over the replacement authorizes again. Context interpretation is an explicit recorded binding, not fuzzy lineage. Rows D1-D3; test_book5_hardening_r5.py"
+    },
+    {
+      "gate": "BASIS_AUTHORITY_RESTORATION",
+      "result": "PASS",
+      "evidence": "the seal mirrors live Book 2 state and remembers nothing: STALE -> OBSERVED (ratified transition) restores authority (A6, B6, F2, L2), and CONTESTED -> CORROBORATED through the accepted P-4 route (independent source/owner/mechanism, proposition-equivalent corroborating claim, FIRST_PARTY_DOC evidence tier) restores authority of the same immutable binding (A7). The binding is not a tombstone"
+    },
+    {
+      "gate": "COMPONENT_AUTHORITY_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "validate_principal_component rejects a PrincipalComponent whose ClaimContextBinding basis claim decays in any of the 4 decay states while the subject claim stays OBSERVED; aggregate_same_unit inherits the rejection (A1 x4 states via DECAY_STATES parametrization)"
+    },
+    {
+      "gate": "FLOW_AUTHORITY_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "a flow record whose QuantitativeRecordContextBinding basis claim went STALE is rejected by validate_quantitative_record; compose_snapshot refuses it. Row B1"
+    },
+    {
+      "gate": "LIABILITY_AUTHORITY_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "same seal for liability records; compose_snapshot refuses a liability whose binding basis decayed. Row B2"
+    },
+    {
+      "gate": "OBSERVED_FACT_AUTHORITY_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "an observed fact whose binding basis went STALE is refused both by compose_snapshot (B3) and by observed_value_display (B4); display inherits the same validator, no second path"
+    },
+    {
+      "gate": "REGISTRY_POSITION_NESTED_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "R4's registry.resolve validated the position ENTRY claim but not the nested PrincipalComponent set inside it — a nested component's ClaimContextBinding basis could decay silently. resolve() now loops record.principal_components.components through validate_principal_component (isinstance-narrowed to CapitalPosition); the chain registry currentness -> record currentness -> binding currentness -> binding basis currentness is complete. Row S1"
+    },
+    {
+      "gate": "REGISTRY_FLOW_BINDING_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "registry.resolve(current) on a flow entry fails once its QuantitativeRecordContextBinding basis claim decays (R4 already routed resolve through validate_quantitative_record; R5 extends that same live validation to the binding basis). Row S2"
+    },
+    {
+      "gate": "REGISTRY_LIABILITY_BINDING_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "liability entries fail registry current resolution when their binding basis decays. Row S3"
+    },
+    {
+      "gate": "REGISTRY_FACT_BINDING_BASIS_DECAY",
+      "result": "PASS",
+      "evidence": "observed-fact entries fail registry current resolution when their binding basis decays. Row S4"
+    },
+    {
+      "gate": "R1_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_hardening_r1.py 37/37 PASS after the R5 seal"
+    },
+    {
+      "gate": "R2_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_hardening_r2.py 44/44 PASS after the R5 seal"
+    },
+    {
+      "gate": "R3_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_hardening_r3.py 46/46 PASS after the R5 seal"
+    },
+    {
+      "gate": "R4_PRESERVED",
+      "result": "PASS",
+      "evidence": "test_book5_hardening_r4.py 51/51 PASS after the R5 seal — the binding-basis seal composes with the registry/derived-ref decay seal without regression"
+    },
+    {
+      "gate": "PRIOR_45_STRESS_ROWS_PRESERVED",
+      "result": "PASS",
+      "evidence": "all 45 rows of CSIA_BOOK_5_STRESS_TRACEABILITY_MATRIX.json re-verified PASS post-seal (traceability enforced by test_stress_traceability_complete, green in the 821-row full run); no stress row modified or skipped in R5"
+    },
+    {
+      "gate": "PRIOR_T1_T14_PRESERVED",
+      "result": "PASS",
+      "evidence": "T-1..T-14 prior canonical/stress traceability rows pass unchanged (enforced inside the Book 5 canonical suite, green in the 821-row full run); zero edits to prior hardening or stress test modules in the R5 commit chain"
+    },
+    {
+      "gate": "BOOK1_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 1 canonical 107/107 (baseline 107); git diff a2526e822...HEAD touches zero Book 1 files; BOOK_1_ACCEPTED_CONTRACT_MUTATIONS = 0"
+    },
+    {
+      "gate": "BOOK2_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 2 canonical 108/108 (baseline 108); Book 2 transition engine used AS-IS (only consumer) — no Book 2 file changed since a2526e822; BOOK_2_ACCEPTED_CONTRACT_MUTATIONS = 0"
+    },
+    {
+      "gate": "BOOK3_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 3 canonical 83/83 (baseline 83); zero Book 3 files changed; BOOK_3_ACCEPTED_CONTRACT_MUTATIONS = 0"
+    },
+    {
+      "gate": "BOOK4_FREEZE",
+      "result": "PASS",
+      "evidence": "Book 4 canonical 230/230 (baseline 230); zero Book 4 files changed; BOOK_4_ACCEPTED_CONTRACT_MUTATIONS = 0"
+    },
+    {
+      "gate": "SENSOR_BASELINE_EQUIVALENCE",
+      "result": "PASS",
+      "evidence": "crypto_sensor_fabric: 2325 PASS / 14 FAIL / 4 SKIPPED — failure set byte-equivalent to the accepted baseline (i05r2 x3, i05r3 x2, i05r4 x3, i06 x3, i06r1 x3 — all pre-existing storage-evidence regen); CRYPTO_SENSOR_MUTATIONS = 0; BOOK5_INTRODUCED_SENSOR_FAILURES = 0"
+    },
+    {
+      "gate": "RUFF_AND_MYPY",
+      "result": "PASS",
+      "evidence": "ruff check src/crypto_systems_intelligence_atlas tests/crypto_systems_intelligence_atlas -> All checks passed; mypy src/crypto_systems_intelligence_atlas -> Success: no issues found in 44 source files (R4 house convention)"
+    }
+  ],
+  "attack_matrix": {
+    "file": "test_book5_hardening_r5.py",
+    "rows": "A1 (basis decay x4 states via aggregate_same_unit), A5/A6/A7 (current, restored OBSERVED, restored CORROBORATED), B1-B6 (flow/liability/fact compose + display, current, restored), C1-C4 (subject-vs-basis 2x2), Q1-Q4 (quantitative subject-vs-basis 2x2), M1-M3 and MQ1-MQ2 (multi-basis weakest link), D1-D3 (supersession no-auto-follow / no rebind / explicit new binding), S1-S4 (registry position nested + flow/liability/fact), E1-E2 (empty basis_claim_refs semantics)",
+    "failure_first_demonstration": "at base a687268f (pre-seal): 10 failed / 7 passed — A1x4, B1-B4, C2, Q2 raised DID NOT RAISE (stale basis kept producing authority); single-engine controls and malformed-fixture rows excluded from the failing set",
+    "empty_basis_semantics": "basis_claim_refs=() is LEGAL: the subject claim is the sole epistemic basis and is already live-revalidated through the record/component's own claim refs; invariant is IF basis refs are present, ALL must be current. No retroactive separate-basis requirement. Rows E1, E2"
+  },
+  "implementation_map": {
+    "seal_method": "Book5Provenance._validate_binding_basis_live(basis_claim_refs, *, binding_family) in book5_provenance.py — loops every basis ref through self.resolve_claim (live currentness) and wraps failures with the BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY message",
+    "call_sites": "validate_principal_component (ClaimContextBinding family) and validate_quantitative_record (QuantitativeRecordContextBinding family) — the two single authority chokepoints; all downstream boundaries (aggregate_same_unit, components_for, collapse_same_unit, lineage_view, compose_snapshot, collapse_request, observed_value_display, registry.resolve) inherit without caller duplication",
+    "registry_extension": "book5_registry.py resolve(): position-kind entries now also validate nested principal components (isinstance CapitalPosition guard) — closes the R4 nested-component gap",
+    "immutability": "the frozen binding object is never mutated; its contextual interpretation stays immutable while its epistemic authority is resolved live at every use"
+  },
+  "doctrine": {
+    "three_independent_dimensions": "REGISTRY MEMBERSHIP != CURRENT AUTHORITY (R4) and BINDING REGISTRATION != CURRENT BINDING AUTHORITY (R5) and SUBJECT CLAIM CURRENT != BINDING BASIS CURRENT (R5) — all three are independently required; authority needs subject currentness AND binding-basis currentness",
+    "no_second_engine": "the seal re-uses the accepted Book 2 engines (resolve_claim / can_promote_to_graph) through the existing provenance validators; no parallel truth, no DB, no graph DB, no global state",
+    "no_auto_follow": "supersession of a basis claim never silently re-bases a frozen binding; recovery requires an explicit new binding registered over the replacement claim",
+    "epistemic_honesty": "registration proves VALID THEN; decision-time resolution proves VALID NOW — the binding mirrors live Book 2 authority and restores when Book 2 restores"
+  }
+}

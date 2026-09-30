@@ -1275,3 +1275,84 @@ LIVE_ACQUISITION_AUTHORITY = FALSE
 ```
 
 Next: operator acceptance.
+
+---
+
+# CHECKPOINT — BOOK 5 HARDENING R5 (BINDING-BASIS LIVE CURRENTNESS SEAL)
+
+Date: 2026-09-30 · Branch: `agent/crypto-systems-intelligence-atlas-book5-build`
+· Starting HEAD: `a687268f` (R4 base, pushed) · Book 4 accepted base:
+`a2526e82`.
+
+1. **Trigger (authorized narrow cycle):** R4 stated
+   "BINDING REGISTRATION != PERMANENT BOOK 2 AUTHORITY" but implemented no
+   provenance-module binding-basis currentness — both binding families
+   (`ClaimContextBinding`, `QuantitativeRecordContextBinding`) validated basis
+   claims only at REGISTRATION. A binding with a current subject claim kept
+   producing authority after its basis claim decayed via the accepted Book 2
+   transition engine. Failure-first at base `a687268f`: 10 failed / 7 passed
+   (A1×4, B1–B4, C2, Q2 DID NOT RAISE) before the seal (`b0778bb7f`).
+2. **Seal:** `Book5Provenance._validate_binding_basis_live(basis_claim_refs, *,
+   binding_family)` loops every basis ref through `self.resolve_claim` (live
+   Book 2 currentness) and rejects STALE/CONTESTED/REJECTED/SUPERSEDED.
+   Wired into the two authority chokepoints — `validate_principal_component`
+   (ClaimContextBinding) and `validate_quantitative_record`
+   (QuantitativeRecordContextBinding) — so `aggregate_same_unit`,
+   `components_for`, `collapse_same_unit`, `lineage_view`, `compose_snapshot`,
+   `collapse_request`, `observed_value_display`, and registry `resolve` inherit
+   with zero caller duplication. Binding object never mutated; registration
+   proves VALID THEN, decision-time resolution proves VALID NOW
+   (`dd183a414`).
+3. **Registry position nested gap closed:** R4 resolve validated the position
+   ENTRY claim but not nested components; resolve() now validates the nested
+   `PrincipalComponent` set through `validate_principal_component`
+   (isinstance `CapitalPosition`). Chain complete: registry currentness →
+   record currentness → binding currentness → binding basis currentness
+   (`0a7f83853`, `e181aa7e8`).
+4. **Semantics:** empty `basis_claim_refs=()` LEGAL — subject claim is the sole
+   epistemic basis, live-revalidated via the record/component's own refs;
+   invariant = IF basis refs present, ALL must be current (E1/E2, `7a347f34`).
+   Multi-basis weakest link both families (M1–M3, MQ1–MQ2). Supersession
+   NO-AUTO-FOLLOW: frozen binding over a SUPERSEDED basis stays REJECTED while
+   the replacement is current; same-subject rebind refused; recovery = new
+   subject claim + new explicit binding (D1–D3). Restoration mirrors live Book
+   2: STALE→OBSERVED (A6/B6/F2/L2) and CONTESTED→CORROBORATED via P-4 (A7).
+5. **Verification:** R5-focused 37/37. Books 1–4 unchanged 107/108/83/230;
+   Book5 256 → 293; Total CSIA 784 → 821. R1/R2/R3/R4 preserved
+   (37/44/46/51). 45 stress traceability rows PASS (enforced by
+   `test_stress_traceability_complete`). Ruff PASS (CSIA src+tests); mypy 44
+   files clean. Sensor 2325 PASS / 14 FAIL / 4 SKIPPED — failure set
+   byte-equivalent to baseline (i05r2 ×3, i05r3 ×2, i05r4 ×3, i06 ×3,
+   i06r1 ×3); BOOK5_INTRODUCED_SENSOR_FAILURES = 0. Freeze vs `a2526e82`:
+   only Book 5 sources/tests + append-only research artifacts; Books 1–4
+   mutations = 0; Sensor mutations = 0.
+6. **R4 evidence reconciliation (honest, no rewriting):** R4 correctly closed
+   registry-record currentness; R5 completes the separately authorized
+   binding-basis currentness clause that R4 did not implement.
+
+Doctrine triad — all three independently required:
+
+```text
+REGISTRY MEMBERSHIP      != CURRENT AUTHORITY            (R4)
+BINDING REGISTRATION     != CURRENT BINDING AUTHORITY    (R5)
+SUBJECT CLAIM CURRENT    != BINDING BASIS CURRENT        (R5)
+```
+
+Artifacts: `CSIA_BOOK_5_HARDENING_R5_MATRIX.json` (27 gates PASS),
+`CSIA_BOOK_5_HARDENING_R5_BINDING_BASIS_CURRENTNESS.md`, R5 section appended
+to `CSIA_BOOK_5_IMPLEMENTATION_EVIDENCE_v0.1.md`.
+
+Exit state:
+
+```text
+BOOK_5_HARDENING_R5 = PASS
+BOOK_5_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK5_CAPITAL_PLUMBING_ECONOMIC_TOPOLOGY_KERNEL (unchanged, still PROPOSED)
+BOOK_5_ACCEPTANCE = NOT_SELF_ACCEPTED
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+BOOK_6 = NOT_STARTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+```
+
+Next: operator acceptance. No R6 unless another newly demonstrated concrete
+correctness defect exists.
