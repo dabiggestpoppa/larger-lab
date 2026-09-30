@@ -3023,3 +3023,77 @@ research                                               = FROZEN
 ```
 
 No self-ratification. I14 not started.
+
+## SENSOR-B4-I13R2 — MANIFEST ROOT MATCHING + FORMAL EVIDENCE-CLOSURE FIXPOINT
+
+Operator source review of the I13R1 chain found five blockers (A free-space
+check silently disabled without injected provider; B metadata parity asserted
+at count level; C revision/declaration parity unmeasured; D DuckDB parity
+row-count-only; E "unselected evidence absent" law too strong + manifest root
+selection too broad). All reproduced, repaired, re-measured. Full narrative:
+`evidence/bloc_04/BLOC_04_I13R2_EVIDENCE_CORRECTION.md`.
+
+Repairs (production, export.py): `_check_free_space` never silently disables —
+default real `shutil.disk_usage` on nearest existing ancestor, injected
+provider override, pre-copy estimate + progressive per-blob check
+(`METADATA_OVERHEAD_BYTES = 64 KiB`); `protected_source_roots` constructor
+guard (§23). Unique manifest-root matching (`_unique_result_manifests`):
+result→manifest proven on identity dims + granularity + window containment +
+coverage/integrity + evidence-binding agreement (blob/projection/lineage refs
+subset + acquisition compatibility); 0 candidates → ExportSourceInvalid, >1 →
+explicit ambiguity error; adversarial lookalike-manifest test proves the
+broad (provider, venue, instrument) selection bug is closed. Formal 3-class
+evidence law (QUERY_SELECTED / REQUIRED_SUPPORT / UNRELATED) via monotone
+fixpoint `_evidence_closure` → frozen `EvidenceClosure` (blob_shas,
+acquisition_ids, projection_ids, matched_manifests, query_selected_*,
+support_*, trace, iterations); expansion edges MANIFEST_BLOB_REF,
+MANIFEST_PROJECTION_REF, PROJECTION_LINEAGE, BLOB_ACQUISITIONS
+(identity-domain), REVISION_FIRST_ACQUISITION, REVISION_SEGMENT_BLOB,
+REVISION_PREFIX, CANONICAL_DECLARATION; policy closure (§16 minimums) never
+shrinks below law and structural closure may enlarge as REQUIRED_SUPPORT
+without altering query selection; visited-set cycle safety; ExportObjectRecord
+NOT extended (trace is test/debug only). Restore replay ordered per accepted
+I06 temporal law: acquisitions sorted by `(response_observed_at,
+acquisition_id)`; RevisionObservationOrderConflict not weakened. Public
+boundary seal intact: `_segments_by_key` / `_declarations_by_key` /
+`_projection_root` in export.py = 0.
+
+Evidence (append-only, byte-stable, digests verified across two runs):
+RESOURCE_SAFETY c3c81119…, EXACT_METADATA_PARITY 9c191332…,
+REVISION_PARITY 29068e5e…, DUCKDB_IDENTITY_PARITY 485deb85…,
+QUERY_POLICY_PARITY 420abb73…, TIME_FILTER_PARITY 32125013…,
+BOUNDED_SLICE 4ffac74d…. BOUNDED_SLICE measured: fixpoint iterations 2,
+idempotent (C1==C2); QUERY_SELECTED 2 blobs + 2 acquisitions ⊆ pack;
+REQUIRED_SUPPORT 1 blob + 1 acquisition with causal trace; pack == restored ==
+expected closure for blobs/acquisitions/revision keys; true unrelated control
+(disjoint partition/sensor/date/manifest) absent; true_leakage_count = 0.
+TIME_FILTER_PARITY: acquired_before and observed_before select identical
+acquisition IDs source vs restored (4/4). QUERY_POLICY_PARITY: default/ALL/
+FIRST_SEEN/LATEST_SEEN/EXACT_REVISION 1/EXACT_REVISION 2/
+PROVIDER_DECLARED_CANONICAL + refusal parity, all source==restored (10/10).
+Each matrix carries exactly one deliberate SYNTHETIC_COUNTERFACTUAL FAIL row
+(rejected naive surrogate method) per established convention; all measured
+rows OK.
+
+Regression: full project `uv run -m pytest tests/ -q` = 3048 passed,
+28 skipped (pre-existing), 0 failures; non-storage disjoint run confirms zero
+tests outside the storage tree. Static: Ruff clean on changed files,
+compileall OK, mypy 0 new errors in changed scope (10 pre-existing in
+untouched providers/ = baseline). Historical I03R1/I04/I11/I12/I13/I13R1
+evidence unchanged vs start HEAD e7e9553 (working-tree CRLF churn from
+outside this session; git blobs untouched). I14 not started.
+
+```
+SENSOR-B4-I13R2
+PASS_SENSOR_B4_I13_EXPORT_BACKUP_RESTORE_SEALED     = OPERATOR_HOLD
+PASS_SENSOR_B4_I13R1_PUBLIC_AUTHORITY_ATOMIC_CLOSURE_SEALED = OPERATOR_HOLD
+PASS_SENSOR_B4_I13R2_EVIDENCE_FIDELITY_RESOURCE_SEALED = PENDING_OPERATOR_REVIEW
+G4-11_EXPORT_RESTORE_GATE                           = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                          = FALSE
+recommended_next                                    = OPERATOR REVIEW OF COMPLETE I13 -> I13R1 -> I13R2 CHAIN
+I14                                                 = UNAUTHORIZED
+I14+                                                = UNAUTHORIZED
+research                                            = FROZEN
+```
+
+No self-ratification. I14 not started.
