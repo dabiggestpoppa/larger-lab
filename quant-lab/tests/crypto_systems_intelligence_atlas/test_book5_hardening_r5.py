@@ -895,3 +895,49 @@ def test_s4_registry_fact_binding_basis_decay_rejects() -> None:
         registry.resolve(
             fact.fact_id, expected_kind="observed_fact", provenance=provenance
         )
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — empty basis_claim_refs semantics (E family)
+# ---------------------------------------------------------------------------
+
+
+def test_e1_empty_basis_refs_legal_subject_still_live_validated() -> None:
+    """E1: basis_claim_refs=() is LEGAL — the binding subject claim is the
+    sole epistemic basis and is live-revalidated through the component own
+    claim refs (ratified meaning; existing R2/R3 contracts rely on it).
+    The R5 seal does NOT retroactively require a separate basis claim."""
+
+    _, _, provenance = kernel()
+    subject = _register_economics_claim(
+        provenance, "e1-subject", qualifier="PRINCIPAL_EXACT_FACT"
+    )
+    provenance.bind_claim_context(
+        ClaimContextBinding(claim_id=subject, asset_ref="csia:token:eth", unit="ETH")
+    )
+    vectors = component_set(component(claim_ref=subject))
+    assert vectors.aggregate_same_unit("ETH", provenance=provenance) == "3"
+
+
+def test_e2_empty_basis_quantitative_legal_subject_still_live_validated() -> None:
+    """E2: same empty-basis legality for the quantitative family (every
+    pre-R5 binding used basis_claim_refs=())."""
+
+    _, _, provenance = kernel()
+    subject = _register_economics_claim(provenance, "e2-subject")
+    provenance.bind_quantitative_record_context(
+        QuantitativeRecordContextBinding(
+            claim_id=subject,
+            record_kind="FLOW",
+            asset_ref="csia:token:eth",
+            unit="ETH",
+        )
+    )
+    synthesis = CapitalFieldSynthesis(provenance)
+    snapshot = synthesis.compose_snapshot(
+        "snap:e2",
+        flows=(_make_flow("flow:e2", claim_ref=subject),),
+        valid_time=T0,
+        observed_at=T1,
+    )
+    assert snapshot.input_record_refs == ("flow:e2",)
