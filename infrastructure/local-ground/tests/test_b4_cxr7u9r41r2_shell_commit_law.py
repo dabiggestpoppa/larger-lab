@@ -87,9 +87,14 @@ def test_impossible_finalizing_commit_marker_fails_closed(tmp_path):
     assert rc == 4, rc
 
 
-def test_finalizing_without_intent_requires_preintent_abort(tmp_path):
+def test_finalizing_without_claim_fails_closed(tmp_path):
+    """B4-CXR7U9R46R3/R4: a FINALIZING record WITHOUT its exact finalize claim
+    is missing authority evidence, not a governed crash state — a legitimate
+    engine writes the durable claim BEFORE advancing the record to
+    FINALIZING. The shell classification fails closed (4) and agrees with the
+    executable resume-finalize phase, which has always required the claim."""
     assert _classify({"state": "FINALIZING",
-                      "selected_transition": "finalize"}, tmp_path) == 5
+                      "selected_transition": "finalize"}, tmp_path) == 4
 
 
 def test_unknowable_record_fails_closed(tmp_path):

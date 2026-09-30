@@ -145,7 +145,12 @@ def _row_finalizing_no_claim(receipt, path):
     _set_record(receipt["operation_id"],
                 state=pgrec.TRANSITION_STATE_FINALIZING,
                 selected_transition="finalize")
-    return 5, "preintent_abort_required"
+    # B4-CXR7U9R46R3/R4: a FINALIZING record WITHOUT its exact finalize claim
+    # is missing authority evidence, not a governed crash state. A legitimate
+    # engine writes the durable claim BEFORE advancing the record to
+    # FINALIZING, so the R45 governed-abort verdict (5 /
+    # preintent_abort_required) is superseded by the fail-closed law.
+    return 4, "unreconciled"
 
 
 def _row_finalizing_exact_finalize(receipt, path):

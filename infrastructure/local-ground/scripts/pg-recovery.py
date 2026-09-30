@@ -1431,53 +1431,85 @@ def _valid_transition_claim(operation_id, transition, promote,
 
 def _receiptless_selector_agrees(operation_id, transition,
                                  transition_dir=None):
-    """Receiptless agreement check (B4-CXR7U9R45R3). When no promote receipt
-    is available to bind an expectation, a canonical claim that exists may
-    still support its durable state ONLY if it is a complete engine-published
-    claim naming exactly that transition. Anything else — unbound, mismatched,
-    malformed or naming the other branch — is a state/selector disagreement
-    and fails closed."""
+    """Receiptless agreement, bound to DURABLE authority (B4-CXR7U9R46R3).
+
+    When no promote receipt is available to bind an expectation, the
+    expectation comes from the DURABLE TRANSITION RECORD's own
+    ``receipt_sha256``: the digest the engine recorded when the branch was
+    selected. A canonical claim may support its durable state ONLY when it
+    is complete, names exactly that transition, and binds the RECORD's
+    digest. A merely syntactically valid digest is NOT agreement: a foreign
+    but well-formed digest is different authority and fails closed. A
+    durable record with a missing or malformed digest is unknowable
+    authority and fails closed. Anything else (unbound, mismatched,
+    malformed, or naming the other branch) is a state/selector disagreement
+    and fails closed.
+    """
     try:
-        state = _claim_state(operation_id, transition_dir)
+        record = _load_transition_record(operation_id,
+                                         transition_dir=transition_dir)
+    except (OSError, ValueError, RuntimeError, TypeError):
+        return False
+    if not isinstance(record, dict):
+        return False
+    expected = record.get("receipt_sha256")
+    if not isinstance(expected, str) or not SHA256_RE.match(expected):
+        # Unknowable authority: the durable record itself carries no exact
+        # receipt digest to bind against. Fail closed.
+        return False
+    try:
+        snapshot = _read_selector_snapshot(operation_id, transition_dir)
+        state = _classify_claim_content(operation_id, snapshot,
+                                        expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
-    if state != "unbound_or_mismatched":
+    if state != "bound_complete":
         return False
-    try:
-        claim = _load_claim(operation_id, transition_dir=transition_dir)
-    except _ExecutionAuthorityConflict:
-        return False
+    # The SAME admitted snapshot that proved the digest binding selects the
+    # branch; there is no second read.
+    claim = snapshot.claim
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
 def _selector_agrees_with_finalizing(operation_id, promote,
                                      transition_dir=None):
-    """ONE state/selector agreement law for FINALIZING (B4-CXR7U9R45R3).
+    """ONE state/selector agreement law for FINALIZING (B4-CXR7U9R45R3,
+    binding corrected B4-CXR7U9R46R3).
 
     Shared verbatim by the shell classifier and phase_reconcile, so the two
-    surfaces can never disagree about a FINALIZING record whose canonical
-    claim is missing, wrong-branched or bound to foreign authority:
-
-      * no canonical claim  -> the selector was lost before the state advance;
-        the governed preintent abort stands (the record itself re-proves its
-        binding on the resume path);
-      * a claim that exists -> it must bind THIS finalize branch exactly
-        (receipt-bound when a promote receipt is available, complete and
-        finalize-naming when none is); anything else is disagreement and
-        fails closed.
+    surfaces can never disagree about a FINALIZING record's selector. A
+    canonical claim supports the FINALIZING record ONLY when it is exactly
+    bound: to THIS promote receipt when one is available, otherwise to the
+    DURABLE RECORD's own receipt digest (B4-CXR7U9R46R3). A foreign but
+    syntactically valid digest is not agreement; a missing record digest is
+    unknowable authority. Every disagreement fails closed.
     """
     if not isinstance(operation_id, str)             or not OPERATION_ID_RE.match(operation_id):
-        return True
+        return False
     try:
-        if _claim_state(operation_id, transition_dir) == "absent":
-            return True
         if promote is not None:
-            return _valid_transition_claim(operation_id, "finalize", promote,
-                                           transition_dir=transition_dir)
-        return _receiptless_selector_agrees(operation_id, "finalize",
-                                            transition_dir)
+            expected = _receipt_digest(promote)
+        else:
+            record = _load_transition_record(operation_id,
+                                             transition_dir=transition_dir)
+            if not isinstance(record, dict):
+                return False
+            expected = record.get("receipt_sha256")
+            if not isinstance(expected, str) or not SHA256_RE.match(expected):
+                return False
+        snapshot = _read_selector_snapshot(operation_id, transition_dir)
+        if not snapshot.present:
+            return False
+        state = _classify_claim_content(operation_id, snapshot,
+                                        expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
+    except (OSError, ValueError, RuntimeError, TypeError):
+        return False
+    if state != "bound_complete":
+        return False
+    claim = snapshot.claim
+    return isinstance(claim, dict) and claim.get("transition") == "finalize"
 
 
 def _claim_state(operation_id, transition_dir=None,

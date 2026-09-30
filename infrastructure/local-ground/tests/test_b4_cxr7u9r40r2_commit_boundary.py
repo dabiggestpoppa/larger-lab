@@ -166,7 +166,13 @@ def test_no_promotion_means_precommit(shell_law):
     ("CREATED", True),
     ("STAGED", True),
     ("PROMOTED", True),
-    ("FINALIZING", True),
+    # B4-CXR7U9R46R3/R4: FINALIZING-without-claim is missing authority
+    # evidence, not a governed crash state. A legitimate engine writes the
+    # durable claim BEFORE advancing the record to FINALIZING, and the
+    # executable resume-finalize phase has always required the exact claim —
+    # so the shell classification now fails closed (4 = UNKNOWABLE/BLOCKED)
+    # and agrees with the phase that would refuse the same authority.
+    ("FINALIZING", False),
     ("ROLLING_BACK", True),
     (pgrec.TRANSITION_STATE_COMMIT_INTENT, False),
     ("COMMIT_POINT_REACHED", False),
@@ -178,7 +184,10 @@ def test_durable_state_controls_rollback_legality(shell_law, state,
                         state)
     assert rc == (0 if expect_precommit else 1), (state, rc, err)
     if not expect_precommit:
-        assert "irreversible commit point" in err, err
+        if state == "FINALIZING":
+            assert "UNKNOWABLE" in err, err
+        else:
+            assert "irreversible commit point" in err, err
 
 
 def test_unknowable_durable_state_fails_closed(shell_law):

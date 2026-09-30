@@ -333,16 +333,15 @@ def test_state_claim_transition_disagreement_fails_closed(
     before = _census(tmp_path)
     # BOTH surfaces fail closed. The receipted route binds the digest
     # expectation and refuses (4). The receiptless state route resolves the
-    # branch NAME agreement: a complete claim naming rollback under a
-    # durably finalize-selected record is detectable disagreement (4); a
-    # finalize-naming claim with a foreign digest cannot be bound receiptlessly
-    # and falls back to the fail-safe preintent verdict (5) — never fresh (0)
-    # in either case.
+    # branch agreement through the DURABLE RECORD's own digest
+    # (B4-CXR7U9R46R3): a complete claim naming rollback under a durably
+    # finalize-selected record is detectable disagreement (4), and a
+    # finalize-naming claim with a foreign digest is a state/selector
+    # disagreement too — never fresh (0) and no longer the R45 fail-safe
+    # preintent verdict (5), which trusted the foreign selector's branch
+    # name.
     assert _shell_receipt(path) == 4
-    if selector == "rollback":
-        assert _shell_state(_record_path(opid)) == 4
-    else:
-        assert _shell_state(_record_path(opid)) == 5
+    assert _shell_state(_record_path(opid)) == 4
     assert _census(tmp_path) == before
 
 
