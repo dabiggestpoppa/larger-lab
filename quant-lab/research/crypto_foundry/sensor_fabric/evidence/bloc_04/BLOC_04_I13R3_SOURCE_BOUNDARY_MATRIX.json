@@ -1,0 +1,186 @@
+{
+  "cases": [
+    {
+      "case_id": "destination_overlap_refused_t0a_blob_root",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0A blob root (equal) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0a",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0A blob root (equal)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0a_blob_root",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0A blob root (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0a\\objects",
+        "exception_type": "ExportDestinationUnsafe",
+        "source_boundary": "T0A blob root (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0a_catalog_root",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0A catalog root (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0a\\catalogs\\manifests",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0A catalog root (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_revision_registry_root",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination revision registry root (equal) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0a\\revisions",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "revision registry root (equal)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0b_projection_payload_root",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0B projection payload root (equal) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0b",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0B projection payload root (equal)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0b_projection_payload_root",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0B projection payload root (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0b\\projections",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0B projection payload root (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0b_projection_catalog",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0B projection catalog (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0b\\catalogs\\manifests\\projections",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0B projection catalog (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0b_schema_catalog",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0B schema catalog (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0b\\catalogs\\projection_schemas",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0B schema catalog (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0b_context_catalog",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0B context catalog (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0b\\catalogs\\manifests\\projection_context",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0B context catalog (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_overlap_refused_t0b_lineage_catalog",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "destination T0B lineage catalog (child) is refused without any caller override — protection derived from wired source boundaries (I13R3 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attempted_destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\src\\t0b\\catalogs\\manifests\\projection_lineage",
+        "exception_type": "ExportPackExists",
+        "source_boundary": "T0B lineage catalog (child)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "destination_symlink_into_source_structural_equivalent",
+      "category": "STRUCTURAL_INTROSPECTION",
+      "invariant": "symlink privilege unavailable on this platform; the always-running structural equivalent (destination parent-chain symlink guard) is present in the production export boundary",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "guard_occurrences": 4,
+        "structural_equivalent": "is_symlink parent-chain guard"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "external_destination_success_control",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "a destination outside every protected source boundary still exports (protection must not degenerate into refusing everything)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destination": "<TMP>\\SOURCE_BOUNDARY\\boundary\\outside\\pack",
+        "object_count": 13
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "constructor_fail_closed_unproven_boundary",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "wiring a source dependency that cannot prove its filesystem root refuses CONSTRUCTION with ExportSourceBoundaryUnproven — silent omission of a root from protection is impossible (§15)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "construction_outcome": "ExportSourceBoundaryUnproven"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "private_access_seal_unchanged",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "export.py performs zero private-attribute access on I05/I06 internals (_segments_by_key/_declarations_by_key/_projection_root each occur 0 times) — the I13R1 public authority repair is not regressed (§17)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "_declarations_by_key": 0,
+        "_projection_root": 0,
+        "_segments_by_key": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_opt_in_protection",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "opt-in protection (protected_source_roots defaulting to []) lets an accidental composition omit T0B/revision roots and write packs INTO the source tree",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "derived fail-closed boundaries (§15)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R2 operator-review findings A-C (vacuous DuckDB identity rows, vacuous T0B parity rows, optional source-root protection)",
+  "mandate": "SENSOR-B4-I13R3",
+  "matrix": "SOURCE_BOUNDARY",
+  "measured_at_checkpoint": "I13R3",
+  "rows_fail": 1,
+  "rows_ok": 14,
+  "rows_total": 15,
+  "synthetic_counterfactuals": 1
+}

@@ -1,0 +1,119 @@
+{
+  "cases": [
+    {
+      "case_id": "t0b_query_selects_nonempty_t0b_graph",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "include_t0b=True query returns results with nonempty projection_refs and lineage_refs BEFORE export (§8)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "lineage_refs": [
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05"
+        ],
+        "projection_refs": [
+          "proj-1"
+        ],
+        "results": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_projection_artifact_nonempty_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "RawProjectionArtifact canonical serialization literally equal with source rows > 0 AND restored rows > 0 (§9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_count": 1,
+        "restored_digest": "f870b4344849b6a3f9804a73c79027141b8cc8fd3295a321c2852e67899c8f83",
+        "source_count": 1,
+        "source_digest": "f870b4344849b6a3f9804a73c79027141b8cc8fd3295a321c2852e67899c8f83"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_projection_context_nonempty_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ProjectionCatalogRecord context canonical serialization equal with nonempty rows on both sides (§9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_count": 1,
+        "restored_digest": "cfd33e0f99469ba4be314f8f0ff9b30d36ebebf94ccd7f24f0eee89409a80fc4",
+        "source_count": 1,
+        "source_digest": "cfd33e0f99469ba4be314f8f0ff9b30d36ebebf94ccd7f24f0eee89409a80fc4"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_projection_lineage_nonempty_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ProjectionLineage entries literally equal with source lineage rows > 0 AND restored rows > 0 (§9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_count": 1,
+        "restored_digest": "b2fbb23a55e9570d74c717024c6afe78314f316d1bafc1fca323afe00cd2c3c5",
+        "source_count": 1,
+        "source_digest": "b2fbb23a55e9570d74c717024c6afe78314f316d1bafc1fca323afe00cd2c3c5"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_projection_schema_nonempty_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "ProjectionSchemaDefinition descriptors literally equal (fingerprint identity) with nonempty registries (§9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_count": 1,
+        "schema_fingerprint": "e0a0fb7f6995249b41746b09fd2ad0c0b1f069e4244d6f2a670d0f5dd4aab43d",
+        "source_count": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_projection_payload_three_way_sha",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "source projection_sha256 == pack payload object sha256 == restored PHYSICAL payload sha256, physical verification through the public open_payload()/verify_physical() surface only — no path-based shortcut (§10)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "pack_sha256": "5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d5112548fec251daa",
+        "restored_physical_sha256": "5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d5112548fec251daa",
+        "source_sha256": "5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d5112548fec251daa",
+        "verify_physical": "OK"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_query_result_digest_parity",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "canonical T0B query result digests equal source vs restored WITH nonempty projection_refs and lineage_refs on the restored side — the restored T0B graph is USABLE, not merely present (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "restored_lineage_refs": [
+          "46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05"
+        ],
+        "restored_projection_refs": [
+          "proj-1"
+        ],
+        "restored_result_digest": "0f53d9ba5100d396764a979bab52929c2ab1e359286eadcaea89a6a9241ae7f2",
+        "source_result_digest": "0f53d9ba5100d396764a979bab52929c2ab1e359286eadcaea89a6a9241ae7f2"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_vacuous_t0b_parity",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "0 artifact rows == 0 artifact rows 'passes' an empty-set parity check while proving the T0B graph was never exported (the I13R2 finding)",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "nonempty rows required (§9)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R2 operator-review findings A-C (vacuous DuckDB identity rows, vacuous T0B parity rows, optional source-root protection)",
+  "mandate": "SENSOR-B4-I13R3",
+  "matrix": "T0B_PARITY",
+  "measured_at_checkpoint": "I13R3",
+  "rows_fail": 1,
+  "rows_ok": 7,
+  "rows_total": 8,
+  "synthetic_counterfactuals": 1
+}

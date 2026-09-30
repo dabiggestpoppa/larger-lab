@@ -1,0 +1,154 @@
+{
+  "cases": [
+    {
+      "case_id": "duckdb_nonvacuous_identity_v_t0_blobs",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "v_t0_blobs: sorted identity tuples [blob_sha256] with source_count > 0 AND restored_count > 0, SOURCE(filtered to pack closure) == PACK_EXPECTED == RESTORED (§6 literal-set law; empty==empty is not parity, §4)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "expected_pack_identity_set": [
+          "[\"46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05\"]",
+          "[\"bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0\"]"
+        ],
+        "identity_columns": "blob_sha256",
+        "restored_count": 2,
+        "restored_rows": [
+          "[\"46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05\"]",
+          "[\"bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0\"]"
+        ],
+        "source_count": 2,
+        "source_rows": [
+          "[\"46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05\"]",
+          "[\"bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0\"]"
+        ],
+        "view": "v_t0_blobs"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_nonvacuous_identity_v_t0_acquisitions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "v_t0_acquisitions: sorted identity tuples [acquisition_id, blob_sha256] with source_count > 0 AND restored_count > 0, SOURCE(filtered to pack closure) == PACK_EXPECTED == RESTORED (§6 literal-set law; empty==empty is not parity, §4)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "expected_pack_identity_set": [
+          "[\"acq-1\",\"46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05\"]",
+          "[\"acq-2\",\"bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0\"]"
+        ],
+        "identity_columns": "acquisition_id, blob_sha256",
+        "restored_count": 2,
+        "restored_rows": [
+          "[\"acq-1\",\"46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05\"]",
+          "[\"acq-2\",\"bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0\"]"
+        ],
+        "source_count": 2,
+        "source_rows": [
+          "[\"acq-1\",\"46573af50edda1d59c3b992f4d9bf0380d4a12eb0ef95c7abf5b3fedc2f50f05\"]",
+          "[\"acq-2\",\"bcc75dd61d5ea462321161e294bbd48d7521457cd55f6a8f8c176b55ee5d48d0\"]"
+        ],
+        "view": "v_t0_acquisitions"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_nonvacuous_identity_v_t0_partitions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "v_t0_partitions: sorted identity tuples [partition_manifest_id, partition_key, manifest_version] with source_count > 0 AND restored_count > 0, SOURCE(filtered to pack closure) == PACK_EXPECTED == RESTORED (§6 literal-set law; empty==empty is not parity, §4)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "expected_pack_identity_set": [
+          "[\"m-t0b\",\"kraken/futures/BTC-USDT/2026-01-15\",2]",
+          "[\"m1\",\"kraken/futures/BTC-USDT/2026-01-15\",1]"
+        ],
+        "identity_columns": "partition_manifest_id, partition_key, manifest_version",
+        "restored_count": 2,
+        "restored_rows": [
+          "[\"m-t0b\",\"kraken/futures/BTC-USDT/2026-01-15\",2]",
+          "[\"m1\",\"kraken/futures/BTC-USDT/2026-01-15\",1]"
+        ],
+        "source_count": 2,
+        "source_rows": [
+          "[\"m-t0b\",\"kraken/futures/BTC-USDT/2026-01-15\",2]",
+          "[\"m1\",\"kraken/futures/BTC-USDT/2026-01-15\",1]"
+        ],
+        "view": "v_t0_partitions"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_nonvacuous_identity_v_t0_revisions",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "v_t0_revisions: sorted identity tuples [source_revision_key, revision_number, segment_id, first_acquisition_id] with source_count > 0 AND restored_count > 0, SOURCE(filtered to pack closure) == PACK_EXPECTED == RESTORED (§6 literal-set law; empty==empty is not parity, §4)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "expected_pack_identity_set": [
+          "[\"34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae\",1,\"34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae:1\",\"acq-1\"]",
+          "[\"e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662\",1,\"e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662:1\",\"acq-2\"]"
+        ],
+        "identity_columns": "source_revision_key, revision_number, segment_id, first_acquisition_id",
+        "restored_count": 2,
+        "restored_rows": [
+          "[\"34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae\",1,\"34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae:1\",\"acq-1\"]",
+          "[\"e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662\",1,\"e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662:1\",\"acq-2\"]"
+        ],
+        "source_count": 2,
+        "source_rows": [
+          "[\"34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae\",1,\"34d391db6ebffcdd4cd883716750ea981bafc82e065ec0bf9321ac3b93235cae:1\",\"acq-1\"]",
+          "[\"e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662\",1,\"e591f8b8a9bb5b368c20144e587dd8694727561d062f9c0d7271410357888662:1\",\"acq-2\"]"
+        ],
+        "view": "v_t0_revisions"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_nonvacuous_identity_v_t0_projections",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "v_t0_projections: sorted identity tuples [projection_id, projection_sha256] with source_count > 0 AND restored_count > 0, SOURCE(filtered to pack closure) == PACK_EXPECTED == RESTORED (§6 literal-set law; empty==empty is not parity, §4)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "expected_pack_identity_set": [
+          "[\"proj-1\",\"5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d5112548fec251daa\"]"
+        ],
+        "identity_columns": "projection_id, projection_sha256",
+        "restored_count": 1,
+        "restored_rows": [
+          "[\"proj-1\",\"5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d5112548fec251daa\"]"
+        ],
+        "source_count": 1,
+        "source_rows": [
+          "[\"proj-1\",\"5d4c04ce1325ea589863d091b78ca3abbb9cb280aec2b27d5112548fec251daa\"]"
+        ],
+        "view": "v_t0_projections"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_single_root_t0b_fixture_fail_closed",
+      "category": "PRODUCTION_BEHAVIOR",
+      "invariant": "rebuilding from the T0A root WITHOUT the T0B projection root on a T0B-bearing fixture refuses typed (DuckDBCatalogCorrupt) — never a silent 0-projection catalog (I13R3 §3)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exception_type": "DuckDBCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "synthetic_counterfactual_empty_equal_empty_parity",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "empty==empty 'parity' (0 source rows, 0 restored rows) ratifies nothing: it cannot distinguish a correct slice from a total rebuild failure",
+      "invariant_source": "SYNTHETIC",
+      "measured": {
+        "asserted": "nonvacuous counts required (§4)"
+      },
+      "result": "FAIL"
+    }
+  ],
+  "corrects": "SENSOR-B4-I13R2 operator-review findings A-C (vacuous DuckDB identity rows, vacuous T0B parity rows, optional source-root protection)",
+  "mandate": "SENSOR-B4-I13R3",
+  "matrix": "DUCKDB_NONVACUOUS_IDENTITY",
+  "measured_at_checkpoint": "I13R3",
+  "rows_fail": 1,
+  "rows_ok": 6,
+  "rows_total": 7,
+  "synthetic_counterfactuals": 1
+}
