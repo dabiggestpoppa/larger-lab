@@ -886,7 +886,10 @@ def test_weakened_pre_r44_publication_creates_a_zero_byte_poison_claim(tmp_path)
     assert _record(h)["state"] == "PROMOTED"
     fresh = _run(h, _rollback_argv(h, h.root / "fresh.json"))
     assert fresh.returncode == 1, "the poison claim reopened fresh authority"
-    assert "already claimed" in fresh.stderr
+    # B4-CXR7U9R46R1: the poison claim is now refused at coordinate admission
+    # (an empty file is not valid JSON) rather than described as an earlier
+    # winner — the fail-closed outcome is unchanged, the message is exact.
+    assert "canonical claim coordinate refused" in fresh.stderr
     resumed = _run(h, _resume_rollback_argv(h, h.root / "resumed.json"))
     assert resumed.returncode == 1, "the poison claim admitted resume"
     assert _record(h)["state"] == "PROMOTED"

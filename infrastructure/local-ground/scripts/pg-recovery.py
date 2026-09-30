@@ -59,6 +59,7 @@ IDENTITY: the directory is derived from where this engine file lives, so no
 environment variable - including the former OCE_RECOVERY_STATE_DIR - can grant
 write authority. An existing receipt is REFUSED, never silently replaced.
 """
+import dataclasses
 import hashlib
 import json
 import os
@@ -118,6 +119,19 @@ _TRANSITION_LADDER = {
 }
 _CLAIM_FORMAT = "oce-transition-claim-v1"
 _CLAIM_TEMP_LIVENESS_ATTEMPTS = 4
+
+# FD-bound selector reading (B4-CXR7U9R46R1). The governed directory and the
+# canonical claim are opened WITHOUT following redirections, close-on-exec,
+# read-only. POSIX has O_NOFOLLOW; Windows has no equivalent flag, so reparse
+# points are refused explicitly at every admission step and the same
+# device/inode identity proof is enforced against the canonical name; a
+# platform that cannot prove these properties fails closed -- there is no
+# pathname fallback.
+_DIR_OPEN_FLAGS = (os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+                   | getattr(os, "O_DIRECTORY", 0))
+_CLAIM_OPEN_FLAGS = (os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
+                     | getattr(os, "O_NOFOLLOW", 0)
+                     | (os.O_BINARY if os.name == "nt" else 0))
 
 
 # The R44X2 claim temporary lifecycle
@@ -988,7 +1002,18 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
                 os.unlink(tmp)
             except OSError:
                 pass
-            winner = _load_claim(operation_id)
+            # The winner is read through ONE FD-bound selector snapshot
+            # (B4-CXR7U9R46R1). The winner publisher's temporary second link
+            # may still be retiring, so a transient link-count refusal is
+            # retried with FRESH fully admitted reads — never a reused
+            # descriptor — before the winner is reported unknown.
+            winner = None
+            for _ in range(_SELECTOR_READ_ATTEMPTS):
+                try:
+                    winner = _load_claim(operation_id)
+                    break
+                except _ExecutionAuthorityConflict:
+                    continue
             chosen = winner.get("transition") if winner else "unknown"
             raise RuntimeError(
                 f"recovery operation {operation_id} was already claimed for "
@@ -1048,77 +1073,330 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
     return claim
 
 
-def _validate_claim_coordinate(path, operation_id, directory):
-    """Canonical claim path/type admission (B4-CXR7U9R45R2).
+# One admission/verification pass, then (for a transient link-count refusal
+# caused by a publisher's retiring temporary second link) fully fresh retries
+# of the ENTIRE FD-bound read (B4-CXR7U9R46R1).
+_SELECTOR_READ_ATTEMPTS = 3
 
-    The canonical claim coordinate must satisfy the same class of admission as
-    the governed lock coordinate before its content may be read as a selector:
 
-      * the pathname is the engine-derived canonical claim name for THIS
-        operation id (never a CLI-supplied root — callers derive it here);
-      * containment: the real parent directory IS the governed transitions
-        directory, so a prefix-sibling directory or a redirected parent
-        cannot smuggle a claim past the law;
-      * type: lstat identifies a REGULAR file — symlinks are refused even
-        when their target is inside the approved root, and directories,
-        devices and FIFOs are refused;
-      * privacy: on POSIX the mode must not be readable/writable by group or
-        other (the engine publishes claims 0600);
-      * stability: a second lstat must observe the same inode, size and
-        mtime, so a replacement during validation is noticed.
+def _derive_claim_coordinate(operation_id, directory):
+    """Derive the canonical claim coordinate INTERNALLY (B4-CXR7U9R46R1).
 
-    Every refusal raises _ExecutionAuthorityConflict: the claim is failed
-    closed by the classification law, never followed, never repaired, and
-    never deleted.
+    The governed directory and the canonical basename are engine-derived
+    from the operation id and the governed transitions directory -- never
+    from CLI or receipt data -- so the only caller-controlled input is the
+    operation id, which must satisfy its strict pattern.
     """
+    if not isinstance(operation_id, str) \
+            or not OPERATION_ID_RE.match(operation_id):
+        raise _ExecutionAuthorityConflict(
+            "malformed operation id; refusing to derive a claim coordinate")
+    if not os.path.isdir(directory):
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} has no governed transition directory")
     governed = os.path.realpath(directory)
-    if os.path.dirname(os.path.realpath(path)) != governed:
+    return governed, f"{operation_id}.claim"
+
+
+def _open_governed_directory(governed_dir, operation_id):
+    """Anchor the governed directory without following any redirection
+    (B4-CXR7U9R46R1).
+
+    POSIX: a real directory descriptor is returned and every subsequent
+    selector step is descriptor-relative, so the whole read is pinned to the
+    opened directory inode.
+
+    Windows: a directory cannot be held open this way, so the anchor is a
+    no-follow stat of the governed directory with an explicit reparse-point
+    refusal. A redirected directory is refused; there is no pathname
+    fallback.
+    """
+    if os.name == "nt":
+        try:
+            info = os.stat(governed_dir, follow_symlinks=False)
+        except OSError as e:
+            raise _ExecutionAuthorityConflict(
+                f"operation {operation_id} governed transition directory "
+                f"could not be identified: {e}")
+        if not stat.S_ISDIR(info.st_mode):
+            raise _ExecutionAuthorityConflict(
+                f"operation {operation_id} governed transition directory is "
+                "not a directory")
+        if getattr(info, "st_file_attributes", 0) \
+                & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+            raise _ExecutionAuthorityConflict(
+                f"operation {operation_id} governed transition directory is "
+                "a reparse point; refusing a redirected directory")
+        return None
+    try:
+        dir_fd = os.open(governed_dir, _DIR_OPEN_FLAGS)
+    except OSError as e:
         raise _ExecutionAuthorityConflict(
-            f"operation {operation_id} canonical claim is not contained in "
-            "its governed transition directory; refusing a redirected claim "
-            "coordinate")
-    info = os.lstat(path)
-    if stat.S_ISLNK(info.st_mode):
+            f"operation {operation_id} governed transition directory could "
+            f"not be opened without following redirections: {e}")
+    info = os.fstat(dir_fd)
+    if not stat.S_ISDIR(info.st_mode):
+        os.close(dir_fd)
         raise _ExecutionAuthorityConflict(
-            f"operation {operation_id} canonical claim is a symlink; refusing "
-            "to follow a redirected selector")
+            f"operation {operation_id} governed transition directory is "
+            "not a directory")
+    return dir_fd
+
+
+def _selector_conflict(operation_id, reason):
+    return _ExecutionAuthorityConflict(
+        f"operation {operation_id} canonical claim coordinate refused: "
+        f"{reason} (B4-CXR7U9R46R1)")
+
+
+def _admit_selector_descriptor(fd, dir_fd, name, operation_id):
+    """Admit the OPENED selector descriptor and PROVE the canonical pathname
+    still names the same object (B4-CXR7U9R46R1).
+
+    The admission sequence runs against the descriptor itself, never against
+    a pathname that could be replaced after validation:
+
+      * fstat #1: the opened object is a REGULAR file (O_NOFOLLOW already
+        refused a symlink at open time on POSIX; on Windows an explicit
+        reparse-point refusal covers the same defect);
+      * privacy: the mode must not be readable/writable by group or other
+        (the engine publishes claims 0600); POSIX only;
+      * link-count invariant: the published canonical claim is the single
+        durable name (st_nlink == 1); anything else is a foreign hard link
+        and is refused;
+      * fstat #2: size, mtime and inode identity are unchanged across the
+        whole admission, so no replacement or rewrite slipped in;
+      * pathname proof: the canonical name is re-stated WITHOUT following
+        symlinks and must still name the SAME device and inode as the opened
+        descriptor -- a replaced or unlinked coordinate fails closed here.
+    """
+    info = os.fstat(fd)
+    if os.name == "nt" and bool(getattr(info, "st_file_attributes", 0)
+                                & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _selector_conflict(
+            operation_id, "the opened object is a reparse point")
     if not stat.S_ISREG(info.st_mode):
-        raise _ExecutionAuthorityConflict(
-            f"operation {operation_id} canonical claim is not a regular "
-            "file; refusing a malformed selector coordinate")
+        raise _selector_conflict(
+            operation_id, "the opened object is not a regular file")
     if os.name != "nt":
         mode = stat.S_IMODE(info.st_mode)
         if mode & 0o077:
-            raise _ExecutionAuthorityConflict(
-                f"operation {operation_id} canonical claim is not private "
-                f"(mode {mode:04o}); refusing a widened selector")
-    recheck = os.lstat(path)
-    if (info.st_ino, info.st_dev, info.st_size, info.st_mtime_ns) \
-            != (recheck.st_ino, recheck.st_dev, recheck.st_size,
-                recheck.st_mtime_ns):
-        raise _ExecutionAuthorityConflict(
-            f"operation {operation_id} canonical claim changed while it was "
-            "being validated; refusing a replaced selector coordinate")
-    return recheck
+            raise _selector_conflict(
+                operation_id, f"the opened object is not private (mode {mode:04o})")
+    if info.st_nlink != 1:
+        # BOTH platforms: the published canonical claim is ONE single durable
+        # name. A foreign hard link (Windows and POSIX both support them)
+        # breaks the published link-count invariant.
+        raise _selector_conflict(
+            operation_id,
+            f"the canonical claim has {info.st_nlink} durable links; the "
+            "published selector is one single durable name")
+    recheck = os.fstat(fd)
+    if (info.st_ino, info.st_dev, info.st_size, info.st_mtime_ns) != \
+            (recheck.st_ino, recheck.st_dev, recheck.st_size,
+             recheck.st_mtime_ns):
+        raise _selector_conflict(
+            operation_id, "the claim changed while it was being admitted")
+    try:
+        proof = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+    except OSError as e:
+        raise _selector_conflict(
+            operation_id,
+            f"the canonical pathname no longer names the opened claim: {e}")
+    if os.name == "nt" and bool(getattr(proof, "st_file_attributes", 0)
+                                & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _selector_conflict(
+            operation_id,
+            "the canonical pathname is a reparse point, not the opened claim")
+    if (proof.st_ino, proof.st_dev) != (info.st_ino, info.st_dev):
+        raise _selector_conflict(
+            operation_id,
+            "the canonical pathname was replaced after the descriptor was "
+            "opened; refusing to trust the reopened object")
+    return info
+
+
+@dataclasses.dataclass(frozen=True)
+class SelectorSnapshot:
+    """The ONE IMMUTABLE, FD-BOUND selector snapshot (B4-CXR7U9R46R1).
+
+    Every authority decision consumes exactly one snapshot. The bytes were
+    read from the same descriptor whose identity and security properties
+    were admitted, and the canonical pathname still named that object when
+    the snapshot returned. The descriptor is closed before the snapshot is
+    handed out; nothing lingers. A snapshot with claim=None describes an
+    absent or unreadable selector and carries no trustable content.
+    """
+    operation_id: str
+    transition_dir: str
+    canonical_path: str
+    present: bool
+    device: int
+    inode: int
+    size: int
+    mode: int
+    link_count: int
+    claim: object
+    read_error: str
+
+
+def _read_selector_snapshot(operation_id, transition_dir=None):
+    """Read THIS operation's canonical claim as ONE FD-bound snapshot.
+
+    POSIX sequence (B4-CXR7U9R46R1): derive the governed directory and the
+    canonical basename internally -> open the governed directory without
+    following redirections -> open the claim once with O_RDONLY|O_CLOEXEC|
+    O_NOFOLLOW, descriptor-relative -> fstat it (regular, private,
+    link-count, no mutation across admission) -> read and parse the JSON
+    from that SAME descriptor -> fstat again (mutation during reading is
+    rejected) -> prove the canonical pathname still names the SAME device
+    and inode without following symlinks -> close the descriptor and return
+    the immutable snapshot. No code may open(path) the claim after this
+    admission.
+
+    Windows equivalence: O_NOFOLLOW is unavailable, so reparse points are
+    refused explicitly on both the opened object and the canonical name, and
+    the same device/inode identity comparison is enforced; a platform that
+    cannot prove these properties fails closed.
+
+    Absence is a documented outcome (claim=None, present=False). Every
+    admission or parse failure raises _ExecutionAuthorityConflict: the
+    selector is failed closed, never followed, never repaired, never
+    deleted.
+    """
+    directory = transition_dir or _transitions_dir()
+    governed, name = _derive_claim_coordinate(operation_id, directory)
+    canonical_path = os.path.join(governed, name)
+    dir_fd = _open_governed_directory(governed, operation_id)
+    # POSIX: every step is descriptor-relative to the bare canonical name.
+    # Windows: there is no directory descriptor, so the FULL canonical path
+    # is used and the no-follow/reparse/identity proofs carry the law.
+    probe_name = name if dir_fd is not None else canonical_path
+    fd = None
+    try:
+        try:
+            st = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
+        except FileNotFoundError:
+            return SelectorSnapshot(
+                operation_id=operation_id, transition_dir=governed,
+                canonical_path=canonical_path, present=False, device=0,
+                inode=0, size=0, mode=0, link_count=0, claim=None,
+                read_error=None)
+        except OSError as e:
+            raise _selector_conflict(operation_id, f"lstat failed: {e}")
+        if os.name == "nt" and bool(getattr(st, "st_file_attributes", 0)
+                                    & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+            raise _selector_conflict(
+                operation_id,
+                "the canonical claim is a reparse point; refusing to follow "
+                "a redirected selector")
+        if not stat.S_ISREG(st.st_mode):
+            raise _selector_conflict(
+                operation_id,
+                "the canonical claim is not a regular file; refusing a "
+                "malformed selector coordinate")
+        if os.name != "nt":
+            mode = stat.S_IMODE(st.st_mode)
+            if mode & 0o077:
+                raise _selector_conflict(
+                    operation_id,
+                    f"the canonical claim is not private (mode {mode:04o}); "
+                    "refusing a widened selector")
+        try:
+            if dir_fd is not None:
+                fd = os.open(name, _CLAIM_OPEN_FLAGS, dir_fd=dir_fd)
+            else:
+                fd = os.open(probe_name, _CLAIM_OPEN_FLAGS)
+        except FileNotFoundError:
+            # The name was removed between lstat and open: the coordinate
+            # moved under us. Fail closed, never describe this as absent.
+            raise _selector_conflict(
+                operation_id,
+                "the canonical claim vanished between lstat and open")
+        except OSError as e:
+            raise _selector_conflict(
+                operation_id, f"the canonical claim could not be opened "
+                f"without following redirections: {e}")
+        _admit_selector_descriptor(fd, dir_fd, probe_name, operation_id)
+        try:
+            # Raw descriptor reads only: the claim bytes never pass through a
+            # second open, a path-based stream, or a buffered text wrapper --
+            # this descriptor IS the admitted object.
+            first = os.fstat(fd)
+            chunks = []
+            while True:
+                chunk = os.read(fd, 65536)
+                if not chunk:
+                    break
+                chunks.append(chunk)
+            mid = os.fstat(fd)
+            if (first.st_ino, first.st_dev, first.st_size,
+                    first.st_mtime_ns) != (mid.st_ino, mid.st_dev,
+                                           mid.st_size, mid.st_mtime_ns):
+                raise _selector_conflict(
+                    operation_id,
+                    "the claim changed while it was being read")
+            try:
+                claim = json.loads(b"".join(chunks).decode("utf-8"))
+            except (UnicodeDecodeError, ValueError) as e:
+                raise _selector_conflict(
+                    operation_id, f"the claim is not valid JSON: {e}")
+        except _ExecutionAuthorityConflict:
+            raise
+        except OSError as e:
+            raise _selector_conflict(
+                operation_id, f"the claim could not be read: {e}")
+        finally:
+            os.close(fd)
+            fd = None
+        try:
+            final = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
+        except OSError as e:
+            raise _selector_conflict(
+                operation_id,
+                f"the canonical pathname no longer names the read claim: {e}")
+        if (final.st_ino, final.st_dev) != (first.st_ino, first.st_dev):
+            raise _selector_conflict(
+                operation_id,
+                "the canonical pathname was replaced after the claim was "
+                "read; refusing the swapped selector")
+        return SelectorSnapshot(
+            operation_id=operation_id, transition_dir=governed,
+            canonical_path=canonical_path, present=True, device=first.st_dev,
+            inode=first.st_ino, size=first.st_size,
+            mode=stat.S_IMODE(first.st_mode), link_count=first.st_nlink,
+            claim=claim, read_error=None)
+    finally:
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+        if dir_fd is not None:
+            try:
+                os.close(dir_fd)
+            except OSError:
+                pass
 
 
 def _load_claim(operation_id, transition_dir=None):
     """The durable operation-wide claim, or None if none was ever taken.
 
-    Every read passes canonical-claim admission (B4-CXR7U9R45R2): a symlink,
-    non-regular object, redirected or widened claim raises
-    _ExecutionAuthorityConflict instead of returning content.
+    B4-CXR7U9R46R1: the claim bytes are read from ONE FD-bound selector
+    snapshot -- the same descriptor whose regular-file type, privacy,
+    link-count, non-mutation and pathname-identity properties were admitted.
+    The old validate-pathname-then-reopen sequence, which left a replacement
+    window between validation and open, no longer exists. A symlink,
+    non-regular object, redirected, widened, replaced or unparseable claim
+    raises _ExecutionAuthorityConflict instead of returning content.
     """
-    directory = transition_dir or _transitions_dir()
-    path = os.path.join(directory, f"{operation_id}.claim")
-    if not os.path.lexists(path):
+    snapshot = _read_selector_snapshot(operation_id, transition_dir)
+    if not snapshot.present:
         return None
-    _validate_claim_coordinate(path, operation_id, directory)
-    try:
-        with open(path, encoding="utf-8") as f:
-            return json.load(f)
-    except (OSError, ValueError):
-        return None
+    if not isinstance(snapshot.claim, dict):
+        raise _selector_conflict(
+            operation_id, "the admitted claim is not a JSON object")
+    return snapshot.claim
 
 
 def _valid_transition_claim(operation_id, transition, promote,
@@ -1127,7 +1405,13 @@ def _valid_transition_claim(operation_id, transition, promote,
     promote receipt (B4-CXR7U9R45R1). One semantic law, shared by the shell
     classifier, reconciliation and every resume path: the claim must pass its
     coordinate admission and be exactly bound, and the claimed transition
-    must equal the one requested."""
+    must equal the one requested.
+
+    B4-CXR7U9R46R2: ONE FD-bound snapshot decides BOTH the binding and the
+    branch. The old shape read the claim twice -- once for classification and
+    once for branch selection -- which let a replacement land between the
+    two reads; there is no second read anymore.
+    """
     if promote is None:
         return False
     expected = _receipt_digest(promote)
@@ -1219,20 +1503,34 @@ def _claim_state(operation_id, transition_dir=None,
                                   admission (symlink, non-regular object,
                                   redirected or widened file: B4-CXR7U9R45R2).
 
-    The selector name being present means the one-time authority was selected
-    or corrupted; no content-based reading can make it fresh again, and the
-    engine never deletes or rewrites it automatically.
+    B4-CXR7U9R46R1/R2: the state is classified from ONE FD-bound selector
+    snapshot. The admission that decides the object's identity is the same
+    read that produced the bytes being classified -- there is no second read
+    in which a replacement could land.
     """
-    directory = transition_dir or _transitions_dir()
-    path = os.path.join(directory, f"{operation_id}.claim")
-    if not os.path.lexists(path):
-        return "absent"
     try:
-        claim = _load_claim(operation_id, transition_dir=directory)
+        snapshot = _read_selector_snapshot(operation_id, transition_dir)
     except _ExecutionAuthorityConflict:
-        # Coordinate admission failed: symlink, non-regular object, redirect
-        # or widened permissions. Fail closed, never describe it as fresh.
+        # Coordinate admission failed: symlink, non-regular object, redirect,
+        # widened permissions, replacement during read. Fail closed, never
+        # describe it as fresh.
         return "malformed"
+    return _classify_claim_content(operation_id, snapshot,
+                                   expected_receipt_sha256=expected_receipt_sha256)
+
+
+def _classify_claim_content(operation_id, snapshot,
+                            expected_receipt_sha256=None):
+    """Classify ONE already-admitted selector snapshot (B4-CXR7U9R46R2).
+
+    Pure decision content: no filesystem access, no second read. Returns the
+    semantic selector state for the snapshot, or None when a PRESENT claim
+    cannot be classified from this snapshot alone -- the caller must fail
+    closed rather than re-read the coordinate.
+    """
+    if not snapshot.present:
+        return "absent"
+    claim = snapshot.claim
     if not isinstance(claim, dict):
         return "malformed"
     if claim.get("format") != _CLAIM_FORMAT \
