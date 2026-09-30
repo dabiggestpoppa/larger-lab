@@ -1,0 +1,331 @@
+{
+  "cases": [
+    {
+      "case_id": "input_mapping_M01",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.provider_id -> AcquisitionRecord.provider_id / PartitionManifest.provider via identity pass-through; authority: providers/base/models.py FetchBatch (Bloc 3 accepted contract); required=required; absent-behavior: BatchIdentityMismatch before any mutation (§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch (Bloc 3 accepted contract)",
+        "failure_if_absent": "BatchIdentityMismatch before any mutation (§6)",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.provider_id",
+        "target_field": "AcquisitionRecord.provider_id / PartitionManifest.provider",
+        "transformation": "identity pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M02",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.sensor_family -> AcquisitionRecord.sensor_family / PartitionManifest.sensor_family via identity pass-through; authority: providers/base/models.py FetchBatch; required=required; absent-behavior: BatchIdentityMismatch (§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "BatchIdentityMismatch (§6)",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.sensor_family",
+        "target_field": "AcquisitionRecord.sensor_family / PartitionManifest.sensor_family",
+        "transformation": "identity pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M03",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.request_fingerprint -> AcquisitionRecord.request_fingerprint (and acquisition identity prefix) via identity pass-through; authority: providers/base/models.py FetchBatch; required=required; absent-behavior: BatchIdentityMismatch (§6/§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "BatchIdentityMismatch (§6/§14)",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.request_fingerprint",
+        "target_field": "AcquisitionRecord.request_fingerprint (and acquisition identity prefix)",
+        "transformation": "identity pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M04",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.native_instrument_id -> AcquisitionRecord.native_instrument / PartitionManifest.native_instrument via identity pass-through; authority: providers/base/models.py FetchBatch; required=required; absent-behavior: typed construction failure",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "typed construction failure",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.native_instrument_id",
+        "target_field": "AcquisitionRecord.native_instrument / PartitionManifest.native_instrument",
+        "transformation": "identity pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M05",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "Bloc3StorageContext.venue -> AcquisitionRecord.venue / PartitionManifest.venue / partition key via identity pass-through; authority: integration-local typed context (§43) — REQUIRED, no default (§44); required=required; absent-behavior: typed refusal at context construction",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "integration-local typed context (§43) — REQUIRED, no default (§44)",
+        "failure_if_absent": "typed refusal at context construction",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "Bloc3StorageContext.venue",
+        "target_field": "AcquisitionRecord.venue / PartitionManifest.venue / partition key",
+        "transformation": "identity pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M06",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "Bloc3StorageContext.source_granularity -> AcquisitionRecord.native_granularity / PartitionManifest.source_granularity via accepted Granularity enum pass-through; authority: providers/base/enums.py Granularity via integration context; required=optional (may be None); absent-behavior: typed refusal if manifest requires it absent",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/enums.py Granularity via integration context",
+        "failure_if_absent": "typed refusal if manifest requires it absent",
+        "provider_specific_inference": false,
+        "required": "optional (may be None)",
+        "source_field": "Bloc3StorageContext.source_granularity",
+        "target_field": "AcquisitionRecord.native_granularity / PartitionManifest.source_granularity",
+        "transformation": "accepted Granularity enum pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M07",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.requested_start / requested_end -> AcquisitionRecord.requested_start/end; PartitionManifest logical_date_start/end; partition date via requested-window semantics preserved verbatim (§13: never actual_*); authority: providers/base/models.py FetchBatch; required=required; absent-behavior: FetchBatch model validation",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "FetchBatch model validation",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.requested_start / requested_end",
+        "target_field": "AcquisitionRecord.requested_start/end; PartitionManifest logical_date_start/end; partition date",
+        "transformation": "requested-window semantics preserved verbatim (§13: never actual_*)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M08",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.actual_first_timestamp / actual_last_timestamp -> AcquisitionRecord.actual_start / actual_end via observation semantics preserved (§13: never conflated with requested_*); authority: providers/base/models.py FetchBatch; required=optional; absent-behavior: None preserved as None",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "None preserved as None",
+        "provider_specific_inference": false,
+        "required": "optional",
+        "source_field": "FetchBatch.actual_first_timestamp / actual_last_timestamp",
+        "target_field": "AcquisitionRecord.actual_start / actual_end",
+        "transformation": "observation semantics preserved (§13: never conflated with requested_*)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M09",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.retrieved_at -> AcquisitionRecord.request_started_at AND response_observed_at via single observation event (§13: response_observed_at is the I06 revision ordering authority — never invented by the handoff); authority: providers/base/models.py FetchBatch; required=required; absent-behavior: FetchBatch model validation",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "FetchBatch model validation",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.retrieved_at",
+        "target_field": "AcquisitionRecord.request_started_at AND response_observed_at",
+        "transformation": "single observation event (§13: response_observed_at is the I06 revision ordering authority — never invented by the handoff)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M10",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "clock() -> AcquisitionRecord.ingested_at via ingestion instant from the composed clock (§13: distinct from retrieved_at); authority: accepted I04 catalog composition; required=required; absent-behavior: typed construction failure",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "accepted I04 catalog composition",
+        "failure_if_absent": "typed construction failure",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "clock()",
+        "target_field": "AcquisitionRecord.ingested_at",
+        "transformation": "ingestion instant from the composed clock (§13: distinct from retrieved_at)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M11",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.http_status / transport_status -> AcquisitionRecord.http_status_or_source_status via http_status preferred, transport_status fallback, else UNKNOWN; authority: integration mapping (INPUT_MAPPING law); required=optional; absent-behavior: recorded as UNKNOWN (never fabricated status)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "integration mapping (INPUT_MAPPING law)",
+        "failure_if_absent": "recorded as UNKNOWN (never fabricated status)",
+        "provider_specific_inference": false,
+        "required": "optional",
+        "source_field": "FetchBatch.http_status / transport_status",
+        "target_field": "AcquisitionRecord.http_status_or_source_status",
+        "transformation": "http_status preferred, transport_status fallback, else UNKNOWN"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M12",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.adapter_version -> AcquisitionRecord.adapter_version via provenance pass-through; authority: providers/base/models.py FetchBatch; required=required; absent-behavior: FetchBatch model validation",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch",
+        "failure_if_absent": "FetchBatch model validation",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.adapter_version",
+        "target_field": "AcquisitionRecord.adapter_version",
+        "transformation": "provenance pass-through"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M13",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "Bloc3StorageContext.endpoint_host/endpoint_path/request_family -> AcquisitionRecord.endpoint_host/endpoint_path/request_family via retrieval-context pass-through; I04R1 secret firewall re-validates at append (§39); authority: integration-local typed context (§43); required=optional; absent-behavior: typed failure at accepted catalog validation",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "integration-local typed context (§43)",
+        "failure_if_absent": "typed failure at accepted catalog validation",
+        "provider_specific_inference": false,
+        "required": "optional",
+        "source_field": "Bloc3StorageContext.endpoint_host/endpoint_path/request_family",
+        "target_field": "AcquisitionRecord.endpoint_host/endpoint_path/request_family",
+        "transformation": "retrieval-context pass-through; I04R1 secret firewall re-validates at append (§39)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M14",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "RawPayloadEnvelope.raw_body (bytes|str) -> T0A EvidenceBlob exact bytes via bytes verbatim; str UTF-8 per Bloc 3 payload_hash law (§11: no normalization); authority: providers/base/fingerprint.py payload_hash law; required=required; absent-behavior: EnvelopeContentHashMismatch (§8)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/fingerprint.py payload_hash law",
+        "failure_if_absent": "EnvelopeContentHashMismatch (§8)",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "RawPayloadEnvelope.raw_body (bytes|str)",
+        "target_field": "T0A EvidenceBlob exact bytes",
+        "transformation": "bytes verbatim; str UTF-8 per Bloc 3 payload_hash law (§11: no normalization)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M15",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "RawPayloadEnvelope.content_hash -> verification-only (never persisted as authority) via SHA-256 recomputed over exact body; provider hash never trusted (§8); authority: providers/base/fingerprint.py payload_hash law; required=required; absent-behavior: EnvelopeContentHashMismatch",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/fingerprint.py payload_hash law",
+        "failure_if_absent": "EnvelopeContentHashMismatch",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "RawPayloadEnvelope.content_hash",
+        "target_field": "verification-only (never persisted as authority)",
+        "transformation": "SHA-256 recomputed over exact body; provider hash never trusted (§8)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M16",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "RawPayloadEnvelope.content_type -> EvidenceBlob.source_media_type via pass-through, default application/octet-stream; authority: providers/base/models.py RawPayloadEnvelope; required=optional; absent-behavior: accepted blob-store default",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py RawPayloadEnvelope",
+        "failure_if_absent": "accepted blob-store default",
+        "provider_specific_inference": false,
+        "required": "optional",
+        "source_field": "RawPayloadEnvelope.content_type",
+        "target_field": "EvidenceBlob.source_media_type",
+        "transformation": "pass-through, default application/octet-stream"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M17",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.next_resume_token -> advance_checkpoint(resume_token=...) via adapter-owned token pass-through ONLY after manifest durability (§22); authority: providers/base/models.py ResumeToken; I07 gate; required=optional; absent-behavior: no token invented (§24)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py ResumeToken; I07 gate",
+        "failure_if_absent": "no token invented (§24)",
+        "provider_specific_inference": false,
+        "required": "optional",
+        "source_field": "FetchBatch.next_resume_token",
+        "target_field": "advance_checkpoint(resume_token=...)",
+        "transformation": "adapter-owned token pass-through ONLY after manifest durability (§22)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M18",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.quality_flags + row_count -> PartitionManifest.coverage_state via EMPTY_VALID→EMPTY_CONFIRMED; GAP_DETECTED→KNOWN_GAP; PARTIAL_INTERVAL→PARTIAL; else COMPLETE_SOURCE_BOUNDARY (§58: never zero); authority: accepted I04 coverage vocabulary; required=required; absent-behavior: typed vocabulary failure",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "accepted I04 coverage vocabulary",
+        "failure_if_absent": "typed vocabulary failure",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.quality_flags + row_count",
+        "target_field": "PartitionManifest.coverage_state",
+        "transformation": "EMPTY_VALID→EMPTY_CONFIRMED; GAP_DETECTED→KNOWN_GAP; PARTIAL_INTERVAL→PARTIAL; else COMPLETE_SOURCE_BOUNDARY (§58: never zero)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M19",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.is_complete -> receipt.complete + COMPLETE transition (§23) via FetchBatch contract already forbids is_complete with a token; authority: providers/base/models.py FetchBatch validator; required=required; absent-behavior: model validation",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "providers/base/models.py FetchBatch validator",
+        "failure_if_absent": "model validation",
+        "provider_specific_inference": false,
+        "required": "required",
+        "source_field": "FetchBatch.is_complete",
+        "target_field": "receipt.complete + COMPLETE transition (§23)",
+        "transformation": "FetchBatch contract already forbids is_complete with a token"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "input_mapping_M20",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FetchBatch.row_count / provider_cursor / duplicate_annotations / rate_limit_snapshot -> (no storage target) via NOT mapped: no accepted AcquisitionRecord/manifest field exists; explicitly recorded as not-crossing (no silent collapse, §12); authority: mandate §60 audit decision; required=n/a; absent-behavior: n/a — documented non-mapping",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "authority": "mandate §60 audit decision",
+        "failure_if_absent": "n/a — documented non-mapping",
+        "provider_specific_inference": false,
+        "required": "n/a",
+        "source_field": "FetchBatch.row_count / provider_cursor / duplicate_annotations / rate_limit_snapshot",
+        "target_field": "(no storage target)",
+        "transformation": "NOT mapped: no accepted AcquisitionRecord/manifest field exists; explicitly recorded as not-crossing (no silent collapse, §12)"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14",
+  "matrix": "INPUT_MAPPING_MATRIX",
+  "measured_at_checkpoint": "I14",
+  "rows_fail": 0,
+  "rows_ok": 20,
+  "rows_total": 20,
+  "synthetic_counterfactuals": 0
+}

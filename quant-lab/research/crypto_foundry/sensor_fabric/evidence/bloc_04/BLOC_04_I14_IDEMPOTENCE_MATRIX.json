@@ -1,0 +1,184 @@
+{
+  "cases": [
+    {
+      "case_id": "idempotence_same_batch_twice",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "identical redelivery mutates nothing and advances nothing (§34)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "digest_stable": true,
+        "first_checkpoint_advanced": true,
+        "second_checkpoint_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W1_BEFORE_RAW_WRITE",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W2_AFTER_RAW_WRITE_BEFORE_ACQUISITION",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W3_AFTER_ACQUISITION_BEFORE_REVISION",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W4_AFTER_REVISION_BEFORE_MANIFEST",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W5_BEFORE_MANIFEST_APPEND",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W6_DURING_MANIFEST_APPEND",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_W7_AFTER_MANIFEST_BEFORE_CHECKPOINT",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry reaches clean-run state; a SECOND retry mutates nothing (§63)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "digest_matches_clean": true,
+        "first_retry_advanced": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_retry_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_checkpoint",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "checkpoint transition count stays EXACTLY 1 across retry (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "after_first": 1,
+        "after_second": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_retry_after_complete",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "retry after COMPLETE adopts frozen history without mutation; a DIVERGENT batch is a typed refusal (§50/§35)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "digest_frozen": true,
+        "divergent_retry_error": "BatchAlreadyCompleted",
+        "retry_checkpoint_advanced": false,
+        "retry_complete": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_same_blob_two_jobs",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "content dedupe shares the blob; acquisitions and checkpoint authority stay identity-bound per job (§56)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "acquisitions_distinct": true,
+        "checkpoint_anchors_distinct": true,
+        "shared_blob_shas": [
+          "8c29ea244d10bb618c8ab796d3451e63c69f8b6d84acfdb163a738727c286d1f"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_same_request_different_bytes",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "two explicit revisions, both T0A blobs preserved, explicit manifest supersession — no overwrite (§16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "manifest_v1": 1,
+        "manifest_v2": 2,
+        "revision1_blob": "a64d90606367093f5d5621456eea1f32e65e70f9c69ce2e63d9fc47f6ec6775f",
+        "revision2_blob": "357c57c0e180111579e5ae918058569bcdb6c39ff8ebdfd8889e9a2ee08dac6b",
+        "supersedes": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "idempotence_counterfactual_inverted_gate",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "COUNTERFACTUAL: checkpoint attempted WITHOUT durable manifest — the accepted gate refuses and the cursor stays put",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "gate_error": "JobResumeGateError",
+        "resume_token_after": null
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14",
+  "matrix": "IDEMPOTENCE_MATRIX",
+  "measured_at_checkpoint": "I14",
+  "rows_fail": 0,
+  "rows_ok": 13,
+  "rows_total": 13,
+  "synthetic_counterfactuals": 1
+}

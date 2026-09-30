@@ -1,0 +1,215 @@
+{
+  "cases": [
+    {
+      "case_id": "crash_restart_W1_BEFORE_RAW_WRITE",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W1_BEFORE_RAW_WRITE",
+        "job_status_after_crash": "ACQUIRING",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": null,
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W2_AFTER_RAW_WRITE_BEFORE_ACQUISITION",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W2_AFTER_RAW_WRITE_BEFORE_ACQUISITION",
+        "job_status_after_crash": "RAW_STAGED",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": null,
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W3_AFTER_ACQUISITION_BEFORE_REVISION",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W3_AFTER_ACQUISITION_BEFORE_REVISION",
+        "job_status_after_crash": "RAW_COMMITTED",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": null,
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W4_AFTER_REVISION_BEFORE_MANIFEST",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W4_AFTER_REVISION_BEFORE_MANIFEST",
+        "job_status_after_crash": "RAW_COMMITTED",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": null,
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W5_BEFORE_MANIFEST_APPEND",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W5_BEFORE_MANIFEST_APPEND",
+        "job_status_after_crash": "RAW_COMMITTED",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": null,
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W6_DURING_MANIFEST_APPEND",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W6_DURING_MANIFEST_APPEND",
+        "job_status_after_crash": "PROJECTION_COMMITTED",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W7_AFTER_MANIFEST_BEFORE_CHECKPOINT",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "resume_after_crash == resume_before (§62/§28) AND final durable semantic digest == clean-run digest (§48) AND retry adopts/advances exactly once (§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_survivors": [
+          "T0A_BLOB",
+          "ACQUISITION",
+          "REVISION",
+          "MANIFEST"
+        ],
+        "fault_raised": true,
+        "final_digest_matches_clean": true,
+        "injected_point": "W7_AFTER_MANIFEST_BEFORE_CHECKPOINT",
+        "job_status_after_crash": "MANIFEST_COMMITTED",
+        "manifest_current_after_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_current_before_crash": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "restart_outcome": "fresh_repositories_from_disk",
+        "resume_token_page_after_restart": null,
+        "resume_token_page_before": null,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "retry_outcome": "adopted_and_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "crash_restart_W7_adopt_exact_once",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "W7: manifest durable + checkpoint old -> retry adopts the EXACT durable manifest (no duplicate semantic version) and advances the checkpoint EXACTLY once (§29/§49)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_old_after_crash": true,
+        "checkpoint_transitions_after_retry": 1,
+        "clean_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "durable_copies_of_intended_manifest": 1,
+        "manifest_durable_after_crash": true,
+        "retry_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14",
+  "matrix": "CRASH_RESTART_MATRIX",
+  "measured_at_checkpoint": "I14",
+  "rows_fail": 0,
+  "rows_ok": 8,
+  "rows_total": 8,
+  "synthetic_counterfactuals": 0
+}

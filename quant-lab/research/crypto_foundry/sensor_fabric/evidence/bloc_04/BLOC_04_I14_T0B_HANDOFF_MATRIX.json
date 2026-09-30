@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "case_id": "t0b_handoff_t0a_only_valid",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "T0A-only path persists, commits manifest, advances checkpoint (§57)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "blob_shas": [
+          "2978b6ae45eea64b1be5613730f375024ce7564a45422c2ba4fb02763e9a9076"
+        ],
+        "checkpoint_advanced": true,
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "projection_refs": []
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_handoff_manifest_binds_projection",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "T0A+T0B: projection refs nonempty, lineage resolves over the EXACT T0A evidence, manifest commit accepted (§64)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "lineage_manifest_id": "lm-i14-handoff-proj-1",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v2",
+        "manifest_version": 2,
+        "projection_refs": [
+          "i14-handoff-proj-1"
+        ],
+        "source_acquisitions": [
+          "fp-job::b4d13a6ac90d48962fe17c8b5bf5904530910e796ae172382678d42cdc10b6bc"
+        ],
+        "source_t0a_blobs": [
+          "b4d13a6ac90d48962fe17c8b5bf5904530910e796ae172382678d42cdc10b6bc"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_handoff_broken_lineage_refused",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "COUNTERFACTUAL: dangling projection ref — manifest commit FAILS CLOSED and the checkpoint stays old (§64)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_status_after": "CHECKPOINT_ADVANCED",
+        "refusal_typed_error": "ProjectionChainBroken",
+        "resume_token_page": 2
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14",
+  "matrix": "T0B_HANDOFF_MATRIX",
+  "measured_at_checkpoint": "I14",
+  "rows_fail": 0,
+  "rows_ok": 3,
+  "rows_total": 3,
+  "synthetic_counterfactuals": 1
+}

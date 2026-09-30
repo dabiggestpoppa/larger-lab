@@ -1,0 +1,312 @@
+{
+  "cases": [
+    {
+      "case_id": "durability_order_job_acquiring",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "stage job_acquiring reaches durable state ACQUIRING in causal order (§61); checkpoint row requires manifest re-readable at proof time",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_status": "ACQUIRING",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_re_readable_at_checkpoint": true,
+        "manifest_version": 1,
+        "observed_events": [
+          {
+            "job_state": "status=ACQUIRING token_page=None",
+            "stage": "W1_raw_write_start"
+          },
+          {
+            "job_state": "status=RAW_STAGED token_page=None",
+            "stage": "after_raw_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_acquisition_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_revision_registered"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "before_manifest_append"
+          },
+          {
+            "job_state": "status=PROJECTION_COMMITTED token_page=None",
+            "stage": "manifest_committed_durable"
+          },
+          {
+            "job_state": "status=MANIFEST_COMMITTED token_page=None",
+            "stage": "checkpoint_advanced"
+          }
+        ],
+        "resume_token_page_after": 11,
+        "stage": "job_acquiring"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_raw_persisted",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "stage raw_persisted reaches durable state RAW_STAGED in causal order (§61); checkpoint row requires manifest re-readable at proof time",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_status": "RAW_STAGED",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_re_readable_at_checkpoint": true,
+        "manifest_version": 1,
+        "observed_events": [
+          {
+            "job_state": "status=ACQUIRING token_page=None",
+            "stage": "W1_raw_write_start"
+          },
+          {
+            "job_state": "status=RAW_STAGED token_page=None",
+            "stage": "after_raw_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_acquisition_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_revision_registered"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "before_manifest_append"
+          },
+          {
+            "job_state": "status=PROJECTION_COMMITTED token_page=None",
+            "stage": "manifest_committed_durable"
+          },
+          {
+            "job_state": "status=MANIFEST_COMMITTED token_page=None",
+            "stage": "checkpoint_advanced"
+          }
+        ],
+        "resume_token_page_after": 11,
+        "stage": "raw_persisted"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_acquisition_persisted",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "stage acquisition_persisted reaches durable state RAW_COMMITTED in causal order (§61); checkpoint row requires manifest re-readable at proof time",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_status": "RAW_COMMITTED",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_re_readable_at_checkpoint": true,
+        "manifest_version": 1,
+        "observed_events": [
+          {
+            "job_state": "status=ACQUIRING token_page=None",
+            "stage": "W1_raw_write_start"
+          },
+          {
+            "job_state": "status=RAW_STAGED token_page=None",
+            "stage": "after_raw_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_acquisition_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_revision_registered"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "before_manifest_append"
+          },
+          {
+            "job_state": "status=PROJECTION_COMMITTED token_page=None",
+            "stage": "manifest_committed_durable"
+          },
+          {
+            "job_state": "status=MANIFEST_COMMITTED token_page=None",
+            "stage": "checkpoint_advanced"
+          }
+        ],
+        "resume_token_page_after": 11,
+        "stage": "acquisition_persisted"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_revision_registered",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "stage revision_registered reaches durable state PROJECTION_PENDING in causal order (§61); checkpoint row requires manifest re-readable at proof time",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_status": "PROJECTION_PENDING",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_re_readable_at_checkpoint": true,
+        "manifest_version": 1,
+        "observed_events": [
+          {
+            "job_state": "status=ACQUIRING token_page=None",
+            "stage": "W1_raw_write_start"
+          },
+          {
+            "job_state": "status=RAW_STAGED token_page=None",
+            "stage": "after_raw_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_acquisition_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_revision_registered"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "before_manifest_append"
+          },
+          {
+            "job_state": "status=PROJECTION_COMMITTED token_page=None",
+            "stage": "manifest_committed_durable"
+          },
+          {
+            "job_state": "status=MANIFEST_COMMITTED token_page=None",
+            "stage": "checkpoint_advanced"
+          }
+        ],
+        "resume_token_page_after": 11,
+        "stage": "revision_registered"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_manifest_committed",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "stage manifest_committed reaches durable state MANIFEST_COMMITTED in causal order (§61); checkpoint row requires manifest re-readable at proof time",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_status": "MANIFEST_COMMITTED",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_re_readable_at_checkpoint": true,
+        "manifest_version": 1,
+        "observed_events": [
+          {
+            "job_state": "status=ACQUIRING token_page=None",
+            "stage": "W1_raw_write_start"
+          },
+          {
+            "job_state": "status=RAW_STAGED token_page=None",
+            "stage": "after_raw_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_acquisition_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_revision_registered"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "before_manifest_append"
+          },
+          {
+            "job_state": "status=PROJECTION_COMMITTED token_page=None",
+            "stage": "manifest_committed_durable"
+          },
+          {
+            "job_state": "status=MANIFEST_COMMITTED token_page=None",
+            "stage": "checkpoint_advanced"
+          }
+        ],
+        "resume_token_page_after": 11,
+        "stage": "manifest_committed"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_checkpoint_advanced",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "stage checkpoint_advanced reaches durable state CHECKPOINT_ADVANCED in causal order (§61); checkpoint row requires manifest re-readable at proof time",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_status": "CHECKPOINT_ADVANCED",
+        "manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "manifest_re_readable_at_checkpoint": true,
+        "manifest_version": 1,
+        "observed_events": [
+          {
+            "job_state": "status=ACQUIRING token_page=None",
+            "stage": "W1_raw_write_start"
+          },
+          {
+            "job_state": "status=RAW_STAGED token_page=None",
+            "stage": "after_raw_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_acquisition_persisted"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "after_revision_registered"
+          },
+          {
+            "job_state": "status=RAW_COMMITTED token_page=None",
+            "stage": "before_manifest_append"
+          },
+          {
+            "job_state": "status=PROJECTION_COMMITTED token_page=None",
+            "stage": "manifest_committed_durable"
+          },
+          {
+            "job_state": "status=MANIFEST_COMMITTED token_page=None",
+            "stage": "checkpoint_advanced"
+          }
+        ],
+        "resume_token_page_after": 11,
+        "stage": "checkpoint_advanced"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_manifest_before_checkpoint",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "manifest_durable_event causally precedes checkpoint publication (§51: structural ordering, not wall clock)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_stage_index": 6,
+        "manifest_stage_index": 5,
+        "transition_chain": [
+          "ACQUIRING",
+          "RAW_STAGED",
+          "RAW_COMMITTED",
+          "PROJECTION_PENDING",
+          "PROJECTION_COMMITTED",
+          "MANIFEST_COMMITTED",
+          "CHECKPOINT_ADVANCED"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "durability_order_completion_terminal",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "partial batch ends CHECKPOINT_ADVANCED; never COMPLETE (§24)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "complete": false,
+        "final_status": "CHECKPOINT_ADVANCED"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14",
+  "matrix": "DURABILITY_ORDER_MATRIX",
+  "measured_at_checkpoint": "I14",
+  "rows_fail": 0,
+  "rows_ok": 8,
+  "rows_total": 8,
+  "synthetic_counterfactuals": 0
+}

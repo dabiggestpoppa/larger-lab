@@ -1,0 +1,38 @@
+{
+  "cases": [
+    {
+      "case_id": "concurrency_same_job_no_fork",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "same job/batch double-persist: exactly ONE checkpoint, no manifest version fork, stable final state (§65/§55)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions": 1,
+        "current_manifest_ids": [
+          "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1"
+        ],
+        "first_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v1",
+        "second_checkpoint_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "concurrency_manifest_cas_stale_writer_refused",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "COUNTERFACTUAL: a stale-expected writer is refused by the accepted manifest CAS — no last-writer-wins, no version fork",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "current_pointer_is_winner": false,
+        "typed_error": "ManifestCASConflict",
+        "winner_manifest_id": "kraken/kraken_spot/MECHANICAL_TRADE/XBT/USD/2026-01-15::v2"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14",
+  "matrix": "CONCURRENCY_MATRIX",
+  "measured_at_checkpoint": "I14",
+  "rows_fail": 0,
+  "rows_ok": 2,
+  "rows_total": 2,
+  "synthetic_counterfactuals": 1
+}
