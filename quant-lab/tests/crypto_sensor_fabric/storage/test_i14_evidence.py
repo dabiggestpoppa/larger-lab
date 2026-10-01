@@ -23,6 +23,8 @@ import sys
 from datetime import timedelta
 from pathlib import Path
 
+import pytest  # noqa: E402  (I14R2 custody law: typed refusal assertions)
+
 
 HERE = Path(__file__).resolve().parent
 if str(HERE) not in sys.path:
@@ -1430,11 +1432,69 @@ def _concurrency_matrix(tmp_path: Path) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Evidence publication + parity guard
+# Evidence custody (I14R2 §5/§6/§7): the six I14 matrices are FOSSILS of
+# the accepted I14 checkpoint (706f18ed2).  A later implementation
+# checkpoint NEVER republishes prior checkpoint matrices; current-runtime
+# evidence belongs to I14R1/I14R2 files only.  Ordinary pytest runs
+# therefore VALIDATE the fossils against the accepted checkpoint blobs —
+# they never write them.  Republication requires the explicit mechanical
+# override AND is only ever legitimate at the I14 checkpoint itself.
 # ---------------------------------------------------------------------------
+
+#: Accepted I14 checkpoint head (the historical evidence authority).
+_FROZEN_I14_SOURCE_COMMIT = "706f18ed229fefbfbbdd31db139f951815e759a5"
+
+#: The six accepted I14 matrices (I14R2 §6 fossils).
+_I14_HISTORICAL_MATRICES = (
+    "BLOC_04_I14_INPUT_MAPPING_MATRIX.json",
+    "BLOC_04_I14_DURABILITY_ORDER_MATRIX.json",
+    "BLOC_04_I14_CRASH_RESTART_MATRIX.json",
+    "BLOC_04_I14_IDEMPOTENCE_MATRIX.json",
+    "BLOC_04_I14_T0B_HANDOFF_MATRIX.json",
+    "BLOC_04_I14_CONCURRENCY_MATRIX.json",
+)
+
+
+def _git_blob_sha256(rev: str, rel_path: str) -> bytes:
+    """Resolve the accepted checkpoint's blob for ``rel_path`` (repo-root
+    relative) through Git itself — the historical authority (I14R2 §3)."""
+    import subprocess
+
+    raw = subprocess.run(
+        ["git", "show", f"{rev}:{rel_path}"],
+        capture_output=True,
+        check=True,
+    ).stdout
+    return raw
+
+
+def _evidence_path(name: str) -> Path:
+    return EVIDENCE_DIR / name
+
+
+def _repo_rel_path(name: str) -> str:
+    return (
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/"
+        f"bloc_04/{name}"
+    )
 
 
 def _write(name: str, payload: dict) -> Path:
+    """Mechanical publication, OVERRIDE-GATED (I14R2 §5).
+
+    Ordinary pytest runs NEVER reach this: the custody test class below
+    replaces the old unconditional republish behavior.  The override
+    exists only for a future operator-authorized republication AT the
+    I14 checkpoint scope.
+    """
+    import os
+
+    if os.environ.get("UPDATE_I14_EVIDENCE") != "1":
+        raise AssertionError(
+            f"refusing to overwrite historical I14 evidence {name!r} "
+            "(I14R2 §5/§6: accepted checkpoint matrices are fossils; "
+            "current-runtime evidence publishes to I14R1/I14R2 files)"
+        )
     EVIDENCE_DIR.mkdir(parents=True, exist_ok=True)
     path = EVIDENCE_DIR / name
     path.write_text(
@@ -1446,37 +1506,100 @@ def _write(name: str, payload: dict) -> Path:
 
 
 class TestI14Evidence:
-    """Each test measures production behavior and publishes ONE matrix."""
+    """CHECKPOINT-SCOPED IMMUTABILITY VALIDATION (I14R2 §5/§6).
+
+    Each historical matrix is still measured live — against CURRENT
+    runtime behavior, in memory only — and the measured rows must still
+    hold, but NOTHING is written.  Separately, the custody test proves
+    the six published fossils are byte-exact against the accepted I14
+    checkpoint blobs in Git.
+    """
 
     def test_input_mapping_matrix(self) -> None:
         matrix = _input_mapping_matrix()
-        assert matrix["rows_fail"] == 0
-        _write("BLOC_04_I14_INPUT_MAPPING_MATRIX.json", matrix)
+        assert matrix["rows_fail"] == 0  # measured in memory; no write
 
     def test_durability_order_matrix(self, tmp_path) -> None:
         matrix = _durability_order_matrix(tmp_path)
         assert matrix["rows_fail"] == 0
-        _write("BLOC_04_I14_DURABILITY_ORDER_MATRIX.json", matrix)
 
     def test_crash_restart_matrix(self, tmp_path) -> None:
         matrix = _crash_restart_matrix(tmp_path)
         assert matrix["rows_fail"] == 0
-        _write("BLOC_04_I14_CRASH_RESTART_MATRIX.json", matrix)
 
     def test_idempotence_matrix(self, tmp_path) -> None:
         matrix = _idempotence_matrix(tmp_path)
         assert matrix["rows_fail"] == 0
-        _write("BLOC_04_I14_IDEMPOTENCE_MATRIX.json", matrix)
 
     def test_t0b_handoff_matrix(self, tmp_path) -> None:
+        """Measured in memory against CURRENT runtime.  NOTE (I14R2 §4):
+        the observation-aware acquisition-id law changed measured ids; a
+        current-run id differs from the fossil's I14-era id — both are
+        true at their own checkpoints (dual truth, no rewrite)."""
         matrix = _t0b_handoff_matrix(tmp_path)
         assert matrix["rows_fail"] == 0
-        _write("BLOC_04_I14_T0B_HANDOFF_MATRIX.json", matrix)
 
     def test_concurrency_matrix(self, tmp_path) -> None:
         matrix = _concurrency_matrix(tmp_path)
         assert matrix["rows_fail"] == 0
-        _write("BLOC_04_I14_CONCURRENCY_MATRIX.json", matrix)
+
+
+class TestI14HistoricalEvidenceCustody:
+    """I14R2 §6: the six accepted I14 matrices are fossils — byte-exact
+    against the accepted checkpoint blobs, untouched by any ordinary test
+    run (live-measure everything, mutate nothing)."""
+
+    def test_all_six_matrices_equal_accepted_checkpoint_blobs(
+        self, tmp_path
+    ) -> None:
+        import hashlib as _hashlib
+
+        unchanged = {}
+        for name in _I14_HISTORICAL_MATRICES:
+            path = _evidence_path(name)
+            assert path.is_file(), f"missing historical matrix {name}"
+            accepted = _git_blob_sha256(
+                _FROZEN_I14_SOURCE_COMMIT, _repo_rel_path(name)
+            )
+            current = path.read_bytes()
+            unchanged[name] = _hashlib.sha256(current).hexdigest()
+            assert current == accepted, (
+                f"historical I14 evidence {name} diverges from the "
+                f"accepted checkpoint {_FROZEN_I14_SOURCE_COMMIT[:9]} "
+                "(I14R2 §3/§6: never republish a prior checkpoint's "
+                "matrices)"
+            )
+        # §6 fossil test: run the live I14 evidence validation, then
+        # require ALL SIX files unchanged.
+        custody_root = tmp_path / "custody"
+        custody_root.mkdir()
+        matrix = _t0b_handoff_matrix(custody_root)
+        assert matrix["rows_fail"] == 0
+        for name in _I14_HISTORICAL_MATRICES:
+            path = _evidence_path(name)
+            assert (
+                _hashlib.sha256(path.read_bytes()).hexdigest()
+                == unchanged[name]
+            ), f"live validation mutated historical {name}"
+
+    def test_republish_override_is_gated(self) -> None:
+        """§5: _write refuses historical overwrites without the explicit
+        mechanical override — no ordinary pytest run can mutate fossils."""
+        import os
+
+        if os.environ.get("UPDATE_I14_EVIDENCE") == "1":
+            pytest.skip("override active: custody refusal not exercisable")
+        with pytest.raises(AssertionError, match="fossils"):
+            _write("BLOC_04_I14_T0B_HANDOFF_MATRIX.json", {"cases": []})
+        # The refusal happened BEFORE any write (file still fossil).
+        accepted = _git_blob_sha256(
+            _FROZEN_I14_SOURCE_COMMIT,
+            _repo_rel_path("BLOC_04_I14_T0B_HANDOFF_MATRIX.json"),
+        )
+        assert (
+            _evidence_path("BLOC_04_I14_T0B_HANDOFF_MATRIX.json").read_bytes()
+            == accepted
+        )
 
 
 if __name__ == "__main__":
