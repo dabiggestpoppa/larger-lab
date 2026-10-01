@@ -1707,3 +1707,131 @@ acquisition, news/social ingestion, RPC, database, graph database, dashboard,
 narrative/catalyst scores, ranking, buy/sell language, causal claims, state-rule
 ratification, response-emission without an assigned comparison owner, or any
 trading/execution authority.
+---
+
+## CHECKPOINT — BOOK 7 D7N DECISIONS RECORDED / BOOK 6 COMPARISON AMENDMENT REQUIRED
+
+```text
+CHECKPOINT_DATE                     = 2026-10-01
+BRANCH                              = agent/crypto-systems-intelligence-atlas-plan
+STARTING_HEAD                       = b172a76698d873935cdc550c6d6fb62cd7563796
+BOOK_6                              = FROZEN_ACCEPTED (unchanged)
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+
+--- D7N DISPOSITIONS ---
+
+D7N-3                               = CLOSED / A
+                                      BOOK7_SPECIFIC_CONTRACT_NOW_VOCABULARY_LATER
+                                      NARRATIVE_STATE_RULES_RATIFIED = 0
+                                      EVOLUTION_STATE_RULES_RATIFIED = 0
+                                      BOOK6_STATE_AUTHORITY_TRANSFER = FALSE
+                                      STATE_VOCABULARY_SELECTION =
+                                        DEFERRED_TO_LATER_RULE_ROUND
+D7N-7                               = CLOSED / A
+                                      BOOK6_OWNED_COMPARISON
+                                      CHANGE_COMPARISON_OWNER = BOOK_6
+                                      BOOK_6_AMENDMENT_REQUIRED = TRUE
+                                      BOOK_7_CHANGE_COMPARISON_AUTHORITY = FALSE
+                                      BOOK_7_RESPONSE_LINKAGE_AUTHORITY = PLANNED_ONLY
+                                      MEASUREMENT_CHANGE != EVENT_RESPONSE_LINK
+D7N-1                               = OPEN_DEFERRED
+D7N-2                               = OPEN_DEFERRED
+D7N-4                               = OPEN_DEFERRED
+D7N-5                               = OPEN_DEFERRED
+D7N-6                               = OPEN_DEFERRED
+
+OPEN_BLOCKING_D7N_DECISIONS         = 0
+OPEN_DEFERRED_D7N_DECISIONS         = 5
+
+--- GOVERNANCE CORRECTION ---
+
+PLAN_v0.2_GOVERNANCE_ERRATUM_v0.1   = RECORDED
+  incorrect historical field         = OPEN_BLOCKING_D7N_DECISIONS = 0
+  correct field                      = OPEN_BLOCKING_D7N_DECISIONS = 2
+  blocking at that time              = D7N-3, D7N-7
+  plan v0.2                          = HISTORICAL DRAFT, unmodified
+  decision-readiness review          = was already correct, unchanged
+  planning ledger (prior checkpoints) = was already correct, unchanged
+  ratifications under wrong field    = 0
+  architecture changed               = NO
+  pre-ratification result changed    = NO
+
+--- BOOK 6 COMPARISON / CHANGE AMENDMENT ---
+
+BOOK_6_AMENDMENT_REQUIRED           = TRUE
+BOOK_6_AMENDMENT_PLAN               = v0.1 DRAFT_PENDING_OPERATOR_RATIFICATION
+BOOK_6_AMENDMENT_PRE_RATIFICATION   = 20 / 20 PASS
+BOOK_6_AMENDMENT_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_6_AMENDMENT_SCOPE              = NARROW — 2 new contract classes
+                                      (ComparisonRule, ChangeObservation)
+  new contract classes              = 2
+  accepted contracts modified       = 0
+  new state classes                 = 0
+  D6M amendments required           = 0
+  default baseline models           = 0 (explicitly none)
+  Book 5 write-back paths           = 0
+  Book 2 claim promotion paths      = 0
+BOOK_6_CURRENT_STATE                = FROZEN_ACCEPTED (unchanged until
+                                      amendment is ratified, implemented,
+                                      regression-reviewed, and re-accepted)
+
+--- BOOK 7 STATUS ---
+
+BOOK_7_PLAN_v0.1                    = SUPERSEDED / NOT RATIFIABLE
+BOOK_7_PLAN_v0.2                    = STRUCTURALLY_READY_PENDING_BOOK6_AMENDMENT
+BOOK_7_PLAN_RATIFICATION            = BLOCKED_PENDING_BOOK6_AMENDMENT
+BOOK_7_RATIFICATION_BLOCKER         = BOOK6_COMPARISON_CONTRACT_NOT_YET_ACCEPTED
+BOOK_7_DECISION_RECONCILIATION_v0.1 = RECORDED
+PRE_RATIFICATION_REVIEW_v0.2        = 45 / 45 PASS (unchanged)
+OPERATIVE RESPONSE POSTURE          = fail-closed — CHANGE_NOT_MEASURABLE
+
+--- UNTOUCHED / INVARIANT ---
+
+BOOK_1_AMENDMENT_REQUIRED           = FALSE
+BOOK_2_AMENDMENT_REQUIRED           = FALSE
+BOOK_3_AMENDMENT_REQUIRED           = FALSE
+BOOK_4_AMENDMENT_REQUIRED           = FALSE
+BOOK_5_AMENDMENT_REQUIRED           = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED     = FALSE
+SENSOR_MUTATION                     = 0
+STRUCTURAL_FAILURES                 = 0
+D2_6                                = IN_FORCE
+D6M_1..D6M_4                        = UNCHANGED
+D6M_5                               = OPEN_DEFERRED
+
+BOOK_6_IMPLEMENTATION_AUTHORITY     = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY     = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY     = FALSE
+LIVE_ACQUISITION_AUTHORITY          = FALSE
+
+NEXT                                = operator review / ratification of the
+                                      narrow Book 6 comparison-change
+                                      amendment (plan, not implementation)
+
+ARTIFACTS_CREATED_THIS_CHECKPOINT
+  CSIA_BOOK_7_PLAN_v0.2_GOVERNANCE_ERRATUM_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.1.md
+  CSIA_BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PRE_RATIFICATION_REVIEW_v0.1.md
+  CSIA_BOOK_7_PLAN_v0.2_DECISION_RECONCILIATION_v0.1.md
+ARTIFACTS_APPENDED_THIS_CHECKPOINT
+  CSIA_OPERATOR_DECISION_LOG.md   (D7N-3, D7N-7, D7N-1/2/4/5/6 deferrals)
+  CSIA_PLANNING_PROGRESS.md       (this checkpoint)
+```
+
+**Reading of this checkpoint.** Both blocking Book 7 decisions are answered,
+so nothing blocks on the operator's D7N ballot any more. One of those
+answers — D7N-7 = A — routes change-comparison semantics upstream into a book
+that is frozen accepted and does not have them. The governance position is
+therefore: Book 7's plan is structurally ready and unratified, Book 6 owes a
+narrow amendment, and the next operator action is to review and ratify that
+amendment **plan** — which authorizes a separate implementation round, not
+implementation itself. Book 7 does not gain a local comparison fallback, and
+its response rung stays fail-closed until the upstream contract is accepted.
+
+**Not authorized and not performed:** Book 6 implementation, Book 6
+re-acceptance, Book 7 ratification, Book 7 implementation, Book 8, D8, live
+acquisition, any state/predicate/coverage-rule ratification, any usage or
+health research, any score, ranking, or trading authority.
