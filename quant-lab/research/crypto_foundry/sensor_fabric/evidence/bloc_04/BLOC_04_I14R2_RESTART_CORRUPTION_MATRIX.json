@@ -1,0 +1,71 @@
+{
+  "cases": [
+    {
+      "case_id": "restart_corruption_digest_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a tampered group digest fails typed on fresh restart (I14R2 §19/§27)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_corruption_content_scope_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "re-scoping a GROUP row as single fails typed (I14R2 §19)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_corruption_member_lineage_removed",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "removing member lineage (digest-only forgery) fails typed (I14R2 §16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_corruption_member_blob_swap",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a swapped member blob fails the digest recompute law (I14R2 §19)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_corruption_member_correspondence_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a tampered acquisition<->blob correspondence diverges from durable member truth and fails typed (I14R2 §15/§21)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_corruption_missing_member_acquisition",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a group whose member acquisition no longer exists durably fails typed on fresh restart (I14R2 §17/§19)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "SourceRevisionCatalogCorrupt"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R2",
+  "matrix": "RESTART_CORRUPTION_MATRIX",
+  "measured_at_checkpoint": "I14R2",
+  "rows_fail": 0,
+  "rows_ok": 6,
+  "rows_total": 6,
+  "synthetic_counterfactuals": 0
+}

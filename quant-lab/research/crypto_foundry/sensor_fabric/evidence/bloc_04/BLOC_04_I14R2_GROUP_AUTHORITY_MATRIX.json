@@ -1,0 +1,86 @@
+{
+  "cases": [
+    {
+      "case_id": "group_authority_valid_group",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "I06 accepts a coherent group directly: every member resolves/verifies, identities and observation instant cohere, digest recomputes (I14R2 §25)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "revision_number": 1,
+        "source_revision_key": "b2ba07758cdf"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "group_authority_foreign_source_member_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a member deriving a DIFFERENT source identity than the canonical group identity is refused typed by I06 itself — no persistence, no binding (I14R2 §8/§10)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "foreign_fingerprint": "fp-OTHER",
+        "refusal": "RevisionConfigurationError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "group_authority_differing_observation_time_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "members from DIFFERENT observation instants are refused typed — one FetchBatch is ONE observation; I06 never collapses times (I14R2 §9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "RevisionObservationConflict": true,
+        "refusal": "RevisionConfigurationError/"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "group_authority_duplicate_member_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "duplicate acquisition ids are rejected before any resolution or persistence (I14R2 §11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "RevisionConfigurationError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "group_authority_forged_digest_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "I06 recomputes the domain-separated digest from the durable member blobs; a forged observation_digest never mints classification truth (I14R2 §25)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "RevisionConfigurationError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "group_authority_member_physical_corruption_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a member whose physical blob no longer verifies is refused typed — the group can never mint truth from unverifiable evidence (I14R2 §25)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "RevisionContentCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "group_authority_same_blobs_different_acquisitions_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "reusing a persisted observation_id with DIFFERENT member acquisitions — even over an identical blob set and identical digest — is a membership conflict, never silently adopted (I14R2 §13)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "RevisionObservationConflict",
+        "same_blob_set": true,
+        "same_digest": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R2",
+  "matrix": "GROUP_AUTHORITY_MATRIX",
+  "measured_at_checkpoint": "I14R2",
+  "rows_fail": 0,
+  "rows_ok": 7,
+  "rows_total": 7,
+  "synthetic_counterfactuals": 0
+}

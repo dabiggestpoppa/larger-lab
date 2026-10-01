@@ -1,0 +1,47 @@
+{
+  "cases": [
+    {
+      "case_id": "historical_all_six_i14_matrices_equal_accepted_blobs",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "all six accepted I14 matrices are byte-exact against the accepted checkpoint blobs in Git — the I14R1 T0B mutation is reverted and custody-enforced (I14R2 §3/§24)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "BLOC_04_I14_CONCURRENCY_MATRIX.json": "9571db1eeb0f8357",
+        "BLOC_04_I14_CRASH_RESTART_MATRIX.json": "ee1a36e388c4a0e5",
+        "BLOC_04_I14_DURABILITY_ORDER_MATRIX.json": "66a5c5d78163cdf3",
+        "BLOC_04_I14_IDEMPOTENCE_MATRIX.json": "4df45b27603fc15e",
+        "BLOC_04_I14_INPUT_MAPPING_MATRIX.json": "575c378a87ff441d",
+        "BLOC_04_I14_T0B_HANDOFF_MATRIX.json": "9dc20f64cb4a0741"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "historical_live_measurement_mutates_zero_files",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "running the live I14 evidence validation changes ZERO historical files — generators are custody-frozen (I14R2 §5/§24)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "files_mutated": 0,
+        "live_rows_fail": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "historical_dual_truth_old_ids_in_i14_new_in_r1_r2",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the I14 fossil keeps the I14-era acquisition identity; the observation-aware identity appears only in I14R1/I14R2 evidence (I14R2 §4 dual truth)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "i14_t0b_carries_i14_era_identity": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R2",
+  "matrix": "HISTORICAL_EVIDENCE_IMMUTABILITY_MATRIX",
+  "measured_at_checkpoint": "I14R2",
+  "rows_fail": 0,
+  "rows_ok": 3,
+  "rows_total": 3,
+  "synthetic_counterfactuals": 0
+}

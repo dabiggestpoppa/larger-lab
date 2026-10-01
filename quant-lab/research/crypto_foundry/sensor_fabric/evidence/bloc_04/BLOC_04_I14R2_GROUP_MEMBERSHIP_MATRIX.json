@@ -1,0 +1,65 @@
+{
+  "cases": [
+    {
+      "case_id": "membership_canonical_pairs_persisted",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the durable group row persists canonical acquisition<->blob PAIRS sorted by blob sha — the correspondence is explicit, not a zip of parallel arrays (I14R2 §15)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "member_acquisition_ids": 2,
+        "member_bindings": 2,
+        "member_blob_sha256": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "membership_manifest_revision_set_coherence",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "manifest blob set == revision group member blob set == resolved member acquisition blob set — no extra, no missing member (I14R2 §26/§19)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "group_members": 2,
+        "manifest_blobs": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "membership_order_permutation_same_semantic_group",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a caller-order permutation of the SAME members maps to the same revision with the same canonical persisted correspondence — order is non-semantic (I14R2 §14/§26)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "permutation": "reversed",
+        "same_revision": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "membership_subset_replay_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a subset of the persisted members reusing the same observation_id is refused — no partial group replay (I14R2 §12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "RevisionObservationConflict"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "membership_superset_replay_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no superset replay: the supplied group must equal the persisted group exactly (I14R2 §12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "refusal": "RevisionObservationConflict"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R2",
+  "matrix": "GROUP_MEMBERSHIP_MATRIX",
+  "measured_at_checkpoint": "I14R2",
+  "rows_fail": 0,
+  "rows_ok": 5,
+  "rows_total": 5,
+  "synthetic_counterfactuals": 0
+}
