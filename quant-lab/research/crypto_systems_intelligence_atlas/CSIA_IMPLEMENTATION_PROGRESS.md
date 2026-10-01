@@ -1799,3 +1799,75 @@ database, graph database, production scheduler, dashboard, Book 7, Book 8, D8,
 trading or execution; it does not execute usage/health empirical research; it
 does not ratify any state rule, predicate, coverage-sufficiency rule, or
 false-comparison methodology.
+
+---
+
+CHECKPOINT — BOOK 6 IMPLEMENTATION ACCEPTANCE (2026-10-01)
+
+FORMAL BOOK 6 IMPLEMENTATION ACCEPTANCE REVIEW completed in worktree
+C:/Users/wifik/Desktop/larger-lab-csia-book6-build on branch
+agent/crypto-systems-intelligence-atlas-book6-build at HEAD
+3919fb8052e216e94034a753fb258d338c5fa0dc == origin (worktree clean before
+review; no reset, rebase, amend, or force push).
+
+Decision:
+
+  PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL = ACCEPTED
+  BOOK_6 = FROZEN_ACCEPTED
+  BOOK_6_IMPLEMENTATION = FROZEN_ACCEPTED
+  BOOK_6_ACCEPTANCE = ACCEPTED
+  BOOK_6_HARDENING_R1 = ACCEPTED_LINEAGE
+  BOOK_6_HARDENING_R2 = ACCEPTED_LINEAGE
+  BOOK_6_HARDENING_R3 = ACCEPTED_LINEAGE
+  ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+  D6M_5 = OPEN_DEFERRED
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+  BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+  BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+
+Lineage verified as strict ancestry: base
+5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4 -> build
+ebb20674d64740740f4c130ae5c30973ff275002 -> R1
+20cf880cd5e378e7d59ebe727e385a3eeffb5b61 -> R2
+392ae784a225c75c3aaac0ac8ec43912f1587e29 -> R3 anchor (HEAD). Freeze diff vs
+base = 44 files, all Book 6-scoped; BOOK1..BOOK5_MUTATIONS = 0;
+SENSOR_MUTATIONS = 0.
+
+Canonical test partition reconciled exactly (file-based selectors):
+BOOK_1 = 107, BOOK_2 = 108, BOOK_3 = 83, BOOK_4 = 230, BOOK_5 = 293,
+BOOK_6 = 1341, TOTAL_CSIA = 2162 PASS. Hardening preserved separately:
+R1 = 93 PASS, R2 = 46 PASS, R3 = 45 PASS (ACCEPTED_LINEAGE).
+
+Phases 5-24 verified mechanically: epistemic authority (no ClaimState; no
+measurement-to-claim promotion; HISTORICAL_BOOK2_AUTHORITY_REPLAY =
+NOT_IMPLEMENTED), measurement core, methodology authority, normalization
+(D6M-2=B), comparability (all 15 false-comparison cases covered), valuation
+(NO_GLOBAL_PRICE_SOURCE; Book 5 read-only), coverage sufficiency (bootstrap
+canonical ratified coverage-rule count = 0), state-rule governance (D6M-3=A;
+canonical StateRule count = 0; predicate count = 0), predicate execution,
+derivation-bound ratification (R3), supersession, output provenance, vector/
+anti-score firewall, D2_6 = IN_FORCE, Book 4/Book 5 seams read-only.
+
+Traceability: 288 rows / 29 families, generated from executable traceability,
+untraced = 0; R1/R2/R3 families present. All 10 research artifacts reviewed.
+Sensor: 2325 PASS / 14 FAIL / 4 SKIPPED; failure set == exact canonical known
+failure set (i05r2 x3, i05r3 x2, i05r4 x3, i06 x3, i06r1 x3);
+BOOK6_INTRODUCED_SENSOR_FAILURES = 0. Quality: Ruff PASS (complete Book 6/CSIA
+scope); mypy PASS (62 source files).
+
+Accepted limitations (limitations, not defects): offline deterministic kernel
+only; no live acquisition, RPC, network collectors, CEX feeds, persistent DB,
+graph DB, production scheduler, dashboard, Book 7, Book 8, D8; no historical
+Book 2 point-in-time authority replay; no canonical Class B StateRule ratified
+(INDIVIDUAL_STATE_RULES_RATIFIED = 0; PREDICATES_CANONICALLY_RATIFIED = 0;
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0); no Class C semantics; no usage/health
+empirical research; no trading/execution authority.
+
+Full evidence: CSIA_BOOK_6_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md (same
+directory).
+
+NEXT = BOOK 7 PLANNING / GOVERNANCE REVIEW ONLY. This checkpoint does NOT
+authorize Book 7 implementation, Book 8 implementation, D8, live acquisition,
+RPC, network calls, database, graph database, production scheduler, dashboard,
+usage/health empirical research, state rule ratification, predicate
+ratification, coverage rule ratification, or trading/execution authority.
