@@ -75,9 +75,20 @@ R2_FAMILIES: Final[tuple[str, ...]] = (
     "R2.PRESERVED_SEALS",
 )
 
+#: The Book 6 Hardening R3 families — state derivation authority binding:
+#: evaluator/target semantics, predicate content fingerprints,
+#: derivation-bound ratification, output provenance, and the R1/R2
+#: seals that must survive R3.
+R3_FAMILIES: Final[tuple[str, ...]] = (
+    "R3.EVALUATOR_SEMANTICS",
+    "R3.RATIFICATION_BINDING",
+    "R3.OUTPUT_PROVENANCE",
+    "R3.PRESERVED_SEALS",
+)
+
 #: Every family the matrix must cover.
 ALL_FAMILIES: Final[tuple[str, ...]] = (
-    VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES + R2_FAMILIES
+    VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES + R2_FAMILIES + R3_FAMILIES
 )
 
 #: ``(row_id, family, claim, test_file, test_name)``. Every row must resolve.
@@ -1892,6 +1903,241 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "test_book6_hardening_r2.py",
         "test_r2_phase18_the_r1_valuation_surface_is_preserved_and_honest",
     ),
+    # -- R3 evaluator/target semantics ---------------------------------------
+    (
+        "R3.ES.01",
+        "R3.EVALUATOR_SEMANTICS",
+        "D1 reproducer: a predicate declaring INCREASING with LESS_THAN semantics is refused as data",
+        "test_book6_hardening_r3.py",
+        "test_r3_d1_the_evaluator_target_contradiction_reproducer_is_refused",
+    ),
+    (
+        "R3.ES.02",
+        "R3.EVALUATOR_SEMANTICS",
+        "INCREASING only binds GREATER_THAN; the three wrong pairings are rejected",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase1_wrong_pairings_are_rejected",
+    ),
+    (
+        "R3.ES.03",
+        "R3.EVALUATOR_SEMANTICS",
+        "the three correct evaluator-target pairings pass structurally",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase1_the_three_correct_pairings_pass_structurally",
+    ),
+    (
+        "R3.ES.04",
+        "R3.EVALUATOR_SEMANTICS",
+        "the evaluator-target map is closed and asserted constant",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase1_the_map_is_closed_and_constant_true",
+    ),
+    (
+        "R3.ES.05",
+        "R3.EVALUATOR_SEMANTICS",
+        "Class C targets remain unimplementable: no STABLE/VOLATILE/OWN-HISTORY semantics",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase2_class_c_targets_are_unimplementable",
+    ),
+    (
+        "R3.ES.06",
+        "R3.EVALUATOR_SEMANTICS",
+        "no generic EXPANDING/CONTRACTING predicate or rule can exist",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase2_no_generic_expanding_contracting_predicate",
+    ),
+    # -- R3 ratification binding ---------------------------------------------
+    (
+        "R3.RB.01",
+        "R3.RATIFICATION_BINDING",
+        "B1: ratification may not precede its predicate; no late binding",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase3_b1_ratification_may_not_precede_its_predicate",
+    ),
+    (
+        "R3.RB.02",
+        "R3.RATIFICATION_BINDING",
+        "B2: predicate first, rule second, ratification third produces a full binding",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase3_b2_predicate_first_then_rule_then_ratify_passes",
+    ),
+    (
+        "R3.RB.03",
+        "R3.RATIFICATION_BINDING",
+        "B3: authorization never silently follows a later predicate version",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase3_b3_rule_authorization_does_not_silently_follow_predicate_v2",
+    ),
+    (
+        "R3.RB.04",
+        "R3.RATIFICATION_BINDING",
+        "B4: an unavailable bound predicate removes the rule's current authority",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase3_b4_unavailable_predicate_loses_authority",
+    ),
+    (
+        "R3.RB.05",
+        "R3.RATIFICATION_BINDING",
+        "Phase 4: the predicate fingerprint is deterministic and content-complete",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase4_the_predicate_fingerprint_is_deterministic_and_content_complete",
+    ),
+    (
+        "R3.RB.06",
+        "R3.RATIFICATION_BINDING",
+        "Phase 5: the ratification decision records the full derivation binding",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase5_the_ratification_records_a_derivation_binding",
+    ),
+    (
+        "R3.RB.07",
+        "R3.RATIFICATION_BINDING",
+        "Phase 7: a low-level ledger decision without a binding is not usable authority",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase7_a_low_level_ledger_ratification_is_not_usable_authority",
+    ),
+    (
+        "R3.RB.08",
+        "R3.RATIFICATION_BINDING",
+        "Phase 7: an unwired registry records binding-less decisions, honestly refused when wired",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase7_bare_ratify_without_wired_registries_records_no_binding",
+    ),
+    (
+        "R3.RB.09",
+        "R3.RATIFICATION_BINDING",
+        "Phase 8: live predicate content drift from the ratified fingerprint refuses authorization",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase8_binding_mismatch_is_refused_at_authorization",
+    ),
+    (
+        "R3.RB.10",
+        "R3.RATIFICATION_BINDING",
+        "Phase 8: methodology content drift refuses authorization; the R2 seal holds",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase8_methodology_content_drift_refuses_authorization",
+    ),
+    (
+        "R3.RB.11",
+        "R3.RATIFICATION_BINDING",
+        "Phase 13: predicate supersession is explicit and never auto-followed",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase13_predicate_supersession_is_explicit_and_not_auto_followed",
+    ),
+    (
+        "R3.RB.12",
+        "R3.RATIFICATION_BINDING",
+        "Phase 13: supersession requires a prior version",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase13_predicate_supersession_requires_a_prior_version",
+    ),
+    (
+        "R3.RB.13",
+        "R3.RATIFICATION_BINDING",
+        "Phase 14: methodology supersession is not auto-followed by a ratified rule",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase14_methodology_supersession_is_not_auto_followed",
+    ),
+    # -- R3 output provenance --------------------------------------------------
+    (
+        "R3.OP.01",
+        "R3.OUTPUT_PROVENANCE",
+        "D3 reproducer: a caller-supplied output methodology_ref that differs from the rule is refused",
+        "test_book6_hardening_r3.py",
+        "test_r3_d3_the_output_methodology_forgery_reproducer_is_refused",
+    ),
+    (
+        "R3.OP.02",
+        "R3.OUTPUT_PROVENANCE",
+        "the emitted dimension derives its methodology from the authorized rule",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase9_the_emitted_dimension_derives_its_methodology",
+    ),
+    (
+        "R3.OP.03",
+        "R3.OUTPUT_PROVENANCE",
+        "every provenance field on the emitted dimension matches the actual derivation",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase10_the_emitted_dimension_provenance_is_coherent",
+    ),
+    (
+        "R3.OP.04",
+        "R3.OUTPUT_PROVENANCE",
+        "S1-S6: mutated rule objects (predicate_ref, methodology, order, target, class) grant nothing",
+        "test_book6_hardening_r3.py",
+        "test_r3_s1_rule_predicate_ref_mutated",
+    ),
+    (
+        "R3.OP.05",
+        "R3.OUTPUT_PROVENANCE",
+        "S6/S9: mutated predicate content (description, permitted methodologies) refuses at authorization",
+        "test_book6_hardening_r3.py",
+        "test_r3_s6_predicate_evaluator_kind_mutated",
+    ),
+    (
+        "R3.OP.06",
+        "R3.OUTPUT_PROVENANCE",
+        "S7: a contradictory predicate target is unconstructable",
+        "test_book6_hardening_r3.py",
+        "test_r3_s7_predicate_target_state_mutated_is_unconstructable",
+    ),
+    (
+        "R3.OP.07",
+        "R3.OUTPUT_PROVENANCE",
+        "S8: the operand order is a one-member closed enum",
+        "test_book6_hardening_r3.py",
+        "test_r3_s8_predicate_operand_order_mutated",
+    ),
+    (
+        "R3.OP.08",
+        "R3.OUTPUT_PROVENANCE",
+        "S10: a forged emitted methodology_ref is refused",
+        "test_book6_hardening_r3.py",
+        "test_r3_s10_emitted_methodology_ref_forged",
+    ),
+    (
+        "R3.OP.09",
+        "R3.OUTPUT_PROVENANCE",
+        "Phase 15: a false INCREASING predicate is a non-emission and never inverts",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase15_negative_increasing_is_not_emitted",
+    ),
+    (
+        "R3.OP.10",
+        "R3.OUTPUT_PROVENANCE",
+        "Phase 15: UNCHANGED emits only under a properly bound EXACT_EQUALITY rule",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase15_unchanged_requires_exact_equality_binding",
+    ),
+    # -- R3 preserved seals -----------------------------------------------------
+    (
+        "R3.PS.01",
+        "R3.PRESERVED_SEALS",
+        "canonical ratification counts for rules, predicates and coverage rules remain zero",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase6_canonical_counts_remain_zero",
+    ),
+    (
+        "R3.PS.02",
+        "R3.PRESERVED_SEALS",
+        "no delegated, bulk or automatic ratification path exists on the registry surface",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase6_no_delegated_or_bulk_ratification_path",
+    ),
+    (
+        "R3.PS.03",
+        "R3.PRESERVED_SEALS",
+        "Phase 16 audit: dimension_id is a documented schema-local label; the derivation stays identified",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase16_dimension_id_is_a_schema_local_label",
+    ),
+    (
+        "R3.PS.04",
+        "R3.PRESERVED_SEALS",
+        "the R2 comparison content seal and corpus row authority survive R3",
+        "test_book6_hardening_r3.py",
+        "test_r3_phase17_r2_seals_survive_at_the_state_boundary",
+    ),
 )
 
 
@@ -1910,6 +2156,7 @@ __all__ = [
     "EVERY_ROW_IS_BOUND_TO_A_REAL_ASSERTION",
     "R1_FAMILIES",
     "R2_FAMILIES",
+    "R3_FAMILIES",
     "STRUCTURAL_FAMILIES",
     "TRACEABILITY_ROWS",
     "VALIDATION_FAMILIES",
