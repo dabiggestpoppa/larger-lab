@@ -248,3 +248,115 @@ hollowing it out.
 
 **Proposed:** `PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL`
 **Not self-accepted.**
+
+---
+
+# APPENDIX — HARDENING R1 (authority closure)
+
+**Round** Book 6 Hardening R1 · **Pre-R1 HEAD** `ebb20674` · **Status**
+`HARDENING_R1_COMPLETE_PROPOSED` — **not self-accepted**
+
+External review of the proposed implementation found four concrete authority
+defects plus one related gap against the authorized design. All five shared a
+single root cause: an authority-bearing check was satisfied by a bare string, a
+self-declared field, or a caller-supplied number rather than by registry-resolved,
+decision-time state. Two further defects of the same class were reproduced while
+auditing for the repair (R1-D6, R1-D7).
+
+Full narrative in `CSIA_BOOK_6_HARDENING_R1_AUTHORITY_CLOSURE.md`; gates in
+`CSIA_BOOK_6_HARDENING_R1_MATRIX.json`.
+
+## A1. Defects, before and after
+
+| Id | Defect | Reproducer | Before | After |
+|----|--------|-----------|--------|-------|
+| R1-D1 | conditional comparison methodology spoof | FC-05 with `methodology_ref="fake:anything"` | `AUTHORIZED` | REFUSED |
+| R1-D2 | valuation price source not Book-2-backed | `source_ref="fake:oracle"`, no cited claim | `AUTHORIZED` | REFUSED |
+| R1-D3 | stale current price authorizes | 30-day-old price, 1-hour staleness bound | `AUTHORIZED` | REFUSED |
+| R1-D4 | fake coverage-rule ref creates `DATA_COMPLETE` | `coverage_sufficiency_rule_refs=("fake:rule",)` | `DATA_COMPLETE` | `DATA_INCOMPLETE` |
+| R1-D5 | methodology registry absent (design gap) | no methodology store on the registry | `NONE` | PRESENT |
+| R1-D6 | normalized value accepted unverified | native 10 / divisor 2, supplied 999 | `AUTHORIZED` | REFUSED |
+| R1-D7 | rule status forgery via `model_copy` | forged `RATIFIED` rule registered | `AUTHORIZED` | REFUSED AT REGISTRATION |
+
+Each was reproduced against the accepted code at `ebb20674` before repair. The
+permanent record is `test_book6_hardening_r1.py`.
+
+## A2. Repairs
+
+- **R1-D5 first, because it is the structural cause.** `book6_methodology.py`
+  adds `Book6MethodologyRegistry` with versioned `ref@version` identity,
+  supersession that retains history and stops authorizing, and local
+  invalidation. Every authority-bearing surface now resolves against it: metric
+  definitions, measurements, normalization rules, comparisons, valuation
+  conversion methodology, state rules. This is structural Book 6 authority, not
+  a second epistemic engine.
+- **R1-D1.** A `CONDITIONAL` row requires the **exact** required identity
+  (no substring, alias or version drift) **and** the methodology's own
+  `authorized_corpus_row_ids` entry for that row. A new methodology version does
+  not inherit the comparison.
+- **R1-D2.** `PriceObservation.source_claim_refs` is required and resolved via
+  `Book6Provenance` at valuation authority time. `source_ref` is an
+  attribution, never evidence. Evidence-exists and admissible-for-purpose stay
+  separate requirements, both tested in both failure directions.
+- **R1-D3.** `authorize_current_valuation(as_of)` and
+  `validate_historical_valuation()` replace one ambiguous API. `as_of` is always
+  explicit; there is no hidden wall clock. `CURRENT UNAVAILABLE != HISTORICALLY
+  INVALID`.
+- **R1-D4.** `CoverageRuleRegistry` plus a registry-issued
+  `CoverageSufficiencyAttestation`. `vector.data_status` is deliberately
+  conservative; `Book6MeasurementEngine.data_status` is the live authority.
+- **R1-D6.** `compute_normalized_value` recomputes deterministically and the
+  engine refuses disagreement. `NormalizationRule` gained an explicit
+  `base_measurement_ref` for `GROWTH_RATE`/`INDEX_TO_BASE`, and
+  `SHARE_OF_TOTAL` now declares its cohort total as `denominator_ref`.
+- **R1-D7.** Ratification moved into a registry-owned `RatificationLedger`
+  shared by both rule registries. Rule objects may only be constructed and
+  registered `UNRATIFIED`; authority is a decision record bound to one
+  `(rule_id, version)` and decays on a revision.
+
+## A3. Post-construction attack matrix
+
+C1 comparison methodology · C2 normalization methodology · C3 valuation
+conversion methodology · C4 price claim refs stripped · C5 price source swapped ·
+C6 price class swapped · C7 staleness bound forged · C8 vector coverage rule refs ·
+C9 coverage rule status forged · C10 coverage rule scope swapped — **all refused,
+all re-validated live at the decision boundary.**
+
+C5 is the informative one: swapping `source_ref` alone changes nothing, because
+authority never came from that string.
+
+## A4. Preserved seals
+
+R1 regressed none of the 21 established Book 6 seals; each is re-asserted in the
+`R1.PRESERVED_SEALS` traceability family.
+
+## A5. Counts
+
+| | before R1 | after R1 |
+|---|---|---|
+| Book 6 tests | 803 | **1094** |
+| R1 focused suite | — | **93** |
+| total CSIA | 1624 | **1915** |
+| traceability rows | 121 | **213** (20 families) |
+| sensor | 2325 / 14 / 4 | **2325 / 14 / 4** |
+| ruff / mypy | pass | **pass** (61 source files) |
+
+Books 1–5 unchanged: 107 / 108 / 83 / 230 / 293.
+
+## A6. Exit state
+
+```text
+BOOK_6_HARDENING_R1 = PASS
+BOOK_6_IMPLEMENTATION = COMPLETE_HARDENED_R1
+BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE / OFFLINE_KERNEL_SCOPE_ONLY
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D6M_5 = OPEN_DEFERRED
+INDIVIDUAL_STATE_RULES_RATIFIED = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+```
+
+**Still not self-accepted.** R1 created the mechanism by which a future operator
+ratification could grant Class B/C authority or `DATA_COMPLETE` — and the
+machinery by which its current absence is provable. It did not grant either.

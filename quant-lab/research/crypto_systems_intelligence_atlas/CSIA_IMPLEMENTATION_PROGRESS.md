@@ -1484,3 +1484,124 @@ scheduler, dashboard, Book 7, Book 8, D8, trading or execution. It does not
 execute usage/health empirical research. It does not ratify any state rule,
 coverage-sufficiency rule, or false-comparison methodology. Acceptance remains an
 individual operator act.
+
+================================================================================
+CHECKPOINT — BOOK 6 HARDENING R1
+================================================================================
+
+External review of the proposed Book 6 implementation found four concrete
+authority defects and one related gap against the authorized design. A focused
+round closed them and nothing else. Two further defects of the same class were
+reproduced during the audit and closed as R1-D6 and R1-D7.
+
+Every reported problem shared one root cause, and naming it is the substance of
+this round: an authority-bearing check was satisfied by a BARE STRING, a
+SELF-DECLARED FIELD, or a CALLER-SUPPLIED NUMBER instead of by registry-resolved,
+decision-time state. The accepted kernel was rigorous about Book 2 — every
+measurement re-resolved its cited claims live — while trusting three other
+kinds of evidence it never re-resolved at all.
+
+DEFECTS REPRODUCED AGAINST THE ACCEPTED HEAD (ebb20674) BEFORE REPAIR:
+
+  R1-D1  conditional comparison methodology spoof
+         FC-05 with methodology_ref="fake:anything"            -> AUTHORIZED
+  R1-D2  valuation price source not Book-2-backed
+         source_ref="fake:oracle", no cited claim              -> AUTHORIZED
+  R1-D3  stale current price passes authorize_valuation()
+         30-day-old price under a 1-hour staleness bound       -> AUTHORIZED
+  R1-D4  fake coverage-sufficiency ref creates DATA_COMPLETE
+         coverage_sufficiency_rule_refs=("fake:rule",)         -> DATA_COMPLETE
+  R1-D5  methodology registry required by the design was absent -> NONE
+  R1-D6  normalized value accepted without verified derivation
+         native 10 / divisor 2 (expected 5), supplied 999      -> AUTHORIZED
+  R1-D7  rule status forgery via model_copy
+         forged RATIFIED rule registered then authorized       -> AUTHORIZED
+
+All seven are now refused. Every reproducer is quoted verbatim in
+CSIA_BOOK_6_HARDENING_R1_AUTHORITY_CLOSURE.md and asserted as a refusal in
+tests/crypto_systems_intelligence_atlas/test_book6_hardening_r1.py.
+
+REPAIR SUMMARY:
+
+  R1-D5 was fixed FIRST because it is the structural cause of R1-D1. Three new
+  modules close the class of defect rather than the individual instances:
+
+    book6_methodology.py    Book6MethodologyRegistry, versioned ref@version
+                            identity, supersession, local invalidation
+    book6_coverage_rules.py CoverageRuleRegistry + registry-issued
+                            CoverageSufficiencyAttestation
+    book6_ratification.py   RatificationLedger, registry-owned ratification
+                            authority shared by BOTH rule registries
+
+  R1-D1  a CONDITIONAL row now requires the EXACT required methodology identity
+         (no substring, alias, or version drift) AND that methodology's own
+         declared authority for that corpus row. A new methodology version does
+         not inherit the comparison.
+  R1-D2  PriceObservation.source_claim_refs is required and resolved through the
+         Book 2 provenance adapter at valuation authority time. A source_ref is
+         an attribution, never epistemic evidence.
+  R1-D3  authorize_current_valuation(as_of) and validate_historical_valuation()
+         replace one ambiguous API. as_of is always explicit; no hidden wall
+         clock. CURRENT UNAVAILABLE != HISTORICALLY INVALID.
+  R1-D4  DATA_COMPLETE additionally requires a registry-issued sufficiency
+         attestation; Book6MeasurementEngine.data_status is the live authority.
+  R1-D6  normalized values are RECOMPUTED from declared inputs and compared;
+         a caller may not assert a normalized number.
+  R1-D7  rule objects may only be constructed and registered UNRATIFIED;
+         ratification is a registry decision record bound to one (rule, version).
+
+POST-CONSTRUCTION ATTACK MATRIX C1-C10: all refused, all re-validated live at
+the decision boundary. C5 is the informative one — swapping a price source_ref
+alone changes nothing, because authority never came from that string.
+
+PRESERVED SEALS: R1 regressed none of the 21 established Book 6 seals. Each is
+re-asserted in the R1.PRESERVED_SEALS traceability family.
+
+QUALITY:
+
+  B1 = 107 PASS   (unchanged)
+  B2 = 108 PASS   (unchanged)
+  B3 =  83 PASS   (unchanged)
+  B4 = 230 PASS   (unchanged)
+  B5 = 293 PASS   (unchanged)
+  B6 = 1094 PASS  (was 803 at the pre-R1 checkpoint)
+  R1_FOCUSED = 93 PASS
+  TOTAL_CSIA = 1915 PASS  (was 1624)
+  SENSOR = 2325 PASS / 14 FAIL / 4 SKIPPED  (exact canonical set preserved)
+  BOOK6_INTRODUCED_SENSOR_FAILURES = 0
+  RUFF = PASS      MYPY = PASS (61 source files)
+  BOOK1/2/3/4/5_MUTATIONS = 0   SENSOR_MUTATIONS = 0
+  TRACEABILITY = 213 rows across 20 families (was 121), every row bound to a
+  real assertion and generated from an executable table.
+
+Canonical invariants at this checkpoint:
+
+  INDIVIDUAL_STATE_RULES_RATIFIED = 0
+  COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+  NO_FREE_STRING_METHODOLOGY_AUTHORITY = TRUE
+  PRICE_BOOK2_PROVENANCE_REQUIRED = TRUE
+  NORMALIZED_VALUE_IS_RECOMPUTED = TRUE
+  OBJECT_STATUS_IS_NOT_AUTHORITY = TRUE
+  MISSING_NEVER_BECOMES_ZERO = TRUE
+  D2_6 = OPEN_DEFERRED  /  NO_USAGE_HEALTH_EXECUTION = TRUE
+
+Decision:
+
+  BOOK_6_HARDENING_R1 = PASS
+  BOOK_6_IMPLEMENTATION = COMPLETE_HARDENED_R1
+  BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+  PROPOSED_EXIT_GATE = PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL
+  BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE / OFFLINE_KERNEL_SCOPE_ONLY
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+  D6M_5 = OPEN_DEFERRED
+  INDIVIDUAL_STATE_RULES_RATIFIED = 0
+  COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+
+NEXT = OPERATOR REVIEW OF BOOK 6 HARDENING R1 ONLY. R1 created the mechanism by
+which a future operator ratification could grant Class B/C authority or
+DATA_COMPLETE, and the machinery by which its current absence is provable. It
+granted neither. This checkpoint does **not** begin live acquisition, RPC,
+network calls, CEX feeds, database, graph database, production scheduler,
+dashboard, Book 7, Book 8, D8, trading or execution. It does not execute
+usage/health empirical research. It does not ratify any state rule,
+coverage-sufficiency rule, or false-comparison methodology.

@@ -1,0 +1,129 @@
+{
+  "document": "CSIA_BOOK_6_HARDENING_R1_MATRIX",
+  "version": "0.1",
+  "date": "2026-09-30",
+  "branch": "agent/crypto-systems-intelligence-atlas-book6-build",
+  "implementation_base": "5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4",
+  "pre_r1_head": "ebb20674d64740740f4c130ae5c30973ff275002",
+  "status": "HARDENING_R1_COMPLETE_PROPOSED",
+  "scope": "BOOK 6 OFFLINE KERNEL ONLY — no live acquisition, no RPC, no database, no Book 7/8/D8",
+  "reproduced_defects": [
+    {
+      "id": "R1-D1",
+      "title": "CONDITIONAL COMPARISON METHODOLOGY SPOOF",
+      "root_cause": "authorize_comparison checked only 'if not methodology_ref', so any non-empty string licensed the comparison",
+      "reproducer": "FC-05 protocol.volume.DEX_NATIVE vs protocol.volume.AGGREGATOR_ROUTED with methodology_ref='fake:anything'",
+      "before_r1": "AUTHORIZED",
+      "after_r1": "REFUSED",
+      "repair": "corpus row required_methodology is now a versioned identity (ref@version) matched EXACTLY, and the methodology must be registered, current, and declare authority for that corpus row"
+    },
+    {
+      "id": "R1-D2",
+      "title": "VALUATION PRICE SOURCE IS NOT BOOK-2-BACKED",
+      "root_cause": "PriceObservation carried source_ref as a bare string with no Book 2 provenance; the engine checked only that it was non-empty",
+      "reproducer": "source_ref='fake:oracle' with no cited claim authorized a PROTOCOL_COLLATERAL_MARK",
+      "before_r1": "AUTHORIZED",
+      "after_r1": "REFUSED",
+      "repair": "PriceObservation.source_claim_refs is REQUIRED and resolved through Book6Provenance at valuation authority time; a source_ref string is an attribution, never evidence"
+    },
+    {
+      "id": "R1-D3",
+      "title": "STALE CURRENT PRICE CAN PASS authorize_valuation()",
+      "root_cause": "ValuationObservation.is_stale existed but authorize_valuation never consulted it",
+      "reproducer": "price observed 30 days ago with staleness_bound_seconds=3600, as_of today",
+      "before_r1": "AUTHORIZED",
+      "after_r1": "REFUSED",
+      "repair": "authority split into authorize_current_valuation(as_of) and validate_historical_valuation(); as_of is always explicit, never a hidden wall clock"
+    },
+    {
+      "id": "R1-D4",
+      "title": "FAKE COVERAGE-SUFFICIENCY REF CAN CREATE DATA_COMPLETE",
+      "root_cause": "data_status derived sufficiency from bool(coverage_sufficiency_rule_refs) without checking that any rule existed",
+      "reproducer": "coverage_sufficiency_rule_refs=('fake:rule',) on a fully observed vector with coverage ids",
+      "before_r1": "DATA_COMPLETE",
+      "after_r1": "DATA_INCOMPLETE",
+      "repair": "CoverageRuleRegistry plus a registry-issued CoverageSufficiencyAttestation; Book6MeasurementEngine.data_status is the live authority"
+    },
+    {
+      "id": "R1-D5",
+      "title": "METHODOLOGY REGISTRY REQUIRED BY THE AUTHORIZED DESIGN IS ABSENT",
+      "root_cause": "the five separated stores were implemented as four; every methodology reference in the kernel was a bare string",
+      "reproducer": "registry surface contained no methodology store at all",
+      "before_r1": "NONE",
+      "after_r1": "Book6MethodologyRegistry present and consulted by every authority-bearing surface",
+      "repair": "added book6_methodology.py with versioned ref@version identity, supersession and local invalidation"
+    },
+    {
+      "id": "R1-D6",
+      "title": "NORMALIZED VALUE ACCEPTED WITHOUT VERIFIED DERIVATION",
+      "root_cause": "engine.normalize authorized whatever value the caller supplied on NormalizedMeasurement, ignoring rule.transformation and the declared inputs",
+      "reproducer": "native value 10, PER_TIME denominator 2 (expected 5), supplied normalized value 999",
+      "before_r1": "AUTHORIZED",
+      "after_r1": "REFUSED",
+      "repair": "compute_normalized_value recomputes deterministically from declared inputs; the engine compares and refuses any disagreement"
+    },
+    {
+      "id": "R1-D7",
+      "title": "RULE STATUS FORGERY VIA model_copy / CONSTRUCTION",
+      "root_cause": "StateRuleRegistry.authorize read rule.is_ratified() off the stored object, and CoverageSufficiencyRule.status was a bare str settable at construction",
+      "reproducer": "rule.model_copy(update={'status':'RATIFIED','ratified_by':'operator','ratified_at':...}) then registry.register(forged) then authorize()",
+      "before_r1": "AUTHORIZED",
+      "after_r1": "REFUSED AT REGISTRATION",
+      "repair": "ratification authority moved into a registry-owned RatificationLedger shared by both rule registries; rule objects may only be constructed and registered UNRATIFIED"
+    }
+  ],
+  "gates": [
+    {"gate": "METHODOLOGY_REGISTRY_PRESENT", "result": "PASS", "evidence": "R1.MR.01; tests/crypto_systems_intelligence_atlas/test_book6_hardening_r1.py::test_r1_d5_the_five_separated_stores_all_exist"},
+    {"gate": "NO_FREE_STRING_METHODOLOGY_AUTHORITY", "result": "PASS", "evidence": "R1.MR.07, R1.MR.03, R1.MR.04, R1.MR.05"},
+    {"gate": "COMPARISON_REQUIRED_METHODOLOGY_MATCH", "result": "PASS", "evidence": "R1.CM.05, R1.CM.06, R1.CM.09, R1.CM.10"},
+    {"gate": "COMPARISON_UNREGISTERED_METHODOLOGY_REJECTED", "result": "PASS", "evidence": "R1.CM.01, R1.CM.02, R1.CM.03, R1.CM.04, R1.CM.07, R1.CM.08"},
+    {"gate": "PRICE_BOOK2_PROVENANCE_REQUIRED", "result": "PASS", "evidence": "R1.PP.01, R1.PP.02, R1.PP.03, R1.PP.04, R1.PP.06"},
+    {"gate": "PRICE_BOOK2_DECAY_PROPAGATION", "result": "PASS", "evidence": "R1.PP.05, R1.PP.11"},
+    {"gate": "CURRENT_STALE_PRICE_REJECTED", "result": "PASS", "evidence": "R1.VS.01, R1.VS.02, R1.VS.03, R1.RA.14"},
+    {"gate": "HISTORICAL_PRICE_VALIDITY_PRESERVED", "result": "PASS", "evidence": "R1.VS.04, R1.VS.05, R1.VS.06, R1.VS.07"},
+    {"gate": "COVERAGE_RULE_REGISTRY_PRESENT", "result": "PASS", "evidence": "R1.CS.05, R1.CS.06"},
+    {"gate": "FAKE_COVERAGE_RULE_REF_REJECTED", "result": "PASS", "evidence": "R1.CS.01, R1.CS.02, R1.CS.03, R1.CS.08, R1.RA.15"},
+    {"gate": "UNRATIFIED_COVERAGE_RULE_REJECTED", "result": "PASS", "evidence": "R1.CS.07, R1.CS.10, R1.CS.12"},
+    {"gate": "COVERAGE_RULE_SCOPE_ENFORCED", "result": "PASS", "evidence": "R1.CS.09, R1.CS.04, R1.RA.17"},
+    {"gate": "DATA_COMPLETE_REQUIRES_RATIFIED_SUPPORT", "result": "PASS", "evidence": "R1.CS.11, R1.CS.13, R1.RA.15"},
+    {"gate": "NORMALIZATION_METHODOLOGY_CLOSURE", "result": "PASS", "evidence": "R1.NI.07, R1.NI.08, R1.NI.09, R1.RA.08, R1.RA.10"},
+    {"gate": "NORMALIZATION_INPUT_METRIC_CLOSURE", "result": "PASS", "evidence": "R1.NI.10, R1.NI.11, R1.NI.12"},
+    {"gate": "NORMALIZED_VALUE_INTEGRITY", "result": "PASS", "evidence": "R1.NI.01, R1.NI.02, R1.NI.03, R1.NI.04, R1.NI.05, R1.NI.06"},
+    {"gate": "MODEL_COPY_R1_CLOSURE", "result": "PASS", "evidence": "R1.RA.07 through R1.RA.17 (C1-C10)"},
+    {"gate": "STATE_RULE_STATUS_FORGERY_REJECTED", "result": "PASS", "evidence": "R1.RA.01, R1.RA.02, R1.RA.03, R1.RA.04"},
+    {"gate": "COVERAGE_RULE_STATUS_FORGERY_REJECTED", "result": "PASS", "evidence": "R1.RA.16, R1.RA.06"},
+    {"gate": "RATIFIED_STATE_RULE_COUNT_ZERO", "result": "PASS", "evidence": "R1.CS.05; STATE_RULE_INTEGRITY family unchanged"},
+    {"gate": "D2_6_DEFERRED_PRESERVED", "result": "PASS", "evidence": "FIREWALL.D2_6 family (4 rows) unchanged by R1"},
+    {"gate": "BOOK1_FREEZE", "result": "PASS", "evidence": "git diff --name-only 5c387f42b..HEAD lists no Book 1 file; Book 1 = 107 PASS"},
+    {"gate": "BOOK2_FREEZE", "result": "PASS", "evidence": "git diff --name-only 5c387f42b..HEAD lists no Book 2 file; Book 2 = 108 PASS"},
+    {"gate": "BOOK3_FREEZE", "result": "PASS", "evidence": "git diff --name-only 5c387f42b..HEAD lists no Book 3 file; Book 3 = 83 PASS"},
+    {"gate": "BOOK4_FREEZE", "result": "PASS", "evidence": "git diff --name-only 5c387f42b..HEAD lists no Book 4 file; Book 4 = 230 PASS"},
+    {"gate": "BOOK5_FREEZE", "result": "PASS", "evidence": "git diff --name-only 5c387f42b..HEAD lists no Book 5 file; Book 5 = 293 PASS"},
+    {"gate": "SENSOR_BASELINE_EQUIVALENCE", "result": "PASS", "evidence": "2325 PASS / 14 FAIL / 4 SKIPPED, exact canonical failure set preserved"}
+  ],
+  "counts": {
+    "book6_tests_before_r1": 803,
+    "book6_tests_after_r1": 1094,
+    "r1_focused_tests": 93,
+    "total_csia_before_r1": 1624,
+    "total_csia_after_r1": 1915,
+    "sensor_pass": 2325,
+    "sensor_fail": 14,
+    "sensor_skipped": 4,
+    "book6_introduced_sensor_failures": 0,
+    "traceability_rows_before_r1": 121,
+    "traceability_rows_after_r1": 213,
+    "source_files": 61
+  },
+  "exit_state": {
+    "BOOK_6_HARDENING_R1": "PASS",
+    "BOOK_6_IMPLEMENTATION": "COMPLETE_HARDENED_R1",
+    "BOOK_6_ACCEPTANCE": "NOT_SELF_ACCEPTED",
+    "PROPOSED_EXIT_GATE": "PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL",
+    "BOOK_6_IMPLEMENTATION_AUTHORITY": "TRUE / OFFLINE_KERNEL_SCOPE_ONLY",
+    "LIVE_ACQUISITION_AUTHORITY": false,
+    "D6M_5": "OPEN_DEFERRED",
+    "INDIVIDUAL_STATE_RULES_RATIFIED": 0,
+    "COVERAGE_SUFFICIENCY_RULES_RATIFIED": 0
+  }
+}
