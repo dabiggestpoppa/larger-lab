@@ -256,6 +256,21 @@ class StateRuleRegistry:
 
         return self._superseded.get(rule_ref, ())
 
+    def registered_rule(self, rule_ref: str) -> StateRule:
+        """Return a registered rule by id, or refuse (structural only).
+
+        R2: named for symmetry with ``CoverageRuleRegistry.registered_rule``.
+        Structural access NEVER authorizes emission; the authority-bearing path
+        is ``authorize``, which re-reads ratification from the ledger live.
+        """
+
+        try:
+            return self._rules[rule_ref]
+        except KeyError as exc:
+            raise StateError(
+                f"state rule {rule_ref} is not registered"
+            ) from exc
+
     def register(self, rule: StateRule) -> StateRule:
         """Register a rule. Registration proves nothing about current authority.
 

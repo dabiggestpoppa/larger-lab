@@ -35,8 +35,8 @@ from datetime import datetime
 from typing import Final
 
 from .book6_comparability import ComparabilityError, authorize_comparison
-from .book6_coverage_rules import CoverageRuleError
-from .book6_grammar import DenominatorState, MeasurementCategory
+from .book6_coverage_rules import CoverageRuleError, CoverageReport
+from .book6_grammar import DenominatorState, MeasurementCategory, MissingnessState
 from .book6_methodology import MethodologyRegistryError
 from .book6_normalization import (
     BASE_RELATIVE_NORMALIZATIONS,
@@ -51,6 +51,11 @@ from .book6_normalization import (
     validate_native_lineage,
     validate_rule_methodology,
 )
+from .book6_predicates import (
+    PredicateNotSatisfied,
+    PredicateRegistry,
+    PredicateRegistryError,
+)
 from .book6_provenance import Book6Provenance, Book6ProvenanceError
 from .book6_records import MeasurementObservation
 from .book6_registry import Book6MeasurementRegistry, Book6RegistryError
@@ -64,7 +69,9 @@ from .book6_states import (
     resolve_availability_state,
 )
 from .book6_valuation import (
+    HISTORICAL_BOOK2_AUTHORITY_REPLAY,
     PRICE_AUTHORITY_MATRIX,
+    HistoricalAuthorityReport,
     ValuationError,
     ValuationObservation,
 )
@@ -108,6 +115,8 @@ class Book6MeasurementEngine:
     def __init__(self, provenance: Book6Provenance) -> None:
         self.provenance = provenance
         self.registry = Book6MeasurementRegistry(provenance)
+        #: R2-D2: canonical predicates. Ships with zero ratified predicates.
+        self.predicates = PredicateRegistry()
 
     # -- authority-bearing measurement use ----------------------------------
 
@@ -380,6 +389,25 @@ class Book6MeasurementEngine:
             coverage_sufficiency_rule_ratified=coverage_sufficiency_ratified,
         )
 
+    def _check_predicate_window(self, rule: StateRule, window_class: object) -> None:
+        """Enforce the rule's declared window-class constraint, live.
+
+        Takes the rule object already returned by ``state_rules.authorize(...)``
+        in this same call rather than re-resolving it, so there is exactly one
+        authority resolution per emission and no second lookup path.
+        """
+
+        constraint = rule.window_class_constraint
+        if constraint is None:
+            return
+        if constraint != getattr(window_class, "value", window_class):
+            raise Book6EngineError(
+                f"state rule {rule.state_rule_id} constrains its inputs to "
+                f"window class {constraint}, but an input declares "
+                f"{getattr(window_class, 'value', window_class)}; cross-window "
+                f"comparison is not permitted without a ratified rule"
+            )
+
     def emit_rule_gated_state(
         self,
         target: StateName,
@@ -394,11 +422,23 @@ class Book6MeasurementEngine:
         coverage_observation_id: str | None = None,
         sensitivity_note: str | None = None,
     ) -> StateDimension:
-        """Emit a Class B or Class C state — only with an individually ratified rule.
+        """Emit a Class B or Class C state — only by REPLAYING its ratified rule.
 
         With ``INDIVIDUAL_STATE_RULES_RATIFIED = 0`` this always refuses, which
         is the intended behaviour: ratification is an operator act, never an
         inference.
+
+        R2-D2 changed what "ratified" is allowed to mean. A ratified rule
+        licenses a derivation METHOD; it does not assert the method's OUTCOME.
+        Emission requires all four of
+
+            RULE RATIFIED  AND  INPUTS CURRENT  AND  METHODOLOGY CURRENT
+              AND  PREDICATE EVALUATES TRUE
+
+        and a predicate that evaluates false produces an explicit
+        ``PredicateNotSatisfied`` non-emission. The opposite state is never
+        inferred: ``FALSE INCREASING != DECREASING``, because inverting a verdict
+        is itself a directional claim requiring its own separately ratified rule.
         """
 
         rule: StateRule = self.registry.state_rules.authorize(target, rule_ref=rule_ref)
@@ -409,8 +449,67 @@ class Book6MeasurementEngine:
                 f"state rule {rule_ref} names methodology {rule.methodology_ref}, "
                 f"which resolves to nothing: {exc}"
             ) from exc
+
+        if tuple(measurement_refs) != tuple(rule.required_measurement_refs):
+            raise Book6EngineError(
+                f"state rule {rule_ref} declares its inputs in the fixed order "
+                f"{rule.required_measurement_refs}, but emission supplied "
+                f"{tuple(measurement_refs)}; operand order belongs to the "
+                f"predicate, not to caller convention"
+            )
+
+        operands: list[float] = []
         for measurement_ref in measurement_refs:
-            self.registry.resolve_current(measurement_ref)
+            observation = self.registry.resolve_current(measurement_ref)
+            if observation.value is None:
+                raise Book6EngineError(
+                    f"state rule {rule_ref} requires {measurement_ref}, which "
+                    f"carries no observed value "
+                    f"({observation.missingness_state.value}); a predicate may "
+                    f"not be evaluated through missingness"
+                )
+            self._check_predicate_window(rule, observation.window_class)
+            operands.append(observation.value)
+
+        try:
+            predicate = self.predicates.resolve(rule.predicate_ref)
+        except PredicateRegistryError as exc:
+            raise Book6EngineError(str(exc)) from exc
+        if predicate.target_state is not target:
+            raise Book6EngineError(
+                f"state rule {rule_ref} targets {target.value} but its predicate "
+                f"{predicate.identity} evaluates to "
+                f"{predicate.target_state.value}; a rule may not bind another "
+                f"state's predicate"
+            )
+        if predicate.state_class is not rule.state_class:
+            raise Book6EngineError(
+                f"state rule {rule_ref} declares class {rule.state_class.value} "
+                f"but predicate {predicate.identity} is "
+                f"{predicate.state_class.value}"
+            )
+        if predicate.permitted_methodology_refs and (
+            rule.methodology_ref not in predicate.permitted_methodology_refs
+        ):
+            raise Book6EngineError(
+                f"predicate {predicate.identity} may only be evaluated under "
+                f"{list(predicate.permitted_methodology_refs)}, not "
+                f"{rule.methodology_ref}"
+            )
+        try:
+            evaluation = self.predicates.evaluate(rule.predicate_ref, tuple(operands))
+        except PredicateRegistryError as exc:
+            raise Book6EngineError(str(exc)) from exc
+        if not evaluation.result:
+            raise PredicateNotSatisfied(
+                f"ratified state rule {rule_ref} was replayed over operands "
+                f"{evaluation.operands} and its predicate "
+                f"{evaluation.predicate_identity} evaluated FALSE; the state "
+                f"{target.value} is NOT emitted, and the opposite state is not "
+                f"inferred either",
+                predicate_id=evaluation.predicate_identity,
+                operands=evaluation.operands,
+            )
         return StateDimension(
             dimension_id=dimension_id,
             state=target,
@@ -495,7 +594,8 @@ class Book6MeasurementEngine:
         numeraire, price or common-value scalar back into a Book 5 record.
         """
 
-        self._validate_valuation_authority(valuation)
+        self._validate_valuation_shape(valuation)
+        self._require_current_price_authority(valuation)
         if valuation.is_stale_at(as_of):
             raise ValuationError(
                 f"valuation {valuation.valuation_id} cites a price observed at "
@@ -506,31 +606,88 @@ class Book6MeasurementEngine:
             )
         return valuation
 
-    def validate_historical_valuation(
+    def validate_recorded_historical_shape(
         self, valuation: ValuationObservation
     ) -> ValuationObservation:
-        """Validate a valuation as the HISTORICAL statement it recorded.
+        """Validate the RECORDED SHAPE of a historical valuation — nothing more.
 
-        Bitemporal preservation (R1-D3): a price that is stale TODAY was fresh
-        when the valuation was observed. This path validates the observation at
-        its OWN recorded ``observed_at``, so
+        R2-D4 replaced ``validate_historical_valuation``, which shared one helper
+        with current authorization and therefore revalidated the price's Book 2
+        claims as CURRENT. A price claim that was valid when the valuation was
+        observed and later went STALE or SUPERSEDED retroactively erased the
+        historical statement — directly contradicting
 
-            CURRENT UNAVAILABLE != HISTORICALLY INVALID
+            CURRENT UNAVAILABLE  !=  HISTORICALLY INVALID
 
-        Requirements 1-3 still apply; only the staleness instant differs.
+        The audit in Phase 12 settled the honest fix. Accepted Book 2 EXPOSES
+        raw history (``ClaimStore.history`` plus timestamped
+        ``TransitionEvent``s) but its epistemic predicate
+        ``can_promote_to_graph`` is explicitly canonical-CURRENT-only by design:
+        it returns ``False`` for any claim version that is not
+        ``claim_store.require(id)``. Re-deriving that predicate bitemporally
+        inside Book 6 would be inventing a Book 2 feature and would create a
+        second epistemic engine, so R2 does not pretend to it.
+
+        This method therefore proves RECORD SHAPE and nothing more:
+
+        - explicit numeraire, non-empty price attribution;
+        - purpose/class admissibility (D6M-4 = A);
+        - the conversion methodology resolves;
+        - the price was NOT already stale at the valuation's own
+          ``observed_at``.
+
+        It deliberately does NOT consult Book 2, so it can neither assert nor
+        deny historical epistemic backing. Use
+        :meth:`historical_authority_status` for that question, which reports
+        ``NOT_REPLAYABLE`` honestly.
         """
 
-        self._validate_valuation_authority(valuation)
+        self._validate_valuation_shape(valuation)
         if valuation.is_stale_at(valuation.observed_at):
             raise ValuationError(
                 f"valuation {valuation.valuation_id} was already stale when it was "
                 f"observed at {valuation.observed_at.isoformat()}; it is not a "
-                f"valid historical statement either"
+                f"valid historical record either"
             )
         return valuation
 
-    def _validate_valuation_authority(self, valuation: ValuationObservation) -> None:
-        """The checks shared by current and historical valuation authority."""
+    def historical_authority_status(
+        self, valuation: ValuationObservation
+    ) -> HistoricalAuthorityReport:
+        """Report, without overclaiming, what can be said about historical authority.
+
+        Deliberately honest about a capability Book 6 does not have. Accepted
+        Book 2 cannot answer "was this claim authoritative at time T", so this
+        returns ``replay_available = False`` with the audit reason, alongside the
+        CURRENT status as a clearly-labelled separate fact.
+        """
+
+        current_backed = self.provenance.claim_is_current(
+            valuation.price.source_claim_refs[0]
+        )
+        return HistoricalAuthorityReport(
+            valuation_id=valuation.valuation_id,
+            replay_capability=HISTORICAL_BOOK2_AUTHORITY_REPLAY,
+            replay_unavailable_reason=(
+                "accepted Book 2 can_promote_to_graph is canonical-current-only by "
+                "design, so Book 6 cannot revalidate a historical claim's "
+                "epistemic authority without inventing a Book 2 feature"
+            ),
+            current_claims_backed=current_backed,
+            record_shape_valid=(
+                self.validate_recorded_historical_shape(valuation) is valuation
+            ),
+        )
+
+    def _validate_valuation_shape(self, valuation: ValuationObservation) -> None:
+        """The record-shape checks shared by current and historical paths.
+
+        R2-D4: this NEVER consults Book 2. It is everything provable about the
+        record itself, independent of any claim's current or historical state.
+        Leaving the Book 2 resolution here would have re-introduced exactly the
+        defect R2-D4 closes — a shared helper silently making the historical
+        path a current-authority path.
+        """
 
         if not valuation.numeraire:
             raise ValuationError(
@@ -542,17 +699,6 @@ class Book6MeasurementEngine:
                 "a valuation requires a cited price source; an unattributed "
                 "price carries no authority"
             )
-        try:
-            self.provenance.resolve_source_claim_refs(
-                valuation.price.source_claim_refs, require_current=True
-            )
-        except Book6ProvenanceError as exc:
-            raise ValuationError(
-                f"valuation {valuation.valuation_id} cites price "
-                f"{valuation.price.price_observation_id}, which has no current "
-                f"Book 2 authority: {exc}; a price source_ref string is an "
-                f"attribution, not epistemic evidence"
-            ) from exc
         admissible = PRICE_AUTHORITY_MATRIX[valuation.purpose]
         if valuation.price.price_class not in admissible:
             raise ValuationError(
@@ -568,41 +714,136 @@ class Book6MeasurementEngine:
                 f"nothing: {exc}"
             ) from exc
 
+    def _require_current_price_authority(
+        self, valuation: ValuationObservation
+    ) -> None:
+        """Book 2 CURRENT authority for the price's cited claims.
+
+        Split out from shape validation precisely so the historical path can
+        prove record shape without inheriting a current-only epistemic check.
+        """
+
+        try:
+            self.provenance.resolve_source_claim_refs(
+                valuation.price.source_claim_refs, require_current=True
+            )
+        except Book6ProvenanceError as exc:
+            raise ValuationError(
+                f"valuation {valuation.valuation_id} cites price "
+                f"{valuation.price.price_observation_id}, which has no current "
+                f"Book 2 authority: {exc}; a price source_ref string is an "
+                f"attribution, not epistemic evidence"
+            ) from exc
+
     # -- vector data completeness --------------------------------------------
 
     def data_status(self, vector: FundamentalStateVector) -> VectorStatus:
-        """AUTHORITATIVE data-completeness evaluation for a vector (R1-D4).
+        """AUTHORITATIVE data-completeness evaluation for a vector.
 
-        ``vector.data_status`` is deliberately conservative: it needs a
-        registry-issued attestation whose scope covers every dimension. This
-        method is the authority — it re-resolves every named coverage-sufficiency
-        rule through the live registry and requires, for each one, that it
-        exists, carries a ratification decision for its CURRENT version, and
-        scopes to the metric being judged.
+        R2-D3 replaced R1's check. R1 asked only whether each NAMED rule applied
+        to at least one vector metric, so a forged attestation claiming a wider
+        scope than the rules actually prove produced ``DATA_COMPLETE`` with a
+        metric that no live rule covered.
+
+        Sufficiency is now RECONSTRUCTED from registry state, per metric:
+
+            covered = { m in required : some named rule is registered,
+                        currently ratified, and scoped exactly to m }
+
+            DATA_COMPLETE  iff  covered == required
+
+        The comparison is explicit SET EQUALITY, not "each supplied rule covers
+        something", so a rule for metric A can never stand in for metric B. The
+        attestation is an AUDIT RECORD: it may name the same rules, but it is
+        never the source of truth about scope.
 
         At bootstrap, with zero ratified coverage-sufficiency rules, this is
         ``DATA_INCOMPLETE`` for every vector.
         """
 
-        if vector.data_status is not VectorStatus.DATA_COMPLETE:
+        if not self._derivation_is_complete(vector):
             return VectorStatus.DATA_INCOMPLETE
-        metric_ids = vector.dimension_metric_ids()
+        required = set(vector.dimension_metric_ids())
+        covered: set[str] = set()
         for rule_ref in vector.coverage_sufficiency_rule_refs:
             try:
                 rule = self.registry.coverage_rules.registered_rule(rule_ref)
             except CoverageRuleError:
-                return VectorStatus.DATA_INCOMPLETE
-            applicable = [metric_id for metric_id in metric_ids if rule.scope_metric_id == metric_id]
-            if not applicable:
-                return VectorStatus.DATA_INCOMPLETE
-            for metric_id in applicable:
+                continue
+            for metric_id in required:
+                if rule.scope_metric_id != metric_id:
+                    continue
                 try:
                     self.registry.coverage_rules.authorize(
                         metric_id=metric_id, rule_ref=rule_ref
                     )
                 except CoverageRuleError:
-                    return VectorStatus.DATA_INCOMPLETE
-        return VectorStatus.DATA_COMPLETE
+                    continue
+                covered.add(metric_id)
+        return (
+            VectorStatus.DATA_COMPLETE
+            if covered == required
+            else VectorStatus.DATA_INCOMPLETE
+        )
+
+    def _derivation_is_complete(self, vector: FundamentalStateVector) -> bool:
+        """Whether every dimension carries an observed, applicable derivation."""
+
+        if not vector.dimensions:
+            return False
+        if vector.schema_status is not VectorStatus.SCHEMA_COMPLETE:
+            return False
+        return all(
+            dimension.missingness
+            in (MissingnessState.OBSERVED, MissingnessState.ZERO_OBSERVED)
+            and dimension.state_class is not StateClass.DEFERRED_GENERIC
+            for dimension in vector.dimensions
+        )
+
+    def coverage_report(self, vector: FundamentalStateVector) -> CoverageReport:
+        """Which required metrics are covered, which are not, and why.
+
+        A diagnostic view of exactly the set equality ``data_status`` requires,
+        so a failing vector says WHICH metric is uncovered instead of only that
+        something is.
+        """
+
+        required = set(vector.dimension_metric_ids())
+        covered: set[str] = set()
+        reasons: dict[str, str] = {
+            metric: "no named coverage-sufficiency rule covers this metric"
+            for metric in required
+        }
+        for rule_ref in vector.coverage_sufficiency_rule_refs:
+            try:
+                rule = self.registry.coverage_rules.registered_rule(rule_ref)
+            except CoverageRuleError as exc:
+                for metric in required:
+                    reasons[metric] = str(exc)
+                continue
+            for metric_id in required:
+                if rule.scope_metric_id != metric_id:
+                    continue
+                try:
+                    self.registry.coverage_rules.authorize(
+                        metric_id=metric_id, rule_ref=rule_ref
+                    )
+                except CoverageRuleError as exc:
+                    reasons[metric_id] = str(exc)
+                    continue
+                covered.add(metric_id)
+                reasons.pop(metric_id, None)
+        return CoverageReport(
+            required_metric_ids=tuple(sorted(required)),
+            covered_metric_ids=tuple(sorted(covered)),
+            uncovered_metric_ids=tuple(sorted(required - covered)),
+            status=(
+                VectorStatus.DATA_COMPLETE
+                if covered == required
+                else VectorStatus.DATA_INCOMPLETE
+            ),
+            reasons=tuple(sorted(reasons.items())),
+        )
 
 
 #: Canonical invariants asserted by the accepted implementation.

@@ -206,8 +206,52 @@ def test_a_rule_may_not_be_used_for_a_state_it_does_not_target() -> None:
 
 
 def test_a_synthetic_ratified_rule_unblocks_exactly_its_own_state() -> None:
+    """A synthetic ratified rule unblocks exactly its own state — by REPLAY.
+
+    R2 (Phase 4): ``RATIFIED RULE != TRUE PREDICATE``. Ratification licenses
+    the derivation method; it does not assert the method's outcome. Emission
+    here happens because a locally registered synthetic predicate REPLAYS TRUE
+    over the operands (current 10.0 > prior 7.0), against a rule that binds
+    that exact predicate and declares the same window class its inputs carry.
+    The same rule with a false predicate is refused in
+    ``test_book6_hardening_r2.py`` (R2-D2).
+    """
+
+    from crypto_systems_intelligence_atlas.book6_predicates import (
+        EvaluatorKind,
+        StatePredicateDefinition,
+    )
+
     engine = _stack()
-    engine.registry.register_state_rule(_rule(StateName.INCREASING))
+    for mid, value in (("obs:cur", 10.0), ("obs:pri", 7.0)):
+        register_measurement(
+            engine,
+            windowed_observation(
+                mid,
+                METRIC,
+                value=value,
+                missingness=MissingnessState.OBSERVED,
+                claim_refs=(CLAIM,),
+            ),
+        )
+    engine.predicates.register(
+        StatePredicateDefinition(
+            predicate_id="predicate:monotone-comparison",
+            version="1",
+            state_class=StateClass.B_SPECIFICATION_ONLY,
+            target_state=StateName.INCREASING,
+            description="synthetic fixture predicate; canonically unratified",
+            required_input_arity=2,
+            evaluator_kind=EvaluatorKind.CURRENT_GREATER_THAN_PRIOR,
+        )
+    )
+    engine.registry.register_state_rule(
+        _rule(
+            StateName.INCREASING,
+            required_measurement_refs=("obs:cur", "obs:pri"),
+            window_class_constraint="INSTANTANEOUS",
+        )
+    )
     engine.registry.state_rules.ratify(
         "staterule:increasing:1", operator="synthetic-fixture-operator", at=NOW
     )
@@ -215,7 +259,7 @@ def test_a_synthetic_ratified_rule_unblocks_exactly_its_own_state() -> None:
         StateName.INCREASING,
         rule_ref="staterule:increasing:1",
         dimension_id="dim:1",
-        measurement_refs=("obs:1", "obs:2"),
+        measurement_refs=("obs:cur", "obs:pri"),
         methodology_ref="book6-methodology@1",
         valid_time=T1,
         observed_at=T1,
