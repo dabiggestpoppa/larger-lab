@@ -335,6 +335,13 @@ class RevisionObservationRecord(BaseModel):
     content_scope: str | None = None
     member_acquisition_ids: list[str] | None = None
     member_blob_sha256: list[str] | None = None
+    # I14R2 §15: canonical acquisition↔blob correspondence.  Two parallel
+    # lists cannot express WHICH acquisition produced WHICH blob; group
+    # rows persist the canonical PAIR set instead, sorted by blob_sha256
+    # (unique per group), so the mapping is durable and order-independent.
+    # None on R1-shaped rows: the loader reconstructs correspondence by
+    # resolving each member acquisition and validating its blob (§16).
+    member_bindings: list[dict[str, str]] | None = None
 
     @field_validator("seen_at", "registered_at")
     @classmethod
@@ -743,10 +750,127 @@ class SourceRevisionRegistry:
             self._observations_by_key.setdefault(
                 record.source_revision_key, []
             ).append(record)
+            if record.content_scope == "GROUP_OBSERVATION":
+                # I14R2 §16/§17: a persisted group row must re-prove its
+                # COMPLETE membership on every fresh load — every member
+                # exists, verifies, matches group identity/time, and the
+                # member blob set recomputes to the group digest.  R1-
+                # shaped rows (no persisted pairs) have their
+                # correspondence reconstructed by resolving each member
+                # and validating its blob against the persisted blob set.
+                self._validate_group_member_lineage(record)
             self._acquisition_bindings[record.acquisition_id] = (
                 record.source_revision_key,
                 record.revision_number,
                 record.blob_sha256,
+            )
+
+    def _validate_group_member_lineage(
+        self, record: RevisionObservationRecord
+    ) -> None:
+        """I14R2 §16/§17: restart-time validation of a persisted GROUP
+        observation — every member individually and the group as a whole.
+
+        For each persisted member acquisition id: the acquisition exists,
+        its physical blob verifies, its source identity equals the group's
+        identity, its observation instant equals the group seen_at, and
+        its blob belongs to the persisted member blob set (no two member
+        ids may map to the same blob).  Correspondence comes from the
+        persisted ``member_bindings`` pairs when present (I14R2 §15);
+        R1-shaped rows (pairs absent) are reconstructed by resolving each
+        member and validating its blob — never an ambiguous zip of
+        independently ordered arrays.  Finally the domain-separated group
+        digest is RECOMPUTED from the actual member blobs and must equal
+        the persisted group digest.  Any divergence is typed corruption;
+        no silent partial group."""
+        member_ids = record.member_acquisition_ids or []
+        member_blobs = record.member_blob_sha256 or []
+        if not member_ids or not member_blobs:
+            raise SourceRevisionCatalogCorrupt(
+                f"group observation {record.observation_id!r} lacks member "
+                "lineage (I14R2 §16)"
+            )
+        if member_blobs != sorted(set(member_blobs)):
+            raise SourceRevisionCatalogCorrupt(
+                f"group observation {record.observation_id!r} member blob "
+                "set is not canonical (I14R2 §14)"
+            )
+        canonical_identity = None
+        resolved_blobs: set[str] = set()
+        pairs: list[tuple[str, str]] = []
+        for member_id in member_ids:
+            try:
+                member = self._resolve_durable_acquisition(member_id)
+            except Exception as exc:
+                raise SourceRevisionCatalogCorrupt(
+                    f"group observation {record.observation_id!r} member "
+                    f"acquisition {member_id!r} does not resolve/verify: "
+                    f"{exc}"
+                ) from exc
+            identity = RevisionSourceIdentityV1.from_acquisition(member)
+            if canonical_identity is None:
+                canonical_identity = identity
+            elif (
+                identity.to_descriptor() != canonical_identity.to_descriptor()
+                or identity.source_revision_key()
+                != canonical_identity.source_revision_key()
+            ):
+                raise SourceRevisionCatalogCorrupt(
+                    f"group observation {record.observation_id!r} member "
+                    f"{member_id!r} derives a foreign source identity "
+                    "(I14R2 §17)"
+                )
+            if _canonical_utc(member.response_observed_at) != record.seen_at:
+                raise SourceRevisionCatalogCorrupt(
+                    f"group observation {record.observation_id!r} member "
+                    f"{member_id!r} observation time diverges from the "
+                    "group seen_at (I14R2 §17)"
+                )
+            if member.blob_sha256 not in member_blobs:
+                raise SourceRevisionCatalogCorrupt(
+                    f"group observation {record.observation_id!r} member "
+                    f"{member_id!r} blob is outside the persisted member "
+                    "blob set (I14R2 §17)"
+                )
+            if member.blob_sha256 in resolved_blobs:
+                raise SourceRevisionCatalogCorrupt(
+                    f"group observation {record.observation_id!r} has two "
+                    "members mapping to the same blob (I14R2 §17)"
+                )
+            resolved_blobs.add(member.blob_sha256)
+            pairs.append((member_id, member.blob_sha256))
+        if resolved_blobs != set(member_blobs):
+            raise SourceRevisionCatalogCorrupt(
+                f"group observation {record.observation_id!r} persisted "
+                "blob set diverges from the resolved member blobs "
+                "(I14R2 §17)"
+            )
+        # Persisted canonical pairs (I14R2 §15) must agree with the
+        # resolved correspondence; R1-shaped rows (pairs absent) are
+        # reconstructed here without ambiguity.
+        if record.member_bindings:
+            persisted_pairs = sorted(
+                (
+                    b["acquisition_id"],
+                    b["blob_sha256"],
+                )
+                for b in record.member_bindings
+            )
+            if persisted_pairs != sorted(pairs):
+                raise SourceRevisionCatalogCorrupt(
+                    f"group observation {record.observation_id!r} persisted "
+                    "member correspondence diverges from durable member "
+                    "truth (I14R2 §15/§21)"
+                )
+        # I14R2 §17: the group digest is RECOMPUTED from the actual member
+        # blobs and must equal the persisted digest.
+        if self.group_content_digest(sorted(resolved_blobs)) != (
+            record.blob_sha256
+        ):
+            raise SourceRevisionCatalogCorrupt(
+                f"group observation {record.observation_id!r} member blob "
+                "set does not recompute to the persisted group digest "
+                "(I14R2 §17/§21)"
             )
 
     def _load_declarations(self) -> None:
@@ -856,14 +980,14 @@ class SourceRevisionRegistry:
                             "evidence (I14R1 §16)"
                         )
                     if (
-                        group_obs.member_acquisition_ids[0]
-                        != birth_seg.first_acquisition_id
+                        birth_seg.first_acquisition_id
+                        not in set(group_obs.member_acquisition_ids)
                         or group_obs.member_blob_sha256
                         != sorted(set(group_obs.member_blob_sha256))
                     ):
                         raise SourceRevisionCatalogCorrupt(
                             "group member lineage does not bind to its "
-                            "segment (I14R1 §16/§21)"
+                            "segment (I14R1 §16/I14R2 §21)"
                         )
                     if self.group_content_digest(
                         group_obs.member_blob_sha256
@@ -1262,14 +1386,59 @@ class SourceRevisionRegistry:
                 raise RevisionConfigurationError(
                     "every acquisition_id must be a nonempty string"
                 )
+        # I14R2 §11: a forensic group cannot contain the same acquisition
+        # twice — reject duplicates BEFORE any resolution or persistence.
+        if len(set(acquisition_ids)) != len(acquisition_ids):
+            raise RevisionConfigurationError(
+                "register_acquisition_group received duplicate acquisition "
+                "ids; a forensic group contains each acquisition exactly "
+                "once"
+            )
 
-        # Resolve + physically verify EVERY component acquisition, and
-        # derive the shared request-semantics identity from the FIRST
-        # component (all components of one batch share request semantics —
-        # the I14 identity gate enforces it before registration).
+        # Resolve + physically verify EVERY component acquisition.  I06 is
+        # a PUBLIC authority (I14R2 §8): it validates group identity and
+        # time coherence ITSELF — never on the caller's word ("I14 already
+        # checked it" is not a law).
         acquisitions = [
             self._resolve_durable_acquisition(a) for a in acquisition_ids
         ]
+        # I14R2 §8/§10: every member's request-semantics identity must
+        # equal the canonical (first member's) identity — compared through
+        # the model's OWN canonical descriptor, never a hand-duplicated
+        # field list.  A foreign-source component is refused typed, with
+        # no persistence, no binding, no revision mutation.
+        canonical_identity = RevisionSourceIdentityV1.from_acquisition(
+            acquisitions[0]
+        )
+        canonical_key = canonical_identity.source_revision_key()
+        for member_id, member in zip(acquisition_ids, acquisitions):
+            member_identity = RevisionSourceIdentityV1.from_acquisition(
+                member
+            )
+            if (
+                member_identity.to_descriptor()
+                != canonical_identity.to_descriptor()
+                or member_identity.source_revision_key() != canonical_key
+            ):
+                raise RevisionConfigurationError(
+                    f"group member {member_id!r} derives a different source "
+                    "identity than the canonical group identity (I14R2 §8: "
+                    "one FetchBatch is ONE logical source; foreign-source "
+                    "components are refused, not collapsed)"
+                )
+        # I14R2 §9: ONE FetchBatch is ONE observation instant.  Every
+        # member's canonical response_observed_at must equal the group's
+        # observation time — no min/max/first/last selection, no silent
+        # collapse into the first member's timestamp.
+        seen_at = _canonical_utc(acquisitions[0].response_observed_at)
+        for member_id, member in zip(acquisition_ids, acquisitions):
+            if _canonical_utc(member.response_observed_at) != seen_at:
+                raise RevisionConfigurationError(
+                    f"group member {member_id!r} carries a different "
+                    "response_observed_at than the group observation "
+                    "instant (I14R2 §9: one FetchBatch is ONE observation; "
+                    "differing component times fail closed)"
+                )
         # I14R1 §13/§16: the digest is RECOMPUTED from the durable member
         # blobs (canonical sorted unique set, domain-separated) and the
         # caller-supplied digest must MATCH — a forged observation_digest
@@ -1286,11 +1455,8 @@ class SourceRevisionRegistry:
                 "observation_digest does not match the durable member "
                 "blob set (forged or stale group identity refused)"
             )
-        identity = RevisionSourceIdentityV1.from_acquisition(
-            acquisitions[0]
-        )
-        key = identity.source_revision_key()
-        seen_at = _canonical_utc(acquisitions[0].response_observed_at)
+        identity = canonical_identity
+        key = canonical_key
         usable = all(self._usable_provenance(a) for a in acquisitions)
 
         # Idempotence (§47): an already-bound observation id replays its
@@ -1532,7 +1698,24 @@ class SourceRevisionRegistry:
     ) -> RevisionObservationRecord:
         """Persist the immutable group observation record and bind EVERY
         component acquisition to the group's revision (I14R1 §25 evidence
-        coherence)."""
+        coherence; I14R2 §15 canonical correspondence).
+
+        ``member_blob_shas`` is the caller-resolved list PARALLEL to the
+        supplied ``acquisition_ids``: positional correspondence is defined
+        at resolution time, then persisted as canonical PAIRS sorted by
+        blob sha (unique per group), so the durable mapping is explicit
+        and order-independent."""
+        bindings: list[dict[str, str]] | None = None
+        if member_blob_shas is not None:
+            if len(member_blob_shas) != len(acquisition_ids):
+                raise RevisionConfigurationError(
+                    "group member correspondence broken: parallel "
+                    "acquisition/blob lists differ in length"
+                )
+            bindings = [
+                {"acquisition_id": acq, "blob_sha256": blob}
+                for blob, acq in sorted(zip(member_blob_shas, acquisition_ids))
+            ]
         record = RevisionObservationRecord(
             observation_id=observation_id,
             acquisition_id=acquisition_ids[0],
@@ -1545,8 +1728,9 @@ class SourceRevisionRegistry:
             severity=severity,
             registered_at=_canonical_utc(self._clock()),
             content_scope="GROUP_OBSERVATION",
-            member_acquisition_ids=list(acquisition_ids),
+            member_acquisition_ids=sorted(set(acquisition_ids)),
             member_blob_sha256=sorted(set(member_blob_shas or [])),
+            member_bindings=bindings,
         )
         try:
             self._observations.commit(
@@ -1579,12 +1763,36 @@ class SourceRevisionRegistry:
         acquisition_ids: list[str],
         record: RevisionObservationRecord,
     ) -> None:
-        """Idempotent group replay: every component must still resolve and
-        physically verify, and every component re-binds to the group's
-        revision (restart rebuilds bindings from observation records, which
-        carry only the FIRST component — this restores the full set)."""
+        """Idempotent group replay (I14R2 §12/§13): the supplied group must
+        equal the PERSISTED group EXACTLY before any rebinding.
+
+        - canonical supplied acquisition-id set == canonical persisted
+          ``record.member_acquisition_ids`` set (no subset, no superset,
+          no replacement member with the same blob content);
+        - resolved supplied blob set == persisted
+          ``record.member_blob_sha256`` set;
+        - every member still resolves and physically verifies.
+
+        A different group of acquisitions reusing the SAME observation_id
+        is a membership conflict — never silently adopted."""
+        persisted_ids = set(record.member_acquisition_ids or [])
+        supplied_ids = set(acquisition_ids)
+        if not persisted_ids or supplied_ids != persisted_ids:
+            raise RevisionObservationConflict(
+                f"observation {record.observation_id!r} is durably bound to "
+                "a DIFFERENT group membership; the supplied member set "
+                "does not equal the persisted member set (I14R2 §12/§13: "
+                "no subset, superset or replacement replay)"
+            )
+        member_blobs = set(record.member_blob_sha256 or [])
+        resolved = [self._resolve_durable_acquisition(a) for a in acquisition_ids]
+        supplied_blobs = {a.blob_sha256 for a in resolved}
+        if not member_blobs or supplied_blobs != member_blobs:
+            raise RevisionObservationConflict(
+                f"observation {record.observation_id!r} member blob set "
+                "diverges from the persisted group (I14R2 §12)"
+            )
         for acquisition_id in acquisition_ids:
-            self._resolve_durable_acquisition(acquisition_id)
             self._acquisition_bindings[acquisition_id] = (
                 record.source_revision_key,
                 record.revision_number,
