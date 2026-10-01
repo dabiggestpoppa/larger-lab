@@ -446,9 +446,9 @@ def test_receiptless_promoted_with_present_claim_is_never_fresh(
 # the R45R1 law added. Every other veto (malformed, unbound-with-expectation)
 # stays — so the weakened engine fails ONLY on the row the law is about, and
 # the positives prove the weakening is surgical, not a general disarm.
-_WEAKENED_TRANSFORM = ('''        elif isinstance(operation_id, str) \\
-                and OPERATION_ID_RE.match(operation_id) \\
-                and _claim_state(operation_id, transition_dir) != "absent":
+_WEAKENED_TRANSFORM = ('''        elif authority is not None \\
+                and _claim_state(operation_id, transition_dir,
+                                 authority=authority) != "absent":
             # PROMOTED with an existing canonical claim and NO receipt to bind:
             # the selector name exists, so the one-time authority is spent —
             # never fresh (B4-CXR7U9R45R1).

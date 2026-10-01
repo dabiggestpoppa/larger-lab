@@ -487,9 +487,13 @@ VALID_CLAIM_R46 = '''    if promote is None:
         return False
     expected = _receipt_digest(promote)
     try:
-        if snapshot is None:
-            snapshot = _read_selector_snapshot(operation_id, transition_dir)
-        state = _classify_claim_content(operation_id, snapshot,
+        if authority is not None:
+            snap = authority.selector
+        elif snapshot is not None:
+            snap = snapshot
+        else:
+            snap = _read_selector_snapshot(operation_id, transition_dir)
+        state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
@@ -497,7 +501,7 @@ VALID_CLAIM_R46 = '''    if promote is None:
         return False
     # The SAME snapshot that proved the binding selects the branch. There is
     # no second read of the coordinate in which a replacement could land.
-    claim = snapshot.claim
+    claim = snap.claim
     return isinstance(claim, dict) and claim.get("transition") == transition
 '''
 

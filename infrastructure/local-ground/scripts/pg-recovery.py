@@ -1344,6 +1344,8 @@ class SelectorSnapshot:
     transition_dir: str
     canonical_path: str
     present: bool
+    governed_device: int
+    governed_inode: int
     device: int
     inode: int
     size: int
@@ -1450,38 +1452,36 @@ def _read_admitted_claim(operation_id, fd):
             operation_id, f"the claim could not be read: {e}")
 
 
-def _read_selector_snapshot(operation_id, transition_dir=None):
-    """Read THIS operation's canonical claim as ONE FD-bound snapshot.
+def _read_selector_snapshot_admitted(operation_id, governed, name, dir_fd,
+                                     identity):
+    """The ONE selector read, performed against an ALREADY-admitted governed
+    directory (B4-CXR7U9R47R1).
 
-    POSIX sequence (B4-CXR7U9R46R1): derive the governed directory and the
-    canonical basename internally -> open the governed directory without
-    following redirections -> open the claim once with O_RDONLY|O_CLOEXEC|
-    O_NOFOLLOW, descriptor-relative -> fstat it (regular, private,
-    no foreign durable name, no mutation across admission) -> read and
-    parse the JSON from that SAME descriptor -> fstat again (a mutation
-    during reading is rejected) -> prove the canonical pathname still names
-    the SAME device
-    and inode without following symlinks -> close the descriptor and return
-    the immutable snapshot. No code may open(path) the claim after this
-    admission.
+    Split out from ``_read_selector_snapshot`` so that a decision which must
+    admit the governed directory exactly once can do so and then take its one
+    selector read against that same admission, instead of having the read
+    re-open the directory behind its back. The caller OWNS ``dir_fd``: it is
+    not closed here.
 
-    Windows equivalence: O_NOFOLLOW is unavailable, so reparse points are
-    refused explicitly on both the opened object and the canonical name, and
-    the same device/inode identity comparison is enforced; a platform that
-    cannot prove these properties fails closed.
+    POSIX sequence: open the claim once with O_RDONLY|O_CLOEXEC|O_NOFOLLOW,
+    descriptor-relative -> fstat it (regular, private, bounded, no foreign
+    durable name, no mutation across admission) -> read and parse the JSON from
+    that SAME descriptor -> fstat again (a mutation during reading is
+    rejected) -> prove the canonical pathname still names the SAME device
+    and inode without following symlinks -> close the claim descriptor and
+    return the immutable snapshot. No code may open(path) the claim after
+    this admission.
+
+    Windows equivalence: there is no directory descriptor, so the FULL
+    canonical path is used and the no-follow, reparse-point and identity
+    proofs carry the law.
 
     Absence is a documented outcome (claim=None, present=False). Every
     admission or parse failure raises _ExecutionAuthorityConflict: the
     selector is failed closed, never followed, never repaired, never
     deleted.
     """
-    directory = transition_dir or _transitions_dir()
-    governed, name = _derive_claim_coordinate(operation_id, directory)
     canonical_path = os.path.join(governed, name)
-    dir_fd = _open_governed_directory(governed, operation_id)
-    # POSIX: every step is descriptor-relative to the bare canonical name.
-    # Windows: there is no directory descriptor, so the FULL canonical path
-    # is used and the no-follow/reparse/identity proofs carry the law.
     probe_name = name if dir_fd is not None else canonical_path
     fd = None
     try:
@@ -1489,8 +1489,9 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
                 operation_id, probe_name, dir_fd) is None:
             return SelectorSnapshot(
                 operation_id=operation_id, transition_dir=governed,
-                canonical_path=canonical_path, present=False, device=0,
-                inode=0, size=0, mode=0, link_count=0, claim=None,
+                canonical_path=canonical_path, present=False,
+                governed_device=identity[0], governed_inode=identity[1],
+                device=0, inode=0, size=0, mode=0, link_count=0, claim=None,
                 read_error=None)
         fd = _open_claim_descriptor(operation_id, name, probe_name, dir_fd)
         _admit_selector_descriptor(fd, dir_fd, probe_name, operation_id)
@@ -1510,8 +1511,9 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
                 "read; refusing the swapped selector")
         return SelectorSnapshot(
             operation_id=operation_id, transition_dir=governed,
-            canonical_path=canonical_path, present=True, device=first.st_dev,
-            inode=first.st_ino, size=first.st_size,
+            canonical_path=canonical_path, present=True,
+            governed_device=identity[0], governed_inode=identity[1],
+            device=first.st_dev, inode=first.st_ino, size=first.st_size,
             mode=stat.S_IMODE(first.st_mode), link_count=first.st_nlink,
             claim=claim, read_error=None)
     finally:
@@ -1520,6 +1522,35 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
                 os.close(fd)
             except OSError:
                 pass
+
+
+def _read_selector_snapshot(operation_id, transition_dir=None):
+    """Read THIS operation's canonical claim as ONE FD-bound snapshot.
+
+    B4-CXR7U9R46R1: derive the governed coordinate and the canonical basename
+    INTERNALLY -> admit that coordinate without following redirections ->
+    open the claim once, read it, parse it, and prove its identity from that
+    same descriptor -> close and return the immutable snapshot.
+
+    B4-CXR7U9R47R1: the admitted read itself is factored into
+    ``_read_selector_snapshot_admitted`` so that ONE decision can admit the
+    governed directory exactly once and take its ONE selector read against
+    that same admission. The convenience wrapper keeps its R46 compatibility
+    signature this rung; the caller-owned-descriptor split is the new seam.
+    """
+    directory = transition_dir or _transitions_dir()
+    governed, name = _derive_claim_coordinate(operation_id, directory)
+    dir_fd = _open_governed_directory(governed, operation_id)
+    info = None
+    if dir_fd is not None:
+        info = os.fstat(dir_fd)
+    else:
+        info = os.stat(governed, follow_symlinks=False)
+    identity = (info.st_dev, info.st_ino)
+    try:
+        return _read_selector_snapshot_admitted(
+            operation_id, governed, name, dir_fd, identity)
+    finally:
         if dir_fd is not None:
             try:
                 os.close(dir_fd)
@@ -1549,7 +1580,8 @@ def _load_claim(operation_id, transition_dir=None):
 
 
 def _valid_transition_claim(operation_id, transition, promote,
-                            transition_dir=None, snapshot=None):
+                            transition_dir=None, snapshot=None,
+                            authority=None):
     """EXACT binding of the canonical selector to this transition and THIS
     promote receipt (B4-CXR7U9R45R1). One semantic law, shared by the shell
     classifier, reconciliation and every resume path: the claim must pass its
@@ -1558,16 +1590,29 @@ def _valid_transition_claim(operation_id, transition, promote,
 
     B4-CXR7U9R46R2: ONE FD-bound snapshot decides BOTH the binding and the
     branch. The old shape read the claim twice -- once for classification and
-    once for branch selection -- which let a replacement land between the
-    two reads; there is no second read anymore.
+    once for branch selection -- which let a replacement land between the two
+    reads; there is no second read anymore.
+
+    B4-CXR7U9R47R1: this was the ONE helper that already took a snapshot, and
+    R46's evidence generalised it to the whole decision. That generalisation
+    was false: ``_claim_state`` had no snapshot parameter at all, so the
+    COMPLETE classifier read the selector once to classify it and then read it
+    again here to select the branch. This function now accepts the whole
+    decision's ``authority`` -- a complete RecoveryAuthoritySnapshot -- so the
+    record and the selector are pinned together. ``snapshot=`` is kept for
+    compatibility this rung and wins when no full authority is supplied.
     """
     if promote is None:
         return False
     expected = _receipt_digest(promote)
     try:
-        if snapshot is None:
-            snapshot = _read_selector_snapshot(operation_id, transition_dir)
-        state = _classify_claim_content(operation_id, snapshot,
+        if authority is not None:
+            snap = authority.selector
+        elif snapshot is not None:
+            snap = snapshot
+        else:
+            snap = _read_selector_snapshot(operation_id, transition_dir)
+        state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
@@ -1575,12 +1620,12 @@ def _valid_transition_claim(operation_id, transition, promote,
         return False
     # The SAME snapshot that proved the binding selects the branch. There is
     # no second read of the coordinate in which a replacement could land.
-    claim = snapshot.claim
+    claim = snap.claim
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
 def _receiptless_selector_agrees(operation_id, transition,
-                                 transition_dir=None):
+                                 transition_dir=None, authority=None):
     """Receiptless agreement, bound to DURABLE authority (B4-CXR7U9R46R3).
 
     When no promote receipt is available to bind an expectation, the
@@ -1594,10 +1639,18 @@ def _receiptless_selector_agrees(operation_id, transition,
     authority and fails closed. Anything else (unbound, mismatched,
     malformed, or naming the other branch) is a state/selector disagreement
     and fails closed.
+
+    B4-CXR7U9R47R1: with an ``authority`` the durable record and the selector
+    are both already inside the decision, so this helper performs no
+    filesystem access. In R46 it re-read BOTH -- the record for its digest and
+    the selector for its binding -- so a record or selector replacement
+    landing between those two reads was legal.
     """
     try:
-        record = _load_transition_record(operation_id,
-                                         transition_dir=transition_dir)
+        if authority is not None:
+            record = authority.record
+        else:
+            record = _load_transition_record(operation_id)
     except (OSError, ValueError, RuntimeError, TypeError):
         return False
     if not isinstance(record, dict):
@@ -1608,8 +1661,9 @@ def _receiptless_selector_agrees(operation_id, transition,
         # receipt digest to bind against. Fail closed.
         return False
     try:
-        snapshot = _read_selector_snapshot(operation_id, transition_dir)
-        state = _classify_claim_content(operation_id, snapshot,
+        snap = (authority.selector if authority is not None
+                else _read_selector_snapshot(operation_id, transition_dir))
+        state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
@@ -1617,12 +1671,13 @@ def _receiptless_selector_agrees(operation_id, transition,
         return False
     # The SAME admitted snapshot that proved the digest binding selects the
     # branch; there is no second read.
-    claim = snapshot.claim
+    claim = snap.claim
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
 def _selector_agrees_with_finalizing(operation_id, promote,
-                                     transition_dir=None, snapshot=None):
+                                     transition_dir=None, snapshot=None,
+                                     authority=None):
     """ONE state/selector agreement law for FINALIZING (B4-CXR7U9R45R3,
     binding corrected B4-CXR7U9R46R3).
 
@@ -1633,6 +1688,14 @@ def _selector_agrees_with_finalizing(operation_id, promote,
     DURABLE RECORD's own receipt digest (B4-CXR7U9R46R3). A foreign but
     syntactically valid digest is not agreement; a missing record digest is
     unknowable authority. Every disagreement fails closed.
+
+    B4-CXR7U9R47R1: THIS WAS THE SECOND HALF OF THE DOUBLE READ. The caller
+    had already spent a selector read on ``_claim_state`` before reaching this
+    helper, which then read the selector again -- and, with no promote
+    receipt, re-read the durable record too. A FINALIZING decision could
+    therefore disagree with itself across a generation swap. ``authority``
+    now supplies both inputs, so one FINALIZING decision reads the record
+    once and the selector once.
     """
     if not isinstance(operation_id, str)             or not OPERATION_ID_RE.match(operation_id):
         return False
@@ -1640,18 +1703,22 @@ def _selector_agrees_with_finalizing(operation_id, promote,
         if promote is not None:
             expected = _receipt_digest(promote)
         else:
-            record = _load_transition_record(operation_id,
-                                             transition_dir=transition_dir)
+            record = (authority.record if authority is not None
+                      else _load_transition_record(operation_id))
             if not isinstance(record, dict):
                 return False
             expected = record.get("receipt_sha256")
             if not isinstance(expected, str) or not SHA256_RE.match(expected):
                 return False
-        if snapshot is None:
-            snapshot = _read_selector_snapshot(operation_id, transition_dir)
-        if not snapshot.present:
+        if authority is not None:
+            snap = authority.selector
+        elif snapshot is not None:
+            snap = snapshot
+        else:
+            snap = _read_selector_snapshot(operation_id, transition_dir)
+        if not snap.present:
             return False
-        state = _classify_claim_content(operation_id, snapshot,
+        state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
@@ -1659,12 +1726,12 @@ def _selector_agrees_with_finalizing(operation_id, promote,
         return False
     if state != "bound_complete":
         return False
-    claim = snapshot.claim
+    claim = snap.claim
     return isinstance(claim, dict) and claim.get("transition") == "finalize"
 
 
 def _claim_state(operation_id, transition_dir=None,
-                 expected_receipt_sha256=None):
+                 expected_receipt_sha256=None, authority=None):
     """The SEMANTIC state of the durable branch selector (B4-CXR7U9R45R1).
 
     ONE classification law for the shell classifier, reconciliation and every
@@ -1672,12 +1739,7 @@ def _claim_state(operation_id, transition_dir=None,
     IS ABSENT. A canonical claim that exists is one of:
 
       * bound_complete         -- format, operation id, permitted transition
-                                  and receipt digest all match (the digest must
-                                  equal expected_receipt_sha256 when one is
-                                  supplied; a structurally valid digest with no
-                                  expectation to compare against is reported as
-                                  unbound_or_mismatched rather than silently
-                                  trusted);
+                                  and receipt digest all match;
       * unbound_or_mismatched  -- a well-shaped claim whose receipt digest is
                                   missing, malformed, or bound to different
                                   authority: the selector coordinate is SPENT,
@@ -1693,46 +1755,25 @@ def _claim_state(operation_id, transition_dir=None,
     snapshot. The admission that decides the object's identity is the same
     read that produced the bytes being classified -- there is no second read
     in which a replacement could land.
+
+    B4-CXR7U9R47R1: THIS FUNCTION IS THE HIDDEN REREAD R46 LEFT IN PLACE. It
+    had no way to accept an already-admitted snapshot, so the COMPLETE shell
+    classifier classified the selector HERE and then -- on the PROMOTED and
+    FINALIZING legs -- read it AGAIN to select the branch. Two reads per
+    decision, with a replacement able to land between them. It now takes the
+    caller's ``authority`` and performs no filesystem access when one is
+    supplied.
     """
     try:
-        snapshot = _read_selector_snapshot(operation_id, transition_dir)
+        snap = (authority.selector if authority is not None
+                else _read_selector_snapshot(operation_id, transition_dir))
     except _ExecutionAuthorityConflict:
         # Coordinate admission failed: symlink, non-regular object, redirect,
         # widened permissions, replacement during read. Fail closed, never
         # describe it as fresh.
         return "malformed"
-    return _classify_claim_content(operation_id, snapshot,
+    return _classify_claim_content(operation_id, snap,
                                    expected_receipt_sha256=expected_receipt_sha256)
-
-
-def _classify_claim_content(operation_id, snapshot,
-                            expected_receipt_sha256=None):
-    """Classify ONE already-admitted selector snapshot (B4-CXR7U9R46R2).
-
-    Pure decision content: no filesystem access, no second read. Returns the
-    semantic selector state for the snapshot: absent, malformed,
-    unbound_or_mismatched, or bound_complete. A present claim that is not a
-    JSON object is malformed -- there is no re-read of the coordinate.
-    """
-    if not snapshot.present:
-        return "absent"
-    claim = snapshot.claim
-    if not isinstance(claim, dict):
-        return "malformed"
-    if claim.get("format") != _CLAIM_FORMAT \
-            or claim.get("operation_id") != operation_id \
-            or claim.get("transition") not in TRANSITIONS_ALLOWED_FROM_PROMOTED:
-        return "malformed"
-    digest = claim.get("receipt_sha256")
-    if not isinstance(digest, str) or len(digest) != 64 \
-            or any(c not in "0123456789abcdef" for c in digest):
-        return "unbound_or_mismatched"
-    if expected_receipt_sha256 is not None \
-            and digest != expected_receipt_sha256:
-        return "unbound_or_mismatched"
-    if expected_receipt_sha256 is None:
-        return "unbound_or_mismatched"
-    return "bound_complete"
 
 
 def _classify_claim_content(operation_id, snapshot,
@@ -1763,6 +1804,114 @@ def _classify_claim_content(operation_id, snapshot,
     if expected_receipt_sha256 is None:
         return "unbound_or_mismatched"
     return "bound_complete"
+
+
+@dataclasses.dataclass(frozen=True)
+class RecoveryAuthoritySnapshot:
+    """THE ONE COMPLETE, IMMUTABLE AUTHORITY SNAPSHOT OF A DECISION
+    (B4-CXR7U9R47R1).
+
+    One recovery-legality decision reads the durable transition record ONCE and
+    the canonical selector ONCE, then decides from this object alone. Every
+    downstream consumer -- the pure classifier, the reconciliation verdict and
+    the executable admission -- is handed THIS instance, so neither a selector
+    nor a record replacement can land inside a decision that has already
+    started.
+
+    Only safe, immutable decision material is carried here, and no secret: the
+    record is the same durable transition record the engine already publishes
+    into its receipts, and ``selector`` is the FD-bound SelectorSnapshot, whose
+    admitted directory identity, object identity, size, mode and durable-name
+    census all travel with the decision.
+
+    ``selector_state`` is deliberately NOT precomputed and neither is a single
+    ``selected_transition``. The semantic state depends on WHICH receipt digest
+    the decision binds against, and that legitimately differs between the
+    promote-receipt form and the receiptless form; a single precomputed answer
+    would either answer one of them wrongly or force the consumer back to the
+    disk to answer the other. Carrying the two INPUTS instead of two
+    conclusions is what lets one classifier serve both from one snapshot.
+
+    ``record_digest`` is the canonical content digest of the admitted record,
+    and ``record_receipt_sha256`` is that record's own recorded receipt
+    binding; together they are the record's identity, so a consumer can prove
+    that the record it is judging is the same record the snapshot admitted.
+    """
+    operation_id: str
+    governed_dir: str
+    governed_device: int
+    governed_inode: int
+    record: object
+    record_digest: object
+    record_receipt_sha256: object
+    selector: object
+    expected_receipt_sha256: object
+
+
+def _acquire_recovery_authority(operation_id, promote=None, record=None, directory=None):
+    """Acquire THE complete authority snapshot for ONE decision.
+
+    The required architecture (B4-CXR7U9R47R1), in this order and exactly once
+    each:
+
+        derive the governed coordinate INTERNALLY
+            -> admit that exact coordinate once, without following a
+               redirection
+            -> take the durable transition record once
+            -> read the selector once, through its admitted descriptor
+            -> build the immutable RecoveryAuthoritySnapshot
+
+    ``record`` may be supplied when the caller has ALREADY read and admitted
+    the durable record as part of this same decision -- that read IS the one
+    transition-record read, and passing it through keeps the count at one
+    instead of reading the same file twice under two generations. When it is
+    not supplied the record is read here, once.
+
+    A record that cannot be admitted is carried as ``record=None`` rather than
+    raised: a missing durable record is an ordinary outcome for a
+    pre-promotion input, and the decision still has to be able to fail closed
+    on it. A coordinate that cannot be admitted RAISES, because there is no
+    governed authority root to speak of at all.
+    """
+    if not isinstance(operation_id, str) \
+            or not OPERATION_ID_RE.match(operation_id):
+        raise _ExecutionAuthorityConflict(
+            "malformed operation id; refusing to acquire recovery authority")
+    directory = directory or _transitions_dir()
+    governed, name = _derive_claim_coordinate(operation_id, directory)
+    dir_fd = _open_governed_directory(governed, operation_id)
+    try:
+        if record is None:
+            try:
+                record = _load_transition_record(operation_id)
+            except (OSError, ValueError, RuntimeError, TypeError):
+                record = None
+        if dir_fd is not None:
+            info = os.fstat(dir_fd)
+        else:
+            info = os.stat(governed, follow_symlinks=False)
+        identity = (info.st_dev, info.st_ino)
+        selector = _read_selector_snapshot_admitted(
+            operation_id, governed, name, dir_fd, identity)
+    finally:
+        if dir_fd is not None:
+            try:
+                os.close(dir_fd)
+            except OSError:
+                pass
+    return RecoveryAuthoritySnapshot(
+        operation_id=operation_id,
+        governed_dir=governed,
+        governed_device=identity[0],
+        governed_inode=identity[1],
+        record=record,
+        record_digest=(_receipt_digest(record)
+                       if isinstance(record, dict) else None),
+        record_receipt_sha256=(record.get("receipt_sha256")
+                               if isinstance(record, dict) else None),
+        selector=selector,
+        expected_receipt_sha256=(_receipt_digest(promote)
+                                 if promote is not None else None))
 
 
 class _ExecutionAuthorityConflict(RuntimeError):
@@ -1827,7 +1976,7 @@ def _require_governed_operation(operation_id, promote):
             f"no governed recovery transition directory; refusing to enter "
             f"execution authority for operation {operation_id}")
     try:
-        record = _load_transition_record(operation_id, transition_dir=directory)
+        record = _load_transition_record(operation_id)
     except (OSError, ValueError, RuntimeError, TypeError) as e:
         raise _ExecutionAuthorityConflict(
             f"operation {operation_id} is not a governed recovery operation; "
@@ -2180,7 +2329,10 @@ def _bound_operation(promote, transition_dir=None):
     operation_id = promote.get("operation_id")
     if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
         raise RuntimeError(f"receipt operation id {operation_id!r} is missing or malformed")
-    record = _load_transition_record(operation_id, transition_dir=transition_dir)
+    if transition_dir is not None:
+        record = _load_transition_record(operation_id, transition_dir)
+    else:
+        record = _load_transition_record(operation_id)
     if record.get("format") != TRANSITION_FORMAT:
         raise RuntimeError("durable recovery operation record has an unknown format")
     if record.get("receipt_sha256") != _receipt_digest(promote):
@@ -3380,18 +3532,29 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     state = record.get("state")
     receipt["durable_state"] = state
     # ONE BRANCH-SELECTION LAW (B4-CXR7U9R44R1, bound in B4-CXR7U9R45R1,
-    # ONE-snapshot-per-decision in B4-CXR7U9R46R2/R4): the ENTIRE reconcile
-    # decision -- existence, coordinate admission, structural validity,
-    # receipt binding, selected branch, state/selector agreement and the
-    # verdict itself -- is derived from ONE FD-bound selector snapshot. No
-    # consumer re-opens the coordinate to fetch the branch after classifying
-    # its binding.
+    # ONE-snapshot-per-decision in B4-CXR7U9R46R2/R4, ONE COMPLETE
+    # authority snapshot in B4-CXR7U9R47R1): the ENTIRE reconcile decision --
+    # existence, coordinate admission, structural validity, receipt binding,
+    # selected branch, state/selector agreement and the verdict itself -- is
+    # derived from ONE complete RecoveryAuthoritySnapshot. No consumer
+    # re-opens the coordinate to fetch the branch after classifying its
+    # binding, and the record and selector inside the decision are pinned to
+    # one another.
     try:
-        snapshot = _read_selector_snapshot(operation_id)
-        selector_state = _classify_claim_content(
-            operation_id, snapshot, expected_receipt_sha256=expected_digest)
+        # B4-CXR7U9R47R1: reconciliation is ONE decision like every other.
+        # It acquires the complete authority snapshot once -- the record it
+        # already holds plus exactly one selector read -- and every verdict
+        # branch below is decided from that object. R46 already threaded a
+        # selector snapshot here, but as a bare snapshot it did not pin the
+        # RECORD alongside it, so the digest expectation and the selector it
+        # was compared against were not provably the same generation.
+        authority = _acquire_recovery_authority(
+            operation_id, promote, record=record)
+        selector_state = _claim_state(
+            operation_id, expected_receipt_sha256=expected_digest,
+            authority=authority)
     except _ExecutionAuthorityConflict:
-        snapshot = None
+        authority = None
         selector_state = "malformed"
     receipt["claim_state"] = selector_state
     if selector_state == "malformed":
@@ -3470,7 +3633,7 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
         # FINALIZING record whose claim is missing, wrong-branched or
         # foreign-bound is unreconciled, never a governed abort.
         if not _selector_agrees_with_finalizing(operation_id, promote,
-                                                snapshot=snapshot):
+                                                authority=authority):
             verdict = "unreconciled"
         elif observation["quarantine_present"] is True \
                 and observation["canonical_matches_inventory"] is True:
@@ -3480,7 +3643,7 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     elif state == TRANSITION_STATE_ROLLING_BACK:
         valid_claim = record.get("selected_transition") == "rollback" \
             and _valid_transition_claim(operation_id, "rollback", promote,
-                                        snapshot=snapshot) \
+                                        authority=authority) \
             and record.get("commit_intent") is None \
             and record.get("commit_point") is None
         catalog_state = _rollback_catalog_state(
@@ -3497,17 +3660,17 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
             verdict = "unreconciled"
     elif state == TRANSITION_STATE_PROMOTED:
         if _valid_transition_claim(operation_id, "finalize", promote,
-                                   snapshot=snapshot):
+                                   authority=authority):
             verdict = "preintent_abort_required"
         elif _valid_transition_claim(operation_id, "rollback", promote,
-                                     snapshot=snapshot):
+                                     authority=authority):
             verdict = "resume_rollback_required"
         else:
             verdict = "fresh_rollback_available"
     elif state == "ROLLED_BACK":
         valid_claim = record.get("selected_transition") == "rollback" \
             and _valid_transition_claim(operation_id, "rollback", promote,
-                                        snapshot=snapshot)
+                                        authority=authority)
         catalog_state = _rollback_catalog_state(
             container, user, db, quarantine, record.get("staging_database"))
         observation["rollback_catalog_state"] = catalog_state
@@ -3538,26 +3701,55 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
     intent, and code 4 is malformed/unknown. When a promote receipt is supplied,
     the exact claim and operation binding are checked; a state label alone can
     never turn a spent branch into fresh authority.
+
+    B4-CXR7U9R47R1: THE COMPLETE DECISION CONSUMES EXACTLY ONE SNAPSHOT.
+    ``record`` is the already-admitted durable record for this decision and
+    ``promote`` supplies the receipt digest, so the RecoveryAuthoritySnapshot
+    is acquired ONCE here and every branch below reads ``authority`` -- never
+    the disk. The verdict matrix below is unchanged from R46R4; what changed is
+    that every branch that consults the selector now consults the SAME one.
+
+    R46's evidence recorded "one decision consumes one snapshot" for this
+    function. That was not true. ``_claim_state`` -- the FIRST branch guard,
+    which runs for every state -- had no way to accept a snapshot and always
+    read the coordinate itself; PROMOTED then read it a second time to select
+    the branch, and FINALIZING read it a second time inside
+    ``_selector_agrees_with_finalizing``. Two selector reads per decision on
+    the two most important legs, and a replacement could land between them.
+
+    The governed directory parameter is still threaded through this rung for
+    compatibility with the R46 call surface; B4-CXR7U9R47R2 removes it.
     """
     if not isinstance(record, dict) or record.get("format") not in (None, TRANSITION_FORMAT):
         return 4
     state = record.get("state")
     operation_id = record.get("operation_id")
-    # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R1). A canonical claim that
-    # exists but is not EXACTLY bound to the supplied promote receipt means the
-    # one-time authority is spent (selected or corrupted): fail closed (code 4)
-    # instead of reopening fresh authority (B4-CXR7U9R44R1; binding law added
-    # by B4-CXR7U9R45R1). A malformed claim, including one that fails its
-    # coordinate admission (symlink, non-regular, redirected or widened file),
-    # fails closed even without a receipt to compare against.
+    authority = None
+    # ONE AUTHORITY ACQUISITION FOR THE WHOLE DECISION (B4-CXR7U9R47R1). The
+    # record is passed IN rather than re-read: the caller's read is this
+    # decision's one transition-record read.
     if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id):
-        expected = _receipt_digest(promote) if promote is not None else None
         try:
-            selector_state = _claim_state(
-                operation_id, transition_dir,
-                expected_receipt_sha256=expected)
+            authority = _acquire_recovery_authority(
+                operation_id, promote, record=record,
+                directory=transition_dir)
         except _ExecutionAuthorityConflict:
+            # The governed transition directory itself could not be admitted
+            # without following a redirection. There is no authority root, so
+            # there is nothing to decide: fail closed.
             return 4
+        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R1). A canonical claim
+        # that exists but is not EXACTLY bound to the supplied promote receipt
+        # means the one-time authority is spent (selected or corrupted): fail
+        # closed (code 4) instead of reopening fresh authority
+        # (B4-CXR7U9R44R1; binding law added by B4-CXR7U9R45R1). A malformed
+        # claim, including one that fails its coordinate admission (symlink,
+        # non-regular, redirected or widened file), fails closed even without
+        # a receipt to compare against.
+        selector_state = _claim_state(
+            operation_id, transition_dir,
+            expected_receipt_sha256=authority.expected_receipt_sha256,
+            authority=authority)
         if selector_state == "malformed":
             return 4
         if promote is not None and selector_state == "unbound_or_mismatched":
@@ -3571,8 +3763,13 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # EXACTLY bound to that finalize branch means the state and the
         # selector DISAGREE: fail closed, never re-describe the spent or
         # missing selector as governed abort authority.
+        #
+        # B4-CXR7U9R47R1: `authority` carries the record that supplies the
+        # receiptless expectation AND the selector that has to agree with it.
+        # Both are the ones already admitted for this decision.
         if not _selector_agrees_with_finalizing(operation_id, promote,
-                                                transition_dir):
+                                                transition_dir,
+                                                authority=authority):
             return 4
         if record.get("selected_transition") == "finalize":
             return 5
@@ -3584,42 +3781,37 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # impossible state/selector disagreement and fails closed. The
         # documented pre-promotion disposition (0) exists ONLY for the
         # absent-selector shape the engine itself produces.
-        if promote is None and isinstance(operation_id, str) \
-                and OPERATION_ID_RE.match(operation_id):
-            try:
-                if _claim_state(operation_id, transition_dir) != "absent":
-                    return 4
-            except _ExecutionAuthorityConflict:
+        if promote is None and authority is not None:
+            # B4-CXR7U9R47R1: the SAME snapshot, not a second read.
+            if _claim_state(operation_id, transition_dir,
+                            authority=authority) != "absent":
                 return 4
         return 0
     if state == TRANSITION_STATE_PROMOTED:
-        # B4-CXR7U9R46R4: ONE admitted snapshot decides the whole PROMOTED
+        # B4-CXR7U9R46R4/R47: ONE admitted snapshot decides the whole PROMOTED
         # verdict -- existence, coordinate admission, binding, branch and
-        # freshness. No consumer re-reads the coordinate between classifying
-        # its binding and selecting the branch.
-        if promote is not None and isinstance(operation_id, str) \
-                and OPERATION_ID_RE.match(operation_id):
-            try:
-                snap = _read_selector_snapshot(operation_id, transition_dir)
-            except _ExecutionAuthorityConflict:
-                return 4
+        # freshness. R46 still took a fresh `_read_selector_snapshot()` on this
+        # leg after `_claim_state` had already read it; the `snap` local it
+        # then threaded into both `_valid_transition_claim` calls was already
+        # the SECOND read of the coordinate.
+        if promote is not None and authority is not None:
             if _valid_transition_claim(operation_id, "rollback", promote,
                                        transition_dir=transition_dir,
-                                       snapshot=snap):
+                                       authority=authority):
                 return 6
             if _valid_transition_claim(operation_id, "finalize", promote,
                                        transition_dir=transition_dir,
-                                       snapshot=snap):
+                                       authority=authority):
                 return 5
             # Defense in depth: if the admitted snapshot is not exactly
             # consumable, the selector is spent -- never fresh.
             if _classify_claim_content(
-                    operation_id, snap,
-                    expected_receipt_sha256=_receipt_digest(promote)) != "absent":
+                    operation_id, authority.selector,
+                    expected_receipt_sha256=authority.expected_receipt_sha256) != "absent":
                 return 4
-        elif isinstance(operation_id, str) \
-                and OPERATION_ID_RE.match(operation_id) \
-                and _claim_state(operation_id, transition_dir) != "absent":
+        elif authority is not None \
+                and _claim_state(operation_id, transition_dir,
+                                 authority=authority) != "absent":
             # PROMOTED with an existing canonical claim and NO receipt to bind:
             # the selector name exists, so the one-time authority is spent —
             # never fresh (B4-CXR7U9R45R1).
@@ -3632,9 +3824,11 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
             return 4
         if promote is None:
             return 6 if record.get("selected_transition") == "rollback" else 0
-        if not isinstance(operation_id, str) \
-                or not _valid_transition_claim(operation_id, "rollback", promote,
-                                               transition_dir=transition_dir):
+        # B4-CXR7U9R47R1: `authority is None` means the operation id was
+        # malformed, and an unbindable record is unknowable authority.
+        if authority is None or not _valid_transition_claim(
+                operation_id, "rollback", promote,
+                transition_dir=transition_dir, authority=authority):
             return 4
         return 6
     if state == "ROLLED_BACK":
@@ -3643,10 +3837,11 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # selector bound to the supplied promote receipt, the terminal state
         # is unknowable and fails closed; code 6 is an idempotent RESUME
         # verification, not a fresh grant.
-        if promote is None or not isinstance(operation_id, str):
+        if promote is None or authority is None:
             return 4
         if not _valid_transition_claim(operation_id, "rollback", promote,
-                                       transition_dir=transition_dir):
+                                       transition_dir=transition_dir,
+                                       authority=authority):
             return 4
         return 6
     if state == "FAILED":
