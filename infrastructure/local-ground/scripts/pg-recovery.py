@@ -118,6 +118,15 @@ _TRANSITION_LADDER = {
     "FAILED": set(),
 }
 _CLAIM_FORMAT = "oce-transition-claim-v1"
+# BOUNDED SELECTOR INPUT (B4-CXR7U9R47R4). The canonical claim is a
+# FIXED-SCHEMA JSON object: format, operation_id, transition, claimed_at and,
+# when a promote receipt binds it, receipt_sha256. Indented with two spaces,
+# the widest truthful encoding of exactly those five fields is well under 300
+# bytes. This bound is therefore conservative by more than an order of
+# magnitude, and it exists so an oversized or growing selector is refused
+# BEFORE the engine allocates a buffer for attacker-influenced bytes. It is a
+# REJECTION bound, never a truncation bound: nothing is cut short and parsed.
+_CLAIM_MAX_BYTES = 4096
 _CLAIM_TEMP_LIVENESS_ATTEMPTS = 4
 
 # FD-bound selector reading (B4-CXR7U9R46R1). The governed directory and the
@@ -1451,7 +1460,7 @@ def _open_claim_descriptor(operation_id, name, probe_name, dir_fd):
 
 def _read_admitted_claim(operation_id, fd):
     """Read and parse the claim from the ADMITTED descriptor, and nothing
-    else (B4-CXR7U9R46R1).
+    else (B4-CXR7U9R46R1, bounded B4-CXR7U9R47R4).
 
     Raw descriptor reads only: the bytes never pass through a second open, a
     path-based stream or a buffered text wrapper, because this descriptor IS
@@ -1459,14 +1468,36 @@ def _read_admitted_claim(operation_id, fd):
     mutation across that read is refused. The descriptor is NOT closed here:
     the caller owns its lifetime and closes it before proving the canonical
     pathname still names what was read.
+
+    The SIZE is bounded before and during the read. ``st_size`` is checked
+    first, so an oversized selector is refused without any buffer being
+    allocated for it at all; the accumulated length is then checked on every
+    iteration, so a selector that GROWS while it is being read is refused at
+    the first chunk past the bound rather than at EOF. Either way the engine
+    never materialises unbounded attacker-influenced bytes, and neither path
+    truncates-and-parses: an over-bound selector is rejected whole.
     """
     try:
         first = os.fstat(fd)
+        if first.st_size > _CLAIM_MAX_BYTES:
+            raise _selector_conflict(
+                operation_id,
+                f"the claim is {first.st_size} bytes, above the "
+                f"{_CLAIM_MAX_BYTES}-byte maximum for a fixed-schema selector; "
+                "refusing to read an oversized selector")
         chunks = []
+        total = 0
         while True:
             chunk = os.read(fd, 65536)
             if not chunk:
                 break
+            total += len(chunk)
+            if total > _CLAIM_MAX_BYTES:
+                raise _selector_conflict(
+                    operation_id,
+                    f"the claim grew past the {_CLAIM_MAX_BYTES}-byte maximum "
+                    "selector size while it was being read; refusing a growing "
+                    "selector")
             chunks.append(chunk)
         mid = os.fstat(fd)
         if (first.st_ino, first.st_dev, first.st_size,
@@ -1808,9 +1839,18 @@ def _classify_claim_content(operation_id, snapshot,
     """Classify ONE already-admitted selector snapshot (B4-CXR7U9R46R2).
 
     Pure decision content: no filesystem access, no second read. Returns the
-    semantic selector state for the snapshot, or None when a PRESENT claim
-    cannot be classified from this snapshot alone -- the caller must fail
-    closed rather than re-read the coordinate.
+    semantic selector state for the snapshot: absent, malformed,
+    unbound_or_mismatched, or bound_complete. A present claim that is not a
+    JSON object is malformed -- there is no re-read of the coordinate.
+
+    B4-CXR7U9R47R4: THIS MODULE DEFINES THIS FUNCTION EXACTLY ONCE. R46 shipped
+    two byte-equivalent definitions of it; the second silently shadowed the
+    first, so the copy a reviewer read at the top of the pair was not the copy
+    that executed. The shadowed copy's docstring also promised a ``None``
+    return "when a PRESENT claim cannot be classified from this snapshot
+    alone", a return value the body never produced -- the two definitions
+    disagreed with each other in their documentation as well as colliding in
+    the module namespace.
     """
     if not snapshot.present:
         return "absent"
