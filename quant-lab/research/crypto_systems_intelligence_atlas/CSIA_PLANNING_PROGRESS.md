@@ -1466,3 +1466,53 @@ NEXT = BOOK 6 OFFLINE IMPLEMENTATION AUTHORIZATION REVIEW
 
 This NEXT does **not** grant implementation authority: Book 6 remains
 planning-ratified only, with no code, and live acquisition remains FALSE.
+---
+
+GOVERNANCE BRIDGE — BOOK 6 ACCEPTANCE INTO PLANNING (2026-10-01)
+
+The operator-authorized FORMAL BOOK 6 IMPLEMENTATION ACCEPTANCE REVIEW has
+completed in the separate implementation worktree
+(C:/Users/wifik/Desktop/larger-lab-csia-book6-build, branch
+agent/crypto-systems-intelligence-atlas-book6-build). Book 6 source was NOT
+merged into planning; this bridge records governance state only.
+
+Decision recorded from the implementation side:
+
+  PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL = ACCEPTED
+  BOOK_6 = FROZEN_ACCEPTED
+  BOOK_6_ACCEPTANCE_COMMIT = 5f94c3f40cea4441470c57671f51454da7377361
+  BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+  D6M_5 = OPEN_DEFERRED
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+  BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+  BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+
+Acceptance evidence (implementation branch): canonical CSIA partition 107 /
+108 / 83 / 230 / 293 / 1341 = 2162 PASS; hardening R1 = 93, R2 = 46,
+R3 = 45 PASS; traceability 288 rows / 29 families; sensor 2325 PASS /
+14 FAIL / 4 SKIPPED with the exact canonical known failure set and
+BOOK6_INTRODUCED_SENSOR_FAILURES = 0; Ruff PASS; mypy PASS (62 source files);
+zero Book 1-5 and sensor mutations. Full record:
+CSIA_BOOK_6_IMPLEMENTATION_ACCEPTANCE_RECORD_v0.1.md on the Book 6 branch.
+
+Book 6 is now frozen as accepted implementation. The ratification record
+(CSIA_BOOK_6_PLAN_RATIFICATION_RECORD_v0.1.md, anchor
+fea27a5ea7988841dd0e30cacd35295a76a9f372) remains the planning-side authority
+for what was built; the acceptance record is the implementation-side authority
+that it was verified and accepted. No planning text above this bridge is
+rewritten; the earlier NEXT (BOOK 6 OFFLINE IMPLEMENTATION AUTHORIZATION
+REVIEW) is superseded by this acceptance.
+
+Consequence for planning: INDIVIDUAL_STATE_RULES_RATIFIED = 0 canonical,
+PREDICATES_CANONICALLY_RATIFIED = 0, COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+canonical remain true post-acceptance; D6M-5 stays OPEN_DEFERRED and its
+closure conditions are unchanged. HISTORICAL_BOOK2_AUTHORITY_REPLAY remains
+NOT_IMPLEMENTED. Nothing in this bridge authorizes execution.
+
+NEXT = BOOK 7 PLANNING / GOVERNANCE REVIEW ONLY.
+
+This bridge does NOT authorize Book 7 implementation, Book 8 implementation,
+D8, live acquisition, RPC, network calls, database, graph database, production
+scheduler, dashboard, usage/health empirical research, state rule ratification,
+predicate ratification, coverage rule ratification, or trading/execution
+authority.
