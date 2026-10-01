@@ -1615,3 +1615,95 @@ acquisition, news/social crawlers, RPC, database, graph database, production
 news/social ingestion, dashboard, narrative scores, catalyst scores, ranking,
 buy/sell language, causal claims from temporal order, narrative-evidence
 promotion to structural truth, state-rule ratification, or trading/execution.
+---
+
+CHECKPOINT — BOOK 7 RESPONSE-SEMANTICS REPAIR + v0.2 SET (2026-10-01)
+
+Triggered by external review: do not ratify Book 7 v0.1. Structural defect in
+Bloc 7C — v0.1 permitted POST-ACTION OBSERVATION to satisfy response semantics
+without proving a change (usage 100 before, 100 after was a "response"), which
+leaked TEMPORAL ORDER -> RESPONSE while the causality doctrine correctly blocked
+TEMPORAL ORDER -> CAUSATION. Reproduced at 9 locations across the v0.1 set
+(Reconciliation v0.1 §1.1; primary: ACTION_LADDER_AND_CAUSALITY_v0.1.md:75-79).
+
+Repair:
+
+  POST_ACTION_OBSERVATION != OBSERVED_CHANGE
+  OBSERVED_CHANGE        != CAUSAL_RESPONSE
+  RESPONSE_LINK          != CAUSAL_CLAIM
+  UNOBSERVED_CHANGE      != NO_CHANGE
+  ZERO_VALUE             != ZERO_CHANGE
+  MATERIALITY            != RESPONSE
+
+Three distinct objects planned (PostActionObservation / ObservedChange /
+ResponseLink); ResponseBaseline contract (selection is methodology; four
+candidate models; NO default); 9 Book 6-compatible comparability gates; seven
+gate rule for USAGE/CAPITAL_RESPONSE_LINKED; 9-outcome response vocabulary with
+6 non-collapsions; NO_RESPONSE_OBSERVED withdrawn -> NO_CHANGE_OBSERVED with 6
+conditions (silence is not evidence); response predicate P1 selected, P2
+cited-only, P3 materiality DEFERRED; methodology sensitivity preserved
+un-averaged; incentives/confounders context-only; causality re-aligned so the
+response layer sits strictly <= ASSOCIATION_ONLY. Ownership seam surfaced as a
+genuine operator decision (Book 6 is frozen; no comparison/change contract
+exists in accepted Book 6).
+
+Second repair (Phase 19 audit): v0.1 event lifecycle was not mechanically
+unambiguous about being non-sequential. Event Grammar v0.2 repairs it:
+occurrence STATUSES (set-valued, family-declared applicability, illustrative
+ordering only, no scalar lifecycle field, no implicit statuses) and an explicit
+non-merger between event status and the nine response outcomes.
+
+Artifacts (v0.1 set preserved unmodified as history; v0.1 plan NOT ratifiable):
+
+  CSIA_BOOK_7_RESPONSE_SEMANTICS_RECONCILIATION_v0.1.md  (defect + full repair)
+  CSIA_BOOK_7_ACTION_LADDER_v0.2.md                       (supersedes v0.1 §1.3/1.4/4)
+  CSIA_BOOK_7_CAUSALITY_DOCTRINE_v0.2.md                 (response <= ASSOCIATION_ONLY)
+  CSIA_BOOK_7_EVENT_GRAMMAR_v0.2.md                      (lifecycle repair, non-merger)
+  CSIA_BOOK_7_FALSE_POSITIVE_CORPUS_v0.2.md              (30 cases; 10 new response
+                                                          cases; 4 ALLOWED rows tightened)
+  CSIA_BOOK_7_NARRATIVE_EVENTS_ECOSYSTEM_EVOLUTION_PLAN_v0.2.md
+  CSIA_BOOK_7_OPERATOR_DECISION_PACKET_D7N_v0.2.md      (D7N-1..6 carried; D7N-7 new;
+                                                          operator_selection slots;
+                                                          directly executable)
+  CSIA_BOOK_7_DECISION_READINESS_REVIEW_v0.1.md          (RC-1..RC-8 per decision)
+  CSIA_BOOK_7_PRE_RATIFICATION_REVIEW_v0.2.md           (45 / 45 PASS)
+
+Decision:
+
+  BOOK_6 = FROZEN_ACCEPTED (unchanged; not re-opened by planning)
+  BOOK_7_PLAN = v0.2 DRAFT_PENDING_OPERATOR_RATIFICATION
+  BOOK_7_PLAN_v0.1 = SUPERSEDED (NOT ratifiable — response-semantics defect)
+  BOOK_7_GOVERNANCE_REVIEW = COMPLETE
+  BOOK_7_RESPONSE_SEMANTICS_RECONCILIATION = COMPLETE
+  PRE_RATIFICATION_REVIEW = 45 / 45 PASS (v0.2; v0.1 superseded)
+  D7N_PACKET = v0.2
+  OPEN_BLOCKING_D7N_DECISIONS = 2 (D7N-3 state governance; D7N-7 change-comparison
+                                    authority — option A would amend frozen Book 6)
+  OPEN_DEFERRED_D7N_DECISIONS = 5 (D7N-1, D7N-2, D7N-4, D7N-5, D7N-6)
+  TOTAL_OPEN_D7N_DECISIONS = 7; DECIDED = 0
+  PLAN_RATIFICATION_GATE = OPEN (may not ratify until D7N-3 and D7N-7 are recorded)
+  D2_6 = IN_FORCE
+  D6M_5 = OPEN_DEFERRED
+  NARRATIVE_STATE_RULES_RATIFIED = 0
+  BOOK_1..BOOK_6_AMENDMENT_REQUIRED = FALSE (option A of D7N-7 would set
+                                              BOOK_6_AMENDMENT_REQUIRED = TRUE;
+                                              surfaced, not performed)
+  CONSTITUTION_AMENDMENT_REQUIRED = FALSE
+  BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+  BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+  STRUCTURAL_FAILURE_COUNT = 0 (after repair)
+
+No implementation, acquisition, crawler, RPC, database, or research execution.
+No change product may be emitted while D7N-7 is open (interim fail-closed:
+CHANGE_NOT_MEASURABLE).
+
+NEXT = operator review of Book 7 v0.2 + D7N packet v0.2 (decide D7N-3 and D7N-7;
+defer or decide the other five).
+
+Ratification, when given, grants planning structure and doctrine only. It does
+NOT authorize Book 7 implementation, Book 8 implementation, D8, live
+acquisition, news/social ingestion, RPC, database, graph database, dashboard,
+narrative/catalyst scores, ranking, buy/sell language, causal claims, state-rule
+ratification, response-emission without an assigned comparison owner, or any
+trading/execution authority.
