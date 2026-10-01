@@ -46,6 +46,7 @@ def _price(
         price_observation_id=f"price:{price_class.value.lower()}:1",
         price_class=price_class,
         source_ref=source_ref,
+        source_claim_refs=("fixture:claim:measurement",),
         price=price,
         valid_time=observed_at,
         observed_at=observed_at,
@@ -131,6 +132,7 @@ def test_a_price_observation_must_carry_its_own_source_and_time() -> None:
             price_observation_id="price:1",
             price_class=PriceObservationClass.MARKET_OBSERVATION,
             source_ref="",
+            source_claim_refs=("fixture:claim:measurement",),
             price=1.0,
             valid_time=NOW,
             observed_at=NOW,
@@ -273,7 +275,7 @@ def test_no_module_level_price_singleton_exists() -> None:
 def test_a_current_price_is_not_stale() -> None:
     valuation = _valuation()
     assert valuation.is_stale is False
-    assert valuation.is_authoritative_now is True
+    assert valuation.is_currently_fresh(valuation.observed_at) is True
 
 
 def test_a_stale_price_makes_the_current_valuation_unavailable() -> None:
@@ -285,7 +287,7 @@ def test_a_stale_price_makes_the_current_valuation_unavailable() -> None:
         ),
     )
     assert valuation.is_stale is True
-    assert valuation.is_authoritative_now is False
+    assert valuation.is_currently_fresh(valuation.observed_at) is False
 
 
 def test_a_price_inside_the_bound_is_not_stale() -> None:
@@ -322,14 +324,14 @@ def test_current_unavailable_is_not_historical_invalid() -> None:
         price=_price(PriceObservationClass.MARKET_OBSERVATION, observed_at=NOW + timedelta(days=30)),
     )
     assert historical.valid_time == T1  # the measurement's own valid time is unchanged
-    assert historical.is_authoritative_now is True
+    assert historical.is_currently_fresh(historical.observed_at) is True
     # the same structure read "now" is unavailable, and that unavailability is
     # a statement about the present, not about the historical observation.
     read_now = _valuation(
         observed_at=NOW + timedelta(days=3650),
         price=_price(PriceObservationClass.MARKET_OBSERVATION, observed_at=NOW),
     )
-    assert read_now.is_authoritative_now is False
+    assert read_now.is_currently_fresh(read_now.observed_at) is False
     assert historical.valuation_id == read_now.valuation_id
 
 
@@ -341,6 +343,7 @@ def test_an_unavailable_source_yields_no_price_observation_at_all() -> None:
             price_observation_id="price:1",
             price_class=PriceObservationClass.MARKET_OBSERVATION,
             source_ref="",
+            source_claim_refs=("fixture:claim:measurement",),
             price=1.0,
             valid_time=NOW,
             observed_at=NOW,
@@ -446,7 +449,7 @@ def test_engine_authorizes_an_admissible_price() -> None:
 
     engine, *_ = build_engine()
     valuation = _valuation()
-    assert engine.authorize_valuation(valuation) is valuation
+    assert engine.authorize_current_valuation(valuation, as_of=NOW) is valuation
 
 
 def test_engine_rejects_an_inadmissible_price() -> None:
@@ -459,7 +462,7 @@ def test_engine_rejects_an_inadmissible_price() -> None:
         }
     )
     with pytest.raises(ValuationError, match="not admissible"):
-        engine.authorize_valuation(forged)
+        engine.authorize_current_valuation(forged, as_of=NOW)
 
 
 def test_engine_rejects_a_forged_price_class_on_a_market_valuation() -> None:
@@ -475,7 +478,7 @@ def test_engine_rejects_a_forged_price_class_on_a_market_valuation() -> None:
         }
     )
     with pytest.raises(ValuationError, match="not admissible"):
-        engine.authorize_valuation(forged)
+        engine.authorize_current_valuation(forged, as_of=NOW)
 
 
 def test_engine_rejects_a_stripped_numeraire_that_reuses_an_admissible_price() -> None:
@@ -486,7 +489,7 @@ def test_engine_rejects_a_stripped_numeraire_that_reuses_an_admissible_price() -
     engine, *_ = build_engine()
     forged = _valuation(numeraire="USD").model_copy(update={"numeraire": ""})
     with pytest.raises(ValuationError, match="explicit numeraire at use"):
-        engine.authorize_valuation(forged)
+        engine.authorize_current_valuation(forged, as_of=NOW)
 
 
 def test_engine_rejects_a_price_with_a_stripped_source() -> None:
@@ -498,7 +501,7 @@ def test_engine_rejects_a_price_with_a_stripped_source() -> None:
         update={"price": valuation.price.model_copy(update={"source_ref": ""})}
     )
     with pytest.raises(ValuationError, match="cited price source"):
-        engine.authorize_valuation(forged)
+        engine.authorize_current_valuation(forged, as_of=NOW)
 
 
 def test_every_valuation_purpose_is_engine_enforced() -> None:
@@ -511,11 +514,11 @@ def test_every_valuation_purpose_is_engine_enforced() -> None:
             valuation = _valuation(
                 purpose=purpose, price_class=next(iter(admissible))
             )
-            engine.authorize_valuation(valuation)
+            engine.authorize_current_valuation(valuation, as_of=NOW)
             if price_class in admissible:
                 continue
             forged = valuation.model_copy(
                 update={"price": valuation.price.model_copy(update={"price_class": price_class})}
             )
             with pytest.raises(ValuationError):
-                engine.authorize_valuation(forged)
+                engine.authorize_current_valuation(forged, as_of=NOW)

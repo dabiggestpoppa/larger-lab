@@ -29,6 +29,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     T1,
     build_engine,
     definition,
+    register_definition,
+    register_measurement,
     windowed_observation,
 )
 from crypto_systems_intelligence_atlas.book6_grammar import MissingnessState
@@ -57,7 +59,7 @@ FAMILY_FIXTURES: tuple[tuple[str, SubjectDomain, SourceFamily], ...] = (
 def _engine():
     engine, *_ = build_engine()
     for metric_id, domain, family in FAMILY_FIXTURES:
-        engine.registry.register_definition(
+        register_definition(engine, 
             definition(metric_id, subject_domain=domain, source_families=(family,))
         )
     return engine
@@ -124,7 +126,7 @@ def test_architecture_agnostic_definitions_apply_everywhere() -> None:
 
 def test_a_scoped_definition_is_not_supported_outside_its_architectures() -> None:
     engine, *_ = build_engine()
-    engine.registry.register_definition(
+    register_definition(engine, 
         definition("metric.family.chain.pos_validators", applies_to=("POS",))
     )
     registered = engine.registry.definition("metric.family.chain.pos_validators")
@@ -137,11 +139,11 @@ def test_not_supported_is_not_zero() -> None:
     """A metric that does not exist natively for a subject is absent, not 0."""
 
     engine, *_ = build_engine()
-    engine.registry.register_definition(
+    register_definition(engine, 
         definition("metric.family.chain.pos_validators", applies_to=("POS",))
     )
     with pytest.raises(MeasurementRecordError, match="NOT_SUPPORTED"):
-        engine.registry.register_measurement(
+        register_measurement(engine, 
             windowed_observation(
                 "obs:wrong",
                 "metric.family.chain.pos_validators",
@@ -156,11 +158,11 @@ def test_not_supported_is_not_zero() -> None:
 
 def test_a_scoped_definition_requires_a_declared_architecture_family() -> None:
     engine, *_ = build_engine()
-    engine.registry.register_definition(
+    register_definition(engine, 
         definition("metric.family.chain.pos_validators", applies_to=("POS",))
     )
     with pytest.raises(MeasurementRecordError, match="declares no architecture family"):
-        engine.registry.register_measurement(
+        register_measurement(engine, 
             windowed_observation(
                 "obs:blank",
                 "metric.family.chain.pos_validators",
@@ -174,10 +176,10 @@ def test_a_scoped_definition_requires_a_declared_architecture_family() -> None:
 
 def test_an_out_of_family_measurement_resolves_to_not_applicable() -> None:
     engine, *_ = build_engine()
-    engine.registry.register_definition(
+    register_definition(engine, 
         definition("metric.family.chain.pos_validators", applies_to=("POS",))
     )
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             "obs:pos",
             "metric.family.chain.pos_validators",
@@ -193,7 +195,7 @@ def test_an_out_of_family_measurement_resolves_to_not_applicable() -> None:
 def test_measurement_roles_remain_distinct_across_families() -> None:
     engine = _engine()
     assert engine.registry.definition("metric.family.chain.tx").role is MeasurementRole.NATIVE
-    engine.registry.register_definition(
+    register_definition(engine, 
         definition(
             "metric.family.protocol.fees_per_user",
             subject_domain=SubjectDomain.PROTOCOL,
@@ -208,7 +210,7 @@ def test_measurement_roles_remain_distinct_across_families() -> None:
 
 def test_every_family_fixture_declares_its_window_and_valid_time() -> None:
     engine = _engine()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             "obs:chain",
             "metric.family.chain.tx",

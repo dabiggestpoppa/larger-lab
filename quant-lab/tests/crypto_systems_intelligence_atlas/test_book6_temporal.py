@@ -38,12 +38,15 @@ from crypto_systems_intelligence_atlas.book6_normalization import check_windows_
 from crypto_systems_intelligence_atlas.book6_provenance import Book6ProvenanceError
 from crypto_systems_intelligence_atlas.book6_registry import Book6RegistryError
 from crypto_systems_intelligence_atlas.book6_support import (
+    normalization_methodology,
     NOW,
     T1,
     T2,
     build_engine,
     decay_claim,
     definition,
+    register_definition,
+    register_measurement,
     windowed_observation,
 )
 from crypto_systems_intelligence_atlas.book6_valuation import (
@@ -64,12 +67,12 @@ REV = timedelta(days=30)
 
 def _stack(*claim_ids: str):
     engine, claim_store, _, service = build_engine(*claim_ids)
-    engine.registry.register_definition(definition(METRIC))
+    register_definition(engine, definition(METRIC))
     return engine, claim_store, service
 
 
 def _observe(engine, measurement_id, *, value, at=T1, claim=CLAIM, **kwargs):
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             measurement_id,
             METRIC,
@@ -198,7 +201,7 @@ def test_a_methodology_change_creates_a_new_version_not_an_edit() -> None:
         identity_rule="subject identity rule declared per metric",
     )
     base = engine.registry.definition(METRIC)
-    engine.registry.register_definition(
+    register_definition(engine, 
         MetricDefinition(
             metric_id=f"{METRIC}_v2",
             name=f"{METRIC}_v2",
@@ -216,7 +219,7 @@ def test_a_methodology_change_creates_a_new_version_not_an_edit() -> None:
             comparability_class=base.comparability_class,
         )
     )
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             "obs:2",
             f"{METRIC}_v2",
@@ -246,7 +249,7 @@ def test_an_observation_cannot_be_registered_under_the_wrong_methodology() -> No
 
     engine, _, _ = _stack()
     with pytest.raises(MeasurementRecordError, match="is not the definition's methodology"):
-        engine.registry.register_measurement(
+        register_measurement(engine, 
             windowed_observation(
                 "obs:wrong",
                 METRIC,
@@ -423,9 +426,9 @@ def test_decay_also_gates_normalized_products() -> None:
     engine, claim_store, _, service = build_engine(DECAYABLE)
     native_metric = "metric.native.tx"
     normalized_metric = "metric.normalized.tx_per_user"
-    engine.registry.register_definition(definition(native_metric))
-    engine.registry.register_definition(definition(normalized_metric, unit="per-user"))
-    engine.registry.register_measurement(
+    register_definition(engine, definition(native_metric))
+    register_definition(engine, definition(normalized_metric, unit="per-user"))
+    register_measurement(engine, 
         windowed_observation(
             "obs:1",
             native_metric,
@@ -436,6 +439,19 @@ def test_decay_also_gates_normalized_products() -> None:
     )
     from crypto_systems_intelligence_atlas.book6_grammar import NormalizationType
 
+    # R1-D6: the divisor is a registered, Book 2-backed observation, so the
+    # normalized product is recomputed (7.0 / 2.0 = 3.5) rather than asserted.
+    register_measurement(engine,
+        windowed_observation(
+            "den:seconds",
+            native_metric,
+            value=2.0,
+            missingness=MissingnessState.OBSERVED,
+            claim_refs=(DECAYABLE,),
+        )
+    )
+    engine.registry.register_methodology(normalization_methodology())
+
     rule = NormalizationRule(
         normalization_rule_id="normrule:1",
         input_metric_definition_ref=native_metric,
@@ -443,7 +459,7 @@ def test_decay_also_gates_normalized_products() -> None:
         normalization_type=NormalizationType.PER_TIME,
         transformation="x = value / seconds",
         denominator_ref="den:seconds",
-        methodology_ref="book6-methodology",
+        methodology_ref="book6-normalization@1",
         valid_time=T1,
         version="1",
         output_metric_definition_ref=normalized_metric,
@@ -484,6 +500,7 @@ def _valuation(price_class=PriceObservationClass.MARKET_OBSERVATION, *, price_at
             price_observation_id="price:1",
             price_class=price_class,
             source_ref="source:venue:1",
+            source_claim_refs=("fixture:claim:measurement",),
             price=1.0,
             valid_time=price_at,
             observed_at=price_at,
@@ -500,24 +517,24 @@ def _valuation(price_class=PriceObservationClass.MARKET_OBSERVATION, *, price_at
 def test_a_current_price_is_authoritative_now() -> None:
     valuation = _valuation()
     assert valuation.is_stale is False
-    assert valuation.is_authoritative_now is True
+    assert valuation.is_currently_fresh(valuation.observed_at) is True
 
 
 def test_a_stale_price_makes_the_current_valuation_unavailable() -> None:
     valuation = _valuation(price_at=NOW, read_at=NOW + timedelta(hours=2))
     assert valuation.is_stale is True
-    assert valuation.is_authoritative_now is False
+    assert valuation.is_currently_fresh(valuation.observed_at) is False
 
 
 def test_currently_unavailable_is_not_historically_invalid() -> None:
     historical = _valuation(price_at=NOW)
     read_today = _valuation(price_at=NOW, read_at=NOW + timedelta(days=3650))
     # the historical statement is untouched by today's missing price
-    assert historical.is_authoritative_now is True
+    assert historical.is_currently_fresh(historical.observed_at) is True
     assert historical.native_quantity == 10.0
     assert historical.price.price == 1.0
     # and today's unavailability is a statement about today only
-    assert read_today.is_authoritative_now is False
+    assert read_today.is_currently_fresh(read_today.observed_at) is False
     assert read_today.native_quantity == historical.native_quantity
 
 
@@ -526,7 +543,8 @@ def test_a_price_from_a_different_purpose_still_diverges() -> None:
     market = _valuation(PriceObservationClass.MARKET_OBSERVATION)
     assert redemption.purpose is ValuationPurpose.REDEMPTION_ACCOUNTING
     assert market.purpose is ValuationPurpose.MARKET_VALUATION
-    assert redemption.is_authoritative_now and market.is_authoritative_now
+    assert redemption.is_currently_fresh(redemption.observed_at)
+    assert market.is_currently_fresh(market.observed_at)
 
 
 def test_a_source_unavailable_price_is_absent_not_zero() -> None:
@@ -551,7 +569,7 @@ def test_a_market_closed_price_is_stale_not_invalid() -> None:
     closed = _valuation(price_at=NOW, read_at=NOW + timedelta(days=3))
     assert closed.price.coverage == 1.0  # the observation is intact
     assert closed.is_stale is True
-    assert closed.is_authoritative_now is False
+    assert closed.is_currently_fresh(closed.observed_at) is False
 
 
 # -- replay determinism -------------------------------------------------------

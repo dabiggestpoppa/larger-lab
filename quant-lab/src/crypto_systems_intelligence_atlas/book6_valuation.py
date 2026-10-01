@@ -17,6 +17,22 @@ observation, an oracle mark, a venue index and a NAV are different measurements,
 and manufacturing a consensus price from them would invent authority.
 
 Sensor retains market-state mechanics; no D8 decision is implemented here.
+
+Book 6 Hardening R1 closes two authority gaps here:
+
+- **R1-D2** ``PriceObservation.source_ref`` was a bare string, so
+  ``source_ref="fake:oracle"`` authorized a collateral valuation. A ``source_ref``
+  is an attribution label, not epistemic evidence. ``source_claim_refs`` is now
+  REQUIRED and is resolved through the Book 2 provenance adapter at valuation
+  authority time, so an unattributed, unknown, decayed or detached price carries
+  no authority.
+- **R1-D3** ``ValuationObservation.is_stale`` existed but the engine never
+  consulted it, so a month-old price authorized a *current* valuation. The
+  authority boundary is now split into ``authorize_current_valuation(...)``,
+  which takes an explicit ``as_of`` and refuses a stale price, and
+  ``validate_historical_valuation(...)``, which preserves a statement that was
+  valid at its own recorded valid time. ``CURRENT UNAVAILABLE`` is not
+  ``HISTORICALLY INVALID``, and there is no hidden wall clock.
 """
 
 from __future__ import annotations
@@ -104,13 +120,21 @@ PRICE_AUTHORITY_MATRIX: Final[dict[ValuationPurpose, frozenset[PriceObservationC
 
 
 class PriceObservation(Book6FrozenModel):
-    """A cited price observation with explicit source class and timestamp."""
+    """A cited price observation with explicit source class and timestamp.
+
+    R1-D2: ``source_claim_refs`` is REQUIRED. ``source_ref`` names where a
+    price came from and is deliberately NOT epistemic evidence — a string like
+    ``"fake:oracle"`` is an attribution, not a Book 2 claim. Only the cited
+    Book 2 claims, resolved live through ``Book6Provenance``, give the price
+    authority.
+    """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     price_observation_id: str = Field(min_length=1)
     price_class: PriceObservationClass
     source_ref: str = Field(min_length=1)
+    source_claim_refs: tuple[str, ...] = Field(min_length=1)
     price: float = Field(gt=0.0)
     valid_time: datetime
     observed_at: datetime
@@ -154,21 +178,29 @@ class ValuationObservation(Book6FrozenModel):
 
     @property
     def is_stale(self) -> bool:
-        """Whether the cited price is older than the declared staleness bound."""
+        """Whether the price was stale at this valuation's own observed time."""
 
-        age = (self.observed_at - self.price.observed_at).total_seconds()
+        return self.is_stale_at(self.observed_at)
+
+    def is_stale_at(self, as_of: datetime) -> bool:
+        """Whether the cited price is older than the staleness bound at ``as_of``.
+
+        The evaluation time is always explicit — passed in, never read from a
+        hidden wall clock — so a replay at a historical instant is reproducible.
+        """
+
+        age = (as_of - self.price.observed_at).total_seconds()
         return age > self.staleness_bound_seconds
 
-    @property
-    def is_authoritative_now(self) -> bool:
-        """Current-value availability. Bitemporal, never destructive.
+    def is_currently_fresh(self, as_of: datetime) -> bool:
+        """Current-value availability at an explicit instant.
 
         A stale or absent CURRENT price makes a *current* valuation unavailable.
         It never invalidates a valuation whose own valid time is historical: the
         historical statement remains historical (ratified plan v0.2 §11).
         """
 
-        return not self.is_stale
+        return not self.is_stale_at(as_of)
 
 
 class Book5WriteBackRefusal(Book6FrozenModel):

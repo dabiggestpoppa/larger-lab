@@ -34,6 +34,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     definition,
     present_denominator,
     ratio_observation,
+    register_definition,
+    register_measurement,
     windowed_observation,
     zero_denominator,
 )
@@ -108,8 +110,8 @@ def test_value_forbidden_states_exclude_both_value_states() -> None:
 
 def test_engine_refuses_to_read_a_value_out_of_an_absence() -> None:
     engine, _, _, _ = build_engine(CLAIM)
-    engine.registry.register_definition(definition("m:supply"))
-    engine.registry.register_measurement(
+    register_definition(engine, definition("m:supply"))
+    register_measurement(engine, 
         windowed_observation(
             "obs:na",
             "m:supply",
@@ -165,7 +167,7 @@ def test_absent_denominator_states_may_not_carry_values(state: str) -> None:
 
 def _ratio_engine():
     engine, _, _, _ = build_engine(CLAIM)
-    engine.registry.register_definition(
+    register_definition(engine, 
         definition(
             "m:ratio",
             category=MeasurementCategory.RATIO,
@@ -178,7 +180,7 @@ def _ratio_engine():
 
 def test_ratio_with_present_denominator_computes() -> None:
     engine = _ratio_engine()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         ratio_observation(
             "obs:r", "m:ratio", value=8.0, denominator=present_denominator(), claim_refs=(CLAIM,)
         )
@@ -190,7 +192,7 @@ def test_ratio_with_present_denominator_computes() -> None:
 
 def test_observed_zero_denominator_yields_undefined_not_infinity() -> None:
     engine = _ratio_engine()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         ratio_observation(
             "obs:rz", "m:ratio", value=8.0, denominator=zero_denominator(), claim_refs=(CLAIM,)
         )
@@ -204,7 +206,7 @@ def test_observed_zero_denominator_yields_undefined_not_infinity() -> None:
 @pytest.mark.parametrize("state", ["UNKNOWN", "UNAVAILABLE", "UNSTABLE"])
 def test_missing_denominator_never_produces_a_ratio(state: str) -> None:
     engine = _ratio_engine()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         ratio_observation(
             f"obs:rd-{state}",
             "m:ratio",
@@ -242,13 +244,16 @@ def test_non_ratio_may_not_declare_a_denominator() -> None:
 def test_coverage_percentage_asserts_no_sufficiency() -> None:
     observation = coverage("obs:1", 0.72)
     assert observation.observed_fraction == pytest.approx(0.72)
-    assert observation.sufficiency_known is False
+    # R1: the structural predicate is renamed and carries NO authority.
+    assert observation.names_a_sufficiency_rule is False
+    assert not hasattr(observation, "sufficiency_known")
     assert not hasattr(observation, "sufficiency")
     assert not hasattr(observation, "is_sufficient")
 
 
 def test_coverage_carries_no_unratified_floor() -> None:
     rule = CoverageSufficiencyRule(
+        version="1",
         rule_id="csr:unratified",
         required_fraction=0.9,
         scope_metric_id="m:supply",

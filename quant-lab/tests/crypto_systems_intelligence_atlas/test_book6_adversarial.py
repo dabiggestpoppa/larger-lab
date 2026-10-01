@@ -52,6 +52,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     definition,
     present_denominator,
     ratio_observation,
+    register_definition,
+    register_measurement,
     windowed_observation,
 )
 
@@ -94,7 +96,7 @@ def _stack():
         ),
         definition(POS_METRIC, applies_to=("POS",)),
     )
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             "obs:1",
             METRIC,
@@ -290,7 +292,7 @@ def test_a_changed_window_class_is_caught_against_the_definition_at_use() -> Non
 
 def test_a_changed_architecture_family_outside_applicability_is_refused() -> None:
     engine = _stack()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             "obs:pos",
             POS_METRIC,
@@ -309,7 +311,7 @@ def test_a_changed_architecture_family_outside_applicability_is_refused() -> Non
 
 def test_a_changed_denominator_is_caught_at_use_by_the_quotient() -> None:
     engine = _stack()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         ratio_observation(
             "obs:ratio",
             RATIO_METRIC,
@@ -336,7 +338,7 @@ def test_a_changed_denominator_is_caught_at_use_by_the_quotient() -> None:
 
 def test_forged_zero_denominator_does_not_produce_infinity() -> None:
     engine = _stack()
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         ratio_observation(
             "obs:ratio",
             RATIO_METRIC,
@@ -488,7 +490,10 @@ def test_a_superseded_observation_must_name_what_it_superseded() -> None:
 
 
 def test_a_forged_ratified_flag_does_not_authorize_a_state() -> None:
-    from crypto_systems_intelligence_atlas.book6_states import StateError
+    from crypto_systems_intelligence_atlas.book6_states import (
+        StateError,
+        StateRuleRegistry,
+    )
 
     engine = _stack()
     rule = StateRule(
@@ -507,14 +512,21 @@ def test_a_forged_ratified_flag_does_not_authorize_a_state() -> None:
             "ratified_at": T1,
         }
     )
-    with pytest.raises(StateError, match="UNRATIFIED"):
+    # R1-D7: the forged copy is inert AND cannot even enter the registry, because
+    # authority is read from the registry's ratification ledger, not from the
+    # rule object's own status field.
+    with pytest.raises(StateError, match="may only be registered"):
+        StateRuleRegistry().register(forged)
+    with pytest.raises(StateError, match="no registry ratification decision"):
         engine.registry.state_rules.authorize(
             StateName.INCREASING, rule_ref=forged.state_rule_id
         )
 
 
 def test_a_rule_ref_cannot_be_forged_to_point_at_another_rule() -> None:
-    from crypto_systems_intelligence_atlas.book6_states import StateError
+    from crypto_systems_intelligence_atlas.book6_states import (
+        StateError,
+    )
 
     engine = _stack()
     engine.registry.register_state_rule(
@@ -553,7 +565,7 @@ def test_a_rule_ref_cannot_be_forged_to_point_at_another_rule() -> None:
 def test_a_measurement_may_not_be_registered_twice() -> None:
     engine = _stack()
     with pytest.raises(Book6RegistryError, match="already registered"):
-        engine.registry.register_measurement(
+        register_measurement(engine, 
             engine.registry.registered_measurement("obs:1")
         )
 
@@ -561,7 +573,7 @@ def test_a_measurement_may_not_be_registered_twice() -> None:
 def test_a_measurement_may_not_define_its_own_metric() -> None:
     engine = _stack()
     with pytest.raises(Book6RegistryError, match="may not define its own metric"):
-        engine.registry.register_measurement(
+        register_measurement(engine, 
             windowed_observation(
                 "obs:orphan",
                 "metric.native.never_registered",
@@ -677,8 +689,8 @@ def test_a_decayed_claim_reference_is_refused_at_use() -> None:
     """REGISTERED THEN != AUTHORITATIVE NOW, proven at the read path."""
 
     engine, claim_store, _, service = build_engine(DECAYING_CLAIM)
-    engine.registry.register_definition(definition(METRIC))
-    engine.registry.register_measurement(
+    register_definition(engine, definition(METRIC))
+    register_measurement(engine, 
         windowed_observation(
             "obs:1",
             METRIC,

@@ -35,6 +35,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     T1,
     build_engine,
     definition,
+    register_definition,
+    register_measurement,
     windowed_observation,
 )
 
@@ -88,7 +90,9 @@ def _dimension(
 
 
 def _vector(
-    *dimensions: StateDimension, coverage_sufficiency_rule_refs: tuple[str, ...] = ()
+    *dimensions: StateDimension,
+    coverage_sufficiency_rule_refs: tuple[str, ...] = (),
+    sufficiency_attestation=None,
 ) -> FundamentalStateVector:
     return FundamentalStateVector(
         subject_ref="fixture:chain:alpha",
@@ -96,6 +100,22 @@ def _vector(
         as_of_valid_time=T1,
         dimensions=dimensions or (_dimension(),),
         coverage_sufficiency_rule_refs=coverage_sufficiency_rule_refs,
+        sufficiency_attestation=sufficiency_attestation,
+    )
+
+
+def _attestation(rule_ids=("covrule:synthetic:1",), scope=("dim:1", "dim:2")):
+    """A synthetic registry-issued attestation, for local fixtures only."""
+
+    from crypto_systems_intelligence_atlas.book6_coverage_rules import (
+        CoverageSufficiencyAttestation,
+    )
+
+    return CoverageSufficiencyAttestation(
+        rule_ids=rule_ids,
+        scope_metric_ids=scope,
+        attested_at=T1,
+        registry_identity="csia:book6:synthetic-fixture",
     )
 
 
@@ -117,6 +137,7 @@ def test_the_vector_has_no_score_fields() -> None:
         "as_of_valid_time",
         "dimensions",
         "coverage_sufficiency_rule_refs",
+        "sufficiency_attestation",
     }
 
 
@@ -173,6 +194,7 @@ def test_a_serialization_round_trip_injects_nothing() -> None:
         "as_of_valid_time",
         "dimensions",
         "coverage_sufficiency_rule_refs",
+        "sufficiency_attestation",
     }
     assert FundamentalStateVector.model_validate(payload) == vector
 
@@ -284,18 +306,28 @@ def test_fully_observed_dimensions_still_fail_closed_without_a_sufficiency_rule(
     assert _observed_vector().data_status is VectorStatus.DATA_INCOMPLETE
 
 
-def test_data_completeness_needs_a_named_sufficiency_rule() -> None:
-    vector = FundamentalStateVector(
-        subject_ref="fixture:chain:alpha",
-        schema_ref="schema:book6:1",
-        as_of_valid_time=T1,
-        dimensions=(
-            _dimension("dim:1", coverage_observation_id="cov:1"),
-            _dimension("dim:2", coverage_observation_id="cov:2"),
-        ),
+def test_data_completeness_needs_an_ATTESTED_sufficiency_rule() -> None:
+    """R1-D4: a rule REF alone is no longer sufficient.
+
+    Before R1 this vector was DATA_COMPLETE from ``("covrule:synthetic:1",)``
+    alone, with no such rule in existence. ``DATA_COMPLETE`` now additionally
+    requires a registry-issued attestation whose scope covers every dimension.
+    """
+
+    vector = _vector(
+        _dimension("dim:1", coverage_observation_id="cov:1"),
+        _dimension("dim:2", coverage_observation_id="cov:2"),
         coverage_sufficiency_rule_refs=("covrule:synthetic:1",),
     )
-    assert vector.data_status is VectorStatus.DATA_COMPLETE
+    assert vector.data_status is VectorStatus.DATA_INCOMPLETE
+
+    attested = _vector(
+        _dimension("dim:1", coverage_observation_id="cov:1"),
+        _dimension("dim:2", coverage_observation_id="cov:2"),
+        coverage_sufficiency_rule_refs=("covrule:synthetic:1",),
+        sufficiency_attestation=_attestation(),
+    )
+    assert attested.data_status is VectorStatus.DATA_COMPLETE
 
 
 def test_naming_a_sufficiency_rule_without_covering_every_dimension_fails_closed() -> None:
@@ -316,11 +348,43 @@ def test_no_coverage_sufficiency_rule_exists_to_name_at_bootstrap() -> None:
 
     rule = CoverageSufficiencyRule(
         rule_id="covrule:synthetic:1",
+        version="1",
         required_fraction=0.9,
         scope_metric_id=METRIC,
         rationale="a synthetic candidate that is deliberately never ratified",
     )
     assert rule.status == "UNRATIFIED"
+
+
+def test_an_unattested_vector_cannot_be_data_complete_even_with_a_ref() -> None:
+    """The R1-D4 reproducer, now refused: an arbitrary ref grants nothing."""
+
+    for fake_ref in ("fake:rule", "covrule:synthetic:1", "anything-at-all"):
+        vector = _vector(
+            _dimension("dim:1", coverage_observation_id="cov:1"),
+            coverage_sufficiency_rule_refs=(fake_ref,),
+        )
+        assert vector.data_status is VectorStatus.DATA_INCOMPLETE, fake_ref
+
+
+def test_an_attestation_that_does_not_cover_every_dimension_fails_closed() -> None:
+    vector = _vector(
+        _dimension("dim:1", coverage_observation_id="cov:1"),
+        _dimension("dim:2", coverage_observation_id="cov:2"),
+        coverage_sufficiency_rule_refs=("covrule:synthetic:1",),
+        sufficiency_attestation=_attestation(scope=("dim:1",)),
+    )
+    assert vector.data_status is VectorStatus.DATA_INCOMPLETE
+
+
+def test_an_attestation_whose_rules_disagree_with_the_refs_fails_closed() -> None:
+    vector = _vector(
+        _dimension("dim:1", coverage_observation_id="cov:1"),
+        _dimension("dim:2", coverage_observation_id="cov:2"),
+        coverage_sufficiency_rule_refs=("covrule:synthetic:1",),
+        sufficiency_attestation=_attestation(rule_ids=("covrule:other:1",)),
+    )
+    assert vector.data_status is VectorStatus.DATA_INCOMPLETE
 
 
 def test_fail_closed_constant_is_true() -> None:
@@ -348,6 +412,7 @@ def test_a_zero_observed_dimension_counts_as_a_derivation_not_as_missing() -> No
             "dim:2", missingness=MissingnessState.ZERO_OBSERVED, coverage_observation_id="cov:2"
         ),
         coverage_sufficiency_rule_refs=("covrule:synthetic:1",),
+        sufficiency_attestation=_attestation(),
     )
     assert vector.data_status is VectorStatus.DATA_COMPLETE
 
@@ -393,8 +458,8 @@ def test_the_vector_must_carry_at_least_one_dimension() -> None:
 
 def _engine_stack():
     engine, *_ = build_engine()
-    engine.registry.register_definition(definition(METRIC))
-    engine.registry.register_measurement(
+    register_definition(engine, definition(METRIC))
+    register_measurement(engine, 
         windowed_observation(
             "obs:1",
             METRIC,
@@ -452,7 +517,9 @@ def test_a_coverage_observation_never_asserts_sufficiency() -> None:
 
     assert "sufficiency" not in set(CoverageObservation.model_fields)
     for fraction in (0.0, 0.5, 0.999, 1.0):
-        assert coverage("obs:1", fraction).sufficiency_known is False
+        # R1: no sufficiency predicate on the observation at all.
+        assert coverage("obs:1", fraction).names_a_sufficiency_rule is False
+        assert not hasattr(coverage("obs:1", fraction), "sufficiency_known")
 
 
 def test_a_full_coverage_fraction_does_not_assert_data_complete() -> None:

@@ -39,6 +39,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     T2,
     build_engine,
     definition,
+    register_definition,
+    register_measurement,
     windowed_observation,
 )
 from crypto_systems_intelligence_atlas.book6_grammar import MissingnessState
@@ -100,8 +102,8 @@ def _rule(
 
 def _stack():
     engine, *_ = build_engine()
-    engine.registry.register_definition(definition(METRIC))
-    engine.registry.register_measurement(
+    register_definition(engine, definition(METRIC))
+    register_measurement(engine, 
         windowed_observation(
             "obs:1",
             METRIC,
@@ -110,7 +112,7 @@ def _stack():
             claim_refs=(CLAIM,),
         )
     )
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             "obs:2",
             METRIC,
@@ -140,7 +142,7 @@ def test_registering_a_rule_does_not_ratify_it() -> None:
     registry = StateRuleRegistry()
     registry.register(_rule())
     assert registry.ratified_count() == 0
-    with pytest.raises(StateError, match="UNRATIFIED"):
+    with pytest.raises(StateError, match="no registry ratification decision"):
         registry.authorize(StateName.INCREASING, rule_ref="staterule:increasing:1")
 
 
@@ -355,13 +357,49 @@ def test_an_unratified_rule_is_representable() -> None:
     assert rule.is_ratified() is False
 
 
-def test_a_ratified_rule_must_record_its_authority_and_time() -> None:
-    with pytest.raises(ValidationError, match="must record its ratifying authority"):
+def test_a_rule_object_may_never_declare_itself_ratified() -> None:
+    """R1-D7: ratification is a registry decision, never a field on the rule.
+
+    Before R1 a caller could construct a RATIFIED rule with an arbitrary
+    ``ratified_by="operator"`` string and register it. Now the object refuses,
+    so authority can only come from ``StateRuleRegistry.ratify``.
+    """
+
+    with pytest.raises(ValidationError, match="may not declare itself RATIFIED"):
         _rule(status=RuleRatificationStatus.RATIFIED)
-    with pytest.raises(ValidationError, match="must record its ratifying authority"):
-        _rule(status=RuleRatificationStatus.RATIFIED, ratified_by="op")
-    with pytest.raises(ValidationError, match="must record its ratifying authority"):
-        _rule(status=RuleRatificationStatus.RATIFIED, ratified_at=NOW)
+    with pytest.raises(ValidationError, match="may not declare itself RATIFIED"):
+        _rule(
+            status=RuleRatificationStatus.RATIFIED,
+            ratified_by="operator",
+            ratified_at=NOW,
+        )
+
+
+def test_a_registered_ratified_rule_is_refused_by_the_registry() -> None:
+    """Even a forged object cannot enter the registry carrying its own status."""
+
+    forged = _rule().model_copy(
+        update={
+            "status": RuleRatificationStatus.RATIFIED,
+            "ratified_by": "operator",
+            "ratified_at": NOW,
+        }
+    )
+    registry = StateRuleRegistry()
+    with pytest.raises(StateError, match="may only be registered"):
+        registry.register(forged)
+
+
+def test_the_registry_ratification_is_recorded_not_self_declared() -> None:
+    registry = StateRuleRegistry()
+    registry.register(_rule())
+    ratified = registry.ratify("staterule:increasing:1", operator="op", at=NOW)
+    # the object stays UNRATIFIED; the DECISION lives in the registry ledger
+    assert ratified.status is RuleRatificationStatus.UNRATIFIED
+    decision = registry.ratification_of("staterule:increasing:1")
+    assert decision is not None
+    assert decision.operator == "op"
+    assert decision.registry_identity == registry.registry_identity
 
 
 def test_a_class_c_rule_needs_a_benchmark_tolerance_or_volatility_identity() -> None:
@@ -419,7 +457,7 @@ def test_a_new_version_does_not_inherit_the_prior_ratification() -> None:
     registry.ratify("staterule:increasing:1", operator="op", at=NOW)
     registry.supersede(_rule(version="2"))
     assert registry.ratified_count() == 0
-    with pytest.raises(StateError, match="UNRATIFIED"):
+    with pytest.raises(StateError, match="no registry ratification decision"):
         registry.authorize(StateName.INCREASING, rule_ref="staterule:increasing:1")
     registry.ratify("staterule:increasing:1", operator="op-2", at=T2)
     assert registry.authorize(
@@ -455,9 +493,17 @@ def test_supersession_history_is_append_only() -> None:
     assert registry.rules_for(StateName.INCREASING)[0].version == "3"
 
 
-def test_status_superseded_is_representable() -> None:
-    rule = _rule(status=RuleRatificationStatus.SUPERSEDED)
-    assert rule.is_ratified() is False
+def test_a_superseded_status_is_representable_in_the_enum() -> None:
+    """The vocabulary still names SUPERSEDED, but no object may carry it.
+
+    R1: supersession is recorded by the registry (which installs a fresh
+    UNRATIFIED version and drops the decision), so the rule object never needs
+    to declare a non-current status for itself.
+    """
+
+    assert RuleRatificationStatus.SUPERSEDED.value == "SUPERSEDED"
+    assert RuleRatificationStatus.SUPERSEDED is not RuleRatificationStatus.RATIFIED
+    assert _rule().is_ratified() is False
 
 
 # -- prohibited prescriptive names (anti-score firewall precursor) -----------

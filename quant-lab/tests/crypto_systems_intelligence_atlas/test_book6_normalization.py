@@ -25,6 +25,7 @@ from crypto_systems_intelligence_atlas.book6_grammar import (
     windows_are_comparable,
 )
 from crypto_systems_intelligence_atlas.book6_normalization import (
+    BASE_RELATIVE_NORMALIZATIONS,
     COHORT_SCOPED_NORMALIZATIONS,
     DIVIDING_NORMALIZATIONS,
     NORMALIZED_WITHOUT_NATIVE_LINEAGE_IS_INVALID,
@@ -42,6 +43,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     T1,
     build_engine_with_definitions,
     definition,
+    normalization_methodology,
+    register_measurement,
     windowed_observation,
 )
 from crypto_systems_intelligence_atlas.book6_definitions import MetricDefinition
@@ -49,9 +52,13 @@ from crypto_systems_intelligence_atlas.book6_grammar import MissingnessState
 
 CLAIM = "fixture:claim:measurement"
 NATIVE_OBSERVATION = "obs:native"
+DENOMINATOR_OBSERVATION = "obs:denominator"
 NATIVE_METRIC = "metric.native.native_transactions"
 NORMALIZED_METRIC = "metric.normalized.transactions_per_user"
 RULE_ID = "normrule:per_user:1"
+NATIVE_VALUE = 7.0
+DIVISOR_VALUE = 2.0
+NORMALIZATION_METHODOLOGY = "book6-normalization@1"
 
 
 def _rule(**overrides: object) -> NormalizationRule:
@@ -61,9 +68,9 @@ def _rule(**overrides: object) -> NormalizationRule:
         "input_measurement_refs": (NATIVE_OBSERVATION,),
         "normalization_type": NormalizationType.PER_USER,
         "transformation": "x = native_transactions / distinct_users",
-        "denominator_ref": "den:distinct-users",
+        "denominator_ref": DENOMINATOR_OBSERVATION,
         "cohort_ref": "cohort:pos@1",
-        "methodology_ref": "book6-methodology",
+        "methodology_ref": NORMALIZATION_METHODOLOGY,
         "valid_time": T1,
         "version": "1",
         "output_metric_definition_ref": NORMALIZED_METRIC,
@@ -80,6 +87,7 @@ def _product(**overrides: object) -> NormalizedMeasurement:
         "normalized_metric_definition_ref": NORMALIZED_METRIC,
         "value": 3.5,
         "unit": "transactions-per-user",
+        # R1-D6: 7.0 native / 2.0 divisor. The engine recomputes and compares.
         "cohort_ref": "cohort:pos@1",
         "valid_time": T1,
     }
@@ -88,17 +96,32 @@ def _product(**overrides: object) -> NormalizedMeasurement:
 
 
 def _stack():
-    """A registered native measurement with a live, current Book 2 citation."""
+    """A registered native measurement with a live, current Book 2 citation.
+
+    R1-D6: the divisor is a REGISTERED measurement with an observed value, so
+    the normalized product is a deterministic function of real inputs
+    (7.0 / 2.0 = 3.5) rather than a number the caller asserts.
+    """
 
     engine = build_engine_with_definitions(
         definition(NATIVE_METRIC),
         definition(NORMALIZED_METRIC, unit="transactions-per-user"),
+        methodologies=(normalization_methodology(),),
     )
-    engine.registry.register_measurement(
+    register_measurement(engine,
         windowed_observation(
             NATIVE_OBSERVATION,
             NATIVE_METRIC,
-            value=7.0,
+            value=NATIVE_VALUE,
+            missingness=MissingnessState.OBSERVED,
+            claim_refs=(CLAIM,),
+        )
+    )
+    register_measurement(engine,
+        windowed_observation(
+            DENOMINATOR_OBSERVATION,
+            NATIVE_METRIC,
+            value=DIVISOR_VALUE,
             missingness=MissingnessState.OBSERVED,
             claim_refs=(CLAIM,),
         )
@@ -110,7 +133,11 @@ def _stack():
 
 
 def test_normalization_rule_requires_every_ratified_field() -> None:
-    """A normalization is not a bare type flag: eleven named fields are bound."""
+    """A normalization is not a bare type flag: twelve named fields are bound.
+
+    R1 added ``base_measurement_ref`` so a growth rate or index may not carry an
+    implicit base observation.
+    """
 
     fields = set(NormalizationRule.model_fields)
     assert fields == {
@@ -125,6 +152,7 @@ def test_normalization_rule_requires_every_ratified_field() -> None:
         "valid_time",
         "version",
         "output_metric_definition_ref",
+        "base_measurement_ref",
     }
 
 
@@ -180,11 +208,65 @@ def test_dividing_normalization_requires_a_denominator(
 def test_non_dividing_normalization_needs_no_denominator(
     normalization_type: NormalizationType,
 ) -> None:
-    payload = {"normalization_type": normalization_type, "denominator_ref": None}
+    """R1: what counts as a "divisor" widened.
+
+    ``SHARE_OF_TOTAL`` is cohort-relative AND divides by the cohort total, so it
+    now declares that total explicitly rather than leaving the divisor implicit.
+    ``GROWTH_RATE`` and ``INDEX_TO_BASE`` divide by neither; they are expressed
+    against a BASE observation, which is declared in its own field.
+    """
+
+    payload: dict[str, object] = {"normalization_type": normalization_type}
     if normalization_type in COHORT_SCOPED_NORMALIZATIONS:
         payload["cohort_ref"] = "cohort:pos@1"
+    if normalization_type is NormalizationType.SHARE_OF_TOTAL:
+        payload["denominator_ref"] = DENOMINATOR_OBSERVATION
+        rule = _rule(**payload)
+        assert rule.denominator_ref == DENOMINATOR_OBSERVATION
+        return
+    payload["denominator_ref"] = None
+    if normalization_type in BASE_RELATIVE_NORMALIZATIONS:
+        payload["base_measurement_ref"] = "obs:base"
+        rule = _rule(**payload)
+        assert rule.base_measurement_ref == "obs:base"
+        return
     rule = _rule(**payload)
     assert rule.denominator_ref is None
+
+
+def test_share_of_total_may_not_leave_its_divisor_implicit() -> None:
+    """A share whose denominator is implicit is unfalsifiable."""
+
+    with pytest.raises(ValidationError, match="SHARE_OF_TOTAL divides"):
+        _rule(
+            normalization_type=NormalizationType.SHARE_OF_TOTAL,
+            cohort_ref="cohort:pos@1",
+            denominator_ref=None,
+        )
+
+
+@pytest.mark.parametrize(
+    "normalization_type",
+    sorted(BASE_RELATIVE_NORMALIZATIONS),
+    ids=lambda t: t.value,
+)
+def test_a_base_relative_normalization_must_name_its_base(
+    normalization_type: NormalizationType,
+) -> None:
+    with pytest.raises(ValidationError, match="base_measurement_ref"):
+        _rule(normalization_type=normalization_type, denominator_ref=None)
+
+
+@pytest.mark.parametrize(
+    "normalization_type",
+    sorted(t for t in NormalizationType if t not in BASE_RELATIVE_NORMALIZATIONS),
+    ids=lambda t: t.value,
+)
+def test_a_non_base_relative_normalization_may_not_name_a_base(
+    normalization_type: NormalizationType,
+) -> None:
+    with pytest.raises(ValidationError, match="not base-relative"):
+        _rule(normalization_type=normalization_type, base_measurement_ref="obs:base")
 
 
 # -- cohort-relative normalizations must name the cohort ---------------------
@@ -451,4 +533,8 @@ def test_normalized_products_are_never_registered_as_native_measurements() -> No
     engine = _stack()
     engine.registry.register_normalization_rule(_rule())
     engine.normalize(_product(), _rule())
-    assert engine.registry.registered_refs() == (NATIVE_OBSERVATION,)
+    # R1-D6: the divisor is a registered observation in its own right.
+    assert engine.registry.registered_refs() == (
+        NATIVE_OBSERVATION,
+        DENOMINATOR_OBSERVATION,
+    )

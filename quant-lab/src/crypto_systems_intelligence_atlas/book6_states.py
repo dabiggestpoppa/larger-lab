@@ -27,6 +27,17 @@ The accepted implementation ships with ``INDIVIDUAL_STATE_RULES_RATIFIED = 0``:
 ratifying the governance model ratified NO rule, so no Class B or Class C state is
 emittable. Ratification is an individual operator act recorded here; nothing in
 this module may self-ratify, and there is no delegated authority (D6M-3 = A).
+
+Book 6 Hardening R1 changed HOW authority is held, in two ways:
+
+- **R1-D7** a ``StateRule`` may no longer be constructed as ``RATIFIED``, and
+  ``StateRuleRegistry`` reads its ratification LEDGER rather than the rule
+  object's own ``status`` field. A ``model_copy``-forged status field, or a
+  forged object handed to ``register``, therefore grants nothing.
+- **R1-D4** ``FundamentalStateVector.data_status`` no longer trusts a tuple of
+  coverage-sufficiency rule strings. It additionally requires a registry-issued
+  ``CoverageSufficiencyAttestation`` whose scope covers every dimension, so an
+  arbitrary ref like ``"fake:rule"`` cannot manufacture ``DATA_COMPLETE``.
 """
 
 from __future__ import annotations
@@ -37,9 +48,15 @@ from typing import Final
 
 from pydantic import ConfigDict, Field, model_validator
 
+from .book6_coverage_rules import CoverageSufficiencyAttestation
 from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import MissingnessState
+from .book6_ratification import (
+    RatificationError,
+    RatificationLedger,
+    RatificationRecord,
+)
 
 
 class StateError(ValueError):
@@ -138,6 +155,12 @@ class StateRule(Book6FrozenModel):
     The object can represent an UNRATIFIED rule, which is how the accepted
     implementation ships. ``target_state`` may not be a Class A state (those need
     no rule) nor a DEFERRED generic state (no predicate was ratified).
+
+    R1-D7: a rule may only be CONSTRUCTED as ``UNRATIFIED``. Ratification is a
+    registry decision record owned by ``StateRuleRegistry``, so neither a
+    directly constructed ``RATIFIED`` rule nor a ``model_copy``-forged status
+    field can grant authority — ``authorize`` reads the registry's ledger, never
+    this object.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -196,11 +219,13 @@ class StateRule(Book6FrozenModel):
                     f"and requires a benchmark, tolerance or volatility-measure "
                     f"identity"
                 )
-        if self.status is RuleRatificationStatus.RATIFIED:
-            if not self.ratified_by or not self.ratified_at:
-                raise StateError(
-                    "a RATIFIED rule must record its ratifying authority and time"
-                )
+        if self.status is not RuleRatificationStatus.UNRATIFIED:
+            raise StateError(
+                f"state rule {self.state_rule_id} may not declare itself "
+                f"{self.status.value}; ratification is an individual operator "
+                f"decision recorded by StateRuleRegistry, never a field on the "
+                f"rule object"
+            )
         return self
 
     def is_ratified(self) -> bool:
@@ -220,6 +245,11 @@ class StateRuleRegistry:
     def __init__(self) -> None:
         self._rules: dict[str, StateRule] = {}
         self._superseded: dict[str, tuple[StateRule, ...]] = {}
+        self._ledger = RatificationLedger("csia:book6:state-rule-registry")
+
+    @property
+    def registry_identity(self) -> str:
+        return self._ledger.registry_identity
 
     def superseded_versions(self, rule_ref: str) -> tuple[StateRule, ...]:
         """Prior versions of a rule, retained so history is never rewritten."""
@@ -227,17 +257,34 @@ class StateRuleRegistry:
         return self._superseded.get(rule_ref, ())
 
     def register(self, rule: StateRule) -> StateRule:
-        """Register a rule. Registration proves nothing about current authority."""
+        """Register a rule. Registration proves nothing about current authority.
+
+        R1-D7: only an ``UNRATIFIED`` rule may be registered. Authority is read
+        from the registry's ratification ledger at decision time, never from the
+        registered object's own ``status`` field.
+        """
 
         if rule.state_rule_id in self._rules:
             raise StateError(f"state rule {rule.state_rule_id} already registered")
+        if rule.status is not RuleRatificationStatus.UNRATIFIED:
+            raise StateError(
+                f"state rule {rule.state_rule_id} may only be registered "
+                f"UNRATIFIED; a rule object cannot carry its own ratification"
+            )
         self._rules[rule.state_rule_id] = rule
         return rule
 
     def ratified_count(self) -> int:
-        """Number of currently-ratified rules."""
+        """Number of rules carrying a live registry ratification decision."""
 
-        return sum(1 for rule in self._rules.values() if rule.is_ratified())
+        return self._ledger.ratified_count()
+
+    def ratification_of(self, rule_ref: str) -> RatificationRecord | None:
+        """The live decision record for a rule, or ``None``. Never raises."""
+
+        return next(
+            (r for r in self._ledger.records() if r.rule_id == rule_ref), None
+        )
 
     def rules_for(self, target: StateName) -> tuple[StateRule, ...]:
         """All registered rules targeting a state (deterministically ordered)."""
@@ -268,12 +315,14 @@ class StateRuleRegistry:
                 f"state rule {rule_ref} targets {rule.target_state.value}, not "
                 f"{target.value}"
             )
-        if not rule.is_ratified():
+        try:
+            self._ledger.decision(rule_ref, version=rule.version)
+        except RatificationError as exc:
             raise StateError(
-                f"state rule {rule_ref} for {target.value} is "
-                f"{rule.status.value}; ratification is an individual operator "
+                f"state rule {rule_ref} for {target.value} carries no registry "
+                f"ratification decision; ratification is an individual operator "
                 f"decision and may not be inferred"
-            )
+            ) from exc
         return rule
 
     def supersede(self, rule: StateRule) -> StateRule:
@@ -309,35 +358,29 @@ class StateRuleRegistry:
         history = self._superseded.get(rule.state_rule_id, ())
         self._superseded[rule.state_rule_id] = history + (current,)
         self._rules[rule.state_rule_id] = rule
+        self._ledger.revoke(rule.state_rule_id)
         return rule
 
     def ratify(self, rule_ref: str, *, operator: str, at: datetime) -> StateRule:
         """Record an individual operator ratification of one rule.
 
-        Ratifies exactly the CURRENT version of ``rule_ref``. A later
-        supersession installs a fresh ``UNRATIFIED`` version (see
-        ``supersede``), so authority decays on a rule revision rather than
-        riding along with it.
+        Ratifies exactly the CURRENT version of ``rule_ref`` by writing a
+        decision record into the registry's ledger. The rule OBJECT is not
+        mutated and never gains a ``RATIFIED`` status of its own — authority
+        lives in the registry, so there is no object a caller can forge. A later
+        supersession installs a fresh ``UNRATIFIED`` version and drops the
+        decision (see ``supersede``), so authority decays on a revision rather
+        than riding along with it.
         """
 
         rule = self._rules.get(rule_ref)
         if rule is None:
             raise StateError(f"state rule {rule_ref} is not registered")
-        if rule.status is RuleRatificationStatus.RATIFIED:
-            raise StateError(
-                f"state rule {rule_ref} is already ratified; a rule is ratified "
-                f"by an individual decision, not re-ratified implicitly"
-            )
-        ratified = StateRule.model_validate(
-            {
-                **rule.model_dump(),
-                "status": RuleRatificationStatus.RATIFIED,
-                "ratified_by": operator,
-                "ratified_at": at,
-            }
-        )
-        self._rules[rule_ref] = ratified
-        return ratified
+        try:
+            self._ledger.record(rule_ref, version=rule.version, operator=operator, at=at)
+        except RatificationError as exc:
+            raise StateError(str(exc)) from exc
+        return rule
 
 
 class VectorStatus(str, Enum):
@@ -397,11 +440,47 @@ class FundamentalStateVector(Book6FrozenModel):
     schema_ref: str = Field(min_length=1)
     as_of_valid_time: datetime
     dimensions: tuple[StateDimension, ...] = Field(min_length=1)
-    #: Ratified coverage-sufficiency rules backing this vector's data status.
-    #: Empty by default, and no such rule is ratified, so ``DATA_COMPLETE`` is
-    #: unreachable at bootstrap: a numeric coverage fraction can never stand in
-    #: for a ratified sufficiency rule (state-vector v0.2 §5, §6).
+    #: Coverage-sufficiency rules this vector claims to be backed by. Retained
+    #: for audit and cross-checked against ``sufficiency_attestation``; a plain
+    #: tuple of strings is NO LONGER sufficient for ``DATA_COMPLETE`` (R1-D4).
     coverage_sufficiency_rule_refs: tuple[str, ...] = ()
+    #: R1-D4: registry-issued evidence that the named rules were resolved,
+    #: ratified and applied to the metric scope covering every dimension.
+    #: Without it ``DATA_COMPLETE`` is unreachable, however many rule refs and
+    #: coverage observations are supplied.
+    sufficiency_attestation: CoverageSufficiencyAttestation | None = None
+
+    def _sufficiency_is_backed(self) -> bool:
+        """Whether ratified, in-scope sufficiency support demonstrably backs this vector.
+
+        Requires a registry-issued attestation whose rule set matches the
+        declared refs and whose scope covers every dimension's metric. The
+        authoritative re-resolution (exists / ratified / current / in scope)
+        happens in ``Book6MeasurementEngine.data_status``; this local check is
+        deliberately conservative so a free string can never be enough.
+        """
+
+        if not self.coverage_sufficiency_rule_refs:
+            return False
+        attestation = self.sufficiency_attestation
+        if attestation is None:
+            return False
+        if set(attestation.rule_ids) != set(self.coverage_sufficiency_rule_refs):
+            return False
+        dimension_metrics = tuple(
+            dimension_id for dimension_id in self.dimension_metric_ids()
+        )
+        return attestation.covers(dimension_metrics)
+
+    def dimension_metric_ids(self) -> tuple[str, ...]:
+        """The metric identity each dimension was measured from.
+
+        A dimension's ``dimension_id`` IS its metric definition reference for
+        engine-built vectors, which is what makes the sufficiency scope check
+        meaningful rather than nominal.
+        """
+
+        return tuple(dim.dimension_id for dim in self.dimensions)
 
     def _resolve_status(self) -> tuple[VectorStatus, VectorStatus]:
         """Compute schema and data status structurally (no score, no judgement)."""
@@ -413,17 +492,14 @@ class FundamentalStateVector(Book6FrozenModel):
         )
         # DATA_COMPLETE is not "every value happened to be observed". It also
         # requires RATIFIED coverage-sufficiency support, so it fails closed
-        # whenever no sufficiency rule backs the vector — which is the case for
-        # the entire accepted implementation.
+        # whenever no attested sufficiency rule backs the vector — which is the
+        # case for the entire accepted implementation.
         derived = all(
             dim.missingness in (MissingnessState.OBSERVED, MissingnessState.ZERO_OBSERVED)
             and dim.state_class is not StateClass.DEFERRED_GENERIC
             for dim in self.dimensions
         )
-        sufficiency_backed = bool(self.coverage_sufficiency_rule_refs) and all(
-            dim.coverage_observation_id is not None for dim in self.dimensions
-        )
-        data_complete = derived and sufficiency_backed
+        data_complete = derived and self._sufficiency_is_backed()
         return (
             VectorStatus.SCHEMA_COMPLETE if schema_complete else VectorStatus.SCHEMA_INCOMPLETE,
             VectorStatus.DATA_COMPLETE if data_complete else VectorStatus.DATA_INCOMPLETE,
@@ -437,13 +513,14 @@ class FundamentalStateVector(Book6FrozenModel):
 
     @property
     def data_status(self) -> VectorStatus:
-        """Data completeness requires an observed derivation AND ratified support.
+        """Data completeness requires an observed derivation AND attested support.
 
-        Two conditions, both necessary: every dimension must carry an observed
-        derivation, and the vector must name the ratified coverage-sufficiency
-        rules that judged its coverage. Because no sufficiency rule is ratified,
-        this fails closed and ``DATA_COMPLETE`` is unreachable at bootstrap
-        (state-vector v0.2 §5, §6).
+        Three conditions, all necessary: every dimension must carry an observed
+        derivation, the vector must name coverage-sufficiency rules, and a
+        registry-issued attestation must prove those rules were resolved,
+        ratified and in scope for every dimension's metric. Because no
+        sufficiency rule is ratified, this fails closed and ``DATA_COMPLETE`` is
+        unreachable at bootstrap (state-vector v0.2 §5, §6).
         """
 
         return self._resolve_status()[1]
@@ -480,16 +557,22 @@ CLASS_B_AND_C_ARE_RULE_GATED: Final[bool] = True
 GENERIC_EXPANDING_CONTRACTING_DEFERRED: Final[bool] = True
 NO_COMPLETENESS_SCORE: Final[bool] = True
 DATA_COMPLETENESS_FAILS_CLOSED: Final[bool] = True
+#: R1: a rule object's own status field is never authority.
+RULE_OBJECT_STATUS_IS_NOT_AUTHORITY: Final[bool] = True
+#: R1: ``DATA_COMPLETE`` requires a registry-issued sufficiency attestation.
+DATA_COMPLETE_REQUIRES_ATTESTED_SUPPORT: Final[bool] = True
 
 
 __all__ = [
     "CLASS_B_AND_C_ARE_RULE_GATED",
     "DATA_COMPLETENESS_FAILS_CLOSED",
+    "DATA_COMPLETE_REQUIRES_ATTESTED_SUPPORT",
     "FundamentalStateVector",
     "GENERIC_EXPANDING_CONTRACTING_DEFERRED",
     "INDIVIDUAL_STATE_RULES_RATIFIED_AT_BOOTSTRAP",
     "NO_COMPLETENESS_SCORE",
     "PROHIBITED_STATE_NAMES",
+    "RULE_OBJECT_STATUS_IS_NOT_AUTHORITY",
     "RuleRatificationStatus",
     "STATE_CLASS_BY_NAME",
     "StateClass",

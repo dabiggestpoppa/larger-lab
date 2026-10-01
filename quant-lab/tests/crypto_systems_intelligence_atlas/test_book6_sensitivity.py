@@ -27,6 +27,7 @@ from crypto_systems_intelligence_atlas.book6_sensitivity import (
 from crypto_systems_intelligence_atlas.book6_support import (
     T1,
     definition,
+    register_measurement,
     windowed_observation,
 )
 from crypto_systems_intelligence_atlas.book6_definitions import SourceFamily
@@ -58,7 +59,7 @@ def _engine(*metric_ids: str, claim_ids: tuple[str, ...] = (CLAIM_A,)):
 
 
 def _observe(engine, measurement_id, metric_id, *, value, claim=CLAIM_A):
-    engine.registry.register_measurement(
+    register_measurement(engine, 
         windowed_observation(
             measurement_id,
             metric_id,

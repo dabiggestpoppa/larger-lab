@@ -64,6 +64,7 @@ T1 = NOW
 T2 = NOW + timedelta(days=1)
 SOURCE_ID = "csia:source:book6-offline"
 MEASUREMENT_QUALIFIER = "MEASUREMENT_INPUT"
+CLAIM_ID = "fixture:claim:measurement"
 
 
 def source_fixture() -> Source:
@@ -160,12 +161,19 @@ def register_claim(
 def build_engine(
     *claim_ids: str,
 ) -> tuple[Book6MeasurementEngine, ClaimStore, EvidenceStore, ClaimService]:
-    """Build an engine over fresh Book 2 stores with the named claims current."""
+    """Build an engine over fresh Book 2 stores with the named claims current.
+
+    R1: the canonical fixture methodology is registered here, because the
+    methodology store is SEPARATED and authority-bearing operations resolve
+    methodology identity against it. Registration is still not authority — every
+    read re-resolves the cited Book 2 claims and the methodology.
+    """
 
     claim_store, evidence_store, service = build_stores()
-    for claim_id in claim_ids or ("fixture:claim:measurement",):
+    for claim_id in claim_ids or (CLAIM_ID,):
         register_claim(claim_store, evidence_store, claim_id)
     engine = Book6MeasurementEngine(Book6Provenance(claim_store, evidence_store))
+    engine.registry.register_methodology(methodology())
     return engine, claim_store, evidence_store, service
 
 
@@ -197,20 +205,131 @@ def decay_claim(
     )
 
 
+def register_definition(engine, metric: MetricDefinition) -> MetricDefinition:
+    """Register a metric definition and the methodology it declares.
+
+    R1: the methodology store is SEPARATED, so registering a definition requires
+    its methodology to be registered too. Tests use this helper rather than
+    touching ``registry`` directly, which keeps the registration order explicit
+    instead of hiding it behind an implicit side effect.
+    """
+
+    _ensure_methodology(engine, metric.methodology)
+    return engine.registry.register_definition(metric)
+
+
+def register_measurement(engine, observation: MeasurementObservation):
+    """Register a measurement, registering its declared methodology first."""
+
+    _ensure_methodology(
+        engine,
+        methodology(observation.methodology_ref, observation.methodology_version),
+    )
+    return engine.registry.register_measurement(observation)
+
+
+def _ensure_methodology(engine, candidate: MeasurementMethodology) -> None:
+    """Register a methodology only if its identity is not already current."""
+
+    if not engine.registry.methodologies.methodology_is_current(candidate.identity):
+        engine.registry.register_methodology(candidate)
+
+
 def build_engine_with_definitions(
     *definitions: MetricDefinition,
     claim_ids: tuple[str, ...] = ("fixture:claim:measurement",),
+    methodologies: tuple[MeasurementMethodology, ...] = (),
 ) -> Book6MeasurementEngine:
     """Build an engine and register metric definitions against live Book 2 claims.
+
+    R1: the methodology store is separated and required, so every methodology a
+    definition (or a test) needs is registered here alongside the definition.
 
     Registration is not authority: every authority-bearing read still re-resolves
     the cited Book 2 claims through the provenance adapter.
     """
 
     engine, *_ = build_engine(*claim_ids)
+    for candidate in methodologies:
+        _ensure_methodology(engine, candidate)
     for metric in definitions:
-        engine.registry.register_definition(metric)
+        register_definition(engine, metric)
     return engine
+
+
+def normalization_methodology(
+    *,
+    ref: str = "book6-normalization",
+    version: str = "1",
+    input_methodology_refs: tuple[str, ...] = ("book6-methodology@1",),
+) -> MeasurementMethodology:
+    """Build the methodology a normalization rule must name.
+
+    R1: a normalization rule's methodology must DECLARE the methodology identity
+    of the metric it normalizes, so a rule may not reinterpret inputs it was not
+    defined over. The default input is the canonical fixture methodology.
+    """
+
+    return MeasurementMethodology(
+        methodology_ref=ref,
+        version=version,
+        formula="normalized = deterministic f(native, declared divisor or base)",
+        window_rule="declared window class of the input metric",
+        filters=("no-fabricated-absence",),
+        denominator_rule="explicit measured denominator observation",
+        source_selection="first-party Book 2-backed source",
+        identity_rule="native lineage is explicit and immutable",
+        input_methodology_refs=input_methodology_refs,
+    )
+
+
+def comparison_methodology(
+    corpus_row_id: str,
+    *,
+    ref: str | None = None,
+    version: str = "1",
+) -> MeasurementMethodology:
+    """Build the methodology a CONDITIONAL corpus row requires.
+
+    R1-D1: the identity must equal the row's ``required_methodology`` EXACTLY and
+    the methodology must declare authority for that row, or the comparison is
+    refused. Building it from the ratified corpus means a test cannot pass a
+    fake name and still expect authorization.
+    """
+
+    from crypto_systems_intelligence_atlas.book6_comparability import (
+        corpus_row_for,
+    )
+    from crypto_systems_intelligence_atlas.book6_methodology import (
+        parse_methodology_identity,
+    )
+
+    left, right = conditional_row_pair(corpus_row_id)
+    row = corpus_row_for(left, right)
+    assert row.required_methodology is not None
+    required_ref, _version = parse_methodology_identity(row.required_methodology)
+    return MeasurementMethodology(
+        methodology_ref=ref or required_ref,
+        version=version,
+        formula=f"reconcile {row.left_metric} against {row.right_metric}",
+        window_rule="declared window class of the compared metrics",
+        filters=("no-cross-window-comparison",),
+        denominator_rule="explicit measured denominator or not applicable",
+        source_selection="first-party Book 2-backed source",
+        identity_rule="subject identity rule declared per metric",
+        authorized_corpus_row_ids=(corpus_row_id,),
+    )
+
+
+def conditional_row_pair(row_id: str) -> tuple[str, str]:
+    """The (left, right) metric pair a CONDITIONAL corpus row governs."""
+
+    from crypto_systems_intelligence_atlas.book6_comparability import (
+        FALSE_COMPARISON_CORPUS,
+    )
+
+    row = next(r for r in FALSE_COMPARISON_CORPUS if r.row_id == row_id)
+    return row.left_metric, row.right_metric
 
 
 def methodology(ref: str = "book6-methodology", version: str = "1") -> MeasurementMethodology:
@@ -333,12 +452,101 @@ def ratio_observation(
     )
 
 
-def coverage(measurement_id: str, fraction: float) -> CoverageObservation:
+def coverage(
+    measurement_id: str, fraction: float, *, sufficiency_rule_ref: str | None = None
+) -> CoverageObservation:
     return CoverageObservation(
         measurement_id=measurement_id,
         observed_fraction=fraction,
         basis="synthetic offline population coverage over the intended metric population",
+        sufficiency_rule_ref=sufficiency_rule_ref,
         valid_time=T1,
+    )
+
+
+def coverage_rule(
+    rule_id: str,
+    *,
+    scope_metric_id: str = "metric.native",
+    required_fraction: float = 0.8,
+    version: str = "1",
+):
+    """Build an UNRATIFIED coverage-sufficiency candidate for synthetic tests."""
+
+    from crypto_systems_intelligence_atlas.book6_definitions import CoverageSufficiencyRule
+
+    return CoverageSufficiencyRule(
+        rule_id=rule_id,
+        version=version,
+        required_fraction=required_fraction,
+        scope_metric_id=scope_metric_id,
+        rationale="synthetic offline coverage-sufficiency candidate for tests",
+    )
+
+
+def price(
+    price_id: str = "price:1",
+    *,
+    price_class: str = "MARKET_OBSERVATION",
+    source_ref: str = "venue:index",
+    claim_refs: tuple[str, ...] = (CLAIM_ID,),
+    value: float = 100.0,
+    observed_at=NOW,
+    coverage_fraction: float = 1.0,
+):
+    """Build a Book 2-backed price observation for valuation fixtures."""
+
+    from crypto_systems_intelligence_atlas.book6_valuation import (
+        PriceObservation,
+        PriceObservationClass,
+    )
+
+    return PriceObservation(
+        price_observation_id=price_id,
+        price_class=PriceObservationClass(price_class),
+        source_ref=source_ref,
+        source_claim_refs=claim_refs,
+        price=value,
+        valid_time=observed_at,
+        observed_at=observed_at,
+        coverage=coverage_fraction,
+    )
+
+
+def valuation(
+    valuation_id: str = "val:1",
+    *,
+    purpose: str = "PROTOCOL_COLLATERAL_MARK",
+    price_observation=None,
+    claim_refs: tuple[str, ...] = (CLAIM_ID,),
+    native_quantity: float = 5.0,
+    numeraire: str = "USD",
+    conversion_methodology_ref: str = "book6-methodology@1",
+    observed_at=NOW,
+    valid_time=NOW,
+    staleness_bound_seconds: int = 3600,
+):
+    """Build a valuation observation over a Book 2-backed price."""
+
+    from crypto_systems_intelligence_atlas.book6_valuation import (
+        ValuationObservation,
+        ValuationPurpose,
+    )
+
+    cited = price_observation or price(claim_refs=claim_refs, observed_at=observed_at)
+    return ValuationObservation(
+        valuation_id=valuation_id,
+        subject_ref="fixture:position",
+        native_quantity=native_quantity,
+        native_unit="token",
+        numeraire=numeraire,
+        purpose=ValuationPurpose(purpose),
+        price=cited,
+        conversion_methodology_ref=conversion_methodology_ref,
+        valid_time=valid_time,
+        observed_at=observed_at,
+        coverage=1.0,
+        staleness_bound_seconds=staleness_bound_seconds,
     )
 
 
@@ -374,19 +582,28 @@ __all__ = [
     "build_engine_with_definitions",
     "build_stores",
     "capture_evidence",
+    "CLAIM_ID",
+    "comparison_methodology",
+    "conditional_row_pair",
     "coverage",
+    "coverage_rule",
     "decay_claim",
     "definition",
     "make_claim",
     "MEASUREMENT_QUALIFIER",
     "methodology",
+    "normalization_methodology",
     "NOW",
     "present_denominator",
+    "price",
     "ratio_observation",
     "register_claim",
+    "register_definition",
+    "register_measurement",
     "SOURCE_ID",
     "T1",
     "T2",
+    "valuation",
     "windowed_observation",
     "zero_denominator",
 ]

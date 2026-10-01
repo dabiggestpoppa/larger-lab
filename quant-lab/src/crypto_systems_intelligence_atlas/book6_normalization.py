@@ -18,16 +18,26 @@ every use (ratified plan v0.2 §12; D6M packet v0.3 §2).
 ``PERCENTILE_WITHIN_COHORT`` is absent from ``NormalizationType`` by design: it
 was REJECTED as a ranking surface (comparability v0.1 §4; Constitution v0.2
 §5.3a) and must not be reintroduced as a convenience enum value.
+
+Book 6 Hardening R1 adds two closures:
+
+- ``validate_native_inputs`` — a rule for metric A may not consume metric B
+  measurements merely because their ids exist;
+- ``compute_normalized_value`` — the normalized number is RECOMPUTED from the
+  declared inputs and the caller's value is compared against it. Before R1 the
+  engine authorized any caller-supplied result, so native 10 over denominator 4
+  authorized a value of 999.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
 from enum import Enum
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from pydantic import ConfigDict, Field, model_validator
 
+from .book6_definitions import MeasurementMethodology
 from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import (
@@ -35,6 +45,9 @@ from .book6_grammar import (
     MeasurementCategory,
     NormalizationType,
 )
+
+if TYPE_CHECKING:  # pragma: no cover - typing only, no runtime cycle
+    from .book6_records import MeasurementObservation
 
 
 class NormalizationRuleError(ValueError):
@@ -69,6 +82,21 @@ DIVIDING_NORMALIZATIONS: Final[frozenset[NormalizationType]] = frozenset(
         NormalizationType.PER_VALIDATOR,
         NormalizationType.PER_BLOCK,
         NormalizationType.PER_UNIT_SECURITY,
+    }
+)
+
+#: R1: ``SHARE_OF_TOTAL`` also divides — by the cohort total — so it must name
+#: its divisor measurement explicitly rather than leaving the divisor implicit in
+#: the cohort label. Without this, a share's denominator was whatever the caller
+#: felt like supplying.
+SHARE_OF_TOTAL_DIVIDES: Final[NormalizationType] = NormalizationType.SHARE_OF_TOTAL
+
+#: Normalization operations expressed against a BASE observation rather than a
+#: divisor: growth relative to a base, and an index rebased to a base.
+BASE_RELATIVE_NORMALIZATIONS: Final[frozenset[NormalizationType]] = frozenset(
+    {
+        NormalizationType.GROWTH_RATE,
+        NormalizationType.INDEX_TO_BASE,
     }
 )
 
@@ -124,6 +152,10 @@ class NormalizationRule(Book6FrozenModel):
     valid_time: datetime
     version: str = Field(min_length=1)
     output_metric_definition_ref: str = Field(min_length=1)
+    #: R1: the base observation a growth rate or index is expressed against.
+    #: Required for ``GROWTH_RATE`` and ``INDEX_TO_BASE`` and forbidden for every
+    #: other type, so the base can never be an implicit guess.
+    base_measurement_ref: str | None = None
 
     @model_validator(mode="after")
     def _check_type_specific_requirements(self) -> "NormalizationRule":
@@ -139,6 +171,25 @@ class NormalizationRule(Book6FrozenModel):
                     f"normalization {self.normalization_type.value} divides and "
                     f"must declare its denominator_ref"
                 )
+        if self.normalization_type is SHARE_OF_TOTAL_DIVIDES:
+            if self.denominator_ref is None:
+                raise NormalizationRuleError(
+                    "SHARE_OF_TOTAL divides by a cohort total and must declare "
+                    "that total as denominator_ref; an implicit divisor makes "
+                    "the share unfalsifiable"
+                )
+        if self.normalization_type in BASE_RELATIVE_NORMALIZATIONS:
+            if self.base_measurement_ref is None:
+                raise NormalizationRuleError(
+                    f"normalization {self.normalization_type.value} is expressed "
+                    f"against a base observation and must declare "
+                    f"base_measurement_ref"
+                )
+        elif self.base_measurement_ref is not None:
+            raise NormalizationRuleError(
+                f"normalization {self.normalization_type.value} is not "
+                f"base-relative and may not declare base_measurement_ref"
+            )
         return self
 
 
@@ -193,6 +244,119 @@ def validate_native_lineage(
         )
 
 
+def validate_native_inputs(
+    rule: NormalizationRule,
+    native_observations: tuple["MeasurementObservation", ...],
+) -> None:
+    """Fail closed unless every native input actually measures the declared metric.
+
+    R1 (Phase 9): without this, a normalization rule for metric A could consume
+    arbitrary metric B measurements merely because their ids existed. The rule's
+    ``input_metric_definition_ref`` is a binding constraint, not decoration.
+    """
+
+    if not native_observations:
+        raise NormalizationRuleError(
+            "a normalization rule must resolve its native inputs; lineage that "
+            "resolves to nothing is not lineage"
+        )
+    for observation in native_observations:
+        declared = getattr(observation, "metric_definition_ref", None)
+        if declared != rule.input_metric_definition_ref:
+            raise NormalizationRuleError(
+                f"normalization rule {rule.normalization_rule_id} declares input "
+                f"metric {rule.input_metric_definition_ref}, but native input "
+                f"{getattr(observation, 'measurement_id', '?')} measures "
+                f"{declared}; a rule may not normalize a different metric"
+            )
+
+
+def validate_rule_methodology(
+    rule: NormalizationRule,
+    *,
+    input_methodology_identity: str,
+    registered_methodology: MeasurementMethodology,
+) -> None:
+    """Fail closed unless the rule's methodology matches its native inputs.
+
+    R1 (Phase 9): a normalization rule's ``methodology_ref`` must resolve in the
+    Book 6 methodology registry, AND that methodology must declare the input
+    metric's methodology identity among its ``input_methodology_refs``. A rule
+    whose method does not match its inputs is refused rather than silently
+    reinterpreting them.
+    """
+
+    allowed = registered_methodology.input_methodology_refs
+    if input_methodology_identity not in allowed:
+        raise NormalizationRuleError(
+            f"methodology {registered_methodology.identity} does "
+            f"not declare input methodology {input_methodology_identity}; a "
+            f"normalization rule may not reinterpret inputs it was not defined "
+            f"over"
+        )
+
+
+def compute_normalized_value(
+    rule: NormalizationRule,
+    *,
+    native_value: float,
+    divisor_value: float | None = None,
+    base_value: float | None = None,
+) -> float:
+    """Compute the normalized value deterministically from declared inputs.
+
+    R1-D6: before this, the engine authorized whatever ``value`` the caller
+    supplied on the ``NormalizedMeasurement``, so native 10 over denominator 4
+    (2.5) authorized a caller-supplied 999. Normalization is a deterministic
+    function of its declared inputs, so the engine now computes the product
+    itself and compares. A caller may not assert a normalized number.
+
+    Denominator doctrine is inherited: a zero divisor yields UNDEFINED, never
+    infinity, never zero, never a dropped observation.
+    """
+
+    kind = rule.normalization_type
+    if kind in DIVIDING_NORMALIZATIONS or kind is SHARE_OF_TOTAL_DIVIDES:
+        if divisor_value is None:
+            raise NormalizationRuleError(
+                f"normalization {kind.value} requires a declared divisor value"
+            )
+        if divisor_value == 0.0:
+            raise NormalizationRuleError(
+                f"normalization {kind.value} has an observed-zero divisor; the "
+                f"normalized value is UNDEFINED, not zero and not infinity"
+            )
+        return native_value / divisor_value
+    if kind is NormalizationType.GROWTH_RATE:
+        if base_value is None:
+            raise NormalizationRuleError(
+                "GROWTH_RATE requires a declared base observation value"
+            )
+        if base_value == 0.0:
+            raise NormalizationRuleError(
+                "GROWTH_RATE has an observed-zero base; growth is UNDEFINED"
+            )
+        return (native_value - base_value) / base_value
+    if kind is NormalizationType.INDEX_TO_BASE:
+        if base_value is None:
+            raise NormalizationRuleError(
+                "INDEX_TO_BASE requires a declared base observation value"
+            )
+        if base_value == 0.0:
+            raise NormalizationRuleError(
+                "INDEX_TO_BASE has an observed-zero base; the index is UNDEFINED"
+            )
+        return native_value / base_value
+    raise NormalizationRuleError(  # pragma: no cover - enum is closed
+        f"normalization {kind.value} has no deterministic offline computation"
+    )
+
+
+#: R1-D6: a normalized value is verified against a deterministic recomputation
+#: from the declared inputs, never accepted as a caller-supplied result.
+NORMALIZED_VALUE_IS_RECOMPUTED: Final[bool] = True
+
+
 def check_normalization_admissibility(
     rule: NormalizationRule, *, input_category: MeasurementCategory
 ) -> None:
@@ -232,16 +396,22 @@ PERCENTILE_NORMALIZATION_IS_REJECTED: Final[bool] = True
 
 
 __all__ = [
+    "BASE_RELATIVE_NORMALIZATIONS",
     "COHORT_SCOPED_NORMALIZATIONS",
     "Cohort",
     "CohortDimension",
+    "compute_normalized_value",
     "DIVIDING_NORMALIZATIONS",
     "NormalizedMeasurement",
+    "NORMALIZED_VALUE_IS_RECOMPUTED",
     "NORMALIZED_WITHOUT_NATIVE_LINEAGE_IS_INVALID",
     "NormalizationRule",
     "NormalizationRuleError",
     "PERCENTILE_NORMALIZATION_IS_REJECTED",
+    "SHARE_OF_TOTAL_DIVIDES",
     "check_normalization_admissibility",
     "check_windows_comparable",
+    "validate_native_inputs",
     "validate_native_lineage",
+    "validate_rule_methodology",
 ]

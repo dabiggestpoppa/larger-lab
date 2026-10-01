@@ -11,6 +11,13 @@ therefore encoded here as data with an enforcement gate, not as prose:
 
 There is no generic "everything numeric is comparable" path
 (ratified plan v0.2 §7).
+
+Book 6 Hardening R1 (R1-D1) closed the gap this module still had: a
+``CONDITIONAL`` row checked only ``if not methodology_ref``, so
+``methodology_ref="fake:anything"`` authorized the FC-05 comparison. The named
+methodology is now a fully-qualified identity that must resolve in the Book 6
+methodology registry AND be authorized by that methodology for that exact
+corpus row.
 """
 
 from __future__ import annotations
@@ -20,6 +27,10 @@ from enum import Enum
 from typing import Final
 
 from .book6_definitions import ComparabilityClass
+from .book6_methodology import (
+    Book6MethodologyRegistry,
+    MethodologyRegistryError,
+)
 
 
 class ComparabilityError(ValueError):
@@ -36,7 +47,15 @@ class CorpusVerdict(str, Enum):
 
 @dataclass(frozen=True)
 class CorpusRow:
-    """One mechanized false-comparison row."""
+    """One mechanized false-comparison row.
+
+    R1: ``required_methodology`` is a fully-qualified methodology IDENTITY
+    (``ref@version``), not a bare name. It is mechanically meaningful, not
+    documentation: ``authorize_comparison`` compares it for EXACT equality
+    against the supplied identity and then requires that methodology to declare
+    authority for this row id. No substring matching, no alias-by-convention, no
+    arbitrary non-empty ref.
+    """
 
     row_id: str
     left_metric: str
@@ -87,7 +106,7 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "protocol.volume.AGGREGATOR_ROUTED",
         "routed volume includes the underlying venue volume; overlap unknown",
         CorpusVerdict.CONDITIONAL,
-        "routing-attribution-methodology",
+        "routing-attribution-methodology@1",
     ),
     CorpusRow(
         "FC-06",
@@ -103,7 +122,7 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.restaked_claims",
         "restaked claims may re-express underlying stake",
         CorpusVerdict.CONDITIONAL,
-        "lineage-dedup-methodology",
+        "lineage-dedup-methodology@1",
     ),
     CorpusRow(
         "FC-08",
@@ -119,7 +138,7 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.common_value_supply",
         "a native-unit count is not a numeraire value",
         CorpusVerdict.CONDITIONAL,
-        "valuation-methodology-with-numeraire",
+        "valuation-methodology-with-numeraire@1",
     ),
     CorpusRow(
         "FC-10",
@@ -143,7 +162,7 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.net_capital_migration",
         "gross includes round trips; net is not gross minus fees",
         CorpusVerdict.CONDITIONAL,
-        "net-migration-methodology",
+        "net-migration-methodology@1",
     ),
     CorpusRow(
         "FC-13",
@@ -159,7 +178,7 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.native_quantity_growth",
         "price appreciation masquerading as native growth",
         CorpusVerdict.CONDITIONAL,
-        "native-unit-growth-methodology",
+        "native-unit-growth-methodology@1",
     ),
     CorpusRow(
         "FC-15",
@@ -167,7 +186,7 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "chain.throughput.SUCCESS_ONLY",
         "differing failed-transaction treatment",
         CorpusVerdict.CONDITIONAL,
-        "success-semantics-methodology",
+        "success-semantics-methodology@1",
     ),
 )
 
@@ -183,15 +202,21 @@ CONDITIONAL_ROW_IDS: Final[tuple[str, ...]] = tuple(
 def gate_comparison(left_metric_id: str, right_metric_id: str) -> CorpusVerdict:
     """Return the corpus verdict for a metric pair (no methodology supplied).
 
-    A ``CONDITIONAL`` row still REFUSES here: the caller must present the named
-    methodology, and no ratified methodology exists yet.
+    A ``CONDITIONAL`` row still REFUSES here: the caller must present the exact
+    named methodology identity, and none is registered by default.
     """
+
+    return corpus_row_for(left_metric_id, right_metric_id).verdict
+
+
+def corpus_row_for(left_metric_id: str, right_metric_id: str) -> CorpusRow:
+    """Return the corpus row governing a metric pair, symmetrically, or refuse."""
 
     for row in FALSE_COMPARISON_CORPUS:
         if row.left_metric == left_metric_id and row.right_metric == right_metric_id:
-            return row.verdict
+            return row
         if row.left_metric == right_metric_id and row.right_metric == left_metric_id:
-            return row.verdict
+            return row
     raise ComparabilityError(
         f"no corpus row governs {left_metric_id!r} vs {right_metric_id!r}"
     )
@@ -204,13 +229,16 @@ def authorize_comparison(
     methodology_ref: str | None,
     left_class: ComparabilityClass,
     right_class: ComparabilityClass,
+    methodologies: Book6MethodologyRegistry,
 ) -> str:
     """Authorize a comparison or refuse it, with an explicit reason.
 
-    ``methodology_ref`` is required for every ``CONDITIONAL`` row. The same
-    comparability class is additionally required unless the corpus row itself
-    licenses the pairing: comparing across comparability classes is refused by
-    default.
+    R1 (R1-D1): for a ``CONDITIONAL`` row a non-empty ``methodology_ref`` is no
+    longer sufficient. The reference must be the EXACT methodology identity the
+    corpus row requires, that methodology must be registered and current in the
+    Book 6 methodology registry, and the methodology must itself declare
+    authority for that corpus row. Registration alone is still not authority, so
+    a later supersession or local invalidation makes the comparison refuse again.
     """
 
     verdict = gate_comparison(left_metric_id, right_metric_id)
@@ -224,6 +252,7 @@ def authorize_comparison(
             f"{left_metric_id} vs {right_metric_id} is licensed only as separate "
             f"metrics, never as a comparison"
         )
+    row = corpus_row_for(left_metric_id, right_metric_id)
     if not methodology_ref:
         raise ComparabilityError(
             f"{left_metric_id} vs {right_metric_id} is comparable only under a "
@@ -234,6 +263,18 @@ def authorize_comparison(
             f"{left_metric_id} and {right_metric_id} declare different "
             f"comparability classes ({left_class.value} vs {right_class.value})"
         )
+    assert row.required_methodology is not None  # guaranteed for CONDITIONAL
+    try:
+        methodologies.require_comparison_authority(
+            methodology_identity_ref=methodology_ref,
+            corpus_row_id=row.row_id,
+            required_identity=row.required_methodology,
+        )
+    except MethodologyRegistryError as exc:
+        raise ComparabilityError(
+            f"{left_metric_id} vs {right_metric_id} requires methodology "
+            f"{row.required_methodology}: {exc}"
+        ) from exc
     return "AUTHORIZED"
 
 
@@ -241,6 +282,7 @@ __all__ = [
     "authorize_comparison",
     "ComparabilityError",
     "CONDITIONAL_ROW_IDS",
+    "corpus_row_for",
     "CorpusRow",
     "CorpusVerdict",
     "FALSE_COMPARISON_CORPUS",

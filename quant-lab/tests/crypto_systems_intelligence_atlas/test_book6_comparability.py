@@ -21,6 +21,8 @@ from crypto_systems_intelligence_atlas.book6_comparability import (
     gate_comparison,
 )
 from crypto_systems_intelligence_atlas.book6_definitions import ComparabilityClass
+from crypto_systems_intelligence_atlas.book6_methodology import Book6MethodologyRegistry
+from crypto_systems_intelligence_atlas.book6_support import comparison_methodology
 
 #: The fifteen comparisons the operator required to be guarded, mapped to the
 #: corpus row that mechanizes each refusal.
@@ -48,6 +50,12 @@ RATIFIED_PAIRS: tuple[tuple[str, str, str], ...] = (
 
 SAME = ComparabilityClass.CHAIN_WITHIN_FAMILY
 OTHER = ComparabilityClass.PROTOCOL_WITHIN_MODEL
+
+#: R1-D1: the free-function gate now requires a REAL methodology registry.
+COMPARISON_REGISTRY = Book6MethodologyRegistry()
+for _row_id in CONDITIONAL_ROW_IDS:
+    COMPARISON_REGISTRY.register_methodology(comparison_methodology(_row_id))
+del _row_id
 
 
 # -- corpus shape -------------------------------------------------------------
@@ -110,7 +118,8 @@ def test_every_ratified_pair_is_refused_without_its_methodology(
     verdict = gate_comparison(left, right)
     with pytest.raises(ComparabilityError):
         authorize_comparison(
-            left, right, methodology_ref=None, left_class=SAME, right_class=SAME
+            left, right, methodology_ref=None, methodologies=COMPARISON_REGISTRY,
+ left_class=SAME, right_class=SAME
         )
     if verdict is not CorpusVerdict.CONDITIONAL:
         with pytest.raises(ComparabilityError):
@@ -118,6 +127,7 @@ def test_every_ratified_pair_is_refused_without_its_methodology(
                 left,
                 right,
                 methodology_ref="some-methodology",
+                methodologies=COMPARISON_REGISTRY,
                 left_class=SAME,
                 right_class=SAME,
             )
@@ -134,6 +144,7 @@ def test_conditional_pairs_authorize_only_under_a_named_methodology(row_id: str)
             row.left_metric,
             row.right_metric,
             methodology_ref=row.required_methodology,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -152,6 +163,7 @@ def test_not_comparable_pairs_stay_refused_even_with_a_methodology(row_id: str) 
             row.left_metric,
             row.right_metric,
             methodology_ref="some-methodology",
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -163,6 +175,7 @@ def test_as_distinct_pairs_are_never_a_comparison() -> None:
             "chain.active_accounts",
             "chain.active_wallets",
             methodology_ref="identity-methodology",
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -177,6 +190,7 @@ def test_ethereum_l1_transactions_are_not_rollup_transactions() -> None:
             "chain.executed_transactions.L1",
             "chain.executed_transactions.ROLLUP",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -188,6 +202,7 @@ def test_solana_instructions_are_not_evm_transactions() -> None:
             "chain.executed_transactions.INSTRUCTION_FAMILY",
             "chain.executed_transactions.EVM_TX",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -199,6 +214,7 @@ def test_perp_notional_is_not_collateral() -> None:
             "capital.perp_notional",
             "capital.collateral_capital",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -210,6 +226,7 @@ def test_token_holders_are_not_protocol_users() -> None:
             "token.holders",
             "protocol.users",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -221,6 +238,7 @@ def test_validator_counts_do_not_cross_consensus_models() -> None:
             "chain.validator_count.POS",
             "chain.validator_count.BFT_FEDERATION",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -232,6 +250,7 @@ def test_github_commits_are_not_deployed_developer_activity() -> None:
             "developer.commits",
             "developer.deployed_apps",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -243,6 +262,7 @@ def test_fees_are_not_revenue() -> None:
             "protocol.fees_paid",
             "protocol.protocol_revenue",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -254,6 +274,7 @@ def test_supplied_principal_is_not_a_tvl_like_total() -> None:
             "capital.supplied_principal",
             "capital.tvL_like_total",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -265,6 +286,7 @@ def test_nominal_value_growth_is_not_native_growth() -> None:
             "capital.common_value_total",
             "capital.native_quantity_growth",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -276,6 +298,7 @@ def test_dex_volume_needs_a_routing_attribution_methodology() -> None:
             "protocol.volume.DEX_NATIVE",
             "protocol.volume.AGGREGATOR_ROUTED",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -287,6 +310,7 @@ def test_restaked_claims_need_a_lineage_dedup_methodology() -> None:
             "capital.staked_principal",
             "capital.restaked_claims",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -298,6 +322,7 @@ def test_stablecoin_supply_is_not_reserve_value() -> None:
             "token.native_supply",
             "capital.common_value_supply",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -309,6 +334,7 @@ def test_gross_bridge_flow_needs_a_net_migration_methodology() -> None:
             "capital.gross_bridge_flow",
             "capital.net_capital_migration",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -320,6 +346,7 @@ def test_failed_transaction_treatment_needs_a_success_semantics_methodology() ->
             "chain.throughput.ALL_ATTEMPTED",
             "chain.throughput.SUCCESS_ONLY",
             methodology_ref=None,
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=SAME,
         )
@@ -350,6 +377,7 @@ def test_comparability_classes_must_match_even_under_a_named_methodology() -> No
             "protocol.volume.DEX_NATIVE",
             "protocol.volume.AGGREGATOR_ROUTED",
             methodology_ref="routing-attribution-methodology",
+            methodologies=COMPARISON_REGISTRY,
             left_class=SAME,
             right_class=OTHER,
         )
@@ -365,17 +393,26 @@ def test_engine_comparison_goes_through_the_same_gate() -> None:
     engine = build_engine_with_definitions(
         definition("protocol.volume.DEX_NATIVE"),
         definition("protocol.volume.AGGREGATOR_ROUTED"),
+        methodologies=(comparison_methodology("FC-05"),),
     )
     assert EngineError is ComparabilityError
     with pytest.raises(ComparabilityError):
         engine.authorize_comparison(
             "protocol.volume.DEX_NATIVE", "protocol.volume.AGGREGATOR_ROUTED", methodology_ref=None
         )
-    assert (
+    # R1-D1: the engine requires the EXACT required methodology identity, resolved
+    # in the Book 6 methodology registry. A bare unversioned name is refused.
+    with pytest.raises(ComparabilityError, match="requires methodology"):
         engine.authorize_comparison(
             "protocol.volume.DEX_NATIVE",
             "protocol.volume.AGGREGATOR_ROUTED",
             methodology_ref="routing-attribution-methodology",
+        )
+    assert (
+        engine.authorize_comparison(
+            "protocol.volume.DEX_NATIVE",
+            "protocol.volume.AGGREGATOR_ROUTED",
+            methodology_ref="routing-attribution-methodology@1",
         )
         == "AUTHORIZED"
     )

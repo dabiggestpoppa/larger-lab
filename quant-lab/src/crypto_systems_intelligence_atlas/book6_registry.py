@@ -12,13 +12,24 @@ The registry inherits the Book 4 / Book 5 lesson literally:
 re-resolves it against live Book 2 state at the moment of use, so a measurement
 whose cited Book 2 claim decayed stops being authoritative while the record itself
 stays queryable as history.
+
+Book 6 Hardening R1 (R1-D5) completed the five separated stores the authorized
+design required. The methodology store was MISSING, which left every
+methodology reference in the kernel a bare string. It now exists here as
+``registry.methodologies``, and every authority-bearing resolution revalidates
+methodology identity against it.
 """
 
 from __future__ import annotations
 
 from typing import Final
 
-from .book6_definitions import CoverageObservation, MetricDefinition
+from .book6_coverage_rules import CoverageRuleRegistry
+from .book6_definitions import CoverageObservation, MeasurementMethodology, MetricDefinition
+from .book6_methodology import (
+    Book6MethodologyRegistry,
+    MethodologyRegistryError,
+)
 from .book6_normalization import NormalizationRule
 from .book6_provenance import Book6Provenance, Book6ProvenanceError
 from .book6_records import MeasurementObservation, validate_against_definition
@@ -40,14 +51,37 @@ class Book6MeasurementRegistry:
         self._measurement_order: list[str] = []
         self._normalization_rules: dict[str, NormalizationRule] = {}
         self.state_rules = StateRuleRegistry()
+        #: R1-D5: the methodology store, separated from the other four.
+        self.methodologies = Book6MethodologyRegistry()
+        #: R1-D4: the coverage-sufficiency rule store. Ships empty.
+        self.coverage_rules = CoverageRuleRegistry()
 
     # -- registration (proves nothing about current authority) ---------------
+
+    def register_methodology(
+        self, methodology: MeasurementMethodology
+    ) -> MeasurementMethodology:
+        """Register a methodology version. Registration is not authority."""
+
+        try:
+            return self.methodologies.register_methodology(methodology)
+        except MethodologyRegistryError as exc:
+            raise Book6RegistryError(str(exc)) from exc
 
     def register_definition(self, definition: MetricDefinition) -> MetricDefinition:
         if definition.metric_id in self._definitions:
             raise Book6RegistryError(f"metric {definition.metric_id} already registered")
+        self.require_methodology(definition.methodology.identity)
         self._definitions[definition.metric_id] = definition
         return definition
+
+    def require_methodology(self, identity: str) -> MeasurementMethodology:
+        """Resolve a methodology identity, or refuse. No free-string authority."""
+
+        try:
+            return self.methodologies.resolve_methodology(identity)
+        except MethodologyRegistryError as exc:
+            raise Book6RegistryError(str(exc)) from exc
 
     def register_coverage(self, coverage: CoverageObservation) -> CoverageObservation:
         if coverage.measurement_id in self._coverage:
@@ -74,6 +108,7 @@ class Book6MeasurementRegistry:
                 f"metric definition {observation.metric_definition_ref} is not "
                 f"registered; a measurement may not define its own metric"
             )
+        self.require_methodology(observation.methodology_identity)
         validate_against_definition(observation, definition)
         self._measurements[observation.measurement_id] = observation
         self._measurement_order.append(observation.measurement_id)
@@ -139,6 +174,7 @@ class Book6MeasurementRegistry:
         observation = self.registered_measurement(measurement_id)
         if not observation.is_value_bearing:
             return observation
+        self.require_methodology(observation.methodology_identity)
         try:
             self._provenance.resolve_source_claim_refs(
                 observation.source_claim_refs, require_current=True
@@ -169,6 +205,19 @@ class Book6MeasurementRegistry:
             raise Book6RegistryError(
                 f"normalization rule {rule_id} is not registered"
             ) from exc
+
+    def registered_methodology(self, identity: str) -> MeasurementMethodology:
+        """Structural lookup by identity; never itself authority."""
+
+        try:
+            return self.methodologies.registered_methodology(identity)
+        except MethodologyRegistryError as exc:
+            raise Book6RegistryError(str(exc)) from exc
+
+    def resolve_methodology(self, identity: str) -> MeasurementMethodology:
+        """Authority-bearing resolution: registered, current, not invalidated."""
+
+        return self.require_methodology(identity)
 
     def definition(self, metric_id: str) -> MetricDefinition:
         try:

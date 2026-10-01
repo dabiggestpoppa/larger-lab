@@ -38,6 +38,8 @@ from crypto_systems_intelligence_atlas.book6_support import (
     NOW,
     build_engine,
     definition,
+    register_definition,
+    register_measurement,
     windowed_observation,
 )
 
@@ -97,7 +99,7 @@ def test_unknown_claim_ref_fails_closed() -> None:
 
 def test_value_bearing_observation_requires_book2_authority() -> None:
     engine, _, _, _ = build_engine(CLAIM)
-    engine.registry.register_definition(definition("m:supply"))
+    register_definition(engine, definition("m:supply"))
     with pytest.raises(ValidationError, match="must cite Book 2 source authority"):
         windowed_observation(
             "obs:none",
@@ -269,12 +271,12 @@ def test_measurement_requires_registered_definition() -> None:
         claim_refs=(CLAIM,),
     )
     with pytest.raises(Book6RegistryError, match="is not registered"):
-        engine.registry.register_measurement(observation)
+        register_measurement(engine, observation)
 
 
 def test_observation_drifting_from_definition_is_refused() -> None:
     engine, _, _, _ = build_engine(CLAIM)
-    engine.registry.register_definition(definition("m:supply", unit="native-unit"))
+    register_definition(engine, definition("m:supply", unit="native-unit"))
     forged = windowed_observation(
         "obs:forged",
         "m:supply",
@@ -284,7 +286,7 @@ def test_observation_drifting_from_definition_is_refused() -> None:
         unit="other-unit",
     )
     with pytest.raises(MeasurementRecordError, match="contradicts definition unit"):
-        engine.registry.register_measurement(forged)
+        register_measurement(engine, forged)
 
 
 def test_engine_exposes_only_registered_definitions() -> None:

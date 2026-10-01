@@ -40,6 +40,10 @@ class MetricDefinitionError(ValueError):
     """A metric definition is incomplete or internally inconsistent."""
 
 
+class CoverageSufficiencyRuleError(ValueError):
+    """A coverage-sufficiency rule is malformed or claims its own ratification."""
+
+
 class SourceFamily(str, Enum):
     """Permitted evidence source families for a metric (grammar v0.1 §3.2)."""
 
@@ -90,6 +94,17 @@ class MeasurementMethodology(Book6FrozenModel):
 
     A value without methodology identity is incomplete: the same metric name
     under a different methodology is a different comparable observation.
+
+    R1: a methodology is structural Book 6 authority and must be REGISTERED in
+    ``Book6MethodologyRegistry`` before it may authorize anything — a bare
+    ``"methodology:whatever"`` string is no longer authority. Two fields make
+    that binding checkable rather than documentary:
+
+    - ``input_methodology_refs`` — the methodology identities this methodology
+      is defined OVER, so a normalization rule can be refused when its
+      methodology does not match the inputs it claims to normalize;
+    - ``authorized_corpus_row_ids`` — the exact false-comparison corpus rows
+      this methodology is authorized to license.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -103,12 +118,21 @@ class MeasurementMethodology(Book6FrozenModel):
     denominator_rule: str = Field(min_length=1)
     source_selection: str = Field(min_length=1)
     identity_rule: str = Field(min_length=1)
+    #: Methodology identities (``ref@version``) this methodology consumes.
+    input_methodology_refs: tuple[str, ...] = ()
+    #: False-comparison corpus row ids this methodology is authorized for.
+    authorized_corpus_row_ids: tuple[str, ...] = ()
 
     @property
     def identity(self) -> str:
         """Fully-qualified methodology identity (ref + version)."""
 
         return f"{self.methodology_ref}@{self.version}"
+
+    def authorizes_row(self, corpus_row_id: str) -> bool:
+        """Whether this methodology declares authority for a corpus row."""
+
+        return corpus_row_id in self.authorized_corpus_row_ids
 
 
 class MetricDefinition(Book6FrozenModel):
@@ -184,31 +208,61 @@ class CoverageObservation(Book6FrozenModel):
     valid_time: datetime
 
     @property
-    def sufficiency_known(self) -> bool:
-        """Whether a ratified rule has judged this coverage sufficient.
+    def names_a_sufficiency_rule(self) -> bool:
+        """Whether this observation NAMES a sufficiency rule ref.
 
-        Always ``False`` in the accepted implementation: no coverage-sufficiency
-        rule is ratified, so sufficiency is unjudged by construction.
+        Deliberately named for what it is: a structural string predicate with
+        NO authority. R1 removed the old ``sufficiency_known`` property, which
+        returned ``True`` for any non-empty string and therefore let a free
+        string assert sufficiency. Whether a named rule is actually ratified
+        and in scope is decided by ``CoverageRuleRegistry`` at decision time,
+        never by this object.
         """
 
-        return self.sufficiency_rule_ref is not None and self.sufficiency_rule_ref != ""
+        return bool(self.sufficiency_rule_ref)
+
+
+class CoverageRuleRatificationStatus(str, Enum):
+    """Per-rule coverage-sufficiency ratification status (D6M-3 = A).
+
+    R1: this is an enum rather than a bare ``str``, and ``RATIFIED`` may not be
+    set at construction at all. Authority lives in the registry's ratification
+    ledger, so a caller cannot manufacture a ratified rule by setting a field.
+    """
+
+    UNRATIFIED = "UNRATIFIED"
+    RATIFIED = "RATIFIED"
+    SUPERSEDED = "SUPERSEDED"
 
 
 class CoverageSufficiencyRule(Book6FrozenModel):
     """A candidate coverage-sufficiency rule. None is ratified.
 
     The object exists so the contract can be represented without smuggling a
-    threshold into a numeric field; ``status`` stays ``UNRATIFIED`` until an
-    individual operator decision ratifies it.
+    threshold into a numeric field. R1: it may only be CONSTRUCTED as
+    ``UNRATIFIED`` — ratification is a registry decision recorded by
+    ``CoverageRuleRegistry.ratify``, so ``model_copy``-forged or directly
+    constructed ``RATIFIED`` rules carry no authority.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
 
     rule_id: str = Field(min_length=1)
+    version: str = Field(min_length=1)
     required_fraction: float = Field(ge=0.0, le=1.0)
     scope_metric_id: str = Field(min_length=1)
     rationale: str = Field(min_length=8)
-    status: str = "UNRATIFIED"
+    status: CoverageRuleRatificationStatus = CoverageRuleRatificationStatus.UNRATIFIED
+
+    @model_validator(mode="after")
+    def _check_not_self_ratified(self) -> "CoverageSufficiencyRule":
+        if self.status is not CoverageRuleRatificationStatus.UNRATIFIED:
+            raise CoverageSufficiencyRuleError(
+                f"coverage sufficiency rule {self.rule_id} may not declare itself "
+                f"{self.status.value}; ratification is an individual operator "
+                f"decision recorded by the registry, never a field on the rule"
+            )
+        return self
 
 
 #: The five ratified metric families and their subject domains (plan v0.2 §28).
@@ -240,7 +294,9 @@ __all__ = [
     "COVERAGE_OBSERVATION_IS_NOT_SUFFICIENCY",
     "ComparabilityClass",
     "CoverageObservation",
+    "CoverageRuleRatificationStatus",
     "CoverageSufficiencyRule",
+    "CoverageSufficiencyRuleError",
     "DenominatorRule",
     "METRIC_FAMILY_BY_SUBJECT_DOMAIN",
     "MeasurementMethodology",
