@@ -17,6 +17,7 @@ import pytest
 from crypto_systems_intelligence_atlas.book6_traceability import (
     ALL_FAMILIES,
     R1_FAMILIES,
+    R2_FAMILIES,
     STRUCTURAL_FAMILIES,
     TRACEABILITY_ROWS,
     VALIDATION_FAMILIES,
@@ -98,7 +99,21 @@ def test_every_structural_family_is_covered(family: str) -> None:
 
 @pytest.mark.parametrize("family", R1_FAMILIES, ids=lambda f: f)
 def test_every_r1_family_is_covered(family: str) -> None:
-    assert len(rows_for_family(family)) > 0, family
+    assert rows_for_family(family), family
+
+
+@pytest.mark.parametrize("family", R2_FAMILIES, ids=lambda f: f)
+def test_every_r2_family_is_covered(family: str) -> None:
+    assert rows_for_family(family), family
+
+
+def test_every_reproduced_r2_defect_has_a_trace_row() -> None:
+    """Each R2 defect is reproduced as a refusal row, not prose."""
+
+    claims = " ".join(row[2] for row in TRACEABILITY_ROWS)
+    assert "D1 reproducer" in claims
+    assert "D2 reproducer" in claims
+    assert "D3 reproducer" in claims
 
 
 def test_the_matrix_covers_exactly_the_ratified_structural_and_r1_families() -> None:

@@ -24,6 +24,13 @@ Book 6 Hardening R1 added the ``R1.*`` families, one per reproduced defect:
 ``R1.VALUATION_STALENESS``, ``R1.COVERAGE_SUFFICIENCY``,
 ``R1.NORMALIZATION_INTEGRITY``, ``R1.RULE_AUTHORITY``,
 ``R1.METHODOLOGY_REGISTRY``, and ``R1.PRESERVED_SEALS``.
+
+Book 6 Hardening R2 added the ``R2.*`` families for the four defects R1 could
+not see: ``R2.METHODOLOGY_CONTENT`` (an identity is not a namespace claim),
+``R2.PREDICATE_EXECUTION`` (a ratified rule is replayed, not merely named),
+``R2.COVERAGE_CLOSURE`` (per-metric set equality against registry state), and
+``R2.HISTORICAL_AUTHORITY`` (a preserved record is not revalidated authority),
+plus ``R2.PRESERVED_SEALS`` for the R1 gates that must survive R2.
 """
 
 from __future__ import annotations
@@ -57,9 +64,20 @@ R1_FAMILIES: Final[tuple[str, ...]] = (
     "R1.PRESERVED_SEALS",
 )
 
+#: The Book 6 Hardening R2 families — canonical content, executed predicates,
+#: per-metric coverage closure, historical authority honesty, and the R1
+#: seals that must survive R2.
+R2_FAMILIES: Final[tuple[str, ...]] = (
+    "R2.METHODOLOGY_CONTENT",
+    "R2.PREDICATE_EXECUTION",
+    "R2.COVERAGE_CLOSURE",
+    "R2.HISTORICAL_AUTHORITY",
+    "R2.PRESERVED_SEALS",
+)
+
 #: Every family the matrix must cover.
 ALL_FAMILIES: Final[tuple[str, ...]] = (
-    VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES
+    VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES + R2_FAMILIES
 )
 
 #: ``(row_id, family, claim, test_file, test_name)``. Every row must resolve.
@@ -1575,6 +1593,305 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "test_book6_hardening_r1.py",
         "test_r1_d6_coverage_rule_constants",
     ),
+    # -- R2 methodology identity binds content -------------------------------
+    (
+        "R2.MC.01",
+        "R2.METHODOLOGY_CONTENT",
+        "D1 reproducer: a caller-built methodology with the right name and garbage content is refused the FC-05 comparison",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_the_self_authorization_reproducer_is_now_refused",
+    ),
+    (
+        "R2.MC.02",
+        "R2.METHODOLOGY_CONTENT",
+        "A5 preserved: the canonical specification itself authorizes the comparison",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_canonical_exact_methodology_authorizes",
+    ),
+    (
+        "R2.MC.03",
+        "R2.METHODOLOGY_CONTENT",
+        "the identity-binds-content and self-authorization-rejected invariants are asserted",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_identity_binds_content_constants",
+    ),
+    (
+        "R2.MC.04",
+        "R2.METHODOLOGY_CONTENT",
+        "the content fingerprint is deterministic and covers every semantic field",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_fingerprint_is_deterministic_and_content_complete",
+    ),
+    (
+        "R2.MC.05",
+        "R2.METHODOLOGY_CONTENT",
+        "M1/M2/M3: formula, row-set and input-ref mutations are refused at registration boundaries",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_content_mutations_are_refused_at_registration_boundaries",
+    ),
+    (
+        "R2.MC.06",
+        "R2.METHODOLOGY_CONTENT",
+        "require_canonical_methodology refuses an object whose content differs from the bound digest",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_require_canonical_methodology_refuses_a_mutated_object",
+    ),
+    (
+        "R2.MC.07",
+        "R2.METHODOLOGY_CONTENT",
+        "the corpus row-authority condition is checked against the ratified spec, not the registered object",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_comparison_authority_row_condition_is_live",
+    ),
+    (
+        "R2.MC.08",
+        "R2.METHODOLOGY_CONTENT",
+        "A6 preserved: a superseded methodology stops authorizing until the corpus licenses a new version",
+        "test_book6_hardening_r2.py",
+        "test_r2_d1_a_superseded_methodology_stops_authorizing",
+    ),
+    (
+        "R2.MC.09",
+        "R2.METHODOLOGY_CONTENT",
+        "the measurement-definition surface refuses a mutated methodology",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase16_measurement_surface_refuses_mutated_formula",
+    ),
+    (
+        "R2.MC.10",
+        "R2.METHODOLOGY_CONTENT",
+        "the normalization surface refuses a mutated methodology and still validates a matching one",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase16_normalization_surface_refuses_mutated_methodology",
+    ),
+    # -- R2 predicate execution ----------------------------------------------
+    (
+        "R2.PE.01",
+        "R2.PREDICATE_EXECUTION",
+        "D2 reproducer: a ratified rule whose predicate evaluates FALSE (current 50 over prior 100) no longer emits INCREASING",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_the_false_predicate_reproducer_is_now_refused",
+    ),
+    (
+        "R2.PE.02",
+        "R2.PREDICATE_EXECUTION",
+        "a true predicate emits only after full live replay of inputs, rule and predicate",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_a_true_predicate_emits_after_full_replay",
+    ),
+    (
+        "R2.PE.03",
+        "R2.PREDICATE_EXECUTION",
+        "a false predicate never inverts into the opposite state",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_false_predicate_does_not_invert_to_the_opposite_state",
+    ),
+    (
+        "R2.PE.04",
+        "R2.PREDICATE_EXECUTION",
+        "canonical predicate and rule ratification counts are zero at bootstrap",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_predicates_shut_with_zero_canonical_ratification",
+    ),
+    (
+        "R2.PE.05",
+        "R2.PREDICATE_EXECUTION",
+        "the evaluator family is a closed three-member enumeration with one explicit operand order",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_the_evaluator_family_is_a_closed_enumeration",
+    ),
+    (
+        "R2.PE.06",
+        "R2.PREDICATE_EXECUTION",
+        "the predicate registry ships empty and resolves nothing by string convention",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_the_registry_ships_empty_and_never_executes_strings",
+    ),
+    (
+        "R2.PE.07",
+        "R2.PREDICATE_EXECUTION",
+        "the evaluator enforces its declared input arity",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_arity_is_enforced_by_the_evaluator",
+    ),
+    (
+        "R2.PE.08",
+        "R2.PREDICATE_EXECUTION",
+        "every evaluator kind computes its own verdict over concrete operands",
+        "test_book6_hardening_r2.py",
+        "test_r2_d2_each_evaluator_kind_computes_its_own_truth",
+    ),
+    (
+        "R2.PE.09",
+        "R2.PREDICATE_EXECUTION",
+        "a rule may not bind another state's predicate",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase6_a_rule_may_not_bind_another_states_predicate",
+    ),
+    (
+        "R2.PE.10",
+        "R2.PREDICATE_EXECUTION",
+        "a rule whose class or target disagrees with its predicate is refused at emission",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase6_a_rule_may_not_misstate_its_class",
+    ),
+    (
+        "R2.PE.11",
+        "R2.PREDICATE_EXECUTION",
+        "S3: swapped measurement ordering is refused because operand order belongs to the rule",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase6_measurement_order_is_explicit_not_conventional",
+    ),
+    (
+        "R2.PE.12",
+        "R2.PREDICATE_EXECUTION",
+        "S4: a model_copy target mutation cannot change which rule the registry authorizes",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase6_predicate_target_mismatch_s4_is_refused",
+    ),
+    (
+        "R2.PE.13",
+        "R2.PREDICATE_EXECUTION",
+        "an emission whose rule names an unregistered predicate refuses",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase7_an_unresolvable_predicate_refuses_the_emission",
+    ),
+    (
+        "R2.PE.14",
+        "R2.PREDICATE_EXECUTION",
+        "S1: a mutated predicate_ref on a rule copy grants nothing; ratification lives in the ledger",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase7_s1_predicate_ref_mutation_grants_nothing",
+    ),
+    # -- R2 per-metric coverage closure --------------------------------------
+    (
+        "R2.CC.01",
+        "R2.COVERAGE_CLOSURE",
+        "D3 reproducer: a forged attestation claiming metric B cannot make an A-only rule set DATA_COMPLETE",
+        "test_book6_hardening_r2.py",
+        "test_r2_d3_the_forged_attestation_reproducer_is_now_refused",
+    ),
+    (
+        "R2.CC.02",
+        "R2.COVERAGE_CLOSURE",
+        "DATA_COMPLETE requires covered == required with every metric backed by a live ratified rule",
+        "test_book6_hardening_r2.py",
+        "test_r2_d3_every_required_metric_covered_is_data_complete",
+    ),
+    (
+        "R2.CC.03",
+        "R2.COVERAGE_CLOSURE",
+        "C1: widening the attestation scope grants nothing",
+        "test_book6_hardening_r2.py",
+        "test_r2_d3_c1_scope_widening_grants_nothing",
+    ),
+    (
+        "R2.CC.04",
+        "R2.COVERAGE_CLOSURE",
+        "C2: a forged registry identity on an attestation grants nothing",
+        "test_book6_hardening_r2.py",
+        "test_r2_d3_c2_a_forged_registry_identity_grants_nothing",
+    ),
+    (
+        "R2.CC.05",
+        "R2.COVERAGE_CLOSURE",
+        "C3: reducing the coverage rule list leaves the metric uncovered and reports it",
+        "test_book6_hardening_r2.py",
+        "test_r2_d3_c3_reducing_the_rule_list_leaves_a_metric_uncovered",
+    ),
+    (
+        "R2.CC.06",
+        "R2.COVERAGE_CLOSURE",
+        "C4: an unrelated live rule cannot stand in for an uncovered metric",
+        "test_book6_hardening_r2.py",
+        "test_r2_d3_c4_an_unrelated_live_rule_cannot_stand_in_for_a_metric",
+    ),
+    (
+        "R2.CC.07",
+        "R2.COVERAGE_CLOSURE",
+        "the attestation is an audit record: stripping or forging it never flips the authoritative verdict",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase10_attestation_is_an_audit_record_not_authority",
+    ),
+    (
+        "R2.CC.08",
+        "R2.COVERAGE_CLOSURE",
+        "the registry issues no partial attestation when one metric lacks a live rule",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase11_build_availability_vector_never_issues_a_partial_attestation",
+    ),
+    (
+        "R2.CC.09",
+        "R2.COVERAGE_CLOSURE",
+        "a coverage report may not claim a metric is both covered and uncovered",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase9_coverage_report_partition_is_enforced",
+    ),
+    # -- R2 historical authority honesty -------------------------------------
+    (
+        "R2.HA.01",
+        "R2.HISTORICAL_AUTHORITY",
+        "the Book 2 authority-replay capability is recorded as NOT_IMPLEMENTED, not faked",
+        "test_book6_hardening_r2.py",
+        "test_r2_d4_the_capability_constant_is_recorded",
+    ),
+    (
+        "R2.HA.02",
+        "R2.HISTORICAL_AUTHORITY",
+        "no historical authority report may claim replay availability while the capability is absent",
+        "test_book6_hardening_r2.py",
+        "test_r2_d4_a_report_may_not_claim_replay_availability",
+    ),
+    (
+        "R2.HA.03",
+        "R2.HISTORICAL_AUTHORITY",
+        "H1: a current price over a current claim authorizes current valuation",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase14_h1_current_price_and_current_claim_authorizes",
+    ),
+    (
+        "R2.HA.04",
+        "R2.HISTORICAL_AUTHORITY",
+        "H2: a stale-now price is refused for CURRENT authority",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase14_h2_a_stale_now_claim_is_refused_for_current_authority",
+    ),
+    (
+        "R2.HA.05",
+        "R2.HISTORICAL_AUTHORITY",
+        "H3: a record stale by clock alone keeps its preserved historical shape",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase14_h3_clock_only_decay_preserves_the_historical_record",
+    ),
+    (
+        "R2.HA.06",
+        "R2.HISTORICAL_AUTHORITY",
+        "H4/H6: a claim decayed after observation preserves the record and reports current backing honestly",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase14_h4_h5_h6_later_claim_decay_preserves_the_record_honestly",
+    ),
+    (
+        "R2.HA.07",
+        "R2.HISTORICAL_AUTHORITY",
+        "no false PASS: a decayed claim grants no current authority through the historical path",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase14_no_false_pass_on_historical_authority",
+    ),
+    # -- R2 preserved seals ---------------------------------------------------
+    (
+        "R2.PS.01",
+        "R2.PRESERVED_SEALS",
+        "the current path still hard-requires Book 2 authority after the historical split",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase18_r1_preserved_the_current_path_still_requires_book2",
+    ),
+    (
+        "R2.PS.02",
+        "R2.PRESERVED_SEALS",
+        "the valuation surface is explicit, separate and honest about its three authorities",
+        "test_book6_hardening_r2.py",
+        "test_r2_phase18_the_r1_valuation_surface_is_preserved_and_honest",
+    ),
 )
 
 
@@ -1592,6 +1909,7 @@ __all__ = [
     "ALL_FAMILIES",
     "EVERY_ROW_IS_BOUND_TO_A_REAL_ASSERTION",
     "R1_FAMILIES",
+    "R2_FAMILIES",
     "STRUCTURAL_FAMILIES",
     "TRACEABILITY_ROWS",
     "VALIDATION_FAMILIES",
