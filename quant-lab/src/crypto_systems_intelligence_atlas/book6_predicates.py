@@ -35,10 +35,24 @@ This module provides the fourth. Three design constraints are load-bearing:
 A false predicate yields an explicit **non-emission**, never the opposite
 state. ``FALSE INCREASING != DECREASING``: inverting a verdict is itself a
 directional claim, and requires its own separately ratified rule.
+
+Book 6 Hardening R3 closes the next layer of the same defect class: a predicate
+declaration is DATA, and data can lie. R3-D1 saw a predicate declare
+``target_state = INCREASING`` while its evaluator computed
+``CURRENT_LESS_THAN_PRIOR`` — a falling series then emitted INCREASING through a
+perfectly replayed pipeline. The closed semantic map :data:`EVALUATOR_TARGET_STATE`
+now binds each evaluator kind to exactly one target state, mechanically. R3-D2
+extends the R2 methodology doctrine to predicates themselves:
+``PREDICATE_IDENTITY_BINDS_CONTENT`` — a predicate's identity carries a
+content fingerprint, and a rule RATIFICATION records the exact fingerprint it
+was shown, so the operator's decision names the executable derivation and not
+merely a name that may later mean something else.
 """
 
 from __future__ import annotations
 
+import hashlib
+import json
 from enum import Enum
 from typing import Final
 
@@ -79,6 +93,48 @@ class EvaluatorKind(str, Enum):
     CURRENT_GREATER_THAN_PRIOR = "CURRENT_GREATER_THAN_PRIOR"
     CURRENT_LESS_THAN_PRIOR = "CURRENT_LESS_THAN_PRIOR"
     EXACT_EQUALITY = "EXACT_EQUALITY"
+
+
+#: R3-D1 (Phase 1): the closed semantic map binding each Class B evaluator to
+#: EXACTLY ONE target state. A predicate's declared target is data, and data can
+#: lie: before R3 a predicate could declare INCREASING while its evaluator
+#: computed CURRENT_LESS_THAN_PRIOR, and a falling series emitted INCREASING
+#: through a perfectly replayed pipeline. No other pairing is legal, and a
+#: Class C evaluator family does not exist yet (Phase 2 — Class C remains
+#: unimplemented until a later individually ratified methodology defines its
+#: benchmark/threshold machinery).
+EVALUATOR_TARGET_STATE: Final[dict[EvaluatorKind, StateName]] = {
+    EvaluatorKind.CURRENT_GREATER_THAN_PRIOR: StateName.INCREASING,
+    EvaluatorKind.CURRENT_LESS_THAN_PRIOR: StateName.DECREASING,
+    EvaluatorKind.EXACT_EQUALITY: StateName.UNCHANGED,
+}
+
+
+def predicate_fingerprint(definition: StatePredicateDefinition) -> str:
+    """A stable content digest for a predicate specification (R3-D2, Phase 4).
+
+    The R2 methodology doctrine applied to predicates:
+    ``PREDICATE_IDENTITY_BINDS_CONTENT``. Deliberately NOT Python object
+    identity and deliberately NOT a hidden global singleton — the digest is a
+    pure function of the definition's semantic content. Unordered collections
+    are sorted, so a cosmetic reordering is not a different predicate.
+    """
+
+    payload = [
+        definition.predicate_id,
+        definition.version,
+        definition.state_class.value,
+        definition.target_state.value,
+        definition.description,
+        definition.required_input_arity,
+        definition.evaluator_kind.value,
+        definition.operand_order.value,
+        sorted(w.value for w in definition.permitted_window_classes),
+        sorted(definition.permitted_methodology_refs),
+    ]
+    return hashlib.sha256(
+        json.dumps(payload, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+    ).hexdigest()
 
 
 class OperandOrder(str, Enum):
@@ -124,6 +180,25 @@ class StatePredicateDefinition(Book6FrozenModel):
         ):
             raise PredicateRegistryError(
                 "EXACT_EQUALITY compares exactly two operands"
+            )
+        # R3-D1: the declared target may not contradict the executable
+        # evaluator. This is registration-time refusal — a lying predicate is
+        # rejected as DATA before any rule can bind it, not merely refused at
+        # some later emission.
+        expected_target = EVALUATOR_TARGET_STATE.get(self.evaluator_kind)
+        if expected_target is not None and self.target_state is not expected_target:
+            raise PredicateRegistryError(
+                f"predicate {self.predicate_id} declares target "
+                f"{self.target_state.value} but its evaluator "
+                f"{self.evaluator_kind.value} computes "
+                f"{expected_target.value}; an evaluator may not contradict the "
+                f"state it claims to derive"
+            )
+        if self.target_state not in tuple(EVALUATOR_TARGET_STATE.values()):
+            raise PredicateRegistryError(
+                f"predicate {self.predicate_id} targets {self.target_state.value}, "
+                f"for which no canonical Class B evaluator family exists; Class C "
+                f"semantics remain unimplemented"
             )
         return self
 
@@ -214,6 +289,29 @@ class PredicateRegistry:
                 f"name a canonical predicate, not prose"
             ) from exc
 
+    def supersede(self, definition: StatePredicateDefinition) -> StatePredicateDefinition:
+        """Install a NEW VERSION of a predicate id, retaining the prior one.
+
+        R3 Phase 13: supersession is explicit and version-pinned. A rule
+        ratified against ``x@1`` NEVER follows ``x@2`` — the rule's binding
+        names one exact identity, and the registry resolves exactly that. This
+        method exists so a version bump is an act with a name, and so the prior
+        version stays queryable as history.
+        """
+
+        prior = self._by_identity.get(definition.identity)
+        if prior is not None:
+            raise PredicateRegistryError(
+                f"predicate {definition.identity} is already registered; "
+                f"supersession requires a new version"
+            )
+        if not any(k.startswith(f"{definition.predicate_id}@") for k in self._by_identity):
+            raise PredicateRegistryError(
+                f"predicate {definition.predicate_id} has no prior registered "
+                f"version; supersession requires a prior version of the same id"
+            )
+        return self.register(definition)
+
     def resolve(self, identity: str) -> StatePredicateDefinition:
         """Authority-bearing resolution: a registered canonical predicate."""
 
@@ -240,17 +338,28 @@ PREDICATES_ARE_EXECUTED_NOT_NAMED: Final[bool] = True
 #: A false predicate never inverts into the opposite state.
 FALSE_PREDICATE_IS_NOT_THE_OPPOSITE_STATE: Final[bool] = True
 
+#: R3-D1: an evaluator may not contradict the state it claims to derive; the map
+#: above is closed and mechanical.
+EVALUATOR_TARGET_SEMANTIC_BINDING: Final[bool] = True
+
+#: R3-D2 (Phase 4): a predicate identity means one exact specification.
+PREDICATE_IDENTITY_BINDS_CONTENT: Final[bool] = True
+
 
 __all__ = [
+    "EVALUATOR_TARGET_STATE",
+    "EVALUATOR_TARGET_SEMANTIC_BINDING",
+    "PREDICATE_IDENTITY_BINDS_CONTENT",
     "evaluate_predicate",
     "EvaluatorKind",
+    "FALSE_PREDICATE_IS_NOT_THE_OPPOSITE_STATE",
     "OperandOrder",
+    "PREDICATES_ARE_EXECUTED_NOT_NAMED",
+    "PREDICATES_CANONICALLY_RATIFIED",
     "PredicateEvaluation",
     "PredicateNotSatisfied",
     "PredicateRegistry",
     "PredicateRegistryError",
-    "PREDICATES_ARE_EXECUTED_NOT_NAMED",
-    "PREDICATES_CANONICALLY_RATIFIED",
-    "FALSE_PREDICATE_IS_NOT_THE_OPPOSITE_STATE",
+    "predicate_fingerprint",
     "StatePredicateDefinition",
 ]

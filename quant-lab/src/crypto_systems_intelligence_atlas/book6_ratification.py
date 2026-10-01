@@ -52,6 +52,13 @@ class RatificationRecord:
     Bound to a specific ``(rule_id, version)``: ratifying version 1 says nothing
     about version 2. This is what makes authority decay on supersession rather
     than inherit.
+
+    R3-D2: ``binding`` carries the exact executable derivation context the
+    operator was shown when deciding — the predicate and methodology
+    IDENTITIES plus their CONTENT FINGERPRINTS and the declared input order.
+    ``None`` means the decision was written by the legacy low-level ledger path
+    WITHOUT a derivation binding, and :meth:`RatificationLedger.binding_of`
+    reports that honestly so an owning registry can refuse to authorize on it.
     """
 
     rule_id: str
@@ -59,6 +66,59 @@ class RatificationRecord:
     operator: str
     ratified_at: datetime
     registry_identity: str
+    binding: "DerivationBinding | None" = None
+
+
+def derivation_binding_digest(binding: "DerivationBinding") -> str:
+    """A deterministic digest over one derivation binding.
+
+    The ratification decision names exactly what executable derivation was
+    approved; this digest is what a live replay compares against. Deterministic,
+    offline, content-derived — never object identity, never a global.
+    """
+
+    import hashlib
+    import json
+
+    payload = [
+        binding.rule_ref,
+        binding.rule_version,
+        binding.predicate_identity,
+        binding.predicate_fingerprint,
+        binding.methodology_identity,
+        binding.methodology_fingerprint,
+        list(binding.required_measurement_refs),
+    ]
+    return hashlib.sha256(
+        json.dumps(payload, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+    ).hexdigest()
+
+
+@dataclass(frozen=True)
+class DerivationBinding:
+    """The exact executable derivation context an operator ratified (R3-D2).
+
+    ``RULE RATIFIED WITH PREDICATE X != RULE AUTHORIZED WITH DIFFERENT CONTENT
+    UNDER X``. Every field is part of the operator's decision:
+
+    - ``predicate_identity`` / ``predicate_fingerprint`` — which predicate AND
+      which content that identity carried at ratification;
+    - ``methodology_identity`` / ``methodology_fingerprint`` — which methodology
+      AND which content (the R2 content seal, applied at ratification);
+    - ``required_measurement_refs`` — the operand-order binding.
+    """
+
+    rule_ref: str
+    rule_version: str
+    predicate_identity: str
+    predicate_fingerprint: str
+    methodology_identity: str
+    methodology_fingerprint: str
+    required_measurement_refs: tuple[str, ...]
+
+    @property
+    def digest(self) -> str:
+        return derivation_binding_digest(self)
 
 
 class RatificationLedger:
@@ -79,9 +139,22 @@ class RatificationLedger:
         self._records: dict[str, RatificationRecord] = {}
 
     def record(
-        self, rule_id: str, *, version: str, operator: str, at: datetime
+        self,
+        rule_id: str,
+        *,
+        version: str,
+        operator: str,
+        at: datetime,
+        binding: "DerivationBinding | None" = None,
     ) -> RatificationRecord:
-        """Record an individual ratification decision for one rule version."""
+        """Record an individual ratification decision for one rule version.
+
+        R3-D2: ``binding`` records the exact executable derivation the operator
+        ratified. The low-level path (binding omitted) stays available for
+        structural registries that do not carry a derivation context — the
+        OWNING registry decides whether such a decision is usable authority —
+        and the binding is re-verified live at every authorization (Phase 8).
+        """
 
         if not rule_id or not version:
             raise RatificationError(
@@ -105,9 +178,25 @@ class RatificationLedger:
             operator=operator,
             ratified_at=at,
             registry_identity=self.registry_identity,
+            binding=binding,
         )
         self._records[rule_id] = decision
         return decision
+
+    def binding_of(self, rule_id: str, *, version: str) -> "DerivationBinding | None":
+        """The derivation binding a decision carries, or ``None``.
+
+        ``None`` is the honest answer for a decision written without one — and
+        a registry that requires a binding refuses to authorize on ``None``.
+        """
+
+        decision = self._records.get(rule_id)
+        if decision is None or decision.version != version:
+            raise RatificationError(
+                f"rule {rule_id} carries no current ratification decision at "
+                f"version {version}"
+            )
+        return decision.binding
 
     def decision(self, rule_id: str, *, version: str) -> RatificationRecord:
         """Return the live decision for a rule version, or refuse.
@@ -198,6 +287,7 @@ OBJECT_STATUS_IS_NOT_AUTHORITY: Final[bool] = True
 
 
 __all__ = [
+    "DerivationBinding",
     "INDIVIDUAL_RULES_RATIFIED_AT_BOOTSTRAP",
     "NO_DELEGATED_RATIFICATION_AUTHORITY",
     "OBJECT_STATUS_IS_NOT_AUTHORITY",
@@ -205,4 +295,5 @@ __all__ = [
     "RatificationLedger",
     "RatificationRecord",
     "RatificationSeal",
+    "derivation_binding_digest",
 ]

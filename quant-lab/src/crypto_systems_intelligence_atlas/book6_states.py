@@ -53,6 +53,7 @@ from .book6_frozen import Book6FrozenModel
 
 from .book6_grammar import MissingnessState
 from .book6_ratification import (
+    DerivationBinding,
     RatificationError,
     RatificationLedger,
     RatificationRecord,
@@ -240,12 +241,42 @@ class StateRuleRegistry:
     No automatic ratification, no delegated authority, no delegation register
     (D6M-3 = A). ``register`` accepts UNRATIFIED rules; ``ratify`` records an
     individual operator decision and is the ONLY path to authorization.
+
+    R3-D2: ratification here is DERIVATION-BOUND. When the registry is wired to
+    its predicate and methodology registries (the engine does this), ``ratify``
+    refuses any rule whose predicate does not already resolve canonically, and
+    the decision records the exact derivation context — predicate identity and
+    content fingerprint, methodology identity and content fingerprint, and the
+    declared operand order. The operator ratifies a derivation, not a name.
     """
 
     def __init__(self) -> None:
         self._rules: dict[str, StateRule] = {}
         self._superseded: dict[str, tuple[StateRule, ...]] = {}
         self._ledger = RatificationLedger("csia:book6:state-rule-registry")
+        #: R3-D2: registries needed to bind a ratification to executable
+        #: content. Both default to ``None``; the engine wires them at build
+        #: time. A bare ``StateRuleRegistry()`` (structural tests) ratifies
+        #: without bindings, and such decisions are NOT usable authority when a
+        #: binding is required (see :meth:`authorize`).
+        self._predicates: object | None = None
+        self._methodologies: object | None = None
+
+    def wire_derivation_registries(
+        self,
+        *,
+        predicates: object,
+        methodologies: object,
+    ) -> None:
+        """Attach the predicate and methodology registries (engine-owned).
+
+        This is what makes ratification binding-aware. Without it, a registry
+        can record decisions but cannot verify the derivation they name, and
+        :meth:`authorize` treats binding-less decisions as insufficient.
+        """
+
+        self._predicates = predicates
+        self._methodologies = methodologies
 
     @property
     def registry_identity(self) -> str:
@@ -311,12 +342,83 @@ class StateRuleRegistry:
             )
         )
 
+    def _build_derivation_binding(self, rule: StateRule) -> DerivationBinding:
+        """Resolve the exact derivation context for a rule, or refuse (R3-D2).
+
+        The predicate must ALREADY resolve canonically (no late binding: a
+        rule may not be ratified against a name that means nothing yet), the
+        predicate's target/class must match the rule, and the methodology must
+        resolve with its canonically bound content (the R2 seal).
+        """
+
+        # Imported lazily: book6_predicates imports StateClass/StateName from
+        # this module, so a module-level import here would be circular.
+        from .book6_methodology import Book6MethodologyRegistry, MethodologyRegistryError
+        from .book6_predicates import PredicateRegistry, PredicateRegistryError, predicate_fingerprint
+
+        predicates = self._predicates
+        methodologies = self._methodologies
+        assert isinstance(predicates, PredicateRegistry)
+        assert isinstance(methodologies, Book6MethodologyRegistry)
+        if predicates is None or methodologies is None:
+            raise StateError(
+                f"state rule {rule.state_rule_id} cannot be ratified because this "
+                f"registry is not wired to the predicate and methodology "
+                f"registries; ratification licenses a derivation method, and a "
+                f"method nobody can resolve is not a method"
+            )
+        try:
+            predicate = predicates.registered_predicate(rule.predicate_ref)
+        except PredicateRegistryError as exc:
+            raise StateError(
+                f"state rule {rule.state_rule_id} names predicate "
+                f"{rule.predicate_ref}, which does not resolve canonically; "
+                f"ratification may not precede its predicate (no late binding)"
+            ) from exc
+        if predicate.target_state is not rule.target_state:
+            raise StateError(
+                f"state rule {rule.state_rule_id} targets "
+                f"{rule.target_state.value} but predicate "
+                f"{predicate.identity} derives {predicate.target_state.value}"
+            )
+        if predicate.state_class is not rule.state_class:
+            raise StateError(
+                f"state rule {rule.state_rule_id} declares class "
+                f"{rule.state_class.value} but predicate {predicate.identity} "
+                f"is {predicate.state_class.value}"
+            )
+        try:
+            methodology = methodologies.resolve_methodology(rule.methodology_ref)
+        except MethodologyRegistryError as exc:
+            raise StateError(
+                f"state rule {rule.state_rule_id} names methodology "
+                f"{rule.methodology_ref}, which does not resolve canonically: {exc}"
+            ) from exc
+        return DerivationBinding(
+            rule_ref=rule.state_rule_id,
+            rule_version=rule.version,
+            predicate_identity=predicate.identity,
+            predicate_fingerprint=predicate_fingerprint(predicate),
+            methodology_identity=methodology.identity,
+            methodology_fingerprint=methodologies.bound_fingerprint(methodology.identity),
+            required_measurement_refs=rule.required_measurement_refs,
+        )
+
     def authorize(self, target: StateName, *, rule_ref: str) -> StateRule:
-        """Return a ratified rule for a state, or refuse.
+        """Return a ratified, binding-current rule for a state, or refuse.
 
         This is the single chokepoint that makes "governance ratified != rule
         ratified" mechanical: a Class B/C state cannot be emitted without naming
         a rule that is individually RATIFIED here.
+
+        R3-D2 / Phase 8: when this registry is wired to its derivation
+        registries, the ratification decision must carry a derivation binding
+        AND that binding must be CURRENT — the live predicate and methodology
+        must still resolve to the exact identities and content fingerprints the
+        operator ratified, over the same declared input order.
+        ``RATIFIED THEN != AUTHORITATIVE NOW`` if any bound component changed.
+        A decision written by the low-level ledger path WITHOUT a binding is
+        recorded history but is NOT usable authority on a wired registry.
         """
 
         rule = self._rules.get(rule_ref)
@@ -331,13 +433,38 @@ class StateRuleRegistry:
                 f"{target.value}"
             )
         try:
-            self._ledger.decision(rule_ref, version=rule.version)
+            decision = self._ledger.decision(rule_ref, version=rule.version)
         except RatificationError as exc:
             raise StateError(
                 f"state rule {rule_ref} for {target.value} carries no registry "
                 f"ratification decision; ratification is an individual operator "
                 f"decision and may not be inferred"
             ) from exc
+        if decision.binding is None and (
+            self._predicates is not None and self._methodologies is not None
+        ):
+            raise StateError(
+                f"state rule {rule_ref} is ratified WITHOUT a derivation binding; "
+                f"a ratification that does not identify the executable derivation "
+                f"it approved licenses nothing (R3-D2)"
+            )
+        if decision.binding is not None and (
+            self._predicates is not None and self._methodologies is not None
+        ):
+            try:
+                current = self._build_derivation_binding(rule)
+            except StateError as exc:
+                raise StateError(
+                    f"state rule {rule_ref} is ratified but its bound derivation is "
+                    f"no longer current: {exc}; RATIFIED THEN != AUTHORITATIVE NOW"
+                ) from exc
+            if current.digest != decision.binding.digest:
+                raise StateError(
+                    f"state rule {rule_ref} is ratified against derivation "
+                    f"{decision.binding.digest[:12]} but the live derivation is "
+                    f"{current.digest[:12]}; the derivation the operator approved "
+                    f"is not the derivation that would now run"
+                )
         return rule
 
     def supersede(self, rule: StateRule) -> StateRule:
@@ -386,13 +513,29 @@ class StateRuleRegistry:
         supersession installs a fresh ``UNRATIFIED`` version and drops the
         decision (see ``supersede``), so authority decays on a revision rather
         than riding along with it.
+
+        R3-D2 (Phase 3/5/7): when this registry is wired to its derivation
+        registries, ratification is BINDING-AWARE — it refuses any rule whose
+        predicate does not already resolve canonically (no late binding: B1),
+        and the decision records the exact derivation context (Phase 5).
+        Synthetic local fixtures ratify through this same path, so there is no
+        unbound ratification route on a wired registry (Phase 6, D6M-3 = A).
         """
 
         rule = self._rules.get(rule_ref)
         if rule is None:
             raise StateError(f"state rule {rule_ref} is not registered")
+        binding: DerivationBinding | None = None
+        if self._predicates is not None and self._methodologies is not None:
+            binding = self._build_derivation_binding(rule)
         try:
-            self._ledger.record(rule_ref, version=rule.version, operator=operator, at=at)
+            self._ledger.record(
+                rule_ref,
+                version=rule.version,
+                operator=operator,
+                at=at,
+                binding=binding,
+            )
         except RatificationError as exc:
             raise StateError(str(exc)) from exc
         return rule

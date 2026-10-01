@@ -31,6 +31,7 @@ from .book6_methodology import (
     MethodologyRegistryError,
 )
 from .book6_normalization import NormalizationRule
+from .book6_predicates import PredicateRegistry
 from .book6_provenance import Book6Provenance, Book6ProvenanceError
 from .book6_records import MeasurementObservation, validate_against_definition
 from .book6_states import StateRule, StateRuleRegistry
@@ -50,11 +51,23 @@ class Book6MeasurementRegistry:
         self._measurements: dict[str, MeasurementObservation] = {}
         self._measurement_order: list[str] = []
         self._normalization_rules: dict[str, NormalizationRule] = {}
+        #: R3-D2: the predicate store lives HERE (not on the engine) so the
+        #: state-rule registry can be wired to it at construction and every
+        #: ratification can be bound to executable content.
+        self.predicates = PredicateRegistry()
         self.state_rules = StateRuleRegistry()
         #: R1-D5: the methodology store, separated from the other four.
         self.methodologies = Book6MethodologyRegistry()
         #: R1-D4: the coverage-sufficiency rule store. Ships empty.
         self.coverage_rules = CoverageRuleRegistry()
+        #: R3-D2: ratification is derivation-bound. Wiring the state-rule
+        #: registry to the predicate and methodology stores makes every
+        #: ratification record exactly what executable derivation the operator
+        #: approved, and refuses rules whose predicate does not yet exist.
+        self.state_rules.wire_derivation_registries(
+            predicates=self.predicates,
+            methodologies=self.methodologies,
+        )
 
     # -- registration (proves nothing about current authority) ---------------
 
