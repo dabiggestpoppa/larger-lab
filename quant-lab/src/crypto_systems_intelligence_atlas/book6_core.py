@@ -460,14 +460,16 @@ class Book6MeasurementEngine:
                 )
             )
         metric_ids = tuple(dimension.dimension_id for dimension in dimensions)
+        attestation = self.registry.coverage_rules.attest(metric_ids, at=as_of_valid_time)
         return FundamentalStateVector(
             subject_ref=subject_ref,
             schema_ref=schema_ref,
             as_of_valid_time=as_of_valid_time,
             dimensions=tuple(dimensions),
-            sufficiency_attestation=self.registry.coverage_rules.attest(
-                metric_ids, at=as_of_valid_time
+            coverage_sufficiency_rule_refs=(
+                attestation.rule_ids if attestation is not None else ()
             ),
+            sufficiency_attestation=attestation,
         )
 
     # -- valuation seam -------------------------------------------------------

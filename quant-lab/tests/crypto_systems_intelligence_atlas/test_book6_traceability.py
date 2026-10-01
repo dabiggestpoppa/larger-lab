@@ -15,6 +15,8 @@ import pathlib
 import pytest
 
 from crypto_systems_intelligence_atlas.book6_traceability import (
+    ALL_FAMILIES,
+    R1_FAMILIES,
     STRUCTURAL_FAMILIES,
     TRACEABILITY_ROWS,
     VALIDATION_FAMILIES,
@@ -73,7 +75,7 @@ def test_every_row_carries_a_substantive_claim(row: tuple[str, str, str, str, st
     row_id, family, claim, _test_file, _test_name = row
     assert row_id and claim
     assert len(claim) > 20, row_id
-    assert family in VALIDATION_FAMILIES + STRUCTURAL_FAMILIES, row_id
+    assert family in ALL_FAMILIES, row_id
 
 
 def test_row_ids_are_unique() -> None:
@@ -94,15 +96,30 @@ def test_every_structural_family_is_covered(family: str) -> None:
     assert len(rows_for_family(family)) > 0, family
 
 
-def test_the_matrix_covers_exactly_the_ratified_and_structural_families() -> None:
+@pytest.mark.parametrize("family", R1_FAMILIES, ids=lambda f: f)
+def test_every_r1_family_is_covered(family: str) -> None:
+    assert len(rows_for_family(family)) > 0, family
+
+
+def test_the_matrix_covers_exactly_the_ratified_structural_and_r1_families() -> None:
     families = {row[1] for row in TRACEABILITY_ROWS}
-    assert families == set(VALIDATION_FAMILIES) | set(STRUCTURAL_FAMILIES)
+    assert families == set(ALL_FAMILIES)
 
 
 def test_every_row_is_distinctly_attributed_to_one_family() -> None:
-    assert len({row[1] for row in TRACEABILITY_ROWS}) == len(
-        set(VALIDATION_FAMILIES) | set(STRUCTURAL_FAMILIES)
-    )
+    assert len({row[1] for row in TRACEABILITY_ROWS}) == len(set(ALL_FAMILIES))
+
+
+def test_every_reproduced_r1_defect_has_a_trace_row() -> None:
+    """Each of the seven reproduced defects must be traceable by name."""
+
+    claims = " ".join(row[2] for row in TRACEABILITY_ROWS)
+    for defect in ("R1-D1", "R1-D2", "R1-D3", "R1-D4", "R1-D6"):
+        assert defect in claims, defect
+    # R1-D5 (the absent methodology registry) and R1-D7 (status forgery) are
+    # traced by family and by assertion rather than by a defect tag
+    assert rows_for_family("R1.METHODOLOGY_REGISTRY")
+    assert rows_for_family("R1.RULE_AUTHORITY")
 
 
 # -- the matrix tracks the assertions that matter most ----------------------
@@ -140,3 +157,11 @@ def test_no_book6_suite_is_untraced() -> None:
 
 def test_the_matrix_cites_a_meaningful_number_of_assertions() -> None:
     assert len(TRACEABILITY_ROWS) >= 60, len(TRACEABILITY_ROWS)
+
+
+def test_the_r1_families_trace_the_post_construction_attack_matrix() -> None:
+    """C1..C10 must all be individually traced, not covered by one row."""
+
+    claims = " ".join(row[2] for row in rows_for_family("R1.RULE_AUTHORITY"))
+    for attack in ("C1 ", "C2 ", "C4 ", "C5 ", "C6 ", "C7 ", "C8 ", "C9 ", "C10 "):
+        assert attack in claims, attack
