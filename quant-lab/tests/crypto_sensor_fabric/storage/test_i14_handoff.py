@@ -454,24 +454,32 @@ class TestG412CoreFlow:
 
 class TestEmptyValidLaw:
     def test_empty_valid_batch_never_fabricates_bytes(self, tmp_path) -> None:
+        """I14R1 §12/§17: an EMPTY_VALID batch IS a durable acquisition
+        EVENT — blob-less AcquisitionRecord + durable EMPTY_CONFIRMED
+        manifest + a REAL I07 checkpoint (no fake bytes, no bypass)."""
         stack = HandoffStack(tmp_path / "s")
         batch = make_batch(
             [],
             row_count=0,
             quality_flags=[QualityFlagAcquisition.EMPTY_VALID],
+            is_complete=True,
         )
         register_job(stack, "job-1", batch)
         receipt = stack.handoff.persist_batch(
             job_id="job-1", batch=batch, context=make_context()
         )
-        # §10: no fake T0A bytes.  A zero-envelope EMPTY_VALID batch carries
-        # no acquisition, so there is nothing to anchor a manifest-floor
-        # checkpoint to — the handoff records durable truth (nothing) and
-        # the adapter's cursor semantics are untouched (no token invented).
+        # §10: no fake T0A bytes — but the acquisition EVENT is durable.
         assert receipt.blob_shas == ()
-        assert receipt.acquisition_ids == ()
+        assert len(receipt.acquisition_ids) == 1
+        record = stack.acq_repo.get_acquisition(receipt.acquisition_ids[0])
+        assert record.blob_sha256 is None
+        assert QualityFlagAcquisition.EMPTY_VALID in record.quality_flags
+        # The checkpoint gate ran for real (V2 EMPTY_VALID law).
         state = stack.jobs_repo.get_job("job-1")
+        assert state.status is StorageJobStatus.COMPLETE
         assert state.resume_token is None
+        assert state.last_committed_blob_sha256 is None
+        assert receipt.checkpoint_advanced is True
 
 
 # -------------------------------------------------------------------------

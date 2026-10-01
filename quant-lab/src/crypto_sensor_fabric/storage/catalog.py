@@ -849,6 +849,30 @@ def is_usable_manifest_provenance(record: AcquisitionRecord) -> bool:
     return True
 
 
+def _is_empty_valid_acquisition(record: AcquisitionRecord) -> bool:
+    """I14R1 §12: the ONE lawful blobless-success shape.
+
+    True ONLY when the record carries the accepted EMPTY_VALID quality
+    flag with NO blob (``blob_sha256 is None``) and NO failure evidence
+    (``failure_ref is None``, no explicitly parsed numeric failure
+    status, no checksum contradiction).  An EMPTY_VALID adapter result is
+    still an acquisition EVENT — provider, sensor, request fingerprint,
+    requested window, observation timestamp, transport/source status —
+    preserved truthfully even though no source bytes exist.  Every OTHER
+    blobless shape remains governed by the I04R1 §26 failure law."""
+    if record.blob_sha256 is not None:
+        return False
+    if QualityFlagAcquisition.EMPTY_VALID not in record.quality_flags:
+        return False
+    if record.failure_ref is not None:
+        return False
+    if AcquisitionRepository._is_explicit_failure(record):
+        return False
+    if record.provider_checksum_verified is False:
+        return False
+    return True
+
+
 # ---------------------------------------------------------------------------
 # Acquisition repository (I04 §15/§18/§26/§28/§29/§70)
 # ---------------------------------------------------------------------------
@@ -933,15 +957,22 @@ class AcquisitionRepository:
                     "physically verified representation exists (I04 §12)"
                 )
         else:
-            # blob_sha256 absent ONLY when the record truthfully represents a
-            # failure/non-payload outcome (I04R1 §25-§27).  The old
-            # ``not status.startswith("2")`` heuristic was TOO WEAK — "OK",
-            # "SUCCESS", "CURRENT_ONLY" are not automatically failures.  With
-            # no closed source-status enum in the repo, blobless persistence
-            # requires explicit failure_ref; an explicitly PARSED numeric HTTP
-            # failure code may contribute but string-prefix guessing never
-            # does.  failure_ref remains the preferred evidence.
-            if not self._is_explicit_failure(record):
+            # blob_sha256 absent when the record truthfully represents a
+            # failure/non-payload outcome (I04R1 §25-§27) OR — I14R1 §12 —
+            # a VALID EMPTY acquisition event: the adapter returned a real,
+            # successful EMPTY_VALID observation with no source bytes, and
+            # the record preserves that event truthfully (no fabricated
+            # blob, no invented failure).  The old ``not
+            # status.startswith("2")`` heuristic was TOO WEAK — "OK",
+            # "SUCCESS", "CURRENT_ONLY" are not automatically failures.
+            # With no closed source-status enum in the repo, blobless
+            # persistence otherwise requires explicit failure_ref; an
+            # explicitly PARSED numeric HTTP failure code may contribute
+            # but string-prefix guessing never does.  failure_ref remains
+            # the preferred evidence.
+            if not self._is_explicit_failure(
+                record
+            ) and not _is_empty_valid_acquisition(record):
                 raise CatalogIntegrityError(
                     "successful acquisition without a blob and without "
                     "explicit failure/unavailable evidence cannot be "

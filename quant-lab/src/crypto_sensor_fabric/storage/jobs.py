@@ -103,6 +103,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from .atomic import ensure_durable_directory
+from ..providers.base.enums import QualityFlagAcquisition
 from .catalog import (
     AcquisitionRepository,
     is_usable_manifest_provenance,
@@ -126,6 +127,8 @@ __all__ = [
     "JobCatalogCorrupt",
     "MIN_DURABLE_STATES",
     "CHECKPOINT_PROOF_VERSION",
+    "CHECKPOINT_PROOF_VERSION_V2",
+    "CHECKPOINT_EVIDENCE_KIND_EMPTY_VALID",
     "validate_checkpoint_proof",
     "DurableJobStateRepository",
 ]
@@ -200,6 +203,12 @@ MIN_DURABLE_STATES: frozenset[StorageJobStatus] = frozenset(
 #: Closed V1 checkpoint-proof schema version (I07R1 §16).
 CHECKPOINT_PROOF_VERSION = 1
 
+#: Closed V2 checkpoint-proof schema version (I14R1 §15): the SMALLEST
+#: backward-compatible extension for EMPTY_VALID evidence — a blob-less
+#: acquisition anchored at the MANIFEST_COMMITTED floor.  Additive field
+#: only; V1 proofs remain valid and are re-proven under V1 law unchanged.
+CHECKPOINT_PROOF_VERSION_V2 = 2
+
 #: Closed V1 checkpoint-proof field set (I07R1G §5): exactly these five.
 CHECKPOINT_PROOF_FIELDS: frozenset[str] = frozenset(
     {
@@ -211,15 +220,37 @@ CHECKPOINT_PROOF_FIELDS: frozenset[str] = frozenset(
     }
 )
 
+#: Closed V2 field set (I14R1 §15): V1 fields PLUS the explicit
+#: ``evidence_kind`` marker that makes a None-blob proof expressible.
+CHECKPOINT_PROOF_FIELDS_V2: frozenset[str] = frozenset(
+    {
+        "proof_version",
+        "minimum_durable_status",
+        "acquisition_id",
+        "blob_sha256",
+        "manifest_id",
+        "evidence_kind",
+    }
+)
+
+#: The ONLY evidence kind that may carry ``blob_sha256 = None``.
+CHECKPOINT_EVIDENCE_KIND_EMPTY_VALID = "EMPTY_VALID"
+
 
 def validate_checkpoint_proof(
     event_id: str, proof: Any
-) -> tuple[StorageJobStatus, str, str, str | None]:
+) -> tuple[StorageJobStatus, str, str | None, str | None]:
     """THE authoritative checkpoint-proof contract (I07R1G §4-§8, pure).
+
+    I14R1 §15: ``proof_version == 2`` is accepted ADDITIVELY — the closed
+    V1 field set PLUS a nonempty ``evidence_kind``.  V2 is valid ONLY at
+    the MANIFEST_COMMITTED floor and ONLY for the ``EMPTY_VALID`` evidence
+    kind with ``blob_sha256 = None``; every other V2 shape fails closed.
+    V1 proofs remain valid and unchanged under V1 law.
 
     Returns ``(floor, acquisition_id, blob_sha256, manifest_id)``.  Every
     failure mode of a persisted proof — absent, wrong Python type, not the
-    closed V1 field set, unknown version, missing/unknown/non-durability
+    closed V1/V2 field set, unknown version, missing/unknown/non-durability
     floor, empty anchors, RAW floor contradicting a manifest anchor,
     MANIFEST floor without one — is typed :class:`JobCatalogCorrupt`.  No
     Python implementation exception (``KeyError``/``TypeError``/
@@ -237,18 +268,38 @@ def validate_checkpoint_proof(
             f"({type(proof).__name__})"
         )
     supplied = set(proof)
+    version = proof.get("proof_version")
+    if version == CHECKPOINT_PROOF_VERSION_V2:
+        if supplied != CHECKPOINT_PROOF_FIELDS_V2:
+            raise JobCatalogCorrupt(
+                f"{label} proof is not the closed V2 schema: missing "
+                f"{sorted(CHECKPOINT_PROOF_FIELDS_V2 - supplied)}, "
+                f"unexpected {sorted(supplied - CHECKPOINT_PROOF_FIELDS_V2)}"
+            )
+        return _validate_checkpoint_proof_body(event_id, proof)
     if supplied != CHECKPOINT_PROOF_FIELDS:
         raise JobCatalogCorrupt(
             f"{label} proof is not the closed V1 schema: missing "
             f"{sorted(CHECKPOINT_PROOF_FIELDS - supplied)}, unexpected "
             f"{sorted(supplied - CHECKPOINT_PROOF_FIELDS)}"
         )
-    version = proof["proof_version"]
     if isinstance(version, bool) or version != CHECKPOINT_PROOF_VERSION:
-        # §16: closed V1 — no silent future-version reading.
+        # §16: closed versions — no silent future-version reading.
         raise JobCatalogCorrupt(
             f"{label} carries unknown checkpoint proof_version {version!r}"
         )
+    return _validate_checkpoint_proof_body(event_id, proof)
+
+
+def _validate_checkpoint_proof_body(
+    event_id: str, proof: dict[str, Any]
+) -> tuple[StorageJobStatus, str, str | None, str | None]:
+    """Shared V1/V2 body law (closed schema already verified by the
+    caller).  V2 adds the explicit EMPTY_VALID only-law (I14R1 §15):
+    MANIFEST floor + evidence_kind EMPTY_VALID + blob_sha256 None, and
+    NOTHING else."""
+    label = f"checkpoint {event_id[:12]}..."
+    version = proof["proof_version"]
     floor_value = proof["minimum_durable_status"]
     if not isinstance(floor_value, str):
         raise JobCatalogCorrupt(
@@ -268,12 +319,35 @@ def validate_checkpoint_proof(
         )
     acquisition_id = proof["acquisition_id"]
     blob_sha = proof["blob_sha256"]
-    if (
-        not isinstance(acquisition_id, str)
-        or not acquisition_id
-        or not isinstance(blob_sha, str)
-        or not blob_sha
-    ):
+    evidence_kind = proof.get("evidence_kind")
+    if version == CHECKPOINT_PROOF_VERSION_V2:
+        # I14R1 §15: the ONLY legal None-blob shape.
+        if (
+            floor is not StorageJobStatus.MANIFEST_COMMITTED
+            or evidence_kind != CHECKPOINT_EVIDENCE_KIND_EMPTY_VALID
+            or blob_sha is not None
+        ):
+            raise JobCatalogCorrupt(
+                f"{label} V2 proof is not an EMPTY_VALID manifest-floor "
+                "shape (evidence_kind/blob_sha256/floor contradiction)"
+            )
+    else:
+        if evidence_kind is not None:
+            raise JobCatalogCorrupt(
+                f"{label} V1 proof carries an evidence_kind field"
+            )
+    if version == CHECKPOINT_PROOF_VERSION_V2:
+        # V2 EMPTY_VALID law: the blob anchor is EXACTLY None.
+        if blob_sha is not None:
+            raise JobCatalogCorrupt(
+                f"{label} V2 EMPTY_VALID proof must anchor no blob"
+            )
+    elif not isinstance(blob_sha, str) or len(blob_sha) != 64:
+        # V1 law unchanged: a nonempty 64-hex blob anchor is mandatory.
+        raise JobCatalogCorrupt(
+            f"{label} proof carries invalid acquisition/blob anchors"
+        )
+    if not isinstance(acquisition_id, str) or not acquisition_id:
         raise JobCatalogCorrupt(
             f"{label} proof carries invalid acquisition/blob anchors"
         )
@@ -692,8 +766,9 @@ class DurableJobStateRepository:
         resume_token: Any,
         acquisition_id: str,
         manifest_id: str | None = None,
+        evidence_kind: str | None = None,
     ) -> StorageJobState:
-        """Persist        ``resume_token`` as the active resume point (§16).
+        """Persist ``resume_token`` as the active resume point (§16).
 
         The ONLY way a chain reaches ``CHECKPOINT_ADVANCED``.  Allowed
         only when the batch's T0 evidence is durably proven at or above
@@ -710,7 +785,11 @@ class DurableJobStateRepository:
         under the floor persisted in its own proof, so a restart with a
         different ``min_durable_status`` can neither reinterpret nor
         refuse durable history.
-        """
+
+        I14R1 §15: ``evidence_kind=EMPTY_VALID`` requests the additive V2
+        proof for a blob-less EMPTY_VALID acquisition anchored at the
+        MANIFEST_COMMITTED floor.  Any other value, or EMPTY_VALID at a
+        RAW floor, is a typed refusal before any state change."""
         with self._job_lock(job_id):
             current = self._get_job_unlocked(job_id)
             if current.status is StorageJobStatus.CHECKPOINT_ADVANCED:
@@ -729,6 +808,19 @@ class DurableJobStateRepository:
                 )
             # NEW checkpoint: the CURRENT constructor floor governs (§7).
             floor = self._min_durable_status
+            # I14R1 §15: the EMPTY_VALID evidence kind is NEW-checkpoint
+            # caller input, shaped by the CURRENT constructor floor.
+            if evidence_kind is not None:
+                if evidence_kind != CHECKPOINT_EVIDENCE_KIND_EMPTY_VALID:
+                    raise JobResumeGateError(
+                        f"unknown checkpoint evidence_kind {evidence_kind!r}"
+                    )
+                if floor is not StorageJobStatus.MANIFEST_COMMITTED:
+                    raise JobResumeGateError(
+                        "EMPTY_VALID checkpoint evidence requires the "
+                        "MANIFEST_COMMITTED floor (no blob may be proven "
+                        "absent below it)"
+                    )
             self._require_checkpoint_shape(floor, manifest_id)
             self._require_checkpoint_eligible(current.status, floor)
             blob_sha = self._prove_batch_durable(
@@ -736,6 +828,7 @@ class DurableJobStateRepository:
                 acquisition_id=acquisition_id,
                 manifest_id=manifest_id,
                 floor=floor,
+                evidence_kind=evidence_kind,
             )
             return self._append_checkpoint_event(
                 job_id=job_id,
@@ -745,6 +838,7 @@ class DurableJobStateRepository:
                 blob_sha=blob_sha,
                 manifest_id=manifest_id,
                 floor=floor,
+                evidence_kind=evidence_kind,
             )
 
     def _append_checkpoint_event(
@@ -754,9 +848,10 @@ class DurableJobStateRepository:
         current: StorageJobState,
         resume_token: Any,
         acquisition_id: str,
-        blob_sha: str,
+        blob_sha: str | None,
         manifest_id: str | None,
         floor: StorageJobStatus,
+        evidence_kind: str | None = None,
     ) -> StorageJobState:
         """PRIVATE gated primitive (I07R1 §4): append a proven checkpoint.
 
@@ -764,6 +859,10 @@ class DurableJobStateRepository:
         state EXPLICITLY (no caller-settable flag exists), fully
         validated, with the immutable checkpoint proof attached to the
         event record (I07R1 §15/§17).
+
+        I14R1 §15: with ``evidence_kind=EMPTY_VALID`` the proof is V2
+        (adds ``evidence_kind``) and ``blob_sha`` is None — the durable
+        empty acquisition is the anchor, never a fabricated blob.
         """
         transitioned_at = self._clock()
         transition = StorageJobTransition(
@@ -809,13 +908,17 @@ class DurableJobStateRepository:
             transition=transition,
             resulting_state=next_state,
         )
-        event["checkpoint_proof"] = {
+        proof: dict[str, Any] = {
             "proof_version": CHECKPOINT_PROOF_VERSION,
             "minimum_durable_status": floor.value,
             "acquisition_id": acquisition_id,
             "blob_sha256": blob_sha,
             "manifest_id": manifest_id,
         }
+        if evidence_kind is not None:
+            proof["proof_version"] = CHECKPOINT_PROOF_VERSION_V2
+            proof["evidence_kind"] = evidence_kind
+        event["checkpoint_proof"] = proof
         self._commit_adopting(
             self._events,
             transition.transition_id,
@@ -932,16 +1035,27 @@ class DurableJobStateRepository:
         acquisition_id: str,
         manifest_id: str | None,
         floor: StorageJobStatus,
-    ) -> str:
+        evidence_kind: str | None = None,
+    ) -> str | None:
         """Resolve §16 proof from durable truth (never caller claims).
 
-        Returns the exact proven ``blob_sha256``.  Enforces, in order:
-        durable acquisition resolution; job↔acquisition identity (§7);
-        the authoritative I04R2 usable-provenance predicate (§8); physical
+        Returns the exact proven ``blob_sha256`` (None ONLY under the V2
+        EMPTY_VALID law, I14R1 §15).  Enforces, in order: durable
+        acquisition resolution; job↔acquisition identity (§7); the
+        authoritative I04R2 usable-provenance predicate (§8); physical
         blob verification; and at the MANIFEST_COMMITTED floor the exact
         manifest↔acquisition source identity (§10).  The SAME routine
         re-proves historical checkpoints at restart under the floor
         persisted in each proof (I07R1 §19/§25).
+
+        I14R1 §15 EMPTY_VALID law (evidence_kind=EMPTY_VALID, MANIFEST
+        floor only): the acquisition MUST exist, belong to this job, and
+        carry ``blob_sha256 = None``; the manifest MUST be current/durable
+        with EMPTY blob_refs, coverage EMPTY_CONFIRMED and integrity
+        UNVERIFIED.  NO raw blob physical verification happens because no
+        raw blob exists — and NO blob is ever fabricated.  Any blob-less
+        acquisition NOT carrying the EMPTY_VALID quality flag fails
+        closed.
         """
         try:
             acquisition = self._acquisitions.get_acquisition(acquisition_id)
@@ -971,6 +1085,13 @@ class DurableJobStateRepository:
                 f"{acquisition.request_fingerprint!r} vs "
                 f"{birth.request_fingerprint!r})"
             )
+        if evidence_kind == CHECKPOINT_EVIDENCE_KIND_EMPTY_VALID:
+            self._prove_empty_batch_durable(
+                job_id=job_id,
+                acquisition=acquisition,
+                manifest_id=manifest_id,
+            )
+            return None
         if not is_usable_manifest_provenance(acquisition):
             # §8: the ONE authoritative I04R2 rule.  A forensic failed
             # acquisition stays durable T0A history but may NOT move the
@@ -1037,6 +1158,95 @@ class DurableJobStateRepository:
                 f"{blob_sha} — the batch is not manifest-committed"
             )
         return blob_sha
+
+    def _prove_empty_batch_durable(
+        self,
+        *,
+        job_id: str,
+        acquisition: Any,
+        manifest_id: str | None,
+    ) -> None:
+        """I14R1 §15: durable-truth proof for an EMPTY_VALID acquisition.
+
+        Law: acquisition carries NO blob (``blob_sha256 is None``) and the
+        accepted EMPTY_VALID quality flag; usable provenance WITHOUT the
+        blob clause (the I04R2 §5 predicate structurally requires bytes —
+        an empty page has none, so the remaining clauses apply: no failure
+        evidence, no explicit numeric failure status, no checksum
+        contradiction); manifest durable, current, EMPTY blob_refs,
+        coverage EMPTY_CONFIRMED, integrity UNVERIFIED.  No physical blob
+        verification — there is no blob, and none is fabricated."""
+        from .catalog import AcquisitionRepository
+        from .enums import CoverageState, IntegrityState
+
+        if acquisition.blob_sha256 is not None:
+            raise JobResumeGateError(
+                f"EMPTY_VALID acquisition {acquisition.acquisition_id!r} "
+                "carries a blob; the EMPTY_VALID proof law requires a "
+                "blob-less acquisition (blob evidence uses the V1 path)"
+            )
+        if (
+            QualityFlagAcquisition.EMPTY_VALID
+            not in acquisition.quality_flags
+        ):
+            raise JobResumeGateError(
+                f"acquisition {acquisition.acquisition_id!r} is blob-less "
+                "without the EMPTY_VALID quality flag — no invented "
+                "missingness (fail closed)"
+            )
+        if acquisition.failure_ref is not None:
+            raise JobResumeGateError(
+                f"EMPTY_VALID acquisition {acquisition.acquisition_id!r} "
+                "carries failure evidence; it may not anchor a checkpoint"
+            )
+        if AcquisitionRepository._is_explicit_failure(acquisition):
+            raise JobResumeGateError(
+                f"EMPTY_VALID acquisition {acquisition.acquisition_id!r} "
+                "carries an explicit failure status; it may not anchor a "
+                "checkpoint"
+            )
+        if acquisition.provider_checksum_verified is False:
+            raise JobResumeGateError(
+                f"EMPTY_VALID acquisition {acquisition.acquisition_id!r} "
+                "carries a checksum contradiction; it may not anchor a "
+                "checkpoint"
+            )
+        assert manifest_id is not None  # shaped by advance_checkpoint
+        try:
+            manifest = self._manifests.get_manifest(manifest_id)
+        except Exception as exc:
+            raise JobResumeGateError(
+                f"batch manifest {manifest_id!r} is not durable: {exc}"
+            ) from exc
+        if (
+            manifest.provider != acquisition.provider_id
+            or manifest.venue != acquisition.venue
+            or manifest.sensor_family != acquisition.sensor_family
+            or manifest.native_instrument != acquisition.native_instrument
+            or manifest.source_granularity != acquisition.native_granularity
+        ):
+            raise JobResumeGateError(
+                f"manifest {manifest_id} does not describe the batch "
+                f"acquisition source (EMPTY_VALID binding failed)"
+            )
+        if manifest.blob_refs:
+            raise JobResumeGateError(
+                f"manifest {manifest_id} carries blob evidence; an "
+                "EMPTY_VALID checkpoint requires an EMPTY manifest"
+            )
+        if manifest.coverage_state is not CoverageState.EMPTY_CONFIRMED:
+            raise JobResumeGateError(
+                f"manifest {manifest_id} coverage is "
+                f"{manifest.coverage_state.value}; EMPTY_VALID requires "
+                "EMPTY_CONFIRMED"
+            )
+        if manifest.integrity_state is not IntegrityState.UNVERIFIED:
+            raise JobResumeGateError(
+                f"manifest {manifest_id} integrity is "
+                f"{manifest.integrity_state.value}; EMPTY_VALID requires "
+                "UNVERIFIED (I04 §46 vacuous-claim rule)"
+            )
+        return None
 
     # -- chain plumbing --------------------------------------------------------
 
@@ -1436,6 +1646,13 @@ class DurableJobStateRepository:
         floor, acquisition_id, blob_sha, manifest_id = (
             validate_checkpoint_proof(event_id, proof)
         )
+        # I14R1 §16: a V2 EMPTY_VALID proof is re-proven under the SAME V2
+        # law that minted it (never reinterpreted through the V1 blob path).
+        evidence_kind = (
+            proof.get("evidence_kind")
+            if isinstance(proof, dict)
+            else None
+        )
         # §17: the proof must bind EXACTLY to the resulting state's anchors.
         if (
             acquisition_id != resulting.last_committed_acquisition_id
@@ -1453,6 +1670,7 @@ class DurableJobStateRepository:
                 acquisition_id=acquisition_id,
                 manifest_id=manifest_id,
                 floor=floor,
+                evidence_kind=evidence_kind,
             )
         except JobResumeGateError as exc:
             raise JobCatalogCorrupt(
