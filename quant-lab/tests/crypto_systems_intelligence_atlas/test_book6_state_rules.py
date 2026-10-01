@@ -100,6 +100,38 @@ def _rule(
     return StateRule(**payload)  # type: ignore[arg-type]
 
 
+def _register_rule_predicate(engine, rule: StateRule) -> None:
+    """Register the canonical predicate a synthetic rule names (R3 Phase 3).
+
+    R3-D2: ratification is derivation-bound, so a rule may not be ratified
+    until its predicate EXISTS with matching target and class. This helper
+    builds the truthful predicate for a synthetic rule; the late-binding
+    refusal itself is exercised in test_book6_hardening_r3.py (B1).
+    """
+
+    from crypto_systems_intelligence_atlas.book6_predicates import (
+        EVALUATOR_TARGET_STATE,
+        StatePredicateDefinition,
+    )
+
+    identity = rule.predicate_ref
+    predicate_id, _, version = identity.rpartition("@")
+    kind = next(
+        k for k, t in EVALUATOR_TARGET_STATE.items() if t is rule.target_state
+    )
+    engine.predicates.register(
+        StatePredicateDefinition(
+            predicate_id=predicate_id,
+            version=version,
+            state_class=rule.state_class,
+            target_state=rule.target_state,
+            description="synthetic fixture predicate for the local rule",
+            required_input_arity=2,
+            evaluator_kind=kind,
+        )
+    )
+
+
 def _stack():
     engine, *_ = build_engine()
     register_definition(engine, definition(METRIC))
@@ -192,7 +224,9 @@ def test_an_unregistered_rule_ref_is_refused() -> None:
 
 def test_a_rule_may_not_be_used_for_a_state_it_does_not_target() -> None:
     engine = _stack()
-    engine.registry.register_state_rule(_rule(StateName.INCREASING))
+    rule = _rule(StateName.INCREASING)
+    engine.registry.register_state_rule(rule)
+    _register_rule_predicate(engine, rule)
     engine.registry.state_rules.ratify(
         "staterule:increasing:1", operator="synthetic-operator", at=NOW
     )
@@ -271,7 +305,9 @@ def test_a_synthetic_ratified_rule_unblocks_exactly_its_own_state() -> None:
 
 def test_synthetic_ratification_is_local_and_not_canonical() -> None:
     engine = _stack()
-    engine.registry.register_state_rule(_rule(StateName.INCREASING))
+    rule = _rule(StateName.INCREASING)
+    engine.registry.register_state_rule(rule)
+    _register_rule_predicate(engine, rule)
     engine.registry.state_rules.ratify(
         "staterule:increasing:1", operator="synthetic-fixture-operator", at=NOW
     )

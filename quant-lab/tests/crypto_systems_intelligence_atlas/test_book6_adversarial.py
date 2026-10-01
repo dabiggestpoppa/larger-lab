@@ -529,6 +529,24 @@ def test_a_rule_ref_cannot_be_forged_to_point_at_another_rule() -> None:
     )
 
     engine = _stack()
+    # R3 Phase 3: ratification is derivation-bound, so the predicate the rule
+    # names must exist first (with matching target/class); register it now.
+    from crypto_systems_intelligence_atlas.book6_predicates import (
+        EvaluatorKind,
+        StatePredicateDefinition,
+    )
+
+    engine.predicates.register(
+        StatePredicateDefinition(
+            predicate_id="predicate",
+            version="1",
+            state_class=StateClass.B_SPECIFICATION_ONLY,
+            target_state=StateName.INCREASING,
+            description="synthetic fixture predicate for the forged-ref test",
+            required_input_arity=2,
+            evaluator_kind=EvaluatorKind.CURRENT_GREATER_THAN_PRIOR,
+        )
+    )
     engine.registry.register_state_rule(
         StateRule(
             state_rule_id="staterule:increasing:1",

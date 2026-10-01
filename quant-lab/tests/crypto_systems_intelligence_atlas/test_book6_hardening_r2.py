@@ -167,9 +167,23 @@ def _ratified_rule_for_metrics(engine, metrics=("metric:A", "metric:B")):
         )
 
 
-def _predicate(engine, *, target=StateName.INCREASING, kind=EvaluatorKind.CURRENT_GREATER_THAN_PRIOR):
+def _predicate(engine, *, target=StateName.INCREASING):
+    # R3-D1: evaluator kind and target state are mechanically bound, so the
+    # kind is DERIVED from the target and the id names its true semantics; the
+    # old single fixed id could carry contradicting semantics, which the
+    # registration seal now refuses.
+    kind = {
+        StateName.INCREASING: EvaluatorKind.CURRENT_GREATER_THAN_PRIOR,
+        StateName.DECREASING: EvaluatorKind.CURRENT_LESS_THAN_PRIOR,
+        StateName.UNCHANGED: EvaluatorKind.EXACT_EQUALITY,
+    }[target]
+    truthful_id = {
+        StateName.INCREASING: "predicate:current_gt_prior",
+        StateName.DECREASING: "predicate:current_lt_prior",
+        StateName.UNCHANGED: "predicate:exact_equality",
+    }[target]
     definition_ = StatePredicateDefinition(
-        predicate_id="predicate:current_gt_prior",
+        predicate_id=truthful_id,
         version="1",
         state_class=StateClass.B_SPECIFICATION_ONLY,
         target_state=target,
@@ -616,7 +630,12 @@ def test_r2_d2_each_evaluator_kind_computes_its_own_truth() -> None:
 
 
 def test_r2_phase6_a_rule_may_not_bind_another_states_predicate() -> None:
-    """A rule targeting INCREASING may not bind a DECREASING predicate."""
+    """A rule targeting INCREASING may not bind a DECREASING predicate.
+
+    R3 strengthens where this fires: the mismatch is refused at RATIFICATION
+    (a binding-aware ratification verifies the predicate's target matches the
+    rule's) rather than surviving ratification until emission.
+    """
 
     engine = build_engine_with_definitions(definition(METRIC))
     _series_engine(engine, current=150.0, prior=100.0)
@@ -632,14 +651,21 @@ def test_r2_phase6_a_rule_may_not_bind_another_states_predicate() -> None:
         version="1",
     )
     engine.registry.register_state_rule(rule)
-    engine.registry.state_rules.ratify(
-        rule.state_rule_id, operator="synthetic-fixture-operator", at=NOW
-    )
-    with pytest.raises(Book6EngineError, match="another state's predicate"):
-        engine.emit_rule_gated_state(StateName.INCREASING, **_emission_kwargs())
+    with pytest.raises(StateError, match="derives"):
+        engine.registry.state_rules.ratify(
+            rule.state_rule_id, operator="synthetic-fixture-operator", at=NOW
+        )
 
 
 def test_r2_phase6_a_rule_may_not_misstate_its_class() -> None:
+    """A rule whose class/target disagree with its predicate cannot exist.
+
+    R3 moved both checks to RATIFICATION: a Class C rule naming a Class B
+    predicate is refused there (derives STABLE-vs-INCREASING and the class
+    mismatch in one binding check), so there is nothing left to misstate at
+    emission.
+    """
+
     engine = build_engine_with_definitions(definition(METRIC))
     _series_engine(engine, current=150.0, prior=100.0)
     _predicate(engine)  # a Class B predicate targeting INCREASING
@@ -657,20 +683,9 @@ def test_r2_phase6_a_rule_may_not_misstate_its_class() -> None:
         version="1",
     )
     engine.registry.register_state_rule(rule)
-    engine.registry.state_rules.ratify(
-        rule.state_rule_id, operator="synthetic-fixture-operator", at=NOW
-    )
-    # the class mismatch is refused before or with the target mismatch
-    with pytest.raises(Book6EngineError, match="(declares class|another state's predicate)"):
-        engine.emit_rule_gated_state(
-            StateName.STABLE,
-            rule_ref=rule.state_rule_id,
-            dimension_id="dim:1",
-            measurement_refs=("obs:current", "obs:prior"),
-            methodology_ref="book6-methodology@1",
-            valid_time=T1,
-            observed_at=T1,
-            missingness=MissingnessState.OBSERVED,
+    with pytest.raises(StateError, match="(derives|declares class)"):
+        engine.registry.state_rules.ratify(
+            rule.state_rule_id, operator="synthetic-fixture-operator", at=NOW
         )
 
 
@@ -691,7 +706,7 @@ def test_r2_phase6_predicate_target_mismatch_s4_is_refused() -> None:
 
     engine = build_engine_with_definitions(definition(METRIC))
     _series_engine(engine, current=150.0, prior=100.0)
-    _predicate(engine, target=StateName.DECREASING)
+    _predicate(engine)  # the INCREASING predicate the rule binds
     _increasing_rule(engine)
     # the registered rule still binds the INCREASING predicate; a forged copy
     # handed to the engine cannot change which predicate is resolved
@@ -708,10 +723,35 @@ def test_r2_phase6_predicate_target_mismatch_s4_is_refused() -> None:
 
 
 def test_r2_phase7_an_unresolvable_predicate_refuses_the_emission() -> None:
+    """An emission naming a rule whose predicate never resolved refuses.
+
+    R3 moved the first refusal to ratification (no late binding), so this now
+    asserts the still-closing gate: the predicate is absent, the rule can never
+    be ratified, and emission stays refused.
+    """
+
     engine = build_engine_with_definitions(definition(METRIC))
     _series_engine(engine, current=150.0, prior=100.0)
-    _increasing_rule(engine)  # no predicate registered at all
-    with pytest.raises(Book6EngineError, match="not registered"):
+    # registered, but no predicate exists at all: ratification is refused
+    # (R3 Phase 3 B1: no late binding), so the rule can never gain authority
+    engine.registry.register_state_rule(
+        StateRule(
+            state_rule_id="staterule:increasing:1",
+            target_state=StateName.INCREASING,
+            state_class=StateClass.B_SPECIFICATION_ONLY,
+            predicate_ref="predicate:current_gt_prior@1",
+            methodology_ref="book6-methodology@1",
+            required_measurement_refs=("obs:current", "obs:prior"),
+            window_class_constraint="INSTANTANEOUS",
+            version="1",
+        )
+    )
+    with pytest.raises(StateError, match="may not precede its predicate"):
+        engine.registry.state_rules.ratify(
+            "staterule:increasing:1", operator="synthetic-fixture-operator", at=NOW
+        )
+    assert engine.registry.state_rules.ratified_count() == 0
+    with pytest.raises((StateError, Book6EngineError)):
         engine.emit_rule_gated_state(StateName.INCREASING, **_emission_kwargs())
 
 
@@ -735,7 +775,8 @@ def test_r2_phase7_s1_predicate_ref_mutation_grants_nothing() -> None:
         StateName.INCREASING, **_emission_kwargs()
     )
     assert dimension.state is StateName.INCREASING
-    # ...and a RATIFIED rule whose bound predicate does not resolve refuses
+    # ...and a rule whose bound predicate does not exist can never be ratified
+    # (R3 Phase 3 B1: no late binding)
     ghost = StateRule(
         state_rule_id="staterule:ghost:1",
         target_state=StateName.INCREASING,
@@ -747,10 +788,12 @@ def test_r2_phase7_s1_predicate_ref_mutation_grants_nothing() -> None:
         version="1",
     )
     engine.registry.register_state_rule(ghost)
-    engine.registry.state_rules.ratify(
-        ghost.state_rule_id, operator="synthetic-fixture-operator", at=NOW
-    )
-    with pytest.raises(Book6EngineError, match="not registered"):
+    with pytest.raises(StateError, match="may not precede its predicate"):
+        engine.registry.state_rules.ratify(
+            ghost.state_rule_id, operator="synthetic-fixture-operator", at=NOW
+        )
+    # and the unratifiable ghost refuses at the authorization gate too
+    with pytest.raises((Book6EngineError, StateError), match="no registry ratification"):
         engine.emit_rule_gated_state(
             StateName.INCREASING,
             rule_ref=ghost.state_rule_id,

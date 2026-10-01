@@ -115,8 +115,18 @@ class Book6MeasurementEngine:
     def __init__(self, provenance: Book6Provenance) -> None:
         self.provenance = provenance
         self.registry = Book6MeasurementRegistry(provenance)
-        #: R2-D2: canonical predicates. Ships with zero ratified predicates.
-        self.predicates = PredicateRegistry()
+
+    @property
+    def predicates(self) -> PredicateRegistry:
+        """The canonical predicate registry (R3: owned by the measurement registry).
+
+        Kept as an engine-level alias so every R2-era caller keeps working: the
+        store itself lives on the registry so the state-rule registry can be
+        WIRED to it and ratification can bind to executable content. Ships with
+        zero ratified predicates.
+        """
+
+        return self.registry.predicates
 
     # -- authority-bearing measurement use ----------------------------------
 
@@ -442,6 +452,18 @@ class Book6MeasurementEngine:
         """
 
         rule: StateRule = self.registry.state_rules.authorize(target, rule_ref=rule_ref)
+        # R3-D3 (Phase 9): the OUTPUT methodology is DERIVED from the already-
+        # authorized canonical rule. The caller-supplied argument is retained
+        # only as a cross-check: derivation used methodology A -> the output may
+        # not claim methodology B. The stored dimension records the canonical
+        # resolved identity, never caller text.
+        if methodology_ref != rule.methodology_ref:
+            raise Book6EngineError(
+                f"state rule {rule_ref} was authorized under methodology "
+                f"{rule.methodology_ref}, but emission claimed "
+                f"{methodology_ref}; the derivation used one methodology and "
+                f"the output may not claim another"
+            )
         try:
             self.registry.resolve_methodology(rule.methodology_ref)
         except Book6RegistryError as exc:
@@ -516,7 +538,8 @@ class Book6MeasurementEngine:
             state_class=rule.state_class,
             measurement_refs=measurement_refs,
             state_rule_ref=rule_ref,
-            methodology_ref=methodology_ref,
+            # R3-D3: derived from the authorized rule, never caller text.
+            methodology_ref=rule.methodology_ref,
             valid_time=valid_time,
             observed_at=observed_at,
             missingness=missingness,
