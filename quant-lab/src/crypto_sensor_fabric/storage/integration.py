@@ -27,7 +27,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from ..providers.base.enums import Granularity, QualityFlagAcquisition
@@ -68,14 +68,28 @@ class DuplicateEnvelopeContent(Bloc3HandoffError):
     """Two envelopes in one batch carry identical raw bytes (§9)."""
 
 
-class BatchAlreadyCompleted(Bloc3HandoffError):
-    """Retry after COMPLETE with new content intent (§50)."""
-
-
 # ---------------------------------------------------------------------------
 # Integration-local input context (§43): a narrow typed carrier for the
 # accepted upstream identity fields FetchBatch deliberately does not carry.
 # ---------------------------------------------------------------------------
+
+
+class BatchAlreadyCompleted(Bloc3HandoffError):
+    """Retry after COMPLETE with new content intent (§50).
+
+    I14R1 §10: this typed refusal is ALSO the terminal answer when a
+    genuinely NEXT batch arrives for a COMPLETE job — COMPLETE is never
+    reopened (no COMPLETE -> ACQUIRING edge exists or may be invented).
+    """
+
+
+class DivergentBatchRewrite(Bloc3HandoffError):
+    """I14R1 §4/§9: a batch that claims a consumed checkpoint position but
+    cannot prove it is the EXACT committed batch (EXACT_RETRY) nor a valid
+    NEXT batch (request fetched from the committed resume token).
+
+    Fail closed BEFORE any evidence mutation: no ACQUIRING transition, no
+    checkpoint movement, no durable write."""
 
 
 @dataclass(frozen=True)
@@ -88,6 +102,18 @@ class Bloc3StorageContext:
     ``Granularity`` enum onto the storage identity.  Both come from
     accepted upstream truth.  NO default exists (§44): a missing
     ``venue`` is a typed construction refusal.
+
+    I14R1 §5/§6: ``request_resume_token`` is the accepted upstream truth
+    for pagination continuation — the adapter fetched THIS batch from
+    ``FetchRequest.resume_token`` (accepted Bloc 3 request field).  The
+    handoff uses it ONLY to classify a CHECKPOINT_ADVANCED job's incoming
+    batch (EXACT_RETRY vs NEXT_BATCH vs DIVERGENT_REWRITE): NEXT_BATCH
+    requires ``request_resume_token == current.resume_token``.  Nextness
+    is NEVER inferred from bytes, timestamps, row counts, manifest
+    versions or provider_cursor heuristics.  None (a first page / a
+    caller that does not track its request) can never continue a
+    consumed checkpoint — a consumed checkpoint's NEXT_BATCH proof must
+    come from upstream, not from guessing.
     """
 
     venue: str
@@ -95,6 +121,7 @@ class Bloc3StorageContext:
     endpoint_host: str | None = None
     endpoint_path: str | None = None
     request_family: str | None = None
+    request_resume_token: Any = None  # providers.base.models.ResumeToken | None
 
     def __post_init__(self) -> None:
         if not self.venue or not isinstance(self.venue, str):
@@ -185,15 +212,15 @@ class Bloc3StorageHandoff:
 
         current = self._jobs.get_job(job_id)
 
-        # §34/§35/§49/§50: a job at/after its committed checkpoint either
-        # ADOPTS the exact committed batch (no second semantic advance, no
-        # durable mutation, receipt re-derived from durable state) or
-        # refuses a divergent retry, typed and closed.
+        # I14R1 §4: a job at/after its committed checkpoint classifies the
+        # incoming batch — EXACT_RETRY (adopt, no mutation), NEXT_BATCH
+        # (continue via the accepted annotated edge, then persist) or
+        # DIVERGENT_REWRITE (typed fail-closed refusal, zero mutation).
         if current.status in (
             StorageJobStatus.CHECKPOINT_ADVANCED,
             StorageJobStatus.COMPLETE,
         ):
-            return self._adopt_committed(job_id, batch, current)
+            return self._classify_committed(job_id, batch, context, current)
 
         # §10: an explicitly EMPTY_VALID batch fabricates nothing.
         if not batch.raw_payloads:
@@ -232,7 +259,11 @@ class Bloc3StorageHandoff:
         self._raise_if_fault(job_id, FAULT_WINDOWS[2])
 
         # Stage 4: revision registration through the accepted I06 path.
-        revision_keys = self._register_revisions(acquisition_ids)
+        revision_keys = self._register_revisions(
+            acquisition_ids,
+            batch,
+            [computed for _sha, _deferred, computed in pairs],
+        )
 
         # W4: crash AFTER revision registration / BEFORE manifest build.
         self._raise_if_fault(job_id, FAULT_WINDOWS[3])
@@ -291,7 +322,7 @@ class Bloc3StorageHandoff:
         return BatchPersistenceReceipt(
             job_id=job_id,
             acquisition_ids=tuple(acquisition_ids),
-            blob_shas=tuple(sha for sha, _ in pairs),
+            blob_shas=tuple(sha for sha, _deferred, _computed in pairs),
             revision_keys=tuple(revision_keys),
             projection_ids=tuple(projection_ids or []),
             manifest_id=manifest.partition_manifest_id,
@@ -367,13 +398,17 @@ class Bloc3StorageHandoff:
 
     def _persist_raw_blobs(
         self, job_id: str, batch: FetchBatch
-    ) -> list[tuple[str, str]]:
-        """Persist exact raw bytes; return [(blob_sha, acquisition_id), ...].
+    ) -> list[tuple[str, str | None, str]]:
+        """Persist exact raw bytes; return [(sha, acquisition_id|None), ...].
 
         No JSON reparse, no newline/whitespace/Unicode normalization, no
         sorted-key serialization (§11): T0A is received source evidence.
+        The acquisition id is deferred (None): I14R1C derives it from the
+        batch's observation instant + content position so identical bytes
+        re-observed at a LATER instant never collide (the pure ``fp::sha``
+        scheme did), while an exact-batch retry keeps a stable id.
         """
-        staged: list[tuple[str, str]] = []
+        staged: list[tuple[str, str | None, str]] = []
         seen_shas: set[str] = set()
         for envelope in batch.raw_payloads:
             body = envelope.raw_body
@@ -401,7 +436,7 @@ class Bloc3StorageHandoff:
                     f"{computed_sha!r} — content addressing violated"
                 )
             self._blob_metadata.append_metadata(put.blob)
-            staged.append((sha, f"{batch.request_fingerprint}::{sha}"))
+            staged.append((sha, None, computed_sha))
         return staged
 
     # -- stage: acquisition records (§12/§13/§31/§39) --------------------------
@@ -410,7 +445,7 @@ class Bloc3StorageHandoff:
         self,
         job_id: str,
         batch: FetchBatch,
-        pairs: list[tuple[str, str]],
+        pairs: list[tuple[str, str | None, str]],
         context: Bloc3StorageContext,
     ) -> list[str]:
         """One AcquisitionRecord per nonempty raw envelope.
@@ -426,9 +461,23 @@ class Bloc3StorageHandoff:
         context.venue→venue; context.source_granularity→native_granularity.
         The accepted I04R1 secret firewall re-validates endpoint/request
         fields at append — never bypassed.
+
+        I14R1C acquisition-id law: ``<fp>::<observed_at>::<sha>`` — the
+        batch's ONE observation instant (retrieved_at) plus the envelope's
+        content position.  Distinct observation instants get distinct
+        acquisitions even for identical bytes (a refetch is a real event);
+        an EXACT-batch retry derives the SAME ids (idempotent adoption).
+        No invented per-envelope times: every envelope of one batch shares
+        the single accepted response_observed_at (I06 §40 preserved).
         """
+        observed = batch.retrieved_at.astimezone(UTC).strftime(
+            "%Y%m%dT%H%M%S%fZ"
+        )
         acquisition_ids: list[str] = []
-        for blob_sha, acquisition_id in pairs:
+        for blob_sha, _deferred, computed_sha in pairs:
+            acquisition_id = (
+                f"{batch.request_fingerprint}::{observed}::{computed_sha}"
+            )
             record = AcquisitionRecord(
                 acquisition_id=acquisition_id,
                 provider_id=batch.provider_id,
@@ -463,30 +512,76 @@ class Bloc3StorageHandoff:
             acquisition_ids.append(acquisition_id)
         return acquisition_ids
 
-    # -- stage: revision registration (§15/§32) --------------------------------
+    # -- stage: revision registration (§15/§32; I14R1 §19-§25 group law) --------
 
-    def _register_revisions(self, acquisition_ids: list[str]) -> list[str]:
+    def _group_observation_identity(
+        self,
+        batch: FetchBatch,
+        member_shas: list[str],
+    ) -> tuple[str, str]:
+        """Deterministic observation identity over the COMPLETE group
+        (I14R1 §21/§13).
+
+        ``observation_digest`` = THE I06 domain-separated group content
+        digest — ``sha256("sensor-revision-group-v1\\n" + sorted unique
+        member blob SHAs)`` — order-INSENSITIVE by construction (Bloc 3
+        declares no raw_payload ordering semantic, so the group is a SET;
+        duplicates are already forbidden within one FetchBatch) and never
+        ambiguous with a literal single blob SHA.  I06 RECOMPUTES this
+        digest from durable member blobs and refuses a forged value.
+
+        ``observation_id`` binds the group to its ONE observation instant
+        (batch.retrieved_at) — never an invented per-envelope time (I06
+        §40 preserved).
+        """
+        if self._revisions is None:  # pragma: no cover - defensive
+            raise Bloc3HandoffError(
+                "revision registry unavailable for group identity"
+            )
+        digest = self._revisions.group_content_digest(member_shas)
+        seen = batch.retrieved_at.astimezone(UTC).strftime(
+            "%Y%m%dT%H%M%S%fZ"
+        )
+        return (
+            f"grp::{batch.request_fingerprint}::{seen}::{digest[:16]}",
+            digest,
+        )
+
+    def _register_revisions(
+        self,
+        acquisition_ids: list[str],
+        batch: FetchBatch,
+        ordered_shas: list[str],
+    ) -> list[str]:
         """Register the batch's source observation through the accepted I06
-        public write path.
+        public write path (I14R1 §19-§25).
 
-        ONE FetchBatch is ONE observation of the source: its N raw
-        envelopes are N bodies of the same response, not N source states.
-        The revision is therefore registered from the batch's FIRST
-        acquisition anchor; the remaining envelopes stay fully durable as
-        T0A blobs + AcquisitionRecords (§9 durable-evidence law).  This
-        keeps the accepted I06 §40 source-order law intact — same
-        observation instant with differing bytes is precisely what I06
-        refuses to order, and the handoff never manufactures observation
-        times to force an ordering.
+        ONE FetchBatch is ONE observation of the source containing N raw
+        evidence bodies.  The observation covers the COMPLETE ordered
+        envelope group through ``SourceRevisionRegistry.
+        register_acquisition_group`` — I06's OWN additive group authority,
+        not a second revision engine here.  A change in ANY component
+        (first, middle, last), a component count change, or any content
+        difference in the ordered group now becomes revision-visible;
+        an identical group re-observation is I06-identical (no new
+        revision).
 
-        ``register_acquisition`` derives the source_revision_key itself
-        (RevisionSourceIdentityV1 over request semantics) and is
-        idempotent on replay (§47 of I06) — never duplicated here.
+        One observation instant: every envelope shares the batch's single
+        accepted ``retrieved_at``; the handoff never manufactures times to
+        force an ordering (I06 §40 preserved — same-instant differing
+        groups still fail closed inside I06).
         """
         keys: list[str] = []
         if self._revisions is None or not acquisition_ids:
             return keys
-        observation = self._revisions.register_acquisition(acquisition_ids[0])
+        observation_id, observation_digest = self._group_observation_identity(
+            batch, ordered_shas
+        )
+        observation = self._revisions.register_acquisition_group(
+            acquisition_ids=acquisition_ids,
+            observation_id=observation_id,
+            observation_digest=observation_digest,
+        )
         keys.append(observation.source_revision_key)
         return keys
 
@@ -497,13 +592,13 @@ class Bloc3StorageHandoff:
         job_id: str,
         batch: FetchBatch,
         context: Bloc3StorageContext,
-        pairs: list[tuple[str, str]],
+        pairs: list[tuple[str, str | None, str]],
         projection_ids: list[str],
     ) -> PartitionManifest:
         return self._append_manifest_cas(
             batch,
             context,
-            blob_refs=sorted(sha for sha, _ in pairs),
+            blob_refs=sorted(sha for sha, _deferred, _computed in pairs),
             projection_ids=projection_ids,
             coverage=self._coverage_state_for(batch),
             integrity=IntegrityState.LOCAL_HASH_VERIFIED,
@@ -600,55 +695,107 @@ class Bloc3StorageHandoff:
             shas.append(hashlib.sha256(data).hexdigest())
         return shas
 
-    def _adopt_committed(
+    def _classify_committed(
         self,
         job_id: str,
         batch: FetchBatch,
+        context: Bloc3StorageContext,
         current: Any,
     ) -> BatchPersistenceReceipt:
-        """Adopt an exact retry of an already-committed batch (§34/§49/§50).
+        """I14R1 §4/§7-§10: classify a batch arriving at/after the committed
+        checkpoint — EXACT_RETRY, NEXT_BATCH or DIVERGENT_REWRITE.
 
-        The receipt is re-derived from DURABLE job state (§46 — the receipt
-        is not an authority): same first acquisition anchor + same adapter-
-        owned resume token ⇒ identical batch, adopt frozen facts and mutate
-        nothing.  Any other content intent under a consumed checkpoint is a
-        typed divergent-retry refusal (§35); the accepted continuation path
-        for a genuinely NEXT batch is the annotated ACQUIRING transition.
+        EXACT_RETRY (same batch semantic identity as the committed batch):
+        adopt durable state, mutate NOTHING.
+
+        NEXT_BATCH (only at CHECKPOINT_ADVANCED): the incoming request was
+        fetched FROM the committed resume token — proven ONLY by the
+        accepted upstream field ``context.request_resume_token ==
+        current.resume_token`` (§5/§6).  I14 then owns the accepted
+        annotated I07 edge CHECKPOINT_ADVANCED -> ACQUIRING (nonempty
+        reason) and persists the next batch through the normal pipeline.
+        The public caller never drives I07 internals.
+
+        DIVERGENT_REWRITE: anything else that claims the consumed position
+        — fail closed typed BEFORE any evidence mutation (no ACQUIRING
+        transition, no checkpoint movement, no durable write).
+
+        At COMPLETE the checkpoint position is terminal: an exact final-
+        batch retry is adopted read-only; any NEXT batch is a typed
+        terminal refusal — COMPLETE is never reopened (§10).
         """
         shas = self._envelope_shas(batch)
-        expected_first = (
-            f"{batch.request_fingerprint}::{shas[0]}" if shas else None
+        observed = batch.retrieved_at.astimezone(UTC).strftime(
+            "%Y%m%dT%H%M%S%fZ"
         )
-        same_batch = (
-            current.last_committed_acquisition_id == expected_first
+        if shas:
+            first_acq: str | None = (
+                f"{batch.request_fingerprint}::{observed}::{shas[0]}"
+            )
+        else:
+            # EMPTY_VALID batch: the durable anchor is the blob-less empty
+            # acquisition event minted by _persist_empty_valid (I14R1 §12).
+            first_acq = (
+                f"{batch.request_fingerprint}::{observed}::EMPTY_VALID"
+                if QualityFlagAcquisition.EMPTY_VALID
+                in set(batch.quality_flags)
+                else None
+            )
+        expected_first = (first_acq,)
+        exact_retry = (
+            current.last_committed_acquisition_id == expected_first[0]
             and current.resume_token == batch.next_resume_token
         )
-        if not same_batch:
-            raise BatchAlreadyCompleted(
-                f"job {job_id!r} is past its committed checkpoint for a "
-                "DIFFERENT batch; divergent retry refused (§35). The next "
-                "batch continues via an annotated ACQUIRING transition, "
-                "never a second checkpoint."
+        if exact_retry:
+            # §34/§49/§50: adopt frozen facts; mutate nothing.  The receipt
+            # anchor is the DURABLE anchor (§46): for an EMPTY_VALID page it
+            # is the blob-less empty acquisition id.
+            anchor = current.last_committed_acquisition_id
+            return BatchPersistenceReceipt(
+                job_id=job_id,
+                acquisition_ids=(anchor,) if anchor else (),
+                blob_shas=tuple(shas),
+                revision_keys=(),
+                projection_ids=(),
+                manifest_id=current.last_manifest_id,
+                manifest_version=None,
+                checkpoint_advanced=False,
+                resume_token=current.resume_token,
+                complete=(
+                    current.status is StorageJobStatus.COMPLETE
+                    or (
+                        bool(batch.is_complete)
+                        and batch.next_resume_token is None
+                    )
+                ),
             )
-        return BatchPersistenceReceipt(
-            job_id=job_id,
-            acquisition_ids=(
-                (expected_first,) if expected_first is not None else ()
-            ),
-            blob_shas=tuple(shas),
-            revision_keys=(),
-            projection_ids=(),
-            manifest_id=current.last_manifest_id,
-            manifest_version=None,
-            checkpoint_advanced=False,
-            resume_token=current.resume_token,
-            complete=(
-                current.status is StorageJobStatus.COMPLETE
-                or (
-                    bool(batch.is_complete)
-                    and batch.next_resume_token is None
-                )
-            ),
+        if current.status is StorageJobStatus.COMPLETE:
+            # §10: terminal — any new batch after COMPLETE is refused; no
+            # COMPLETE -> ACQUIRING edge exists or may be invented.
+            raise BatchAlreadyCompleted(
+                f"job {job_id!r} is COMPLETE; the job chain is frozen and "
+                "no next batch may reopen it (I14R1 §10)"
+            )
+        # CHECKPOINT_ADVANCED: NEXT_BATCH requires upstream-provable
+        # nextness — the request WAS made with the committed resume token.
+        request_token = context.request_resume_token
+        if request_token is not None and request_token == current.resume_token:
+            self._jobs.advance_status(
+                job_id,
+                to_status=StorageJobStatus.ACQUIRING,
+                reason=(
+                    "NEXT_BATCH continuation: incoming request was fetched "
+                    "from the committed resume token (I14R1 §3/§4)"
+                ),
+            )
+            return self.persist_batch(
+                job_id=job_id, batch=batch, context=context
+            )
+        raise DivergentBatchRewrite(
+            f"job {job_id!r} is past its committed checkpoint and the "
+            "incoming batch proves neither EXACT_RETRY (same batch) nor "
+            "NEXT_BATCH (request_resume_token == committed resume token); "
+            "divergent rewrite refused before any mutation (I14R1 §4/§9)"
         )
 
     def _persist_empty_valid(
@@ -657,43 +804,40 @@ class Bloc3StorageHandoff:
         batch: FetchBatch,
         context: Bloc3StorageContext,
     ) -> BatchPersistenceReceipt:
-        """§10: an explicitly EMPTY_VALID batch fabricates NOTHING.
+        """§10/§12/§17 (I14R1 Blocker B repair): an explicitly EMPTY_VALID
+        batch is a REAL acquisition event — durable acquisition truth with
+        NO fabricated bytes.
 
-        No empty JSON blob, no zero-byte provider response, no fake T0A.
-        The durable missingness truth is a manifest with zero blob_refs,
-        coverage EMPTY_CONFIRMED, and integrity UNVERIFIED (the accepted
-        I04 §46 vacuous-claim rule).  No acquisition exists to anchor a
-        manifest-floor checkpoint, so the cursor truthfully stays put —
-        an explicit no-resume state (§24), never false progress and never
-        an invented token.
+        Durable sequence (§17): durable empty AcquisitionRecord (no T0A
+        blob — ``blob_sha256`` stays None; nothing is fabricated) ->
+        durable zero-blob EMPTY_CONFIRMED / UNVERIFIED manifest -> THE
+        accepted I07 gate ``advance_checkpoint`` — never bypassed.  A
+        valid adapter ``next_resume_token`` is PRESERVED (empty partial:
+        CHECKPOINT_ADVANCED with the token); an empty complete page
+        (token=None) checkpoints and terminates: CHECKPOINT_ADVANCED ->
+        COMPLETE.  Receipt and durable state always agree.
         """
-        if self._jobs.get_job(job_id).status is StorageJobStatus.PLANNED:
+        # Idempotence (§34): if this exact empty page already checkpointed,
+        # adopt without any mutation (I14R1 §29 empty exact retry).
+        current = self._jobs.get_job(job_id)
+        if current.status in (
+            StorageJobStatus.CHECKPOINT_ADVANCED,
+            StorageJobStatus.COMPLETE,
+        ):
+            return self._classify_committed(job_id, batch, context, current)
+        if current.status is StorageJobStatus.PLANNED:
             self._jobs.advance_status(
                 job_id,
                 to_status=StorageJobStatus.ACQUIRING,
                 reason="EMPTY_VALID handoff begins (no bytes to stage)",
             )
         partition_key = self._partition_key(batch, context)
-        pointer = self._manifests.read_current_pointer(partition_key)
-        if pointer is not None:
-            existing = self._manifests.get_manifest(
-                pointer.partition_manifest_id
-            )
-            if existing is not None and not existing.blob_refs:
-                # §34 idempotence: empty-truth manifest already durable.
-                self._drive_to(job_id, StorageJobStatus.MANIFEST_COMMITTED)
-                return BatchPersistenceReceipt(
-                    job_id=job_id,
-                    acquisition_ids=(),
-                    blob_shas=(),
-                    revision_keys=(),
-                    projection_ids=(),
-                    manifest_id=existing.partition_manifest_id,
-                    manifest_version=existing.manifest_version,
-                    checkpoint_advanced=False,
-                    resume_token=None,
-                    complete=bool(batch.is_complete),
-                )
+        del partition_key  # identity flows through _append_manifest_cas
+        # §34 idempotent adoption is owned by the versioned CAS append: if
+        # the current manifest IS the exact intended empty manifest (W7
+        # survivor / empty retry), it is adopted; an empty page arriving
+        # after nonempty pages appends the next superseding version (I14R1
+        # §29: nonempty -> empty next page stays a real versioned page).
         self._raise_if_fault(job_id, FAULT_WINDOWS[0])
         self._raise_if_fault(job_id, FAULT_WINDOWS[4])
         manifest = self._append_manifest_cas(
@@ -705,17 +849,74 @@ class Bloc3StorageHandoff:
             integrity=IntegrityState.UNVERIFIED,
         )
         self._drive_to(job_id, StorageJobStatus.MANIFEST_COMMITTED)
+        # W7 (I14R1 §18): manifest durable / checkpoint old — the same
+        # critical window as the raw path; the retry must adopt the exact
+        # empty manifest + acquisition and advance exactly once.
+        self._raise_if_fault(job_id, FAULT_WINDOWS[6])
+        # Durable EMPTY_VALID acquisition truth (§12): one record per empty
+        # page event, keyed by the observation instant, blob-less.
+        observed = batch.retrieved_at.astimezone(UTC).strftime(
+            "%Y%m%dT%H%M%S%fZ"
+        )
+        acquisition_id = (
+            f"{batch.request_fingerprint}::{observed}::EMPTY_VALID"
+        )
+        record = AcquisitionRecord(
+            acquisition_id=acquisition_id,
+            provider_id=batch.provider_id,
+            venue=context.venue,
+            sensor_family=batch.sensor_family,
+            request_fingerprint=batch.request_fingerprint,
+            adapter_version=batch.adapter_version,
+            requested_start=batch.requested_start,
+            requested_end=batch.requested_end,
+            native_instrument=batch.native_instrument_id,
+            native_granularity=context.source_granularity,
+            request_started_at=batch.retrieved_at,
+            response_observed_at=batch.retrieved_at,
+            ingested_at=self._clock(),
+            http_status_or_source_status=(
+                str(batch.http_status)
+                if batch.http_status is not None
+                else (batch.transport_status or "UNKNOWN")
+            ),
+            endpoint_host=context.endpoint_host,
+            endpoint_path=context.endpoint_path,
+            request_family=context.request_family,
+            source_locator=f"bloc3://{batch.provider_id}/{batch.request_fingerprint}",
+            blob_sha256=None,
+            quality_flags=[QualityFlagAcquisition.EMPTY_VALID],
+        )
+        self._acquisitions.append_acquisition(record)
+        # THE gate — I14R1 §14/§15: the checkpoint proof carries
+        # blob_sha256=None under the explicit V2 EMPTY_VALID law.  Never a
+        # bypass, never a fabricated blob.
+        next_token = batch.next_resume_token  # §22: adapter-owned semantics
+        self._jobs.advance_checkpoint(
+            job_id,
+            resume_token=next_token,
+            acquisition_id=acquisition_id,
+            manifest_id=manifest.partition_manifest_id,
+            evidence_kind="EMPTY_VALID",
+        )
+        complete = bool(batch.is_complete) and next_token is None
+        if complete:
+            self._jobs.advance_status(
+                job_id,
+                to_status=StorageJobStatus.COMPLETE,
+                reason="EMPTY_VALID page complete; no next resume token (§23)",
+            )
         return BatchPersistenceReceipt(
             job_id=job_id,
-            acquisition_ids=(),
+            acquisition_ids=(acquisition_id,),
             blob_shas=(),
             revision_keys=(),
             projection_ids=(),
             manifest_id=manifest.partition_manifest_id,
             manifest_version=manifest.manifest_version,
-            checkpoint_advanced=False,
-            resume_token=None,
-            complete=bool(batch.is_complete),
+            checkpoint_advanced=True,
+            resume_token=next_token,
+            complete=complete,
         )
 
     # -- laws -------------------------------------------------------------------
