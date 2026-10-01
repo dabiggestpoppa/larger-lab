@@ -283,6 +283,12 @@ class RevisionSegmentRecord(BaseModel):
     revision_state: str
     revision_reason: str
     registered_at: datetime  # operational audit clock (§21) — not chronology
+    # I14R1 §22 (additive, backward-compatible): GROUP_OBSERVATION marks a
+    # segment whose content truth is the GROUP observation digest over ALL
+    # ordered component blobs (one FetchBatch observation), not the birth
+    # acquisition's own blob.  Absent/None on every historical single-
+    # acquisition segment, which keeps the strict blob-equality reload law.
+    content_scope: str | None = None
 
     @field_validator("first_seen_at", "registered_at")
     @classmethod
@@ -302,7 +308,16 @@ class RevisionObservationRecord(BaseModel):
     acquisition (§24/§31).  Chronology is ``seen_at`` =
     response_observed_at (§20).  ``usable_provenance`` is preserved
     explicitly: revision evidence never promotes forensic acquisitions
-    (§19)."""
+    (§19).
+
+    I14R1 §16/§17 (additive, backward-compatible): a GROUP observation
+    row additionally persists ``content_scope="GROUP_OBSERVATION"``, the
+    COMPLETE ``member_acquisition_ids`` set and the COMPLETE
+    ``member_blob_sha256`` set, so the full forensic lineage of one
+    source revision (which acquisitions/blobs constituted it) is
+    durably reconstructible — a digest alone is not lineage.  Absent on
+    every historical single-acquisition row: legacy SINGLE law.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
@@ -317,6 +332,9 @@ class RevisionObservationRecord(BaseModel):
     usable_provenance: bool
     severity: str
     registered_at: datetime
+    content_scope: str | None = None
+    member_acquisition_ids: list[str] | None = None
+    member_blob_sha256: list[str] | None = None
 
     @field_validator("seen_at", "registered_at")
     @classmethod
@@ -801,10 +819,60 @@ class SourceRevisionRegistry:
                         "durably"
                     ) from exc
                 if acq.blob_sha256 != birth_seg.blob_sha256:
-                    raise SourceRevisionCatalogCorrupt(
-                        "segment first acquisition blob does not match the "
-                        "segment blob"
+                    if birth_seg.content_scope != "GROUP_OBSERVATION":
+                        raise SourceRevisionCatalogCorrupt(
+                            "segment first acquisition blob does not match "
+                            "the segment blob"
+                        )
+                    # I14R1 §22 group birth: the segment's content truth is
+                    # the GROUP digest; the birth acquisition is the first
+                    # COMPONENT, whose own blob is one member of the group.
+                    # Require instead that a durable group observation binds
+                    # this segment's revision with the COMPLETE member
+                    # lineage (I14R1 §16: digest alone is not lineage).
+                    group_obs = next(
+                        (
+                            o
+                            for o in self._observations_by_key.get(
+                                birth_seg.source_revision_key, []
+                            )
+                            if o.revision_number
+                            == birth_seg.revision_number
+                            and o.blob_sha256 == birth_seg.blob_sha256
+                        ),
+                        None,
                     )
+                    if group_obs is None:
+                        raise SourceRevisionCatalogCorrupt(
+                            "group segment has no binding group observation"
+                        )
+                    if (
+                        group_obs.content_scope != "GROUP_OBSERVATION"
+                        or not group_obs.member_acquisition_ids
+                        or not group_obs.member_blob_sha256
+                    ):
+                        raise SourceRevisionCatalogCorrupt(
+                            "group segment lacks complete member lineage "
+                            "evidence (I14R1 §16)"
+                        )
+                    if (
+                        group_obs.member_acquisition_ids[0]
+                        != birth_seg.first_acquisition_id
+                        or group_obs.member_blob_sha256
+                        != sorted(set(group_obs.member_blob_sha256))
+                    ):
+                        raise SourceRevisionCatalogCorrupt(
+                            "group member lineage does not bind to its "
+                            "segment (I14R1 §16/§21)"
+                        )
+                    if self.group_content_digest(
+                        group_obs.member_blob_sha256
+                    ) != birth_seg.blob_sha256:
+                        raise SourceRevisionCatalogCorrupt(
+                            "group member blob set does not recompute to "
+                            "the persisted group digest (I14R1 §21 tamper "
+                            "refusal)"
+                        )
                 # I06R1 §11: re-derive the identity from the durable
                 # acquisition's REQUEST semantics and require the persisted
                 # descriptor AND key to match it exactly.
@@ -848,9 +916,14 @@ class SourceRevisionRegistry:
                         "revision that does not exist"
                     )
                 if obs.blob_sha256 != seg.blob_sha256:
-                    raise SourceRevisionCatalogCorrupt(
-                        "observation blob does not match its revision segment"
-                    )
+                    if seg.content_scope != "GROUP_OBSERVATION":
+                        raise SourceRevisionCatalogCorrupt(
+                            "observation blob does not match its revision "
+                            "segment"
+                        )
+                    # I14R1 §22: group digest equality is recomputed from
+                    # the observation's persisted member set above — the
+                    # segment carries the same digest.
                 prior = all_bindings.get(obs.acquisition_id)
                 if prior is not None and prior != (
                     obs.source_revision_key,
@@ -874,10 +947,33 @@ class SourceRevisionRegistry:
                         "not exist durably"
                     ) from exc
                 if acq.blob_sha256 != obs.blob_sha256:
-                    raise SourceRevisionCatalogCorrupt(
-                        "observation acquisition blob does not match the "
-                        "observation"
-                    )
+                    if seg.content_scope != "GROUP_OBSERVATION":
+                        raise SourceRevisionCatalogCorrupt(
+                            "observation acquisition blob does not match the "
+                            "observation"
+                        )
+                    # I14R1 §22/§16 group observation: the observation's
+                    # content truth is the GROUP digest over ALL members;
+                    # its recorded acquisition is the first COMPONENT.  The
+                    # COMPLETE member lineage must be persisted and the
+                    # recorded member-blob set must recompute to the group
+                    # digest (I14R1 §21 tamper refusal).
+                    if (
+                        obs.content_scope != "GROUP_OBSERVATION"
+                        or not obs.member_acquisition_ids
+                        or not obs.member_blob_sha256
+                    ):
+                        raise SourceRevisionCatalogCorrupt(
+                            "group observation lacks complete member lineage "
+                            "(I14R1 §16)"
+                        )
+                    if self.group_content_digest(
+                        obs.member_blob_sha256
+                    ) != obs.blob_sha256:
+                        raise SourceRevisionCatalogCorrupt(
+                            "group member blob set does not recompute to "
+                            "the persisted group digest (I14R1 §21)"
+                        )
                 # I06R1 §12: the observation's SOURCE key must equal the key
                 # derived from its durable acquisition — same bytes under a
                 # different logical source is corruption, not identity.
@@ -1090,6 +1186,411 @@ class SourceRevisionRegistry:
 
     # -- registration ----------------------------------------------------------
 
+    #: I14R1 §13: domain-separated group content digest.  The digest is
+    #: computed over the CANONICAL SORTED member blob SHAs (the Bloc 3
+    #: contract declares no raw_payload ordering semantic, so the group is
+    #: a SET; duplicates are already forbidden inside one FetchBatch, so
+    #: the sorted unique list is the canonical multiset).  Domain
+    #: separation guarantees a group digest can never collide with (or be
+    #: mistaken for) a literal single raw blob SHA.
+    GROUP_DIGEST_DOMAIN = "sensor-revision-group-v1"
+
+    @classmethod
+    def group_content_digest(cls, member_blob_shas: list[str]) -> str:
+        """THE deterministic group content digest (I14R1 §13).
+
+        ``sha256("sensor-revision-group-v1\\n" + "\\n".join(sorted(
+        unique member blob shas)))``.  Order-insensitive by construction;
+        never equal to any single member blob SHA."""
+        canonical = "\n".join(sorted(set(member_blob_shas)))
+        return hashlib.sha256(
+            f"{cls.GROUP_DIGEST_DOMAIN}\n{canonical}".encode("utf-8")
+        ).hexdigest()
+
+    def register_acquisition_group(
+        self,
+        *,
+        acquisition_ids: list[str],
+        observation_id: str,
+        observation_digest: str,
+    ) -> RevisionObservationRecord:
+        """I14R1 §22 — additive I06 GROUP observation authority.
+
+        ONE observation of a logical source may span N durable
+        acquisitions (one FetchBatch = N raw evidence bodies).  This
+        method reuses the ENTIRE existing single-acquisition machinery —
+        same key derivation, same §39/§40 ordering and temporal-ambiguity
+        law, same §24/§25/§41/§47 classification and persistence — with
+        ONE caller-declared observation identity covering the COMPLETE
+        ordered group:
+
+        - ``observation_id``: the durable observation record's logical id
+          (caller-derived, deterministic — I14R1 §21 law: provider, sensor,
+          request fingerprint, observation instant, ordered envelope SHAs).
+          All component acquisitions bind to the group's revision; a
+          re-delivered group with the SAME observation_id is idempotent;
+        - ``observation_digest``: the caller's deterministic digest over
+          the ordered group content — the classification's byte identity.
+          I06 verifies every component blob physically, then classifies
+          ``observation_digest`` against history exactly as it classifies
+          a single blob_sha256.
+
+        Same-instant law (§40) is PRESERVED: the group carries the ONE
+        accepted observation instant of its components; two differing
+        groups observed at the same instant still fail closed.  No new
+        identity primitive, no second revision engine, no schema change.
+        """
+        if not acquisition_ids:
+            raise RevisionConfigurationError(
+                "register_acquisition_group requires at least one "
+                "acquisition_id"
+            )
+        if not isinstance(observation_id, str) or not observation_id:
+            raise RevisionConfigurationError(
+                "observation_id must be a nonempty string"
+            )
+        if (
+            not isinstance(observation_digest, str)
+            or len(observation_digest) != 64
+        ):
+            raise RevisionConfigurationError(
+                "observation_digest must be a 64-hex sha256 over the "
+                "ordered group content"
+            )
+        for acquisition_id in acquisition_ids:
+            if not isinstance(acquisition_id, str) or not acquisition_id:
+                raise RevisionConfigurationError(
+                    "every acquisition_id must be a nonempty string"
+                )
+
+        # Resolve + physically verify EVERY component acquisition, and
+        # derive the shared request-semantics identity from the FIRST
+        # component (all components of one batch share request semantics —
+        # the I14 identity gate enforces it before registration).
+        acquisitions = [
+            self._resolve_durable_acquisition(a) for a in acquisition_ids
+        ]
+        # I14R1 §13/§16: the digest is RECOMPUTED from the durable member
+        # blobs (canonical sorted unique set, domain-separated) and the
+        # caller-supplied digest must MATCH — a forged observation_digest
+        # can never mint classification truth.
+        member_blobs = [a.blob_sha256 for a in acquisitions]
+        if len(set(member_blobs)) != len(member_blobs):
+            raise RevisionConfigurationError(
+                "group members must carry DISTINCT content (duplicate blob "
+                "sha inside one observation)"
+            )
+        recomputed_digest = self.group_content_digest(member_blobs)
+        if recomputed_digest != observation_digest:
+            raise RevisionConfigurationError(
+                "observation_digest does not match the durable member "
+                "blob set (forged or stale group identity refused)"
+            )
+        identity = RevisionSourceIdentityV1.from_acquisition(
+            acquisitions[0]
+        )
+        key = identity.source_revision_key()
+        seen_at = _canonical_utc(acquisitions[0].response_observed_at)
+        usable = all(self._usable_provenance(a) for a in acquisitions)
+
+        # Idempotence (§47): an already-bound observation id replays its
+        # durable classification after re-verifying every component blob.
+        with self._key_lock(key):
+            existing_observation = self._observations.get(observation_id)
+        if existing_observation is not None:
+            record = RevisionObservationRecord(**existing_observation)
+            if record.source_revision_key != key:
+                raise RevisionObservationConflict(
+                    f"observation {observation_id!r} is durably bound to "
+                    "a different source revision key"
+                )
+            self._verify_group_bindings(acquisition_ids, record)
+            return record
+
+        file_lock = self._acquire_file_lock(key)
+        try:
+            with self._key_lock(key):
+                existing_observation = self._observations.get(observation_id)
+                if existing_observation is not None:
+                    record = RevisionObservationRecord(
+                        **existing_observation
+                    )
+                    if record.source_revision_key != key:
+                        raise RevisionObservationConflict(
+                            f"observation {observation_id!r} is durably "
+                            "bound to a different source revision key"
+                        )
+                    self._verify_group_bindings(
+                        acquisition_ids, record
+                    )
+                    return record
+                segments = self._segments_by_key.get(key, [])
+                if not segments:
+                    return self._register_group_birth(
+                        key=key,
+                        identity=identity,
+                        acquisition_ids=acquisition_ids,
+                        observation_id=observation_id,
+                        observation_digest=observation_digest,
+                        seen_at=seen_at,
+                        usable=usable,
+                        member_blob_shas=member_blobs,
+                    )
+                return self._classify_group_against_history(
+                    key=key,
+                    identity=identity,
+                    acquisition_ids=acquisition_ids,
+                    observation_id=observation_id,
+                    observation_digest=observation_digest,
+                    seen_at=seen_at,
+                    usable=usable,
+                    segments=sorted(
+                        segments, key=lambda s: s.revision_number
+                    ),
+                    member_blob_shas=member_blobs,
+                )
+        finally:
+            self._release_file_lock(file_lock, key)
+
+    def _register_group_birth(
+        self,
+        *,
+        key: str,
+        identity: RevisionSourceIdentityV1,
+        acquisition_ids: list[str],
+        observation_id: str,
+        observation_digest: str,
+        seen_at: datetime,
+        usable: bool,
+        member_blob_shas: list[str],
+    ) -> RevisionObservationRecord:
+        """Group birth (§23): no prior revision — rev1 STABLE, the segment
+        birth IS the first observation, anchored to the FIRST component
+        acquisition with the GROUP digest as the segment's content truth."""
+        registered_at = _canonical_utc(self._clock())
+        segment = RevisionSegmentRecord(
+            source_revision_key=key,
+            segment_id=f"{key}:1",
+            identity_version=identity.identity_version,
+            identity_descriptor=identity.to_descriptor(),
+            revision_number=1,
+            blob_sha256=observation_digest,
+            first_seen_at=seen_at,
+            first_acquisition_id=acquisition_ids[0],
+            revision_state=RevisionState.STABLE.value,
+            revision_reason=(
+                "first group observation of this logical source "
+                "(multi-envelope batch)"
+            ),
+            registered_at=registered_at,
+            content_scope="GROUP_OBSERVATION",
+        )
+        try:
+            self._segments.commit(f"{key}:1", segment.model_dump(mode="json"))
+        except JsonCatalogCorrupt as exc:
+            raise SourceRevisionCatalogCorrupt(str(exc)) from exc
+        self._segments_by_key.setdefault(key, []).append(segment)
+        return self._commit_group_observation(
+            key=key,
+            acquisition_ids=acquisition_ids,
+            observation_id=observation_id,
+            revision_number=1,
+            digest=observation_digest,
+            seen_at=seen_at,
+            observation_state=ObservationState.FIRST_REGISTRATION.value,
+            usable=usable,
+            severity=MutationSeverity.INFO.value,
+            member_blob_shas=member_blob_shas,
+        )
+
+    def _classify_group_against_history(
+        self,
+        *,
+        key: str,
+        identity: RevisionSourceIdentityV1,
+        acquisition_ids: list[str],
+        observation_id: str,
+        observation_digest: str,
+        seen_at: datetime,
+        usable: bool,
+        segments: list[RevisionSegmentRecord],
+        member_blob_shas: list[str],
+    ) -> RevisionObservationRecord:
+        """Group classification (§39/§40/§24/§25/§41): the group digest is
+        classified EXACTLY as a single blob_sha256 would be — identical to
+        the current revision: no new revision; differing: new revision,
+        under the same temporal-ambiguity and ordering guards."""
+        current = segments[-1]
+        latest_seen = self._latest_seen_for(key)
+        if seen_at < latest_seen:
+            raise RevisionObservationOrderConflict(
+                f"observation seen_at {seen_at} precedes the latest "
+                f"registered seen_at {latest_seen} for source "
+                f"{key[:12]}...; retroactive insertion with renumbering is "
+                "forbidden (I06 §39)"
+            )
+        if observation_digest == current.blob_sha256:
+            # §24/§41: identical group content to the CURRENT revision — no
+            # new revision, ever.  The re-delivered group is an immutable
+            # IDENTICAL_REFETCH observation (different event, same bytes).
+            return self._commit_group_observation(
+                key=key,
+                acquisition_ids=acquisition_ids,
+                observation_id=observation_id,
+                revision_number=current.revision_number,
+                digest=observation_digest,
+                seen_at=seen_at,
+                observation_state=ObservationState.IDENTICAL_REFETCH.value,
+                usable=usable,
+                severity=MutationSeverity.INFO.value,
+                member_blob_shas=member_blob_shas,
+            )
+        # §40: identical seen_at with differing bytes — source order cannot
+        # be proven; fail closed.  Group evidence stays durable.
+        if seen_at == latest_seen:
+            raise RevisionTemporalAmbiguity(
+                f"same seen_at {seen_at} with differing group bytes for "
+                f"source {key[:12]}...; source order cannot be proven — "
+                "fail closed (I06 §40)"
+            )
+        return self._register_group_new_revision(
+            key=key,
+            acquisition_ids=acquisition_ids,
+            observation_id=observation_id,
+            observation_digest=observation_digest,
+            seen_at=seen_at,
+            usable=usable,
+            current=current,
+            member_blob_shas=member_blob_shas,
+        )
+
+    def _register_group_new_revision(
+        self,
+        *,
+        key: str,
+        acquisition_ids: list[str],
+        observation_id: str,
+        observation_digest: str,
+        seen_at: datetime,
+        usable: bool,
+        current: RevisionSegmentRecord,
+        member_blob_shas: list[str],
+    ) -> RevisionObservationRecord:
+        """§25/§33 for groups: differing group content → new revision
+        (SOURCE_MUTATION, WARNING — no provider declaration path is taken
+        by the integration caller; §37 requires explicit drift evidence).
+        """
+        new_number = current.revision_number + 1
+        segment_id = f"{key}:{new_number}"
+        segment = RevisionSegmentRecord(
+            source_revision_key=key,
+            segment_id=segment_id,
+            identity_version=current.identity_version,
+            identity_descriptor=current.identity_descriptor,
+            revision_number=new_number,
+            blob_sha256=observation_digest,
+            first_seen_at=seen_at,
+            first_acquisition_id=acquisition_ids[0],
+            revision_state=RevisionState.SOURCE_MUTATION.value,
+            revision_reason=(
+                "observed group bytes differ from the current revision"
+            ),
+            registered_at=_canonical_utc(self._clock()),
+            content_scope="GROUP_OBSERVATION",
+        )
+        try:
+            self._segments.commit(segment_id, segment.model_dump(mode="json"))
+        except JsonCatalogCorrupt as exc:
+            raise SourceRevisionCatalogCorrupt(str(exc)) from exc
+        self._segments_by_key.setdefault(key, []).append(segment)
+        return self._commit_group_observation(
+            key=key,
+            acquisition_ids=acquisition_ids,
+            observation_id=observation_id,
+            revision_number=new_number,
+            digest=observation_digest,
+            seen_at=seen_at,
+            observation_state=ObservationState.SOURCE_MUTATION.value,
+            usable=usable,
+            severity=MutationSeverity.WARNING.value,
+            member_blob_shas=member_blob_shas,
+        )
+
+    def _commit_group_observation(
+        self,
+        *,
+        key: str,
+        acquisition_ids: list[str],
+        observation_id: str,
+        revision_number: int,
+        digest: str,
+        seen_at: datetime,
+        observation_state: str,
+        usable: bool,
+        severity: str,
+        member_blob_shas: list[str] | None = None,
+    ) -> RevisionObservationRecord:
+        """Persist the immutable group observation record and bind EVERY
+        component acquisition to the group's revision (I14R1 §25 evidence
+        coherence)."""
+        record = RevisionObservationRecord(
+            observation_id=observation_id,
+            acquisition_id=acquisition_ids[0],
+            source_revision_key=key,
+            revision_number=revision_number,
+            blob_sha256=digest,
+            seen_at=seen_at,
+            observation_state=observation_state,
+            usable_provenance=usable,
+            severity=severity,
+            registered_at=_canonical_utc(self._clock()),
+            content_scope="GROUP_OBSERVATION",
+            member_acquisition_ids=list(acquisition_ids),
+            member_blob_sha256=sorted(set(member_blob_shas or [])),
+        )
+        try:
+            self._observations.commit(
+                observation_id, record.model_dump(mode="json")
+            )
+        except JsonCatalogConflict:
+            existing = self._observations.get(observation_id)
+            if existing is None or self._semantic_conflict(
+                existing,
+                record,
+                _OBSERVATION_SEMANTIC_FIELDS,
+            ):
+                raise RevisionObservationConflict(
+                    f"observation {observation_id!r} already exists with "
+                    "different revision semantics (I06 §48)"
+                ) from None
+        except JsonCatalogCorrupt as exc:
+            raise SourceRevisionCatalogCorrupt(str(exc)) from exc
+        self._observations_by_key.setdefault(key, []).append(record)
+        for acquisition_id in acquisition_ids:
+            self._acquisition_bindings[acquisition_id] = (
+                key,
+                revision_number,
+                digest,
+            )
+        return record
+
+    def _verify_group_bindings(
+        self,
+        acquisition_ids: list[str],
+        record: RevisionObservationRecord,
+    ) -> None:
+        """Idempotent group replay: every component must still resolve and
+        physically verify, and every component re-binds to the group's
+        revision (restart rebuilds bindings from observation records, which
+        carry only the FIRST component — this restores the full set)."""
+        for acquisition_id in acquisition_ids:
+            self._resolve_durable_acquisition(acquisition_id)
+            self._acquisition_bindings[acquisition_id] = (
+                record.source_revision_key,
+                record.revision_number,
+                record.blob_sha256,
+            )
+
     def register_acquisition(
         self,
         acquisition_id: str,
@@ -1099,7 +1600,11 @@ class SourceRevisionRegistry:
         """Resolve the durable acquisition, verify its blob, classify the
         observation against the source's revision history and persist it
         append-only (§15-§47).  ``provider_declaration`` is EXPLICIT
-        evidence (§33) — never inferred."""
+        evidence (§33) — never inferred.
+
+        I14R1 §22: for one observation spanning N durable acquisitions
+        (multi-envelope FetchBatch), use ``register_acquisition_group`` —
+        the same classification law over the COMPLETE ordered group."""
         if not isinstance(acquisition_id, str) or not acquisition_id:
             raise RevisionConfigurationError(
                 "acquisition_id must be a nonempty string"
