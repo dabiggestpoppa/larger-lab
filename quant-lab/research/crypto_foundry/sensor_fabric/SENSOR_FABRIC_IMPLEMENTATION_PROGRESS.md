@@ -3489,3 +3489,44 @@ research                                             = FROZEN
 ```
 
 No self-ratification. I15 not started. STOP after I14R2.
+
+---
+
+## SENSOR-B4-I14R2-RATIFY
+
+**Type:** governance only (operator ratification of the complete I14 -> I14R1 -> I14R2 chain). **Commit:** (this commit). **Production diff:** ZERO. **Historical evidence diff:** ZERO.
+
+**Acceptance artifact:** `evidence/bloc_04/BLOC_04_I14_CHAIN_OPERATOR_RATIFICATION.md` (new, append-only). No Python test added -> I11R2 tracked-Python audit NOT republished (stays 990). No I14/I14R1/I14R2 published evidence modified.
+
+**Ratification verification (all green this run, ZERO deterministic failures):**
+
+- Start gate: branch agent/crypto-sensor-fabric-build; HEAD = origin build = d45d611700d7b76f11726d319158d7df22289e34; origin/main = 7c7816f382947bbc8a1f2154435fc436f2428fa8; strict ancestry a37aad77cb -> 706f18ed2 -> 4111205e0 -> d45d61170 verified via merge-base --is-ancestor; no rewritten history.
+- Focused chain re-validation: I14 custody + I14R2 + I14R1 evidence 16 passed; I14R1 reproduction + compat 39 passed (3-page public-API continuation: 3 checkpoints / 2 CHECKPOINT_ADVANCED->ACQUIRING / 1 COMPLETE / 0 external manipulations; V1/V2 compat A-J; mixed restart); I06/I06R1/I07/I04 14 passed.
+- I14R2 matrices re-run nonvacuous, PRODUCTION_MEASURED: HISTORICAL_EVIDENCE_IMMUTABILITY 3/3, GROUP_AUTHORITY 7/7, GROUP_MEMBERSHIP 5/5, RESTART_CORRUPTION 6/6 (= 21/21).
+- Historical custody: 6/6 original I14 matrices byte-identical to accepted I14 head 706f18ed2 (TestI14HistoricalEvidenceCustody, pinned SHA-256). Generator freeze held: historical file mutation count = 0; UPDATE_I14_EVIDENCE gate stays disabled by default.
+- Broader battery: I11R2 audit (no-update, byte-stable @ 990 tracked .py) + I12 matrices + I13 + I13 ratify boundary 13 passed; I07R1* + blob store core 85 passed / 2 skipped; blob-store adversarial + namespace evidence 35 passed; I08 chain 77 passed; I12/I13 remainder 165 passed / 2 skipped; I05 + I09 chains 180 passed; I10/I11 chain + I14 handoff helpers 108 passed / 19 skipped.
+- Blob-store flake truth: known pre-existing flake test_blob_store_adversarial.py::TestConcurrency::test_concurrent_identical_writers_one_final (previously reproduced at untouched baseline 4111205e, ~1/6, not a chain regression) did NOT flake this run; documented, nothing hidden. Prior local full baseline unchanged: 3133 passed / 28 skipped / 0 failures.
+- Tooling: compileall OK; Ruff scoped diff empty (2 pre-existing findings in untouched test_i08_evidence.py); mypy storage = 10 errors all pre-existing in providers/ (0 new). Production diff = ZERO.
+- external_ci = NONE_OBSERVED (0 statuses / 0 check-runs queried live at ratified head). Local pytest is not called CI.
+
+**Laws ratified (committed-code anchors verified):** checkpoint-after-durable-manifest (integration.py drives MANIFEST_COMMITTED then advance_checkpoint()); continuation classifier EXACT_RETRY / NEXT_BATCH / DIVERGENT_REWRITE; acquisition ID law fp-job::<observation instant>::<sha> (or EMPTY_VALID sentinel) with dual-truth tolerance for the historical fp-job::<sha> T0B fossil; EMPTY_VALID blobless durable semantics (blob_sha256=None / blob_refs=[] / EMPTY_CONFIRMED / UNVERIFIED); checkpoint proof V1 (blob-backed; blobless and unknown-version refuse) and V2 (EMPTY_VALID only, MANIFEST_COMMITTED floor); mixed V1/V2 restart under persisted proof versions; group authority owned by SourceRevisionRegistry.register_acquisition_group() with domain-separated digest sensor-revision-group-v1 over sorted unique member blob SHAs ([X,Y]==[Y,X], [X,Y1]!=[X,Y2]); I06 self-validation of EVERY group member; durable member_bindings acquisition->blob correspondence; exact membership replay with subset/superset/replacement/foreign/duplicate refusals; group restart re-proof; group mutation semantics (identical refetch / SOURCE_MUTATION on member change / order-only permutation non-semantic / later-time same-set identical-refetch); manifest blob-ref set == group member blob set; W1-W7 crash safety with old-resume-token invariant and W7 exact-once adoption; corruption refusals with no repair-on-read.
+
+```
+SENSOR-B4-I14R2-RATIFY
+PASS_SENSOR_B4_I14_BLOC3_INTEGRATION_SEALED           = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I14R1_STREAM_CONTINUATION_EMPTY_REVISION_SEALED = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I14R2_EVIDENCE_CUSTODY_GROUP_AUTHORITY_SEALED   = OPERATOR_ACCEPTED
+G4-12_BLOC3_HANDOFF_GATE                              = PASS
+next_checkpoint_authorized                            = TRUE
+next_checkpoint                                       = SENSOR-B4-I15 HARDENING AND SECURITY
+authorized_scope                                      = I15 ONLY
+I16+                                                  = UNAUTHORIZED
+research                                              = FROZEN
+recommended_next                                      = SENSOR-B4-I15 IMPLEMENTATION
+```
+
+G4-13_BLOC5_READINESS_GATE = NOT_YET_IMPLEMENTED / PENDING_LATER_CHECKPOINT. I14 ratification does NOT earn G4-13 (frozen definition: RawNormalizationBatch PIT-normalization evidence sufficiency without filesystem/path assumptions).
+
+I15 authorization covers ONLY hardening of existing accepted Bloc 4 surfaces (secret scan, path traversal, symlink escape, corruption handling, resource bounds). It does NOT authorize I16 final acceptance/evidence, I17 Bloc 5 handoff, research restart, provider redesign, new storage architecture, new query semantics, new revision semantics, or normalization logic.
+
+No self-ratification of I15: it is AUTHORIZED but NOT STARTED. STOP after I14R2-RATIFY.
