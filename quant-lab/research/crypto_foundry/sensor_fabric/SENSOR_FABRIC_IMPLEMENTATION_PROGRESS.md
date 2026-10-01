@@ -3338,3 +3338,82 @@ research                                             = FROZEN
 ```
 
 No self-ratification. I15 not started. STOP after I14.
+
+## SENSOR-B4-I14R1 — PAGINATED CONTINUATION + EMPTY_VALID CHECKPOINT + MULTI-ENVELOPE REVISION CLOSURE: COMPLETE CHAIN I14R1A-E; IMPLEMENTATION PASS PENDING OPERATOR REVIEW
+
+Operator review of I14 found three blockers; I14R1 reproduces all three
+failure-first (RED) and repairs them without rewriting I14 history.
+
+Blocker A (continuation): at/after CHECKPOINT_ADVANCED the handoff now
+classifies EXACT_RETRY (adopt, zero mutation) / NEXT_BATCH (proven ONLY by
+accepted upstream context: Bloc3StorageContext.request_resume_token ==
+current.resume_token, sourced from the accepted FetchRequest.resume_token
+field; nextness NEVER inferred from bytes/timestamps/row counts/manifest
+versions/provider_cursor) / DIVERGENT_REWRITE (typed fail-closed before any
+evidence mutation). I14 owns the accepted annotated CHECKPOINT_ADVANCED ->
+ACQUIRING edge; the public caller never drives I07 (external manipulation
+count = 0). COMPLETE stays terminal. Three-page single-job proof through ONLY
+persist_batch: exactly 3 checkpoints, 2 annotated continuation edges, 1
+COMPLETE, no skipped page, no duplicate manifest version.
+
+Blocker B (EMPTY_VALID progress): AcquisitionRecord.blob_sha256 audited —
+already nullable, no fabrication needed. An EMPTY_VALID page now persists a
+durable blob-less AcquisitionRecord carrying the accepted EMPTY_VALID flag
+(additive _is_empty_valid_acquisition shape in the I04R1 §26 blobless gate),
+a durable EMPTY_CONFIRMED/UNVERIFIED zero-blob manifest, and advances the
+checkpoint through THE accepted I07 gate with the additive V2 proof
+(proof_version=2, evidence_kind=EMPTY_VALID, blob_sha256=None) — valid ONLY
+at the MANIFEST_COMMITTED floor, ONLY for EMPTY_VALID. V1 remains closed and
+unchanged (mandatory 64-hex blob anchor; blobless V1 still corrupt; unknown
+fields/versions still corrupt). Restart replay is VERSION-AWARE: each event
+validates under its OWN persisted proof version; mixed V1/V2 chains replay
+cleanly. Empty partial preserves the adapter token; empty complete runs
+CHECKPOINT_ADVANCED -> COMPLETE. Fake blob count = 0 across all windows.
+
+Blocker C (multi-envelope revision): I06 audited — no contract gap; extended
+additively. SourceRevisionRegistry.register_acquisition_group() reuses the
+entire existing classification machinery over the COMPLETE group; group
+digest = sha256("sensor-revision-group-v1\n" + sorted unique member blob
+SHAs) — canonical SET (Bloc 3 declares no envelope ordering semantic:
+[X,Y] vs [Y,X] is the SAME observation), domain-separated from any literal
+blob SHA, RECOMPUTED by I06 on every registration and restart. Group
+observation rows durably persist the COMPLETE member_acquisition_ids and
+member_blob_sha256 sets (a digest alone is NOT lineage — I14R1 §16/§17);
+the restart loader refuses any GROUP row/segment whose lineage is absent,
+unbound, or does not recompute to the persisted digest. Additive
+content_scope field: absent = legacy SINGLE law (historical rows unchanged;
+single-acquisition register_acquisition semantics untouched). Manifest
+evidence set == revision observation set.
+
+Acquisition-id law corrected: fp::sha -> fp::observed_at::sha (empty:
+fp::observed_at::EMPTY_VALID); exact retry keeps the id, identical bytes at
+a later instant are a distinct event with the same blob SHA. One
+legitimately re-measured historical I14 row (T0B source_acquisitions);
+documented in the correction file.
+
+Evidence (append-only; historical I14 matrices immutable): CONTINUATION 9/9
+OK; EMPTY_VALID_CHECKPOINT 7/7 OK; MULTI_ENVELOPE_REVISION 6/6 OK; RESTART
+3/3 OK; BLOC_04_I14R1_EVIDENCE_CORRECTION.md. Focused I14R1 (reproduction +
+evidence + compat suites): 43 passed / 0 failed. Regression at final file
+set: full storage+project 3127 passed / 28 pre-existing skips, ZERO failures
+(includes I14 original 23, I06/I07 suites 79, Bloc 3 base/contracts 1111+).
+Ruff clean on changed scope; compileall OK; mypy 0 new findings (10
+pre-existing providers/ baseline via followed imports). Secret scan clean;
+zero network. I11R2 governance-binding audit mechanically republished at the
+true tracked-Python count 989 (986 + 3 new I14R1 test modules), no-update
+byte-stability rerun green. external_ci = NONE_OBSERVED (0 statuses, 0
+check-runs at start head). CRLF-only churn in old I03R1/I04 evidence never
+staged.
+
+```
+SENSOR-B4-I14R1
+PASS_SENSOR_B4_I14_BLOC3_INTEGRATION_SEALED          = OPERATOR_HOLD
+PASS_SENSOR_B4_I14R1_STREAM_CONTINUATION_EMPTY_REVISION_SEALED = PENDING_OPERATOR_REVIEW
+G4-12_BLOC3_HANDOFF_GATE                             = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                           = FALSE
+recommended_next                                     = OPERATOR REVIEW OF I14 -> I14R1 CHAIN
+I15+                                                 = UNAUTHORIZED
+research                                             = FROZEN
+```
+
+No self-ratification. I15 not started. STOP after I14R1.
