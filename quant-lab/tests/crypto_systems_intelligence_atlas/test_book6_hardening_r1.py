@@ -187,12 +187,19 @@ def test_r1_d1_a5b_identity_alone_is_not_enough_without_row_authority() -> None:
     """A5's second half: the methodology must declare the row itself.
 
     A methodology that resolves and matches the required name exactly, but does
-    not list the corpus row in ``authorized_corpus_row_ids``, is still refused.
+    not carry the canonical row authority, is still refused.
+
+    R2 tightened the reason this fires. Under R1 a caller-built object reached
+    the row-authority gate at all; under R2 a mutated ``authorized_corpus_row_ids``
+    is part of the CONTENT DIGEST, so it is caught one condition earlier, at the
+    canonical-content seal. The claim under test is unchanged and in fact
+    stronger: the identity alone licenses nothing. The row-authority condition
+    itself is exercised directly in ``test_book6_hardening_r2.py``.
     """
 
     registry = Book6MethodologyRegistry()
     registry.register_methodology(methodology("routing-attribution-methodology", "1"))
-    with pytest.raises(ComparabilityError, match="is not authorized for corpus row"):
+    with pytest.raises(ComparabilityError, match="content does not match"):
         _authorize(*FC05, "routing-attribution-methodology@1", registry)
 
 
@@ -565,8 +572,8 @@ def test_r1_d3_current_unavailable_is_not_historically_invalid() -> None:
     with pytest.raises(ValuationError, match="stale"):
         engine.authorize_current_valuation(historical, as_of=NOW)
     # the price was fresh when the valuation was observed, so the HISTORICAL
-    # statement stands
-    assert engine.validate_historical_valuation(historical) is historical
+    # record's shape stands
+    assert engine.validate_recorded_historical_shape(historical) is historical
 
 
 def test_r1_d3_a_valuation_already_stale_when_observed_is_not_historically_valid() -> None:
@@ -577,33 +584,71 @@ def test_r1_d3_a_valuation_already_stale_when_observed_is_not_historically_valid
         observed_at=NOW,
     )
     with pytest.raises(ValuationError, match="already stale"):
-        engine.validate_historical_valuation(bogus)
+        engine.validate_recorded_historical_shape(bogus)
 
 
 def test_r1_d3_historical_validation_still_requires_book_2_authority() -> None:
+    """R1 asserted the historical path re-checks Book 2 CURRENT authority.
+
+    R2-D4 REVERSED this on purpose, and that reversal is the point of the R2
+    round. Re-checking ``require_current=True`` on the historical path meant a
+    price claim that was valid at observation time and later went REJECTED
+    retroactively erased a historical statement - which is exactly the
+    conflation ``CURRENT UNAVAILABLE != HISTORICALLY INVALID`` forbids.
+
+    The historical path now proves RECORD SHAPE only and refuses to claim
+    epistemic backing it cannot establish; the CURRENT authority question is
+    reported separately and labelled. Both halves are asserted below, and the
+    current path still hard-requires Book 2 authority.
+    """
+
     engine, claim_store, service = _valuation_engine(PRICE_CLAIM)
+    observed = NOW - timedelta(days=30)
     historical = valuation(
         "val:1",
-        price_observation=price("price:1", claim_refs=(PRICE_CLAIM,), observed_at=NOW - timedelta(days=30)),
-        observed_at=NOW,
+        price_observation=price("price:1", claim_refs=(PRICE_CLAIM,), observed_at=observed),
+        observed_at=observed + timedelta(seconds=60),
+        valid_time=observed + timedelta(seconds=60),
     )
+    assert engine.validate_recorded_historical_shape(historical) is historical
+    assert engine.historical_authority_status(historical).current_claims_backed is True
+
     decay_claim(service, claim_store, PRICE_CLAIM, "REJECTED")
+
+    # the record is preserved...
+    assert engine.validate_recorded_historical_shape(historical) is historical
+    report = engine.historical_authority_status(historical)
+    # ...but Book 6 makes NO claim that it is revalidated authority
+    assert report.current_claims_backed is False
+    assert report.replay_available is False
+    assert report.replay_capability == "NOT_IMPLEMENTED"
+
+    # and the CURRENT path still refuses outright
     with pytest.raises(ValuationError, match="no current Book 2 authority"):
-        engine.validate_historical_valuation(historical)
+        engine.authorize_current_valuation(historical, as_of=NOW)
 
 
 def test_r1_d3_the_ambiguous_single_api_is_gone() -> None:
-    """Two explicit authorities, not one overloaded method."""
+    """Explicit, separate authorities - not one overloaded method."""
 
     engine, *_ = _valuation_engine()
-    surface = {
-        name
-        for name in dir(engine)
-        if not name.startswith("_")
-        and "valuation" in name.lower()
-        and callable(getattr(engine, name))
+    public = {
+        name for name in dir(engine) if not name.startswith("_")
     }
-    assert surface == {"authorize_current_valuation", "validate_historical_valuation"}
+    valuation_surface = sorted(
+        name
+        for name in public
+        if callable(getattr(engine, name))
+        and (
+            "valuation" in name.lower()
+            or "historical" in name.lower()
+        )
+    )
+    assert valuation_surface == [
+        "authorize_current_valuation",
+        "historical_authority_status",
+        "validate_recorded_historical_shape",
+    ]
 
 
 # ===========================================================================
@@ -1231,8 +1276,17 @@ def test_r1_c8_vector_coverage_rule_refs_replaced_by_fake_refs() -> None:
     assert vector.coverage_sufficiency_rule_refs == ("covrule:1",)
     forged = vector.model_copy(update={"coverage_sufficiency_rule_refs": ("fake:rule",)})
     assert engine.data_status(forged) is VectorStatus.DATA_INCOMPLETE
-    forged_attestation = vector.model_copy(update={"sufficiency_attestation": None})
-    assert engine.data_status(forged_attestation) is VectorStatus.DATA_INCOMPLETE
+    # R2-D3 supersedes the R1-D4 mechanism here, deliberately and narrowly:
+    # the attestation is now an AUDIT RECORD, not the source of truth, so
+    # stripping it cannot flip the authoritative verdict. The engine
+    # reconstructs sufficiency from registry state by per-metric set
+    # equality, and the forged / overstated / reduced / unrelated-rule
+    # attacks this None-attestation assertion used to stand in for are now
+    # executed for real against the registry in test_book6_hardening_r2.py.
+    stripped = vector.model_copy(update={"sufficiency_attestation": None})
+    assert engine.data_status(stripped) is VectorStatus.DATA_COMPLETE
+    # The preserved R1 gate itself: fake rule refs still fail closed.
+    assert engine.data_status(forged) is VectorStatus.DATA_INCOMPLETE
 
 
 def test_r1_c9_coverage_rule_status_forged_to_ratified() -> None:

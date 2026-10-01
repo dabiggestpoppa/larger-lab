@@ -29,10 +29,19 @@ Book 6 Hardening R1 closes two authority gaps here:
 - **R1-D3** ``ValuationObservation.is_stale`` existed but the engine never
   consulted it, so a month-old price authorized a *current* valuation. The
   authority boundary is now split into ``authorize_current_valuation(...)``,
-  which takes an explicit ``as_of`` and refuses a stale price, and
-  ``validate_historical_valuation(...)``, which preserves a statement that was
-  valid at its own recorded valid time. ``CURRENT UNAVAILABLE`` is not
+  which takes an explicit ``as_of`` and refuses a stale price, and the
+  historical path, which preserves a statement that was valid at its own
+  recorded valid time. ``CURRENT UNAVAILABLE`` is not
   ``HISTORICALLY INVALID``, and there is no hidden wall clock.
+- **R2-D4** the historical path above shared ONE helper with the current path,
+  so it revalidated the price's Book 2 claims with ``require_current=True``.
+  A price claim valid when the valuation was observed and later STALE or
+  SUPERSEDED retroactively erased the historical statement. The semantics are
+  now split honestly: ``validate_recorded_historical_shape(...)`` proves
+  RECORD SHAPE only and never consults Book 2, while
+  ``historical_authority_status(...)`` reports that Book 2 authority replay is
+  :data:`HISTORICAL_BOOK2_AUTHORITY_REPLAY`. A preserved record is not
+  revalidated historical authority, and Book 6 does not claim otherwise.
 """
 
 from __future__ import annotations
@@ -203,6 +212,71 @@ class ValuationObservation(Book6FrozenModel):
         return not self.is_stale_at(as_of)
 
 
+#: R2-D4 capability ledger. Accepted Book 2 EXPOSES raw claim history
+#: (``ClaimStore.history`` plus timestamped ``TransitionEvent``s), but its
+#: epistemic predicate ``can_promote_to_graph`` requires the claim to BE the
+#: canonical current record:
+#:
+#:     if claim_store.require(claim.claim_id) != claim: return False
+#:
+#: It is therefore CURRENT-ONLY BY DESIGN, and Book 2 offers no "was this claim
+#: authoritative at valid_time T" query. Book 6 cannot re-derive that predicate
+#: bitemporally without inventing a Book 2 feature and standing up a second
+#: epistemic engine, so R2 records the capability as absent rather than faking
+#: a historical PASS. This is an accepted capability limitation; only a
+#: governance-authorized Book 2 amendment can change it.
+HISTORICAL_BOOK2_AUTHORITY_REPLAY: Final[str] = "NOT_IMPLEMENTED"
+
+
+class HistoricalAuthorityReport(Book6FrozenModel):
+    """What can honestly be said about a historical valuation's authority.
+
+    R2-D4. Two DIFFERENT claims are kept apart instead of being collapsed:
+
+    ``record_shape_valid``
+        PRESERVED HISTORICAL RECORD — provable offline from the record itself:
+        explicit numeraire, cited price, purpose/class admissibility, resolvable
+        methodology, and a price that was not already stale at its own
+        ``observed_at``.
+
+    ``current_claims_backed``
+        CURRENT authority as of *now* — a separate, clearly-labelled fact.
+
+    ``replay_available``
+        Whether Book 2 can revalidate historical epistemic authority. It is
+        ``False``: see :data:`HISTORICAL_BOOK2_AUTHORITY_REPLAY`.
+
+    ``PRESERVED_HISTORICAL_RECORD`` is NOT ``REVALIDATED_HISTORICAL_AUTHORITY``.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    valuation_id: str = Field(min_length=1)
+    replay_capability: str = HISTORICAL_BOOK2_AUTHORITY_REPLAY
+    replay_available: bool = False
+    replay_unavailable_reason: str = Field(min_length=1)
+    current_claims_backed: bool
+    record_shape_valid: bool
+
+    @model_validator(mode="after")
+    def _check_no_false_replay_claim(self) -> "HistoricalAuthorityReport":
+        """No report may claim what the kernel cannot deliver.
+
+        Bound to the MODULE capability constant, not to this instance's field:
+        while ``HISTORICAL_BOOK2_AUTHORITY_REPLAY`` is not ``"AVAILABLE"``, a
+        forged report claiming ``replay_available=True`` is invalid data, full
+        stop. A caller cannot launder the claim by asserting a capability the
+        kernel does not ship.
+        """
+
+        if self.replay_available and HISTORICAL_BOOK2_AUTHORITY_REPLAY != "AVAILABLE":
+            raise ValuationError(
+                "a historical authority report may not claim replay availability "
+                f"while Book 2 authority replay is {HISTORICAL_BOOK2_AUTHORITY_REPLAY}"
+            )
+        return self
+
+
 class Book5WriteBackRefusal(Book6FrozenModel):
     """Explicit refusal token for the Book 5 seam (documentation + test surface).
 
@@ -242,7 +316,9 @@ def check_price_divergence_is_preserved(
 
 __all__ = [
     "BOOK5_WRITE_BACK_IS_REFUSED",
+    "HISTORICAL_BOOK2_AUTHORITY_REPLAY",
     "Book5WriteBackRefusal",
+    "HistoricalAuthorityReport",
     "check_price_divergence_is_preserved",
     "NO_GLOBAL_PRICE_SOURCE_CLASS",
     "PRICE_AUTHORITY_IS_PURPOSE_SPECIFIC",

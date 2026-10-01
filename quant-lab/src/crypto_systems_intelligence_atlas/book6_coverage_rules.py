@@ -47,7 +47,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Final
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_validator
 
 from .book6_definitions import CoverageRuleRatificationStatus, CoverageSufficiencyRule
 from .book6_frozen import Book6FrozenModel
@@ -79,6 +79,34 @@ class CoverageSufficiencyAttestation(Book6FrozenModel):
         """Whether this attestation's scope covers every named metric."""
 
         return set(metric_ids) <= set(self.scope_metric_ids)
+
+
+class CoverageReport(Book6FrozenModel):
+    """The explicit set equality a data-complete vector must satisfy.
+
+    R2-D3: sufficiency is reconstructed per metric rather than inferred from an
+    attestation's claimed scope. This report is that reconstruction made
+    inspectable, so a ``DATA_INCOMPLETE`` verdict says WHICH metric is uncovered
+    and why, instead of only that something is.
+    """
+
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+    required_metric_ids: tuple[str, ...] = Field(min_length=1)
+    covered_metric_ids: tuple[str, ...]
+    uncovered_metric_ids: tuple[str, ...]
+    status: str = "DATA_INCOMPLETE"
+    reasons: tuple[tuple[str, str], ...] = ()
+
+    @model_validator(mode="after")
+    def _check_partition(self) -> "CoverageReport":
+        covered = set(self.covered_metric_ids)
+        uncovered = set(self.uncovered_metric_ids)
+        if covered & uncovered:
+            raise CoverageRuleError(
+                "a metric may not be both covered and uncovered in a report"
+            )
+        return self
 
 
 class CoverageRuleRegistry:
@@ -279,6 +307,7 @@ NUMERIC_COVERAGE_IS_NOT_SUFFICIENCY: Final[bool] = True
 
 __all__ = [
     "COVERAGE_RULE_REF_IS_NOT_AUTHORITY",
+    "CoverageReport",
     "COVERAGE_SUFFICIENCY_RULES_RATIFIED_AT_BOOTSTRAP",
     "CoverageRuleError",
     "CoverageRuleRegistry",
