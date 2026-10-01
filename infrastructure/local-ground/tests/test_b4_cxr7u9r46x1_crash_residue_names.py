@@ -96,6 +96,12 @@ def _governed(tmp_path, state="PROMOTED", record_digest=EXACT):
     }
     (transitions / f"{OPID}.json").write_bytes(_bytes(record))
     os.chmod(transitions / f"{OPID}.json", 0o600)
+    # B4-CXR7U9R47R2: the engine now derives its governed transition root from
+    # its own identity -- no parameter is left to pass a directory through --
+    # so every tree built here binds that root in process through the explicit
+    # test seam. A proof that builds a second tree rebinds to it, which is
+    # exactly why two trees can never share an authority root.
+    pgrec._bind_test_recovery_root(str(tmp_path / "governed-recovery"))
     return transitions, record
 
 
@@ -151,7 +157,7 @@ def test_x1_publisher_crash_residue_is_admitted_by_one_snapshot(tmp_path):
         transitions, _bytes({**CLAIM,
                              "receipt_sha256":
                              pgrec._receipt_digest(promote)}))
-    snapshot = pgrec._read_selector_snapshot(OPID, str(transitions))
+    snapshot = pgrec._read_selector_snapshot(OPID)
     assert snapshot.present is True
     assert snapshot.link_count == 2
     assert (snapshot.device, snapshot.inode) == \
@@ -159,7 +165,7 @@ def test_x1_publisher_crash_residue_is_admitted_by_one_snapshot(tmp_path):
     assert snapshot.read_error is None
     assert snapshot.claim["transition"] == "rollback"
     assert snapshot.canonical_path == str(claim)
-    assert pgrec._load_claim(OPID, str(transitions)) == snapshot.claim
+    assert pgrec._load_claim(OPID) == snapshot.claim
     # the residue is untouched by the read: the engine never repairs, deletes
     # or rewrites a selector it admitted
     assert os.stat(residue).st_nlink == 2
@@ -189,7 +195,7 @@ def test_x2_crash_residue_still_governs_the_branch_selection(tmp_path):
     _publisher_crash_residue(
         transitions_b, _bytes({**CLAIM, "receipt_sha256": FOREIGN}))
     assert pgrec._classify_record_for_shell(
-        record_b, promote, transition_dir=str(transitions_b)) == 4
+        record_b, promote) == 4
 
 
 # --------------------------------------------------------------------- #
@@ -208,11 +214,11 @@ def test_x3_foreign_name_inside_the_governed_directory_is_refused(tmp_path):
     before = _census(transitions)
     try:
         with pytest.raises(pgrec._ExecutionAuthorityConflict):
-            pgrec._read_selector_snapshot(OPID, str(transitions))
+            pgrec._read_selector_snapshot(OPID)
         assert _census(transitions) == before
     finally:
         second.unlink()
-    assert pgrec._read_selector_snapshot(OPID, str(transitions)).present
+    assert pgrec._read_selector_snapshot(OPID).present
 
 
 def test_x4_foreign_link_outside_the_governed_directory_is_refused(tmp_path):
@@ -232,7 +238,7 @@ def test_x4_foreign_link_outside_the_governed_directory_is_refused(tmp_path):
     before = _census(transitions)
     try:
         with pytest.raises(pgrec._ExecutionAuthorityConflict) as refusal:
-            pgrec._read_selector_snapshot(OPID, str(transitions))
+            pgrec._read_selector_snapshot(OPID)
         if os.name != "nt":
             # POSIX refuses it for the exact, provable reason: the link count
             # and the in-directory census disagree.
@@ -241,7 +247,7 @@ def test_x4_foreign_link_outside_the_governed_directory_is_refused(tmp_path):
         assert outside.is_file()
     finally:
         outside.unlink()
-    assert pgrec._read_selector_snapshot(OPID, str(transitions)).present
+    assert pgrec._read_selector_snapshot(OPID).present
 
 
 # --------------------------------------------------------------------- #
@@ -271,7 +277,7 @@ def test_x5_withdrawn_total_link_count_law_refuses_the_legal_residue(
     monkeypatch.setattr(pgrec, "_assert_selector_authority_names",
                         withdrawn_law)
     with pytest.raises(pgrec._ExecutionAuthorityConflict) as refusal:
-        pgrec._read_selector_snapshot(OPID, str(transitions))
+        pgrec._read_selector_snapshot(OPID)
     assert "one single durable name" in str(refusal.value)
 
 
@@ -304,18 +310,19 @@ def test_x6_every_denial_leaves_the_governed_tree_byte_identical(tmp_path):
         before = _census(transitions)
         try:
             if extra is None:
-                snapshot = pgrec._read_selector_snapshot(OPID, str(transitions))
+                snapshot = pgrec._read_selector_snapshot(OPID)
                 assert snapshot.present is True
                 # the exact branch is decided by ONE admitted snapshot
+                authority = pgrec._acquire_recovery_authority(OPID, promote)
                 assert pgrec._valid_transition_claim(
                     OPID, "rollback", promote,
-                    snapshot=snapshot) is True
+                    authority=authority) is True
                 assert pgrec._valid_transition_claim(
                     OPID, "finalize", promote,
-                    snapshot=snapshot) is False
+                    authority=authority) is False
             else:
                 with pytest.raises(pgrec._ExecutionAuthorityConflict):
-                    pgrec._read_selector_snapshot(OPID, str(transitions))
+                    pgrec._read_selector_snapshot(OPID)
                 # and the decision law fails closed instead of guessing
                 assert pgrec._valid_transition_claim(
                     OPID, "rollback", promote,

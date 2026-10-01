@@ -129,6 +129,10 @@ _CLAIM_TEMP_LIVENESS_ATTEMPTS = 4
 # pathname fallback.
 _DIR_OPEN_FLAGS = (os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
                    | getattr(os, "O_DIRECTORY", 0))
+# B4-CXR7U9R47R2: the DIRECTORY open is guarded by O_NOFOLLOW as well, so a
+# symlinked transition directory fails at open instead of being resolved to
+# its target first; Windows refuses reparse points explicitly instead.
+_DIR_OPEN_NO_FOLLOW_FLAGS = _DIR_OPEN_FLAGS | getattr(os, "O_NOFOLLOW", 0)
 _CLAIM_OPEN_FLAGS = (os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
                      | getattr(os, "O_NOFOLLOW", 0)
                      | (os.O_BINARY if os.name == "nt" else 0))
@@ -702,14 +706,22 @@ def _write_transition_record(operation_id, record) -> None:
         raise
 
 
-def _load_transition_record(operation_id, transition_dir=None):
-    directory = transition_dir or _transitions_dir()
-    path = os.path.join(directory, operation_id + ".json")
+def _load_transition_record(operation_id):
+    """The durable operation record, read ONCE per decision (B4-CXR7U9R47R2).
+
+    There is no directory parameter. R46 accepted ``transition_dir`` here and
+    in every selector helper beneath it, which is precisely how a caller could
+    declare the authority root that its own record was then validated against.
+    The governed directory is derived from the engine's own identity and from
+    nowhere else, so no caller-supplied value can redirect a record read.
+    """
+    path = os.path.join(_transitions_dir(), operation_id + ".json")
     if not os.path.isfile(path):
         raise RuntimeError("no durable recovery operation record for operation "
                            f"{operation_id}")
     with open(path, encoding="utf-8") as f:
         return json.load(f)
+
 
 
 def _merge_prior_transition_facts(path, record):
@@ -1101,37 +1113,45 @@ def _claim_transition(operation_id, transition, promote=None) -> dict:
 _SELECTOR_READ_ATTEMPTS = 3
 
 
-def _derive_claim_coordinate(operation_id, directory):
-    """Derive the canonical claim coordinate INTERNALLY (B4-CXR7U9R46R1).
+def _derive_claim_coordinate(operation_id):
+    """Derive the canonical claim coordinate INTERNALLY (B4-CXR7U9R46R1,
+    corrected B4-CXR7U9R47R2/R3).
 
-    The governed directory and the canonical basename are engine-derived
-    from the operation id and the governed transitions directory -- never
-    from CLI or receipt data -- so the only caller-controlled input is the
+    The governed directory and the canonical basename are engine-derived from
+    the operation id and the engine's OWN transitions directory -- never from
+    CLI, receipt or record data -- so the only caller-controlled input is the
     operation id, which must satisfy its strict pattern.
+
+    B4-CXR7U9R47R2: the governed directory is no longer a parameter, so the
+    returned coordinate is exactly the engine-derived one and there is no
+    caller-supplied path left to resolve or launder. Nothing in this function
+    resolves, follows or rewrites the coordinate; the admission in
+    ``_open_governed_directory`` is the first and only thing that touches it.
     """
     if not isinstance(operation_id, str) \
             or not OPERATION_ID_RE.match(operation_id):
         raise _ExecutionAuthorityConflict(
             "malformed operation id; refusing to derive a claim coordinate")
-    if not os.path.isdir(directory):
-        raise _ExecutionAuthorityConflict(
-            f"operation {operation_id} has no governed transition directory")
-    governed = os.path.realpath(directory)
-    return governed, f"{operation_id}.claim"
+    return _transitions_dir(), f"{operation_id}.claim"
 
 
 def _open_governed_directory(governed_dir, operation_id):
-    """Anchor the governed directory without following any redirection
-    (B4-CXR7U9R46R1).
+    """Admit the governed-directory COORDINATE without following any redirection (no-follow open added B4-CXR7U9R47R2).
 
-    POSIX: a real directory descriptor is returned and every subsequent
-    selector step is descriptor-relative, so the whole read is pinned to the
-    opened directory inode.
+    Returns ``(dir_fd, (st_dev, st_ino))``.
+
+    POSIX: the SUPPLIED coordinate is opened with
+    O_RDONLY|O_CLOEXEC|O_DIRECTORY|O_NOFOLLOW. A symlinked transition
+    directory therefore fails at ``open`` with ELOOP instead of being silently
+    resolved to its target, and the opened descriptor is fstat'ed so that the
+    identity returned is the identity of the directory actually admitted. Every
+    later step of the decision is descriptor-relative to that descriptor, so
+    the whole read is pinned to this directory inode.
 
     Windows: a directory cannot be held open this way, so the anchor is a
-    no-follow stat of the governed directory with an explicit reparse-point
-    refusal. A redirected directory is refused; there is no pathname
-    fallback.
+    no-follow stat of the ORIGINAL coordinate with an explicit reparse-point
+    refusal and a directory-type proof. A redirected directory is refused;
+    there is no pathname fallback.
     """
     if os.name == "nt":
         try:
@@ -1139,7 +1159,7 @@ def _open_governed_directory(governed_dir, operation_id):
         except OSError as e:
             raise _ExecutionAuthorityConflict(
                 f"operation {operation_id} governed transition directory "
-                f"could not be identified: {e}")
+                f"could not be identified without following redirections: {e}")
         if not stat.S_ISDIR(info.st_mode):
             raise _ExecutionAuthorityConflict(
                 f"operation {operation_id} governed transition directory is "
@@ -1149,20 +1169,26 @@ def _open_governed_directory(governed_dir, operation_id):
             raise _ExecutionAuthorityConflict(
                 f"operation {operation_id} governed transition directory is "
                 "a reparse point; refusing a redirected directory")
-        return None
+        return None, (info.st_dev, info.st_ino)
     try:
-        dir_fd = os.open(governed_dir, _DIR_OPEN_FLAGS)
+        dir_fd = os.open(governed_dir, _DIR_OPEN_NO_FOLLOW_FLAGS)
     except OSError as e:
         raise _ExecutionAuthorityConflict(
             f"operation {operation_id} governed transition directory could "
             f"not be opened without following redirections: {e}")
-    info = os.fstat(dir_fd)
+    try:
+        info = os.fstat(dir_fd)
+    except OSError as e:
+        os.close(dir_fd)
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} governed transition directory could "
+            f"not be identified once admitted: {e}")
     if not stat.S_ISDIR(info.st_mode):
         os.close(dir_fd)
         raise _ExecutionAuthorityConflict(
             f"operation {operation_id} governed transition directory is "
             "not a directory")
-    return dir_fd
+    return dir_fd, (info.st_dev, info.st_ino)
 
 
 def _selector_conflict(operation_id, reason):
@@ -1524,29 +1550,27 @@ def _read_selector_snapshot_admitted(operation_id, governed, name, dir_fd,
                 pass
 
 
-def _read_selector_snapshot(operation_id, transition_dir=None):
+def _read_selector_snapshot(operation_id):
     """Read THIS operation's canonical claim as ONE FD-bound snapshot.
 
-    B4-CXR7U9R46R1: derive the governed coordinate and the canonical basename
-    INTERNALLY -> admit that coordinate without following redirections ->
-    open the claim once, read it, parse it, and prove its identity from that
-    same descriptor -> close and return the immutable snapshot.
+    POSIX sequence (B4-CXR7U9R46R1, corrected B4-CXR7U9R47R2/R3): derive the
+    governed coordinate and the canonical basename INTERNALLY -> admit that
+    EXACT coordinate without following redirections (O_DIRECTORY|O_CLOEXEC|
+    O_NOFOLLOW, never a realpath first) -> open the claim once, read it, parse
+    it, and prove its identity from that same descriptor -> close and return
+    the immutable snapshot.
 
-    B4-CXR7U9R47R1: the admitted read itself is factored into
-    ``_read_selector_snapshot_admitted`` so that ONE decision can admit the
-    governed directory exactly once and take its ONE selector read against
-    that same admission. The convenience wrapper keeps its R46 compatibility
-    signature this rung; the caller-owned-descriptor split is the new seam.
+    B4-CXR7U9R47R2: the governed directory is no longer a parameter. It is
+    derived from the engine's own identity, so a caller cannot name the
+    authority root its own record is judged against.
+
+    Windows equivalence: O_NOFOLLOW is unavailable, so reparse points are
+    refused explicitly on both the opened object and the canonical name, and
+    the same device/inode identity comparison is enforced; a platform that
+    cannot prove these properties fails closed.
     """
-    directory = transition_dir or _transitions_dir()
-    governed, name = _derive_claim_coordinate(operation_id, directory)
-    dir_fd = _open_governed_directory(governed, operation_id)
-    info = None
-    if dir_fd is not None:
-        info = os.fstat(dir_fd)
-    else:
-        info = os.stat(governed, follow_symlinks=False)
-    identity = (info.st_dev, info.st_ino)
+    governed, name = _derive_claim_coordinate(operation_id)
+    dir_fd, identity = _open_governed_directory(governed, operation_id)
     try:
         return _read_selector_snapshot_admitted(
             operation_id, governed, name, dir_fd, identity)
@@ -1558,19 +1582,24 @@ def _read_selector_snapshot(operation_id, transition_dir=None):
                 pass
 
 
-def _load_claim(operation_id, transition_dir=None):
+def _load_claim(operation_id):
     """The durable operation-wide claim, or None if none was ever taken.
 
     B4-CXR7U9R46R1: the claim bytes are read from ONE FD-bound selector
     snapshot -- the same descriptor whose regular-file type, privacy,
     durable-name, non-mutation and pathname-identity properties were
     admitted.
+    B4-CXR7U9R47R2: no directory parameter. The governed root is derived from
+    the engine's own identity, so no caller can point this read at a root it
+    owns.
+
     The old validate-pathname-then-reopen sequence, which left a replacement
     window between validation and open, no longer exists. A symlink,
-    non-regular object, redirected, widened, replaced or unparseable claim
-    raises _ExecutionAuthorityConflict instead of returning content.
+    non-regular object, redirected, widened, replaced, oversized or
+    unparseable claim raises _ExecutionAuthorityConflict instead of returning
+    content.
     """
-    snapshot = _read_selector_snapshot(operation_id, transition_dir)
+    snapshot = _read_selector_snapshot(operation_id)
     if not snapshot.present:
         return None
     if not isinstance(snapshot.claim, dict):
@@ -1579,9 +1608,7 @@ def _load_claim(operation_id, transition_dir=None):
     return snapshot.claim
 
 
-def _valid_transition_claim(operation_id, transition, promote,
-                            transition_dir=None, snapshot=None,
-                            authority=None):
+def _valid_transition_claim(operation_id, transition, promote, authority=None):
     """EXACT binding of the canonical selector to this transition and THIS
     promote receipt (B4-CXR7U9R45R1). One semantic law, shared by the shell
     classifier, reconciliation and every resume path: the claim must pass its
@@ -1594,24 +1621,20 @@ def _valid_transition_claim(operation_id, transition, promote,
     reads; there is no second read anymore.
 
     B4-CXR7U9R47R1: this was the ONE helper that already took a snapshot, and
-    R46's evidence generalised it to the whole decision. That generalisation
-    was false: ``_claim_state`` had no snapshot parameter at all, so the
-    COMPLETE classifier read the selector once to classify it and then read it
-    again here to select the branch. This function now accepts the whole
-    decision's ``authority`` -- a complete RecoveryAuthoritySnapshot -- so the
-    record and the selector are pinned together. ``snapshot=`` is kept for
-    compatibility this rung and wins when no full authority is supplied.
+    R46's evidence generalised it to the whole decision. That generalisation was
+    false: ``_claim_state`` had no snapshot parameter at all, so the COMPLETE
+    classifier read the selector once to classify it and then read it again here
+    to select the branch. This function still accepts an already-started
+    decision's ``authority`` -- but ``authority`` is now the decision, not just
+    the selector, so the record and the selector are pinned together and a
+    replacement cannot land between them.
     """
     if promote is None:
         return False
     expected = _receipt_digest(promote)
     try:
-        if authority is not None:
-            snap = authority.selector
-        elif snapshot is not None:
-            snap = snapshot
-        else:
-            snap = _read_selector_snapshot(operation_id, transition_dir)
+        snap = (authority.selector if authority is not None
+                else _read_selector_snapshot(operation_id))
         state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
@@ -1624,8 +1647,7 @@ def _valid_transition_claim(operation_id, transition, promote,
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
-def _receiptless_selector_agrees(operation_id, transition,
-                                 transition_dir=None, authority=None):
+def _receiptless_selector_agrees(operation_id, transition, authority=None):
     """Receiptless agreement, bound to DURABLE authority (B4-CXR7U9R46R3).
 
     When no promote receipt is available to bind an expectation, the
@@ -1643,14 +1665,12 @@ def _receiptless_selector_agrees(operation_id, transition,
     B4-CXR7U9R47R1: with an ``authority`` the durable record and the selector
     are both already inside the decision, so this helper performs no
     filesystem access. In R46 it re-read BOTH -- the record for its digest and
-    the selector for its binding -- so a record or selector replacement
-    landing between those two reads was legal.
+    the selector for its binding -- so a record or selector replacement landing
+    between those two reads was legal.
     """
     try:
-        if authority is not None:
-            record = authority.record
-        else:
-            record = _load_transition_record(operation_id)
+        record = (authority.record if authority is not None
+                  else _load_transition_record(operation_id))
     except (OSError, ValueError, RuntimeError, TypeError):
         return False
     if not isinstance(record, dict):
@@ -1662,7 +1682,7 @@ def _receiptless_selector_agrees(operation_id, transition,
         return False
     try:
         snap = (authority.selector if authority is not None
-                else _read_selector_snapshot(operation_id, transition_dir))
+                else _read_selector_snapshot(operation_id))
         state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
@@ -1675,9 +1695,7 @@ def _receiptless_selector_agrees(operation_id, transition,
     return isinstance(claim, dict) and claim.get("transition") == transition
 
 
-def _selector_agrees_with_finalizing(operation_id, promote,
-                                     transition_dir=None, snapshot=None,
-                                     authority=None):
+def _selector_agrees_with_finalizing(operation_id, promote, authority=None):
     """ONE state/selector agreement law for FINALIZING (B4-CXR7U9R45R3,
     binding corrected B4-CXR7U9R46R3).
 
@@ -1691,11 +1709,11 @@ def _selector_agrees_with_finalizing(operation_id, promote,
 
     B4-CXR7U9R47R1: THIS WAS THE SECOND HALF OF THE DOUBLE READ. The caller
     had already spent a selector read on ``_claim_state`` before reaching this
-    helper, which then read the selector again -- and, with no promote
-    receipt, re-read the durable record too. A FINALIZING decision could
-    therefore disagree with itself across a generation swap. ``authority``
-    now supplies both inputs, so one FINALIZING decision reads the record
-    once and the selector once.
+    helper, which then read the selector again -- and, with no promote receipt,
+    re-read the durable record too. A FINALIZING decision could therefore
+    disagree with itself across a generation swap. ``authority`` now supplies
+    both inputs, so one FINALIZING decision reads the record once and the
+    selector once.
     """
     if not isinstance(operation_id, str)             or not OPERATION_ID_RE.match(operation_id):
         return False
@@ -1710,12 +1728,8 @@ def _selector_agrees_with_finalizing(operation_id, promote,
             expected = record.get("receipt_sha256")
             if not isinstance(expected, str) or not SHA256_RE.match(expected):
                 return False
-        if authority is not None:
-            snap = authority.selector
-        elif snapshot is not None:
-            snap = snapshot
-        else:
-            snap = _read_selector_snapshot(operation_id, transition_dir)
+        snap = (authority.selector if authority is not None
+                else _read_selector_snapshot(operation_id))
         if not snap.present:
             return False
         state = _classify_claim_content(operation_id, snap,
@@ -1730,8 +1744,8 @@ def _selector_agrees_with_finalizing(operation_id, promote,
     return isinstance(claim, dict) and claim.get("transition") == "finalize"
 
 
-def _claim_state(operation_id, transition_dir=None,
-                 expected_receipt_sha256=None, authority=None):
+def _claim_state(operation_id, authority=None,
+                 expected_receipt_sha256=None):
     """The SEMANTIC state of the durable branch selector (B4-CXR7U9R45R1).
 
     ONE classification law for the shell classifier, reconciliation and every
@@ -1739,7 +1753,12 @@ def _claim_state(operation_id, transition_dir=None,
     IS ABSENT. A canonical claim that exists is one of:
 
       * bound_complete         -- format, operation id, permitted transition
-                                  and receipt digest all match;
+                                  and receipt digest all match (the digest must
+                                  equal expected_receipt_sha256 when one is
+                                  supplied; a structurally valid digest with no
+                                  expectation to compare against is reported as
+                                  unbound_or_mismatched rather than silently
+                                  trusted);
       * unbound_or_mismatched  -- a well-shaped claim whose receipt digest is
                                   missing, malformed, or bound to different
                                   authority: the selector coordinate is SPENT,
@@ -1761,16 +1780,16 @@ def _claim_state(operation_id, transition_dir=None,
     classifier classified the selector HERE and then -- on the PROMOTED and
     FINALIZING legs -- read it AGAIN to select the branch. Two reads per
     decision, with a replacement able to land between them. It now takes the
-    caller's ``authority`` and performs no filesystem access when one is
-    supplied.
+    caller's ``authority`` and performs no filesystem access whatsoever when
+    one is supplied.
     """
     try:
         snap = (authority.selector if authority is not None
-                else _read_selector_snapshot(operation_id, transition_dir))
+                else _read_selector_snapshot(operation_id))
     except _ExecutionAuthorityConflict:
         # Coordinate admission failed: symlink, non-regular object, redirect,
-        # widened permissions, replacement during read. Fail closed, never
-        # describe it as fresh.
+        # widened permissions, replacement during read, oversized selector. Fail
+        # closed, never describe it as fresh.
         return "malformed"
     return _classify_claim_content(operation_id, snap,
                                    expected_receipt_sha256=expected_receipt_sha256)
@@ -1848,7 +1867,7 @@ class RecoveryAuthoritySnapshot:
     expected_receipt_sha256: object
 
 
-def _acquire_recovery_authority(operation_id, promote=None, record=None, directory=None):
+def _acquire_recovery_authority(operation_id, promote=None, record=None):
     """Acquire THE complete authority snapshot for ONE decision.
 
     The required architecture (B4-CXR7U9R47R1), in this order and exactly once
@@ -1877,20 +1896,14 @@ def _acquire_recovery_authority(operation_id, promote=None, record=None, directo
             or not OPERATION_ID_RE.match(operation_id):
         raise _ExecutionAuthorityConflict(
             "malformed operation id; refusing to acquire recovery authority")
-    directory = directory or _transitions_dir()
-    governed, name = _derive_claim_coordinate(operation_id, directory)
-    dir_fd = _open_governed_directory(governed, operation_id)
+    governed, name = _derive_claim_coordinate(operation_id)
+    dir_fd, identity = _open_governed_directory(governed, operation_id)
     try:
         if record is None:
             try:
                 record = _load_transition_record(operation_id)
             except (OSError, ValueError, RuntimeError, TypeError):
                 record = None
-        if dir_fd is not None:
-            info = os.fstat(dir_fd)
-        else:
-            info = os.stat(governed, follow_symlinks=False)
-        identity = (info.st_dev, info.st_ino)
         selector = _read_selector_snapshot_admitted(
             operation_id, governed, name, dir_fd, identity)
     finally:
@@ -2319,8 +2332,11 @@ def _execution_binding_blocked(phase, receipt_in_path, inventory_path, db, user,
     return _blocked(receipt, f"refusing recovery execution binding: {exc}")
 
 
-def _bound_operation(promote, transition_dir=None):
-    """Bind a promote receipt to its ONE durable operation record: the record
+def _bound_operation(promote):
+    """Bind a promote receipt to its ONE durable operation record. The
+    B4-CXR7U9R47R2: there is no directory parameter -- the governed
+    transition root is derived by the engine, never named by the receipt
+    or the caller. The record
     must exist, its format must be known, its content digest must match this
     receipt, and every identity field must agree. Shared by the transition
     gate (which then checks state/permission) and by RECONCILIATION (which
@@ -2329,10 +2345,7 @@ def _bound_operation(promote, transition_dir=None):
     operation_id = promote.get("operation_id")
     if not isinstance(operation_id, str) or not OPERATION_ID_RE.match(operation_id):
         raise RuntimeError(f"receipt operation id {operation_id!r} is missing or malformed")
-    if transition_dir is not None:
-        record = _load_transition_record(operation_id, transition_dir)
-    else:
-        record = _load_transition_record(operation_id)
+    record = _load_transition_record(operation_id)
     if record.get("format") != TRANSITION_FORMAT:
         raise RuntimeError("durable recovery operation record has an unknown format")
     if record.get("receipt_sha256") != _receipt_digest(promote):
@@ -3693,7 +3706,7 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     return receipt
 
 
-def _classify_record_for_shell(record, promote=None, transition_dir=None):
+def _classify_record_for_shell(record, promote=None):
     """The single rollback-legality law for both engine callers and the shell.
 
     Code 0 is fresh rollback authority, code 5 is pre-intent finalize abort,
@@ -3714,11 +3727,12 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
     which runs for every state -- had no way to accept a snapshot and always
     read the coordinate itself; PROMOTED then read it a second time to select
     the branch, and FINALIZING read it a second time inside
-    ``_selector_agrees_with_finalizing``. Two selector reads per decision on
-    the two most important legs, and a replacement could land between them.
+    ``_selector_agrees_with_finalizing``. Two selector reads per decision on the
+    two most important legs, and a replacement could land between them.
 
-    The governed directory parameter is still threaded through this rung for
-    compatibility with the R46 call surface; B4-CXR7U9R47R2 removes it.
+    B4-CXR7U9R47R2: there is no directory parameter. The governed authority
+    root is derived by the engine; a caller can no longer hand this function a
+    root it owns.
     """
     if not isinstance(record, dict) or record.get("format") not in (None, TRANSITION_FORMAT):
         return 4
@@ -3727,12 +3741,13 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
     authority = None
     # ONE AUTHORITY ACQUISITION FOR THE WHOLE DECISION (B4-CXR7U9R47R1). The
     # record is passed IN rather than re-read: the caller's read is this
-    # decision's one transition-record read.
+    # decision's one transition-record read. `authority is not None` is
+    # therefore exactly the old "well-formed operation id" condition, and every
+    # branch below uses it in place of re-deriving that condition.
     if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id):
         try:
             authority = _acquire_recovery_authority(
-                operation_id, promote, record=record,
-                directory=transition_dir)
+                operation_id, promote, record=record)
         except _ExecutionAuthorityConflict:
             # The governed transition directory itself could not be admitted
             # without following a redirection. There is no authority root, so
@@ -3744,12 +3759,11 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # closed (code 4) instead of reopening fresh authority
         # (B4-CXR7U9R44R1; binding law added by B4-CXR7U9R45R1). A malformed
         # claim, including one that fails its coordinate admission (symlink,
-        # non-regular, redirected or widened file), fails closed even without
-        # a receipt to compare against.
+        # non-regular, redirected, widened or oversized), fails closed even
+        # without a receipt to compare against.
         selector_state = _claim_state(
-            operation_id, transition_dir,
-            expected_receipt_sha256=authority.expected_receipt_sha256,
-            authority=authority)
+            operation_id, authority=authority,
+            expected_receipt_sha256=authority.expected_receipt_sha256)
         if selector_state == "malformed":
             return 4
         if promote is not None and selector_state == "unbound_or_mismatched":
@@ -3768,7 +3782,6 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # receiptless expectation AND the selector that has to agree with it.
         # Both are the ones already admitted for this decision.
         if not _selector_agrees_with_finalizing(operation_id, promote,
-                                                transition_dir,
                                                 authority=authority):
             return 4
         if record.get("selected_transition") == "finalize":
@@ -3783,8 +3796,7 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # absent-selector shape the engine itself produces.
         if promote is None and authority is not None:
             # B4-CXR7U9R47R1: the SAME snapshot, not a second read.
-            if _claim_state(operation_id, transition_dir,
-                            authority=authority) != "absent":
+            if _claim_state(operation_id, authority=authority) != "absent":
                 return 4
         return 0
     if state == TRANSITION_STATE_PROMOTED:
@@ -3796,11 +3808,9 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # the SECOND read of the coordinate.
         if promote is not None and authority is not None:
             if _valid_transition_claim(operation_id, "rollback", promote,
-                                       transition_dir=transition_dir,
                                        authority=authority):
                 return 6
             if _valid_transition_claim(operation_id, "finalize", promote,
-                                       transition_dir=transition_dir,
                                        authority=authority):
                 return 5
             # Defense in depth: if the admitted snapshot is not exactly
@@ -3810,8 +3820,7 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
                     expected_receipt_sha256=authority.expected_receipt_sha256) != "absent":
                 return 4
         elif authority is not None \
-                and _claim_state(operation_id, transition_dir,
-                                 authority=authority) != "absent":
+                and _claim_state(operation_id, authority=authority) != "absent":
             # PROMOTED with an existing canonical claim and NO receipt to bind:
             # the selector name exists, so the one-time authority is spent —
             # never fresh (B4-CXR7U9R45R1).
@@ -3827,8 +3836,7 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         # B4-CXR7U9R47R1: `authority is None` means the operation id was
         # malformed, and an unbindable record is unknowable authority.
         if authority is None or not _valid_transition_claim(
-                operation_id, "rollback", promote,
-                transition_dir=transition_dir, authority=authority):
+                operation_id, "rollback", promote, authority=authority):
             return 4
         return 6
     if state == "ROLLED_BACK":
@@ -3840,7 +3848,6 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
         if promote is None or authority is None:
             return 4
         if not _valid_transition_claim(operation_id, "rollback", promote,
-                                       transition_dir=transition_dir,
                                        authority=authority):
             return 4
         return 6
@@ -3867,18 +3874,44 @@ def _classify_record_for_shell(record, promote=None, transition_dir=None):
     return 4
 
 
-def _classify_state_for_shell(path):
-    """Classify a transition record without docker; malformed means fail closed."""
-    try:
-        with open(path, encoding="utf-8") as f:
-            record = json.load(f)
-    except (OSError, ValueError):
+def _test_classify_state_for_shell(record):
+    """EXPLICITLY PRIVATE TEST SEAM for record classification
+    (B4-CXR7U9R47R2).
+
+    R46 shipped this decision behind ``--classify-state <arbitrary path>``. The
+    CLI opened whatever file it was handed and then passed
+    ``os.path.dirname(path)`` down as the transition authority root, so a
+    caller could create a CREATED-shaped record inside a directory it owned,
+    name that directory on the command line, and be told it held fresh
+    rollback authority (exit 0) -- against an authority root it had itself
+    manufactured. A caller may not declare the authority against which its
+    own input is validated, so that surface is gone.
+
+    There is no public classification route any more. This function takes an
+    ALREADY-READ record -- never a path, and therefore never a
+    caller-chosen directory -- and derives the governed authority root from the
+    engine's own identity, exactly as the production route does. It is
+    reachable only by importing the module in process, where
+    ``_bind_test_recovery_root`` (B4-CXR7U9R39-R2) has already chosen the
+    root; it is not reachable from any command line and no environment channel
+    reaches it.
+    """
+    if not isinstance(record, dict):
         return 4
-    return _classify_record_for_shell(record, transition_dir=os.path.dirname(path))
+    return _classify_record_for_shell(record)
 
 
-def _classify_rollback_for_shell(receipt_path, transition_dir=None):
-    """Bind the shell's legality decision to the exact promote receipt."""
+def _classify_rollback_for_shell(receipt_path):
+    """Bind the shell's legality decision to the exact promote receipt.
+
+    B4-CXR7U9R47R2: the governed transition directory is DERIVED here, by the
+    engine. R46 accepted it as a ``--transition-dir`` argument and threaded it
+    through the whole classifier, so the caller chose the authority root its
+    own record was judged against -- including an absolute directory of its own
+    choosing, a prefix sibling of the real root, or a ``..`` escape from it.
+    The receipt still names WHICH operation is judged; the ROOT does not come
+    from the command line. This is the route restore.sh uses.
+    """
     try:
         promote = _load_receipt(receipt_path)
         if not isinstance(promote, dict) \
@@ -3887,10 +3920,8 @@ def _classify_rollback_for_shell(receipt_path, transition_dir=None):
                 or promote.get("exit_status") != 0 \
                 or promote.get("promoted") is not True:
             return 4
-        _operation_id, record = _bound_operation(
-            promote, transition_dir=transition_dir)
-        return _classify_record_for_shell(
-            record, promote, transition_dir=transition_dir)
+        _operation_id, record = _bound_operation(promote)
+        return _classify_record_for_shell(record, promote)
     except (OSError, ValueError, RuntimeError, TypeError):
         return 4
 
@@ -3905,8 +3936,7 @@ def _parse_cli(argv):
         a = argv[i]
         if a in ("--phase", "--archive", "--inventory", "--inventory-sha", "--db",
                  "--user", "--container", "--receipt-out", "--receipt-in",
-                 "--verify-tables", "--classify-state", "--classify-rollback",
-                 "--transition-dir"):
+                 "--verify-tables", "--classify-rollback"):
             i += 1
             val = argv[i] if i < len(argv) else None
             if a == "--phase":
@@ -3990,13 +4020,15 @@ def _run_recovery_phase(phase, kw, db, user, container, probe):
 
 def main():
     phase, probe, kw = _parse_cli(sys.argv[1:])
-    # Shell-support mode (B4-CXR7U9R41-R2): classify a durable transition
-    # record by exit code, no docker/catalog access. Not a recovery phase.
-    if kw.get("classify_state"):
-        sys.exit(_classify_state_for_shell(kw["classify_state"]))
+    # Shell-support mode (B4-CXR7U9R41-R2, authority rooted
+    # B4-CXR7U9R47R2): classify a durable transition by exit code, no
+    # docker/catalog access. Not a recovery phase. The governed transition
+    # directory is DERIVED by the engine here; there is no longer any
+    # --transition-dir for a caller to name one, and --classify-state (which
+    # read an arbitrary record and treated ITS OWN parent as the authority
+    # root) no longer exists as a command at all.
     if kw.get("classify_rollback"):
-        sys.exit(_classify_rollback_for_shell(
-            kw["classify_rollback"], kw.get("transition_dir")))
+        sys.exit(_classify_rollback_for_shell(kw["classify_rollback"]))
     _validate_cli(phase, kw)
     out = kw.get("receipt_out")
     if out:

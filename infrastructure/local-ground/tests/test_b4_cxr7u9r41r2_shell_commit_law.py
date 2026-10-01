@@ -2,10 +2,17 @@
 """B4-CXR7U9R41-R2 — the shell's commit law has ONE authority: the engine.
 
 `durable_precommit` in restore.sh no longer re-encodes the transition ladder;
-it delegates to `pg-recovery.py --phase reconcile --classify-state <record>`,
+it delegates to `pg-recovery.py --classify-rollback <promote-receipt>`,
 whose exit codes are the law: 0 = pre-commit, 3 = post-commit (rollback
-forbidden), 4 = unknowable (fail closed). These proofs drive the REAL engine
-in a child process, exactly as the shell does, against REAL durable records:
+forbidden), 4 = unknowable (fail closed).
+
+B4-CXR7U9R47R2: the classification law itself is still driven here, but through
+the engine's explicitly PRIVATE in-process seam `_test_classify_state_for_shell`,
+not through a command line. R46 exposed this law as `--classify-state <path>`,
+which opened whatever file it was handed and then treated THAT FILE'S PARENT as the
+transition authority root -- so a caller could name its own authority. The command
+is gone; the record now arrives as a value and the governed root is derived by the
+engine. These proofs drive the REAL engine against REAL durable records:
 
 1. every non-finalizing pre-commit state classifies 0;
 2. COMMIT_POINT_REACHED and FINALIZED classify 3;
@@ -25,6 +32,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+import recovery_cli
+
 TESTS = Path(__file__).resolve().parent
 CLI = TESTS.parent / "scripts" / "pg-recovery.py"
 
@@ -34,13 +43,19 @@ POSTCOMMIT_STATES = ["COMMIT_INTENT_RECORDED", "COMMIT_POINT_REACHED",
 TERMINAL_STATES = ["ROLLED_BACK", "FAILED"]
 
 
+_ENGINE = recovery_cli.load_engine()
+
+
 def _classify(record: dict, tmp_path: Path) -> int:
-    rec = tmp_path / "op.json"
-    rec.write_text(json.dumps(record), encoding="utf-8")
-    r = subprocess.run([sys.executable, str(CLI), "--phase", "reconcile",
-                        "--classify-state", str(rec)],
-                       capture_output=True, text=True, timeout=60)
-    return r.returncode
+    """Classify a durable record through the engine's PRIVATE seam.
+
+    B4-CXR7U9R47R2: the record is a VALUE here. Nothing in this call path lets
+    the caller name a directory, so there is no longer any way to point the
+    engine at an authority root the test itself manufactured. These records
+    carry no operation_id, so the decision is pure and touches no filesystem.
+    """
+    recovery_cli.bind_root(_ENGINE, tmp_path)
+    return _ENGINE._test_classify_state_for_shell(record)
 
 
 def test_every_precommit_state_classifies_zero(tmp_path):
@@ -104,22 +119,36 @@ def test_finalizing_without_claim_fails_closed(tmp_path):
 
 
 def test_unknowable_record_fails_closed(tmp_path):
-    rec = tmp_path / "broken.json"
-    rec.write_text("{not json", encoding="utf-8")
-    r = subprocess.run([sys.executable, str(CLI), "--phase", "reconcile",
-                        "--classify-state", str(rec)],
-                       capture_output=True, text=True, timeout=60)
-    assert r.returncode == 4, r.returncode
+    # B4-CXR7U9R47R2: an unparseable record can no longer even reach the
+    # engine through a path. The nearest surviving proof is that the engine
+    # refuses a non-object record outright, which is what the old path-based
+    # reader turned its OSError/ValueError into.
     assert _classify({"state": "SOME_FUTURE_STATE"}, tmp_path) == 4
+    assert _classify(["not", "a", "record"], tmp_path) == 4
+    assert _classify(None, tmp_path) == 4
 
 
-def test_unreadable_record_path_fails_closed(tmp_path):
-    unreadable = tmp_path / "not-a-record"
-    unreadable.mkdir()
-    r = subprocess.run([sys.executable, str(CLI), "--phase", "reconcile",
-                        "--classify-state", str(unreadable)],
-                       capture_output=True, text=True, timeout=60)
-    assert r.returncode == 4
+def test_classify_state_command_no_longer_exists(tmp_path):
+    """B4-CXR7U9R47R2: the caller-declared authority root is GONE, not merely
+    discouraged. `--classify-state` is no longer a recognised argument, so a
+    caller cannot supply a record path at all -- and therefore cannot supply
+    the directory the old implementation read out of that path."""
+    record = tmp_path / "caller-owned.json"
+    record.write_text(json.dumps({"state": "CREATED"}), encoding="utf-8")
+    # an attacker-authored record, in a caller-authored directory
+    r = subprocess.run(
+        [sys.executable, str(CLI), "--phase", "reconcile",
+         "--classify-state", str(record)],
+        capture_output=True, text=True, timeout=60)
+    assert r.returncode == 2, (r.returncode, r.stdout, r.stderr)
+    assert "USAGE_ERROR" in r.stderr
+    # and a caller-declared transition directory is equally unrecognised
+    r = subprocess.run(
+        [sys.executable, str(CLI), "--classify-rollback", str(record),
+         "--transition-dir", str(tmp_path)],
+        capture_output=True, text=True, timeout=60)
+    assert r.returncode == 2, (r.returncode, r.stdout, r.stderr)
+    assert "USAGE_ERROR" in r.stderr
 
 
 def test_malformed_commit_intent_fails_closed(tmp_path):

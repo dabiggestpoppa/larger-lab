@@ -389,11 +389,15 @@ def test_negative_control_r41r2_classifies_legal_but_ordinary_rollback_fails(tmp
 
 
 def _classify(harness):
+    """B4-CXR7U9R47R2: no --transition-dir. The governed root is derived by the
+    engine from its own identity; the child gets the disposable harness root
+    through the in-process test seam, which is not reachable from the
+    production command line."""
     return subprocess.run(
-        [sys.executable, str(SCRIPTS / "pg-recovery.py"), "--phase", "reconcile",
-         "--classify-rollback", str(harness.promote), "--transition-dir",
-         str(harness.transitions)], env=harness.env, capture_output=True,
-        text=True, timeout=30).returncode
+        recovery_cli.cli_argv(["--classify-rollback", str(harness.promote)],
+                              str(harness.root)),
+        env=harness.env, capture_output=True, text=True,
+        timeout=30).returncode
 
 
 def test_artifact_source_authority_is_exact_and_registry_independent():

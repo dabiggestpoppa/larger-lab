@@ -228,11 +228,9 @@ def _weakened_engine(tmp_path):
 
 TWO_READ_OLD = '''        if promote is not None and authority is not None:
             if _valid_transition_claim(operation_id, "rollback", promote,
-                                       transition_dir=transition_dir,
                                        authority=authority):
                 return 6
             if _valid_transition_claim(operation_id, "finalize", promote,
-                                       transition_dir=transition_dir,
                                        authority=authority):
                 return 5
 '''

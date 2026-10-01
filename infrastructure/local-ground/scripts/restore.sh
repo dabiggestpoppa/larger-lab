@@ -384,8 +384,7 @@ durable_precommit() {
   # receipt to its durable record, claim and intent. A missing/corrupt receipt,
   # missing/malformed record, digest mismatch, or unknown state returns 4.
   "$OCE_PYTHON" "$BIN/pg-recovery.py" --phase reconcile \
-    --classify-rollback "$PROMOTE_RECEIPT" \
-    --transition-dir "$VAR_DIR/recovery/transitions" 2>/dev/null
+    --classify-rollback "$PROMOTE_RECEIPT" 2>/dev/null
   local cls=$?
   DURABLE_ROLLBACK_CLASS="$cls"
   if [[ "$cls" -eq 0 ]]; then

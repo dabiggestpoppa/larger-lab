@@ -135,20 +135,25 @@ def _census(root):
 # --------------------------------------------------------------------- #
 
 def _shell_state(record_path):
-    return subprocess.run(
-        [sys.executable, str(CLI), "--phase", "reconcile",
-         "--classify-state", str(record_path)],
-        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
-        capture_output=True, text=True, timeout=60).returncode
+    """B4-CXR7U9R47R2: `--classify-state <path>` is GONE. It opened whatever
+    file it was handed and passed that file's PARENT down as the transition
+    authority root, so a caller could declare the authority its own record was
+    judged against. The record is now read by the PROOF and handed to the
+    engine's private seam as a VALUE; the governed root is still derived by the
+    engine, so every refusal below is still the engine refusing the poisoned
+    selector at its OWN canonical coordinate."""
+    try:
+        record = json.loads(Path(record_path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return 4
+    return pgrec._test_classify_state_for_shell(record)
 
 
 def _shell_receipt(receipt_path):
-    return subprocess.run(
-        [sys.executable, str(CLI), "--phase", "reconcile",
-         "--classify-rollback", str(receipt_path),
-         "--transition-dir", str(_transitions())],
-        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
-        capture_output=True, text=True, timeout=60).returncode
+    """B4-CXR7U9R47R2: --transition-dir no longer exists, so the child derives
+    the governed root itself; the disposable root it needs reaches it only
+    through the explicit in-process bootstrap, never on the command line."""
+    return _run_engine(CLI, ["--classify-rollback", str(receipt_path)])
 
 
 def _reconcile_argv(receipt_path, output):
@@ -447,8 +452,7 @@ def test_receiptless_promoted_with_present_claim_is_never_fresh(
 # stays — so the weakened engine fails ONLY on the row the law is about, and
 # the positives prove the weakening is surgical, not a general disarm.
 _WEAKENED_TRANSFORM = ('''        elif authority is not None \\
-                and _claim_state(operation_id, transition_dir,
-                                 authority=authority) != "absent":
+                and _claim_state(operation_id, authority=authority) != "absent":
             # PROMOTED with an existing canonical claim and NO receipt to bind:
             # the selector name exists, so the one-time authority is spent —
             # never fresh (B4-CXR7U9R45R1).
@@ -470,8 +474,14 @@ def _weakened_engine(tmp_path):
 
 
 def _run_engine(engine_path, argv):
+    """B4-CXR7U9R47R2: there is no --transition-dir to pass, so the child is
+    bound to the SAME disposable governed root the in-process engine already
+    uses, through the explicit in-process bootstrap. This is the same seam
+    discipline as recovery_cli.cli_argv: the root is chosen in process, never
+    on the command line, and the production default is untouched."""
     return subprocess.run(
-        [sys.executable, str(engine_path), *map(str, argv)],
+        [sys.executable, "-c", recovery_cli._BOOTSTRAP, str(engine_path),
+         str(Path(pgrec._recovery_state_dir())), *map(str, argv)],
         env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
         capture_output=True, text=True, timeout=60).returncode
 
@@ -496,15 +506,17 @@ def test_weakened_classifier_reproduces_false_fresh_and_the_shipped_engine_kills
         _write_claim(opid, {"format": pgrec._CLAIM_FORMAT,
                             "note": "foreign"})
 
-    state_argv = ["--phase", "reconcile", "--classify-state",
-                  str(_record_path(opid))]
-    weak = _weakened_engine(tmp_path)
+    # B4-CXR7U9R47R2: the record travels as a VALUE to each engine's private
+    # seam. Nothing in this call path can name a directory.
+    record = _load_record(opid)
+    weak_mod = recovery_cli.load_engine(_weakened_engine(tmp_path))
+    recovery_cli.bind_root(weak_mod, Path(pgrec._recovery_state_dir()))
 
     # the defect, observed at runtime on the weakened copy
-    assert _run_engine(weak, state_argv) == 0, (
+    assert weak_mod._test_classify_state_for_shell(record) == 0, (
         "the weakened control no longer reproduces false-fresh")
     # the shipped engine refuses it, deterministically
-    assert _run_engine(CLI, state_argv) == 4
+    assert pgrec._test_classify_state_for_shell(record) == 4
     # the durable world is unchanged by either classification
     assert _load_record(opid)["state"] == "PROMOTED"
     assert len(list(_transitions().glob("*.claim"))) == 1
@@ -527,14 +539,11 @@ def test_weakened_and_shipped_engines_agree_on_every_positive_row(
     rows.append(("absent", rpath3))
 
     for name, rpath in rows:
-        argv = ["--phase", "reconcile", "--classify-rollback", str(rpath),
-                "--transition-dir", str(_transitions())]
+        argv = ["--classify-rollback", str(rpath)]
         assert _run_engine(weak, argv) == _run_engine(CLI, argv), (
             f"positive row {name} diverged")
     # the absent row is fresh on BOTH engines
-    assert _run_engine(CLI, [
-        "--phase", "reconcile", "--classify-rollback", str(rows[-1][1]),
-        "--transition-dir", str(_transitions())]) == 0
+    assert _run_engine(CLI, ["--classify-rollback", str(rows[-1][1])]) == 0
 
 
 # --------------------------------------------------------------------- #

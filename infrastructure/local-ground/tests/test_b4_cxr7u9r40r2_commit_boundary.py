@@ -32,6 +32,7 @@ from test_b4_cxr7u9r35_recovery_authority import (  # noqa: F401 — fixtures
     _Bridge, _promote_receipt, production_recovery_identity, pgrec)
 
 SCRIPTS = Path(pgrec.__file__).resolve().parent
+TESTS = Path(__file__).resolve().parent
 # the SAME bash the other shell-driving suites use: Python's bare "bash"
 # resolution can find a WSL stub on Windows, which is not the interpreter
 # restore.sh runs under.
@@ -59,6 +60,25 @@ def shell_law(tmp_path):
     functions = _extract_durable_precommit_bash()
 
     python_exe = sys.executable.replace("\\", "/")
+
+    # B4-CXR7U9R47R2: restore.sh no longer passes --transition-dir, so the
+    # engine DERIVES its governed transition root from its own identity -- the
+    # whole point of the repair. The shell is still driven with restore.sh's own
+    # byte-for-byte extracted `durable_precommit`, but its BIN is a wrapper that
+    # binds the disposable root in process (the same explicit seam the other
+    # proofs use, never a command-line directory). In production BIN is the real
+    # engine file and the derived root is the program-identity one.
+    bin_root = tmp_path / "shell" / "recovery"
+    bindir = tmp_path / "test-bin"
+    bindir.mkdir(exist_ok=True)
+    wrapper = bindir / "pg-recovery.py"
+    wrapper.write_text(
+        "#!/usr/bin/env python3\nimport sys\n"
+        f"sys.path.insert(0, {str(TESTS)!r})\nimport recovery_cli\n"
+        f"r=recovery_cli.run_cli(sys.argv[1:], write_root={str(bin_root)!r})\n"
+        "sys.stdout.write(r.stdout); sys.stderr.write(r.stderr)\n"
+        "raise SystemExit(r.returncode)\n", encoding="utf-8")
+    wrapper.chmod(0o755)
 
     def run(promote_receipt, record_state):
         receipts = tmp_path / "shell" / "receipts"
@@ -141,7 +161,7 @@ def shell_law(tmp_path):
         script = (
             "set -uo pipefail\n"
             f"OCE_PYTHON=\"{python_exe}\"\n"
-            f"BIN='{SCRIPTS.as_posix()}'\n"
+            f"BIN=\'{bindir.as_posix()}\'\n"
             f"PROMOTE_RECEIPT='{promote}'\n"
             f"VAR_DIR='{tmp_path / 'shell'}'\n"
             f"export OCE_BACKUP_ROOTS='{tmp_path / 'shell'}'\n"

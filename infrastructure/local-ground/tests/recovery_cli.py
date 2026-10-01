@@ -42,6 +42,46 @@ _BOOTSTRAP = (
 )
 
 
+def load_engine(module_path=None):
+    """Import pg-recovery.py as an in-process module object
+    (B4-CXR7U9R47R2).
+
+    B4-CXR7U9R47R2 removed the public ``--classify-state <arbitrary path>``
+    surface, because it let a caller hand the engine a record AND, through
+    ``os.path.dirname(path)``, the transition authority root that record was
+    then validated against. Proofs that still need to classify a bare record
+    now call the engine's explicitly private seam
+    ``_test_classify_state_for_shell(record)`` in process instead of through a
+    command line -- the record arrives as a value, never as a path, so there is
+    no directory left for a caller to declare.
+
+    Same discipline as ``cli_argv``: this is a test-only loader, unreachable
+    from the production CLI, and the ONLY thing it can change about authority
+    is ``bind_root``. ``module_path`` points at an explicitly constructed
+    copy (used by the executable weakened controls); the default is the real
+    shipped engine.
+    """
+    import importlib.util
+    target = str(module_path or CLI)
+    name = "pgrec_inprocess_" + str(abs(hash(target)) % 1000000)
+    spec = importlib.util.spec_from_file_location(name, target)
+    mod = importlib.util.module_from_spec(spec)
+    sys.modules[name] = mod
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def bind_root(mod, write_root):
+    """Bind an in-process engine to a disposable governed root (test seam).
+
+    The counterpart of ``_bind_test_recovery_root``: after this call the engine
+    derives its governed transition directory from ``write_root`` alone. No
+    environment variable participates, exactly as in ``cli_argv``.
+    """
+    mod._bind_test_recovery_root(str(write_root))
+    return mod
+
+
 def cli_argv(argv, write_root, bridge_path=None):
     """The real CLI, with `write_root` bound by the in-process test seam.
     With `bridge_path`, the child additionally loads a container-bridge module

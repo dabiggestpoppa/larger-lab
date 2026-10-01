@@ -327,11 +327,16 @@ def _dbs(harness):
 
 
 def _classify(harness):
+    """B4-CXR7U9R47R2: the governed transition directory is DERIVED by the
+    engine, so the child is bound to the disposable harness root through the
+    in-process test seam instead of being told a directory on the command
+    line. The classification decision is byte-for-byte the one restore.sh
+    makes."""
     return subprocess.run(
-        [sys.executable, str(CLI), "--phase", "reconcile",
-         "--classify-rollback", str(harness.promote), "--transition-dir",
-         str(harness.transitions)], env=harness.env, capture_output=True,
-        text=True, timeout=30).returncode
+        recovery_cli.cli_argv(["--classify-rollback", str(harness.promote)],
+                              str(harness.root)),
+        env=harness.env, capture_output=True, text=True,
+        timeout=30).returncode
 
 
 def _reconcile(harness, name):
@@ -560,12 +565,14 @@ def test_control_impossible_marker_classifier_reopens_old_window(tmp_path):
     """Negative control: the former marker exception runs and classifies the
     impossible FINALIZING+marker record as rollback-safe/postcommit; the real
     engine rejects that malformed state."""
-    record = tmp_path / "impossible.json"
-    record.write_text(json.dumps({
+    # B4-CXR7U9R47R2: the record is a VALUE. It is no longer written to a file
+    # for the engine to open, because the old surface derived the transition
+    # authority root from exactly that file's parent directory.
+    record = {
         "state": "FINALIZING",
         "commit_point": {"marker": "quarantine_dropped",
                          "at": "2026-09-24T00:00:00Z"},
-    }), encoding="utf-8")
+    }
 
     def old_marker(source):
         old = '''        if record.get("commit_intent") is not None or record.get("commit_point") is not None:\n            return 4\n'''
@@ -574,15 +581,16 @@ def test_control_impossible_marker_classifier_reopens_old_window(tmp_path):
         return source.replace(old, new)
 
     engine = _weakened_engine(tmp_path, old_marker)
-    args = ["--phase", "reconcile", "--classify-state", str(record)]
-    weak = subprocess.run(_weakened_cli(engine, tmp_path / "unused", None, args),
-                          env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
-                          capture_output=True, text=True, timeout=30)
-    real = subprocess.run([sys.executable, str(CLI), *args],
-                          env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
-                          capture_output=True, text=True, timeout=30)
-    assert weak.returncode == 3
-    assert real.returncode == 4
+    # B4-CXR7U9R47R2: `--classify-state <path>` no longer exists (it let the
+    # caller name the authority root out of the record's own parent
+    # directory), so both engines are now driven through the PRIVATE seam and
+    # the record travels as a VALUE. Same weakening, same split verdict.
+    weak_engine = recovery_cli.load_engine(engine)
+    real_engine = recovery_cli.load_engine()
+    recovery_cli.bind_root(weak_engine, tmp_path)
+    recovery_cli.bind_root(real_engine, tmp_path)
+    assert weak_engine._test_classify_state_for_shell(record) == 3
+    assert real_engine._test_classify_state_for_shell(record) == 4
 
 
 def test_control_permissive_missing_record_classifier(tmp_path):
@@ -600,12 +608,11 @@ def test_control_permissive_missing_record_classifier(tmp_path):
         return source.replace(old, new)
 
     engine = _weakened_engine(tmp_path, permissive)
-    args = ["--phase", "reconcile", "--classify-rollback", str(h.promote),
-            "--transition-dir", str(h.transitions)]
+    args = ["--phase", "reconcile", "--classify-rollback", str(h.promote)]
     weak = subprocess.run(
         _weakened_cli(engine, h.root, h.bridge, args), env=h.env,
         capture_output=True, text=True, timeout=30)
-    real = subprocess.run([sys.executable, str(CLI), *args], env=h.env,
+    real = subprocess.run(recovery_cli.cli_argv(args, str(h.root)), env=h.env,
                           capture_output=True, text=True, timeout=30)
     assert weak.returncode == 0
     assert real.returncode == 4

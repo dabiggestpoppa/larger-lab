@@ -122,13 +122,24 @@ class _ReplaySnapshot:
         self.claim = claim
 
 
+@pytest.fixture(autouse=True)
+def _governed_root(tmp_path):
+    """B4-CXR7U9R47R2: the engine derives its governed transition root from
+    its own identity; there is no longer any way to hand it a directory.
+    Every proof below binds the disposable root in process through the
+    explicit test seam, which is not reachable from the production CLI."""
+    pgrec._bind_test_recovery_root(str(tmp_path / "governed-recovery"))
+    yield
+    pgrec._unbind_test_recovery_root()
+
+
 @pytest.fixture
 def patched_replay(monkeypatch):
     holder = {}
     real_read = pgrec._read_selector_snapshot
 
-    def fake(operation_id, transition_dir=None):
-        snap = real_read(operation_id, transition_dir)
+    def fake(operation_id):
+        snap = real_read(operation_id)
         if not snap.present:
             return snap
         return _ReplaySnapshot(snap, holder["claim"])
@@ -167,7 +178,7 @@ def test_p1_replacement_between_preopen_lstat_and_open_is_refused(
 
     monkeypatch.setattr(pgrec.os, "stat", stat_then_swap)
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     # the engine never repaired or deleted the attacker's bytes, and the
     # durable record is byte-identical
     assert (transitions / f"{OPID}.claim").read_bytes() == b"{not json"
@@ -194,7 +205,7 @@ def test_p3_replacement_after_admission_before_parse_is_refused(
 
     monkeypatch.setattr(pgrec, "_admit_selector_descriptor", admit_then_swap)
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     assert (transitions / f"{OPID}.claim").read_bytes() == b"{garbage"
     assert _record_bytes(transitions) == before_record
 
@@ -219,7 +230,7 @@ def test_p4_replacement_after_parse_before_name_proof_is_refused(
 
     monkeypatch.setattr(pgrec.json, "loads", loads_then_swap)
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     assert _record_bytes(transitions) == before_record
 
 
@@ -248,7 +259,7 @@ def test_p5_unlink_and_recreate_at_the_canonical_name_is_refused(
     monkeypatch.setattr(pgrec.os, "stat", stat_then_attack)
     state["mode"] = "unlink"
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     assert not (transitions / f"{OPID}.claim").exists(), \
         "the engine must never recreate or restore the claim"
     # phase 1 legitimately left the coordinate absent; restore the attacker's
@@ -257,7 +268,7 @@ def test_p5_unlink_and_recreate_at_the_canonical_name_is_refused(
     state["fired"] = False
     state["mode"] = "recreate"
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     assert (transitions / f"{OPID}.claim").read_bytes() == b"{other", \
         "the engine never deleted or rewrote the attacker's object"
     assert _record_bytes(transitions) == before_record
@@ -276,7 +287,7 @@ def test_p6_regular_file_to_symlink_substitution_is_refused(tmp_path):
     claim.unlink()
     os.symlink(payload, claim)
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     # the engine never deleted or repaired the symlink, and never touched the
     # payload it pointed at
     assert os.path.islink(claim)
@@ -291,11 +302,11 @@ def test_p7_valid_claim_swapped_for_a_different_valid_claim_is_never_bound(
     transitions, _record = _governed(tmp_path)
     _publish(transitions, _bytes(CLAIM))
     patched_replay({**CLAIM, "receipt_sha256": FOREIGN})
-    snap = pgrec._read_selector_snapshot(OPID, transitions)
+    snap = pgrec._read_selector_snapshot(OPID)
     assert pgrec._classify_claim_content(
         OPID, snap, expected_receipt_sha256=EXACT) == "unbound_or_mismatched"
     assert pgrec._claim_state(
-        OPID, transitions, expected_receipt_sha256=EXACT) \
+        OPID, expected_receipt_sha256=EXACT) \
         == "unbound_or_mismatched"
 
 
@@ -308,29 +319,27 @@ def test_p8_one_decision_consumes_exactly_one_snapshot(tmp_path,
     calls = {"n": 0}
     real_read = pgrec._read_selector_snapshot
 
-    def counting(operation_id, transition_dir=None):
+    def counting(operation_id):
         calls["n"] += 1
-        return real_read(operation_id, transition_dir)
+        return real_read(operation_id)
 
     monkeypatch.setattr(pgrec, "_read_selector_snapshot", counting)
     promote = {"operation_phase": "promote", "exit_status": 0}
     expected = pgrec._receipt_digest(promote)
     bound = {**CLAIM, "receipt_sha256": expected}
     _publish(transitions, _bytes(bound))
-    assert pgrec._valid_transition_claim(OPID, "rollback", promote,
-                                         transition_dir=transitions) is True
+    assert pgrec._valid_transition_claim(OPID, "rollback", promote) is True
     assert calls["n"] == 1, (
         "one authority decision must consume exactly one selector snapshot")
     # a swapped branch inside the admitted object is refused by the same law
-    def replay_counting(operation_id, transition_dir=None):
+    def replay_counting(operation_id):
         calls["n"] += 1
         return _ReplaySnapshot(
-            real_read(operation_id, transition_dir),
+            real_read(operation_id),
             {**bound, "transition": "finalize"})
 
     monkeypatch.setattr(pgrec, "_read_selector_snapshot", replay_counting)
-    assert pgrec._valid_transition_claim(OPID, "rollback", promote,
-                                         transition_dir=transitions) is False
+    assert pgrec._valid_transition_claim(OPID, "rollback", promote) is False
     assert calls["n"] == 2
 
 
@@ -346,15 +355,15 @@ def test_p9_swap_between_shell_classification_and_phase_admission(
     _publish(transitions, _bytes({**CLAIM, "receipt_sha256": expected}))
     record["selected_transition"] = "rollback"
     assert pgrec._classify_record_for_shell(
-        record, promote, transition_dir=transitions) == 6
+        record, promote) == 6
     # deterministic swap, then the phase-admission re-verification
     _swap_claim(transitions, _bytes(
         {**CLAIM, "receipt_sha256": FOREIGN,
          "transition": "rollback"}))
     assert pgrec._valid_transition_claim(
-        OPID, "rollback", promote, transition_dir=transitions) is False
+        OPID, "rollback", promote) is False
     assert pgrec._classify_record_for_shell(
-        record, promote, transition_dir=transitions) == 4
+        record, promote) == 4
 
 
 def test_p10_foreign_hard_link_is_refused(tmp_path):
@@ -370,7 +379,7 @@ def test_p10_foreign_hard_link_is_refused(tmp_path):
     with_link = _census(transitions)
     try:
         with pytest.raises(pgrec._ExecutionAuthorityConflict):
-            pgrec._read_selector_snapshot(OPID, transitions)
+            pgrec._read_selector_snapshot(OPID)
         assert _census(transitions) == with_link
     finally:
         try:
@@ -388,7 +397,7 @@ def test_p11_finalizing_without_claim_fails_closed(tmp_path):
     transitions, record = _governed(tmp_path, state="FINALIZING")
     before = _census(transitions)
     assert pgrec._classify_record_for_shell(record) == 4
-    assert pgrec._selector_agrees_with_finalizing(OPID, None, transitions) \
+    assert pgrec._selector_agrees_with_finalizing(OPID, None) \
         is False
     assert not (transitions / f"{OPID}.claim").exists()
     assert _census(transitions) == before
@@ -400,9 +409,9 @@ def test_p12_finalizing_foreign_well_formed_digest_fails_closed(tmp_path):
                                   "receipt_sha256": FOREIGN}))
     before = _census(transitions)
     assert pgrec._classify_record_for_shell(
-        record, transition_dir=transitions) == 4
+        record) == 4
     assert pgrec._selector_agrees_with_finalizing(
-        OPID, None, transitions) is False
+        OPID, None) is False
     assert _census(transitions) == before
 
 
@@ -412,7 +421,7 @@ def test_p13_created_or_staged_with_a_claim_fails_closed(tmp_path, state):
     _publish(transitions, _bytes(CLAIM))
     before = _census(transitions)
     assert pgrec._classify_record_for_shell(
-        record, transition_dir=transitions) == 4
+        record) == 4
     assert _census(transitions) == before
 
 
@@ -422,7 +431,7 @@ def test_created_or_staged_without_selector_keeps_documented_disposition(
     transitions, record = _governed(tmp_path, state=state)
     before = _census(transitions)
     assert pgrec._classify_record_for_shell(
-        record, transition_dir=transitions) == 0
+        record) == 0
     assert _census(transitions) == before
 
 
@@ -431,12 +440,12 @@ def test_p14_rolled_back_without_exact_selector_fails_closed(tmp_path):
     before = _census(transitions)
     # no receipt at all: unknowable authority
     assert pgrec._classify_record_for_shell(
-        record, transition_dir=transitions) == 4
+        record) == 4
     # a receipt bound to different authority: still closed
     other = {"operation_phase": "promote", "exit_status": 0,
              "operation_id": OPID, "note": "different authority"}
     assert pgrec._classify_record_for_shell(
-        record, promote=other, transition_dir=transitions) == 4
+        record, promote=other) == 4
     assert _census(transitions) == before
 
 
@@ -444,11 +453,11 @@ def test_p15_failed_without_a_claim_fails_closed(tmp_path):
     transitions, record = _governed(tmp_path, state="FAILED")
     before = _census(transitions)
     assert pgrec._classify_record_for_shell(
-        record, transition_dir=transitions) == 4
+        record) == 4
     other = {"operation_phase": "promote", "exit_status": 0,
              "operation_id": OPID}
     assert pgrec._classify_record_for_shell(
-        record, promote=other, transition_dir=transitions) == 4
+        record, promote=other) == 4
     assert _census(transitions) == before
 
 
@@ -456,8 +465,7 @@ def test_p16_malformed_record_digest_fails_closed(tmp_path):
     transitions, _record = _governed(tmp_path, record_digest="not-a-digest")
     _publish(transitions, _bytes(CLAIM))
     before = _census(transitions)
-    assert pgrec._receiptless_selector_agrees(
-        OPID, "rollback", transitions) is False
+    assert pgrec._receiptless_selector_agrees(OPID, "rollback") is False
     assert _census(transitions) == before
 
 
@@ -466,7 +474,7 @@ def test_foreign_operation_id_claim_is_malformed(tmp_path):
     _publish(transitions, _bytes({**CLAIM, "operation_id": "f" * 32}))
     before = _census(transitions)
     assert pgrec._claim_state(
-        OPID, transitions, expected_receipt_sha256=EXACT) == "malformed"
+        OPID, expected_receipt_sha256=EXACT) == "malformed"
     assert _census(transitions) == before
 
 
@@ -474,7 +482,7 @@ def test_foreign_operation_id_claim_is_malformed(tmp_path):
 # executable weakened controls (child processes, deterministic hooks)
 # --------------------------------------------------------------------- #
 
-LOAD_CLAIM_R46 = '''    snapshot = _read_selector_snapshot(operation_id, transition_dir)
+LOAD_CLAIM_R46 = '''    snapshot = _read_selector_snapshot(operation_id)
     if not snapshot.present:
         return None
     if not isinstance(snapshot.claim, dict):
@@ -487,12 +495,8 @@ VALID_CLAIM_R46 = '''    if promote is None:
         return False
     expected = _receipt_digest(promote)
     try:
-        if authority is not None:
-            snap = authority.selector
-        elif snapshot is not None:
-            snap = snapshot
-        else:
-            snap = _read_selector_snapshot(operation_id, transition_dir)
+        snap = (authority.selector if authority is not None
+                else _read_selector_snapshot(operation_id))
         state = _classify_claim_content(operation_id, snap,
                                         expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
@@ -505,7 +509,7 @@ VALID_CLAIM_R46 = '''    if promote is None:
     return isinstance(claim, dict) and claim.get("transition") == transition
 '''
 
-LOAD_CLAIM_WEAK = '''    path = os.path.join(transition_dir or _transitions_dir(),
+LOAD_CLAIM_WEAK = '''    path = os.path.join(_transitions_dir(),
                         operation_id + ".claim")
     if not os.path.lexists(path):
         return None
@@ -520,14 +524,14 @@ VALID_CLAIM_WEAK = '''    if promote is None:
         return False
     expected = _receipt_digest(promote)
     try:
-        state = _claim_state(operation_id, transition_dir,
+        state = _claim_state(operation_id,
                              expected_receipt_sha256=expected)
     except _ExecutionAuthorityConflict:
         return False
     if state != "bound_complete":
         return False
     _WEAK_HOOK()
-    claim = _load_claim(operation_id, transition_dir=transition_dir)
+    claim = _load_claim(operation_id)
     return isinstance(claim, dict) and claim.get("transition") == transition
 '''
 
@@ -549,6 +553,11 @@ spec = importlib.util.spec_from_file_location("engine_under_test",
                                               engine_path)
 mod = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(mod)
+# B4-CXR7U9R47R2: the engine derives the governed transition root from its
+# own identity, so the disposable root reaches the child through the same
+# explicit in-process seam the other proofs use, never as a command-line
+# directory. tdir is the transitions directory; the bound ROOT is its parent.
+mod._bind_test_recovery_root(os.path.dirname(os.path.abspath(tdir)))
 
 promote = {"operation_phase": "promote", "exit_status": 0}
 claim = {"format": mod._CLAIM_FORMAT, "operation_id": opid,
@@ -594,7 +603,7 @@ if mode == "reader":
         mod._WEAK_HOOK = hook
     else:
         hook()
-    content = mod._load_claim(opid, tdir)
+    content = mod._load_claim(opid)
     branch = content["transition"] if content else "None"
     print(("MIXED" if branch != "rollback" else "COHERENT")
           + f":branch={branch}:reads={fired['n']}")
@@ -612,8 +621,7 @@ elif mode == "decision":
     else:
         hook()
     try:
-        accepted = mod._valid_transition_claim(opid, "finalize", promote,
-                                               transition_dir=tdir)
+        accepted = mod._valid_transition_claim(opid, "finalize", promote)
     except mod._ExecutionAuthorityConflict:
         print(f"REFUSED:conflict:reads={fired['n']}")
         sys.exit(0)
@@ -697,14 +705,14 @@ def test_every_denial_has_zero_authority_side_effects(tmp_path, monkeypatch):
     # denials on the selector law: foreign-bound claim, terminal FAILED state,
     # and a directory parked at the canonical coordinate
     assert pgrec._classify_record_for_shell(
-        record, transition_dir=transitions) == 4
+        record) == 4
     assert pgrec._selector_agrees_with_finalizing(
-        OPID, None, transitions) is False
+        OPID, None) is False
     claim = transitions / f"{OPID}.claim"
     claim.unlink()
     claim.mkdir()
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
-        pgrec._load_claim(OPID, transitions)
+        pgrec._load_claim(OPID)
     claim.rmdir()
     # restore the exact attacker object the census was taken with
     _publish(transitions, _bytes({**CLAIM, "receipt_sha256": FOREIGN}))
@@ -716,9 +724,9 @@ def test_shipped_reader_binds_bytes_to_admitted_identity(tmp_path):
     transitions, _record = _governed(tmp_path)
     _publish(transitions, _bytes(CLAIM))
     before = _census(transitions)
-    claim = pgrec._load_claim(OPID, transitions)
+    claim = pgrec._load_claim(OPID)
     assert claim["receipt_sha256"] == EXACT
-    snap = pgrec._read_selector_snapshot(OPID, transitions)
+    snap = pgrec._read_selector_snapshot(OPID)
     assert snap.present and snap.link_count == 1
     assert pgrec._classify_claim_content(
         OPID, snap, expected_receipt_sha256=EXACT) == "bound_complete"

@@ -515,8 +515,7 @@ def test_weakened_rolling_back_classifier_reopens_fresh_authority(tmp_path):
     process = _spawn(h, _rollback_argv(h, h.root / "crash.json"))
     _kill_at_signal(process, h.signal)
     _clear(h)
-    args = ["--phase", "reconcile", "--classify-rollback", str(h.promote),
-            "--transition-dir", str(h.transitions)]
+    args = ["--phase", "reconcile", "--classify-rollback", str(h.promote)]
     weak = _weakened_engine(
         tmp_path, lambda source: source.replace(
             '        return 6\n    if state == "ROLLED_BACK":',
@@ -525,7 +524,8 @@ def test_weakened_rolling_back_classifier_reopens_fresh_authority(tmp_path):
             str(h.root), "--test-bridge", str(h.bridge)]
     weakened = subprocess.run(base + args, env=h.env, capture_output=True,
                                text=True, timeout=60)
-    real = subprocess.run([sys.executable, str(CLI), *args], env=h.env,
+    # B4-CXR7U9R47R2: the real engine derives its governed root itself.
+    real = subprocess.run(recovery_cli.cli_argv(args, str(h.root)), env=h.env,
                           capture_output=True, text=True, timeout=60)
     assert weakened.returncode == 0
     assert real.returncode == 6

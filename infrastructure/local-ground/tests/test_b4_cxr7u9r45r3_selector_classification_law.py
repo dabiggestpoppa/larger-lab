@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """B4-CXR7U9R45R3 — ONE selector classification law, table-driven.
 
-The shell classifier (`--classify-state` / `--classify-rollback`, real child
-processes of the real CLI) and the reconciliation engine (`phase_reconcile`,
+The shell classifier and the reconciliation engine (`phase_reconcile`,
 the real phase code with only its docker/catalog OBSERVATIONS stubbed, the
 same discipline as the R40R2 boundary proofs) must produce the SAME semantic
+
+B4-CXR7U9R47R2: the shell leg used to be driven by `--classify-state <path>`
+and `--classify-rollback --transition-dir <dir>`; both authority-bearing
+arguments are gone. The record now reaches each engine through its private
+in-process seam as a VALUE, and the governed transition root is derived by
+the engine from its own identity. The LAW is unchanged; only the way a
+caller could influence it has been removed.
 verdict for every state/selector combination that can exist. This module
 drives both surfaces across the complete matrix and rejects any disagreement:
 
@@ -24,9 +30,9 @@ an engine COPY and must visibly diverge from the shipped engine on exactly
 the rows the law is about; the shipped engine passes every row.
 """
 import json
-import os
-import subprocess
-import sys
+from pathlib import Path
+
+import recovery_cli
 
 import pytest
 
@@ -318,8 +324,7 @@ def test_terminal_resume_stays_idempotent(bridge, tmp_path, monkeypatch):
 # --------------------------------------------------------------------- #
 
 _WEAKENED_TRANSFORM = ('''        elif authority is not None \\
-                and _claim_state(operation_id, transition_dir,
-                                 authority=authority) != "absent":
+                and _claim_state(operation_id, authority=authority) != "absent":
             # PROMOTED with an existing canonical claim and NO receipt to bind:
             # the selector name exists, so the one-time authority is spent —
             # never fresh (B4-CXR7U9R45R1).
@@ -329,11 +334,12 @@ _WEAKENED_TRANSFORM = ('''        elif authority is not None \\
 ''')
 
 
-def _run_engine(engine_path, argv):
-    return subprocess.run(
-        [sys.executable, str(engine_path), *map(str, argv)],
-        env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
-        capture_output=True, text=True, timeout=60).returncode
+def _classify_record_in_process(engine_path, record):
+    """B4-CXR7U9R47R2: classify a durable RECORD (a value, never a path)
+    through the engine's private seam, in process."""
+    mod = recovery_cli.load_engine(engine_path)
+    recovery_cli.bind_root(mod, Path(pgrec._recovery_state_dir()))
+    return mod._test_classify_state_for_shell(record)
 
 
 def test_weakened_engine_fails_the_matrix_the_shipped_engine_passes(
@@ -357,13 +363,9 @@ def test_weakened_engine_fails_the_matrix_the_shipped_engine_passes(
         expected_shell, _expected_verdict = build(receipt, path)
         # the dropped veto lives on the RECEIPTLESS surface: classify the
         # durable record directly, with no promote receipt to bind
-        record_path = _record_path(receipt["operation_id"])
-        shipped = _run_engine(
-            CLI, ["--phase", "reconcile", "--classify-state",
-                  str(record_path)])
-        weak = _run_engine(
-            weak_path, ["--phase", "reconcile", "--classify-state",
-                        str(record_path)])
+        record = _load_record(receipt["operation_id"])
+        shipped = _classify_record_in_process(CLI, record)
+        weak = _classify_record_in_process(weak_path, record)
         if weak != shipped:
             diverged.append((name, shipped, weak))
         # the shipped engine never disagrees with the law on any row

@@ -250,9 +250,12 @@ def _resume_rollback_argv(harness, output):
 
 
 def _classify_rollback(harness):
+    """B4-CXR7U9R47R2: the governed transition root is derived by the engine;
+    the disposable harness root reaches the child only through the in-process
+    test seam, never as a command-line argument."""
     return subprocess.run(
-        [sys.executable, str(CLI), "--classify-rollback", str(harness.promote),
-         "--transition-dir", str(harness.transitions)],
+        recovery_cli.cli_argv(["--classify-rollback", str(harness.promote)],
+                              str(harness.root)),
         env=harness.env, capture_output=True, text=True, timeout=60)
 
 
@@ -772,7 +775,8 @@ def test_malformed_selector_is_a_deterministic_fail_closed_verdict(tmp_path):
     _r44_bridge(h)
     _claim(h).write_bytes(b"")
     assert _classify_rollback(h).returncode == 4
-    assert _classify_state(h).returncode == 4
+    # B4-CXR7U9R47R2: the private seam returns the exit code directly.
+    assert _classify_state(h) == 4
 
     reconciled = _reconcile(h, h.root / "reconcile.json")
     assert reconciled.returncode == 1
@@ -788,11 +792,20 @@ def test_malformed_selector_is_a_deterministic_fail_closed_verdict(tmp_path):
     assert _record(h)["state"] == "PROMOTED"
 
 
+_STATE_ENGINE = recovery_cli.load_engine()
+
+
 def _classify_state(harness):
-    return subprocess.run(
-        [sys.executable, str(CLI), "--classify-state",
-         str(harness.transitions / f"{_opid(harness)}.json")],
-        env=harness.env, capture_output=True, text=True, timeout=60)
+    """B4-CXR7U9R47R2: `--classify-state <path>` is gone, because it handed the
+    caller its own authority root. The record is read by the PROOF and handed
+    to the engine's private seam as a value; the engine still derives the
+    governed root itself and still reads the poisoned selector at its own
+    canonical coordinate, which is the whole point of these cases."""
+    record = json.loads(
+        (harness.transitions / f"{_opid(harness)}.json").read_text(
+            encoding="utf-8"))
+    recovery_cli.bind_root(_STATE_ENGINE, harness.root)
+    return _STATE_ENGINE._test_classify_state_for_shell(record)
 
 
 @pytest.mark.parametrize("poison", [b"", b'{"format": "oce-transition-claim-v1"',
