@@ -27,14 +27,14 @@ from test_b4_cxr7u9r47r1_authority_snapshot import (  # noqa: F401
 
 ENGINE = Path(pgrec.__file__).resolve()
 
-DERIVE_SHIPPED = '''    if not isinstance(operation_id, str) \
+DERIVE_SHIPPED = r'''    if not isinstance(operation_id, str) \
             or not OPERATION_ID_RE.match(operation_id):
         raise _ExecutionAuthorityConflict(
             "malformed operation id; refusing to derive a claim coordinate")
     return _transitions_dir(), f"{operation_id}.claim"
 '''
 
-DERIVE_REALPATH_FIRST_R46 = '''    if not isinstance(operation_id, str) \
+DERIVE_REALPATH_FIRST_R46 = r'''    if not isinstance(operation_id, str) \
             or not OPERATION_ID_RE.match(operation_id):
         raise _ExecutionAuthorityConflict(
             "malformed operation id; refusing to derive a claim coordinate")

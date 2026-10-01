@@ -182,12 +182,14 @@ def test_x2_crash_residue_still_governs_the_branch_selection(tmp_path):
         transitions, _bytes({**CLAIM,
                              "receipt_sha256":
                              pgrec._receipt_digest(promote)}))
+    # B4-CXR7U9R47R1: the branch decision consumes ONE complete authority
+    # snapshot -- there is no directory parameter left to pass.
+    authority = pgrec._acquire_recovery_authority(OPID, promote)
     assert pgrec._valid_transition_claim(
-        OPID, "rollback", promote, transition_dir=str(transitions)) is True
+        OPID, "rollback", promote, authority=authority) is True
     assert pgrec._valid_transition_claim(
-        OPID, "finalize", promote, transition_dir=str(transitions)) is False
-    assert pgrec._classify_record_for_shell(
-        record, promote, transition_dir=str(transitions)) == 6
+        OPID, "finalize", promote, authority=authority) is False
+    assert pgrec._classify_record_for_shell(record, promote) == 6
 
     # the same residue whose payload binds a FOREIGN well-formed digest is
     # different authority and is refused, not honoured
@@ -325,8 +327,7 @@ def test_x6_every_denial_leaves_the_governed_tree_byte_identical(tmp_path):
                     pgrec._read_selector_snapshot(OPID)
                 # and the decision law fails closed instead of guessing
                 assert pgrec._valid_transition_claim(
-                    OPID, "rollback", promote,
-                    transition_dir=str(transitions)) is False
+                    OPID, "rollback", promote) is False
             # the governed tree, the claim bytes, the residue and the foreign
             # name all survive the decision exactly as they were
             assert _census(transitions) == before
