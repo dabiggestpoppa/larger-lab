@@ -129,9 +129,12 @@ _CLAIM_TEMP_LIVENESS_ATTEMPTS = 4
 # pathname fallback.
 _DIR_OPEN_FLAGS = (os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
                    | getattr(os, "O_DIRECTORY", 0))
-# B4-CXR7U9R47R2: the DIRECTORY open is guarded by O_NOFOLLOW as well, so a
-# symlinked transition directory fails at open instead of being resolved to
-# its target first; Windows refuses reparse points explicitly instead.
+# B4-CXR7U9R47R3: O_NOFOLLOW now guards the DIRECTORY open as well as the claim
+# open. R46 applied it to the claim only, and only AFTER it had already run
+# os.path.isdir() (which follows a symlink) and os.path.realpath() over the
+# supplied coordinate -- so the no-follow guarantee the code claimed to hold for
+# the governed directory was never exercised against the coordinate that was
+# actually supplied. The no-follow open is now the FIRST thing that touches it.
 _DIR_OPEN_NO_FOLLOW_FLAGS = _DIR_OPEN_FLAGS | getattr(os, "O_NOFOLLOW", 0)
 _CLAIM_OPEN_FLAGS = (os.O_RDONLY | getattr(os, "O_CLOEXEC", 0)
                      | getattr(os, "O_NOFOLLOW", 0)
@@ -1122,11 +1125,16 @@ def _derive_claim_coordinate(operation_id):
     CLI, receipt or record data -- so the only caller-controlled input is the
     operation id, which must satisfy its strict pattern.
 
-    B4-CXR7U9R47R2: the governed directory is no longer a parameter, so the
-    returned coordinate is exactly the engine-derived one and there is no
-    caller-supplied path left to resolve or launder. Nothing in this function
-    resolves, follows or rewrites the coordinate; the admission in
-    ``_open_governed_directory`` is the first and only thing that touches it.
+    B4-CXR7U9R47R3: the coordinate is returned UNRESOLVED, and there is no
+    ``realpath`` anywhere in this function. The R46 form called
+    ``os.path.isdir(directory)`` -- which FOLLOWS a symlink -- and then
+    ``os.path.realpath(directory)`` BEFORE ``_open_governed_directory()`` ever
+    saw the path, so a symlinked transition directory was laundered into a
+    legitimate-looking real path and the no-follow proof was applied to the
+    TARGET instead of to the coordinate that was supplied. Resolution would
+    launder a redirection into legitimacy; the admission in
+    ``_open_governed_directory`` is now the first and only thing that touches
+    this coordinate.
     """
     if not isinstance(operation_id, str) \
             or not OPERATION_ID_RE.match(operation_id):
@@ -1135,8 +1143,8 @@ def _derive_claim_coordinate(operation_id):
     return _transitions_dir(), f"{operation_id}.claim"
 
 
-def _open_governed_directory(governed_dir, operation_id):
-    """Admit the governed-directory COORDINATE without following any redirection (no-follow open added B4-CXR7U9R47R2).
+def _open_governed_directory(coordinate, operation_id):
+    """Admit the ORIGINAL governed-directory COORDINATE (B4-CXR7U9R47R3).
 
     Returns ``(dir_fd, (st_dev, st_ino))``.
 
@@ -1155,7 +1163,7 @@ def _open_governed_directory(governed_dir, operation_id):
     """
     if os.name == "nt":
         try:
-            info = os.stat(governed_dir, follow_symlinks=False)
+            info = os.stat(coordinate, follow_symlinks=False)
         except OSError as e:
             raise _ExecutionAuthorityConflict(
                 f"operation {operation_id} governed transition directory "
@@ -1171,7 +1179,7 @@ def _open_governed_directory(governed_dir, operation_id):
                 "a reparse point; refusing a redirected directory")
         return None, (info.st_dev, info.st_ino)
     try:
-        dir_fd = os.open(governed_dir, _DIR_OPEN_NO_FOLLOW_FLAGS)
+        dir_fd = os.open(coordinate, _DIR_OPEN_NO_FOLLOW_FLAGS)
     except OSError as e:
         raise _ExecutionAuthorityConflict(
             f"operation {operation_id} governed transition directory could "
