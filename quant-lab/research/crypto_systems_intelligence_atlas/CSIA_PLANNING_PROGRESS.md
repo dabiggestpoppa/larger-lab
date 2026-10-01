@@ -1516,3 +1516,102 @@ D8, live acquisition, RPC, network calls, database, graph database, production
 scheduler, dashboard, usage/health empirical research, state rule ratification,
 predicate ratification, coverage rule ratification, or trading/execution
 authority.
+---
+
+CHECKPOINT — BOOK 7 PLANNING + GOVERNANCE REVIEW (2026-10-01)
+
+Operator-authorized BOOK 7 PLANNING + GOVERNANCE REVIEW ONLY. Performed in
+this planning worktree on branch agent/crypto-systems-intelligence-atlas-plan
+at predecessor HEAD 7f77cb19e1121065119b45c1692c8cc61a5c1dfb (Book 6
+acceptance bridge). Predecessor state: BOOK_6 = FROZEN_ACCEPTED (anchor
+3919fb8052e216e94034a753fb258d338c5fa0dc, acceptance commit
+5f94c3f40cea4441470c57671f51454da7377361, exit gate
+PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL).
+
+Governing artifacts read before drafting: Constitution v0.2 (Axioms 3/5/6/7/8,
+5.3a, 12.2, 20-21, 23.1, 25), master roadmap Book 7 blocs 7A-7D, operator
+decision log (D2-6, D3-1/2/7, D4, D5CAP, D7 closed, D6M-1..5, D8 reserved),
+Books 2-5 accepted plans, Book 6 plan v0.2 + acceptance record + seams doc.
+D7N namespace verified collision-free (0 hits across decision log,
+constitution, roadmap; distinct from the closed Capital-Field D7).
+
+Artifacts created (all PLANNING, none ratified, no implementation):
+
+  CSIA_BOOK_7_BOUNDARY_REVIEW_v0.1.md            (ownership vs all neighbors;
+                                                  anti-bleed AB-1/AB-2/AB-3;
+                                                  amendments = NONE required)
+  CSIA_BOOK_7_EVENT_GRAMMAR_v0.1.md              (6-way separation; 7 planned
+                                                  event contracts; identity
+                                                  doctrine REPORT_COUNT !=
+                                                  EVENT_COUNT; lifecycle; 10-
+                                                  field temporal model;
+                                                  structural seam CHANGED vs
+                                                  CHANGE_CLAIMED; family stress
+                                                  notes)
+  CSIA_BOOK_7_NARRATIVE_MODEL_v0.1.md            (7-term grammar; narrative
+                                                  identity split/merge/relapse;
+                                                  descriptive propagation, zero
+                                                  scores; firewall FW-1..FW-4;
+                                                  7 typed contradiction forms)
+  CSIA_BOOK_7_NARRATIVE_STATE_GOVERNANCE_v0.1.md (STATE NAME != DERIVATION
+                                                  RULE; three-class doctrine;
+                                                  Book 7-specific contract vs
+                                                  Book 6 reuse; 0 rules ratified)
+  CSIA_BOOK_7_ACTION_LADDER_AND_CAUSALITY_v0.1.md (constitutional ladder with
+                                                  per-rung evidence bars;
+                                                  NarrativeActionLink; 6-state
+                                                  response-absence vocabulary;
+                                                  no universal lag windows)
+  CSIA_BOOK_7_CAUSALITY_DOCTRINE_v0.1.md         (TEMPORAL ORDER != ASSOCIATION
+                                                  != MECHANISTIC LINK != CAUSAL
+                                                  CLAIM; Level-4 unreachable)
+  CSIA_BOOK_7_ECOSYSTEM_EVOLUTION_v0.1.md        (graph diffs between accepted
+                                                  states only; no valence;
+                                                  migration via Book 3; generic
+                                                  EXPANSION/CONTRACTION rejected;
+                                                  PRESERVED != REVALIDATED;
+                                                  bitemporality)
+  CSIA_BOOK_7_FALSE_POSITIVE_CORPUS_v0.1.md      (20 stress cases fully resolved)
+  CSIA_BOOK_7_EVENT_CANDIDATE_MATRIX_v0.1.md     (12 families: 8 KEEP, 4 REVISE,
+                                                  0 DEFER, 0 REJECT)
+  CSIA_BOOK_7_NARRATIVE_CANDIDATE_MATRIX_v0.1.md (7 concepts: 5 KEEP, 1 REVISE,
+                                                  1 DEFER, 0 REJECT)
+  CSIA_BOOK_7_SEAMS_AND_FIREWALL_v0.1.md         (Book 6 ref-only consumption;
+                                                  MARKET_RESPONSE_REF ceiling;
+                                                  structural anti-prescription
+                                                  firewall)
+  CSIA_BOOK_7_OPERATOR_DECISION_PACKET_D7N_v0.1.md (6 decisions surfaced, 0
+                                                  decided: D7N-1 identity,
+                                                  D7N-2 narrative identity,
+                                                  D7N-3 state governance,
+                                                  D7N-4 causality, D7N-5 market
+                                                  seam, D7N-6 replay)
+  CSIA_BOOK_7_NARRATIVE_EVENTS_ECOSYSTEM_EVOLUTION_PLAN_v0.1.md
+                                                 (consolidated plan)
+  CSIA_BOOK_7_PRE_RATIFICATION_REVIEW_v0.1.md    (35/35 PASS)
+
+Decision:
+
+  BOOK_6 = FROZEN_ACCEPTED (unchanged)
+  BOOK_7_GOVERNANCE_REVIEW = COMPLETE
+  BOOK_7_PLAN = v0.1 DRAFT_PENDING_OPERATOR_RATIFICATION
+  OPEN_D7N_DECISIONS = 6
+  NARRATIVE_STATE_RULES_RATIFIED = 0
+  D2_6 = IN_FORCE
+  D6M_5 = OPEN_DEFERRED
+  BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+  BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+
+No crawler, RPC, network, database, or research execution was performed or
+planned for execution. Books 1-6, Sensor, and the Constitution are untouched
+(no amendment required anywhere). No news/social ingestion exists.
+
+NEXT = operator review of Book 7 plan / D7N decisions.
+
+Ratifying the plan would ratify planning structure and doctrine only. It does
+NOT authorize Book 7 implementation, Book 8 implementation, D8, live
+acquisition, news/social crawlers, RPC, database, graph database, production
+news/social ingestion, dashboard, narrative scores, catalyst scores, ranking,
+buy/sell language, causal claims from temporal order, narrative-evidence
+promotion to structural truth, state-rule ratification, or trading/execution.
