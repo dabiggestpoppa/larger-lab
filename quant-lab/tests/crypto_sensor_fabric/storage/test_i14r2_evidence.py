@@ -39,16 +39,9 @@ repro = load_sibling(
 )
 make_context = repro.make_context
 
-from crypto_sensor_fabric.providers.base.fingerprint import (  # noqa: E402
-    payload_hash,
-)
-from crypto_sensor_fabric.storage.integration import (  # noqa: E402
-    Bloc3StorageContext,
-)
 from crypto_sensor_fabric.storage.revisions import (  # noqa: E402
     RevisionConfigurationError,
     RevisionObservationConflict,
-    SourceRevisionCatalogCorrupt,
     SourceRevisionRegistry,
 )
 
@@ -135,11 +128,7 @@ def _group_digest(stack, receipt):  # type: ignore[no-untyped-def]
     return stack.registry.group_content_digest(member_blobs)
 
 
-def _observation_id(stack, receipt):  # type: ignore[no-untyped-def]
-    seen = batch_seen = None
-    acq = stack.acq_repo.get_acquisition(receipt.acquisition_ids[0])
-    seen = acq.response_observed_at.strftime("%Y%m%dT%H%M%S%fZ")
-    return f"grp::{receipt.job_id if hasattr(receipt, 'job_id') else 'job-1'}::{seen}"
+
 
 
 # ---------------------------------------------------------------------------

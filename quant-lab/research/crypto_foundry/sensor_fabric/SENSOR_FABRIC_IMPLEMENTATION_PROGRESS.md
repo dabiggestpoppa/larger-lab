@@ -3417,3 +3417,75 @@ research                                             = FROZEN
 ```
 
 No self-ratification. I15 not started. STOP after I14R1.
+
+## SENSOR-B4-I14R2 — HISTORICAL EVIDENCE IMMUTABILITY + I06 GROUP-AUTHORITY SELF-VALIDATION: COMPLETE CHAIN I14R2A-E; IMPLEMENTATION PASS PENDING OPERATOR REVIEW
+
+Operator review of I14R1 found two blockers; both closed without touching
+any published I14R1 matrix.
+
+Blocker A (historical evidence mutation): reproduced exactly — between
+706f18ed2 and 4111205e, BLOC_04_I14_T0B_HANDOFF_MATRIX.json changed one
+line (source_acquisitions fp-job::b4d13a6a… gained the observation-instant
+segment) because the live I14 evidence generator republished historical
+matrices on every pytest run. Closure: the T0B fossil restored byte-exact to
+the accepted I14 checkpoint blob (sha256 9dc20f64cb4a0741…, resolved through
+Git itself); test_i14_evidence.py converted to CHECKPOINT-SCOPED
+IMMUTABILITY VALIDATION — the six I14 matrices are fossils, still
+live-measured in memory, never written by an ordinary pytest run; _write is
+gated behind UPDATE_I14_EVIDENCE=1 with a typed refusal; a custody test
+proves all six byte-equal the accepted blobs and that a live pass mutates
+none. Dual truth: I14-era identity in the fossil, observation-aware identity
+in R1/R2 evidence only. Generalized law recorded: once a checkpoint
+advances, its evidence files are immutable; later changes publish correction
+evidence at the later checkpoint. Generator audit (§29): I13 already
+custody-frozen, I05 writes outside the evidence tree, I14 was the only live
+writer — no systemic overwrite problem, no STOP.
+
+Blocker B (I06 group authority trusted its caller): register_acquisition_group
+now self-validates — every member's RevisionSourceIdentityV1 descriptor and
+source_revision_key must equal the canonical first-member identity (compared
+through the model's own descriptor); every member's canonical
+response_observed_at must equal the group instant (no min/max/first/last
+collapse); duplicate acquisition ids rejected before resolution; replay
+requires the supplied id set AND resolved blob set to equal the persisted
+sets exactly (subset/superset/same-blobs-different-acquisitions all typed
+conflicts). New finding repaired (§15): R1 persisted member ids in caller
+order and blobs sorted independently — correspondence was lost; group rows
+now persist canonical member_bindings acquisition<->blob PAIRS sorted by
+blob sha (existing fields retained; R1-shaped rows reconstructed at load by
+resolution, never an ambiguous zip). Restart validation (§17/§18): every
+persisted GROUP row re-proves all members (existence, physical
+verification, identity, instant, unique blob mapping) and recomputes the
+domain-separated digest; group segments require a complete binding
+observation. I14 remains a pre-validating client; I06 repeats the
+authoritative checks (no trust inversion).
+
+Evidence (append-only; I14R1 matrices untouched): HISTORICAL_EVIDENCE_IMMUTABILITY
+3/3 OK; GROUP_AUTHORITY 7/7 OK (direct I06 API, §20); GROUP_MEMBERSHIP 5/5 OK;
+RESTART_CORRUPTION 6/6 OK; BLOC_04_I14R2_EVIDENCE_CORRECTION.md.
+
+Regression: full project 3133 passed / 28 pre-existing skips, ZERO failures
+(R2 module included; rerun after final file set). One transient
+test_blob_store_adversarial concurrency flake (REUSED_EXISTING 6/7 race)
+reproduced at the untouched baseline head 4111205e in a throwaway worktree
+(2/10 fail there, test + blob_store.py unchanged since I03R1C) — pre-existing
+timing race, NOT an I14R2 regression; the full-suite rerun passed clean.
+Ruff clean changed scope; compileall OK; mypy 0 new findings (10 pre-existing
+providers/ baseline). Secret scan clean. I11R2 audit mechanically republished
+at true tracked count 990 (989 + test_i14r2_evidence.py); no-update rerun
+byte-stable. external_ci = NONE_OBSERVED. CRLF-only churn in old I03R1/I04
+evidence never staged.
+
+```
+SENSOR-B4-I14R2
+PASS_SENSOR_B4_I14_BLOC3_INTEGRATION_SEALED          = OPERATOR_HOLD
+PASS_SENSOR_B4_I14R1_STREAM_CONTINUATION_EMPTY_REVISION_SEALED = OPERATOR_HOLD
+PASS_SENSOR_B4_I14R2_EVIDENCE_CUSTODY_GROUP_AUTHORITY_SEALED = PENDING_OPERATOR_REVIEW
+G4-12_BLOC3_HANDOFF_GATE                             = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                           = FALSE
+recommended_next                                     = OPERATOR REVIEW OF COMPLETE I14 -> I14R1 -> I14R2 CHAIN
+I15+                                                 = UNAUTHORIZED
+research                                             = FROZEN
+```
+
+No self-ratification. I15 not started. STOP after I14R2.
