@@ -1229,3 +1229,275 @@ DECISION LOG ENTRY {
   binding_commit_sha:           (assigned at ratification commit)
 }
 ```
+---
+
+## D7N-3 — NARRATIVE / EVOLUTION STATE-RULE GOVERNANCE (RATIFIED, CLOSED)
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D7N-3
+  operator_selection:           A
+  operator_wording:             "BOOK7_SPECIFIC_CONTRACT_NOW,
+                                 VOCABULARY_LATER"
+  source_packet:                CSIA_BOOK_7_OPERATOR_DECISION_PACKET_D7N_v0.2.md
+                                 §3
+  selected_model:               BOOK7_SPECIFIC_CONTRACT_NOW_VOCABULARY_LATER
+  open_status:                  CLOSED
+  ratification_status:          RATIFIED / CLOSED
+  blocking_at_creation:         TRUE (was 1 of the 2 blocking D7N decisions)
+  BOOK7_SPECIFIC_STATE_CONTRACT: TRUE
+  STATE_VOCABULARY_SELECTION:   DEFERRED_TO_LATER_RULE_ROUND
+  NARRATIVE_STATE_RULES_RATIFIED: 0
+  EVOLUTION_STATE_RULES_RATIFIED:  0
+  BOOK6_STATE_AUTHORITY_TRANSFER: FALSE
+  BOOK6_STATE_RULE_CODE_REUSED:   FALSE
+  OPERATOR_ONLY_INDIVIDUAL_RATIFICATION_REMAINS: TRUE
+  CLASS_A_AVAILABILITY_STATES:   STRUCTURALLY_USABLE
+  generic_EXPANDING_CONTRACTING:  REJECTED
+  state_name_may_outrun_derivation_rule: PROHIBITED
+  vocabulary_round:             NOT YET CONVENED; no names may be selected
+                                 before a derivation rule exists
+  no_implementation_granted:    TRUE (contract shape is planning-only;
+                                 emissions remain blocked pending the
+                                 vocabulary/rule round)
+  amendment_consequence:        none (Book 6 state authority is untouched;
+                                 no authority transfers out of Book 6)
+  interaction_with_D6M-3:       UNCHANGED (D6M-3=A centralized operator
+                                 ratification only; D7N-3 does not extend,
+                                 relax, or supersede it)
+  interaction_with_D2_6:        UNCHANGED (IN_FORCE)
+  interaction_with_D6M-5:       UNCHANGED (OPEN_DEFERRED)
+  reversibility:                later recorded operator decision only
+  effective_timestamp:          2026-10-01
+  binding_plan_artifact:        CSIA_BOOK_7_NARRATIVE_STATE_GOVERNANCE_v0.1.md
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+```
+
+**Effect, stated plainly:** Book 7 now *has* a state-rule contract of its own —
+its shape is settled — but it is empty. Zero narrative state rules and zero
+evolution state rules are ratified. No state may be emitted, because no
+vocabulary has been chosen and no derivation rule has been ratified to derive
+it. Choosing a name before its rule is exactly the Book 6 v0.1 failure mode
+this decision refuses to repeat. Class A availability states (a component is
+present, absent, or partly present) remain structurally usable because they
+describe structural facts owned by Books 3–4 rather than derived narrative
+state. Generic `EXPANDING` / `CONTRACTING` remains rejected as an
+undimensioned judgment.
+
+---
+
+## D7N-7 — CHANGE-COMPARISON AUTHORITY (RATIFIED, CLOSED)
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D7N-7
+  operator_selection:           A
+  operator_wording:             "BOOK6_OWNED_COMPARISON"
+  source_packet:                CSIA_BOOK_7_OPERATOR_DECISION_PACKET_D7N_v0.2.md
+                                 §7
+  selected_model:               BOOK6_OWNED_COMPARISON
+  open_status:                  CLOSED
+  ratification_status:          RATIFIED / CLOSED
+  blocking_at_creation:         TRUE (was 2 of the 2 blocking D7N decisions)
+  CHANGE_COMPARISON_OWNER:      BOOK_6
+  BOOK_6_AMENDMENT_REQUIRED:    TRUE
+  BOOK_7_CHANGE_COMPARISON_AUTHORITY: FALSE
+  BOOK_7_RESPONSE_LINKAGE_AUTHORITY: PLANNED_ONLY
+  required_separation:          MEASUREMENT_CHANGE != EVENT_RESPONSE_LINK
+  Book 6 owns:                  baseline selection methodology; comparability
+                                 gates; numeric delta; direction derivation;
+                                 comparability truth; measurement normalization
+  Book 7 owns:                  event/action linkage; response window linkage;
+                                 descriptive response relationship
+  Book 7 must NOT own:          baseline-selection arithmetic; measurement
+                                 comparison; numeric delta computation;
+                                 direction derivation; comparability truth;
+                                 measurement normalization
+  supersedes_interim_posture:   D7N-7 interim posture C (fail-closed
+                                 CHANGE_NOT_MEASURABLE) is REPLACED by the
+                                 ratified doctrine; fail-closed remains the
+                                 operative behaviour UNTIL the Book 6
+                                 comparison contract is ratified and
+                                 re-accepted
+  downstream_consequence:       BOOK_7_PLAN_RATIFICATION =
+                                 BLOCKED_PENDING_BOOK6_AMENDMENT
+  BOOK_6_AMENDMENT_PLAN:        CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.1.md
+                                 (DRAFT_PENDING_OPERATOR_RATIFICATION)
+  amendment_required_before_use: Book 6 plan ratification; Book 6
+                                 implementation on accepted lineage; Book 6
+                                 regression/hardening review; formal Book 6
+                                 re-acceptance
+  no_implementation_granted:    TRUE
+  interaction_with_D2_6:        UNCHANGED (IN_FORCE)
+  interaction_with_D6M-5:       UNCHANGED (OPEN_DEFERRED) — usage/health
+                                 parameters stay deferred; a change record is
+                                 not a health or adoption reading
+  interaction_with_Book 5:      UNCHANGED (read-only consumer; no write-back)
+  reversibility:                later recorded operator decision only
+  effective_timestamp:          2026-10-01
+  binding_artifacts:            CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.1.md
+                                 CSIA_BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.1.md
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+```
+
+**Effect, stated plainly:** a comparison across two measurements is a
+measurement-domain act, so it belongs to the measurement authority. Book 6
+is `FROZEN_ACCEPTED`, and it has never had a comparison or baseline
+contract, so this decision **re-opens Book 6 by one narrow amendment** rather
+than by a general reopening. Until that amendment is ratified, implemented,
+regression-reviewed, and formally re-accepted, no comparison product exists
+and the operative response posture stays fail-closed.
+
+The separation this decision establishes is the load-bearing one:
+
+```text
+MEASUREMENT_CHANGE  !=  EVENT_RESPONSE_LINK
+```
+
+Book 6 answers "did the measured value change, and is that change
+well-defined?" Book 7 answers "is that change temporally situated inside a
+declared response window after a declared action?" Neither answer may be
+inferred from the other, and neither may be silently substituted for the
+other.
+---
+
+## D7N-1..D7N-2, D7N-4..D7N-6 — DEFERRED (NOT CLOSED)
+
+The operator recorded no selection for the five non-blocking decisions. Their
+existing fail-closed interim postures are preserved verbatim below. Per the
+decision-log session-integrity rule, **an unanswered slot is `DEFER`; nothing
+is inferred from silence and no planning recommendation is silently promoted
+to a decision.**
+
+```text
+DECISION LOG ENTRY {
+  decision_id:                  D7N-1  EVENT IDENTITY AUTHORITY
+  operator_selection:           DEFER
+  open_status:                  OPEN / DEFERRED
+  ratification_status:          OPEN / DEFERRED (NOT closed)
+  interim_posture_preserved:    fail-closed — occurrence-evidence-first binding
+                                 with unresolved report groups held at
+                                 IDENTITY_CONTESTED; no adjudication layer
+                                 assumed to exist
+  must_not_be_inferred:         planning recommended option A; that
+                                 recommendation is NOT a decision
+  may_not_close_via:            silence; elapsed time; plan readiness; any
+                                 downstream artifact assuming a model
+  blocks:                       plan ratification = NO;
+                                 identity resolution implementation = YES
+  effective_timestamp:          2026-10-01
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+
+DECISION LOG ENTRY {
+  decision_id:                  D7N-2  NARRATIVE IDENTITY METHODOLOGY
+  operator_selection:           DEFER
+  open_status:                  OPEN / DEFERRED
+  ratification_status:          OPEN / DEFERRED (NOT closed)
+  interim_posture_preserved:    fail-closed — no auto-merge, no auto-split;
+                                 narrative identity operations require an
+                                 explicit cited methodology
+  must_not_be_inferred:         planning recommended a model; that
+                                 recommendation is NOT a decision
+  may_not_close_via:            silence; elapsed time; plan readiness
+  blocks:                       plan ratification = NO;
+                                 narrative identity implementation = YES
+  effective_timestamp:          2026-10-01
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+
+DECISION LOG ENTRY {
+  decision_id:                  D7N-4  CAUSAL-CLAIM GOVERNANCE
+  operator_selection:           DEFER
+  open_status:                  OPEN / DEFERRED
+  ratification_status:          OPEN / DEFERRED (NOT closed)
+  interim_posture_preserved:    fail-closed — a causal claim requires an
+                                 explicit ratified methodology; temporal
+                                 adjacency, association, and mechanistic
+                                 link each remain capped below CAUSAL_CLAIM
+  rejected_by_doctrine:         option C (unrestricted causal language) stays
+                                 rejected; deferral does not reopen it
+  must_not_be_inferred:         silence; plan readiness
+  blocks:                       plan ratification = NO;
+                                 causal-claim emission = YES
+  effective_timestamp:          2026-10-01
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+
+DECISION LOG ENTRY {
+  decision_id:                  D7N-5  MARKET-RESPONSE SEAM REPRESENTATION
+  operator_selection:           DEFER
+  open_status:                  OPEN / DEFERRED
+  ratification_status:          OPEN / DEFERRED (NOT closed)
+  interim_posture_preserved:    reference-only seam — no market-regime
+                                 semantics, no confirmation state combining
+                                 CSIA with Sensor, no finalized lag windows,
+                                 no D8
+  ownership_note:               Book 8 owns the structural-to-market Context
+                                 Bridge; Crypto Sensor owns mechanical market
+                                 observation; Book 7 references only
+  must_not_be_inferred:         silence; plan readiness; Book 8 planning
+                                 progress
+  blocks:                       plan ratification = NO;
+                                 market-response semantics = YES
+  effective_timestamp:          2026-10-01
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+
+DECISION LOG ENTRY {
+  decision_id:                  D7N-6  HISTORICAL EVOLUTION REPLAY SEMANTICS
+  operator_selection:           DEFER
+  open_status:                  OPEN / DEFERRED
+  ratification_status:          OPEN / DEFERRED (NOT closed)
+  interim_posture_preserved:    PRESERVED_GRAPH_HISTORY !=
+                                 REVALIDATED_HISTORICAL_TOPOLOGY; the same
+                                 honesty constraint Book 6 found for
+                                 HISTORICAL_BOOK2_AUTHORITY_REPLAY =
+                                 NOT_IMPLEMENTED applies here — preserved
+                                 history is never presented as revalidated
+                                 historical authority
+  must_not_be_inferred:         silence; plan readiness; upstream book
+                                 progress
+  blocks:                       plan ratification = NO;
+                                 historical replay claims = YES
+  effective_timestamp:          2026-10-01
+  binding_commit_sha:           (assigned at this ratification commit)
+}
+```
+
+**Standing rule for all five:** deferral is an accepted terminal state for a
+non-blocking decision, not a defect and not an implied approval. Each remains
+individually closable by a later recorded operator decision. None may be
+closed implicitly by implementation, by a plan referencing it, or by silence
+in a future session.
+
+---
+
+## D7N DISPOSITION SUMMARY (post-session)
+
+```text
+DECISIONS_SURFACED            = 7 (D7N-1 .. D7N-7)
+DECIDED_THIS_SESSION          = 2
+  D7N-3                       = A / RATIFIED / CLOSED
+  D7N-7                       = A / RATIFIED / CLOSED
+DEFERRED                      = 5
+  D7N-1, D7N-2, D7N-4, D7N-5, D7N-6 = OPEN / DEFERRED (NOT closed)
+OPEN_BLOCKING_D7N_DECISIONS   = 0
+OPEN_DEFERRED_D7N_DECISIONS   = 5
+BOOK_6_AMENDMENT_REQUIRED     = TRUE
+BOOK_7_RATIFICATION_BLOCKER   = BOOK6_COMPARISON_CONTRACT_NOT_YET_ACCEPTED
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY    = FALSE
+D2_6                          = IN_FORCE
+D6M_5                         = OPEN_DEFERRED
+```
+
+Note on the blocking count moving from 2 to 0: the two blocking decisions were
+answered, not reclassified. Blocking counted *unanswered blocking* decisions.
+D7N-7's answer resolved a decision while creating a *different* kind of
+obligation — an upstream Book 6 amendment — which is tracked as
+`BOOK_7_RATIFICATION_BLOCKER`, not as an open D7N decision. Book 7 remains
+unratified.
