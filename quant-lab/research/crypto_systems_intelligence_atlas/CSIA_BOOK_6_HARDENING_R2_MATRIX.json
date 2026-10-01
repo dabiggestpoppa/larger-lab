@@ -1,0 +1,112 @@
+{
+  "document": "CSIA_BOOK_6_HARDENING_R2_MATRIX",
+  "version": "0.1",
+  "date": "2026-10-01",
+  "branch": "agent/crypto-systems-intelligence-atlas-book6-build",
+  "implementation_base": "5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4",
+  "pre_r2_head": "20cf880cd5e378e7d59ebe727e385a3eeffb5b61",
+  "status": "HARDENING_R2_COMPLETE_PROPOSED",
+  "scope": "BOOK 6 OFFLINE KERNEL ONLY — no live acquisition, no RPC, no database, no graph DB, no Book 7/8/D8, no ranking, no composite score",
+  "reproduced_defects": [
+    {
+      "id": "R2-D1",
+      "title": "METHODOLOGY IDENTITY IS STILL CALLER-SELF-ASSERTED",
+      "root_cause": "R1 required an exact identity AND authorized_corpus_row_ids, but both could be satisfied by ONE caller-created MeasurementMethodology object — the authority relationship was asserted by the caller, not proven by ratified data",
+      "reproducer": "MeasurementMethodology(methodology_ref='routing-attribution-methodology', version='1', formula='garbage', window_rule='garbage', denominator_rule='garbage', source_selection='garbage', identity_rule='garbage', authorized_corpus_row_ids=('FC-05',)) registered, then FC-05 comparison with methodology_ref='routing-attribution-methodology@1'",
+      "before_r2": "AUTHORIZED",
+      "after_r2": "REFUSED",
+      "repair": "every semantic field is folded into a deterministic canonical content digest bound at registration; the CONDITIONAL corpus rows pin the full canonical specification and the comparison gate compares the registered methodology's content digest against the corpus-pinned digest; the row-authority condition is checked against the ratified corpus spec, not the registered object"
+    },
+    {
+      "id": "R2-D2",
+      "title": "RATIFIED StateRule TARGET CAN BE EMITTED WITHOUT EXECUTING ITS PREDICATE",
+      "root_cause": "emit_rule_gated_state checked rule exists + ratified + methodology resolvable + measurement refs resolve, then emitted target_state directly — predicate_ref was never evaluated",
+      "reproducer": "prior=100, current=50, synthetic ratified StateRule targeting INCREASING with predicate_ref='predicate:current_gt_prior@1' → INCREASING emitted",
+      "before_r2": "INCREASING emitted for a falling series",
+      "after_r2": "PredicateNotSatisfied (explicit non-emission, operands recorded); the opposite state is never inferred",
+      "repair": "a closed, eval-free predicate registry (CURRENT_GREATER_THAN_PRIOR / CURRENT_LESS_THAN_PRIOR / EXACT_EQUALITY over CURRENT_THEN_PRIOR operands); emission requires RULE RATIFIED AND INPUTS CURRENT AND METHODOLOGY CURRENT AND PREDICATE EVALUATES TRUE; RATIFIED RULE != TRUE PREDICATE"
+    },
+    {
+      "id": "R2-D3",
+      "title": "MULTI-METRIC DATA_COMPLETE CAN TRUST A FORGED / OVERSTATED ATTESTATION SCOPE",
+      "root_cause": "engine.data_status re-resolved each NAMED rule but only checked that each rule applied to at least one vector metric; a forged attestation claiming scope {A,B} while only rule:A exists produced DATA_COMPLETE with metric B uncovered",
+      "reproducer": "metrics A+B observed; live ratified rule scoped to metric A only; forged CoverageSufficiencyAttestation(rule_ids=('rule:A',), scope_metric_ids=('metric:A','metric:B')); vector.data_status == DATA_COMPLETE and engine.data_status == DATA_COMPLETE",
+      "before_r2": "DATA_COMPLETE (both locally and through the engine)",
+      "after_r2": "DATA_INCOMPLETE (engine); coverage_report names metric:B as uncovered",
+      "repair": "engine.data_status reconstructs sufficiency per metric from registry state and requires explicit SET EQUALITY covered == required; the attestation is an audit record, never the source of truth (ATTESTATION CLAIMS SCOPE != REGISTRY PROVES SCOPE)"
+    },
+    {
+      "id": "R2-D4",
+      "title": "HISTORICAL VALUATION REVALIDATES PRICE CLAIMS AS CURRENT, NOT HISTORICALLY VALID",
+      "root_cause": "validate_historical_valuation shared one authority helper with current authorization, which resolves price claims with require_current=True; a claim valid at observation time and later STALE/SUPERSEDED/REJECTED retroactively erased the historical statement",
+      "reproducer": "valuation observed at T with a fresh price; price claim later decayed to REJECTED through Book 2's own ClaimStateEngine; validate_historical_valuation then REFUSED",
+      "before_r2": "REFUSED (CURRENT UNAVAILABLE treated as HISTORICALLY INVALID)",
+      "after_r2": "record shape PRESERVED; Book 6 makes no claim of revalidated historical authority",
+      "repair": "Phase 12 audit settled Phase 13B: accepted Book 2 EXPOSES raw history (ClaimStore.history, timestamped TransitionEvents) but can_promote_to_graph is canonical-CURRENT-ONLY by design, so Book 6 refuses to invent bitemporal replay. API split into validate_recorded_historical_shape (record shape only, zero Book 2 consultation) and historical_authority_status (reports replay_available=False with HISTORICAL_BOOK2_AUTHORITY_REPLAY='NOT_IMPLEMENTED', plus current_claims_backed as a clearly-labelled separate fact)"
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "Design A (content fingerprint bound at registration) for R2-D1",
+      "why": "deterministic, offline, no hidden global mutable singleton, no Python object identity; the digest is bound when the identity is first registered and every later use re-verifies live content against it",
+      "fields_in_digest": ["methodology_ref", "version", "formula", "parameters", "window_rule", "filters", "denominator_rule", "source_selection", "identity_rule", "input_methodology_refs", "authorized_corpus_row_ids"],
+      "canonical_ordering": "unordered fields (parameters, filters, input_methodology_refs, authorized_corpus_row_ids) are sorted before serialization; sha256 over compact JSON"
+    },
+    {
+      "decision": "Phase 13B (honest capability split) for R2-D4",
+      "why": "NO BOOK 2 HISTORICAL FEATURE INVENTION. Book 2's epistemic predicate is current-only by design; faking historical epistemic validation would create a second epistemic engine and a false PASS. PRESERVED_HISTORICAL_RECORD != REVALIDATED_HISTORICAL_AUTHORITY"
+    },
+    {
+      "decision": "C8/R1-D4 attestation mechanism deliberately superseded by the R2 doctrine",
+      "why": "R1 required a registry-issued attestation as a precondition; R2 demotes the attestation to an audit record because a forged one was provable authority. The R1 gate that still holds is that fake rule refs fail closed (preserved in test_r1_c8)"
+    }
+  ],
+  "gates": [
+    {"gate": "METHODOLOGY_IDENTITY_BINDS_CONTENT", "result": "PASS", "evidence": "R2.MC.03, R2.MC.04, R2.MC.06; test_book6_hardening_r2.py::test_r2_d1_identity_binds_content_constants + test_r2_d1_fingerprint_is_deterministic_and_content_complete"},
+    {"gate": "METHODOLOGY_SELF_AUTHORIZATION_REJECTED", "result": "PASS", "evidence": "R2.MC.01; test_book6_hardening_r2.py::test_r2_d1_the_self_authorization_reproducer_is_now_refused"},
+    {"gate": "COMPARISON_CANONICAL_METHODOLOGY_REQUIRED", "result": "PASS", "evidence": "R2.MC.02, R2.MC.05, R2.MC.07, R2.MC.08"},
+    {"gate": "METHODOLOGY_CONTENT_MODEL_COPY_REVALIDATED", "result": "PASS", "evidence": "R2.MC.05, R2.MC.06, R2.MC.09, R2.MC.10 (M1 formula, M2 row set, M3 input refs all parametrized)"},
+    {"gate": "STATE_RULE_PREDICATE_EXECUTED", "result": "PASS", "evidence": "R2.PE.02, R2.PE.08, R2.PE.11, R2.PE.14"},
+    {"gate": "STATE_FALSE_PREDICATE_NO_EMISSION", "result": "PASS", "evidence": "R2.PE.01, R2.PE.03"},
+    {"gate": "STATE_PREDICATE_TARGET_MATCH", "result": "PASS", "evidence": "R2.PE.09, R2.PE.10, R2.PE.12"},
+    {"gate": "STATE_INPUT_ORDER_EXPLICIT", "result": "PASS", "evidence": "R2.PE.11 (S3 swap refused), R2.PE.14"},
+    {"gate": "STATE_METHODOLOGY_CURRENT", "result": "PASS", "evidence": "R2.PE.01, R2.PE.02 (emission re-resolves rule methodology live, preserving the R1 path); R1.RULE_AUTHORITY suite still green"},
+    {"gate": "CANONICAL_STATE_RULE_COUNT_ZERO", "result": "PASS", "evidence": "R2.PE.04; INDIVIDUAL_STATE_RULES_RATIFIED_AT_BOOTSTRAP == 0"},
+    {"gate": "COVERAGE_PER_METRIC_CLOSURE", "result": "PASS", "evidence": "R2.CC.01, R2.CC.02, R2.CC.05"},
+    {"gate": "ATTESTATION_SCOPE_NOT_AUTHORITY", "result": "PASS", "evidence": "R2.CC.07 (attestation stripped or forged never flips the verdict)"},
+    {"gate": "FORGED_ATTESTATION_SCOPE_REJECTED", "result": "PASS", "evidence": "R2.CC.01, R2.CC.03, R2.CC.04"},
+    {"gate": "EVERY_REQUIRED_METRIC_HAS_LIVE_RULE", "result": "PASS", "evidence": "R2.CC.02, R2.CC.04, R2.CC.06"},
+    {"gate": "COVERAGE_CANONICAL_RULE_COUNT_ZERO", "result": "PASS", "evidence": "R2.PE.04; COVERAGE_SUFFICIENCY_RULES_RATIFIED_AT_BOOTSTRAP == 0"},
+    {"gate": "HISTORICAL_BOOK2_CAPABILITY_AUDITED", "result": "PASS", "evidence": "R2.HA.01, R2.HA.02; Phase 12 audit recorded in reproduced_defects[R2-D4].repair and CSIA_BOOK_6_HARDENING_R2_DERIVATION_AND_HISTORICAL_AUTHORITY.md §3"},
+    {"gate": "CURRENT_AUTHORITY_NOT_HISTORICAL_AUTHORITY", "result": "PASS", "evidence": "R2.HA.03 vs R2.HA.05/R2.HA.06; current path refuses stale/decayed (R2.PS.01), historical path preserves shape without claiming epistemic backing"},
+    {"gate": "BITEMPORAL_VALUATION_CLAIM_HONEST", "result": "PASS", "evidence": "R2.HA.01, R2.HA.02, R2.HA.06, R2.HA.07; replay_available is False and validator-bound to the module capability constant"},
+    {"gate": "R1_GATES_PRESERVED", "result": "PASS", "evidence": "all 93 R1-focused tests still pass; R1.PS.01-08 + R2.PS.01-02; only deliberate supersession is the C8 attestation mechanism recorded in design_decisions"},
+    {"gate": "BOOK1_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 1 files touched (BOOK1_MUTATIONS = 0)"},
+    {"gate": "BOOK2_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 2 files touched (BOOK2_MUTATIONS = 0)"},
+    {"gate": "BOOK3_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 3 files touched (BOOK3_MUTATIONS = 0)"},
+    {"gate": "BOOK4_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 4 files touched (BOOK4_MUTATIONS = 0)"},
+    {"gate": "BOOK5_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 5 files touched (BOOK5_MUTATIONS = 0)"},
+    {"gate": "SENSOR_BASELINE_EQUIVALENCE", "result": "PASS", "evidence": "sensor suite re-run: 2325 PASS / 14 FAIL / 4 SKIPPED, exact known set unchanged; BOOK6_INTRODUCED_SENSOR_FAILURES = 0"}
+  ],
+  "counts": {
+    "book6_tests_before_r2": 1094,
+    "book6_tests_after_r2": 1140,
+    "r1_focused": 93,
+    "r2_focused": 46,
+    "total_csia_after_r2": 1961,
+    "traceability_rows": 255,
+    "traceability_families": 25,
+    "r2_traceability_rows": 42
+  },
+  "exit_state": {
+    "BOOK_6_HARDENING_R2": "PASS (proposed; NOT self-accepted)",
+    "BOOK_6_IMPLEMENTATION": "COMPLETE_HARDENED_R2",
+    "PROPOSED_EXIT_GATE": "PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL",
+    "BOOK_6_ACCEPTANCE": "NOT_SELF_ACCEPTED",
+    "LIVE_ACQUISITION_AUTHORITY": false,
+    "D6M_5": "OPEN_DEFERRED",
+    "INDIVIDUAL_STATE_RULES_RATIFIED": "0 canonical",
+    "COVERAGE_SUFFICIENCY_RULES_RATIFIED": "0 canonical",
+    "PREDICATES_CANONICALLY_RATIFIED": 0
+  }
+}

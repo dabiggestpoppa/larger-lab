@@ -1605,3 +1605,99 @@ network calls, CEX feeds, database, graph database, production scheduler,
 dashboard, Book 7, Book 8, D8, trading or execution. It does not execute
 usage/health empirical research. It does not ratify any state rule,
 coverage-sufficiency rule, or false-comparison methodology.
+
+---
+
+# CHECKPOINT — BOOK 6 HARDENING R2
+
+> 2026-10-01 — Canonical methodology content + executable state rules +
+> per-metric coverage closure + historical authority honesty.
+
+Trigger: independent review found four NEW concrete defects in the R1-hardened
+kernel. Each let a caller ASSERT what the registry was supposed to PROVE:
+
+  R2-D1 METHODOLOGY IDENTITY IS STILL CALLER-SELF-ASSERTED
+        (right name + garbage formula + self-listed FC-05 -> AUTHORIZED)
+  R2-D2 RATIFIED StateRule TARGET EMITTED WITHOUT EXECUTING ITS PREDICATE
+        (prior=100, current=50 -> INCREASING emitted)
+  R2-D3 MULTI-METRIC DATA_COMPLETE TRUSTS A FORGED ATTESTATION SCOPE
+        (rule:A live only; forged scope {A,B} -> DATA_COMPLETE)
+  R2-D4 HISTORICAL VALUATION REVALIDATES PRICE CLAIMS AS CURRENT
+        (claim decayed after observation -> historical REFUSED)
+
+Repairs (all reproduced failure-first before repair; probe deleted after):
+
+  1. CONTENT SEAL       sha256 over the eleven canonical semantic fields,
+                        bound at first registration; live re-verification at
+                        every methodology-consuming boundary; CONDITIONAL
+                        corpus rows pin their full canonical specification;
+                        comparison compares the registered digest against the
+                        corpus-pinned digest; row authority checked against the
+                        ratified spec itself.
+  2. PREDICATE ENGINE   new book6_predicates.py: closed three-member
+                        EvaluatorKind, explicit CURRENT_THEN_PRIOR operand
+                        order, no eval/exec, no caller callables, registry
+                        ships empty, PREDICATES_CANONICALLY_RATIFIED = 0.
+                        Emission = RULE RATIFIED AND INPUTS CURRENT AND
+                        METHODOLOGY CURRENT AND PREDICATE TRUE; false predicate
+                        is an explicit PredicateNotSatisfied non-emission;
+                        FALSE INCREASING != DECREASING.
+  3. COVERAGE CLOSURE   data_status reconstructs sufficiency per metric from
+                        registry state; explicit set equality
+                        covered == required; attestation demoted to audit
+                        record (deliberate, recorded supersession of the R1-D4
+                        mechanism via demonstrated defect R2-D3); CoverageReport
+                        names uncovered metrics; no partial attestations.
+  4. HISTORICAL HONESTY Phase 12 audit: Book 2 exposes raw history
+                        (ClaimStore.history, TransitionEvent.transitioned_at)
+                        but can_promote_to_graph is canonical-CURRENT-ONLY by
+                        design -> Phase 13B applied. API split:
+                        validate_recorded_historical_shape (record shape only,
+                        zero Book 2 consultation) + historical_authority_status
+                        (replay_available=False, HISTORICAL_BOOK2_AUTHORITY_REPLAY
+                        = NOT_IMPLEMENTED, current_claims_backed labelled
+                        separately). No Book 2 mutation. No false PASS.
+
+Invariants now asserted:
+
+  METHODOLOGY_IDENTITY_BINDS_CONTENT = TRUE
+  METHODOLOGY_SELF_AUTHORIZATION_REJECTED = TRUE
+  PREDICATES_ARE_EXECUTED_NOT_NAMED = TRUE
+  FALSE_PREDICATE_IS_NOT_THE_OPPOSITE_STATE = TRUE
+  ATTESTATION_SCOPE_NOT_AUTHORITY = TRUE (covered == required)
+  HISTORICAL_BOOK2_AUTHORITY_REPLAY = NOT_IMPLEMENTED (honest, validator-bound)
+  PRESERVED_HISTORICAL_RECORD != REVALIDATED_HISTORICAL_AUTHORITY
+
+Counts:
+
+  Book 6 tests   1094 -> 1230   (R2 focused suite: 46; R1 preserved: 93)
+  total CSIA     1915 -> 2051
+  traceability   213 rows / 20 families -> 255 rows / 25 families (42 R2 rows)
+  sensor         2325 / 14 / 4 unchanged (exact known set; 0 introduced)
+  ruff PASS; mypy PASS (62 source files)
+
+Books 1-5 unchanged: 107 / 108 / 83 / 230 / 293.
+Freeze vs 5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4: every changed file is a
+book6_* file. BOOK1..BOOK5_MUTATIONS = 0; SENSOR_MUTATIONS = 0.
+
+Decision:
+
+  BOOK_6_HARDENING_R2 = PASS (proposed)
+  BOOK_6_IMPLEMENTATION = COMPLETE_HARDENED_R2
+  BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+  PROPOSED_EXIT_GATE = PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+  D6M_5 = OPEN_DEFERRED
+  INDIVIDUAL_STATE_RULES_RATIFIED = 0 canonical
+  COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0 canonical
+  PREDICATES_CANONICALLY_RATIFIED = 0
+
+NEXT = OPERATOR REVIEW OF BOOK 6 HARDENING R2 ONLY. R2 closed four reproduced
+caller-assertion defects and recorded one accepted capability limitation
+(historical authority replay) rather than faking it. It granted no authority.
+No R3 exists or is planned without another NEW concrete demonstrated defect.
+This checkpoint does not begin live acquisition, RPC, network calls, database,
+graph database, production scheduler, dashboard, Book 7, Book 8, D8, trading or
+execution; it does not execute usage/health empirical research; it does not
+ratify any state rule, coverage-sufficiency rule, predicate, or
+false-comparison methodology.

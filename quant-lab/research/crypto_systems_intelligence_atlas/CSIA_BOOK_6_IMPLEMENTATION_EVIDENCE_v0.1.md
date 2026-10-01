@@ -360,3 +360,89 @@ COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
 **Still not self-accepted.** R1 created the mechanism by which a future operator
 ratification could grant Class B/C authority or `DATA_COMPLETE` — and the
 machinery by which its current absence is provable. It did not grant either.
+
+---
+
+# APPENDIX B — BOOK 6 HARDENING R2
+
+> Canonical methodology content + executable state rules + per-metric coverage
+> closure + historical authority honesty. Full derivation:
+> `CSIA_BOOK_6_HARDENING_R2_DERIVATION_AND_HISTORICAL_AUTHORITY.md`.
+> Gate matrix: `CSIA_BOOK_6_HARDENING_R2_MATRIX.json`.
+
+## B1. Reproduced defects (failure-first, all before repair)
+
+- **R2-D1** one caller-created `MeasurementMethodology` (right name, garbage
+  formula, `FC-05` self-listed) registered and got the FC-05 comparison
+  `AUTHORIZED`. Identity was still a namespace claim.
+- **R2-D2** `emit_rule_gated_state` never evaluated `predicate_ref`:
+  prior=100, current=50 with predicate `current_gt_prior` emitted `INCREASING`.
+- **R2-D3** a forged attestation claiming scope {A,B} with only a live rule for
+  A produced `DATA_COMPLETE` for both metrics through the engine.
+- **R2-D4** the historical path shared one helper with current authorization and
+  revalidated price claims with `require_current=True`, so a claim decayed AFTER
+  observation retroactively erased the historical statement.
+
+## B2. Repairs
+
+1. **Content seal** — sha256 over the eleven canonical semantic fields
+   (unordered collections sorted), bound at first registration inside the
+   registry instance; `assert_content_matches` re-verifies live at every
+   methodology-consuming boundary; the six CONDITIONAL corpus rows pin their
+   full canonical specification and comparison compares the registered
+   methodology's digest against the corpus-pinned digest. Row authority is
+   checked against the ratified spec, not the registered object.
+2. **Executable predicates** — new `book6_predicates.py`: closed three-member
+   `EvaluatorKind` (`CURRENT_GREATER_THAN_PRIOR`, `CURRENT_LESS_THAN_PRIOR`,
+   `EXACT_EQUALITY`), explicit `CURRENT_THEN_PRIOR` operand order, no eval/exec,
+   no caller callables, registry ships empty,
+   `PREDICATES_CANONICALLY_RATIFIED = 0`. Emission now requires
+   RULE RATIFIED AND INPUTS CURRENT AND METHODOLOGY CURRENT AND PREDICATE TRUE;
+   a false predicate is an explicit `PredicateNotSatisfied` non-emission and
+   never inverts into the opposite state.
+3. **Per-metric coverage closure** — `data_status` reconstructs sufficiency from
+   registry state per metric and demands explicit set equality
+   (`covered == required`); the attestation is an audit record, never authority
+   (this deliberately supersedes the R1-D4 attestation mechanism, recorded);
+   `CoverageReport` makes the equality inspectable; no partial attestations.
+4. **Historical authority honesty** — Phase 12 audit: accepted Book 2 exposes raw
+   history (`ClaimStore.history`, timestamped `TransitionEvent`s) but
+   `can_promote_to_graph` is canonical-CURRENT-ONLY by design; Phase 13B
+   therefore split the semantics without inventing a Book 2 feature:
+   `validate_recorded_historical_shape` (record shape only, zero Book 2
+   consultation) + `historical_authority_status` (reports
+   `HISTORICAL_BOOK2_AUTHORITY_REPLAY = NOT_IMPLEMENTED`,
+   `replay_available=False`, and `current_claims_backed` as a clearly-labelled
+   separate fact). `PRESERVED_HISTORICAL_RECORD != REVALIDATED_HISTORICAL_AUTHORITY`.
+
+## B3. Counts
+
+| | before R2 | after R2 |
+|---|---|---|
+| Book 6 tests | 1094 | **1230** |
+| R1 focused suite | 93 | **93** (preserved) |
+| R2 focused suite | — | **46** |
+| total CSIA | 1915 | **2051** |
+| traceability rows | 213 (20 families) | **255 (25 families; 42 R2 rows)** |
+| sensor | 2325 / 14 / 4 | **2325 / 14 / 4** (exact known set) |
+| ruff / mypy | pass | **pass** (62 source files) |
+
+Books 1–5 unchanged: 107 / 108 / 83 / 230 / 293.
+
+## B4. Exit state
+
+```text
+BOOK_6_HARDENING_R2 = PASS (proposed)
+BOOK_6_IMPLEMENTATION = COMPLETE_HARDENED_R2
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL
+BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D6M_5 = OPEN_DEFERRED
+INDIVIDUAL_STATE_RULES_RATIFIED = 0 canonical
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0 canonical
+PREDICATES_CANONICALLY_RATIFIED = 0
+```
+
+**Still not self-accepted.** R2 closed four reproduced caller-assertion defects
+and recorded one accepted capability limitation (historical authority replay)
+instead of faking it. It granted no authority anywhere.
