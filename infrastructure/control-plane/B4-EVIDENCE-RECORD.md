@@ -2846,3 +2846,229 @@ PR #4 at the evidence head: OPEN, MERGEABLE, UNSTABLE, unmerged, head
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`. No merge was performed or
 authorized, no history was rewritten, no LFS object was migrated or deleted,
 and recurring cost remains $0.
+# Append this section to B4-EVIDENCE-RECORD.md (append-only; R46 preserved verbatim)
+
+## B4-CXR7U9R47 — SUPERSEDING: ONE COMPLETE RECOVERY-AUTHORITY SNAPSHOT + NO CALLER-DECLARED AUTHORITY ROOT
+
+**Gate:** B4-CXR7U9R47 · **Branch:** `oce-program-build` · **Authorized start SHA:**
+`53c51741e8f6a13e4b0830108acd396f02eeb42e` (tree `31a2b1c60c8d3e1d34183a0a445ebbbd33d51d10`)
+
+This section SUPERSEDES the R46R4/R46 evidence statement "one decision consumes
+one snapshot." R46 remains valid historical evidence for the tests it ran. The
+independent review's four defects (A, B, C, D) were all reproduced against the
+shipped R46 head and all are repaired here with executable proofs.
+
+### 47.1 The superseded claim, stated precisely
+
+- **Which helper was single-read in R46:** `_valid_transition_claim()` — since
+  B4-CXR7U9R46R2 it classified and branch-selected from ONE FD-bound snapshot
+  when the caller supplied `snapshot=`.
+- **Which complete classifier still performed two reads in R46:**
+  `_classify_record_for_shell()`. Its FIRST branch guard ran on every state:
+  `_claim_state()` — a helper with **no snapshot parameter at all** — always
+  performed its own `_read_selector_snapshot()`. On the PROMOTED leg the
+  classifier then performed a SECOND `_read_selector_snapshot()` and threaded
+  the second snapshot into both `_valid_transition_claim()` calls; on the
+  FINALIZING leg the second selector read happened inside
+  `_selector_agrees_with_finalizing()` (which, with no promote receipt, also
+  re-read the durable record).
+- **The reproduction result:** a deterministic replay presenting read 1 = exact
+  rollback selector and read 2 = exact finalize selector produced
+  `PROMOTED classifier code = 6, selector reads = 2` and
+  `MIXED_GENERATION_EXIT = 5, reads = 2` — the mixed rollback/finalize
+  generation was accepted. Also reproduced at that head:
+  `ARBITRARY_CLASSIFY_EXIT = 0` (a caller-created CREATED record in a
+  caller-created directory classified as fresh rollback authority through
+  `--classify-state <path>`), `SYMLINK_TRANSITION_DIR_ACCEPTED = True`
+  (`_derive_claim_coordinate` ran `os.path.isdir()` + `os.path.realpath()`
+  before `_open_governed_directory()`), and the duplicate
+  `_classify_claim_content()` definition whose second copy silently shadowed
+  the first (the two docstrings even disagreed about the return value).
+- **The repair and its executable negative control:** R47R1–R47R4 (below).
+  `test_b4_cxr7u9r47r1_authority_snapshot.py` proves the COMPLETE classifier
+  now reads the record once and the selector once per decision on every ladder
+  row and never performs the mixed-generation second read; its weakened control
+  restores the R46 two-read PROMOTED leg in a copied engine and proves THAT
+  copy accepts the swapped finalize generation (reads=2, verdict=5) while the
+  shipped engine refuses it (reads=1, verdict=6). Non-vacuous by construction.
+
+### 47.2 Implementation ladder (append-only, all pushed)
+
+| Commit | Tree | Contract |
+|---|---|---|
+| `53c51741e` (start) | `31a2b1c60c8d3e1d34183a0a445ebbbd33d51d10` | R46 evidence head |
+| `51c048a50` `B4-CXR7U9R47R1: make recovery decisions consume one authority snapshot` | `3cabdbba77965eeafded8864cf9b380ac0659fc4` | ONE immutable `RecoveryAuthoritySnapshot` per decision; `_acquire_recovery_authority()` admits the governed directory once, takes the durable record once and the selector once; `_claim_state`, `_valid_transition_claim`, `_selector_agrees_with_finalizing`, `_receiptless_selector_agrees` consume `authority=` and perform no filesystem access inside a decision; `phase_reconcile` acquires ONE authority; R47R1 test module (17 tests) with the executable weakened control. R1 shipped an explicit, temporary compatibility seam: the R46 directory parameter was still threaded while every decision was rooted through the new snapshot (its own suite proves the counts) |
+| `3646a3215` `B4-CXR7U9R47R2: remove caller-declared recovery authority roots` | `c9663a823b52fe18c9897f9a4cda92c73b9c241b` | `--classify-state` and `--transition-dir` removed from `_parse_cli` (both now usage-error exit 2); `_classify_state_for_shell(path)` replaced by the private in-process seam `_test_classify_state_for_shell(record)` (a VALUE, never a path); `_classify_rollback_for_shell` and `_bound_operation` derive the governed root internally; `_derive_claim_coordinate(operation_id)` returns the engine-derived coordinate; the directory admission opens with O_NOFOLLOW (POSIX) / reparse refusal (Windows) and fstat-identity; restore.sh dropped `--transition-dir`; `recovery_cli.py` gained `load_engine`/`bind_root`; eight pre-existing suites migrated to the seam |
+| `4c37b9c03` `B4-CXR7U9R47R3: anchor recovery authority before path resolution` | `ae8dc9dfce183b202300d820fbe7836825e13c56` | `_derive_claim_coordinate` returns the coordinate UNRESOLVED (no realpath/isdir anywhere in it — AST-proven); `_open_governed_directory(coordinate, ...)` opens the ORIGINAL supplied coordinate (O_DIRECTORY\|O_CLOEXEC\|O_NOFOLLOW, fstat identity; Windows no-follow stat + FILE_ATTRIBUTE_REPARSE_POINT refusal); red-green control proves the restored realpath-first R46 form ACCEPTS a symlinked transition directory and the shipped form REFUSES it (POSIX CI) |
+| `f696132c5` `B4-CXR7U9R47R4: make selector parsing singular and bounded` | `ef992a1a8a846538bb66b6b1abcf1ab94dfac2a7` | `_classify_claim_content` defined EXACTLY ONCE (the shadowed copy deleted; zero top-level name collisions module-wide, AST-proven); `_CLAIM_MAX_BYTES = 4096` with the fixed-schema rationale; `_read_admitted_claim` bounds the selector from `st_size` BEFORE reading and by accumulated length DURING reading — oversized/growing selectors rejected whole, never truncated-and-parsed; 13-test R4 module |
+| `6a8ec1158` `B4-CXR7U9R47X1: repair POSIX-gated proofs exposed by Linux CI` | `f05e057741ad6bf9a0fdb173d6bbe20362ad6fb8` | CI-exposed repair, recorded per the mission's disclosure rule: `test_b4_cxr7u9r46x1_crash_residue_names.py` (POSIX-only, so Windows local runs never executed it) still passed a stale `transition_dir=` kwarg that Linux CI refused; and `test_b4_cxr7u9r47r3_directory_coordinate.py`'s weakened-control anchors were non-raw triple-quoted literals, so Python's string-literal line-continuation swallowed the `\<newline>` pairs and the anchors matched nothing on a case-sensitive filesystem. Both proofs repaired and executed on Linux |
+
+Implementation head = `6a8ec1158d11ca629fde2a70fdc907072ce1fcc0`, tree
+`f05e057741ad6bf9a0fdb173d6bbe20362ad6fb8`. Parent chain is linear:
+`53c51741e → 51c048a50 → 3646a3215 → 4c37b9c03 → f696132c5 → 6a8ec1158`.
+No amend, squash, rebase, reset or force-push; the R46 ladder is untouched.
+
+### 47.3 The four exit-gate requirements, discharged by proof
+
+1. **One complete rollback-legality decision consumes exactly one immutable
+   authority snapshot.** `test_b4_cxr7u9r47r1_authority_snapshot.py` drives the
+   COMPLETE classifier and reconciliation with counters on
+   `_load_transition_record` and `_read_selector_snapshot_admitted`: every
+   ladder row (CREATED/STAGED/PROMOTED rollback/PROMOTED finalize/FINALIZING/
+   ROLLING_BACK/ROLLED_BACK/FAILED/COMMIT_INTENT/COMMIT_POINT/FINALIZED)
+   performs at most one record read and one selector read; the
+   mixed-generation replay (read 1 = rollback, attempted read 2 = finalize)
+   is never performed (reads=1, verdict from the admitted snapshot).
+2. **No public CLI argument can declare its own transition authority root.**
+   `test_b4_cxr7u9r47r2_no_caller_authority.py`: both arguments are no longer
+   parsed (exit 2); an attacker-authored record + matching attacker selector in
+   an attacker-owned directory returns 4 with the governed tree byte-identical;
+   an AST surface proof shows no classification-path function accepts a
+   `transition_dir` parameter; the canonical production route still succeeds;
+   every denial makes zero container/database/receipt/authority mutations.
+3. **The original directory coordinate is admitted without following a
+   redirection.** R3's collection proof shows `_derive_claim_coordinate`
+   performs no `realpath/isdir/abspath/islink/readlink`; R2/R3's admission
+   tests prove the no-follow open refuses a symlinked directory (Linux CI
+   executed it: 0 skips) while the weakened realpath-first control accepts the
+   same redirect.
+4. **Record and selector generations cannot be mixed; selector parsing is
+   singular and bounded.** The admitted-record pin proof (replacement landed
+   mid-decision ⇒ decision still from the admitted record; a LATER decision
+   sees the replacement), the single-definition AST proofs, and the four
+   bounded-refusal shapes (oversized pre-read, growing during read, truncated,
+   padded-valid-claim-still-refused) with byte-identical governed trees.
+
+Weakened negative controls across the gate (all executable, none skipped):
+R1's two-read classifier control, R3's realpath-first control, R2's
+seam-invisible authority roots, R4's padding-smuggling refusal.
+
+### 47.4 Authoritative runner, registry, and local totals
+
+- Runner: `run-validation.sh` selection line = 34 quoted `$VAR` suite
+  arguments, exactly one pytest invocation, all four R47 variables defined and
+  selected; zero duplicate variable references (45R5 regression class holds).
+- Registry: `b2_registry.py` validates (905 ids / 19 categories,
+  control-plane only — zero local-ground ids, so no regeneration was needed);
+  `validate_registry()` passes inside the b2 workflow.
+- Node IDs: 45 R47 nodes collected (17+10+5+13), zero duplicate full node IDs.
+- Local totals (Windows host, exact implementation tree):
+  - Focused R39–R47 batch (25 modules): **293 passed, 24 skipped** — every
+    skip is a declared Windows gate (symlink/hard-link/POSIX-publication
+    proofs; Linux CI executes them — confirmed below with 0 CI skips).
+  - Full local split: authority/recovery batch **386 collected / 357 passed /
+    0 failed / 29 skipped**; hardening batch **135 collected / 118 passed /
+    1 failed / 16 skipped**. The 16 skips are all Docker-gated
+    `test_container_lifecycle` nodes. The single failure is
+    `test_backup_hardening.py::test_incomplete_full_backup_rejected`, a
+    60-second `subprocess.TimeoutExpired` inside `backup.sh --scope state-only`:
+    measured 74–80 s wall time for that script on this host (278 tracked var/
+    files copied per invocation) with zero `pg-recovery.py` coupling, and it
+    reproduced identically on a detached temp worktree at start head
+    `53c51741e` — a pre-existing environment timing condition, not an R47
+    regression. Linux CI executed the same test successfully at this head
+    (below).
+  - `test_local_ground.py` was not run locally (requires the Docker stack,
+    which this host lacks); it runs inside b1 CI.
+- Hygiene: `git diff --check` clean on every commit and the worktree; Ruff
+  clean on every touched Python file; `py_compile` clean;
+  `bash -n` clean on `restore.sh` and `run-validation.sh`; ShellCheck-clean
+  shell changes (b1's shellcheck stage); no `.r47-scratch` content in any
+  commit; no unrelated untracked file published.
+
+### 47.5 Implementation-head CI (all five authoritative workflows)
+
+Exact head `6a8ec1158d11ca629fde2a70fdc907072ce1fcc0`, all push-triggered
+except B1-I1R (`pull_request`), all **SUCCESS**:
+
+| Workflow | Run | Conclusion |
+|---|---|---|
+| b1-local-ground-validation | `36918303772` | success (single `validate` job) |
+| b2-control-plane-validation | `36918303770` | success |
+| b3-worker-fabric-validation | `36918303802` | success |
+| b4-config-spine-validation | `36918303763` | success |
+| B1-I1R Validation | `36918308876` | success |
+
+Five `validate` check-runs on the same commit (ids `110557702394`,
+`110557703054`, `110557703308`, `110557703332`, `110557720846`): all
+completed/success.
+
+b1 artifact `b1-local-ground-evidence-0a517418956f` (id `11190389427`),
+OCE_RUN_ID `0a517418956f`, identity commit
+`6a8ec1158d11ca629fde2a70fdc907072ce1fcc0`, tree
+`f05e057741ad6bf9a0fdb173d6bbe20362ad6fb8`:
+
+- junit.xml: **552 tests / 552 executed / 552 passed / 0 failed / 0 errors /
+  0 skipped** (parsed from the artifact, not summed from memory).
+- test-summary.json: `mandatory_skipped: 0`; container-backed
+  `27/27 executed, 27 passed, 0 skipped`.
+- Every mandatory R47 proof executed on Linux with zero skips: **45 R47 nodes
+  in the CI JUnit, 0 R47 skips** — including the POSIX-only symlink-admission
+  red-green control and the crash-residue proofs Windows cannot execute.
+- independent-gate.json: **PASS** (`AUTHORITATIVE_CI` mode);
+  adversarial-results.json: 8 PASS / 0 FAIL; 37 manifest artifacts recorded;
+  source-clean.json: clean before and after (`dirty_pre 0`, `dirty_post 0`);
+  container-cleanup.json + cleanup.json: cleanup ok, disposable removed;
+  `cloud_mutations 0`, `cloud_cost_state ZERO`,
+  `LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW`.
+
+The failed intermediate implementation head `f696132c5` is recorded, not
+erased: b1 run `36916007080` failed in acceptance-tests because the two
+POSIX-gated proof defects above (stale kwarg; non-raw anchor) could only
+execute on Linux. b2/b3/b4 and B1-I1R already passed there. The X1 repair
+commit fixed exactly those two proofs, was re-pushed, and the full five-workflow
+set re-ran green at `6a8ec1158`. No runner, registry or assertion defect was
+labelled "external."
+
+### 47.6 External-check truth (fresh, exact-head, never called green)
+
+- **SonarCloud** at `6a8ec1158`: check run `110558634247`, COMPLETED /
+  **FAILURE** — same two failed conditions (C Reliability Rating on New Code,
+  D Security Rating on New Code; required ≥ A). GitHub-visible annotation
+  window = **50 annotations (14 failure-level, 36 warning-level; page 2
+  empty)**. This is a sliding window, never a total. Failure-level entries in
+  this window: `pg-recovery.py:667` and `:2736` (path-traversal hot spots on
+  containment-validated sinks `_load_receipt`/`_validated_read_text`),
+  `pg-recovery.py:3757` (`_classify_record_for_shell`, cognitive complexity
+  76 > 15 — the R46R4 verdict matrix this gate deliberately preserves),
+  `pg-recovery.py:2198` (complexity 24), `pg-recovery.py:2336`
+  (`_ExecutionLock.__exit__` always-False return, the context-manager
+  contract), plus `http_api.py:106`, `migrate.py:129`,
+  `independent-gate-b2.py:135`, `pg_scheduler.py:239`,
+  `validate_engine.py:106/527/1396`, `worker_supervisor.py:217`,
+  `backup.sh:166`. R47 added no NOSONAR, no exclusions, no severity or profile
+  changes and no gate weakening. Adjudication status: the two path-traversal
+  flags and the always-False context-manager return are the operator-facing
+  adjudication items named here; the complexity entries are the standing
+  fail-closed matrix shape, unchanged by R47. Three heads (R46
+  implementation, R46 evidence, R47 implementation) have now produced three
+  distinct 50-annotation windows — window contents differ per head; the gate
+  is FAILURE at every head and is not claimed green anywhere.
+- **Kilo** at `6a8ec1158`: check run `110557745711`, COMPLETED / **FAILURE**
+  at 2026-10-01T21:12:32Z — "Review failed: Workspace setup failed: sandbox
+  storage full," the provider-side clone dying in `git-lfs smudge` on
+  `quant-lab/research/crypto_foundry/alt_rotation/data_1/`
+  `ALT_DATA_1_ASSET_MULTISCALE_FEATURES.parquet` (exit 128, filter
+  `git-lfs filter-process` failed, "Clone succeeded, but checkout failed").
+  Same 626 MB LFS-object blocker recorded at the authorized start (run
+  `110078358797`). The LFS object was not deleted, migrated, untracked or
+  rewritten. Exact operator actions, unchanged: (a) restore/increase the Git
+  LFS bandwidth/storage quota for this repository, or (b) configure Kilo's
+  checkout environment with `GIT_LFS_SKIP_SMUDGE=1` (or equivalent skip)
+  before clone. No repository-controlled change can fix a provider-side
+  workspace.
+
+### 47.7 Authorization boundary
+
+PR #4 is OPEN, MERGEABLE, UNSTABLE, unmerged, head
+`6a8ec1158d11ca629fde2a70fdc907072ce1fcc0`, base
+`7c7816f382947bbc8a1f2154435fc436f2428fa8` (`main` untouched). No merge was
+performed or authorized. Cloud, broker, capital and execution-authority
+mutations are 0; `cloud_cost_state` ZERO; recurring cost $0. Book 5 and Atlas
+Program Block 4 remain untouched. Prior sections are preserved verbatim and
+are superseded only where this section says so.
+
+**Status: INTERNAL IMPLEMENTATION AND CI COMPLETE AND GREEN AT THE
+IMPLEMENTATION HEAD; two external platform conditions remain, both named
+exactly above — SonarCloud quality-gate FAILURE on New Code (unsuppressed)
+and Kilo Code Review FAILURE on the provider-side LFS budget.**

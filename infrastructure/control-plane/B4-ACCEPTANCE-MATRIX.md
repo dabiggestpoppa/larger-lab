@@ -566,3 +566,30 @@ green at any head. Kilo at that head is check run `110073886281`, COMPLETED /
 FAILURE, the identical provider-side LFS-budget smudge failure, still an exact
 operator blocker. PR #4 is OPEN, MERGEABLE, UNSTABLE, unmerged at that head;
 `main` untouched at `7c7816f3`. The exit-gate truth above is unchanged.
+
+## B4-CXR7U9R47 — superseding acceptance truth (one complete authority snapshot; no caller-declared authority root)
+
+**Requirement set (mission §2–§5) → implementation → proof, all at implementation head `6a8ec1158` (tree `f05e057741ad6bf9a0fdb173d6bbe20362ad6fb8`):**
+
+| # | Requirement | Implementation surface | Proof (executed in authoritative Linux CI, 0 skips) |
+|---|-------------|------------------------|-----------------------------------------------------|
+| 1 | ONE immutable `RecoveryAuthoritySnapshot` per complete decision | `_acquire_recovery_authority` + `RecoveryAuthoritySnapshot` (pg-recovery.py) | `test_b4_cxr7u9r47r1_authority_snapshot.py`: record/selector read counters ≤1/≤1 on every ladder row; mixed-generation replay never performs read 2; weakened two-read control accepts the swapped generation (non-vacuous) |
+| 2 | No hidden rereads in any participating helper | `_claim_state`, `_valid_transition_claim`, `_selector_agrees_with_finalizing`, `_receiptless_selector_agrees` consume `authority=` | R1 suite read-counters + the pure-classifier proof (every reader raises; classification still succeeds) |
+| 3 | No public caller-declared authority root | `--classify-state`/`--transition-dir` unparsed (exit 2); `_test_classify_state_for_shell` private seam; engine-derived root in `_classify_rollback_for_shell`/`_bound_operation`; restore.sh updated | `test_b4_cxr7u9r47r2_no_caller_authority.py`: attacker record+selector+directory ⇒ 4, world byte-identical; AST surface proof: no classification function takes a directory parameter; zero container/db/receipt mutations on denial |
+| 4 | Original coordinate admitted before any resolution | `_derive_claim_coordinate` returns UNRESOLVED; `_open_governed_directory` opens with O_NOFOLLOW (Windows: reparse refusal + no-follow stat) | `test_b4_cxr7u9r47r3_directory_coordinate.py`: collection proof (no realpath/isdir in derive); red-green control — realpath-first R46 form ACCEPTS the symlinked directory, shipped form REFUSES it (executed on Linux CI) |
+| 5 | Record/selector generations never mixed | admitted record pinned into the same snapshot as the selector | R1 pin proof: replacement landing mid-decision leaves the verdict from the ADMITTED record; a later decision sees the replacement (4, not 6) |
+| 6 | Singular selector implementation | `_classify_claim_content` defined exactly once; shadowed duplicate deleted | `test_b4_cxr7u9r47r4_singular_bounded_selector.py` AST proofs: 1 definition; zero top-level collisions module-wide |
+| 7 | Bounded selector input | `_CLAIM_MAX_BYTES = 4096`; pre-read `st_size` check + during-read cumulative check in `_read_admitted_claim` | R4 proofs: oversized refused before any `os.read`; growing refused mid-read (`grew past`); truncated/empty/malformed refused whole; padding-smuggling refused; governed tree byte-identical after every denial; valid selector still accepted |
+| 8 | Dedicated R47 tests in the real authoritative runner | `run-validation.sh` defines+selects all four R47 variables | 45 R47 nodes collected, 0 duplicate node IDs, **45 executed in b1 CI JUnit with 0 skips** |
+| 9 | Mandatory registry | `b2_registry.py` validates unchanged (905 ids, control-plane only) | b2 run `36918303770` success |
+| 10 | Weakened controls genuinely fail | R1 two-read control, R3 realpath-first control | both executed in CI (0 skips), both visibly accept the attack the shipped engine refuses |
+
+**Implementation-head CI (all SUCCESS):** b1 `36918303772` (552/552 passed, 0 failed, 0 errors, **0 skipped**, `mandatory_skipped 0`, 27/27 container-backed, independent gate PASS, adversarial 8/0, 37 manifest artifacts, source clean pre/post, cleanup ok, OCE_RUN_ID `0a517418956f`), b2 `36918303770`, b3 `36918303802`, b4 `36918303763`, B1-I1R `36918308876`. The failed intermediate head `f696132c5` (b1 `36916007080`: two POSIX-gated proof defects invisible on Windows) was repaired by append-only `B4-CXR7U9R47X1` (`6a8ec1158`) and the full workflow set re-ran green — recorded, not erased.
+
+**External truth (fresh, exact-head, not called green):** SonarCloud `110558634247` COMPLETED/**FAILURE** (C Reliability + D Security on New Code; 50-annotation sliding window: 14 failure-level / 36 warning-level; no NOSONAR, exclusions, severity or profile changes). Kilo `110557745711` COMPLETED/**FAILURE** — provider-side clone cannot smudge the 626 MB LFS parquet ("sandbox storage full", exit 128); operator action: restore/increase the LFS quota or set `GIT_LFS_SKIP_SMUDGE=1` in Kilo's checkout. LFS object untouched.
+
+**Local totals (Windows host, disclosed):** focused R39–R47 293 passed / 24 skipped (all Windows-gated; all executed in Linux CI); full split 386c/357p/29s + 135c/118p/16s; the one local failure (`test_backup_hardening::test_incomplete_full_backup_rejected`) is a 60 s subprocess timeout around `backup.sh` (74–80 s on this host), reproduced at start head `53c51741e` in a detached worktree and passing in Linux CI at `6a8ec1158` — pre-existing environment timing, not an R47 regression. `test_local_ground.py` not run locally (Docker stack absent on this host); it runs in b1 CI.
+
+**Authorization boundary:** PR #4 OPEN, MERGEABLE, UNSTABLE, unmerged, head `6a8ec1158`; `main` untouched at `7c7816f382947bbc8a1f2154435fc436f2428fa8`; cloud/broker/capital/execution mutations 0; recurring cost $0; no LFS migration; Book 5 and Atlas Program Block 4 untouched. `MERGE_AUTHORIZED = false` while SonarCloud or Kilo remains non-success.
+
+**Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW` — internal implementation and authoritative CI are complete and green at the implementation head; every internal R47 requirement is discharged by executable proof with zero CI skips; the two external failures are exactly named with their operator actions, and merge authorization is explicitly withheld.
