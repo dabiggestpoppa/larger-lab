@@ -1701,3 +1701,101 @@ graph database, production scheduler, dashboard, Book 7, Book 8, D8, trading or
 execution; it does not execute usage/health empirical research; it does not
 ratify any state rule, coverage-sufficiency rule, predicate, or
 false-comparison methodology.
+
+---
+
+# CHECKPOINT — BOOK 6 HARDENING R3
+
+> 2026-10-01 — State derivation authority binding closure.
+
+Trigger: independent review found one concrete remaining correctness class in
+the StateRule -> predicate -> emitted StateDimension chain. The pipeline
+verified NAMES and replayed semantics, but nothing bound a ratification
+decision — or an emitted record's provenance — to the exact executable content
+those names mean:
+
+  R3-D1 PREDICATE DECLARED TARGET CAN CONTRADICT ITS EXECUTABLE EVALUATOR
+        (INCREASING declared, LESS_THAN computed; 50<100 emitted INCREASING)
+  R3-D2 STATE RULE RATIFICATION BINDS ONLY predicate_ref NAME
+        (decision written before the predicate existed; late binding)
+  R3-D3 EMITTED StateDimension CAN CLAIM A CALLER-SUPPLIED methodology_ref
+        (authorized under book6-methodology@1, stored fake:other-methodology@9)
+
+Repairs (failure-first probe deleted after repair; permanent record is
+test_book6_hardening_r3.py, 45 tests):
+
+  1. EVALUATOR/TARGET MAP   EVALUATOR_TARGET_STATE binds each Class B evaluator
+                            to exactly one target (GREATER_THAN->INCREASING,
+                            LESS_THAN->DECREASING, EXACT_EQUALITY->UNCHANGED);
+                            enforced at predicate CONSTRUCTION; all Class C
+                            targets unconstructable; no generic
+                            EXPANDING/CONTRACTING.
+  2. DERIVATION-BOUND       PREDICATE_IDENTITY_BINDS_CONTENT (content
+     RATIFICATION          fingerprint over every semantic field);
+                            DerivationBinding records rule ref/version +
+                            predicate identity AND fingerprint + methodology
+                            identity AND fingerprint + operand order; wired
+                            ratify refuses missing predicates (no late
+                            binding, B1-B4); low-level binding-less ledger
+                            entries are NOT usable authority (Phase 7);
+                            authorize live-verifies the binding digest
+                            (RATIFIED THEN != AUTHORITATIVE NOW, Phase 8);
+                            predicate/methodology supersession explicit, no
+                            auto-follow (Phase 13/14).
+  3. OUTPUT PROVENANCE      StateDimension.methodology_ref DERIVED from the
+                            authorized rule; caller argument is an
+                            exact-equality cross-check only. DERIVATION USED
+                            METHODOLOGY A -> OUTPUT MAY NOT CLAIM METHODOLOGY B.
+
+Invariants now asserted:
+
+  EVALUATOR_TARGET_SEMANTIC_BINDING = TRUE (closed three-pairing map)
+  PREDICATE_IDENTITY_BINDS_CONTENT = TRUE
+  STATE_RULE_RATIFICATION_REQUIRES_PREDICATE = TRUE (no late binding)
+  STATE_RULE_BINDS_PREDICATE_FINGERPRINT = TRUE
+  STATE_RULE_BINDS_METHODOLOGY_FINGERPRINT = TRUE
+  STATE_RULE_BINDS_INPUT_ORDER = TRUE
+  STATE_OUTPUT_METHODOLOGY_DERIVED = TRUE
+  LATE_PREDICATE_REGISTRATION_NO_AUTHORITY = TRUE
+  PREDICATE/METHODOLOGY SUPERSESSION_NO_AUTO_FOLLOW = TRUE
+
+S1-S10 model_copy attacks all REJECT. Phase 15 negative/positive/UNCHANGED
+replays hold; FALSE never inverts to the opposite state. Phase 16 dimension_id
+audit: documented schema-local label, derivation fully identified, no
+forbidden misrepresentation demonstrated -> NO R3-D4 recorded, no ontology
+project started.
+
+Counts:
+
+  Book 6 tests   1230 -> 1341   (R3 focused suite: 45; R1 93 and R2 46 preserved)
+  total CSIA     2051 -> 2162
+  traceability   255 rows / 25 families -> 288 rows / 29 families (33 R3 rows)
+  sensor         2325 / 14 / 4 unchanged (exact canonical failure set)
+  ruff PASS; mypy PASS (62 source files)
+
+Books 1-5 unchanged: 107 / 108 / 83 / 230 / 293.
+Freeze vs 5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4: every changed file is a
+book6_* file or a Book 6 research artifact. BOOK1..BOOK5_MUTATIONS = 0;
+SENSOR_MUTATIONS = 0.
+
+Decision:
+
+  BOOK_6_HARDENING_R3 = PASS (proposed)
+  BOOK_6_IMPLEMENTATION = COMPLETE_HARDENED
+  BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+  STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+  PROPOSED_EXIT_GATE = PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL
+  LIVE_ACQUISITION_AUTHORITY = FALSE
+  D6M_5 = OPEN_DEFERRED
+  INDIVIDUAL_STATE_RULES_RATIFIED = 0 canonical
+  PREDICATES_CANONICALLY_RATIFIED = 0
+  COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0 canonical
+
+NEXT = FORMAL BOOK 6 OPERATOR ACCEPTANCE REVIEW. R3 closed the state derivation
+binding class — three reproduced defects, one narrow round. It granted no
+authority. No R4 exists or is planned without another NEW concrete demonstrated
+defect. This checkpoint does not begin live acquisition, RPC, network calls,
+database, graph database, production scheduler, dashboard, Book 7, Book 8, D8,
+trading or execution; it does not execute usage/health empirical research; it
+does not ratify any state rule, predicate, coverage-sufficiency rule, or
+false-comparison methodology.

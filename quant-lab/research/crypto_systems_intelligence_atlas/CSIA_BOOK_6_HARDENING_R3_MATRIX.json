@@ -1,0 +1,113 @@
+{
+  "document": "CSIA_BOOK_6_HARDENING_R3_MATRIX",
+  "version": "0.1",
+  "date": "2026-10-01",
+  "branch": "agent/crypto-systems-intelligence-atlas-book6-build",
+  "implementation_base": "5c387f42b4a0e01e30d6a8554d8b67a04e4e98e4",
+  "pre_r3_head": "392ae784a225c75c3aaac0ac8ec43912f1587e29",
+  "status": "HARDENING_R3_COMPLETE_PROPOSED",
+  "scope": "BOOK 6 OFFLINE KERNEL ONLY — no live acquisition, no RPC, no database, no graph DB, no Book 7/8/D8, no ranking, no composite score",
+  "reproduced_defects": [
+    {
+      "id": "R3-D1",
+      "title": "PREDICATE DECLARED TARGET CAN CONTRADICT ITS EXECUTABLE EVALUATOR",
+      "root_cause": "StatePredicateDefinition validated state_class and input arity but nothing bound evaluator_kind to target_state; a declaration is DATA and the data could lie",
+      "reproducer": "StatePredicateDefinition(target_state=INCREASING, evaluator_kind=CURRENT_LESS_THAN_PRIOR) bound to a ratified INCREASING rule; inputs prior=100, current=50; evaluator returns TRUE because 50 < 100",
+      "before_r3": "INCREASING emitted for a falling series",
+      "after_r3": "REFUSED at predicate construction (registration-time refusal as data, ValidationError wrapping PredicateRegistryError)",
+      "repair": "closed semantic map EVALUATOR_TARGET_STATE: GREATER_THAN->INCREASING, LESS_THAN->DECREASING, EXACT_EQUALITY->UNCHANGED; no other pairing is legal; targets outside the map (all Class C states) are unconstructable"
+    },
+    {
+      "id": "R3-D2",
+      "title": "STATE RULE RATIFICATION BINDS ONLY predicate_ref NAME, NOT THE EXECUTABLE PREDICATE CONTENT",
+      "root_cause": "StateRuleRegistry.ratify wrote a decision for (rule_id, version) without requiring the predicate to exist or recording any derivation context; semantics could be attached AFTER the operator decided",
+      "reproducer": "register rule naming predicate:future@1; ratify (decision written); only afterwards register predicate:future@1",
+      "before_r3": "ratification decision existed BEFORE the predicate; late registration made the rule usable",
+      "after_r3": "ratification REFUSED ('ratification may not precede its predicate'); every wired decision records a full DerivationBinding and authorize live-verifies it",
+      "repair": "predicate content fingerprint (PREDICATE_IDENTITY_BINDS_CONTENT); DerivationBinding records rule ref/version + predicate identity AND fingerprint + methodology identity AND fingerprint + required_measurement_refs; Phase 7: a low-level ledger entry without a binding is NOT usable authority; Phase 8: RATIFIED THEN != AUTHORITATIVE NOW if any bound component changed"
+    },
+    {
+      "id": "R3-D3",
+      "title": "EMITTED StateDimension CAN CLAIM A CALLER-SUPPLIED methodology_ref DIFFERENT FROM THE METHODOLOGY ACTUALLY USED",
+      "root_cause": "emit_rule_gated_state resolved rule.methodology_ref for authorization but stored the independently caller-supplied methodology_ref argument on the emitted StateDimension",
+      "reproducer": "rule.methodology_ref='book6-methodology@1'; caller passes methodology_ref='fake:other-methodology@9'; all rule/predicate checks pass",
+      "before_r3": "StateDimension.methodology_ref == 'fake:other-methodology@9'",
+      "after_r3": "REFUSED ('the derivation used one methodology and the output may not claim another'); the stored dimension always derives methodology_ref from the authorized rule",
+      "repair": "DERIVATION USED METHODOLOGY A -> OUTPUT MAY NOT CLAIM METHODOLOGY B; caller argument retained only as an exact-equality cross-check; the dimension stores the canonical rule methodology"
+    }
+  ],
+  "design_decisions": [
+    {
+      "decision": "Registration-time refusal for R3-D1 (data, not just emission-time refusal)",
+      "why": "a lying predicate is invalid DATA; refusing it at construction means no rule can ever bind it, rather than every emission having to re-detect the lie"
+    },
+    {
+      "decision": "Ratification-time derivation binding for R3-D2, with live replay at authorize (Phase 8)",
+      "why": "the trust root is OPERATOR RATIFIED RULE + EXACT EXECUTABLE DERIVATION, not FIRST CALLER TO REGISTER predicate:x@1; binding at ratification makes the decision self-describing, and live verification makes REGISTERED THEN != AUTHORITATIVE NOW hold for derivation content"
+    },
+    {
+      "decision": "Engine-owned wiring (Book6MeasurementRegistry owns the PredicateRegistry and wires state_rules to it)",
+      "why": "Phase 7 without a bypass: on a wired registry there is no public path that writes a usable ratification decision without the full derivation binding; bare unwired registries remain for structural tests but record binding-less decisions that authorize() refuses"
+    },
+    {
+      "decision": "Output provenance derived from the rule, argument kept as cross-check",
+      "why": "API compatibility without authority leakage: the caller's string can no longer diverge from the derivation, and the stored value is the canonical rule methodology, never caller text"
+    },
+    {
+      "decision": "Phase 16 dimension_id audit closed WITHOUT an R3-D4",
+      "why": "dimension_id is a documented schema-local label; the derivation is fully identified on the dimension (rule, binding, methodology, measurement refs) and engine-built vectors bind dimension_id to the metric definition; no reproducer showed a forbidden misrepresentation, so no ontology project is started"
+    }
+  ],
+  "gates": [
+    {"gate": "EVALUATOR_TARGET_SEMANTIC_BINDING", "result": "PASS", "evidence": "R3.ES.04; EVALUATOR_TARGET_SEMANTIC_BINDING is True and the map is closed"},
+    {"gate": "INCREASING_ONLY_GREATER_THAN", "result": "PASS", "evidence": "R3.ES.01, R3.ES.02 (INCREASING + LESS_THAN and INCREASING + EXACT_EQUALITY rejected)"},
+    {"gate": "DECREASING_ONLY_LESS_THAN", "result": "PASS", "evidence": "R3.ES.02 (DECREASING + GREATER_THAN rejected); R3.ES.03 (correct pairing passes)"},
+    {"gate": "UNCHANGED_ONLY_EXACT_EQUALITY", "result": "PASS", "evidence": "R3.ES.02 (UNCHANGED + GREATER_THAN rejected); R3.OP.10 (UNCHANGED emits only under EXACT_EQUALITY)"},
+    {"gate": "CLASS_C_REMAINS_UNRATIFIED", "result": "PASS", "evidence": "R3.ES.05, R3.ES.06; no Class C evaluator semantics exist; canonical counts zero"},
+    {"gate": "STATE_RULE_RATIFICATION_REQUIRES_PREDICATE", "result": "PASS", "evidence": "R3.RB.01 (B1); R2 suite updated where the old late-binding path was exercised"},
+    {"gate": "PREDICATE_IDENTITY_BINDS_CONTENT", "result": "PASS", "evidence": "R3.RB.05; PREDICATE_IDENTITY_BINDS_CONTENT is True"},
+    {"gate": "STATE_RULE_BINDS_PREDICATE_FINGERPRINT", "result": "PASS", "evidence": "R3.RB.02, R3.RB.06; binding.predicate_fingerprint equals the live predicate digest at ratify"},
+    {"gate": "STATE_RULE_BINDS_METHODOLOGY_FINGERPRINT", "result": "PASS", "evidence": "R3.RB.06, R3.RB.10"},
+    {"gate": "STATE_RULE_BINDS_INPUT_ORDER", "result": "PASS", "evidence": "R3.RB.06 (binding.required_measurement_refs recorded); R3.OP.04 (S3 reorder refused)"},
+    {"gate": "LATE_PREDICATE_REGISTRATION_NO_AUTHORITY", "result": "PASS", "evidence": "R3.RB.01: refusal at ratify time; late registration cannot retroactively authorize"},
+    {"gate": "PREDICATE_SUPERSESSION_NO_AUTO_FOLLOW", "result": "PASS", "evidence": "R3.RB.03 (B3), R3.RB.11, R3.RB.12; supersession is explicit and version-pinned"},
+    {"gate": "METHODOLOGY_SUPERSESSION_NO_AUTO_FOLLOW", "result": "PASS", "evidence": "R3.RB.13; the binding keeps methodology:m@1 when m@2 appears"},
+    {"gate": "STATE_OUTPUT_METHODOLOGY_DERIVED", "result": "PASS", "evidence": "R3.OP.01, R3.OP.02; dimension.methodology_ref == rule.methodology_ref always"},
+    {"gate": "STATE_OUTPUT_PROVENANCE_COHERENT", "result": "PASS", "evidence": "R3.OP.03 (state, class, rule ref, methodology, measurement refs all correspond)"},
+    {"gate": "STATE_MODEL_COPY_REVALIDATED", "result": "PASS", "evidence": "R3.OP.04-R3.OP.08: S1-S10 all REJECT"},
+    {"gate": "CANONICAL_STATE_RULE_COUNT_ZERO", "result": "PASS", "evidence": "R3.PS.01; INDIVIDUAL_STATE_RULES_RATIFIED_AT_BOOTSTRAP == 0"},
+    {"gate": "CANONICAL_PREDICATE_COUNT_ZERO", "result": "PASS", "evidence": "R3.PS.01; PREDICATES_CANONICALLY_RATIFIED == 0"},
+    {"gate": "CANONICAL_COVERAGE_RULE_COUNT_ZERO", "result": "PASS", "evidence": "R3.PS.01; COVERAGE_SUFFICIENCY_RULES_RATIFIED_AT_BOOTSTRAP == 0"},
+    {"gate": "R1_GATES_PRESERVED", "result": "PASS", "evidence": "R1 focused suite 93 PASS; all R1 seals unchanged"},
+    {"gate": "R2_GATES_PRESERVED", "result": "PASS", "evidence": "R2 focused suite 46 PASS; R3.PS.04; only intentional strengthening: binding checks moved earlier (ratification) where R2 asserted them at emission"},
+    {"gate": "BOOK1_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 1 files touched"},
+    {"gate": "BOOK2_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 2 files touched"},
+    {"gate": "BOOK3_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 3 files touched"},
+    {"gate": "BOOK4_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 4 files touched"},
+    {"gate": "BOOK5_FREEZE", "result": "PASS", "evidence": "freeze diff vs 5c387f42b: zero Book 5 files touched"},
+    {"gate": "SENSOR_BASELINE_EQUIVALENCE", "result": "PASS", "evidence": "sensor suite: 2325 PASS / 14 FAIL / 4 SKIPPED, exact canonical failure set unchanged; BOOK6_INTRODUCED_SENSOR_FAILURES = 0"}
+  ],
+  "counts": {
+    "book6_tests_before_r3": 1230,
+    "book6_tests_after_r3": 1341,
+    "r1_focused": 93,
+    "r2_focused": 46,
+    "r3_focused": 45,
+    "total_csia_after_r3": 2162,
+    "traceability_rows": 288,
+    "traceability_families": 29,
+    "r3_traceability_rows": 33
+  },
+  "exit_state": {
+    "BOOK_6_HARDENING_R3": "PASS (proposed; NOT self-accepted)",
+    "BOOK_6_IMPLEMENTATION": "COMPLETE_HARDENED",
+    "PROPOSED_EXIT_GATE": "PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL",
+    "BOOK_6_ACCEPTANCE": "NOT_SELF_ACCEPTED",
+    "STATUS": "READY_FOR_OPERATOR_ACCEPTANCE",
+    "LIVE_ACQUISITION_AUTHORITY": false,
+    "D6M_5": "OPEN_DEFERRED",
+    "INDIVIDUAL_STATE_RULES_RATIFIED": "0 canonical",
+    "PREDICATES_CANONICALLY_RATIFIED": 0,
+    "COVERAGE_SUFFICIENCY_RULES_RATIFIED": "0 canonical"
+  }
+}

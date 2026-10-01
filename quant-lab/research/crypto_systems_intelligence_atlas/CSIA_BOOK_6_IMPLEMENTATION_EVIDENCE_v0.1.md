@@ -446,3 +446,86 @@ PREDICATES_CANONICALLY_RATIFIED = 0
 **Still not self-accepted.** R2 closed four reproduced caller-assertion defects
 and recorded one accepted capability limitation (historical authority replay)
 instead of faking it. It granted no authority anywhere.
+
+---
+
+# APPENDIX C — BOOK 6 HARDENING R3
+
+> State derivation authority binding closure. Full derivation:
+> `CSIA_BOOK_6_HARDENING_R3_STATE_DERIVATION_BINDING.md`.
+> Gate matrix: `CSIA_BOOK_6_HARDENING_R3_MATRIX.json`.
+
+## C1. Reproduced defects (failure-first, all before repair)
+
+- **R3-D1** a predicate DECLARED `target_state=INCREASING` while its evaluator
+  computed `CURRENT_LESS_THAN_PRIOR`; prior=100, current=50 → the evaluator was
+  TRUE and the engine emitted INCREASING for a falling series through a fully
+  replayed R2 pipeline.
+- **R3-D2** a StateRule was RATIFIED while its `predicate_ref` resolved to
+  nothing; the operator ratified a NAME, and the derivation semantics were
+  whatever that name meant LATER (late binding).
+- **R3-D3** the emitted `StateDimension.methodology_ref` was independently
+  caller-supplied: the engine authorized under `book6-methodology@1` and stored
+  `fake:other-methodology@9`.
+
+## C2. Repairs
+
+1. **Evaluator/target semantic map** — `EVALUATOR_TARGET_STATE` binds
+   GREATER_THAN→INCREASING, LESS_THAN→DECREASING, EXACT_EQUALITY→UNCHANGED,
+   mechanically, at predicate construction. All Class C targets are
+   unconstructable; no Class C semantics were invented.
+2. **Derivation-bound ratification** — `PREDICATE_IDENTITY_BINDS_CONTENT`
+   (predicate content fingerprint); `DerivationBinding` records rule
+   ref/version + predicate identity AND fingerprint + methodology identity AND
+   fingerprint + operand order. Ratification may not precede its predicate (B1);
+   the engine wires the registries, so a low-level binding-less ledger entry is
+   never usable authority (Phase 7); `authorize` live-verifies the binding —
+   `RATIFIED THEN != AUTHORITATIVE NOW` on any drift (Phase 8). Predicate and
+   methodology supersession are explicit and never auto-followed (Phase 13/14).
+3. **Output provenance derived** — the emitted dimension's methodology_ref is
+   derived from the authorized rule; a diverging caller argument is refused.
+   `DERIVATION USED METHODOLOGY A → OUTPUT MAY NOT CLAIM METHODOLOGY B`.
+
+## C3. Attack matrix and audit
+
+S1–S10 model_copy attacks all REJECT (rule predicate_ref/methodology/order/
+target/class mutations via live binding digests; predicate content drift via
+live fingerprints; contradictory targets unconstructable; operand order a
+one-member closed enum; forged output methodology refused). Phase 15
+negative/positive/UNCHANGED replays hold and FALSE never inverts. Phase 16
+dimension_id audit: documented schema-local label, derivation fully identified,
+no forbidden misrepresentation demonstrated — **no R3-D4 recorded**.
+
+## C4. Counts
+
+| | before R3 | after R3 |
+|---|---|---|
+| Book 6 tests | 1230 | **1341** |
+| R1 / R2 focused | 93 / 46 | **93 / 46** (preserved) |
+| R3 focused | — | **45** |
+| total CSIA | 2051 | **2162** |
+| traceability rows | 255 (25 families) | **288 (29 families; 33 R3 rows)** |
+| sensor | 2325 / 14 / 4 | **2325 / 14 / 4** (exact canonical set) |
+| ruff / mypy | pass | **pass** (62 source files) |
+
+Books 1–5 unchanged: 107 / 108 / 83 / 230 / 293.
+
+## C5. Exit state
+
+```text
+BOOK_6_HARDENING_R3 = PASS (proposed)
+BOOK_6_IMPLEMENTATION = COMPLETE_HARDENED
+PROPOSED_EXIT_GATE = PASS_CSIA_BOOK6_FUNDAMENTAL_MEASUREMENT_STATE_KERNEL
+BOOK_6_ACCEPTANCE = NOT_SELF_ACCEPTED
+STATUS = READY_FOR_OPERATOR_ACCEPTANCE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D6M_5 = OPEN_DEFERRED
+INDIVIDUAL_STATE_RULES_RATIFIED = 0 canonical
+PREDICATES_CANONICALLY_RATIFIED = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0 canonical
+```
+
+**Still not self-accepted.** R3 closed the state derivation binding class —
+three reproduced defects, one narrow round — and granted no authority anywhere.
+NEXT = formal Book 6 operator acceptance review. No R4 without another NEW
+concrete demonstrated defect.
