@@ -27,9 +27,11 @@ from enum import Enum
 from typing import Final
 
 from .book6_definitions import ComparabilityClass
+from .book6_definitions import MeasurementMethodology
 from .book6_methodology import (
     Book6MethodologyRegistry,
     MethodologyRegistryError,
+    methodology_fingerprint,
 )
 
 
@@ -49,12 +51,17 @@ class CorpusVerdict(str, Enum):
 class CorpusRow:
     """One mechanized false-comparison row.
 
-    R1: ``required_methodology`` is a fully-qualified methodology IDENTITY
-    (``ref@version``), not a bare name. It is mechanically meaningful, not
-    documentation: ``authorize_comparison`` compares it for EXACT equality
-    against the supplied identity and then requires that methodology to declare
-    authority for this row id. No substring matching, no alias-by-convention, no
-    arbitrary non-empty ref.
+    R1 made ``required_methodology`` a versioned identity compared for EXACT
+    equality. That was still a NAME, and R2-D1 showed that a name plus a
+    self-declared row-authority list is enough for one caller-created object to
+    license its own comparison.
+
+    R2 therefore stores the full canonical methodology SPECIFICATION on the row.
+    It is ratified corpus data, not runtime caller input, so a comparison can
+    compare the registered methodology's content digest against content the
+    operator ratified. ``required_methodology`` and
+    ``required_methodology_fingerprint`` are derived from it, so they cannot
+    drift apart.
     """
 
     row_id: str
@@ -62,7 +69,58 @@ class CorpusRow:
     right_metric: str
     why_naive_fails: str
     verdict: CorpusVerdict
-    required_methodology: str | None
+    required_methodology_spec: MeasurementMethodology | None = None
+
+    @property
+    def required_methodology(self) -> str | None:
+        """The exact methodology identity this row requires (``ref@version``)."""
+
+        if self.required_methodology_spec is None:
+            return None
+        return self.required_methodology_spec.identity
+
+    @property
+    def required_methodology_fingerprint(self) -> str | None:
+        """The canonical content digest this row requires."""
+
+        if self.required_methodology_spec is None:
+            return None
+        return methodology_fingerprint(self.required_methodology_spec)
+
+
+
+def _canonical_spec(
+    ref: str,
+    formula: str,
+    *,
+    version: str = "1",
+    window_rule: str = "declared window class of both compared metrics",
+    filters: tuple[str, ...] = ("no-cross-window-comparison",),
+    denominator_rule: str = "explicit measured denominator or not applicable",
+    source_selection: str = "first-party Book 2-backed source",
+    identity_rule: str = "subject identity rule declared per metric",
+    row_id: str,
+) -> MeasurementMethodology:
+    """Build the canonical specification a CONDITIONAL corpus row requires.
+
+    This lives in the ratified corpus rather than in a test fixture precisely so
+    that it is NOT caller input: R2-D1 reproduced by registering a methodology
+    with the right name and a garbage formula, which R1 could not distinguish
+    from the real thing.
+    """
+
+    return MeasurementMethodology(
+        methodology_ref=ref,
+        version=version,
+        formula=formula,
+        window_rule=window_rule,
+        filters=filters,
+        denominator_rule=denominator_rule,
+        source_selection=source_selection,
+        identity_rule=identity_rule,
+        authorized_corpus_row_ids=(row_id,),
+    )
+
 
 
 #: The fifteen ratified corpus rows (validation stress matrix v0.1 §6). Each is
@@ -106,7 +164,12 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "protocol.volume.AGGREGATOR_ROUTED",
         "routed volume includes the underlying venue volume; overlap unknown",
         CorpusVerdict.CONDITIONAL,
-        "routing-attribution-methodology@1",
+        _canonical_spec(
+            "routing-attribution-methodology",
+            "venue_routed_volume = venue_volume - overlap_with_other_venues, "
+            "where overlap is resolved by per-fill route attribution",
+            row_id="FC-05",
+        ),
     ),
     CorpusRow(
         "FC-06",
@@ -122,7 +185,12 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.restaked_claims",
         "restaked claims may re-express underlying stake",
         CorpusVerdict.CONDITIONAL,
-        "lineage-dedup-methodology@1",
+        _canonical_spec(
+            "lineage-dedup-methodology",
+            "restaked_principal = stake_represented_by_claim - "
+            "stake_already_counted_at_the_same_origin",
+            row_id="FC-07",
+        ),
     ),
     CorpusRow(
         "FC-08",
@@ -138,7 +206,12 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.common_value_supply",
         "a native-unit count is not a numeraire value",
         CorpusVerdict.CONDITIONAL,
-        "valuation-methodology-with-numeraire@1",
+        _canonical_spec(
+            "valuation-methodology-with-numeraire",
+            "common_value_supply = native_supply * price_observation, with the "
+            "numeraire and the admissible price class stated explicitly",
+            row_id="FC-09",
+        ),
     ),
     CorpusRow(
         "FC-10",
@@ -162,7 +235,12 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.net_capital_migration",
         "gross includes round trips; net is not gross minus fees",
         CorpusVerdict.CONDITIONAL,
-        "net-migration-methodology@1",
+        _canonical_spec(
+            "net-migration-methodology",
+            "net_migration = inbound_bridged - outbound_bridged, counted once "
+            "per unique address and net of round trips",
+            row_id="FC-12",
+        ),
     ),
     CorpusRow(
         "FC-13",
@@ -178,7 +256,12 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "capital.native_quantity_growth",
         "price appreciation masquerading as native growth",
         CorpusVerdict.CONDITIONAL,
-        "native-unit-growth-methodology@1",
+        _canonical_spec(
+            "native-unit-growth-methodology",
+            "native_growth = quantity_t1 - quantity_t0 measured in the native "
+            "unit, holding the price constant",
+            row_id="FC-14",
+        ),
     ),
     CorpusRow(
         "FC-15",
@@ -186,7 +269,12 @@ FALSE_COMPARISON_CORPUS: Final[tuple[CorpusRow, ...]] = (
         "chain.throughput.SUCCESS_ONLY",
         "differing failed-transaction treatment",
         CorpusVerdict.CONDITIONAL,
-        "success-semantics-methodology@1",
+        _canonical_spec(
+            "success-semantics-methodology",
+            "throughput = count(transactions where status == SUCCESS), with the "
+            "success predicate and the included set stated explicitly",
+            row_id="FC-15",
+        ),
     ),
 )
 
@@ -239,6 +327,14 @@ def authorize_comparison(
     Book 6 methodology registry, and the methodology must itself declare
     authority for that corpus row. Registration alone is still not authority, so
     a later supersession or local invalidation makes the comparison refuse again.
+
+    R2 (R2-D1) adds the condition R1 was missing. R1 compared an IDENTITY and
+    a SELF-DECLARED row list, and one caller-created ``MeasurementMethodology``
+    could satisfy both at once - right name, garbage formula, ``FC-05`` in its
+    own row set, comparison ``AUTHORIZED``. The row therefore now pins the full
+    canonical methodology SPECIFICATION and this gate compares the registered
+    methodology's CONTENT digest against it. The authority relationship is no
+    longer something a caller can assert by including its own row id.
     """
 
     verdict = gate_comparison(left_metric_id, right_metric_id)
@@ -264,11 +360,12 @@ def authorize_comparison(
             f"comparability classes ({left_class.value} vs {right_class.value})"
         )
     assert row.required_methodology is not None  # guaranteed for CONDITIONAL
+    assert row.required_methodology_spec is not None
     try:
         methodologies.require_comparison_authority(
             methodology_identity_ref=methodology_ref,
             corpus_row_id=row.row_id,
-            required_identity=row.required_methodology,
+            required_spec=row.required_methodology_spec,
         )
     except MethodologyRegistryError as exc:
         raise ComparabilityError(

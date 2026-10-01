@@ -27,6 +27,31 @@ before it may authorize anything:
 - ``ValuationObservation.conversion_methodology_ref``
 - ``StateRule.methodology_ref``
 
+Book 6 Hardening R2 (R2-D1) closes the hole R1 left. An identity alone was still
+a **namespace claim**: a caller could construct one ``MeasurementMethodology``
+with ``formula="garbage"`` and ``authorized_corpus_row_ids=("FC-05",)``,
+register it, and thereby license the comparison. R1 required exact identity,
+registration and row authority, but all three came from the SAME caller-created
+object, so the three checks agreed with each other and with the attacker.
+
+R2 binds identity to CONTENT with a canonical fingerprint over every semantic
+field, and adds a second, independent canonical source for the case where
+self-authorization is most dangerous:
+
+1. **Registry binding** - first registration binds ``identity -> fingerprint``.
+   Any later object presented under that identity must match exactly, which
+   closes content mutation (a ``model_copy`` of a formula, an input-methodology
+   ref set, a row-authority set) on EVERY surface, not only comparisons.
+2. **Corpus-pinned canonical specification** - the ratified false-comparison
+   corpus carries the full canonical methodology specification for each
+   ``CONDITIONAL`` row, not merely its name. A comparison therefore compares
+   the registered methodology's fingerprint against content the operator
+   ratified, so even a FIRST registration cannot self-authorize.
+
+Neither mechanism uses Python object identity or a hidden global singleton:
+both would make the seal depend on process state rather than on the
+methodology's meaning, which is exactly what R2 closes.
+
 This is NOT a second epistemic engine. Methodology registration is structural
 Book 6 authority — the same class of thing as registering a metric definition.
 It confers no Book 2 claim state, mints no claim, and never evaluates evidence.
@@ -35,19 +60,87 @@ Book 2 remains the only epistemic engine.
 
 from __future__ import annotations
 
+import hashlib
+import json
 from typing import Final
 
 from .book6_definitions import MeasurementMethodology
 
 
 class MethodologyRegistryError(ValueError):
-    """A methodology reference is unknown, not current, or unauthorized."""
+    """A methodology reference is unknown, not current, unauthorized, or altered."""
 
 
 #: The separator between a methodology ref and its version. Versioned
 #: methodology identity is the whole point: "monthly active addresses" under
 #: two different methodologies are two different observations.
 METHODOLOGY_IDENTITY_SEPARATOR: Final[str] = "@"
+
+
+#: Every semantic field of a methodology, in canonical order. The fingerprint is
+#: taken over exactly these - no more, no less - so "equivalent content, same
+#: digest; different content, different digest" is a property of this list rather
+#: than of hand-maintained bookkeeping.
+METHODOLOGY_CANONICAL_FIELDS: Final[tuple[str, ...]] = (
+    "methodology_ref",
+    "version",
+    "formula",
+    "parameters",
+    "window_rule",
+    "filters",
+    "denominator_rule",
+    "source_selection",
+    "identity_rule",
+    "input_methodology_refs",
+    "authorized_corpus_row_ids",
+)
+
+
+def canonical_methodology_spec(methodology: MeasurementMethodology) -> str:
+    """Serialize a methodology's full semantic content deterministically.
+
+    Unordered fields (``filters``, ``input_methodology_refs``,
+    ``authorized_corpus_row_ids``, ``parameters``) are SORTED, because their
+    order carries no meaning and an order-sensitive digest would let a cosmetic
+    reordering masquerade as a different methodology.
+    """
+
+    values: dict[str, object] = {
+        "methodology_ref": methodology.methodology_ref,
+        "version": methodology.version,
+        "formula": methodology.formula,
+        "parameters": sorted(methodology.parameters),
+        "window_rule": methodology.window_rule,
+        "filters": sorted(methodology.filters),
+        "denominator_rule": methodology.denominator_rule,
+        "source_selection": methodology.source_selection,
+        "identity_rule": methodology.identity_rule,
+        "input_methodology_refs": sorted(methodology.input_methodology_refs),
+        "authorized_corpus_row_ids": sorted(methodology.authorized_corpus_row_ids),
+    }
+    if set(values) != set(METHODOLOGY_CANONICAL_FIELDS):  # pragma: no cover
+        raise MethodologyRegistryError(
+            "canonical methodology fields drifted from the specification"
+        )
+    return json.dumps(
+        [values[field] for field in METHODOLOGY_CANONICAL_FIELDS],
+        separators=(",", ":"),
+        ensure_ascii=True,
+    )
+
+
+def methodology_fingerprint(methodology: MeasurementMethodology) -> str:
+    """A stable content digest for a methodology specification.
+
+    Deliberately NOT Python object identity (``id()`` / ``is``) and deliberately
+    NOT a hidden global singleton: both would make the seal depend on process
+    state rather than on the methodology's meaning, which is precisely the
+    defect R2 is closing.
+    """
+
+    return hashlib.sha256(
+        canonical_methodology_spec(methodology).encode("utf-8")
+    ).hexdigest()
 
 
 def methodology_identity(methodology_ref: str, version: str) -> str:
@@ -102,6 +195,10 @@ class Book6MethodologyRegistry:
         self._current_by_ref: dict[str, str] = {}
         self._superseded: dict[str, tuple[MeasurementMethodology, ...]] = {}
         self._invalidated: dict[str, str] = {}
+        #: R2-D1: identity -> canonically bound CONTENT digest, fixed at first
+        #: registration. A later object bearing the same identity but different
+        #: content is refused, so content may not drift under a fixed name.
+        self._fingerprints: dict[str, str] = {}
 
     # -- registration (proves nothing about current authority) ---------------
 
@@ -116,6 +213,7 @@ class Book6MethodologyRegistry:
             )
         self._by_identity[identity] = methodology
         self._order.append(identity)
+        self._fingerprints[identity] = methodology_fingerprint(methodology)
         current = self._current_by_ref.get(methodology.methodology_ref)
         if current is not None:
             self._superseded[current] = self._superseded.get(current, ()) + (
@@ -240,53 +338,139 @@ class Book6MethodologyRegistry:
             return False
         return True
 
+    # -- canonical content binding (R2-D1) ---------------------------------
+
+    def bound_fingerprint(self, identity: str) -> str:
+        """The content digest canonically bound to a methodology identity."""
+
+        resolved = self.resolve_methodology(identity)
+        try:
+            return self._fingerprints[resolved.identity]
+        except KeyError as exc:  # pragma: no cover - resolve implies binding
+            raise MethodologyRegistryError(
+                f"methodology {resolved.identity} has no bound content"
+            ) from exc
+
+    def assert_content_matches(self, identity: str, candidate: MeasurementMethodology) -> None:
+        """Refuse unless ``candidate`` is the content bound to ``identity``.
+
+        This is the seal that closes content mutation on EVERY surface. A
+        ``model_copy`` of a formula, a window rule, an input-methodology set or
+        a row-authority set produces an object whose digest differs from the
+        bound one, and is refused here rather than at some later decision point.
+        """
+
+        bound = self.bound_fingerprint(identity)
+        presented = methodology_fingerprint(candidate)
+        if bound != presented:
+            raise MethodologyRegistryError(
+                f"methodology {identity} content does not match the canonically "
+                f"bound specification: expected {bound[:12]}, presented "
+                f"{presented[:12]}; an identity names one exact methodology and "
+                f"may not carry altered semantics"
+            )
+
+    def require_canonical_methodology(
+        self, candidate: MeasurementMethodology
+    ) -> MeasurementMethodology:
+        """Resolve a presented methodology and re-verify its CONTENT, live.
+
+        The authority-bearing path for every Book 6 surface that receives a
+        methodology OBJECT rather than a bare ref: metric definitions,
+        measurements, normalization rules, valuations, state rules. Structural
+        registration alone would accept an altered copy, because
+        ``model_copy`` does not re-run validators.
+        """
+
+        canonical = self.resolve_methodology(candidate.identity)
+        self.assert_content_matches(canonical.identity, candidate)
+        return canonical
+
     def require_comparison_authority(
-        self, *, methodology_identity_ref: str, corpus_row_id: str, required_identity: str
+        self,
+        *,
+        methodology_identity_ref: str,
+        corpus_row_id: str,
+        required_spec: MeasurementMethodology,
     ) -> MeasurementMethodology:
         """Authorize a CONDITIONAL corpus row, or refuse.
 
-        Two independent conditions, both required:
+        Three independent conditions, all required (R2 supersedes R1's two):
 
         1. the supplied methodology identity EQUALS the exact identity the
-           ratified corpus row requires — no substring match, no alias; and
-        2. that methodology itself declares authority for this row via
-           ``authorized_corpus_row_ids``.
+           ratified corpus row requires - no substring match, no alias;
+        2. the registered methodology's CONTENT digest equals the digest of the
+           canonical specification the ratified corpus row pins - so a
+           caller-created object with the right name and a garbage formula
+           cannot self-authorize; and
+        3. the ratified canonical specification ITSELF lists ``corpus_row_id``
+           in ``authorized_corpus_row_ids``.
 
-        Condition 1 alone is a name. Condition 2 alone is a claim with no
-        ratified name behind it. Only together is it authority, which is what
-        makes A5 ("PASS only if the methodology itself is authorized for that
-        corpus row") mechanically true.
+        R1 had only 1 and 3, both of which a single caller-created object could
+        satisfy simultaneously; that was R2-D1. Condition 2 compares against
+        content the operator ratified, not content the caller supplied.
+
+        Condition 3 is deliberately checked against ``required_spec`` rather
+        than against the REGISTERED methodology. Checking the registered object
+        would have been dead code: condition 2 already pins the registered row
+        set to the corpus row set, so a mutated row set always fails at 2 and
+        never reaches 3. As written, 3 is a live self-consistency check on the
+        ratified corpus - it fails if a corpus row ever pins a methodology
+        specification that does not license that very row.
         """
 
+        required_identity = required_spec.identity
         if methodology_identity_ref != required_identity:
             raise MethodologyRegistryError(
                 f"corpus row {corpus_row_id} requires methodology "
                 f"{required_identity}, not {methodology_identity_ref}; a "
                 f"different methodology does not license this comparison"
             )
-        methodology = self.resolve_methodology(methodology_identity_ref)
-        if corpus_row_id not in methodology.authorized_corpus_row_ids:
+        if corpus_row_id not in required_spec.authorized_corpus_row_ids:
             raise MethodologyRegistryError(
-                f"methodology {methodology_identity_ref} is not authorized for "
-                f"corpus row {corpus_row_id}; it declares "
-                f"{list(methodology.authorized_corpus_row_ids) or 'no rows'}"
+                f"the canonical methodology specification ratified for corpus "
+                f"row {corpus_row_id} is not authorized for corpus row "
+                f"{corpus_row_id} itself; it declares "
+                f"{list(required_spec.authorized_corpus_row_ids) or 'no rows'}. "
+                f"A corpus row may not license itself through a methodology "
+                f"that does not name it"
+            )
+        methodology = self.resolve_methodology(methodology_identity_ref)
+        required_fingerprint = methodology_fingerprint(required_spec)
+        actual = methodology_fingerprint(methodology)
+        if actual != required_fingerprint:
+            raise MethodologyRegistryError(
+                f"methodology {methodology_identity_ref} content does not match "
+                f"the canonical specification ratified for corpus row "
+                f"{corpus_row_id}: expected {required_fingerprint[:12]}, "
+                f"registered {actual[:12]}; an identity may not carry altered "
+                f"semantics"
             )
         return methodology
 
 
-#: Canonical invariants asserted by the R1 implementation.
+#: Canonical invariants asserted by the R1/R2 implementation.
 METHODOLOGY_REGISTRY_PRESENT: Final[bool] = True
 NO_FREE_STRING_METHODOLOGY_AUTHORITY: Final[bool] = True
 METHODOLOGY_IDENTITY_IS_VERSIONED: Final[bool] = True
+#: R2-D1: one identity names one exact methodology specification.
+METHODOLOGY_IDENTITY_BINDS_CONTENT: Final[bool] = True
+#: R2-D1: an identity is not an arbitrary namespace claim.
+METHODOLOGY_SELF_AUTHORIZATION_REJECTED: Final[bool] = True
 
 
 __all__ = [
     "Book6MethodologyRegistry",
+    "canonical_methodology_spec",
+    "METHODOLOGY_CANONICAL_FIELDS",
+    "METHODOLOGY_IDENTITY_BINDS_CONTENT",
     "METHODOLOGY_IDENTITY_IS_VERSIONED",
     "METHODOLOGY_IDENTITY_SEPARATOR",
     "METHODOLOGY_REGISTRY_PRESENT",
+    "METHODOLOGY_SELF_AUTHORIZATION_REJECTED",
     "MethodologyRegistryError",
     "NO_FREE_STRING_METHODOLOGY_AUTHORITY",
+    "methodology_fingerprint",
     "methodology_identity",
     "parse_methodology_identity",
 ]

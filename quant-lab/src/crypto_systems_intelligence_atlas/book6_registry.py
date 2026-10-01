@@ -71,7 +71,7 @@ class Book6MeasurementRegistry:
     def register_definition(self, definition: MetricDefinition) -> MetricDefinition:
         if definition.metric_id in self._definitions:
             raise Book6RegistryError(f"metric {definition.metric_id} already registered")
-        self.require_methodology(definition.methodology.identity)
+        self.require_canonical_methodology(definition.methodology)
         self._definitions[definition.metric_id] = definition
         return definition
 
@@ -80,6 +80,22 @@ class Book6MeasurementRegistry:
 
         try:
             return self.methodologies.resolve_methodology(identity)
+        except MethodologyRegistryError as exc:
+            raise Book6RegistryError(str(exc)) from exc
+
+    def require_canonical_methodology(
+        self, candidate: MeasurementMethodology
+    ) -> MeasurementMethodology:
+        """Resolve a presented methodology AND re-verify its CONTENT (R2-D1).
+
+        Every surface that receives a methodology OBJECT rather than a bare ref
+        goes through here, so an altered copy - a mutated formula, window rule,
+        input-methodology set or row-authority set - is refused rather than
+        resolved by name alone.
+        """
+
+        try:
+            return self.methodologies.require_canonical_methodology(candidate)
         except MethodologyRegistryError as exc:
             raise Book6RegistryError(str(exc)) from exc
 

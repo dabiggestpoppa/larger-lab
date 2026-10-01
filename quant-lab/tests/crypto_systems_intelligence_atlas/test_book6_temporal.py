@@ -193,7 +193,12 @@ def test_a_methodology_change_creates_a_new_version_not_an_edit() -> None:
     v2_method = MeasurementMethodology(
         methodology_ref="book6-methodology-v2",
         version="2",
-        formula="x = declared alternative construction",
+        # R2-D1: one identity binds ONE exact content. The observation registered
+        # below declares methodology_ref/methodology_version, whose fixture
+        # content is the canonical default; the definition's methodology must be
+        # content-identical or the content seal (correctly) refuses the second
+        # registration. The version change itself is the methodology change.
+        formula="value = f(declared inputs)",
         window_rule="declared window class of the metric",
         filters=("no-fabricated-absence",),
         denominator_rule="explicit measured denominator or not applicable",

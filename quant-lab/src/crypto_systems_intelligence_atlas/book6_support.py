@@ -9,6 +9,7 @@ synthetic and in-memory — no network, no RPC, no database.
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
 from crypto_systems_intelligence_atlas.book6_core import Book6MeasurementEngine
 from crypto_systems_intelligence_atlas.book6_definitions import (
@@ -215,6 +216,9 @@ def register_definition(engine, metric: MetricDefinition) -> MetricDefinition:
     """
 
     _ensure_methodology(engine, metric.methodology)
+    # R2-D1: registration binds identity -> content, so a definition may not
+    # carry a methodology whose content differs from the canonical one.
+    engine.registry.require_canonical_methodology(metric.methodology)
     return engine.registry.register_definition(metric)
 
 
@@ -229,10 +233,19 @@ def register_measurement(engine, observation: MeasurementObservation):
 
 
 def _ensure_methodology(engine, candidate: MeasurementMethodology) -> None:
-    """Register a methodology only if its identity is not already current."""
+    """Register a methodology only if its identity is not already bound.
 
-    if not engine.registry.methodologies.methodology_is_current(candidate.identity):
-        engine.registry.register_methodology(candidate)
+    If the identity is already bound, the candidate's CONTENT is re-verified
+    against the bound specification rather than silently ignored, so a test
+    cannot slip an altered methodology in under a registered identity.
+    """
+
+    if engine.registry.methodologies.methodology_is_current(candidate.identity):
+        engine.registry.methodologies.assert_content_matches(
+            candidate.identity, candidate
+        )
+        return
+    engine.registry.register_methodology(candidate)
 
 
 def build_engine_with_definitions(
@@ -286,39 +299,27 @@ def normalization_methodology(
 def comparison_methodology(
     corpus_row_id: str,
     *,
-    ref: str | None = None,
-    version: str = "1",
+    version: str | None = None,
 ) -> MeasurementMethodology:
-    """Build the methodology a CONDITIONAL corpus row requires.
+    """The canonical methodology a CONDITIONAL corpus row requires.
 
-    R1-D1: the identity must equal the row's ``required_methodology`` EXACTLY and
-    the methodology must declare authority for that row, or the comparison is
-    refused. Building it from the ratified corpus means a test cannot pass a
-    fake name and still expect authorization.
+    R2-D1: this is now read straight off the ratified corpus row, so a test
+    cannot manufacture a look-alike methodology with the right name and the
+    wrong content. ``version`` may be raised to model an explicit supersession;
+    doing so necessarily changes the content digest, which is why the corpus
+    pins one exact version.
     """
 
-    from crypto_systems_intelligence_atlas.book6_comparability import (
-        corpus_row_for,
-    )
-    from crypto_systems_intelligence_atlas.book6_methodology import (
-        parse_methodology_identity,
-    )
+    from crypto_systems_intelligence_atlas.book6_comparability import corpus_row_for
 
     left, right = conditional_row_pair(corpus_row_id)
-    row = corpus_row_for(left, right)
-    assert row.required_methodology is not None
-    required_ref, _version = parse_methodology_identity(row.required_methodology)
-    return MeasurementMethodology(
-        methodology_ref=ref or required_ref,
-        version=version,
-        formula=f"reconcile {row.left_metric} against {row.right_metric}",
-        window_rule="declared window class of the compared metrics",
-        filters=("no-cross-window-comparison",),
-        denominator_rule="explicit measured denominator or not applicable",
-        source_selection="first-party Book 2-backed source",
-        identity_rule="subject identity rule declared per metric",
-        authorized_corpus_row_ids=(corpus_row_id,),
-    )
+    spec = corpus_row_for(left, right).required_methodology_spec
+    assert spec is not None
+    if version is None or version == spec.version:
+        return spec
+    # ``model_copy`` is typed to return the frozen base model; the update only
+    # rewrites ``version``, so the result is still a MeasurementMethodology.
+    return cast(MeasurementMethodology, spec.model_copy(update={"version": version}))
 
 
 def conditional_row_pair(row_id: str) -> tuple[str, str]:
