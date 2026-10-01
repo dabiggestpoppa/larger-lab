@@ -1,0 +1,118 @@
+{
+  "cases": [
+    {
+      "case_id": "continuation_exact_retry_after_checkpoint",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "page 1 re-delivery at CHECKPOINT_ADVANCED adopts exactly: no transition, no new manifest, no new checkpoint (I14R1 §8)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "retry_checkpoint_advanced": false,
+        "retry_manifest_id_matches": true,
+        "transitions_stable": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_next_page_accepted",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "page 2 (request fetched FROM the committed token) continues via the accepted annotated edge with ZERO external state manipulation (I14R1 §3)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_token_page": 3,
+        "external_state_manipulations": 0,
+        "next_page_checkpoint_advanced": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_stale_resume_source_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "incoming request_resume_token unrelated to the durable token fails typed BEFORE any evidence mutation: no ACQUIRING transition, no checkpoint movement (I14R1 §9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "digest_frozen": true,
+        "transitions_stable": true,
+        "typed_refusal": "DivergentBatchRewrite"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_three_sequential_pages_complete",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "page1 -> page2 -> page3(is_complete) through ONLY persist_batch: exactly 3 checkpoint transitions, exactly 2 annotated continuation edges, COMPLETE terminal, no skipped page, no double advance (I14R1 §7)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions": 3,
+        "continuation_edges": 2,
+        "external_state_manipulations": 0,
+        "final_status": "COMPLETE"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_duplicate_next_page_delivery",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "duplicate page-2 delivery is an exact retry: adopted without mutation, no cursor skip (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "digest_frozen": true,
+        "duplicate_checkpoint_advanced": false,
+        "durable_token_page": 3
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_crash_after_continuation_transition",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a crash on the CONTINUATION path recovers through the same public API: retry adopts/continues and the durable token is exactly the page-2 next token, no cursor skip (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_token_page": 3,
+        "retry_checkpoint_advanced": true,
+        "window": "W1_BEFORE_RAW_WRITE"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_crash_before_next_manifest",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a crash on the CONTINUATION path recovers through the same public API: retry adopts/continues and the durable token is exactly the page-2 next token, no cursor skip (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "durable_token_page": 3,
+        "retry_checkpoint_advanced": true,
+        "window": "W5_BEFORE_MANIFEST_APPEND"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_w7_on_page_2",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "W7 on page 2: manifest durable / checkpoint old -> retry adopts the exact manifest and advances the checkpoint EXACTLY once, no cursor skip (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions_total": 2,
+        "retry_checkpoint_advanced": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "continuation_w7_on_page_3",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "W7 on page 3: manifest durable / checkpoint old -> retry adopts the exact manifest and advances the checkpoint EXACTLY once, no cursor skip (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions_total": 3,
+        "retry_checkpoint_advanced": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R1",
+  "matrix": "CONTINUATION_MATRIX",
+  "measured_at_checkpoint": "I14R1",
+  "rows_fail": 0,
+  "rows_ok": 9,
+  "rows_total": 9,
+  "synthetic_counterfactuals": 0
+}

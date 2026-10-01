@@ -1,0 +1,94 @@
+{
+  "cases": [
+    {
+      "case_id": "empty_partial_with_next_token",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "EMPTY_VALID partial: durable blob-less acquisition + EMPTY_CONFIRMED manifest + real checkpoint with the adapter token preserved (I14R1 §17)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "acquisition_blob_sha256": null,
+        "blob_count": 0,
+        "checkpoint_advanced": true,
+        "durable_token_page": 5
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "empty_complete_via_gate",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "EMPTY_VALID complete: checkpoint gate ran (MANIFEST_COMMITTED -> CHECKPOINT_ADVANCED -> COMPLETE), never bypassed (I14R1 §17)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "final_status": "COMPLETE",
+        "gate_transitions_present": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "empty_exact_retry",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "EMPTY_VALID re-delivery adopts exactly: no mutation, no second checkpoint (I14R1 §29)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "digest_frozen": true,
+        "retry_checkpoint_advanced": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "empty_w7_restart",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "manifest durable / checkpoint old -> retry adopts the exact empty manifest/acquisition and advances EXACTLY once; no fake blob ever appears (I14R1 §18)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions_total": 1,
+        "fake_blob_count": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "empty_then_nonempty_next_page",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "EMPTY_VALID page followed by a nonempty page: the checkpoint progresses across both, cursor truthful (I14R1 §29)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "final_token_page": 3,
+        "second_page_blobs": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "nonempty_then_empty_next_page",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "nonempty page followed by an EMPTY_VALID page: a real superseding manifest version + real checkpoint, no fake blob (I14R1 §29)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "final_token_page": 3,
+        "manifests_distinct": true,
+        "second_page_blobs": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "empty_durable_acquisition_truth",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the EMPTY_VALID acquisition EVENT is durably preserved with full provenance and NO fabricated bytes (I14R1 §12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "blob_sha256": null,
+        "empty_valid_flag": true,
+        "has_fingerprint": true,
+        "has_observation_timestamp": true,
+        "has_provider": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R1",
+  "matrix": "EMPTY_VALID_CHECKPOINT_MATRIX",
+  "measured_at_checkpoint": "I14R1",
+  "rows_fail": 0,
+  "rows_ok": 7,
+  "rows_total": 7,
+  "synthetic_counterfactuals": 0
+}

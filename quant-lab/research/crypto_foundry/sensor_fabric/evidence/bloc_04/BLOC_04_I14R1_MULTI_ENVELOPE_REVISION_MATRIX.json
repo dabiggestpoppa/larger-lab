@@ -1,0 +1,81 @@
+{
+  "cases": [
+    {
+      "case_id": "multi_envelope_unchanged_group_no_new_revision",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "identical ordered group re-observed later: NO new revision; the re-delivery is an IDENTICAL_REFETCH observation (I14R1 §24A)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "identical_refetch_observed": true,
+        "segments": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "multi_envelope_non_first_component_mutation",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a change in a NON-FIRST envelope becomes revision-visible: explicit new SOURCE_MUTATION revision (I14R1 §24B) — the blocker-C defect is closed",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "group_digest_v1": "fde761f00a6ee081",
+        "group_digest_v2": "76b6bdc3e032e20f",
+        "latest_state": "SOURCE_MUTATION",
+        "segments": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "multi_envelope_first_component_mutation",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a change in the FIRST envelope is also revision-visible under the group law (I14R1 §24C)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "latest_state": "SOURCE_MUTATION",
+        "segments": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "multi_envelope_component_count_change",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "an envelope ADDED to the observation group is an explicit new revision (I14R1 §24D)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "latest_state": "SOURCE_MUTATION",
+        "segments": 2
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "multi_envelope_order_change",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "Bloc 3 declares no envelope-ordering semantic; the group digest is a canonical SET, so [X,Y] vs [Y,X] is the SAME observation: no new revision, durable IDENTICAL_REFETCH (I14R1 §24E/§18F)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "identical_refetch_observed": true,
+        "ordering_semantic": "NONE (canonical SET, contract silent)",
+        "segments": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "multi_envelope_manifest_revision_coherence",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the revision observation describes the SAME evidence set the manifest commits: digest over ALL ordered envelope shas == observation content truth (I14R1 §25)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "expected_digest_prefix": "3a886f54fbf616af",
+        "manifest_blob_count": 3,
+        "observation_digest_prefix": "3a886f54fbf616af"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R1",
+  "matrix": "MULTI_ENVELOPE_REVISION_MATRIX",
+  "measured_at_checkpoint": "I14R1",
+  "rows_fail": 0,
+  "rows_ok": 6,
+  "rows_total": 6,
+  "synthetic_counterfactuals": 0
+}

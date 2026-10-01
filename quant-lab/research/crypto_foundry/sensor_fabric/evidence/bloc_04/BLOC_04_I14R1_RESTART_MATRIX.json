@@ -1,0 +1,43 @@
+{
+  "cases": [
+    {
+      "case_id": "restart_raw_path_w7_single_advance",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "raw-path W7 under the I14R1 pipeline: manifest adopted, checkpoint advanced EXACTLY once across both runs (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions_total": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_empty_valid_w7_single_advance",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "EMPTY_VALID W7: retry adopts the exact empty manifest/acquisition, advances exactly once, NO fake blob (I14R1 §18)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions_total": 1,
+        "fake_blob_count": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "restart_continuation_path_w1_recovery",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "continuation-path crash recovers through the SAME public API; page 2 checkpoints exactly once after page 1 (no cursor skip, no double advance) (I14R1 §28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "checkpoint_transitions_total": 2,
+        "final_token_page": 3
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I14R1",
+  "matrix": "RESTART_MATRIX",
+  "measured_at_checkpoint": "I14R1",
+  "rows_fail": 0,
+  "rows_ok": 3,
+  "rows_total": 3,
+  "synthetic_counterfactuals": 0
+}
