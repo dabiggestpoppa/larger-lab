@@ -2210,3 +2210,187 @@ implementation, Book 8, D8, live acquisition, any comparison-rule, benchmark
 rule, or coverage-rule ratification, any state/predicate/coverage-rule
 ratification, any usage or health research, any score, ranking, or trading
 authority.
+---
+
+## CHECKPOINT — BOOK 6 AMENDMENT QUESTION-SET CLOSURE — TWO CLASSES ASKED, ELEVEN INSTANCES FOUND, PLAN HELD
+
+```text
+CHECKPOINT_DATE                       = 2026-10-01
+BRANCH                                = agent/crypto-systems-intelligence-atlas-plan
+STARTING_HEAD                         = 38b9aa2a7dfaff835112b7e4d87dc6cc1afb688a
+BOOK_6                                = FROZEN_ACCEPTED (unchanged)
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+
+--- AUTHORIZATION SCOPE ---
+
+THIS SESSION = QUESTION-SET CLOSURE + FINAL RATIFICATION-READINESS REVIEW ONLY
+NO AMENDMENT RATIFICATION
+NO BOOK 6 IMPLEMENTATION
+NO grammar v0.4 / plan v0.4 / seam v0.4 / boundary v0.3 CREATED
+
+--- NEW INVARIANTS DEFINED ---
+
+AC_17_SINGLE_MEANING_ABSENCE         = VERIFIED_AS_RULE / 6 INSTANCES UNRESOLVED
+  doctrine: no nullable/optional/absent field in ComparisonRule,
+  ChangeObservation, ComparisonDerivationBinding, or a seam-facing record may
+  use absence to encode more than one semantic state; absence has exactly ONE
+  defined meaning; ambiguity is replaced by an explicit enum/discriminator
+  ABSENT != UNKNOWN != NOT_APPLICABLE != UNAVAILABLE != NOT_REQUIRED !=
+    UNRESOLVED != UNDEFINED != ZERO != FALSE
+
+AC_18_POLICY_NOT_AUTHORITY           = VERIFIED_AS_RULE / 5 INSTANCES UNRESOLVED
+  doctrine: no rule-author-settable policy parameter may make a comparison
+  more permissive, manufacture sufficiency, weaken a fail-closed gate, create
+  a hidden threshold, create materiality/significance/health, override
+  upstream authority, or bypass a separately operator-ratified rule authority
+  POLICY PARAMETER != SUFFICIENCY AUTHORITY
+  POLICY PARAMETER != THRESHOLD AUTHORITY
+  POLICY PARAMETER != GATE WAIVER
+AC-18a (mechanism)                    every policy parameter must be a CLOSED
+  ENUM or typed policy object with a declared semantic for every value;
+  permissive values removed from the domain, not merely discouraged
+
+--- INVENTORIES (from the v0.3 field definitions, not assumption) ---
+
+NULLABLE_FIELDS_INVENTORIED           = 36 (ComparisonRule 12, ChangeObservation 8,
+                                         DerivationBinding 4, ResponseLink 4,
+                                         remaining candidate fields assessed)
+AMBIGUOUS_NULLABLE_FIELDS             = 6   (required 0)
+  F-2  ComparisonRule.coverage_applicability_source_ref
+       absent = "no upstream determination exists" OR "not recorded"
+  F-3  ChangeObservation.coverage_observation
+       absent conflates NOT_APPLICABLE with not-measured
+  F-4  ResponseLink.coverage_verdict_quoted        (optional; source always
+       carries a value incl. UNKNOWN)
+  F-4  ResponseLink.coverage_requirement_quoted    (same)
+  F-5  ComparisonRule.supersedes                    (first version vs unknown)
+  F-5  ComparisonRule.valid_time.valid_to           (still valid vs end unknown)
+
+POLICY_PARAMETERS_INVENTORIED         = 14
+POLICY_PARAMETERS_WITH_UNGOVERNED_AUTHORITY = 5   (required 0)
+  P1 delta_formula_basis            (open: "e.g." illustration, not enum)
+  P2 direction_derivation           (open)
+  P3 zero_baseline_policy           (describes fail-closed; does not foreclose
+                                     percentage/capped substitutes)
+  P4 unit_divisibility_policy       (open)
+  P5 rounding_precision_policy      (open; can express "below X = NO_CHANGE"
+                                     = significance threshold)
+
+--- CLASS-LEVEL ADVERSARIAL OUTCOMES ---
+
+NULL-1 (absence = NOT_APPLICABLE or UNKNOWN)   FAIL  (F-3)
+NULL-2 (ref absence = not required / missing)   FAIL  (F-2); coverage_sufficiency
+                                               ref itself PASS (discriminated)
+NULL-3 (numeric absence = zero / undefined)     PASS  (discriminated by
+                                               change_kind; zero never absence)
+POL-1  (policy bypasses upstream gate)          PASS  (applicability derived)
+POL-2  (policy creates numeric sufficiency)     FAIL  (P5)
+POL-3  (rounding changes direction)             ALLOWED ONLY when fingerprinted/
+                                               ratified/visible — v0.3 does;
+                                               failure is unconstrained domain
+POL-4  (policy mutated under same identity)     PASS  (fingerprint rejects)
+POL-5  (policy v2 appears)                      PASS  (new rule version + new
+                                               ratification; no auto-follow)
+
+FREE-STRING / DYNAMIC POLICY: no eval, no exec, no callback anywhere in v0.3;
+  free-string policy authority PARTLY PRESENT via P1–P5 (F-1)
+
+--- REVIEWS ---
+
+PRE_RATIFICATION_REVIEW                 = v0.4 — 40 / 42 PASS
+  Q41 (every nullable field single-meaning)          = FAIL (6 ambiguous)
+  Q42 (no policy parameter can act as authority)     = FAIL (5 ungoverned)
+  AMENDMENT_PLAN_HOLD = TRUE
+  Q1–Q40 = 40 PASS (unchanged; no v0.3 design change this session)
+
+RATIFICATION_READINESS                  = HOLD
+INDEPENDENT_READINESS_REVIEW_v0.2       = 14 structural surfaces
+  SURFACES_CLEAN  = 10
+  SURFACES_FAILED = 4  (hidden thresholds; nullable multi-meaning; anti-score
+                        firewall; rule-author policy parameters)
+  NEW_UNASKED_STRUCTURAL_DEFECTS = 0   ← question-set closure SUCCEEDED
+  NEW_DESIGN_DEFECTS_FOUND       = 11  ← but the closed questions now REVEAL
+                                          defects Q1–Q40 could not see
+
+EVERY_HISTORICAL_DEFECT_HAS_GENERAL_CLASS_COVERAGE = TRUE
+  R6A-D1 → policy/hidden-threshold class (Q42)
+  R6A-D2 → self-authority class (Q26)
+  R6A-D4 → external-dependency/mutable-ref class (Q31–Q34, Q39)
+  R6A-D5 → nullable-single-meaning + applicability-authority class (Q41/Q35–38)
+  boundary count → contract-count honesty class (Q40)
+
+--- CLOSURE VERDICT (the point of this session) ---
+
+THE QUESTION-SET CLOSURE WORKED; THE DESIGN DID NOT SURVIVE IT.
+Closing the two unasked classes made them able to see defects the prior
+checklist structurally could not. That is the closure paying for itself: had
+AC-17/AC-18 been written as instance fixes (only the coverage ref; only the
+coverage threshold), five ambiguous fields and four policy parameters would
+have survived into ratification.
+
+--- REPAIRS SPECIFIED (not implemented; v0.4 NOT created — out of scope) ---
+
+R-1  AC-18a: closed enum/typed policy for the 5 comparison_semantics params,
+     permissive values removed from the domain
+R-2  coverage_applicability_source_ref: absence means "no upstream
+     determination exists"; missing citation under REQUIRED/NOT_APPLICABLE
+     is a rejection
+R-3  ChangeObservation.coverage_observation: absence read THROUGH
+     coverage_requirement_status
+R-4  seam: quoted coverage fields must be carried when the source carries them
+R-5  supersedes = "first version"; valid_to = "still valid"
+
+--- UNTOUCHED / INVARIANT ---
+
+BOOK_1_AMENDMENT_REQUIRED              = FALSE
+BOOK_2_AMENDMENT_REQUIRED              = FALSE
+BOOK_3_AMENDMENT_REQUIRED              = FALSE
+BOOK_4_AMENDMENT_REQUIRED              = FALSE
+BOOK_5_AMENDMENT_REQUIRED              = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED        = FALSE
+SENSOR_MUTATION                        = 0
+COMPARISON_RULES_RATIFIED              = 0 canonical
+COVERAGE_SUFFICIENCY_RULES_RATIFIED    = 0 canonical
+CHANGE_OBSERVATION_CANONICAL_COUNT     = 0 canonical
+D2_6                                   = IN_FORCE
+D6M_5                                  = OPEN_DEFERRED
+BOOK_6_IMPLEMENTATION_AUTHORITY        = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY        = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY        = FALSE
+LIVE_ACQUISITION_AUTHORITY             = FALSE
+BOOK_7_PLAN                            = READY_PENDING_BOOK6_COMPARISON_AMENDMENT
+
+NEXT = NOT ratification. Either authorize a v0.4 artifact set implementing the
+      five repairs (R-1..R-5) and re-review, or — if the operator prefers —
+      explicitly accept the two defect classes as planning limitations, which
+      would require a recorded decision noting that a comparison rule can
+      currently express a materiality threshold through a rounding parameter,
+      something the plan's own anti-score firewall prohibits.
+
+ARTIFACTS_CREATED_THIS_CHECKPOINT
+  CSIA_BOOK_6_COMPARISON_CHANGE_QUESTIONSET_CLOSURE_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PRE_RATIFICATION_REVIEW_v0.4.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_READINESS_v0.2.md
+ARTIFACTS_APPENDED_THIS_CHECKPOINT
+  CSIA_PLANNING_PROGRESS.md   (this checkpoint)
+```
+
+**Reading of this checkpoint.** The two general classes the readiness review
+asked for were defined, and the moment they were applied they found eleven
+instances the Q1–Q40 checklist could not see — six nullable fields using
+absence for more than one meaning, and five policy parameters whose value
+domains are open rather than enumerated. The most consequential is
+`rounding_precision_policy`: an unconstrained precision value can express
+"changes below X are NO_CHANGE", which is a significance threshold reached
+through a parameter the anti-score firewall does not name. Fingerprinting does
+not close it; ratification fixes who chose a policy, not what was chosen. The
+plan is therefore held, not passed. The closure is nonetheless a real gain:
+it converts a checklist that could not see these defects into one that can,
+and the two new general classes now cover every historical defect at the
+class level.
+
+**Not authorized and not performed:** amendment ratification, Book 6
+implementation, Book 6 re-acceptance, Book 7 ratification, Book 7
+implementation, Book 8, D8, live acquisition, any comparison-rule, benchmark
+rule, or coverage-rule ratification, any usage or health research, any score,
+ranking, or trading authority.
