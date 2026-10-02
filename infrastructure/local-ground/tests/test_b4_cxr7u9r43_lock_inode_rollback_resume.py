@@ -518,8 +518,16 @@ def test_weakened_rolling_back_classifier_reopens_fresh_authority(tmp_path):
     args = ["--phase", "reconcile", "--classify-rollback", str(h.promote)]
     weak = _weakened_engine(
         tmp_path, lambda source: source.replace(
-            '        return 6\n    if state == "ROLLED_BACK":',
-            '        return 0\n    if state == "ROLLED_BACK":'))
+            '    if authority is None or not _valid_transition_claim(\n'
+            '            record.get("operation_id"), "rollback", promote,\n'
+            '            authority=authority):\n'
+            '        return _VERDICT_FAIL_CLOSED\n'
+            '    return _VERDICT_ROLLBACK_RESUME',
+            '    if authority is None or not _valid_transition_claim(\n'
+            '            record.get("operation_id"), "rollback", promote,\n'
+            '            authority=authority):\n'
+            '        return _VERDICT_FAIL_CLOSED\n'
+            '    return _VERDICT_FRESH'))
     base = [sys.executable, "-c", recovery_cli._BOOTSTRAP, str(weak),
             str(h.root), "--test-bridge", str(h.bridge)]
     weakened = subprocess.run(base + args, env=h.env, capture_output=True,

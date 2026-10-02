@@ -323,14 +323,14 @@ def test_terminal_resume_stays_idempotent(bridge, tmp_path, monkeypatch):
 # the executable weakened control at matrix level
 # --------------------------------------------------------------------- #
 
-_WEAKENED_TRANSFORM = ('''        elif authority is not None \\
-                and _claim_state(operation_id, authority=authority) != "absent":
-            # PROMOTED with an existing canonical claim and NO receipt to bind:
-            # the selector name exists, so the one-time authority is spent —
-            # never fresh (B4-CXR7U9R45R1).
-            return 4
-        return 0
-''', '''        return 0
+_WEAKENED_TRANSFORM = ('''    elif authority is not None \\
+            and _claim_state(authority.operation_id, authority=authority) \\
+            != "absent":
+        # PROMOTED with an existing canonical claim and NO receipt to bind:
+        # the selector name exists, so the one-time authority is spent.
+        return _VERDICT_FAIL_CLOSED
+''', '''    elif False:
+        return _VERDICT_FAIL_CLOSED
 ''')
 
 

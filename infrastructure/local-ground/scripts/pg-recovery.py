@@ -4280,44 +4280,180 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     return receipt
 
 
+# B4-CXR7U9R48R4 -- ONE STATE DISPATCH TABLE
+# ======================================================================
+# R47's classifier was a single hundred-line if-chain. It was correct, but the
+# verdict matrix was implicit: to answer "what does a ROLLING_BACK record with
+# a spent selector produce", a reviewer had to read every branch above it in
+# order. It also carried one function's worth of nesting on the two legs that
+# matter most.
+#
+# The matrix is now STATED: one handler per durable state, one table, one
+# dispatch. Each handler is PURE -- it reads only the immutable authority
+# bundle and the record it was handed, and touches no filesystem. An unknown or
+# contradictory state is not "unreachable": it is a table miss, and a miss is
+# fail-closed by construction rather than by falling off the end of a chain.
+
+_VERDICT_FRESH = 0
+_VERDICT_NO_ROLLBACK = 3
+_VERDICT_FAIL_CLOSED = 4
+_VERDICT_FINALIZE_ABORT = 5
+_VERDICT_ROLLBACK_RESUME = 6
+
+
+def _classify_state_created(record, promote, authority):
+    """A pre-promotion record offers no transition authority at all.
+
+    With no promote receipt there is no exact binding to prove, so a canonical
+    claim present at that coordinate is an impossible state/selector
+    disagreement and fails closed. The documented pre-promotion disposition
+    exists ONLY for the absent-selector shape the engine itself produces.
+    """
+    del record
+    if promote is None and authority is not None:
+        if _claim_state(authority.operation_id,
+                        authority=authority) != "absent":
+            return _VERDICT_FAIL_CLOSED
+    return _VERDICT_FRESH
+
+
+def _classify_state_promoted(record, promote, authority):
+    """ONE admitted bundle decides the whole PROMOTED verdict: existence,
+    coordinate admission, binding, branch and freshness."""
+    del record
+    if promote is not None and authority is not None:
+        if _valid_transition_claim(authority.operation_id, "rollback", promote,
+                                   authority=authority):
+            return _VERDICT_ROLLBACK_RESUME
+        if _valid_transition_claim(authority.operation_id, "finalize", promote,
+                                   authority=authority):
+            return _VERDICT_FINALIZE_ABORT
+        # Defense in depth: if the admitted snapshot is not exactly consumable,
+        # the selector is spent -- never fresh.
+        if _classify_claim_content(
+                authority.operation_id, authority.selector,
+                expected_receipt_sha256=authority.expected_receipt_sha256) \
+                != "absent":
+            return _VERDICT_FAIL_CLOSED
+    elif authority is not None \
+            and _claim_state(authority.operation_id, authority=authority) \
+            != "absent":
+        # PROMOTED with an existing canonical claim and NO receipt to bind:
+        # the selector name exists, so the one-time authority is spent.
+        return _VERDICT_FAIL_CLOSED
+    return _VERDICT_FRESH
+
+
+def _classify_state_finalizing(record, promote, authority):
+    """A FINALIZING record names a durably selected finalize branch."""
+    if record.get("commit_intent") is not None \
+            or record.get("commit_point") is not None:
+        return _VERDICT_FAIL_CLOSED
+    if not _selector_agrees_with_finalizing(
+            record.get("operation_id"), promote, authority=authority):
+        return _VERDICT_FAIL_CLOSED
+    if record.get("selected_transition") == "finalize":
+        return _VERDICT_FINALIZE_ABORT
+    return _VERDICT_FAIL_CLOSED
+
+
+def _classify_state_rolling_back(record, promote, authority):
+    """An in-flight rollback is resumable only for the rollback branch."""
+    if record.get("selected_transition") not in (None, "rollback"):
+        return _VERDICT_FAIL_CLOSED
+    if record.get("commit_intent") is not None \
+            or record.get("commit_point") is not None:
+        return _VERDICT_FAIL_CLOSED
+    if promote is None:
+        return (_VERDICT_ROLLBACK_RESUME
+                if record.get("selected_transition") == "rollback"
+                else _VERDICT_FRESH)
+    if authority is None or not _valid_transition_claim(
+            record.get("operation_id"), "rollback", promote,
+            authority=authority):
+        return _VERDICT_FAIL_CLOSED
+    return _VERDICT_ROLLBACK_RESUME
+
+
+def _classify_state_rolled_back(record, promote, authority):
+    """The terminal catalog truth is verified idempotently and is NEVER
+    labelled fresh authority."""
+    if promote is None or authority is None:
+        return _VERDICT_FAIL_CLOSED
+    if not _valid_transition_claim(record.get("operation_id"), "rollback",
+                                   promote, authority=authority):
+        return _VERDICT_FAIL_CLOSED
+    return _VERDICT_ROLLBACK_RESUME
+
+
+def _classify_state_failed(record, promote, authority):
+    """A failed operation is ALWAYS fail-closed, with or without a receipt."""
+    del record, promote, authority
+    return _VERDICT_FAIL_CLOSED
+
+
+def _classify_state_commit_intent(record, promote, authority):
+    """Forward commit intent may not coexist with rollback authority."""
+    del authority
+    intent = record.get("commit_intent")
+    if not isinstance(intent, dict) \
+            or intent.get("marker") != "forward_commit":
+        return _VERDICT_FAIL_CLOSED
+    if promote is not None and not _valid_commit_intent(record, promote):
+        return _VERDICT_FAIL_CLOSED
+    return _VERDICT_NO_ROLLBACK
+
+
+def _classify_state_commit_point(record, promote, authority):
+    """Past the commit point there is no rollback, ever."""
+    del authority
+    if promote is not None and not _valid_commit_intent(record, promote):
+        return _VERDICT_FAIL_CLOSED
+    commit_point = record.get("commit_point")
+    if not isinstance(commit_point, dict) \
+            or commit_point.get("marker") != "quarantine_dropped":
+        return _VERDICT_FAIL_CLOSED
+    return _VERDICT_NO_ROLLBACK
+
+
+# THE ONE AUTHORITATIVE STATE/VERDICT MATRIX. There is no second table and no
+# classifier that is not dispatched from this one.
+_STATE_DISPATCH = {
+    "CREATED": _classify_state_created,
+    "STAGED": _classify_state_created,
+    "PROMOTED": _classify_state_promoted,
+    "FINALIZING": _classify_state_finalizing,
+    "ROLLING_BACK": _classify_state_rolling_back,
+    "ROLLED_BACK": _classify_state_rolled_back,
+    "FAILED": _classify_state_failed,
+    "COMMIT_INTENT_RECORDED": _classify_state_commit_intent,
+    "COMMIT_POINT_REACHED": _classify_state_commit_point,
+    "FINALIZED": _classify_state_commit_point,
+}
+
+
 def _classify_record_for_shell(record, promote=None):
     """The single rollback-legality law for both engine callers and the shell.
 
     Code 0 is fresh rollback authority, code 5 is pre-intent finalize abort,
     code 6 is explicit rollback resume, code 3 forbids rollback after forward
-    intent, and code 4 is malformed/unknown. When a promote receipt is supplied,
-    the exact claim and operation binding are checked; a state label alone can
-    never turn a spent branch into fresh authority.
+    intent, and code 4 is malformed/unknown.
 
-    B4-CXR7U9R47R1: THE COMPLETE DECISION CONSUMES EXACTLY ONE SNAPSHOT.
-    ``record`` is the already-admitted durable record for this decision and
-    ``promote`` supplies the receipt digest, so the RecoveryAuthoritySnapshot
-    is acquired ONCE here and every branch below reads ``authority`` -- never
-    the disk. The verdict matrix below is unchanged from R46R4; what changed is
-    that every branch that consults the selector now consults the SAME one.
+    B4-CXR7U9R48R1: the record judged is the one ADMITTED through the same
+    pinned governed-directory descriptor as the selector, so the state and the
+    selector can never come from two different directory generations.
 
-    R46's evidence recorded "one decision consumes one snapshot" for this
-    function. That was not true. ``_claim_state`` -- the FIRST branch guard,
-    which runs for every state -- had no way to accept a snapshot and always
-    read the coordinate itself; PROMOTED then read it a second time to select
-    the branch, and FINALIZING read it a second time inside
-    ``_selector_agrees_with_finalizing``. Two selector reads per decision on the
-    two most important legs, and a replacement could land between them.
-
-    B4-CXR7U9R47R2: there is no directory parameter. The governed authority
-    root is derived by the engine; a caller can no longer hand this function a
-    root it owns.
+    B4-CXR7U9R48R4: the verdict matrix is now ONE dispatch table over
+    immutable decision material. Each handler is pure. An unknown state, a
+    non-mapping record, an unknown format, or a bundle that cannot be acquired
+    is a table miss or an explicit refusal, and every one of them fails
+    closed.
     """
-    if not isinstance(record, dict) or record.get("format") not in (None, TRANSITION_FORMAT):
-        return 4
-    state = record.get("state")
+    if not isinstance(record, dict) \
+            or record.get("format") not in (None, TRANSITION_FORMAT):
+        return _VERDICT_FAIL_CLOSED
     operation_id = record.get("operation_id")
     authority = None
-    # ONE AUTHORITY ACQUISITION FOR THE WHOLE DECISION (B4-CXR7U9R47R1). The
-    # record is passed IN rather than re-read: the caller's read is this
-    # decision's one transition-record read. `authority is not None` is
-    # therefore exactly the old "well-formed operation id" condition, and every
-    # branch below uses it in place of re-deriving that condition.
     if isinstance(operation_id, str) and OPERATION_ID_RE.match(operation_id):
         try:
             authority = _acquire_recovery_authority(
@@ -4326,137 +4462,31 @@ def _classify_record_for_shell(record, promote=None):
             # The governed transition directory itself could not be admitted
             # without following a redirection. There is no authority root, so
             # there is nothing to decide: fail closed.
-            return 4
-        # B4-CXR7U9R48R1: DECIDE FROM THE ADMITTED RECORD. The record that
-        # reaches this function came from a pathname read by the caller; the
-        # record that reached the SAME pinned directory descriptor as the
-        # selector is the authority. From here on the decision reads
-        # `authority.record`, so the state judged and the selector judged can
-        # no longer come from two different directory generations.
-        record = authority.record
-        state = record.get("state") if isinstance(record, dict) else None
+            return _VERDICT_FAIL_CLOSED
+        # DECIDE FROM THE ADMITTED RECORD, not the caller's copy.
+        admitted = authority.record
+        if admitted is None:
+            return _VERDICT_FAIL_CLOSED
+        record = admitted
         operation_id = authority.operation_id
-        if record is None:
-            return 4
-        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R1). A canonical claim
-        # that exists but is not EXACTLY bound to the supplied promote receipt
-        # means the one-time authority is spent (selected or corrupted): fail
-        # closed (code 4) instead of reopening fresh authority
-        # (B4-CXR7U9R44R1; binding law added by B4-CXR7U9R45R1). A malformed
-        # claim, including one that fails its coordinate admission (symlink,
-        # non-regular, redirected, widened or oversized), fails closed even
-        # without a receipt to compare against.
         selector_state = _claim_state(
             operation_id, authority=authority,
             expected_receipt_sha256=authority.expected_receipt_sha256)
         if selector_state == "malformed":
-            return 4
+            return _VERDICT_FAIL_CLOSED
         if promote is not None and selector_state == "unbound_or_mismatched":
-            return 4
-    if state == TRANSITION_STATE_FINALIZING:
-        if record.get("commit_intent") is not None or record.get("commit_point") is not None:
-            return 4
-        # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R3, corrected
-        # B4-CXR7U9R46R3/R4): a FINALIZING record names a durably selected
-        # finalize branch. A canonical claim that is missing or is not
-        # EXACTLY bound to that finalize branch means the state and the
-        # selector DISAGREE: fail closed, never re-describe the spent or
-        # missing selector as governed abort authority.
-        #
-        # B4-CXR7U9R47R1: `authority` carries the record that supplies the
-        # receiptless expectation AND the selector that has to agree with it.
-        # Both are the ones already admitted for this decision.
-        if not _selector_agrees_with_finalizing(operation_id, promote,
-                                                authority=authority):
-            return 4
-        if record.get("selected_transition") == "finalize":
-            return 5
-        return 4
-    if state in ("CREATED", "STAGED"):
-        # B4-CXR7U9R46R4: a pre-promotion record offers no transition
-        # authority at all. With no promote receipt there is no exact binding
-        # to prove, so a canonical claim present at that coordinate is an
-        # impossible state/selector disagreement and fails closed. The
-        # documented pre-promotion disposition (0) exists ONLY for the
-        # absent-selector shape the engine itself produces.
-        if promote is None and authority is not None:
-            # B4-CXR7U9R47R1: the SAME snapshot, not a second read.
-            if _claim_state(operation_id, authority=authority) != "absent":
-                return 4
-        return 0
-    if state == TRANSITION_STATE_PROMOTED:
-        # B4-CXR7U9R46R4/R47: ONE admitted snapshot decides the whole PROMOTED
-        # verdict -- existence, coordinate admission, binding, branch and
-        # freshness. R46 still took a fresh `_read_selector_snapshot()` on this
-        # leg after `_claim_state` had already read it; the `snap` local it
-        # then threaded into both `_valid_transition_claim` calls was already
-        # the SECOND read of the coordinate.
-        if promote is not None and authority is not None:
-            if _valid_transition_claim(operation_id, "rollback", promote,
-                                       authority=authority):
-                return 6
-            if _valid_transition_claim(operation_id, "finalize", promote,
-                                       authority=authority):
-                return 5
-            # Defense in depth: if the admitted snapshot is not exactly
-            # consumable, the selector is spent -- never fresh.
-            if _classify_claim_content(
-                    operation_id, authority.selector,
-                    expected_receipt_sha256=authority.expected_receipt_sha256) != "absent":
-                return 4
-        elif authority is not None \
-                and _claim_state(operation_id, authority=authority) != "absent":
-            # PROMOTED with an existing canonical claim and NO receipt to bind:
-            # the selector name exists, so the one-time authority is spent —
-            # never fresh (B4-CXR7U9R45R1).
-            return 4
-        return 0
-    if state == TRANSITION_STATE_ROLLING_BACK:
-        if record.get("selected_transition") not in (None, "rollback"):
-            return 4
-        if record.get("commit_intent") is not None or record.get("commit_point") is not None:
-            return 4
-        if promote is None:
-            return 6 if record.get("selected_transition") == "rollback" else 0
-        # B4-CXR7U9R47R1: `authority is None` means the operation id was
-        # malformed, and an unbindable record is unknowable authority.
-        if authority is None or not _valid_transition_claim(
-                operation_id, "rollback", promote, authority=authority):
-            return 4
-        return 6
-    if state == "ROLLED_BACK":
-        # B4-CXR7U9R46R4: the terminal catalog truth is verified idempotently
-        # and is NEVER labelled fresh authority. Without the exact rollback
-        # selector bound to the supplied promote receipt, the terminal state
-        # is unknowable and fails closed; code 6 is an idempotent RESUME
-        # verification, not a fresh grant.
-        if promote is None or authority is None:
-            return 4
-        if not _valid_transition_claim(operation_id, "rollback", promote,
-                                       authority=authority):
-            return 4
-        return 6
-    if state == "FAILED":
-        # B4-CXR7U9R46R4: a failed operation is ALWAYS fail-closed, with or
-        # without a receipt. Fresh transition authority is never returned
-        # merely because no receipt object was passed.
-        return 4
-    if state == TRANSITION_STATE_COMMIT_INTENT:
-        intent = record.get("commit_intent")
-        if not isinstance(intent, dict) or intent.get("marker") != "forward_commit":
-            return 4
-        if promote is not None and not _valid_commit_intent(record, promote):
-            return 4
-        return 3
-    if state in (TRANSITION_STATE_COMMIT_POINT, "FINALIZED"):
-        if promote is not None and not _valid_commit_intent(record, promote):
-            return 4
-        commit_point = record.get("commit_point")
-        if not isinstance(commit_point, dict) \
-                or commit_point.get("marker") != "quarantine_dropped":
-            return 4
-        return 3
-    return 4
+            return _VERDICT_FAIL_CLOSED
+    state = record.get("state")
+    try:
+        handler = _STATE_DISPATCH.get(state)
+    except TypeError:
+        # B4-CXR7U9R48R4: an UNHASHABLE state (a list, a dict) must be a
+        # fail-closed miss like any other unknown state, not an exception.
+        handler = None
+    if handler is None:
+        # Unknown or contradictory state: fail closed BY CONSTRUCTION.
+        return _VERDICT_FAIL_CLOSED
+    return handler(record, promote, authority)
 
 
 def _test_classify_state_for_shell(record):

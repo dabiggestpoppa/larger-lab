@@ -226,29 +226,27 @@ def _weakened_engine(tmp_path):
     return path
 
 
-TWO_READ_OLD = '''        if promote is not None and authority is not None:
-            if _valid_transition_claim(operation_id, "rollback", promote,
-                                       authority=authority):
-                return 6
-            if _valid_transition_claim(operation_id, "finalize", promote,
-                                       authority=authority):
-                return 5
+TWO_READ_OLD = '''    if promote is not None and authority is not None:
+        if _valid_transition_claim(authority.operation_id, "rollback", promote,
+                                   authority=authority):
+            return _VERDICT_ROLLBACK_RESUME
+        if _valid_transition_claim(authority.operation_id, "finalize", promote,
+                                   authority=authority):
+            return _VERDICT_FINALIZE_ABORT
 '''
 
-TWO_READ_TWO_READ = '''        if promote is not None and authority is not None:
-            # B4-CXR7U9R47R1 NEGATIVE CONTROL: the R46 shape, verbatim in
-            # effect. Classify from the admitted snapshot, then RE-ACQUIRE a
-            # second one to select the branch. The second read is the window in
-            # which the swapped generation lands.
-            _claim_state(operation_id, authority=authority)
-            second = _acquire_recovery_authority(operation_id, promote,
-                                                 record=record)
-            if _valid_transition_claim(operation_id, "rollback", promote,
-                                       authority=second):
-                return 6
-            if _valid_transition_claim(operation_id, "finalize", promote,
-                                       authority=second):
-                return 5
+TWO_READ_TWO_READ = '''    if promote is not None and authority is not None:
+            # B4-CXR7U9R47R1 NEGATIVE CONTROL: classify from the admitted
+            # snapshot, then RE-ACQUIRE a second one to select the branch.
+        _claim_state(authority.operation_id, authority=authority)
+        authority = _acquire_recovery_authority(
+            authority.operation_id, promote, record=authority.record)
+        if _valid_transition_claim(authority.operation_id, "rollback", promote,
+                                   authority=authority):
+            return _VERDICT_ROLLBACK_RESUME
+        if _valid_transition_claim(authority.operation_id, "finalize", promote,
+                                   authority=authority):
+            return _VERDICT_FINALIZE_ABORT
 '''
 
 
