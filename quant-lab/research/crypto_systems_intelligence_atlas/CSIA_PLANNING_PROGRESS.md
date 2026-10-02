@@ -2952,3 +2952,133 @@ ratification, any new policy, any new delta operator, any epsilon or
 tolerance or materiality or significance, Book 7 ratification or
 implementation, Book 8, D8, live acquisition, RPC, network, database, graph
 database, and any branch creation.
+
+---
+
+# CHECKPOINT — RATIFIED-PLAN PHANTOM CITATION SWEEP v0.1 — 2026-10-02
+
+**Artifact:** `CSIA_RATIFIED_PLAN_PHANTOM_CITATION_SWEEP_v0.1.md` (718 lines)
+**Verdict:** `RATIFIED_PLAN_PHANTOM_CITATION_SWEEP = HOLD`
+**Requested by:** operator — extend the Book 6 review's defect test to the other
+ratified CSIA plans.
+
+## What was asked
+
+The Book 6 Comparison/Change authorization review returned HOLD on four gaps.
+All four share one shape: doctrine asserts a determination is **derived from an
+accepted artifact**, and that artifact does not exist in the codebase. The
+operator asked for that test to be applied to the other ratified plans.
+
+## What was done
+
+Ten ratified planning artifacts were swept in two passes — a code-font symbol
+pass and a prose citation pass — against all 62 runtime modules in
+`quant-lab/src/crypto_systems_intelligence_atlas/`. 106 prose citation phrases
+and 69 unresolved symbol citations were examined. Classification was on
+**assertion verb**, not symbol absence, because most unresolved symbols are
+legitimate forward specifications (`ComparisonRule`, `ResponseLink`) or explicit
+negations (`ATTRACTIVE` as a forbidden name, `CHANNEL_REPRESENTATIVE` as "not
+adopted").
+
+Two self-corrections are recorded in §2 of the artifact. The first symbol pass
+reported `CapitalPrincipalLineage` as a phantom; it is not — the substrate is
+`CapitalPrincipalLineageGraph` at `book5_lineage.py:117`, and exact-name
+matching had missed a suffix. All symbol results were re-run prefix-aware before
+any conclusion was drawn.
+
+## The finding — GAP-5, PHANTOM-BENCHMARK
+
+The amendment doctrine requires every `ComparisonRule` to carry a non-null
+`baseline_selection_methodology_ref` citing an ACCEPTED, individually
+operator-ratified Book 6 benchmark rule from a closed five-member domain
+(`PRIOR_COMPARABLE_WINDOW | ROLLING_MEAN | ROLLING_MEDIAN |
+HISTORICAL_DISTRIBUTION | BASELINE_EPOCH`).
+
+- `grep -rn "Benchmark" src/crypto_systems_intelligence_atlas/*.py` returns
+  **zero matches across all 62 modules**. No `BenchmarkRule`, no registry, no
+  namespace constant, no fingerprint function.
+- The only `benchmark` occurrences are an enum member (`book6_grammar.py:47`) and
+  a state class (`book6_states.py:72`).
+- `BENCHMARK_RULES_RATIFIED = 0`.
+- The field is REQUIRED and appears nowhere in the §8.1 nullable inventory
+  (§8.1 = lines 524-543).
+
+The same non-existent namespace is asserted in five binding artifacts: the Book
+6 base plan v0.2 (which is honest — "none is chosen by this plan"), Grammar v0.4
+§2 line 246, Amendment plan v0.4 lines 35 and 134, Boundary v0.3 lines 41 and
+129, and the Ratification record v0.1 lines 152 and 230.
+
+**GAP-5 is worse than GAP-3.** Coverage applicability has a defined absent state
+(`NO_UPSTREAM_DETERMINATION_EXISTS`), so the record stays constructible in a
+degraded form. `baseline_selection_methodology_ref` has no absent state, no
+registry to register into, and a closed domain of five unregisterable
+identifiers. No baseline-bearing `ComparisonRule` can ever be constructed.
+
+**Why it was never caught.** Boundary v0.3 §1 classifies baseline-selection
+methodology as "would be" authority-bearing, then resolves it as "**accepted**
+benchmark namespace, reused unmodified → new class? **no**". The phantom premise
+answers the boundary's own question, which places baseline selection outside
+the authority accounting, which is why no later audit asked whether the
+namespace exists. The review's no-policy-invention test inventoried 17 ratified
+domains and could not flag a domain the boundary had already declared settled by
+assumption. A phantom citation appearing in a boundary artifact disqualifies
+itself from review.
+
+## GAP-2 strengthened
+
+The nearest candidate unit substrate —
+`CSIA_BOOK_5_UNIT_DOMAIN_VALUATION_SEAM_DOCTRINE_v0.1.md` — self-declares
+`NOT RATIFIED`, defines "unit" as an asset-symbol naming convention rather than
+a dimensional class, and explicitly defers cross-unit arithmetic to Book 6. So
+GAP-2's contract is absent from code **and** from ratified doctrine. Option 2A
+would mean authoring dimensional-class algebra from nothing, materially larger
+than "add a third contract class" implies.
+
+## What is clean
+
+Seven of ten ratified artifacts are clean: Constitution v0.2, Book 1 v0.3,
+Book 2 v0.2, Book 3 v0.2, Book 4 v0.2, Book 5 v0.3, Book 7 v0.2. Book 7's
+`ObservedChange` / `PostActionObservation` / `ResponseLink` are its own forward
+specifications, correctly absent from code.
+
+Verified exactly, with the same standard applied to clean results:
+
+- All three accepted regression baselines reproduce **exactly** — Book 6 = 1341,
+  full CSIA = 2162, Sensor = 2343 = 2325 PASS + 14 FAIL + 4 SKIPPED.
+- All six ratified Book 2 decisions (D2-1..D2-5 plus D2-6 deferral) resolve to
+  enforcing runtime symbols.
+- Book 1's `RealizationIdentity` (`identity.py:267`), the `Hyperedge` primitive
+  (`relationships.py:495`), and Book 3's `SECURED_BY` (`relationships.py:112`)
+  all hold.
+
+## One prior verdict corrected
+
+`BENCHMARK_RUNTIME_PATH_SUFFICIENT = TRUE` is recorded as **NOT SUPPORTABLE AS
+STATED**. The runtime path is adequate; the doctrine citation it was credited
+with satisfying is a phantom with no absent state. The criterion conflated "the
+code can express this" with "the cited artifact exists". The HOLD verdict is
+unchanged and strengthened.
+
+```text
+GAPS_NOW_OPEN = 5   (GAP-1..GAP-5; GAP-5 new, GAP-2 strengthened)
+AUTHORIZATION_PACKET = NOT CREATED
+BOOK_6/7/8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY = FALSE
+D6M_5 = OPEN_DEFERRED
+COMPARISON_RULES_RATIFIED = 0
+BENCHMARK_RULES_RATIFIED = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+```
+
+Five operator decisions are now required. None is made here.
+
+**Not authorized and not performed:** any implementation, any source or test
+change, any re-ratification, any amendment edit, any new policy, value domain,
+contract class or absent state, any decision on GAP-1..GAP-5, Book 7 or Book 8
+work, live acquisition, RPC, network, database, graph database, branch creation,
+force-push, rebase or history rewrite.
+
+**Next:** operator decisions on GAP-1..GAP-5, then re-run the authorization
+review with GAP-5 included. GAP-5 should be decided **before** GAP-3, because
+options 5A/5B remove the entire baseline-bearing surface and therefore change
+what "all 19 replay checks implementable" means.

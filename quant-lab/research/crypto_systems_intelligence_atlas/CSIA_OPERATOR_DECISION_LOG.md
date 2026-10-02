@@ -1694,3 +1694,116 @@ operator, any epsilon, tolerance, materiality or significance, Book 7
 ratification or implementation, Book 8, D8, live acquisition, RPC, network,
 database, graph database, branch creation, force-push, rebase or history
 rewrite.
+
+---
+
+## PHANTOM-CITATION-SWEEP-v0.1 — 2026-10-02
+
+```text
+DECISION_ID   = PHANTOM-CITATION-SWEEP-v0.1
+KIND          = AUDIT VERDICT (NOT AN AUTHORIZATION)
+REQUESTED BY  = operator, this session
+SCOPE         = ratified CSIA planning artifacts, phantom-citation class only
+                (doctrine citing an accepted artifact that does not exist)
+VERDICT       = HOLD
+```
+
+```text
+RATIFIED_PLAN_PHANTOM_CITATION_SWEEP = HOLD
+
+NEW_DEFECTS_FOUND             = 1
+  PHANTOM_BENCHMARK (GAP-5)  = CONFIRMED, RATIFIED, PROPAGATED
+
+PRIOR_GAPS_STRENGTHENED      = 1
+  GAP-2 (unit contract)      = CONFIRMED, absent from DOCTRINE as well as code
+PRIOR_GAPS_UNCHANGED         = 3  (GAP-1, GAP-3, GAP-4)
+
+RATIFIED_ARTIFACTS_EXAMINED  = 10
+CLEAN                        = 7   (Constitution v0.2, B1 v0.3, B2 v0.2,
+                                   B3 v0.2, B4 v0.2, B5 v0.3, B7 v0.2)
+AFFECTED                     = 3   (B6 base plan v0.2, amendment plan v0.4,
+                                   grammar v0.4)
+
+CITATIONS_EXAMINED           = 106 prose citation phrases
+                             +  69 unresolved symbol citations
+PHANTOM_CITATIONS            = 1 new + 4 prior
+VERIFIED_CLEAN_CITATIONS     = 3 regression baselines exact
+                             + 6 Book 2 ratified decisions
+                             + 3 Book 1/3/4 cross-book primitives
+METADATA_DRIFT_RECORDED      = 1   (artifact Status headers vs decision log)
+```
+
+GAP-5, verbatim: doctrine requires a non-null
+`baseline_selection_methodology_ref` on every `ComparisonRule`, citing an
+ACCEPTED, individually operator-ratified Book 6 benchmark rule from the closed
+domain PRIOR_COMPARABLE_WINDOW | ROLLING_MEAN | ROLLING_MEDIAN |
+HISTORICAL_DISTRIBUTION | BASELINE_EPOCH. `grep -rn "Benchmark"` over all 62
+runtime modules returns zero matches. `BENCHMARK_RULES_RATIFIED = 0`. The field
+is REQUIRED and is absent from the grammar's own nullable inventory. It is
+asserted in five binding artifacts, including the ratification record.
+
+```text
+GAP-5A  remove baseline_selection_methodology_ref; baseline-bearing surface
+        only; zero benchmark rules permanently
+GAP-5B  keep the field, make it NULLABLE with absent state
+        NO_ACCEPTED_BENCHMARK_RULE_EXISTS, mirroring GAP-3A; five-member
+        domain must still be deleted or frozen
+GAP-5C  author and ratify a benchmark-rule contract class before
+        implementation; requires BenchmarkRule, registry, canonical
+        fingerprint, D6M-3 individual ratification, and >=1 ratified rule
+GAP-5D  defer the benchmark question to a follow-on amendment; block the
+        baseline-bearing surface until decided
+```
+
+```text
+CORRECTION TO PRIOR REVIEW:
+  BENCHMARK_RUNTIME_PATH_SUFFICIENT = TRUE
+  -> NOT SUPPORTABLE AS STATED
+     The runtime path is adequate; the doctrine citation credited with
+     satisfying it is a phantom with no absent state. The criterion
+     conflated "the code can express this" with "the cited artifact exists".
+     The prior HOLD verdict is unchanged and strengthened.
+
+AUTHORIZATION_PACKET           = NOT CREATED
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+D6M_5                           = OPEN_DEFERRED
+COMPARISON_RULES_RATIFIED       = 0
+BENCHMARK_RULES_RATIFIED        = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+
+GAPS_NOW_OPEN = 5
+  GAP-1 canonical numeric representation
+  GAP-2 unit dimensional-class contract      (strengthened by this sweep)
+  GAP-3 coverage-applicability derivation
+  GAP-4 comparability_status value domain + producing check
+  GAP-5 accepted benchmark-rule namespace    (opened by this sweep)
+
+Every GAP-5 option requires at least one re-ratification, because the phantom
+citation is inside the ratified record. No option preserves the current
+ratification text unchanged.
+
+NEXT = operator decisions on GAP-1..GAP-5. Decide GAP-5 before GAP-3: options
+       5A and 5B remove the entire baseline-bearing surface and therefore
+       change what "all 19 replay checks implementable" means. Then re-run the
+       authorization review with GAP-5 included.
+```
+
+Artifact produced by this sweep:
+
+```text
+  CSIA_RATIFIED_PLAN_PHANTOM_CITATION_SWEEP_v0.1.md
+```
+
+Method note for future reviews: a criterion of the form `X_IS_SUFFICIENT` must
+be evaluated against the citation, not only the runtime path. Where doctrine
+says "derived from an accepted Y", sufficiency of X is not established until Y
+exists.
+
+**Not authorized and not performed:** any implementation, any source or test
+change, any re-ratification, any amendment edit, any new policy, value domain,
+contract class or absent state, any decision on GAP-1..GAP-5, Book 7 or Book 8
+ratification or implementation, D8, live acquisition, RPC, network, database,
+graph database, branch creation, force-push, rebase or history rewrite.
