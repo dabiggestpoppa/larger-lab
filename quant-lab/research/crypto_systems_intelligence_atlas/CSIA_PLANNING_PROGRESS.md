@@ -3179,3 +3179,100 @@ cross-metric corpus mutation, coverage applicability heuristic, NOT_APPLICABLE b
 absence, new canonical coverage rule, rule ratification, Book 6 re-acceptance,
 Book 7 or Book 8, live acquisition, branch creation, force-push, rebase or
 history rewrite.
+
+---
+
+# CHECKPOINT — GAP-5 5E BASELINE SELECTOR — 2026-10-02
+
+**Session scope:** GAP-5 resolution as 5E plus successor artifacts for all five
+gaps. **Nine artifacts. Zero source, zero test code, zero implementation.**
+
+## Phase 0 — verification
+
+Planning `39aa6d9a7` local == origin == ls-remote, worktree clean.
+Implementation `5f94c3f4` clean, remote matches, anchor `3919fb80` an ancestor,
+the single commit past it is the acceptance commit itself → **zero drift**.
+
+## GAP-5 confirmed again, mechanically
+
+```
+$ grep -rn "Benchmark" src/crypto_systems_intelligence_atlas/*.py
+(zero matches across all 62 modules)
+```
+
+No `BenchmarkRule`, no `BenchmarkRuleRegistry`, no benchmark fingerprint, no
+ratified benchmark rule. The origin was Book 6 base plan v0.2 §5, which named the
+five tokens and said "**none is chosen by this plan**". The v0.4 amendment
+promoted that planning vocabulary into an accepted authority substrate. **The
+promotion was the defect; the original naming was not.**
+
+## 5E — what it does and why it works
+
+`BaselineSelectorSpec` is a nested value object inside `ComparisonRule`. No
+registry, no ledger, no independent lifecycle, no separate ratification — so it
+is not a third contract class and the count stays at 2.
+
+**Two substrate findings made 5E implementable rather than merely stated:**
+
+1. `MeasurementMethodology.identity` returns `ref@version`
+   (`book6_definitions.py:127–130`), so methodology compatibility is an exact
+   string comparison rather than a fuzzy match.
+2. `MetricDefinition.aggregation: AggregationSemantics`
+   (`book6_definitions.py:151`, closed set at `:59–67`) **already exists**. This
+   resolved Phase 8 cleanly: aggregation is declared on the *metric*, so an
+   interval-window observation already carries its aggregated value. The
+   selector **selects**; it never **aggregates**. Phase 8's `HOLD and surface it`
+   branch therefore has a defined substrate rather than an invented one, and it
+   remains a live runtime condition rather than a planning gap.
+
+## Criterion renamed, not retained
+
+`BENCHMARK_RUNTIME_PATH_SUFFICIENT` was retired in favour of
+`BASELINE_SELECTION_RUNTIME_PATH_SUFFICIENT`. The old name asserted a benchmark
+runtime that does not exist and is not being created — carrying it forward would
+have been a small phantom of the same family this session removes.
+
+## Results
+
+```text
+PRE_RATIFICATION_REVIEW_v0.2              = 20 / 20 PASS
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.3  = READY_PENDING_SUBSTRATE_CLARIFICATION_RATIFICATION
+                                              10 TRUE / 0 FALSE
+TEST_SPEC_v0.3                           = 237 cases, 0 BLOCKED
+REPLAY_CHECK_COUNT                       = 20
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+HIDDEN_THIRD_CONTRACT                    = NONE
+```
+
+**First session in this program with no criterion carried as an exception.**
+
+## The structural fix
+
+Boundary v0.4 adds a phantom-citation invariant: an existence claim about
+accepted substrate must resolve to a runtime symbol or a ratified artifact
+defining it as intentionally non-runtime **before** the item may be excluded from
+scope as "reused". Resolution must precede classification. Test spec v0.3 adds
+`PHANTOM-1..PHANTOM-6` with four categories so the check does not flag forward
+specifications or prohibitions, scans prose (the original GAP-2 defect had no
+code font), and fails a grep-only checker (the
+`CapitalPrincipalLineageGraph` false positive).
+
+**This is the third time an unverified assertion was caught rather than passed:**
+the sweep's correction of the prior review, this session's refusal to mark
+`BENCHMARK_RUNTIME_PATH_SUFFICIENT` TRUE, and now retiring the criterion name
+itself.
+
+## Ratified history preserved
+
+No ratified artifact edited in place. The phantom correction is prospective via
+`..._RATIFICATION_RECORD_ERRATUM_v0.1.md`, which quotes the original statements
+verbatim (record lines 152 and 230, plus boundary v0.3:41, plan v0.4:35 and 134,
+grammar v0.4:246) and claims no retroactive correction.
+
+**Not authorized and not performed:** any implementation, source or test change,
+any `BenchmarkRule` or `BenchmarkRuleRegistry`, any benchmark-rule ratification,
+any rolling mean / rolling median / historical distribution / baseline epoch
+implementation, any `observed_at` baseline ordering, any random or caller-order
+selection, any caller-selected authoritative baseline, Book 6 re-acceptance, Book
+7 or Book 8, live acquisition, branch creation, force-push, rebase or history
+rewrite.

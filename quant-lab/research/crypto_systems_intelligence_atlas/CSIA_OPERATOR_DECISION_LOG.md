@@ -1962,3 +1962,178 @@ applicability heuristic, any NOT_APPLICABLE by absence, any new canonical
 coverage rule, any rule ratification, Book 6 re-acceptance, Book 7 or Book 8
 ratification or implementation, D8, live acquisition, RPC, network, database,
 graph database, branch creation, force-push, rebase or history rewrite.
+
+---
+
+## BOOK6-GAP5-BASELINE-SELECTOR-5E-v0.1 — 2026-10-02
+
+```text
+DECISION_ID   = BOOK6-GAP5-BASELINE-SELECTOR-5E-v0.1
+KIND          = PROPOSED RESOLUTIONS (DRAFT — NOT RATIFIED)
+REQUESTED BY  = operator, this session
+SCOPE         = Book 6 Comparison/Change GAP-5 resolution as 5E, plus successor
+                artifacts for all five gaps
+STATUS        = DRAFT_PENDING_OPERATOR_RATIFICATION
+```
+
+```text
+PROPOSED_RESOLUTION_GAP_1 = 1A-STRICT
+PROPOSED_RESOLUTION_GAP_2 = 2D  SAME_METRIC_EXACT_UNIT_IDENTITY
+PROPOSED_RESOLUTION_GAP_3 = 3C  COVERAGE_RULE_PRESENCE_DERIVATION
+PROPOSED_RESOLUTION_GAP_4 = 4D  EXPLICIT_TEMPORAL_COMPARABILITY
+PROPOSED_RESOLUTION_GAP_5 = 5E  COMPARISON_RULE_OWNED_BASELINE_SELECTOR
+
+GAP_5A = NOT SELECTED
+GAP_5B = NOT SELECTED
+GAP_5C = NOT SELECTED
+GAP_5D = NOT SELECTED
+```
+
+```text
+GAP_5  ACCEPTED BENCHMARK RULE NAMESPACE  = FALSE
+       BENCHMARK_RULE_RUNTIME             = NOT_IMPLEMENTED
+       BENCHMARK_RULES_RATIFIED          = 0
+
+GAP_5  BaselineSelectorSpec = NESTED VALUE OBJECT inside ComparisonRule
+       BASELINE_SELECTOR_INDEPENDENT_RATIFICATION = FALSE
+       BASELINE_SELECTOR_INDEPENDENT_REGISTRY      = FALSE
+       BASELINE_SELECTOR_AUTHORITY = BOUND_INSIDE_COMPARISON_RULE
+       not a public contract / not separately ratified / not separately
+       registered / not a Book 2 Claim / not a StateRule / not a BenchmarkRule
+
+GAP_5  EXECUTABLE_BASELINE_SELECTOR_COUNT = 1
+       EXECUTABLE_BASELINE_SELECTOR      = PRIOR_COMPARABLE_WINDOW
+       ROLLING_MEAN            = RESERVED_NOT_EXECUTABLE
+       ROLLING_MEDIAN          = RESERVED_NOT_EXECUTABLE
+       HISTORICAL_DISTRIBUTION = RESERVED_NOT_EXECUTABLE
+       BASELINE_EPOCH          = RESERVED_NOT_EXECUTABLE
+
+GAP_5  PRIOR_COMPARABLE_WINDOW
+       eligibility: same subject_ref; same metric_definition_ref; same
+         metric-definition semantic fingerprint; same MeasurementMethodology
+         identity/version (ref@version) where required; same exact
+         MetricDefinition.unit (2D); compatible denominator; compatible
+         cohort where applicable; required WindowClass/window compatibility;
+         candidate valid_time STRICTLY PRECEDES comparison valid_time;
+         Book 2 authority current; missingness requirements met
+       ordering: greatest valid_time END strictly before comparison START;
+         then greatest valid_time START; then stable lexical measurement_ref
+       BASELINE_SELECTION_DETERMINISTIC   = TRUE
+       CALLER_ORDER_AFFECTS_BASELINE      = FALSE
+       OBSERVED_AT_USED_FOR_BASELINE_ORDERING = FALSE
+       NO_ELIGIBLE_PRIOR_BASELINE -> INSUFFICIENT_DATA / BASELINE_UNAVAILABLE
+       BASELINE RESULT = ONE MeasurementObservation
+       SELECTOR_AGGREGATES = FALSE
+       coverage is an AUTHORIZATION GATE AFTER structural selection, never a
+         selection input (selection-bias firewall)
+```
+
+```text
+GAP_5  SEPARATE_BENCHMARK_AUTHORITY_BINDING   = NONE
+       COMPARISON_RULE_BINDS_BASELINE_SELECTOR = TRUE
+       selector content inside ComparisonRule canonical fingerprint;
+       mutation invalidates prior authority
+       precedent: METHODOLOGY_CANONICAL_FIELDS book6_methodology.py:85-97
+       -> canonical_methodology_spec:99 -> methodology_fingerprint:132
+
+GAP_5  BOOK6_CLASS_C_STATE_BENCHMARK_RUNTIME = UNRATIFIED / UNIMPLEMENTED
+       StateRule.benchmark_methodology_ref book6_states.py:178 (enforced :214)
+       is a SEPARATE accepted mechanism; NOT repurposed; NOT solved here
+
+REPLAY_CHECK_COUNT = 20
+  1-3  ComparisonRule identity / ratification / fingerprint
+  4    baseline selector kind/spec validity            (replaces phantom 4-6)
+  5    deterministic baseline candidate eligibility
+  6    deterministic PRIOR_COMPARABLE_WINDOW resolution
+  7-18 carried; 19 temporal comparability; 20 deterministic recomputation
+AGGREGATE_ONLY = REJECTED
+all 20 independently falsifiable
+
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+    ComparisonRule
+    ChangeObservation
+HIDDEN_THIRD_CONTRACT = NONE
+```
+
+```text
+PRE_RATIFICATION_REVIEW_v0.2        = 20 / 20 PASS
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1 = HOLD / SUPERSEDED
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.2 = READY_PENDING_SUBSTRATE_CLARIFICATION_RATIFICATION
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.3 = READY_PENDING_SUBSTRATE_CLARIFICATION_RATIFICATION
+
+  NO_UNRATIFIED_POLICY_NEEDED                   = TRUE
+  NO_RUNTIME_AUTHORITY_GAP                       = TRUE
+  NUMERIC_REPRESENTATION_SUFFICIENT              = TRUE
+  UNIT_ARITHMETIC_SOURCE_SUFFICIENT              = TRUE
+  BASELINE_SELECTION_RUNTIME_PATH_SUFFICIENT     = TRUE   (renamed criterion)
+  COVERAGE_RUNTIME_PATH_SUFFICIENT               = TRUE
+  ALL_REPLAY_CHECKS_IMPLEMENTABLE                = TRUE
+  NEGATIVE_SURFACE_TESTS_SPECIFIED               = TRUE
+  TRACEABILITY_PLAN_COMPLETE                     = TRUE
+  UPSTREAM_FREEZE_PRESERVABLE                    = TRUE
+  SCORE = 10 TRUE / 0 FALSE
+
+  RETIRED CRITERION NAME: BENCHMARK_RUNTIME_PATH_SUFFICIENT
+  (renamed because no benchmark runtime is created; the old name asserted an
+   authority that cannot resolve — the same phantom family this entry removes)
+```
+
+```text
+PHANTOM_CITATION_REGRESSION = SPECIFIED (PHANTOM-1..PHANTOM-6)
+  RUNTIME_REQUIRED      must resolve to a runtime symbol, or FAIL
+  GOVERNANCE_ONLY       must resolve to a ratified artifact, or FAIL
+  FORWARD_SPECIFICATION labelled intended-to-create; not a failure
+  PROHIBITED / NEGATED  labelled forbidden/rejected; not a failure
+  prose claims are scanned (the GAP-2 defect had no code font)
+  a grep-only checker fails itself (CapitalPrincipalLineage false positive)
+```
+
+Artifacts produced:
+
+```text
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_SUBSTRATE_CLARIFICATION_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.6.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.6.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.4.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_RECORD_ERRATUM_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_TEST_SPEC_v0.3.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_SUBSTRATE_PRE_RATIFICATION_REVIEW_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.3.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_SUBSTRATE_RATIFICATION_PACKET_v0.2.md
+```
+
+Ratified artifacts remain RATIFIED and UNCHANGED: amendment plan v0.4, grammar
+v0.4, boundary v0.3, seam v0.4, readiness v0.3, ratification record v0.1. No
+ratified artifact is edited in place. The phantom correction is prospective via
+a separate erratum; RETROACTIVE_CORRECTION_CLAIMED = FALSE.
+
+```text
+STATUS                      = DRAFT_PENDING_OPERATOR_RATIFICATION
+GAP_1..GAP_5_CLOSED         = FALSE  (resolved in draft, NOT ratified)
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+COMPARISON_RULES_RATIFIED       = 0
+BENCHMARK_RULES_RATIFIED        = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+D6M_5                           = OPEN_DEFERRED
+
+STANDING CONDITIONS (recorded, not waived):
+ - Phase 8: metric.aggregation == NONE with multiple observations in one
+   comparison window -> HOLD and surface as a new operator decision
+ - Class C StateRule benchmark semantics: UNRATIFIED / UNIMPLEMENTED, out of
+   scope for this amendment
+
+NEXT = operator decision on the Class C StateRule benchmark question, then
+       RATIFY_SUBSTRATE_CLARIFICATION_v0.2_AND_SUCCESSORS or HOLD, then re-run
+       the implementation authorization review post-ratification.
+```
+
+**Not authorized and not performed:** any implementation, any source or test
+change, any `BenchmarkRule`, any `BenchmarkRuleRegistry`, any benchmark-rule
+ratification, any rolling mean / rolling median / historical distribution /
+baseline epoch implementation, any `observed_at` baseline ordering, any random
+or caller-order selection, any caller-selected authoritative baseline, Book 6
+re-acceptance, Book 7 or Book 8, live acquisition, branch creation, force-push,
+rebase or history rewrite.
