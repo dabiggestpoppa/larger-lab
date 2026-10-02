@@ -3199,3 +3199,148 @@ origin/main remains `7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched.
 
 **Status: INTERNAL R48 IMPLEMENTATION COMPLETE. `MERGE_AUTHORIZED = false`
 while SonarCloud and Kilo remain non-success.**
+
+
+# B4-CXR7U9R48X - LINUX CLOSURE REPAIR AND EVIDENCE CORRECTION
+
+**This section supersedes the R48 closure claim only. It rewrites nothing
+above.** The R48 evidence commit `a659584ea` stays published and unchanged as
+historical evidence.
+
+## 1. Correction of the R48 closure claim
+
+R48's architecture was materially implemented and remains in force: one
+admitted transitions-directory descriptor owns both the record and the
+selector read, authority material is deeply immutable, and the classifier is
+a single dispatch table.
+
+What the R48 evidence commit asserted, however, was internal closure, and
+that claim was not satisfied. The R48 evidence head was green only on a
+Windows host, where no directory descriptor exists and the POSIX pin path is
+therefore never executed. Linux CI on that exact head was red:
+
+- evidence head `a659584ea488e1e2b2d3cfdd8a8ee3896400a00c`
+- workflow `b1-local-ground-validation`, run `36954352454`
+- JUnit: **671 collected / 671 executed / 10 failed / 0 errors / 0 skipped**
+
+The other four workflows were green on that head; the failure was confined to
+b1 and was not disclosed in the R48 evidence record. The record's local
+totals ("591 passed, 48 skipped, 1 failed" = 640) also do not reconcile with
+the 671 actually collected.
+
+## 2. Classification of the ten failures
+
+Seven were legacy fixture permission drift, not production defects. The R40R2
+commit-boundary fixture wrote its transition record with `Path.write_text`,
+leaving POSIX mode 0644 under the CI umask. R48R1 admits records
+descriptor-relative under the same privacy law the claim already carried, and
+the engine publishes records 0600, so Linux refused the fixture as "not
+private" and every durable state classified as UNKNOWABLE. **The production
+permission rule was correct and was not weakened; only the fixture changed.**
+
+Three were defects in R48's own mandatory proofs:
+
+1. `test_a_weakened_control_reproduces_the_mixed_generation` - the control
+   did not reconstruct the R47 defect. R47's defect was an ORDERING defect:
+   the record was read by pathname and the transitions directory was admitted
+   only afterwards, for the selector. The control fired its swap after the
+   directory was already pinned, so the selector stayed on the old generation
+   and no mixture was produced. A first repair that only moved the swap
+   earlier still failed on Linux and was itself superseded; the control now
+   restores the R47 ordering and asserts the exact mixture (acquired,
+   PROMOTED, finalize). Its anchor is extracted from the shipped engine
+   rather than transcribed and occurs exactly once in it.
+2. `test_e_identity_is_bound_to_real_descriptors` - it called `os.fstat`
+   after `_acquire_recovery_authority` returned, by which time the engine had
+   closed the descriptor, so it proved only that a closed fd is closed. It now
+   proves the pin while the fd is live and, after return, that the fd is gone.
+3. `test_g_a_denied_authority_mutates_nothing` - it demanded
+   `outcome == "refused"`, which is stricter than the contract. A coherent pin
+   to the pinned old generation is a legal result. It now accepts either legal
+   outcome while rejecting mixed generations, engine-created files and
+   ungoverned writes, and separates the attacker's swap from engine mutation.
+
+## 3. Additional defects found during the R48X audit and repaired
+
+- A before-admission assertion ended in `or True`, making that window pass
+  unconditionally. It now asserts the admitted identity is the replacement
+  identity, that both snapshots name it, the record/selector pair, and the
+  absence of a mixed generation.
+- A zero-side-effect proof compared a census with itself after the denial.
+  The census is now captured before the denial and compared afterward.
+- Admission did not bind the admitted record's internal identity to the
+  requested coordinate. A record filed under one coordinate could enter a
+  bundle describing another operation and be caught only later, by a
+  classifier, after the selector had already been read. Admission now
+  requires a JSON object, the declared transition format and a matching
+  operation id, and raises before any selector authority is read. Proofs
+  cover internal operation-id mismatch, null/empty/non-string operation id,
+  missing operation id, unknown/null/arbitrary format, and non-object JSON.
+
+## 4. R48X repairs and their SHAs
+
+| Commit | Tree | Subject |
+|---|---|---|
+| `dee68028d6cbb10b19723fb59a5177eed7957135` | `f9a5f34e594a3c253dbaa875dae172bf01b4ba2d` | R48X1 align legacy record fixtures with governed 0600 publication |
+| `13d1d83618c44e5090f9af5ea253a460c43af705` | `5a2b876d12c1948ff55f5f30ed59163f415d6ad3` | R48X2 repair the R48 mandatory proofs and bind record identity |
+| `dce32e66662d2a88f2e47e1ed9016a86febf87f1` | `ab25078de18d634d237f0a815e6d7cb11e69e623` | R48X2b reconstruct the real R47 ordering in the negative control |
+
+No commit was amended, squashed, rebased, reset or force-pushed. The R48
+chain (`f9d1ae7f9` -> `bbb58b2ae` -> `116c42bf6` -> `5cc57a021` ->
+`a659584ea`) is published and unmodified, and `parent(f9d1ae7f9)` is still
+`cb2f0ed8a`.
+
+## 5. Authoritative runs on the R48X implementation head
+
+Implementation head `dce32e66662d2a88f2e47e1ed9016a86febf87f1`, tree
+`ab25078de18d634d237f0a815e6d7cb11e69e623`.
+
+| Workflow | Run | Conclusion |
+|---|---|---|
+| b1-local-ground-validation | `37027124632` | success |
+| b2-control-plane-validation | `37027124708` | success |
+| b3-worker-fabric-validation | `37027124647` | success |
+| b4-config-spine-validation | `37027124548` | success |
+| B1-I1R Validation | `37027135586` | success |
+
+b1 JUnit, parsed from the run artifact: **679 collected / 679 executed / 679
+passed / 0 failed / 0 errors / 0 skipped**, 0 duplicate full node IDs,
+`mandatory_skipped = 0`. Independent gate: 75 checks, 0 failing. Evidence
+manifest: 12 entries. Cleanup: ok, disposable removed. Adversarial results:
+8 PASS / 0 FAIL. Tested-commit identity and tree match the head above, and
+`main_sha` is `7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched.
+
+Mandatory POSIX proof execution on Linux: the whole run reports 0 skipped, so
+the R48R3 directory-replacement, mixed-generation, descriptor-lifetime,
+deep-immutability and side-effect proofs all executed, as did the symlink,
+FIFO and POSIX-mode record attacks that are platform-gated locally. The legacy
+R40 durable-state matrix executed all 8 nodes. The weakened mixed-generation
+control executed and discriminated, producing the old PROMOTED record paired
+with the replacement finalize selector, while the shipped engine pinned
+coherently.
+
+R48X node accounting: 679 collected, 679 unique, 0 duplicates; 80 R48 nodes
+(43 in R48R3, 39 in R48R4), each selected exactly once by the runner. R48X
+adds 8 nodes net (9 identity-binding proofs added, 1 superseded identity proof
+removed).
+
+## 6. External checks - unchanged, and still blocking merge
+
+- **SonarCloud** check run `110650539392` - **FAILURE**. No NOSONAR, no
+  exclusions, no quality-profile or threshold change, no severity downgrade
+  and no test removal were made in R48X. No repository-wide finding count is
+  claimed, because the GitHub annotation feed is only a sample.
+- **Kilo Code Review** check run `110649645875` - **FAILURE**, provider-side,
+  during workspace setup and before review: `git-lfs smudge` exhausts the
+  provider sandbox on the 626 MB parquet. The LFS object is untouched and no
+  migration was attempted. Kilo is not claimed to have succeeded.
+
+## 7. Accounting
+
+cloud mutations = 0 - broker mutations = 0 - capital mutations = 0 -
+execution mutations = 0 - recurring cost = $0 - capital.authority = none.
+origin/main remains `7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched.
+
+**Status: INTERNAL R48X CLOSURE SATISFIED ON THE EXACT IMPLEMENTATION HEAD.
+`MERGE_AUTHORIZED = false`** - the external SonarCloud and Kilo failures in
+section 6 keep merge authority withheld.

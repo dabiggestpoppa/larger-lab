@@ -720,3 +720,32 @@ origin/main remains `7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched.
 
 **Status: INTERNAL R48 IMPLEMENTATION COMPLETE. `MERGE_AUTHORIZED = false`
 while SonarCloud and Kilo remain non-success.**
+
+
+# B4-CXR7U9R48X - acceptance correction
+
+This supersedes the R48 acceptance row only; nothing above is rewritten.
+
+The R48 row recorded internal closure on a Windows host whose local totals
+(640) did not reconcile with the 671 collected, and whose exact evidence head
+was red on Linux. That is corrected here.
+
+| Item | R48 evidence head | R48X implementation head |
+|---|---|---|
+| head | `a659584ea488e1e2b2d3cfdd8a8ee3896400a00c` | `dce32e66662d2a88f2e47e1ed9016a86febf87f1` |
+| b1 run | `36954352454` FAILURE | `37027124632` success |
+| JUnit | 671 collected / 10 failed | 679 collected / 679 passed / 0 failed |
+| errors | 0 | 0 |
+| skipped | 0 | 0 |
+| duplicate node IDs | 0 | 0 |
+| independent gate | not green | 75 checks, 0 failing |
+| b2 / b3 / b4 / B1-I1R | success | success |
+
+Ten Linux failures are accounted for by full node ID: seven legacy
+`test_durable_state_controls_rollback_legality` parameterizations (fixture
+permission drift, production rule unchanged) and three R48R3 proof defects
+(mixed-generation control ordering, descriptor-lifetime observation,
+over-strict side-effect expectation). All ten now pass on Linux.
+
+**Status: internal R48X gate satisfied. `MERGE_AUTHORIZED = false`** while
+SonarCloud `110650539392` and Kilo `110649645875` remain FAILURE.
