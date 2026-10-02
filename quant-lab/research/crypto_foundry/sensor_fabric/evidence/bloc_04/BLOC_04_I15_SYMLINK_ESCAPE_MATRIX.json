@@ -1,0 +1,85 @@
+{
+  "cases": [
+    {
+      "case_id": "platform_capability",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "link capability measured; behavioral rows run whenever the platform can create links, structural rows always run (§16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mechanism": "symlink_or_junction",
+        "symlink_available": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "containment_choke_point_structural",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "every storage filesystem resolution funnels through resolve_under_root (single containment choke point) (§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "blob_store_uses_choke_point": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "intermediate_dir_link_write",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a linked intermediate directory can NEVER redirect a blob write outside the configured root (§12/§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_root_mutations": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "staging_dir_link_write",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "linked staging namespace refuses publication outside the root",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_root_mutations": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "preplaced_final_name_link",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a pre-placed link at the final artifact name cannot replace or redirect immutable evidence (§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_file_untouched": true,
+        "refusal": "typed (containment or no-replace publication)",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "data_root_itself_linked",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "when the configured root is itself a link, containment holds against the RESOLVED real root (§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_root_mutations": 0,
+        "writes_inside_real_root": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "toctou_scope_truth",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "TOCTOU symlink-swap race safety is NOT claimed by I15; static escape rejection is proven (§15)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "claimed": "static escape rejection only"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15",
+  "matrix": "SYMLINK_ESCAPE_MATRIX",
+  "measured_at_checkpoint": "I15",
+  "rows_fail": 0,
+  "rows_ok": 7,
+  "rows_total": 7,
+  "synthetic_counterfactuals": 0
+}

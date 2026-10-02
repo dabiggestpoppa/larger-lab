@@ -1,0 +1,474 @@
+{
+  "cases": [
+    {
+      "case_id": "traverse_refused_1",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_2",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_3",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_4",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_5",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_6",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_7",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_8",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_9",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_9",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_10",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_11",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_10",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_13",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_11",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_15",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_16",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_17",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_12",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_13",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_14",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_15",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "traverse_refused_16",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hostile path-like key refused typed before any mutation (§11/§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "typed",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_23",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_24",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_25",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_26",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_27",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_28",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "literal_contained_29",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no URL/percent decoding exists; accepted keys are literal names resolving only inside the root (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "mutation_count": 0,
+        "outside_root_files": 0,
+        "refusal": "none",
+        "surface": "resolve_under_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "provider_segment_encoding",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "provider-supplied path-like values enter keys ONLY through the canonical percent-encoding (literal-safe alphabet) (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "encoded_prefix": "%2E%2E%2F%2E%2E%2FX%2FY%"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "blob_read_surface_typed",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "blob read path accepts only validated SHA-256 ids; hostile ids refuse typed before any filesystem access",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hostile_ids_refused": 3
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "outside_root_mutation_total",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "outside-root file count = 0 across every traversal attack (§46)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attacks": 33,
+        "outside_root_files": 0,
+        "typed_refusals": 16
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "storage_zero_shell_structural",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "Bloc 4 storage production code contains zero subprocess/os.system/shell=True/Popen usage (§13 structural)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "files_with_shell_surface": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "malicious_instrument_is_data",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "provider instrument strings never reach a shell interpreter; persisted as encoded data only (§43 behavioral)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "shell_artifacts": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "containment_choke_point_bypass_audit",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "every Bloc 4 storage module resolves caller-influenced keys through the single hardened resolve_under_root; no module opens a directly-joined key (§2)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "modules_audited": 15,
+        "modules_bypassing": 0,
+        "modules_calling_choke_point": [
+          "blob_store",
+          "catalog",
+          "duckdb_catalog",
+          "projection_resolver",
+          "projections",
+          "export",
+          "recovery"
+        ],
+        "pkg_present": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15",
+  "matrix": "PATH_TRAVERSAL_MATRIX",
+  "measured_at_checkpoint": "I15",
+  "rows_fail": 0,
+  "rows_ok": 36,
+  "rows_total": 36,
+  "synthetic_counterfactuals": 0
+}

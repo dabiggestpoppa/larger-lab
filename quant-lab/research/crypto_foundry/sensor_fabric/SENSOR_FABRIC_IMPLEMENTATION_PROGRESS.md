@@ -3530,3 +3530,69 @@ G4-13_BLOC5_READINESS_GATE = NOT_YET_IMPLEMENTED / PENDING_LATER_CHECKPOINT. I14
 I15 authorization covers ONLY hardening of existing accepted Bloc 4 surfaces (secret scan, path traversal, symlink escape, corruption handling, resource bounds). It does NOT authorize I16 final acceptance/evidence, I17 Bloc 5 handoff, research restart, provider redesign, new storage architecture, new query semantics, new revision semantics, or normalization logic.
 
 No self-ratification of I15: it is AUTHORIZED but NOT STARTED. STOP after I14R2-RATIFY.
+
+---
+
+## SENSOR-B4-I15 HARDENING AND SECURITY
+
+**Type:** implementation + adversarial hardening of ALREADY ACCEPTED Bloc 4 surfaces. **Production diff:** ONE file (`src/crypto_sensor_fabric/storage/paths.py`). **Historical evidence diff:** ZERO (7 old I03R1/I04 artifacts show CRLF-only churn, allowlisted; never staged/normalised).
+
+**Scope (frozen I15 contract):** secret scan; path traversal; symlink escape; corruption handling; resource bounds. No provider redesign, no storage/query/revision semantics change, no normalisation logic. I16+ UNAUTHORIZED; G4-13 NOT EARNED; research FROZEN.
+
+### 1. RED finding -- static symlink escape (reproduced BEFORE repair)
+
+Failure-first record: a link planted at an intermediate directory inside the configured storage root (blobs/, staging/) allowed a blob WRITE to land OUTSIDE the configured root. resolve_under_root() was lexical-only and its docstring explicitly deferred symlink escape to a later hardening checkpoint, so the pre-repair result was UNSAFE (outside-root mutation PRODUCED). Root cause: lexical segment validation cannot see a link at an intermediate component.
+
+### 2. Repair -- single containment choke point
+
+resolve_under_root() now additionally resolves BOTH the root and the candidate through the filesystem and refuses (typed ValueError) any target whose REAL location is not the root itself or a descendant of it. It returns the UN-resolved path so containment stays relative to the RESOLVED root. Chosen law A: a configured DATA ROOT MAY ITSELF be a symlink -- its resolved target is the authority (proven by the root-is-a-link case). Post-repair: same attack refused typed, outside-root mutation count = 0; a pre-placed link at the exact final artifact name is refused by typed containment OR AtomicPublishError (no-replace publication) and the outside file is untouched. Audit confirmed the hardened helper is the single filesystem containment choke point for caller-influenced keys (blob_store, catalog, manifests, json_catalog/duckdb_catalog, projection resolver/projections, export, recovery); the bypass audit found no module opening a directly-joined caller key.
+
+**STATIC_SYMLINK_ESCAPE = SEALED. TOCTOU_SYMLINK_SWAP = KNOWN_LIMITATION** (no race-safety claim is made; recorded explicitly, never claimed).
+
+### 3. Adversarial results (fresh, PRODUCTION_MEASURED)
+
+- Secret scan: 0 credential-shaped findings across source / tests / evidence roots after a NARROW allowlist (TEST_ONLY sentinels + documented exact accepted redaction-fixture literals only). Scanner self-match excluded (its own regex/source definitions are not counted) and a separate runtime-built realistic synthetic credential IS detected -- proving the allowlist is not a blanket suppression. Error messages name no secret value.
+- Runtime sentinel: secret-bearing request/auth metadata refused typed (SecretBearingAcquisitionMetadata); recursive durable-tree scan = 0 sentinel hits (per-case, isolated); raw response bytes remain exact evidence (never redacted); accepted URL/header/DSN sanitizers proven.
+- Path traversal: full matrix (now including explicit cross-platform Windows/POSIX cases: mixed separators, drive-absolute, extended-length device path, dot-segments, reserved names, shell-style expansions, Unicode slash lookalike, trailing dot/space, encoded/double-encoded, NUL) -- every hostile key typed-refused or literally contained; OUTSIDE-ROOT MUTATIONS = 0. Provider values enter keys ONLY through the canonical percent-encoding.
+- No shell: structural (zero subprocess/os.system/shell=True/Popen in storage) AND behavioural (a shell-metacharacter instrument persists as data; 0 shell artifacts).
+- Hardlink: mutating accepted immutable evidence through a hardlink IS detected typed (content verification), never silently accepted.
+
+### 4. Corruption (FRESH-RESTART, outcome vocabulary)
+
+Fresh repository instances used throughout (no in-memory cached refusal counted):
+- T0A payload tamper -> QUARANTINED_ACCEPTED (QUARANTINED_INTEGRITY_FAILURE).
+- Manifest fragment tamper -> FAIL_CLOSED_TYPED on fresh read (no repair-on-read).
+- Acquisition fragment tamper -> FAIL_CLOSED_TYPED on fresh read.
+- DuckDB corrupt/delete -> REBUILD_DISPOSABLE_STATE from durable evidence (never a source of truth).
+- Recovery over hostile staging state -> read-only scan: nothing created/deleted, valid T0A preserved, unknown hostile file never promoted to trusted evidence.
+- Remaining subsystems (T0B, revision, job/checkpoint, export) cited to existing measured suites (I05R1-R4, I06/I14R2 RESTART_CORRUPTION, I07R1I, I13) -- no generic "exception happened" rows.
+
+### 5. Resource bounds (write scale severed from scan scale)
+
+- Logical 1 GiB-equivalent streaming hash: bounded by configured chunk (memory never grows with source size); 64 MiB-equivalent T0A write streams at 256 KiB chunks (dedupe -> REUSED_EXISTING without double-buffering). T0A = SAFE_BY_STREAMING_API.
+- ACTUAL MANIFEST ROWS SCANNED >= 10,000 (frozen benchmark honoured literally): manifest_rows_created = 10,000; manifest_rows_scanned = 10,000; invalid_rows = 0; duplicate logical ids = 0; fragment_files = 10,000 (one canonical parquet row/fragment, since the accepted catalog physically requires len(rows)==1); deterministic (sorted) order; peak scan memory ~56 MiB. Corpus construction was EXPLICIT benchmark-fixture setup with the canonical serializer/schema into the production on-disk layout; the ACTUAL scan ran PRODUCTION reader code (RecoveryEngine._all_manifests -> read_fragment + _manifest_from_row). Pointer/parquet-object counts were NEVER relabelled as manifest rows.
+- WRITE_SCALE measured SEPARATELY: 200 real append_partition_manifest appends = 24.44 s (full durability re-proof per append). No 10k-append throughput claim.
+- DuckDB rebuild + read-only query over 150 synthetic projection identities completes; export ceilings + injectable free-space law; query limit is the explicit caller bound (reader materializes the gated set, no invented pagination); long revision chain (200): ALL/FIRST/LATEST/EXACT exact, no recursion, no silent truncation.
+- Disk-watermark policy MATRIX preserves accepted I09 semantics exactly: NORMAL all PROCEED; WATCH all WARN; CONSTRAINED P0/P1 PROCEED, P2 DEFER, P3 PAUSE; CRITICAL P0 WARN (continue), P1/P2/P3 BLOCK; absolute floor blocks even P0; NO automatic T0A deletion. Resource ceilings are CONFIGURATION (independent fixtures prove different safe limits leave scientific evidence identity unchanged).
+
+### 6. Regressions (after final code)
+
+Focused I15: test_i15_hardening.py 17 passed; test_i15_resource_bounds.py 12 passed; test_i15_manifest_scan_scale.py 2 passed. Storage subsystem regressions: blob/catalog/manifest core 295 passed (1 pre-existing known concurrency flake -- passes on retry, reproduced at untouched baseline); projections/revisions/duckdb/export/quota/atomic 300 passed; recovery/job-state/I04 212 passed (1 skipped); I05-I07 123 passed; I08-I10 223 passed; I11-I12 141 passed (21 skipped, postgres BLOCKED_ENVIRONMENT); I13-I14 143 passed (2 skipped); checksums/models/serialization/provenance 314 passed. ZERO deterministic failures.
+
+**Pre-existing defect surfaced and fixed forward:** the I14R2-RATIFY committed ledger carried 42 CRLF sequences, failing test_job_state_r1i.py::test_ledger_is_utf8_lf at UNTOUCHED HEAD. The I15 ledger append normalises the document to UTF-8 LF (required by that contract); no prior commit amended.
+
+Tooling: compileall OK; Ruff clean on changed scope (2 pre-existing findings in untouched test_i08_evidence.py); mypy storage = 10 errors all pre-existing in probes/providers (0 new). external_ci = NONE_OBSERVED. I11R2 tracked-Python audit mechanically regenerated after final filenames and re-run no-update for byte stability.
+
+Published matrices (I15 only; historical I03-I14 evidence untouched): SECRET_SAFETY_MATRIX, PATH_TRAVERSAL_MATRIX, SYMLINK_ESCAPE_MATRIX, CORRUPTION_MATRIX, RESOURCE_BOUNDS_MATRIX, MANIFEST_SCAN_MATRIX (+ BLOC_04_I15_HARDENING_EVIDENCE.md).
+
+```
+SENSOR-B4-I15
+PASS_SENSOR_B4_I15_HARDENING_SECURITY_SEALED          = PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                            = FALSE
+recommended_next                                      = OPERATOR REVIEW OF SENSOR-B4-I15
+I16+                                                  = UNAUTHORIZED
+G4-13                                                 = NOT_YET_IMPLEMENTED / PENDING_LATER_CHECKPOINT
+research                                              = FROZEN
+```
+
+No self-ratification. I16 not started. STOP after I15.

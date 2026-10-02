@@ -1,0 +1,280 @@
+{
+  "cases": [
+    {
+      "case_id": "gib_streaming_hash",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "1 GiB-equivalent hash completes with memory bounded by chunk size, never by source size (§26)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "digest": "2c06ade942ee3f17",
+        "logical_bytes": 1073741824,
+        "max_read_chunk": 1048576,
+        "peak_python_memory_bytes": 1048978,
+        "reads": 1024
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "large_t0a_streaming_write",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "64 MiB-equivalent T0A write streams at configured chunk; hash identity exact; memory bounded by chunk (§27)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "disposition": "COMMITTED_NEW",
+        "logical_bytes": 67108864,
+        "max_read_chunk": 262144,
+        "peak_python_memory_bytes": 555910,
+        "source_sha_prefix": "281e519df3077b55"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "content_dedupe_bounded",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "identical re-put dedupes (REUSED_EXISTING) via streaming verification; never both sources in memory (§28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "disposition": "REUSED_EXISTING",
+        "max_read_chunk": 262144,
+        "peak_python_memory_bytes": 537623
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "chunk_size_is_configuration",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "hash/write chunking is a configured parameter (no fixed RAM/disk assumption in science logic) (§37)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "configured_chunk": 262144,
+        "default_chunk": 1048576
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "write_scale_production_append",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "bounded production-API manifest appends complete with real per-append durability cost measured; informational, NOT a 10k-append claim (§19)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "append_seconds": 12.04,
+        "manifests_appended": 200,
+        "ms_per_append": 60.2,
+        "protocol": "real append_partition_manifest (full durability re-proof per append)"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_many_projection_scale",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "DuckDB rebuild + read-only query over many synthetic projection identities completes (§30)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "projections_seeded": 150,
+        "rebuild_seconds": 3.61,
+        "seed_seconds": 35.17,
+        "v_t0_projections_rows": 150,
+        "view_row_counts": {
+          "v_t0_acquisitions": 150,
+          "v_t0_blobs": 150,
+          "v_t0_gaps": 0,
+          "v_t0_partitions": 0,
+          "v_t0_projections": 150,
+          "v_t0_quarantine": 0,
+          "v_t0_revisions": 150,
+          "v_t0_storage_usage": 2
+        }
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "export_ceilings_configured",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "export enforces object-count / object-byte / total-byte / manifest-byte ceilings (typed refusals, I13 measured) (§32)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "adversarial_declared_sizes": "typed-refusal suites: test_i13_export_restore.py, test_i13r2_evidence.py",
+        "limits": {
+          "max_manifest_bytes": 67108864,
+          "max_object_bytes": 8589934592,
+          "max_objects": 1000000,
+          "max_total_bytes": 1099511627776
+        }
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "export_free_space_injectable",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "free-space check runs before expansion via injectable probe; export succeeds within real free space (§36)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "exported_objects": 18
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "critical_watermark_p0_preservation",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "at critical watermark non-essential writes pause/refuse; P0 continues; absolute floor blocks even P0; NO automatic T0A deletion (§35)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destructive_auto_clean": false,
+        "floor_block": "BLOCK",
+        "p0": "WARN",
+        "p2": "BLOCK",
+        "p3": "BLOCK",
+        "pressure": "CRITICAL"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "revision_chain_scale",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "long revision chain resolves ALL/FIRST/LATEST/EXACT without recursion explosion; no silent truncation (§34)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "all_count": 200,
+        "resolve_ms": 0.2,
+        "revisions": 200,
+        "seed_seconds": 30.27
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resource_config_law",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "same evidence under different safe resource configuration yields identical scientific identity (§37)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "chunk_configs": [
+          65536,
+          1048576
+        ],
+        "sha_prefix": "2877eb3b93582ba8"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "disk_watermark_policy_matrix",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "accepted I09 priority semantics are PRESERVED across all four pressure classes: only P0 continues at critical, and NO automatic T0A deletion exists (§30)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destructive_auto_clean": false,
+        "expected": {
+          "CONSTRAINED": {
+            "P0": "PROCEED",
+            "P1": "PROCEED",
+            "P2": "DEFER",
+            "P3": "PAUSE"
+          },
+          "CRITICAL": {
+            "P0": "WARN",
+            "P1": "BLOCK",
+            "P2": "BLOCK",
+            "P3": "BLOCK"
+          },
+          "NORMAL": {
+            "P0": "PROCEED",
+            "P1": "PROCEED",
+            "P2": "PROCEED",
+            "P3": "PROCEED"
+          },
+          "WATCH": {
+            "P0": "WARN",
+            "P1": "WARN",
+            "P2": "WARN",
+            "P3": "WARN"
+          }
+        },
+        "grid": {
+          "CONSTRAINED": {
+            "P0": "PROCEED",
+            "P1": "PROCEED",
+            "P2": "DEFER",
+            "P3": "PAUSE"
+          },
+          "CRITICAL": {
+            "P0": "WARN",
+            "P1": "BLOCK",
+            "P2": "BLOCK",
+            "P3": "BLOCK"
+          },
+          "NORMAL": {
+            "P0": "PROCEED",
+            "P1": "PROCEED",
+            "P2": "PROCEED",
+            "P3": "PROCEED"
+          },
+          "WATCH": {
+            "P0": "WARN",
+            "P1": "WARN",
+            "P2": "WARN",
+            "P3": "WARN"
+          }
+        }
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "resource_config_independent_fixtures",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "different safe operational resource configuration (independent fixtures, no reused state) does not change scientific evidence identity (§31)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "chunk_configs": [
+          65536,
+          2097152
+        ],
+        "independent_roots": 2,
+        "sha_prefix": "8dcf93eaa352cb8d"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "query_result_bound_and_materialization",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "RawEvidenceQuery exposes ``limit`` as the explicit caller result bound and the reader materializes the gated set (no lazily unbounded stream, no invented pagination) (§28)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "limit_field_present": true,
+        "limited_result_count": 1,
+        "pagination_cursor": "none (limit only, by design)",
+        "reader_materializes": true,
+        "unlimited_result_count": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "projection_input_bound",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "projection write accepts an explicit materialized ``rows: list[dict]`` (caller-held input bound) and builds one Arrow Table; no unbounded lazy iterable is accepted, no RED resource gap (§26)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "accepted_input": "list[dict] (explicit bounded)",
+        "classification": "SAFE_BY_EXPLICIT_INPUT_BOUND",
+        "materializes": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0a_streaming_input_bound",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "LocalBlobStore.put accepts a file-like streaming source and hashes/writes at chunk size; large evidence never needs a single in-memory buffer (§24)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "classification": "SAFE_BY_STREAMING_API",
+        "proven_by": "large_t0a_streaming_write (64 MiB-equivalent virtual stream)"
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15",
+  "matrix": "RESOURCE_BOUNDS_MATRIX",
+  "measured_at_checkpoint": "I15",
+  "rows_fail": 0,
+  "rows_ok": 16,
+  "rows_total": 16,
+  "synthetic_counterfactuals": 0
+}

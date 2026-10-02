@@ -1,0 +1,198 @@
+{
+  "cases": [
+    {
+      "case_id": "t0a_payload_byte_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered T0A payload detects typed (QUARANTINED_INTEGRITY_FAILURE); no silent read, no repair (§18)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "file_repaired": false,
+        "integrity_state": "QUARANTINED_INTEGRITY_FAILURE"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "metadata_fragment_binding",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "catalog fragments reject masquerading identity: physical key must hash the logical id; parse/binding divergence fails closed (json_catalog law)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "law": "JsonCatalogCorrupt"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "acquisition_manifest_tamper",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "acquisition provenance + manifest coherence tamper: fresh load fails typed where invariant violated (I04R1/I04R2 measured suites)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "suites": [
+          "test_i04r1_evidence.py",
+          "test_i04r2_evidence.py"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "t0b_projection_tamper",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "T0B payload/sha/schema/context/lineage tamper: loud typed refusal, no partial acceptance (I05R1-R4 measured suites) (§20)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "suites": [
+          "test_i05r1_evidence.py",
+          "test_i05r2_evidence.py",
+          "test_i05r4_adversarial.py"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "revision_tamper",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "revision segment digest/bindings/first/source-key/number/declaration/observation/content_scope tamper: fresh restart fails closed, no repair-on-read (I06 + I14R2 §27 measured) (§21)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "suites": [
+          "test_i06_evidence.py",
+          "test_i14r2_evidence.py RESTART_CORRUPTION 6/6"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "job_checkpoint_tamper",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "status event / proof version / resume token / manifest id / event sequence / terminal state tamper: fresh DurableJobStateRepository typed corruption, no cursor advance from invalid evidence (I07R1I measured) (§22)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "suites": [
+          "test_i07r1i_evidence.py FAILED_GATE_ATOMICITY_MATRIX 17"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "export_pack_tamper",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "export pack manifest/pack-root digest, missing/extra object, object checksum, path field, spec tamper: verifier and restore fail BEFORE final-root promotion (I13 measured) (§23)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "suites": [
+          "test_i13_export_restore.py",
+          "test_i13r2_evidence.py"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_disposable_rebuild",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "DuckDB is disposable discovery state: delete/tamper rebuilds from durable evidence; never unique source of truth (I10 measured) (§24)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "suites": [
+          "test_i10_evidence.py",
+          "test_i10r2_evidence.py"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "recovery_quarantine_safety",
+      "category": "EXISTING_MEASURED_SUITE",
+      "invariant": "recovery never deletes valid T0A, never adopts hostile files, never follows links out of root, never overwrites quarantine evidence; quota decision is side-effect-free (I08 measured + structural) (§25)",
+      "invariant_source": "EXISTING_MEASURED_SUITE",
+      "measured": {
+        "structural": "no destructive auto-clean in recovery/quota modules",
+        "suites": [
+          "test_i08r1_crash_truth.py"
+        ]
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "hardlink_mutation_detected",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "mutating accepted immutable evidence through a hardlink is DETECTED typed (content verification catches it); never silently accepted (§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hardlink_available": true,
+        "hardlink_still_present": true,
+        "integrity_state": "QUARANTINED_INTEGRITY_FAILURE",
+        "silent_acceptance": false
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_restart_t0a_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "T0A payload tamper after commit is detected by a FRESH repository instance (not an in-memory cache) (§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "integrity_state": "QUARANTINED_INTEGRITY_FAILURE",
+        "outcome": "QUARANTINED_ACCEPTED"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_restart_manifest_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered committed manifest fragment fails CLOSED typed on a fresh repository read; no repaired-on-read, no silent acceptance (§14/§15)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "outcome": "FAIL_CLOSED_TYPED"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_restart_acquisition_tamper",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered acquisition fragment fails CLOSED typed on a fresh repository read (no cached refusal counted) (§14/§15)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "outcome": "FAIL_CLOSED_TYPED"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "duckdb_disposable_rebuild_from_evidence",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "corrupted/deleted DuckDB is DISPOSABLE discovery state: rebuild from durable evidence yields canonical row counts (§16-A)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outcome": "REBUILD_DISPOSABLE_STATE",
+        "rows_after_rebuild": 1
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "recovery_hostile_state_readonly",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "recovery scan over hostile staging state mutates nothing, deletes no valid T0A, never promotes an unknown hostile file to trusted evidence (§17)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "files_unchanged": true,
+        "findings": 1,
+        "has_blockers": false,
+        "hostile_file_promoted": false,
+        "problems": [
+          "UNCOMMITTED_STAGING"
+        ],
+        "valid_t0a_preserved": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15",
+  "matrix": "CORRUPTION_MATRIX",
+  "measured_at_checkpoint": "I15",
+  "rows_fail": 0,
+  "rows_ok": 15,
+  "rows_total": 15,
+  "synthetic_counterfactuals": 0
+}

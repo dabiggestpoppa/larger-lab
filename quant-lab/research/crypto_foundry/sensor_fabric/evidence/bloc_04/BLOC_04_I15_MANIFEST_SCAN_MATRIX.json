@@ -1,0 +1,33 @@
+{
+  "cases": [
+    {
+      "case_id": "manifest_scan_scale_10k_real_rows",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "scan >=10,000 ACTUAL VALID PartitionManifest ROWS with production reader code: rows_scanned == rows_created, invalid_rows == 0, duplicate logical ids == 0, deterministic order, bounded memory (§18-§22)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "build_seconds_informational": 62.8,
+        "corpus_construction": "benchmark_fixture (canonical serializer + schema, production on-disk layout) — NOT append throughput",
+        "deterministic_order": true,
+        "duplicate_logical_ids": 0,
+        "fragment_files": 10000,
+        "invalid_rows": 0,
+        "manifest_rows_created": 10000,
+        "manifest_rows_scanned": 10000,
+        "per_record_rows": 1,
+        "rows_required": 10000,
+        "scan_peak_memory_bytes": 56224269,
+        "scan_reader": "RecoveryEngine._all_manifests -> read_fragment + _manifest_from_row (production)",
+        "scan_seconds_informational": 168.62
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15",
+  "matrix": "MANIFEST_SCAN_MATRIX",
+  "measured_at_checkpoint": "I15",
+  "rows_fail": 0,
+  "rows_ok": 1,
+  "rows_total": 1,
+  "synthetic_counterfactuals": 0
+}

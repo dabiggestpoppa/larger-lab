@@ -269,7 +269,26 @@ def resolve_under_root(root: str | Path, object_key: str) -> Path:
             raise ValueError(
                 f"object_key segment {segment!r} contains a structural character"
             )
-    return Path(root).joinpath(*segments)
+    path = Path(root).joinpath(*segments)
+    # SENSOR-B4-I15 (§12/§14): symlink-escape containment.  Lexical
+    # validation above cannot see a link planted at an intermediate
+    # directory (``blobs``, ``staging``, catalogs, ...): resolve BOTH the
+    # root and the candidate through the filesystem and refuse any target
+    # whose REAL location is not the root itself or a descendant of it.
+    # Static escape rejection only — no TOCTOU race-safety claim is made.
+    # Containment is relative to the RESOLVED root, so a root that is
+    # itself a link stays valid while still bounding every child.
+    resolved_root = Path(root).resolve()
+    resolved_target = path.resolve()
+    if (
+        resolved_target != resolved_root
+        and resolved_root not in resolved_target.parents
+    ):
+        raise ValueError(
+            "object_key resolves outside the storage root (link escape "
+            f"refused): {object_key!r}"
+        )
+    return path
 
 
 __all__ = [
