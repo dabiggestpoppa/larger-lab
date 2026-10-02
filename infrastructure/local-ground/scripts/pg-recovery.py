@@ -2191,6 +2191,39 @@ def _admit_record_descriptor(fd, dir_fd, name, operation_id):
     return info
 
 
+def _assert_record_identity(operation_id, record):
+    """Bind the admitted record's OWN identity to the requested coordinate.
+
+    B4-CXR7U9R48X3. Admission already proved that the BYTES came from the
+    canonical file inside the pinned governed directory. It did not prove that
+    the object inside those bytes DESCRIBES that operation. Without this a
+    record whose internal ``operation_id`` or ``format`` names something else
+    enters the bundle as trusted record material, and the disagreement is only
+    noticed later -- by a classifier, after the selector has already been read
+    and after the bundle exists. A record that is not even a JSON object is
+    refused here as well.
+
+    Absence stays legal: a pre-promotion input legitimately has no durable
+    record yet, so this only runs when a record was actually admitted.
+    """
+    if not isinstance(record, dict):
+        raise _record_conflict(
+            operation_id, "the admitted transition record is not a JSON "
+            "object; refusing to trust an unidentifiable record")
+    declared_format = record.get("format")
+    if declared_format != TRANSITION_FORMAT:
+        raise _record_conflict(
+            operation_id, f"the admitted transition record declares format "
+            f"{declared_format!r}, not {TRANSITION_FORMAT!r}; refusing an "
+            "unknown transition-record format")
+    declared_operation = record.get("operation_id")
+    if declared_operation != operation_id:
+        raise _record_conflict(
+            operation_id, "the admitted transition record's internal operation "
+            f"id {declared_operation!r} is not the requested operation "
+            f"{operation_id!r}; refusing a crossed record identity")
+
+
 def _read_admitted_record(operation_id, fd):
     """Read, bound and parse the record from the ADMITTED descriptor only.
 
@@ -2465,6 +2498,12 @@ def _acquire_recovery_authority(operation_id, promote=None, record=None):
                 governed_inode=identity[1], device=0, inode=0, size=0, mode=0,
                 link_count=0, record=None, record_digest=None,
                 raw_digest=None, read_error="refused")
+        # B4-CXR7U9R48X3: the record must describe the operation it was filed
+        # under BEFORE any selector authority is read. Doing it here, rather
+        # than in a downstream classifier, is what makes a crossed record
+        # identity a denial instead of material the bundle carries.
+        if admitted_record is not None:
+            _assert_record_identity(operation_id, admitted_record)
         selector = _read_selector_snapshot_admitted(
             operation_id, governed, name, dir_fd, identity)
         _assert_one_directory_generation(

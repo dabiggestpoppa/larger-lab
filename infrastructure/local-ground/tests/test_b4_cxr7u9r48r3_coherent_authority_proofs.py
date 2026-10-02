@@ -19,7 +19,6 @@ that the attack was impossible.
 import dataclasses
 import json
 import os
-import shutil
 import tempfile
 from pathlib import Path
 
@@ -102,36 +101,82 @@ def _r47_shape(tmp_path):
     return weakened
 
 
-def _swap_whole_directory(transitions, opid, new_transition):
-    """Replace the ENTIRE governed directory with a new generation."""
+# The state the replacement generation publishes. It differs from the
+# build generation's PROMOTED so the two are distinguishable, and it is
+# paired with a finalize selector so that neither generation's
+# (state, transition) pair can be mistaken for the other's.
+GENERATION_B_STATE = "STAGED"
+
+
+def _swap_whole_directory(transitions, opid, new_transition,
+                          new_state=GENERATION_B_STATE):
+    """Replace the ENTIRE governed directory with a COMPLETE new generation.
+
+    Two properties matter for the proofs below to mean anything:
+
+    * generation A is renamed aside and LEFT IN PLACE. A pinned directory
+      descriptor keeps a renamed inode readable, which is exactly the state a
+      real whole-directory replacement leaves behind and exactly what the
+      R48R1 pin is supposed to keep reading. Deleting it would remove the
+      generation under test rather than exercise it.
+    * generation B publishes its own record as well as its own claim, with a
+      different record state. "Mixed" is then decidable from the CONTENT PAIR
+      (record state, selector transition) instead of from which file happened
+      to be missing, so the same assertion means the same thing on a platform
+      that pins the selector and on one that does not.
+
+    The receipt digest is carried over unchanged on purpose: that is what makes
+    this a real attack, because a differing digest would be refused by the
+    claim-to-receipt binding before any coherence question arose.
+    """
     aside = transitions.with_name(transitions.name + ".aside")
     os.rename(transitions, aside)
     fresh = transitions
     fresh.mkdir(mode=0o700)
-    digest = json.loads(
-        (aside / f"{opid}.json").read_text(encoding="utf-8"))["receipt_sha256"]
+    origin = json.loads(
+        (aside / f"{opid}.json").read_text(encoding="utf-8"))
+    record_path = fresh / f"{opid}.json"
+    record_path.write_text(json.dumps(
+        {**origin, "state": new_state, "selected_transition": new_transition}),
+        encoding="utf-8")
+    os.chmod(record_path, 0o600)
     _publish(fresh, {"format": pgrec._CLAIM_FORMAT,
-                       "operation_id": opid,
-                       "transition": new_transition,
-                       "receipt_sha256": digest})
-    shutil.rmtree(aside, ignore_errors=True)
+                     "operation_id": opid,
+                     "transition": new_transition,
+                     "receipt_sha256": origin["receipt_sha256"]})
     return fresh
 
 
 def _capture(module, operation_id, promote, swap, hook="_selector"):
-    """Acquire authority, forcing `swap` at a chosen point in the sequence."""
+    """Acquire authority, forcing `swap` at a chosen point in the sequence.
+
+    ``hook`` names the window:
+
+    ``_selector``
+        after the record read, before the selector read;
+    ``_record``
+        immediately after the record read completes;
+    ``after_admission``
+        after the governed-directory descriptor has been pinned but BEFORE
+        either read;
+    ``pathname_record``
+        after a PATHNAME record read and before the governed directory is
+        admitted at all. This is the R47 ordering the weakened control
+        reproduces.
+    """
     fired = []
     if hook == "_selector":
-        real = module._read_selector_snapshot_admitted
+        attribute = "_read_selector_snapshot_admitted"
+        real = getattr(module, attribute)
 
         def wrapped(op, governed, name, dir_fd, identity):
             if not fired:
                 fired.append(True)
                 swap()
             return real(op, governed, name, dir_fd, identity)
-        module._read_selector_snapshot_admitted = wrapped
-    else:
-        real = module._read_record_snapshot_admitted
+    elif hook == "_record":
+        attribute = "_read_record_snapshot_admitted"
+        real = getattr(module, attribute)
 
         def wrapped(op, governed, name, dir_fd, identity):
             snap = real(op, governed, name, dir_fd, identity)
@@ -139,7 +184,35 @@ def _capture(module, operation_id, promote, swap, hook="_selector"):
                 fired.append(True)
                 swap()
             return snap
-        module._read_record_snapshot_admitted = wrapped
+    elif hook == "after_admission":
+        attribute = "_open_governed_directory"
+        real = getattr(module, attribute)
+
+        def wrapped(coordinate, operation):
+            admitted = real(coordinate, operation)
+            if not fired:
+                fired.append(True)
+                swap()
+            return admitted
+    elif hook == "pathname_record":
+        # The real R47 ordering. The R47 engine read the record by PATHNAME
+        # and only afterwards derived the claim coordinate and admitted the
+        # transitions directory for the selector. Firing the swap here --
+        # after the pathname record read, before that admission -- reconstructs
+        # the defect itself: an OLD record paired with a NEW selector, because
+        # the two reads were never governed by one admission.
+        attribute = "_load_transition_record"
+        real = getattr(module, attribute)
+
+        def wrapped(op):
+            loaded = real(op)
+            if not fired:
+                fired.append(True)
+                swap()
+            return loaded
+    else:
+        raise AssertionError(f"unknown swap window {hook!r}")
+    setattr(module, attribute, wrapped)
     try:
         try:
             return "acquired", module._acquire_recovery_authority(
@@ -147,20 +220,36 @@ def _capture(module, operation_id, promote, swap, hook="_selector"):
         except Exception as exc:                # noqa: BLE001 - shape probe
             return "refused", exc
     finally:
-        if hook == "_selector":
-            module._read_selector_snapshot_admitted = real
-        else:
-            module._read_record_snapshot_admitted = real
+        setattr(module, attribute, real)
 
 
-def _mixed(authority):
-    """True when a bundle pairs an old record with a new selector."""
+# The (record state, selector transition) pairs the two generations built
+# by _build and _swap_whole_directory actually contain. A bundle is MIXED
+# when its pair is neither of these, because then its two reads cannot have
+# come from one governed-directory generation. Naming both pairs, rather than
+# only the PROMOTED/finalize pair that the Windows shape produces, is what
+# keeps the proof meaningful on POSIX, where the R47 defect mixes the other
+# way round.
+_COHERENT_PAIRS = frozenset({
+    ("PROMOTED", "rollback"),
+    (GENERATION_B_STATE, "finalize"),
+})
+
+
+def _authority_pair(authority):
+    """The (record state, selector transition) an accepted bundle paired."""
     record = authority.record
     selector = authority.selector
     if not isinstance(record, dict) or not isinstance(selector.claim, dict):
-        return False
-    return (record.get("state") == "PROMOTED"
-            and selector.claim.get("transition") == "finalize")
+        return None
+    return (record.get("state"), selector.claim.get("transition"))
+
+
+def _cross_generation(authority):
+    """True when a bundle paired material that never coexisted in one
+    governed-directory generation."""
+    pair = _authority_pair(authority)
+    return pair is not None and pair not in _COHERENT_PAIRS
 
 
 # ===================================================================== #
@@ -175,25 +264,41 @@ def test_a_shipped_never_accepts_a_mixed_generation_decision(tmp_path):
         pgrec, OPID, promote,
         lambda: _swap_whole_directory(transitions, OPID, "finalize"))
     if outcome == "acquired":
-        assert not _mixed(bundle), (
+        assert not _cross_generation(bundle), (
             "a whole-directory replacement yielded an accepted mixed-"
-            "generation decision")
+            f"generation decision: {_authority_pair(bundle)!r}")
     else:
         assert isinstance(bundle, pgrec._ExecutionAuthorityConflict), bundle
-        assert "mixed-generation" in str(bundle) or "replaced" in str(bundle)
+        assert "generation" in str(bundle), str(bundle)
 
 
 def test_a_weakened_control_reproduces_the_mixed_generation(tmp_path):
-    """A.2 The R47 shape MUST still be exploitable, or A.1 proves nothing."""
+    """A.2 The R47 shape MUST still be exploitable, or A.1 proves nothing.
+
+    The R47 defect was an ORDERING defect, not a per-platform one. R47 read the
+    transition record by PATHNAME and only afterwards derived the claim
+    coordinate and admitted the transitions directory for the selector, so the
+    two reads were never governed by a single admission. A whole-directory
+    replacement landing between them produced an accepted decision built from
+    an OLD PROMOTED record and the replacement generation's NEW finalize
+    selector.
+
+    The control therefore fires the swap AFTER the pathname record read and
+    BEFORE the directory is admitted, which is exactly that sequence, and the
+    proof requires the exact mixture: acquired, PROMOTED, finalize. Asserting
+    any weaker property here would let a control that no longer reproduces the
+    defect pass.
+    """
     transitions, _record, promote, _receipt = _build(
         tmp_path, "PROMOTED", "rollback")
     weak = _import(_r47_shape(tmp_path), "r48r3_a_weak")
     weak._bind_test_recovery_root(str(transitions.parents[0]))
     outcome, bundle = _capture(
         weak, OPID, promote,
-        lambda: _swap_whole_directory(transitions, OPID, "finalize"))
+        lambda: _swap_whole_directory(transitions, OPID, "finalize"),
+        hook="pathname_record")
     assert outcome == "acquired", outcome
-    assert _mixed(bundle), (
+    assert _authority_pair(bundle) == ("PROMOTED", "finalize"), (
         "the weakened control must combine the old PROMOTED record with the "
         "replacement finalize selector, proving the proof discriminates")
 
@@ -232,22 +337,55 @@ def test_b_every_replacement_window_is_coherent_or_denied(tmp_path, window):
                 bundle, outcome = None, "refused"
         finally:
             pgrec._open_governed_directory = real_dir
-        # The replacement happened BEFORE admission, so the new generation is
-        # the one admitted -- coherent, and its selector is finalize with a
-        # PROMOTED record read from the SAME generation.
+        # The replacement happened BEFORE admission, so generation B is the
+        # one admitted. Every one of these is concrete: the admitted identity,
+        # both snapshots naming it, the record/selector pair, and the absence
+        # of a mixed generation. The expression this replaced ended in
+        # `or True`, which made the whole window pass unconditionally.
         if outcome == "acquired":
-            assert bundle.governed_device == bundle.record_snapshot \
-                .governed_device or bundle.record is None or True
-            assert not _mixed(bundle)
+            info = os.stat(transitions)
+            replacement_identity = (info.st_dev, info.st_ino)
+            assert (bundle.governed_device, bundle.governed_inode) == \
+                replacement_identity, (
+                "the admitted identity is not the replacement directory's")
+            assert (bundle.record_snapshot.governed_device,
+                    bundle.record_snapshot.governed_inode) == \
+                replacement_identity, (
+                "the record snapshot does not name the replacement directory")
+            assert (bundle.selector.governed_device,
+                    bundle.selector.governed_inode) == replacement_identity, (
+                "the selector snapshot does not name the replacement "
+                "directory")
+            if bundle.record is None:
+                # A replacement that publishes no admissible record must leave
+                # the bundle with NO record, and the decision must fail closed
+                # rather than fall back to anything.
+                assert pgrec._classify_record_for_shell(bundle, None) == 4
+            else:
+                assert _authority_pair(bundle) == (GENERATION_B_STATE,
+                                                   "finalize")
+            assert not _cross_generation(bundle), (
+                "the before-admission window accepted a mixed generation")
         return
 
-    hook = "_record" if window in (
-        "between_record_open_and_selector", "after_record_before_selector") \
-        else "_selector"
+    # Each named window has to fire the swap where its NAME says. This
+    # mapping used to send "after_admission" to the selector hook as well,
+    # so that window silently re-ran the "during_selector" case and the
+    # window between pinning the governed directory and reading the record
+    # -- the one the R47 pathname defect actually lives in on POSIX -- was
+    # never exercised at all.
+    hook = {
+        "after_admission": "after_admission",
+        "between_record_open_and_selector": "_record",
+        "after_record_before_selector": "_record",
+    }.get(window, "_selector")
     outcome, bundle = _capture(pgrec, OPID, promote, swap, hook=hook)
     if outcome == "acquired":
-        assert not _mixed(bundle), (
-            f"window {window} produced a mixed-generation decision")
+        assert not _cross_generation(bundle), (
+            f"window {window} produced a mixed-generation decision: "
+            f"{_authority_pair(bundle)!r}")
+    else:
+        assert isinstance(bundle, pgrec._ExecutionAuthorityConflict), bundle
 
 
 def test_b_after_both_reads_the_bundle_is_already_coherent(tmp_path):
@@ -300,10 +438,13 @@ def test_c_receipt_digest_mismatch_fails_closed(tmp_path):
     """
     transitions, record, promote, _receipt = _build(
         tmp_path, "PROMOTED", "rollback")
+    # The census is captured BEFORE the denial. Comparing a census with itself
+    # proves nothing, which is what this assertion used to do.
+    before = _census(pgrec._transitions_dir())
     record["receipt_sha256"] = FOREIGN
     with pytest.raises(pgrec._ExecutionAuthorityConflict):
         pgrec._acquire_recovery_authority(OPID, promote, record=record)
-    assert _census(pgrec._transitions_dir()) == _census(pgrec._transitions_dir())
+    assert _census(pgrec._transitions_dir()) == before
 
 
 def test_c_contradictory_state_and_selector_fail_closed(tmp_path):
@@ -313,17 +454,77 @@ def test_c_contradictory_state_and_selector_fail_closed(tmp_path):
     assert pgrec._classify_record_for_shell(record, promote) == 4
 
 
-def test_c_operation_id_mismatch_is_refused(tmp_path):
-    """C.5 A record naming a different operation is not this authority."""
+@pytest.mark.parametrize("mutation,label", [
+    ({"operation_id": "c" * 32}, "internal operation id names another op"),
+    ({"operation_id": None}, "internal operation id is null"),
+    ({"operation_id": ""}, "internal operation id is empty"),
+    ({"operation_id": 7}, "internal operation id is not a string"),
+    ({"format": "oce-pg-recovery-transition-v0"}, "unknown record format"),
+    ({"format": None}, "record format is null"),
+    ({"format": "not-a-format"}, "record format is arbitrary text"),
+])
+def test_c_record_internal_identity_is_bound_at_admission(
+        tmp_path, mutation, label):
+    """C.5/C.6 A record filed under a coordinate must DESCRIBE that
+    operation, or it never becomes authority material.
+
+    Admission proved the bytes came from the canonical file in the pinned
+    governed directory. These proofs cover the remaining half: that the object
+    inside those bytes is really this operation's record. Each case must be a
+    denial at admission, raised before any selector authority is read, and
+    must leave the governed directory byte-identical.
+    """
     transitions, record, promote, _receipt = _build(
         tmp_path, "PROMOTED", "rollback")
-    record["operation_id"] = "c" * 32
+    record.update(mutation)
     (transitions / f"{OPID}.json").write_bytes(_bytes(record))
     os.chmod(transitions / f"{OPID}.json", 0o600)
-    bundle = pgrec._acquire_recovery_authority(OPID, promote)
-    assert bundle.record["operation_id"] == "c" * 32
-    # the selector is bound to OPID, so the disagreement fails closed
-    assert pgrec._classify_record_for_shell(record, promote) == 4
+    before = _census(pgrec._transitions_dir())
+
+    # The selector read is the LAST thing acquisition does; if it is never
+    # reached, no selector authority was consumed on a crossed record.
+    real_selector = pgrec._read_selector_snapshot_admitted
+
+    def forbidden(*_a, **_k):
+        raise AssertionError(
+            "selector authority must not be consumed after a crossed record "
+            "identity")
+
+    pgrec._read_selector_snapshot_admitted = forbidden
+    try:
+        with pytest.raises(pgrec._ExecutionAuthorityConflict) as caught:
+            pgrec._acquire_recovery_authority(OPID, promote)
+    finally:
+        pgrec._read_selector_snapshot_admitted = real_selector
+    assert "operation id" in str(caught.value) or "format" in str(caught.value), \
+        (label, str(caught.value))
+    assert _census(pgrec._transitions_dir()) == before, label
+
+
+def test_c_a_record_that_is_not_an_object_is_refused(tmp_path):
+    """C.7 Valid JSON that is not an object is not a record."""
+    transitions, _record, promote, _receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+    path = transitions / f"{OPID}.json"
+    path.write_bytes(b"[1, 2, 3]")
+    os.chmod(path, 0o600)
+    before = _census(pgrec._transitions_dir())
+    with pytest.raises(pgrec._ExecutionAuthorityConflict) as caught:
+        pgrec._acquire_recovery_authority(OPID, promote)
+    assert "JSON object" in str(caught.value), str(caught.value)
+    assert _census(pgrec._transitions_dir()) == before
+
+
+def test_c_a_missing_internal_operation_id_is_refused(tmp_path):
+    """C.8 A record with no operation id at all is not this authority."""
+    transitions, record, promote, _receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+    record.pop("operation_id", None)
+    (transitions / f"{OPID}.json").write_bytes(_bytes(record))
+    os.chmod(transitions / f"{OPID}.json", 0o600)
+    with pytest.raises(pgrec._ExecutionAuthorityConflict) as caught:
+        pgrec._acquire_recovery_authority(OPID, promote)
+    assert "operation id" in str(caught.value), str(caught.value)
 
 
 @pytest.mark.skipif(os.name == "nt",
@@ -494,6 +695,15 @@ def test_e_identity_is_bound_to_real_descriptors(tmp_path):
                                    record.governed_inode)
         seen["selector_identity"] = (selector.governed_device,
                                      selector.governed_inode)
+        if os.name != "nt" and dir_fd is not None:
+            # fstat INSIDE the decision. _acquire_recovery_authority closes
+            # the directory descriptor in its finally block before it returns,
+            # so stat-ing it after the call proves nothing but a closed fd --
+            # which is why this proof raised EBADF on Linux. Pin liveness has
+            # to be observed while the descriptor is still the one the
+            # decision is reading through.
+            live = os.fstat(dir_fd)
+            seen["live_identity"] = (live.st_dev, live.st_ino)
         return real(operation_id, governed, dir_fd, identity, record,
                     selector)
     pgrec._assert_one_directory_generation = probe
@@ -506,8 +716,15 @@ def test_e_identity_is_bound_to_real_descriptors(tmp_path):
     if os.name != "nt":
         assert seen["dir_fd"] is not None, (
             "POSIX must hold a real directory descriptor during the decision")
-        live = os.fstat(seen["dir_fd"])
-        assert (live.st_dev, live.st_ino) == seen["identity"]
+        assert seen["live_identity"] == seen["identity"], (
+            "the pinned descriptor must still name the admitted directory "
+            "while the decision is reading through it")
+        # ...and it must be GONE once the bundle is returned. The engine owns
+        # the descriptor, not its caller: a live fd reachable from a returned
+        # object is a leak, and a proof that only ever observed the fd while
+        # the decision was running would not notice one.
+        with pytest.raises(OSError):
+            os.fstat(seen["dir_fd"])
 
 
 # ===================================================================== #
@@ -558,17 +775,47 @@ def test_f_every_verdict_row_stays_coherent(tmp_path):
 # ===================================================================== #
 
 def test_g_a_denied_authority_mutates_nothing(tmp_path):
-    """G.1 Every governed file is byte-identical after a denial."""
+    """G.1 A replacement is refused or fully pinned, and never mutates.
+
+    The two platforms reach those two outcomes by different routes and the
+    proof must accept both, because requirement 7 is "complete pinning OR
+    fail-closed", never an accepted mix. On Windows the engine re-identifies
+    the coordinate after the reads and refuses, because the replacement
+    changed the directory the coordinate names. On POSIX it does not need to:
+    a pinned descriptor keeps naming the admitted generation even after the
+    directory is renamed away, so the decision completes coherently on
+    generation A. Neither path may accept a mixed generation, and neither may
+    write anything.
+    """
     transitions, _record, promote, _receipt = _build(
         tmp_path, "PROMOTED", "rollback")
     before = _census(pgrec._transitions_dir())
-    outcome, _bundle_obj = _capture(
+    outcome, bundle = _capture(
         pgrec, OPID, promote,
         lambda: _swap_whole_directory(transitions, OPID, "finalize"))
-    assert outcome == "refused"
+    if outcome == "acquired":
+        # A coherent pin to the OLD generation is a legal result, not a
+        # defect, so it is accepted -- but only once the bundle is shown to be
+        # internally consistent and still pinned to the admitted generation.
+        assert not _cross_generation(bundle), (
+            "a replacement yielded an accepted mixed-generation decision: "
+            f"{_authority_pair(bundle)!r}")
+        if bundle.record is not None:
+            assert bundle.selector.governed_device == \
+                bundle.record_snapshot.governed_device
+            assert bundle.record.get("operation_id") == OPID
+    else:
+        assert isinstance(bundle, pgrec._ExecutionAuthorityConflict), bundle
     after = set(_census(pgrec._transitions_dir()))
-    # the swap itself is the attacker's; the engine added nothing
-    assert after <= set(before) | {f"{OPID}.claim"}
+    # The directory replacement is the ATTACKER's doing and is not an engine
+    # mutation, so the governed NAME SET is compared rather than the bytes:
+    # generation B legitimately republishes the same two coordinates. What
+    # must not appear is any coordinate the engine invented, and the receipt
+    # (which lives outside the transitions directory) must be untouched.
+    assert after - set(before) == set(), (
+        f"the engine created governed files: {sorted(after - set(before))}")
+    for name, fingerprint in _census(pgrec._transitions_dir()).items():
+        assert name in before, f"ungoverned write: {name}"
 
 
 def test_g_an_oversized_record_denial_is_inert(tmp_path):
