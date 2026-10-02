@@ -1601,3 +1601,96 @@ DECISION LOG ENTRY {
   binding_commit_sha:           (assigned at this ratification commit;
                                  ratified plan anchor = 28bfac52c23c891ebb54e9924dedc925a859b359)
 }
+
+---
+
+## BOOK6-COMPARE-AMEND-IMPL-AUTHZ-v0.1 — 2026-10-02
+
+```text
+DECISION_ID   = BOOK6-COMPARE-AMEND-IMPL-AUTHZ-v0.1
+KIND          = REVIEW VERDICT (NOT AN AUTHORIZATION)
+REQUESTED BY  = operator, this session
+SCOPE         = Book 6 Comparison / Change Amendment offline implementation
+                authorization review ONLY
+VERDICT       = HOLD
+```
+
+```text
+BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_AUTHORIZATION_REVIEW = HOLD
+
+NO_UNRATIFIED_POLICY_NEEDED            = FALSE
+NO_RUNTIME_AUTHORITY_GAP                = TRUE
+NUMERIC_REPRESENTATION_SUFFICIENT       = FALSE
+UNIT_CONTRACT_SUFFICIENT                = FALSE
+BENCHMARK_RUNTIME_PATH_SUFFICIENT       = TRUE
+COVERAGE_RUNTIME_PATH_SUFFICIENT        = FALSE
+ALL_19_REPLAY_CHECKS_IMPLEMENTABLE      = FALSE
+NEGATIVE_SURFACE_TESTS_SPECIFIED        = TRUE
+TRACEABILITY_PLAN_COMPLETE              = TRUE
+UPSTREAM_FREEZE_PRESERVABLE             = TRUE
+```
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+D6M_5                           = OPEN_DEFERRED
+COMPARISON_RULES_RATIFIED       = 0
+BENCHMARK_RULES_RATIFIED        = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+```
+
+Four operator decisions are required. This entry records them and grants
+nothing.
+
+```text
+GAP-1  canonical numeric representation for Book 6 measurements
+       1A keep binary float; define exact canonical equality as equality of
+          the stored double; the doctrine wording must be amended so the
+          claim is not overstated
+       1B adopt decimal.Decimal; changes MeasurementObservation.value and
+          needs a ratified precision/scale contract
+       1C adopt fractions.Fraction; changes the same field and needs a
+          ratified source-to-rational canonicalisation contract
+
+GAP-2  whether a unit dimensional-class contract is in scope
+       2A in scope; this is a THIRD authority-bearing contract class and
+          amends the ratified "hidden third = NONE"
+       2B out of scope; arithmetic validity is unavailable by absence, so
+          absolute_delta is always NOT_COMPUTABLE and relative_delta always
+          UNDEFINED
+       2C deferred; unit_requirements ships as a citation that is not
+          enforced at check 19
+
+GAP-3  whether a coverage-applicability derivation is in scope
+       3A out of scope; coverage_requirement_status is always UNRESOLVED
+          absent a ratified derivation and every comparison is UNAVAILABLE
+       3B in scope; author and ratify the derivation before implementation
+
+GAP-4  the value domain and derivation of comparability_status, and the
+       check that produces change_kind = NOT_COMPARABLE
+       4A defer the field and the member to a follow-on amendment
+       4B ratify a value domain and the producing check in this amendment
+```
+
+```text
+NEXT = operator decisions on GAP-1, GAP-2, GAP-3, GAP-4, then re-run review
+       Phases 3, 8, 10, 14 and 17 before any implementation authorization
+       is considered.
+AUTHORIZATION_PACKET = NOT CREATED (Phase 30 is conditional on PASS)
+```
+
+Artifacts produced by this review:
+
+```text
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_TEST_SPEC_v0.1.md
+```
+
+**Not authorized and not performed:** Book 6 implementation, Book 6
+re-acceptance, any rule ratification, any new policy, any new delta
+operator, any epsilon, tolerance, materiality or significance, Book 7
+ratification or implementation, Book 8, D8, live acquisition, RPC, network,
+database, graph database, branch creation, force-push, rebase or history
+rewrite.

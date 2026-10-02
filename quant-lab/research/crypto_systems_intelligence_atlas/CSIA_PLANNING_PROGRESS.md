@@ -2800,3 +2800,155 @@ acquisition, RPC, network, database, graph database, any comparison-rule,
 benchmark-rule, or coverage-rule ratification, any materiality or tolerance
 methodology, any health or usage threshold, any causality semantics, any
 score, ranking, grade, buy, or sell authority.
+
+---
+
+## Checkpoint — Book 6 Comparison / Change Amendment Offline Implementation Authorization Review
+
+```text
+CHECKPOINT_DATE                             = 2026-10-02
+PLANNING_HEAD_AT_START                      = 8557f4df82a67434951b2f9682142a59125f5153
+BOOK_6_IMPL_BRANCH_HEAD                     = 5f94c3f40cea4441470c57671f51454da7377361
+BOOK_6_ACCEPTED_ANCHOR                      = 3919fb8052e216e94034a753fb258d338c5fa0dc
+LINEAGE_DRIFT                               = NONE
+```
+
+```text
+BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_AUTHORIZATION_REVIEW = HOLD
+
+NO_UNRATIFIED_POLICY_NEEDED            = FALSE
+NO_RUNTIME_AUTHORITY_GAP                = TRUE
+NUMERIC_REPRESENTATION_SUFFICIENT       = FALSE
+UNIT_CONTRACT_SUFFICIENT                = FALSE
+BENCHMARK_RUNTIME_PATH_SUFFICIENT       = TRUE
+COVERAGE_RUNTIME_PATH_SUFFICIENT        = FALSE
+ALL_19_REPLAY_CHECKS_IMPLEMENTABLE      = FALSE
+NEGATIVE_SURFACE_TESTS_SPECIFIED        = TRUE
+TRACEABILITY_PLAN_COMPLETE              = TRUE
+UPSTREAM_FREEZE_PRESERVABLE             = TRUE
+
+CRITERIA_TRUE = 5 / 10
+```
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+AUTHORIZATION_PACKET           = NOT CREATED (Phase 30 is conditional on PASS)
+```
+
+**The four blockers, stated exactly.**
+
+```text
+GAP-1  CANONICAL NUMERIC REPRESENTATION
+       Accepted Book 6 stores MeasurementObservation.value as a binary
+       float (book6_records.py:113) and book6_core.py:181 already injects
+       float("nan") as a denominator sentinel. Ratified doctrine requires
+       "canonical UNROUNDED value" and "exact canonical equality" and draws
+       the separation DISPLAYED EQUALITY != MEASURED EQUALITY. Binary
+       floating point cannot deliver exact equality on the represented real
+       number, and its own arithmetic result is a rounded double.
+       Decide: 1A keep float and define canonical equality as equality of
+       the stored double (doctrine wording must be amended so the claim is
+       not overstated); 1B adopt Decimal (changes an accepted public field
+       and needs a ratified precision contract); 1C adopt Fraction (same,
+       plus a source-to-rational canonicalisation contract).
+
+GAP-2  UNIT DIMENSIONAL CONTRACT DOES NOT EXIST
+       Grammar 1.4 and P3 derive arithmetic validity FROM the accepted unit
+       contract and forbid a rule from redefining it. There is no such
+       contract: MetricDefinition.unit and MeasurementObservation.unit are
+       bare strings and the only accepted unit check is string equality. No
+       dimensional class, no compatibility relation, no convertibility.
+       POL-11 is therefore untestable as written.
+       Decide: 2A a unit contract is in scope, which is a THIRD
+       authority-bearing contract class and amends the ratified "hidden
+       third = NONE"; 2B arithmetic validity is unavailable by absence, so
+       every comparison is NOT_COMPUTABLE / UNDEFINED; 2C deferred, with
+       unit_requirements shipping as an unenforced citation.
+
+GAP-3  COVERAGE APPLICABILITY HAS NO DERIVATION RULE
+       P10 requires a derived determination and grammar 2 marks
+       coverage_requirement_status as DERIVED upstream, but no accepted
+       MetricDefinition or MeasurementMethodology field carries an
+       applicability signal. The UNRESOLVED branch IS fully ratified, so the
+       non-inventing implementation exists -- but it makes the amendment
+       produce zero authorized changes.
+       Decide: 3A always UNRESOLVED until a derivation is separately
+       ratified; 3B author and ratify a derivation before implementation.
+
+GAP-4  comparability_status HAS NO VALUE DOMAIN AND NOT_COMPARABLE HAS NO
+       PRODUCING CHECK
+       Grammar 3 lists comparability_status as REQUIRED with no value
+       domain and no derivation, and includes NOT_COMPARABLE in
+       change_kind. No check in 1..19 produces NOT_COMPARABLE: check 19
+       derives change_kind from the sign of absolute_delta, and a sign
+       cannot yield it. Accepted Book 6 does contain a real comparability
+       mechanism -- the 15-row FALSE_COMPARISON_CORPUS in
+       book6_comparability.py -- but it governs a CROSS-METRIC PAIR while a
+       ComparisonRule is SINGLE-METRIC TEMPORAL, corpus_row_for raises on
+       any ungoverned pair, and no ratified amendment artifact cites it.
+       Decide: 4A defer the field and the member to a follow-on amendment;
+       4B ratify a value domain plus the producing check.
+```
+
+**What the review found to be genuinely ready.** The doctrine is unusually
+precise: seventeen ratified value domains, four deleted policy fields
+(direction_derivation, zero_baseline_policy, unit_divisibility_policy,
+rounding_precision_policy), a closed two-member delta operator set, a named
+coverage tri-state, a named observation-state discriminator, single-meaning
+absence across the nullable inventory, and nineteen enumerated replay checks.
+Accepted Book 6 supplies an imitable pattern for almost every remaining
+requirement: canonical_methodology_spec() and methodology_fingerprint() with
+a field-drift guard solve the MetricDefinition content-binding problem
+without touching MetricDefinition's public contract; RatificationLedger,
+RatificationRecord, DerivationBinding and derivation_binding_digest() solve
+the registry and binding requirements; CoverageRuleRegistry already enforces
+ratification gating with a canonical count of zero. The closed operator
+execution, the fixed direction law, the zero-baseline law, the nullable
+runtime constraints, the ChangeObservation creation path, the authority
+replay path and the Book 7 seam are all implementable with zero invention.
+
+```text
+NEW_FILES_PROPOSED         = 10   (4 Book 6 source + 5 Book 6 test + spec)
+MODIFIED_FILES_PROPOSED    = 5
+UNCHANGED_IMPORT_ONLY      = 8
+BOOK1..BOOK5_SURFACE_TOUCHED = 0
+TEST_CASES_SPECIFIED       = 178
+TEST_CASES_WRITABLE_NOW    = 164
+TEST_CASES_BLOCKED_BY_GAPS = 14
+NEGATIVE_SURFACE_CASES     = 45   (9 names x 5 attacks)
+```
+
+**Reading of this checkpoint.** The operator asked whether the ratified
+amendment was specified enough to authorize implementation without inventing
+policy during coding. The answer is no, and the reason is narrower and more
+specific than vagueness. Three of the four blockers are references the
+ratification makes to artifacts it describes as already accepted -- a unit
+contract, a derived coverage determination, a comparability outcome -- and
+that were never built. The fourth is a numeric-representation choice that
+alters an accepted public model type and is therefore never an
+implementation detail. This is the same class of finding the program has
+caught before in a different form: an authority boundary that reads as
+settled because the prose is confident, while the substrate it depends on is
+absent. Holding here costs one round. Proceeding would have produced a
+comparison engine whose NO_CHANGE verdict rests on a numeric semantics nobody
+ratified, whose absolute_delta is computed without a unit contract, and
+whose comparability field exists because the grammar listed it.
+
+```text
+NEXT = operator decisions on GAP-1, GAP-2, GAP-3 and GAP-4 exactly as
+       stated above, then re-run review Phases 3, 8, 10, 14 and 17 before
+       any implementation authorization is considered.
+```
+
+No authorization packet was created. Phase 30 is conditional on PASS, and a
+packet at HOLD would necessarily embed the four decisions above, which is
+the self-authorizing artifact this program forbids.
+
+**Not authorized and not performed:** Book 6 implementation, Book 6
+re-acceptance, any comparison-rule, benchmark-rule or coverage-rule
+ratification, any new policy, any new delta operator, any epsilon or
+tolerance or materiality or significance, Book 7 ratification or
+implementation, Book 8, D8, live acquisition, RPC, network, database, graph
+database, and any branch creation.
