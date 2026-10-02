@@ -1835,3 +1835,173 @@ its response rung stays fail-closed until the upstream contract is accepted.
 re-acceptance, Book 7 ratification, Book 7 implementation, Book 8, D8, live
 acquisition, any state/predicate/coverage-rule ratification, any usage or
 health research, any score, ranking, or trading authority.
+---
+
+## CHECKPOINT — BOOK 6 COMPARISON AMENDMENT v0.2 — TWO AUTHORITY DEFECTS REPAIRED
+
+```text
+CHECKPOINT_DATE                       = 2026-10-01
+BRANCH                                = agent/crypto-systems-intelligence-atlas-plan
+STARTING_HEAD                         = 0b72f7cab1949f0af6778e80315f528a20a2e8b4
+BOOK_6                                = FROZEN_ACCEPTED (unchanged)
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+
+--- EXTERNAL REVIEW FINDINGS ADDRESSED ---
+
+R6A-D1  COMPARISON_RULE_EMBEDS_COVERAGE_SUFFICIENCY = REPAIRED
+        reproduced at:
+          CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.1.md:72
+            coverage_requirements: "minimum comparable coverage"   ← embedded
+          CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.1.md:226
+            G7 tested inputs against "the rule's minimum"          ← consumed it
+          dependent: plan v0.1:90, plan v0.1:106, grammar v0.1:143, 286
+        found:  COMPARISON_RULE_CAN_EMBED_UNGOVERNED_COVERAGE_THRESHOLD = TRUE
+        violated accepted frozen Book 6 doctrine:
+          COVERAGE_OBSERVATION != COVERAGE_SUFFICIENCY_RULE
+          (Book 6 plan v0.2:114; State Vector Design v0.2 §5;
+           State Rule Reconciliation v0.1:234;
+           no global floor absent a ratified global floor rule)
+        review gap: v0.1 pre-ratification review (20/20) asked no coverage
+          sufficiency question
+
+R6A-D2  CHANGEOBSERVATION_CARRIES_RATIFIED_STATUS = REPAIRED
+        reproduced at:
+          CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.1.md:148
+          CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.1.md:77   (ComparisonRule)
+          CSIA_BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.1.md:100 (ResponseLink)
+          CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.1.md:45
+        found:  CHANGEOBSERVATION_CAN_SELF_DECLARE_RATIFIED = TRUE
+                COMPARISONRULE_CAN_SELF_DECLARE_RATIFIED   = TRUE
+
+R6A-D3 (related) D6M_3_AUTHORITY_BLEED = REPAIRED
+        reproduced at grammar v0.1:93 ("exactly as for StateRule (D6M-3 = A)")
+        found:  authority source unstated; read as inheritance
+        D6M-3 governs StateRules and does not grant, extend, or lend
+          comparison-rule ratification authority
+
+--- REPAIRS ---
+
+COVERAGE_DOCTRINE_RECONCILED           = TRUE
+  REMOVED  ComparisonRule.coverage_requirements (numeric cutoff)
+  ADDED    ComparisonRule.coverage_sufficiency_rule_ref
+  ADDED    ComparisonRule.coverage_scope_requirements  (structural scope only)
+  G7 rebuilt = verdict required via ratified rule re-resolution, not a
+                self-declared number
+  NO_RAW_COVERAGE_NUMBER_EQUALS_SUFFICIENCY = TRUE
+  NO_GLOBAL_COVERAGE_FLOOR               = TRUE
+  SECOND_COVERAGE_RULE_CONTRACT_CREATED  = FALSE
+  COVERAGE_RULE_AUTHORITY               = accepted Book 6 authority, reused
+  gate G7 self-declared-minimum path    = CLOSED
+
+CHANGE_OBSERVATION_SELF_RATIFICATION    = PROHIBITED
+  REMOVED  ChangeObservation.status ∈ {DRAFT | RATIFIED | SUPERSEDED}
+  ADDED    construction_status (workflow only)
+  ADDED    record_state ∈ {CURRENT | SUPERSEDED | WITHDRAWN | INVALIDATED}
+           (record lifecycle; NOT a Book 2 ClaimState; NOT authority)
+  ADDED    current_authority ∈ {TRUE | FALSE}  (DERIVED at use time)
+  NEW_EPISTEMIC_CLAIMSTATE_INTRODUCED    = FALSE
+  AUTHORITY_REPLAY_CHECKS                = 11
+  AUTHORITY_DECAY_PRESERVES_HISTORY      = TRUE
+  RATIFIED THEN != AUTHORITATIVE NOW     = TRUE
+
+COMPARISON_RULE_SELF_RATIFICATION        = PROHIBITED
+  REMOVED  self-declared RATIFIED object status as an authority source
+  REGISTRATION != RATIFICATION           = TRUE
+  OBJECT_STATUS_IS_NOT_AUTHORITY         = TRUE
+  RATIFICATION_BOUND_TO = rule id + version + canonical content fingerprint
+  MUTATED_CONTENT_UNDER_BOUND_IDENTITY   = REJECTED
+  SUPERSESSION_DOES_NOT_INHERIT          = TRUE
+  COMPARISON_RULE_RATIFICATION_AUTHORITY = OPERATOR_ONLY
+  AUTHORITY_SOURCE = established BY THIS AMENDMENT, pattern CONSISTENT WITH
+                     D6M-3; no authority inherited from D6M-3
+
+--- CANONICAL COUNTS (all zero; no rule ships canonically active) ---
+
+COMPARISON_RULES_RATIFIED               = 0 canonical
+COVERAGE_SUFFICIENCY_RULES_RATIFIED     = 0 canonical
+CHANGE_OBSERVATION_CANONICAL_COUNT      = 0 canonical
+COMPARISON_RULE_RATIFICATION != COVERAGE_RULE_RATIFICATION = TRUE
+  ⇒ a ComparisonRule requiring a coverage verdict is UNUSABLE until a
+    coverage rule is separately ratified (correct fail-closed behaviour;
+    no auto-ratification, no default rule, no relaxed gate)
+
+--- ADVERSARIAL COVERAGE ADDED ---
+
+COVERAGE_ADVERSARIAL_CASES              = 8 (COV-1 .. COV-8)
+CHANGE_AUTHORITY_ADVERSARIAL_CASES      = 8 (CHG-1 .. CHG-8)
+  every case requires a concrete real test function under exit gate G-5
+
+--- ARTIFACT VERSIONS ---
+
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.1 = SUPERSEDED / NOT RATIFIABLE
+BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.1        = SUPERSEDED (preserved)
+BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.1   = SUPERSEDED (preserved)
+AMENDMENT_PRE_RATIFICATION_REVIEW_v0.1       = SUPERSEDED (20/20, preserved)
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN      = v0.2 DRAFT_PENDING_OPERATOR_RATIFICATION
+BOOK_6_COMPARISON_CHANGE_GRAMMAR             = v0.2
+BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM        = v0.2
+AMENDMENT_PRE_RATIFICATION_REVIEW            = v0.2 — 30 / 30 PASS
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_RECONCILIATION = v0.1 (audit of record)
+
+--- BOOK 7 IMPACT ---
+
+BOOK_7_PLAN                            = READY_PENDING_BOOK6_COMPARISON_AMENDMENT
+BOOK_7_ARCHITECTURE_CHANGE              = NONE
+NEW_D7N_DECISION_REQUIRED               = NONE
+D7N_7                                   = A (binding, unchanged)
+BOOK_7_RATIFICATION                     = BLOCKED_PENDING_BOOK6_AMENDMENT
+BOOK_7_RATIFICATION_BLOCKER             = BOOK6_COMPARISON_CONTRACT_NOT_YET_ACCEPTED
+BOOK_7_USAGE_OF_RESPONSE_LADDER         = fail-closed CHANGE_NOT_MEASURABLE
+BOOK_7_PLAN_PRE_RATIFICATION_REVIEW_v0.2 = 45 / 45 PASS (unchanged)
+
+--- UNTOUCHED / INVARIANT ---
+
+STRUCTURAL_FAILURES                    = 2 (R6A-D1, R6A-D2) + 1 governance
+                                         scope ambiguity (D6M-3 bleed, repaired)
+BOOK_1_AMENDMENT_REQUIRED              = FALSE
+BOOK_2_AMENDMENT_REQUIRED              = FALSE
+BOOK_3_AMENDMENT_REQUIRED              = FALSE
+BOOK_4_AMENDMENT_REQUIRED              = FALSE
+BOOK_5_AMENDMENT_REQUIRED              = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED        = FALSE
+SENSOR_MUTATION                        = 0
+D2_6                                    = IN_FORCE
+D6M_1..D6M_4                            = UNCHANGED
+D6M_5                                   = OPEN_DEFERRED
+BOOK_6_IMPLEMENTATION_AUTHORITY        = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY        = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY        = FALSE
+LIVE_ACQUISITION_AUTHORITY             = FALSE
+
+NEXT = operator ratification review of Book 6 comparison/change amendment v0.2
+      (ratify the PLAN; implementation remains separately authorized)
+
+ARTIFACTS_CREATED_THIS_CHECKPOINT
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RECONCILIATION_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PRE_RATIFICATION_REVIEW_v0.2.md
+  CSIA_BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.2.md
+ARTIFACTS_APPENDED_THIS_CHECKPOINT
+  CSIA_PLANNING_PROGRESS.md   (this checkpoint)
+```
+
+**Reading of this checkpoint.** The v0.1 amendment was caught one step before
+ratification with two defects that would have reopened a frozen book with two
+of its own hardened failures. The first would have let any `ComparisonRule`
+author invent a coverage sufficiency threshold — precisely the
+`COVERAGE_OBSERVATION != COVERAGE_SUFFICIENCY_RULE` separation that accepted
+Book 6 v0.2 established and that the 20/20 v0.1 pre-ratification review never
+tested. The second would have let a derived record and a methodology rule
+each assert their own authority through a self-declared status field. Both are
+closed by construction in v0.2: a coverage verdict must be replayed from a
+separately ratified rule, and record authority is computed by an
+eleven-check re-resolution that no caller can assert. The zero canonical
+counts are preserved deliberately — ratifying this plan ratifies the
+framework, not a single rule.
+
+**Not authorized and not performed:** amendment ratification, Book 6
+implementation, Book 6 re-acceptance, Book 7 ratification, Book 7
+implementation, Book 8, D8, live acquisition, any comparison-rule or
+coverage-rule ratification, any state/predicate/coverage-rule ratification,
+any usage or health research, any score, ranking, or trading authority.
