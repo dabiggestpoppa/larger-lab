@@ -59,6 +59,7 @@ IDENTITY: the directory is derived from where this engine file lives, so no
 environment variable - including the former OCE_RECOVERY_STATE_DIR - can grant
 write authority. An existing receipt is REFUSED, never silently replaced.
 """
+import collections.abc
 import dataclasses
 import hashlib
 import json
@@ -726,11 +727,92 @@ def _transitions_dir() -> str:
     return os.path.join(_recovery_state_dir(), "transitions")
 
 
+# B4-CXR7U9R48R2 -- DEEP IMMUTABILITY
+# ======================================================================
+# `@dataclass(frozen=True)` is SHALLOW. It stops the snapshot's own attribute
+# rebinding, and nothing else: the nested dictionaries stayed ordinary `dict`
+# objects, so `snapshot.record["state"] = "FINALIZED"` and
+# `snapshot.selector.claim["transition"] = "finalize"` both succeeded, and a
+# caller that kept a reference to the dict it handed in could still rewrite
+# the decision material underneath the decision.
+#
+# These two helpers make the material genuinely immutable. `_deep_freeze`
+# builds a PRIVATE structure -- every container is new -- and wraps mappings
+# so they cannot be mutated; `_thaw` is the only way back out, and it is used
+# solely to compute canonical digests.
+class _FrozenDict(dict):
+    """A dict that refuses every mutating operation.
+
+    B4-CXR7U9R48R2. The bundle material must still satisfy the engine's own
+    ``isinstance(x, dict)`` decision law and stay JSON-serialisable for
+    canonical digests, so the immutable mapping is a dict SUBCLASS whose
+    mutators are refused rather than a proxy type that would silently fail
+    every one of those checks.
+    """
+
+    __slots__ = ()
+
+    def _refuse(self, *_args, **_kwargs):
+        raise TypeError(
+            "recovery authority material is deeply immutable; the attempt to "
+            "mutate it is refused")
+
+    __setitem__ = _refuse
+    __delitem__ = _refuse
+    __ior__ = _refuse
+    clear = _refuse
+    pop = _refuse
+    popitem = _refuse
+    setdefault = _refuse
+    update = _refuse
+
+
+def _deep_freeze(value):
+    """Return a deeply immutable private copy of ``value``.
+
+    No caller-owned object survives into the result: every mapping is rebuilt
+    as a ``_FrozenDict`` over freshly frozen values, sequences become tuples
+    and sets become frozensets. Mutating the ORIGINAL object afterwards
+    cannot reach the copy, and mutating the copy is refused at every level.
+    """
+    if isinstance(value, collections.abc.Mapping):
+        return _FrozenDict(
+            (key, _deep_freeze(item)) for key, item in value.items())
+    if isinstance(value, (list, tuple)):
+        return tuple(_deep_freeze(item) for item in value)
+    if isinstance(value, (set, frozenset)):
+        return frozenset(_deep_freeze(item) for item in value)
+    return value
+
+
+def _thaw(value):
+    """Rebuild a plain, private, mutable structure from immutable material.
+
+    Used for canonical digest computation only. The result is never stored
+    back into authority material, so thawing cannot reintroduce an alias.
+    """
+    if isinstance(value, collections.abc.Mapping):
+        return {key: _thaw(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_thaw(item) for item in value]
+    if isinstance(value, (set, frozenset)):
+        return [_thaw(item) for item in sorted(value, key=repr)]
+    return value
+
+
 def _receipt_digest(receipt) -> str:
     """Content binding between a receipt and its operation record. Canonical
     (sorted keys, no padding) so the digest is independent of file
-    whitespace and therefore checkable across processes."""
-    canonical = json.dumps(receipt, sort_keys=True, separators=(",", ":"))
+    whitespace and therefore checkable across processes.
+
+    B4-CXR7U9R48R2: the authority bundle holds DEEPLY IMMUTABLE material
+    (``MappingProxyType`` / ``tuple`` / ``frozenset``), which ``json.dumps``
+    cannot serialise. The value is thawed to a private, freshly built
+    structure first, so the digest is computed over exactly the admitted
+    content and never over a caller-reachable object.
+    """
+    canonical = json.dumps(_thaw(receipt), sort_keys=True,
+                           separators=(",", ":"))
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
@@ -1624,7 +1706,7 @@ def _read_selector_snapshot_admitted(operation_id, governed, name, dir_fd,
             governed_device=identity[0], governed_inode=identity[1],
             device=first.st_dev, inode=first.st_ino, size=first.st_size,
             mode=stat.S_IMODE(first.st_mode), link_count=first.st_nlink,
-            claim=claim, read_error=None)
+            claim=_deep_freeze(claim), read_error=None)
     finally:
         if fd is not None:
             try:
@@ -2209,7 +2291,7 @@ def _read_record_snapshot_admitted(operation_id, governed, name, dir_fd,
             governed_device=identity[0], governed_inode=identity[1],
             device=first.st_dev, inode=first.st_ino, size=first.st_size,
             mode=stat.S_IMODE(first.st_mode), link_count=first.st_nlink,
-            record=record, record_digest=_receipt_digest(record)
+            record=_deep_freeze(record), record_digest=_receipt_digest(record)
             if isinstance(record, dict) else None,
             raw_digest=hashlib.sha256(raw).hexdigest(), read_error=None)
     finally:
@@ -2319,6 +2401,13 @@ class RecoveryAuthoritySnapshot:
     record_snapshot: object = None
 
 
+# B4-CXR7U9R48R2: the bundle is the name R48 gives the R47 snapshot. Both
+# names refer to the same single class -- there is exactly ONE authority
+# bundle type in this module, so a consumer cannot be handed a different,
+# weaker structure.
+RecoveryAuthorityBundle = RecoveryAuthoritySnapshot
+
+
 def _acquire_recovery_authority(operation_id, promote=None, record=None):
     """Acquire THE complete authority snapshot for ONE decision.
 
@@ -2399,7 +2488,7 @@ def _acquire_recovery_authority(operation_id, promote=None, record=None):
         governed_dir=governed,
         governed_device=identity[0],
         governed_inode=identity[1],
-        record=admitted_record,
+        record=_deep_freeze(admitted_record),
         record_digest=record_snapshot.record_digest,
         record_receipt_sha256=(admitted_record.get("receipt_sha256")
                                if isinstance(admitted_record, dict) else None),
