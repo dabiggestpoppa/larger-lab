@@ -3344,3 +3344,42 @@ origin/main remains `7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched.
 **Status: INTERNAL R48X CLOSURE SATISFIED ON THE EXACT IMPLEMENTATION HEAD.
 `MERGE_AUTHORIZED = false`** - the external SonarCloud and Kilo failures in
 section 6 keep merge authority withheld.
+
+## 8. External-check truth at the evidence-correction head `701da835c`
+
+Section 6 records external checks as observed at the R48X implementation head.
+GitHub creates fresh external check-runs for every commit, so those ids are
+scoped to `dce32e6666` and are not the current external truth. At
+`701da835ca3ad1367ca4520a8f98c9d42ad06707` the external checks are:
+
+| Check | Run | Status | Conclusion |
+|---|---|---|---|
+| SonarCloud Code Analysis | `110912278869` | completed | **FAILURE** - "Quality Gate failed" |
+| Kilo Code Review | `110910907968` | completed | **FAILURE** |
+
+The five internal `validate` check-runs on that same commit are all success:
+b1 `37029019652`, b2 `37029018864`, b3 `37029019889`, b4 `37029019135`,
+B1-I1R `37029030733`.
+
+Both external blockers are unchanged in kind from section 6, and neither was
+adjudicated by suppression:
+
+- **SonarCloud** - no NOSONAR, no exclusions, no severity downgrade, no
+  quality-profile, gate or threshold change, no coverage manipulation and no
+  test removal. No repository-wide finding count is claimed, because the GitHub
+  annotation feed is only a sample of the open new-code issues. Failures
+  outside this narrow gate are preserved truthfully.
+- **Kilo Code Review** - provider-side, during workspace setup and before code
+  review: `sandbox storage full`, exit 128, raised from
+  `lfs.(*GitFilter).downloadFile` inside `git-lfs smudge` for the 626 MB
+  parquet `quant-lab/research/crypto_foundry/alt_rotation/data_1/ALT_DATA_1_ASSET_MULTISCALE_FEATURES.parquet`.
+  No repository-wide LFS migration was attempted and the LFS object is
+  untouched. The remedy is operator-side: raise the provider's sandbox/LFS
+  quota, or set `GIT_LFS_SKIP_SMUDGE=1` in the checkout environment.
+
+External check ids are per-commit and will differ again for any future commit.
+Each section states the head it was measured at; nothing is claimed for a head
+that has not been measured.
+
+**Status at `701da835c`: `MERGE_AUTHORIZED = false`** for the same two external
+reasons. The internal gate is satisfied on the exact evidence head.

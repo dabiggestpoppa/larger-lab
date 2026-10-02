@@ -749,3 +749,30 @@ over-strict side-effect expectation). All ten now pass on Linux.
 
 **Status: internal R48X gate satisfied. `MERGE_AUTHORIZED = false`** while
 SonarCloud `110650539392` and Kilo `110649645875` remain FAILURE.
+
+# B4-CXR7U9R48X2 - external-check truth at the evidence-correction head
+
+This supersedes only the external-check ids quoted in the section above; nothing
+above is rewritten. GitHub issues a new external check-run per commit, so the
+ids recorded at the R48X implementation head do not describe the head that now
+exists.
+
+| Check | Run at `dce32e6666` | Run at `701da835c` | Conclusion at `701da835c` |
+|---|---|---|---|
+| SonarCloud Code Analysis | `110650539392` | `110912278869` | **FAILURE** |
+| Kilo Code Review | `110649645875` | `110910907968` | **FAILURE** |
+| b1 | `37027124632` success | `37029019652` success | success |
+| b2 | `37027124708` success | `37029018864` success | success |
+| b3 | `37027124647` success | `37029019889` success | success |
+| b4 | `37027124548` success | `37029019135` success | success |
+| B1-I1R | `37027135586` success | `37029030733` success | success |
+
+Neither blocker changed in kind and neither was removed by suppression: no
+NOSONAR, no exclusions, no severity downgrade, no profile, gate or threshold
+change, no coverage manipulation, no test removal; no repository-wide LFS
+migration and the LFS object is untouched. The Kilo remedy remains
+operator-side - provider sandbox/LFS quota, or `GIT_LFS_SKIP_SMUDGE=1`.
+
+**Status: internal gate green on the exact evidence head. `MERGE_AUTHORIZED =
+false`** while SonarCloud `110912278869` and Kilo `110910907968` remain
+FAILURE.
