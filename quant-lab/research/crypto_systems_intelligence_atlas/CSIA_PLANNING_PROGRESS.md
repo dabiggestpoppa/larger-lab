@@ -2488,6 +2488,19 @@ NEW_UNASKED_STRUCTURAL_DEFECTS        = 0
 NEW_DESIGN_DEFECTS_FOUND              = 0
 EVERY_KNOWN_DEFECT_HAS_GENERAL_CLASS_COVERAGE = TRUE
 
+--- PLAN STATUS (exact result; NOT a ratification) ---
+
+AMENDMENT_PLAN_v0.3                     = SUPERSEDED / NOT RATIFIABLE
+  preserved unmodified; it carried 5 open policy value domains and 6
+  multi-meaning nullable fields, and is not ratifiable as written
+AMENDMENT_PLAN                          = v0.4 READY_FOR_OPERATOR_RATIFICATION
+NO_CHANGE_IS_MATERIALITY                = FALSE
+DISPLAYED_EQUALITY_IS_MEASURED_EQUALITY  = FALSE
+
+RATIFICATION_HAS_NOT_OCCURRED            = TRUE
+NOTHING WAS RATIFIED BY THIS CHECKPOINT — no amendment, no comparison rule,
+no coverage rule, no benchmark rule, no state rule, no predicate rule.
+
 --- CONTRACT-CLASS RE-AUDIT (after a semantics section was deleted) ---
 
 NEW_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
