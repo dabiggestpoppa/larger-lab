@@ -232,7 +232,39 @@ def valid_phase_prefix(phases, canon):
     return all(g == w for g, w in zip(phases, canon))
 
 
+# B4-CXR7U9R47S1: docker's own CLI parses any argument that begins with '-' as
+# a FLAG, not as an operand. The container reference is a command-line value
+# and it lands in an argument position, so an unvalidated reference is a
+# command-argument-injection channel: `container="--help"` reaches the argv as
+# `docker exec -i --help mktemp -d`, where docker reads `--help` as a flag.
+# Nothing legitimate needs a leading dash in a container reference, so the
+# reference is refused before any subprocess is started -- here, at the single
+# choke point every `docker exec` call passes through.
+_CONTAINER_REF_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*\Z")
+
+
+def _validated_container_ref(container):
+    """Fail closed unless `container` is a plain container-reference token."""
+    ref = container if isinstance(container, str) else ""
+    if not _CONTAINER_REF_RE.match(ref):
+        raise RuntimeError(
+            "refusing a container reference that is not a plain token: "
+            f"{container!r}")
+    return ref
+
+
+def _validated_cp_operand(path):
+    """Fail closed on a `docker cp` operand docker could read as a flag."""
+    text = path if isinstance(path, str) else ""
+    if not text or text.startswith("-"):
+        raise RuntimeError(
+            "refusing a docker cp operand that could be read as a flag: "
+            f"{path!r}")
+    return text
+
+
 def docker_exec(container, cmd, stdin_bytes=None, timeout=600):
+    container = _validated_container_ref(container)
     r = subprocess.run(["docker", "exec", "-i", container] + cmd,
                        input=stdin_bytes, capture_output=True, timeout=timeout)
     return r
@@ -469,7 +501,13 @@ def clone_archive_into_container(container, archive_path):
     exclusively (mktemp -d, mode 0700) and return that path. Naming a path
     inside a shared temp directory would let anything else in the container
     pre-create it, so the copy could land on a chosen file or symlink.
+
+    Both operands are validated FIRST (B4-CXR7U9R47S1): a refused reference
+    or path raises before the container is asked for anything, so a hostile
+    value never reaches a command line.
     """
+    container = _validated_container_ref(container)
+    archive_path = _validated_cp_operand(archive_path)
     made = docker_exec(container, ["mktemp", "-d"])
     remote_dir = made.stdout.decode(errors="replace").strip()
     if made.returncode != 0 or not remote_dir:
