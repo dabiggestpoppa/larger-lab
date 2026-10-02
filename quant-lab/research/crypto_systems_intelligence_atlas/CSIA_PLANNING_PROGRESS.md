@@ -2394,3 +2394,193 @@ implementation, Book 6 re-acceptance, Book 7 ratification, Book 7
 implementation, Book 8, D8, live acquisition, any comparison-rule, benchmark
 rule, or coverage-rule ratification, any usage or health research, any score,
 ranking, or trading authority.
+---
+
+## CHECKPOINT — BOOK 6 COMPARISON AMENDMENT v0.4 — CLASSES REPAIRED, READINESS PASS
+
+```text
+CHECKPOINT_DATE                       = 2026-10-01
+BRANCH                                = agent/crypto-systems-intelligence-atlas-plan
+STARTING_HEAD                         = e2d3ffe06ce283289fe04b9e6186ab992cc067dc
+BOOK_6                                = FROZEN_ACCEPTED (unchanged)
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+
+--- AUTHORIZATION SCOPE ---
+
+THIS SESSION = BOOK 6 COMPARISON/CHANGE AMENDMENT v0.4 DESIGN REPAIR +
+                FINAL RATIFICATION-READINESS REVIEW ONLY
+NO AMENDMENT RATIFICATION
+NO BOOK 6 IMPLEMENTATION / RE-ACCEPTANCE
+NO BOOK 7 RATIFICATION / IMPLEMENTATION
+NO COMPARISON-RULE / BENCHMARK-RULE / COVERAGE-RULE RATIFICATION
+
+--- CLASS A REPAIR (nullable / absent multi-meaning) ---
+
+AC_17_SINGLE_MEANING_ABSENCE          = SATISFIED
+AMBIGUOUS_NULLABLE_FIELDS             = 0   (36 re-inventoried; was 6)
+  R-2  coverage_applicability_source_ref  absent = NO_UPSTREAM_DETERMINATION_
+        EXISTS only; required when status ∈ {REQUIRED, NOT_APPLICABLE}
+  R-3  coverage_observation           replaced by coverage_observation_state
+        ∈ {PRESENT, UNAVAILABLE, NOT_APPLICABLE}; ref required iff PRESENT
+  R-4  seam coverage quotes          MANDATORY when source carries the value
+  R-5  supersedes                    version==1 → absent; version>1 → required
+  R-5  valid_time.valid_to           absent = OPEN_ENDED only
+NULL-1..NULL-9                        = ALL PASS
+
+--- CLASS B REPAIR (rule-author policy value domains) ---
+
+AC_18_POLICY_NOT_AUTHORITY            = SATISFIED
+AC_18a_NO_OPEN_POLICY_DOMAINS         = SATISFIED
+AC_18b_DERIVED_OVER_CHOSEN            = SATISFIED (added this round)
+POLICY_PARAMETERS_WITH_UNGOVERNED_AUTHORITY = 0   (was 5)
+POLICY_PARAMETERS                     = 10   (was 14)
+FREE_STRING_POLICY_AUTHORITY          = 0
+ARBITRARY_NUMERIC_THRESHOLD_PARAMETERS = 0
+  delta_formula_basis  → REDUCED to closed operator set
+                            {ABSOLUTE_DELTA | RELATIVE_DELTA}
+  direction_derivation → REMOVED (fixed: sign of canonical UNROUNDED
+                            absolute delta)
+  zero_baseline_policy → REMOVED (fixed fail-closed: relative UNDEFINED)
+  unit_divisibility_policy → REMOVED (derived from accepted unit contract)
+  rounding_precision_policy → REMOVED from authority (display_metadata only,
+                            outside fingerprint and replay check 19)
+POL-1..POL-11                         = ALL PASS
+
+--- NEW BOUNDARY INVARIANTS ---
+
+AC_19_NO_TOLERANCE_OR_MATERIALITY_IN_COMPARISON = TRUE
+  no epsilon / tolerance / materiality / significance field exists
+  NO_CHANGE means EXACT CANONICAL EQUALITY and nothing else
+  NO_CHANGE != NOT_MATERIAL_CHANGE
+AC_20_DISPLAY_IS_NOT_AUTHORITY        = TRUE
+  DISPLAYED EQUALITY != MEASURED EQUALITY
+ROUNDING_AFFECTS_CHANGE_CLASSIFICATION = FALSE
+DISPLAY_ROUNDING_IS_AUTHORITY          = FALSE
+
+--- CANONICAL ARITHMETIC (fixed law) ---
+
+ABSOLUTE_DELTA = comparison_value - baseline_value
+RELATIVE_DELTA = (comparison_value - baseline_value) / baseline_value
+                 where semantically valid
+direction      = SIGN(canonical UNROUNDED absolute_delta)
+  >0 INCREASE · <0 DECREASE · ==0 NO_CHANGE
+baseline==0    → relative UNDEFINED/ABSENT (never 0, inf, NaN, capped, %)
+unit validity  → DERIVED from accepted typed unit contract
+new operator   → requires a new contract version, never a string
+
+--- GATES ---
+
+PRE_RATIFICATION_REVIEW               = v0.5 — 48 / 48 PASS
+  Q43 rounding/display cannot change classification  = PASS
+  Q44 epsilon/tolerance/materiality via any field    = PASS (no field)
+  Q45 custom arithmetic injection                    = PASS (closed set)
+  Q46 known coverage omitted at seam                 = PASS (RL-12)
+  Q47 supersedes absence ≠ first version             = PASS
+  Q48 valid_to absence ≠ open-ended                 = PASS
+
+RATIFICATION_READINESS                = PASS
+INDEPENDENT_READINESS_REVIEW_v0.3     = 16 structural surfaces
+  SURFACES_CLEAN  = 16
+  SURFACES_FAILED = 0   (v0.2 failed surfaces 4, 7, 12, 13, 14 — all now PASS)
+  NEW SURFACES ADDED = 2 — arithmetic/operator openness; seam information
+                        preservation (both PASS)
+NEW_UNASKED_STRUCTURAL_DEFECTS        = 0
+NEW_DESIGN_DEFECTS_FOUND              = 0
+EVERY_KNOWN_DEFECT_HAS_GENERAL_CLASS_COVERAGE = TRUE
+
+--- CONTRACT-CLASS RE-AUDIT (after a semantics section was deleted) ---
+
+NEW_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+  ComparisonRule
+  ChangeObservation
+HIDDEN_THIRD_CONTRACT                 = NONE
+  v0.4 deleted the comparison_semantics section outright, so the one place a
+  free-form authority-bearing value could have grown into a de-facto third
+  class no longer exists.
+
+--- RESIDUAL LIMITATIONS (recorded, not defects) ---
+
+no first-class MetricDefinition versioning (content-bound at ratification; a
+  separate amendment would be required)
+no tolerance / materiality methodology (would be a separate, individually
+  ratified methodology if ever authorized)
+no shared versioned delta-operator class (operator set closed and fixed; a new
+  operator requires a contract version)
+no causal methodology (D7N-4 OPEN / DEFERRED)
+no usage / health semantics (D6M-5 OPEN_DEFERRED)
+NOTE: the v0.3 limitation "comparison semantics are per-rule rather than
+  shared" is RESOLVED, not deferred — the semantics section was deleted, so
+  direction, zero-baseline, unit validity, and precision are no longer
+  per-rule at all.
+
+--- UNTOUCHED / INVARIANT ---
+
+BOOK_1_AMENDMENT_REQUIRED              = FALSE
+BOOK_2_AMENDMENT_REQUIRED              = FALSE
+BOOK_3_AMENDMENT_REQUIRED              = FALSE
+BOOK_4_AMENDMENT_REQUIRED              = FALSE
+BOOK_5_AMENDMENT_REQUIRED              = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED        = FALSE
+SENSOR_MUTATION                        = 0
+COMPARISON_RULES_RATIFIED              = 0 canonical
+COVERAGE_SUFFICIENCY_RULES_RATIFIED    = 0 canonical
+BENCHMARK_RULES_RATIFIED               = 0 canonical
+CHANGE_OBSERVATION_CANONICAL_COUNT     = 0 canonical
+D2_6                                    = IN_FORCE
+D6M_1..D6M_4                            = UNCHANGED
+D6M_5                                   = OPEN_DEFERRED
+BOOK_6_IMPLEMENTATION_AUTHORITY        = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY        = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY        = FALSE
+LIVE_ACQUISITION_AUTHORITY             = FALSE
+BOOK_7_PLAN                            = READY_PENDING_BOOK6_COMPARISON_AMENDMENT
+BOOK_7_RATIFICATION_BLOCKER            = BOOK6_COMPARISON_CONTRACT_NOT_YET_ACCEPTED
+
+NEXT = operator ratification of the Book 6 comparison/change amendment PLAN
+      v0.4 (ratification of the PLAN only; it would authorize a separate
+      implementation round, which remains separately gated)
+
+ARTIFACTS_CREATED_THIS_CHECKPOINT
+  CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.4.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.3.md
+  CSIA_BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.4.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.4.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PRE_RATIFICATION_REVIEW_v0.5.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_READINESS_v0.3.md
+ARTIFACTS_APPENDED_THIS_CHECKPOINT
+  CSIA_PLANNING_PROGRESS.md   (this checkpoint)
+```
+
+**Reading of this checkpoint.** Amendment plan v0.4 is the first version in
+this chain that closes both general defect classes by changing the design
+rather than by documenting the risk. The governing move was to ask, for each
+of five open policy surfaces, whether a rule author should have a choice at
+all — and in four cases the answer was no, because the correct behaviour was
+already determined by arithmetic, by the unit contract, or by the display
+layer. Deleting those four fields is stronger than closing them in an enum: it
+removes the attack surface rather than narrowing it, and it resolves a v0.3
+limitation instead of deferring it. The most consequential single repair is
+that rounding left the canonical fingerprint entirely. In v0.3 a precision
+value could express "differences below X are not a change" — a significance
+threshold reached through a field the anti-score firewall did not name. In
+v0.4 there is no field through which any threshold can be expressed, and
+`NO_CHANGE` means exact canonical equality and nothing else. The independent
+readiness review now passes all sixteen surfaces, including two new ones this
+round added — arithmetic openness and seam information preservation — because
+a review that asks only whether authority is sound would not have noticed
+that the seam permitted silence about a coverage verdict the source record
+always carried. Every known defect, historical and new, maps to a general
+question class rather than an instance question.
+
+**What PASS means and does not mean.** The plan is ready to be put to the
+operator. It is not ratified. Ratification of the plan would authorize a
+separate implementation round, which is separately gated, and Book 6 would
+still need regression review and formal re-acceptance before Book 7 could be
+ratified.
+
+**Not authorized and not performed:** amendment ratification, Book 6
+implementation, Book 6 re-acceptance, Book 7 ratification, Book 7
+implementation, Book 8, D8, live acquisition, any comparison-rule,
+benchmark-rule, or coverage-rule ratification, any state/predicate/coverage
+ratification, any usage or health research, any score, ranking, or trading
+authority.
