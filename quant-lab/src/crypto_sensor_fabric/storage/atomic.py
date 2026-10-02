@@ -568,10 +568,46 @@ def ensure_same_device(
 # ---------------------------------------------------------------------------
 
 
+def _real_path(path: str | Path) -> Path:
+    """``os.path.realpath`` normalised so two spellings compare equal.
+
+    SENSOR-B4-I15R1B: on Windows ``ntpath.realpath`` only strips the
+    extended-length ``\\\\?\\`` prefix when its post-strip re-resolution check
+    succeeds, so the SAME directory is returned spelled with the prefix on
+    some calls and without it on others (observed transiently while another
+    thread is creating the directory).  Comparing the raw results produces a
+    FALSE "resolves outside the containment root" refusal, which broke
+    legitimate concurrent publication.  The prefix (and its UNC form) is
+    therefore normalised away before any containment decision.  No-op on
+    POSIX, where ``realpath`` is stable.
+    """
+    real = os.path.realpath(path)
+    if os.name == "nt":
+        prefix = "\\\\?\\UNC\\"
+        if real.startswith(prefix):
+            real = "\\\\" + real[len(prefix) :]
+        else:
+            prefix = "\\\\?\\"
+            if real.startswith(prefix):
+                real = real[len(prefix) :]
+    return Path(real)
+
+
+def _file_identity(path: str | Path) -> tuple[int, int]:
+    """``(st_dev, st_ino)`` of ``path`` WITHOUT following a final link.
+
+    ``st_ino`` is the Windows file index as well as the POSIX inode, and a
+    hard link shares it with its source, so two names report the same value
+    exactly when they are the same durable file.
+    """
+    st = os.lstat(path)
+    return (st.st_dev, st.st_ino)
+
+
 def _is_within(path: str | Path, root_real: Path) -> bool:
     """True iff ``path`` resolves to ``root_real`` or a descendant of it."""
     try:
-        real = Path(os.path.realpath(path))
+        real = _real_path(path)
     except OSError:  # pragma: no cover - defensive
         return False
     return real == root_real or root_real in real.parents
@@ -654,9 +690,7 @@ def publish_no_replace(
     # on platforms without descriptor-relative link if the artifact landed
     # outside the root.
     lexical_root = Path(containment_root) if containment_root is not None else None
-    root_real = (
-        Path(os.path.realpath(lexical_root)) if lexical_root is not None else None
-    )
+    root_real = _real_path(lexical_root) if lexical_root is not None else None
     if lexical_root is not None:
         assert root_real is not None
         if not _is_within(fp.parent, root_real):
@@ -665,6 +699,14 @@ def publish_no_replace(
                 "containment root (link escape / TOCTOU swap detected before "
                 "commit)"
             )
+        # SENSOR-B4-I15R1C: the SOURCE of the link is inside the same
+        # check/use window.  Anchor the identity of the staged artifact that
+        # was just verified, so a namespace swapped between verification and
+        # publication cannot substitute a different file for it.
+        try:
+            staged_identity: tuple[int, int] | None = _file_identity(sp)
+        except OSError:  # pragma: no cover - defensive
+            staged_identity = None
     # SENSOR-B4-I03R1 (Defect B): the final parent chain is created DURABLY
     # from the deepest existing ancestor — every new directory NAME is fsynced
     # into its parent BEFORE publication — never via blind os.makedirs() +
@@ -683,6 +725,12 @@ def publish_no_replace(
             raise AtomicPublishSecurityError(
                 f"refusing publication: {fp.parent!s} resolves outside the "
                 "containment root after namespace creation"
+            )
+        if not _is_within(sp, root_real):
+            raise AtomicPublishSecurityError(
+                f"refusing publication: staged source {sp!s} resolves outside "
+                "the containment root (staging namespace swapped inside the "
+                "check/use window)"
             )
         parent_fd = _open_parent_no_follow(fp.parent, lexical_root, root_real)
 
@@ -709,16 +757,32 @@ def publish_no_replace(
 
     if lexical_root is not None:
         assert root_real is not None
-        if not _is_within(fp, root_real):
+        committed_outside = not _is_within(fp, root_real)
+        # Identity revalidation: the published NAME must be the SAME durable
+        # file that was staged and verified.  A source namespace swapped
+        # inside the check/use window links a DIFFERENT file, which would
+        # publish foreign bytes under an already-verified content address.
+        substituted = False
+        if staged_identity is not None:
+            try:
+                substituted = _file_identity(fp) != staged_identity
+            except OSError:  # pragma: no cover - defensive
+                substituted = True
+        if committed_outside or substituted:
             # Cross-platform guarantee: a component swapped between the
             # pre-check and the link on a platform without descriptor-
-            # relative link is detected here, the outside artifact is
+            # relative link is detected here, the offending artifact is
             # REVERTED, and the commit is refused typed — never silently
             # accepted.
             try:
                 os.unlink(fp)
             except OSError:  # pragma: no cover - best effort revert
                 pass
+            if substituted:
+                raise AtomicPublishSecurityError(
+                    "staged source was substituted inside the check/use "
+                    "window; commit reverted and refused"
+                )
             raise AtomicPublishSecurityError(
                 "published artifact left the containment root; commit reverted "
                 "and refused"

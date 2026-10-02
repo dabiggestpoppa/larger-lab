@@ -3657,3 +3657,94 @@ research                                                  = FROZEN
 The I15 hardening seal is hereby advanced from PENDING_OPERATOR_REVIEW to OPERATOR_HOLD (two blockers closed; operator review of the combined I15 -> I15R1 chain remains open).
 
 No self-ratification. I16 not started. STOP after I15R1.
+
+---
+
+## SENSOR-B4-I15R1 — INDEPENDENT VERIFICATION CORRECTION (append-only)
+
+An independent verification pass over the I15R1 head found two things the
+first pass had got wrong, and corrected both. Nothing above was rewritten; I15
+matrices and historical I03-I14 evidence are untouched.
+
+**1. The first test measured the wrong seam.** `FaultPoint.BEFORE_PUBLISH` is
+raised by `LocalBlobStore.put` BEFORE `publish_no_replace` is entered, so it
+proves an already-swapped-at-entry refusal, not the residual window INSIDE the
+writer between its own containment check / parent-descriptor open and
+`os.link`. The correct seam is the existing `OpRecorder` `OP_FINAL_LINK` hook,
+which fires exactly there. Re-measured against a clean `git archive` export of
+`bc6d5e059f3d039235dbcc4769658819146ff7db`: at the I15 head the residual seam
+SUCCEEDS and lands 1 artifact outside the configured root (the decisive RED);
+at the I15R1 head the same seam is refused `AtomicPublishSecurityError` with 0
+outside-root mutations. A pre-repair counterfactual row (R1 primitive disabled
+in-process = exact I15-head semantics) reproduces the escape at that seam, so
+the seal is earned by the production primitive and not by the harness. TOCTOU
+matrix is now 11 rows / 11 OK / 0 FAIL / 1 synthetic counterfactual;
+outside-root mutation count = 0.
+
+**2. Regression introduced by the first R1 repair — found and fixed.** The first
+repair compared `os.path.realpath()` results as plain strings. On Windows
+CPython's `ntpath.realpath` keeps the `\\?\` extended-length prefix whenever its
+post-strip re-resolution check fails, so the SAME directory is spelled two
+different ways and valid concurrent writes were refused
+`AtomicPublishSecurityError`. `_real_path()` now normalises `\\?\` and
+`\\?\UNC\` on both sides of every containment comparison (no-op on POSIX);
+containment semantics are unchanged and both TOCTOU seams still refuse with 0
+outside-root mutations. Concurrent-writer trials, 15 each, back to back: I15
+head 5 pass; I15R1 unfixed 3/10; I15R1 fixed 8.
+
+**Residual, pre-existing, reported and NOT fixed under I15R1:** the known
+concurrency flake remains at the I15 head's own rate, from two Windows path-API
+causes that exist at `bc6d5e05` before any I15R1 code — `resolve_under_root`
+(I15) raising `UnsafeObjectKey` on the same prefix instability, and
+`ensure_durable_directory` (I03) raising `ValueError: components must be
+nonempty` on a transient `Path.exists()`. Both fail CLOSED. Closing them would
+reopen accepted I15/I03 code and needs its own authorized checkpoint.
+
+**3. Second RED found by this pass and closed: the STAGING SOURCE of the atomic
+link was unguarded.** The first repair anchored only the DESTINATION. The
+`os.link` source sits in the same check/use window, so swapping the staging
+namespace at the final-link seam published ATTACKER bytes under an
+already-verified content address while the receipt asserted the genuine digest
+— a silent content-integrity violation inside the root, measured as
+`PUT_SUCCEEDED / COMMITTED_NEW`, receipt `9bb24023…`, published blob
+`84e3b4d2…`. `publish_no_replace` now captures the staged artifact's
+`(st_dev, st_ino)` identity before the window opens, requires the staged
+source to still resolve inside the containment root immediately before the
+commit, and requires the published NAME to report the SAME identity immediately
+after it — otherwise the artifact is unlinked, the commit reverted and refused
+typed as `AtomicPublishSecurityError`. Platform-neutral, no descriptor-relative
+source required (`st_ino` is the Windows file index and a hard link shares it
+with its source). Post-repair the same substitution is refused with 0 artifacts
+published; the vacuous-check counterfactual still publishes foreign bytes and
+is recorded as the measured RED. TOCTOU matrix is now **13 rows / 13 OK / 0
+FAIL / 2 synthetic counterfactuals**; outside-root mutations = 0, foreign bytes
+published = 0.
+
+**Verification totals after the correction:** focused I15R1 + I15 = 42 passed /
+0 failed; full storage = 1791 passed / 11 skipped / 0 failed; full project
+`quant-lab/tests` = 3170 passed / 12 skipped / 0 failed. An earlier full-project
+run reported 1 failure in `test_i07r1h_evidence`; its diff named exactly the
+three I15 matrices and the cause was operator error — `git checkout` of those
+matrices was run WHILE the suite was executing, between that test's before/after
+directory-hash snapshots. Re-run without touching the worktree: 0 failed.
+Reported, not hidden. (Earlier full-storage runs before the C2/C4 repairs
+measured 1787 passed / 4 failed; all four re-measured in isolation — 3
+environmental `git show` subprocess `STATUS_DLL_INIT_FAILED` failures in the
+long run, all 3 passing alone, and 1 the pre-existing flake above.) Ruff clean;
+compileall clean; mypy 10 pre-existing errors in `providers/`, 0 in
+`atomic.py`. I15 matrices unchanged (informational timing rewrites reverted,
+never staged). I11R2 governance-binding audit byte-stable, no new test file
+names. external_ci = NONE_OBSERVED.
+
+```
+SENSOR-B4-I15R1
+PASS_SENSOR_B4_I15_HARDENING_SECURITY_SEALED              = OPERATOR_HOLD
+PASS_SENSOR_B4_I15R1_TOCTOU_FRESH_CORRUPTION_SEALED       = PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                                = FALSE
+recommended_next                                          = OPERATOR REVIEW OF I15 -> I15R1 CHAIN
+I16+                                                      = UNAUTHORIZED
+G4-13                                                     = NOT_YET_IMPLEMENTED / PENDING_LATER_CHECKPOINT
+research                                                  = FROZEN
+```
+
+No self-ratification. I16 not started. STOP after I15R1.

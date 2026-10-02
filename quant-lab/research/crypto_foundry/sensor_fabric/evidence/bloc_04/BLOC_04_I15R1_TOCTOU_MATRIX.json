@@ -47,6 +47,73 @@
       "result": "OK"
     },
     {
+      "case_id": "check_use_seam_at_final_link",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "swapping the blobs component INSIDE publish_no_replace — after its containment check and after the parent descriptor is open, immediately before final-name creation — can never leave an artifact outside the configured root; where descriptor-relative link exists the commit is anchored to the opened parent, otherwise the post-commit verification reverts and refuses typed (§3/§6/§7)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "descriptor_relative_available": false,
+        "hook_fired": true,
+        "outcome": "REFUSED_TYPED",
+        "outside_root_mutations": 0,
+        "seam": "OP_FINAL_LINK inside publish_no_replace",
+        "typed_refusal": "AtomicPublishSecurityError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "check_use_seam_pre_repair_counterfactual_escape",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "with the I15R1 containment primitive disabled the SAME seam commits outside the root; the seal is therefore earned by the production repair, not by the test harness (§5-B/§21)",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {
+        "hook_fired": true,
+        "outcome": "COMMITTED_OUTSIDE_ROOT",
+        "outside_root_mutations": 1,
+        "repair_disabled": [
+          "atomic._is_within -> always True",
+          "atomic._open_parent_no_follow -> None"
+        ],
+        "seam": "OP_FINAL_LINK inside publish_no_replace",
+        "typed_refusal": null
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "check_use_swap_staging_source_namespace",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "swapping the STAGING namespace to a link inside the check/use window can never publish a different file under an already-verified content address; the staged source is re-anchored by containment plus file-identity revalidation around the commit (§3/§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "attacker_bytes_offered": "2ff2b2092aa1033596048b38e9f30c89fac78f303821a5345527a86b599ad693",
+        "foreign_bytes_published": 0,
+        "hook_fired": true,
+        "published_artifacts": [],
+        "seam": "OP_FINAL_LINK inside publish_no_replace",
+        "typed_refusal": "AtomicPublishSecurityError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "staged_source_substitution_pre_repair_counterfactual",
+      "category": "SYNTHETIC_COUNTERFACTUAL",
+      "invariant": "with the I15R1 source anchoring disabled the SAME seam publishes foreign bytes under the genuine content address, so the seal is earned by the production repair (§5-B/§21)",
+      "invariant_source": "SYNTHETIC_COUNTERFACTUAL",
+      "measured": {
+        "hook_fired": true,
+        "outcome": "FOREIGN_BYTES_PUBLISHED",
+        "published": [
+          {
+            "is_attacker_bytes": true,
+            "path": "blobs\\sha256\\e8\\cb\\e8cb89c5c0f1fdddf1caf930c001699f6a93897ca6978994a93c7c0927205690.blob"
+          }
+        ],
+        "seam": "OP_FINAL_LINK inside publish_no_replace",
+        "typed_refusal": null
+      },
+      "result": "OK"
+    },
+    {
       "case_id": "final_name_preexisting_link",
       "category": "PRODUCTION_MEASURED",
       "invariant": "a link pre-placed at the EXACT final name cannot replace or redirect immutable evidence; the outside file is untouched (§3)",
@@ -105,7 +172,7 @@
   "matrix": "TOCTOU_MATRIX",
   "measured_at_checkpoint": "I15R1",
   "rows_fail": 0,
-  "rows_ok": 9,
-  "rows_total": 9,
-  "synthetic_counterfactuals": 0
+  "rows_ok": 13,
+  "rows_total": 13,
+  "synthetic_counterfactuals": 2
 }
