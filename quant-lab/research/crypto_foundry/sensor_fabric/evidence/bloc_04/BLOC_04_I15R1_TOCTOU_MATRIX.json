@@ -1,0 +1,111 @@
+{
+  "cases": [
+    {
+      "case_id": "platform_link_capability",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "link capability measured; behavioral TOCTOU rows run whenever the platform can create links (§3)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "link_available": true,
+        "mechanism": "junction"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "static_intermediate_link_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a statically planted intermediate link is refused typed before any commit (§8)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_root_mutations": 0,
+        "refusal": "typed"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "check_use_swap_blob_namespace",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "swapping the blobs component to a link AFTER containment validation but BEFORE final-name creation can never produce an outside-root mutation; the commit is refused typed (§3/§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hook_fired": true,
+        "outside_root_mutations": 0,
+        "refusal": "AtomicPublishSecurityError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "check_use_swap_staging_namespace",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "swapping the staging component to a link inside the check/use window can never produce an outside-root mutation (§3/§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "hook_fired": true,
+        "outside_root_mutations": 0,
+        "refusal": "AtomicPublishError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "final_name_preexisting_link",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a link pre-placed at the EXACT final name cannot replace or redirect immutable evidence; the outside file is untouched (§3)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_file_untouched": true,
+        "refusal": "NotADirectoryError"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "root_symlink_law_a_preserved",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "law A preserved: a configured data root may itself be a link, its resolved target is storage authority; normal publication still succeeds inside the real root (§8)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "writes_inside_real_root": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "outside_root_mutation_total",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "outside-root mutation count = 0 across the static escape, both check/use swaps and the final-name race (§21)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_root_files": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "structural_containment_reuse",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "every production publish_no_replace call site anchors its commit to a containment root (structural reuse of the hardened primitive) (§21)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "anchored": 5,
+        "call_sites": 5
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "platform_guarantee_classification",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "platform guarantee is stated exactly: POSIX anchors the commit to an already-open parent descriptor; where descriptor-relative link is unavailable the verify-before/after + revert law is the guarantee (§7)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "guarantee": "verify_before_and_after_with_revert (Windows)",
+        "platform": "win32",
+        "posix_descriptor_relative_available": false
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15R1",
+  "matrix": "TOCTOU_MATRIX",
+  "measured_at_checkpoint": "I15R1",
+  "rows_fail": 0,
+  "rows_ok": 9,
+  "rows_total": 9,
+  "synthetic_counterfactuals": 0
+}

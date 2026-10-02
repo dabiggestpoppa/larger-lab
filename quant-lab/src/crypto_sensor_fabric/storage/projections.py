@@ -778,7 +778,7 @@ def write_projection(
 
         # ---- 8. No-clobber publish ----------------------------------------
         try:
-            publish_no_replace(staged, final)
+            publish_no_replace(staged, final, containment_root=root)
         except (FileExistsError, AtomicPublishTargetExists):
             # Idempotent: verify the existing object is byte-identical.
             existing_digest = sha256_file(str(final))

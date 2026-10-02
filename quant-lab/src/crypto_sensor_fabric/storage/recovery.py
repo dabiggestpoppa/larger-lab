@@ -1371,7 +1371,9 @@ class RecoveryEngine:
                 "scanned content identity; nothing published"
             )
         try:
-            publish_no_replace(staging, destination)
+            publish_no_replace(
+                staging, destination, containment_root=self._t0_root
+            )
         except OSError as exc:
             staging.unlink(missing_ok=True)
             raise RecoveryQuarantineConflict(

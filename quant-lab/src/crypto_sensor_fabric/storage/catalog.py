@@ -481,7 +481,7 @@ def publish_immutable_fragment(
                     f"staged fragment {staged!s} row {index} does not match "
                     "the expected record"
                 )
-        publish_no_replace(staged, final, ops=ops)
+        publish_no_replace(staged, final, ops=ops, containment_root=root)
         fsync_directory(final.parent)
         digest = sha256_file(str(final))
         return CatalogFragmentReceipt(

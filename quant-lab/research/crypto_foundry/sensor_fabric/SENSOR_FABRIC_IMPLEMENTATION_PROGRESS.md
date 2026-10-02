@@ -3596,3 +3596,64 @@ research                                              = FROZEN
 ```
 
 No self-ratification. I16 not started. STOP after I15.
+
+---
+
+## SENSOR-B4-I15R1 TOCTOU CUSTODY + FRESH CORRUPTION RE-MEASUREMENT
+
+**Type:** hardening microseal closing the two operator-review blockers on the I15 checkpoint. **Base HEAD:** bc6d5e059f3d039235dbcc4769658819146ff7db. **Historical evidence diff:** ZERO. **I15 matrices and the I15 ledger section are NOT modified** — I15 remains valid historical hardening evidence; I15R1 is append-only correction evidence.
+
+### 1. TOCTOU — RED reproduced, then closed
+
+**RED (at the I15 head, before the R1 repair):** a deterministic test drove the existing atomic.FaultPoint.BEFORE_PUBLISH seam — precisely between containment validation (resolve_under_root) and final-name creation (os.link). The hook swapped the `blobs` component to a link to an outside directory. Result: `LocalBlobStore.put_bytes` SUCCEEDED and the immutable blob landed OUTSIDE the configured root (outside/sha256/40/91/<sha>.blob). A true race permitted an outside-root mutation — BLOCKING.
+
+**Repair (smallest compatible production change), in `atomic.publish_no_replace` which now accepts a `containment_root`:**
+1. verify BEFORE any namespace is created — typed refusal if the final parent does not resolve inside the root;
+2. POSIX: re-open the parent chain component-by-component with O_NOFOLLOW from the resolved root and link with `dst_dir_fd=<open parent>` (descriptor-relative; a swap after the open cannot redirect the commit);
+3. cross-platform: verify AFTER the commit and REVERT + refuse typed as `AtomicPublishSecurityError` if the artifact does not resolve inside the root (the guarantee where descriptor-relative link is unavailable).
+
+Every production call site now passes its containment root: blob_store (T0A), catalog.publish_immutable_fragment (catalogs/manifests/acquisitions), json_catalog, projections (T0B), recovery. Structural reuse proven: call_sites == anchored == 5.
+
+**Post-repair:** the same check/use swap at BOTH blobs and staging refuses typed with outside-root mutation count = 0; the static intermediate link stays refused; a link pre-placed at the exact final name cannot replace evidence; accepted root-symlink law A (configured root may itself be a link) is preserved. Platform guarantee stated exactly (POSIX = descriptor-relative link; Windows = verify-before/after with revert). Measured platform this run: win32 (posix_descriptor_relative_available = false).
+
+### 2. Fresh corruption re-measurement (one current-run row per durable subsystem)
+
+Every row: valid state committed, durable invariant tampered AFTER commit, old repository/service instances destroyed, FRESH instance constructed, operation attempted; each row records fresh_instance = true and repair_on_read = false. No row is satisfied only by citing an existing suite.
+
+| Subsystem | Tamper | Fresh operation | Outcome |
+|---|---|---|---|
+| T0A | payload byte flipped | fresh LocalBlobStore.verify_blob | QUARANTINED_ACCEPTED |
+| acquisition | fragment overwritten | fresh get_acquisition | FAIL_CLOSED_TYPED |
+| manifest | fragment overwritten (pointer binding) | fresh get_current_manifest | FAIL_CLOSED_TYPED |
+| T0B | projection payload overwritten | fresh ProjectionArtifactRepository.verify_physical | FAIL_CLOSED_TYPED |
+| revision | segment overwritten | fresh SourceRevisionRegistry + resolve(ALL) | FAIL_CLOSED_TYPED |
+| job/checkpoint | job state overwritten | fresh DurableJobStateRepository.get_job | FAIL_CLOSED_TYPED |
+| export | pack object overwritten | fresh EvidencePackVerifier + EvidencePackRestorer | FAIL_CLOSED_TYPED (no final-root promotion) |
+| DuckDB (A) | duckdb file overwritten | fresh rebuild_duckdb_catalog | REBUILD_DISPOSABLE_STATE |
+| DuckDB (B) | durable evidence under the catalog overwritten | fresh rebuild_duckdb_catalog | FAIL_CLOSED_TYPED (bad truth NOT canonized) |
+| recovery/quarantine | hostile unknown + corrupt partial in staging | fresh RecoveryEngine.scan | QUARANTINED_ACCEPTED (valid T0A preserved) |
+
+UNSAFE_SILENT_ACCEPTANCE did not occur. The 10,000-manifest-row scan was NOT repeated: the reader path was not touched and its I15 result (created = scanned = 10000, invalid_rows = 0, duplicate_logical_ids = 0) stands.
+
+### 3. Regressions (after final code)
+
+Focused: test_i15r1_toctou 2 + test_i15r1_fresh_corruption 11 + test_i15_hardening 17 + test_i15_resource_bounds 12 = 42 passed. Storage regressions: core path/blob/catalog/manifest/json_catalog/atomic/namespace 197 passed / 3 skipped; projections/revisions/duckdb/quota/retention/utilities 588 passed; recovery/job-state/I04/I05/I06 318 passed / 1 skipped; I07-I10 241 passed; I11-I14 285 passed / 23 skipped; final atomic-refactor validation 165 passed / 2 skipped. ZERO deterministic failures. The known concurrency flake did not reappear this run.
+
+Tooling: Ruff clean on changed scope (2 pre-existing findings in untouched test_i08_evidence.py); mypy storage = 10 errors all pre-existing in probes/providers (0 new); compileall OK. external_ci = NONE_OBSERVED.
+
+Published I15R1 evidence: BLOC_04_I15R1_TOCTOU_MATRIX.json (9/9), BLOC_04_I15R1_FRESH_CORRUPTION_MATRIX.json (10/10), BLOC_04_I15R1_EVIDENCE_CORRECTION.md.
+
+```
+SENSOR-B4-I15R1
+PASS_SENSOR_B4_I15_HARDENING_SECURITY_SEALED              = OPERATOR_HOLD
+PASS_SENSOR_B4_I15R1_TOCTOU_FRESH_CORRUPTION_SEALED       = PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                                = FALSE
+recommended_next                                          = OPERATOR REVIEW OF I15 -> I15R1 CHAIN
+I16+                                                      = UNAUTHORIZED
+G4-13                                                     = NOT_YET_IMPLEMENTED / PENDING_LATER_CHECKPOINT
+research                                                  = FROZEN
+```
+
+The I15 hardening seal is hereby advanced from PENDING_OPERATOR_REVIEW to OPERATOR_HOLD (two blockers closed; operator review of the combined I15 -> I15R1 chain remains open).
+
+No self-ratification. I16 not started. STOP after I15R1.

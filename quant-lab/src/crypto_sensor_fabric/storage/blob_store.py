@@ -651,6 +651,7 @@ class LocalBlobStore:
                 device_probe=self._device_probe,
                 fault_hooks=fault_hooks,
                 ops=ops,
+                containment_root=self.root,
             )
         except AtomicPublishTargetExists:
             # Lost a same-hash publish race: the winner is already final.

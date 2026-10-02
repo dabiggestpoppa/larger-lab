@@ -476,7 +476,13 @@ class DurableJsonCatalog:
             if self._ops is not None:
                 self._ops.record(CATALOG_OP_PUBLISH)
             try:
-                publish_no_replace(staged, final, fault_hooks=pub_hook, ops=self._ops)
+                publish_no_replace(
+                    staged,
+                    final,
+                    fault_hooks=pub_hook,
+                    ops=self._ops,
+                    containment_root=self.root,
+                )
             except (FileExistsError, AtomicPublishTargetExists):
                 # A concurrent writer won the publish race.  Adopt only if
                 # the winner is byte-identical; otherwise typed conflict.

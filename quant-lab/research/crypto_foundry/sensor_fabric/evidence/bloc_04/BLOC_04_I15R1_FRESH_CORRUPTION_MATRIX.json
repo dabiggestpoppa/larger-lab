@@ -1,0 +1,181 @@
+{
+  "cases": [
+    {
+      "case_id": "fresh_t0a_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "T0A payload tamper after a valid commit is detected by a FRESH LocalBlobStore (§10)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "integrity_state": "QUARANTINED_INTEGRITY_FAILURE",
+        "old_objects_discarded": true,
+        "operation": "verify_blob",
+        "outcome": "QUARANTINED_ACCEPTED",
+        "repair_on_read": false,
+        "tamper": "payload byte flipped after commit"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_acquisition_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered acquisition fragment fails CLOSED typed on a FRESH repository read; no cached proof, no repair-on-read (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "get_acquisition",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "tamper": "fragment bytes overwritten after commit",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_manifest_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered committed manifest fragment + current pointer binding fails CLOSED typed on a FRESH repository read; no auto-repair (§12)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "get_current_manifest",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "tamper": "fragment bytes overwritten after commit",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_t0b_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered T0B projection payload is refused typed by a FRESH projection artifact repository; no partial projection acceptance (§13)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "verify_physical (fresh repository)",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "tamper": "projection payload bytes overwritten after commit",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_revision_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered revision segment fails CLOSED typed on FRESH registry construction/resolution; no repair-on-read (§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "SourceRevisionRegistry + resolve(ALL)",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "tamper": "revision segment bytes overwritten after commit",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_job_checkpoint_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered durable job checkpoint state fails CLOSED typed on a FRESH repository read; no cursor movement (§15)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "cursor_moved": false,
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "get_job",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "tamper": "job state bytes overwritten after commit",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_export_pack_corruption",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "tampered export pack is refused by FRESH verifier and restorer BEFORE any final-root promotion (§16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "final_root_promoted": false,
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "EvidencePackVerifier.verify_pack + EvidencePackRestorer.restore_pack",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "restore_typed": true,
+        "tamper": "pack object bytes overwritten after export",
+        "verify_typed": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_duckdb_disposable",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "A. corrupted/deleted DuckDB is DISPOSABLE: a FRESH rebuild from durable evidence succeeds (§17-A)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "rebuild_duckdb_catalog",
+        "outcome": "REBUILD_DISPOSABLE_STATE",
+        "projection_rows_after_rebuild": 1,
+        "repair_on_read": false,
+        "tamper": "duckdb file overwritten"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_duckdb_bad_source",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "B. corrupted durable source evidence underneath the catalog is NOT silently converted into valid canonical DuckDB rows: the fresh rebuild fails/refuses (§17-B)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "rebuild_duckdb_catalog",
+        "outcome": "FAIL_CLOSED_TYPED",
+        "repair_on_read": false,
+        "silently_canonicalized": false,
+        "tamper": "durable manifest fragment overwritten under the catalog",
+        "typed_refusal": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "fresh_recovery_hostile_state",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "FRESH recovery scan over hostile staging state preserves valid T0A, promotes no hostile object, performs no destructive auto-clean and produces an accepted finding classification (§18)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "destructive_auto_clean": false,
+        "files_unchanged": true,
+        "findings": 1,
+        "fresh_instance": true,
+        "old_objects_discarded": true,
+        "operation": "RecoveryEngine.scan",
+        "outcome": "QUARANTINED_ACCEPTED",
+        "problems": [
+          "UNCOMMITTED_STAGING"
+        ],
+        "repair_on_read": false,
+        "tamper": "hostile unknown + corrupt partial placed in staging",
+        "valid_t0a_preserved": true
+      },
+      "result": "OK"
+    }
+  ],
+  "mandate": "SENSOR-B4-I15R1",
+  "matrix": "FRESH_CORRUPTION_MATRIX",
+  "measured_at_checkpoint": "I15R1",
+  "rows_fail": 0,
+  "rows_ok": 10,
+  "rows_total": 10,
+  "synthetic_counterfactuals": 0
+}

@@ -56,6 +56,17 @@ class CrossFilesystemAtomicityError(AtomicPublishError):
     """Staging and final live on different devices — atomic commit denied."""
 
 
+class AtomicPublishSecurityError(AtomicPublishError):
+    """The commit was refused, or reverted, because it would leave the root.
+
+    SENSOR-B4-I15R1 (§6): the check/use (TOCTOU) window between containment
+    validation and final-name creation is closed by verifying the ACTUAL
+    filesystem topology immediately BEFORE and immediately AFTER the commit,
+    and by anchoring the commit to an already-open parent directory on
+    platforms that support descriptor-relative ``os.link``.
+    """
+
+
 class DurabilityUnsupported(AtomicPublishError):
     """The platform cannot provide the required durability semantics."""
 
@@ -557,6 +568,53 @@ def ensure_same_device(
 # ---------------------------------------------------------------------------
 
 
+def _is_within(path: str | Path, root_real: Path) -> bool:
+    """True iff ``path`` resolves to ``root_real`` or a descendant of it."""
+    try:
+        real = Path(os.path.realpath(path))
+    except OSError:  # pragma: no cover - defensive
+        return False
+    return real == root_real or root_real in real.parents
+
+
+def _open_parent_no_follow(
+    parent: Path, lexical_root: Path, root_real: Path
+) -> int | None:
+    """Open ``parent`` as a descriptor anchored under the real root (POSIX).
+
+    Every component is opened RELATIVE to the already-open parent with
+    ``O_NOFOLLOW``, so a component swapped to a link between containment
+    validation and publication can never be traversed — the commit lands in
+    the directory that was genuinely opened from the root.  Returns ``None``
+    where the platform lacks descriptor-relative open (e.g. Windows), in
+    which case the caller relies on the verify-before/after containment law.
+    """
+    if not hasattr(os, "O_DIRECTORY") or not os.supports_dir_fd:
+        return None
+    try:
+        rel = Path(parent).relative_to(lexical_root)
+    except ValueError:
+        return None
+    flags = os.O_RDONLY | os.O_DIRECTORY
+    nofollow = getattr(os, "O_NOFOLLOW", 0)
+    try:
+        fd = os.open(root_real, flags)
+    except OSError:  # pragma: no cover - defensive
+        return None
+    try:
+        for part in rel.parts:
+            next_fd = os.open(part, flags | nofollow, dir_fd=fd)
+            os.close(fd)
+            fd = next_fd
+    except OSError as exc:
+        os.close(fd)
+        raise AtomicPublishSecurityError(
+            "publication refused: parent chain for "
+            f"{Path(parent)!s} changed identity or contains a link ({exc})"
+        ) from exc
+    return fd
+
+
 def publish_no_replace(
     staging_path: str | Path,
     final_path: str | Path,
@@ -564,6 +622,7 @@ def publish_no_replace(
     device_probe: DeviceProbe = default_device_probe,
     fault_hooks: FaultHook | None = None,
     ops: OpRecorder | None = None,
+    containment_root: str | Path | None = None,
 ) -> None:
     """Atomically publish a fully-fsynced staged file at ``final_path``.
 
@@ -585,6 +644,27 @@ def publish_no_replace(
         raise AtomicPublishError(
             f"staging artifact {sp!s} is missing or not a regular file"
         )
+
+    # SENSOR-B4-I15R1 (§6/§7): with a caller-supplied containment root the
+    # commit is anchored to the REAL filesystem topology.  (1) the check
+    # BEFORE any namespace is created refuses an already-swapped component;
+    # (2) on POSIX the link is anchored to an already-OPEN parent directory
+    # (descriptor-relative, O_NOFOLLOW per component) so a concurrent swap
+    # cannot redirect it; (3) the check AFTER the commit reverts and refuses
+    # on platforms without descriptor-relative link if the artifact landed
+    # outside the root.
+    lexical_root = Path(containment_root) if containment_root is not None else None
+    root_real = (
+        Path(os.path.realpath(lexical_root)) if lexical_root is not None else None
+    )
+    if lexical_root is not None:
+        assert root_real is not None
+        if not _is_within(fp.parent, root_real):
+            raise AtomicPublishSecurityError(
+                f"refusing publication: {fp.parent!s} resolves outside the "
+                "containment root (link escape / TOCTOU swap detected before "
+                "commit)"
+            )
     # SENSOR-B4-I03R1 (Defect B): the final parent chain is created DURABLY
     # from the deepest existing ancestor — every new directory NAME is fsynced
     # into its parent BEFORE publication — never via blind os.makedirs() +
@@ -596,12 +676,25 @@ def publish_no_replace(
         ops.record(OP_DEVICE_CHECK)
     ensure_same_device(sp.parent, fp.parent, device_probe=device_probe)
 
+    parent_fd: int | None = None
+    if lexical_root is not None:
+        assert root_real is not None
+        if not _is_within(fp.parent, root_real):
+            raise AtomicPublishSecurityError(
+                f"refusing publication: {fp.parent!s} resolves outside the "
+                "containment root after namespace creation"
+            )
+        parent_fd = _open_parent_no_follow(fp.parent, lexical_root, root_real)
+
     if ops is not None:
         ops.record(OP_ATOMIC_PUBLISH)
     if ops is not None:
         ops.record(OP_FINAL_LINK)
     try:
-        os.link(sp, fp)
+        if parent_fd is not None:
+            os.link(sp, fp.name, dst_dir_fd=parent_fd)
+        else:
+            os.link(sp, fp)
     except FileExistsError as exc:
         raise AtomicPublishTargetExists(
             f"final object {fp!s} already exists; no overwrite attempted"
@@ -610,6 +703,26 @@ def publish_no_replace(
         raise AtomicPublishError(
             f"no-clobber publication of {fp!s} failed: {exc}"
         ) from exc
+    finally:
+        if parent_fd is not None:
+            os.close(parent_fd)
+
+    if lexical_root is not None:
+        assert root_real is not None
+        if not _is_within(fp, root_real):
+            # Cross-platform guarantee: a component swapped between the
+            # pre-check and the link on a platform without descriptor-
+            # relative link is detected here, the outside artifact is
+            # REVERTED, and the commit is refused typed — never silently
+            # accepted.
+            try:
+                os.unlink(fp)
+            except OSError:  # pragma: no cover - best effort revert
+                pass
+            raise AtomicPublishSecurityError(
+                "published artifact left the containment root; commit reverted "
+                "and refused"
+            )
 
     if fault_hooks is not None:
         fault_hooks.raise_if(FaultPoint.AFTER_PUBLISH_BEFORE_DIR_FSYNC)
@@ -652,6 +765,7 @@ __all__ = [
     "OP_STAGING_CLEANUP",
     "OP_SUCCESS_RETURN",
     "AtomicPublishError",
+    "AtomicPublishSecurityError",
     "AtomicPublishTargetExists",
     "ComponentTooLong",
     "ComponentValidator",
