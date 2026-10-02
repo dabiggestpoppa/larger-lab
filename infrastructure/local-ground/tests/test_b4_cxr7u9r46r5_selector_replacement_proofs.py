@@ -354,6 +354,12 @@ def test_p9_swap_between_shell_classification_and_phase_admission(
     expected = pgrec._receipt_digest(promote)
     _publish(transitions, _bytes({**CLAIM, "receipt_sha256": expected}))
     record["selected_transition"] = "rollback"
+    # B4-CXR7U9R48R1: the classifier now judges the record ADMITTED through the
+    # pinned governed directory descriptor, not the caller's in-memory copy.
+    # Mutating the dict alone would no longer be an authority change, so this
+    # proof persists the record it intends to judge.
+    (transitions / f"{OPID}.json").write_bytes(_bytes(record))
+    os.chmod(transitions / f"{OPID}.json", 0o600)
     assert pgrec._classify_record_for_shell(
         record, promote) == 6
     # deterministic swap, then the phase-admission re-verification

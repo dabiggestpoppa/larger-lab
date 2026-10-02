@@ -366,20 +366,25 @@ def test_record_replaced_after_admission_stays_pinned_to_that_record(
         tmp_path, "PROMOTED", "rollback")
     assert admitted_record["state"] == "PROMOTED"
     path = transitions / f"{OPID}.json"
-    real_load = pgrec._load_transition_record
+    # B4-CXR7U9R48R1: the decision's record read is now descriptor-relative,
+    # so the swap has to be forced immediately AFTER that admitted read -- the
+    # same instant the R47 form was attacked at. The proof's INTENT is
+    # unchanged: a replacement landing after admission must not enter a
+    # decision that has already begun.
+    real_read = pgrec._read_record_snapshot_admitted
 
-    def load_then_swap(operation_id):
-        admitted = real_load(operation_id)
+    def read_then_swap(operation_id, governed, name, dir_fd, identity):
+        admitted = real_read(operation_id, governed, name, dir_fd, identity)
         # the attacker replaces the durable record the instant it was admitted
         path.write_bytes(_bytes(_record(promote, "ROLLED_BACK",
                                         digest=FOREIGN)))
         return admitted
 
-    pgrec._load_transition_record = load_then_swap
+    pgrec._read_record_snapshot_admitted = read_then_swap
     try:
         verdict = pgrec._classify_rollback_for_shell(str(receipt))
     finally:
-        pgrec._load_transition_record = real_load
+        pgrec._read_record_snapshot_admitted = real_read
     # the replacement really landed on disk during the decision ...
     assert json.loads(path.read_text(encoding="utf-8"))["state"] == \
         "ROLLED_BACK"
@@ -434,8 +439,22 @@ def test_authority_snapshot_carries_the_admitted_governed_directory_identity(
     assert authority.governed_device == info.st_dev
     assert authority.governed_inode == info.st_ino
     assert authority.selector.governed_inode == info.st_ino
-    assert authority.record is record
+    # B4-CXR7U9R48R1: the snapshot no longer carries the CALLER'S record
+    # object. It carries the record that was read descriptor-relative through
+    # the SAME pinned directory descriptor as the selector, so the two cannot
+    # come from two different directory generations. The content is the same
+    # here; the OBJECT is not, and must not be, the caller's.
+    assert authority.record == record
+    assert authority.record is not record, (
+        "the snapshot must not alias a caller-owned record object")
     assert authority.record_digest == pgrec._receipt_digest(record)
+    # B4-CXR7U9R48R1: the record and the selector must carry the SAME admitted
+    # governed directory identity, not merely the same-looking path.
+    assert (authority.record_snapshot.governed_device,
+            authority.record_snapshot.governed_inode) == (info.st_dev,
+                                                          info.st_ino)
+    assert (authority.selector.governed_device,
+            authority.selector.governed_inode) == (info.st_dev, info.st_ino)
     assert authority.expected_receipt_sha256 == pgrec._receipt_digest(promote)
     # and it is immutable: a decision may not rewrite its own evidence
     with pytest.raises(Exception):

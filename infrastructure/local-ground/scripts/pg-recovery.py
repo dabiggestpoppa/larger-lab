@@ -1917,6 +1917,361 @@ def _classify_claim_content(operation_id, snapshot,
     return "bound_complete"
 
 
+# B4-CXR7U9R48R1 -- ONE DIRECTORY FD OWNS BOTH AUTHORITY READS
+# ======================================================================
+# R47 proved "one record read and one selector read per decision". It did NOT
+# prove those two reads came from the same authority generation, and they did
+# not: the record was read through a PATHNAME while the selector was read
+# through the admitted directory descriptor. A whole-directory replacement
+# landing between them produced a decision that combined a record from
+# generation A with a selector from generation B.
+#
+# Everything below exists so that one admitted transitions-directory
+# descriptor owns BOTH reads. The record is opened descriptor-relative with
+# os.open(name, flags, dir_fd=...) -- never by path -- so both reads are
+# pinned to the directory inode that was actually admitted.
+_RECORD_MAX_BYTES = 262144
+_RECORD_OPEN_FLAGS = _CLAIM_OPEN_FLAGS
+
+
+def _record_conflict(operation_id, reason):
+    return _selector_conflict(operation_id, reason)
+
+
+def _derive_record_coordinate_name(operation_id):
+    """Derive the canonical RECORD basename from the governed operation id.
+
+    B4-CXR7U9R48R1. The name is a bare basename by construction, and that is
+    asserted rather than assumed: it must contain no path separator, no parent
+    reference, no NUL, no alternate separator spelling and no drive or UNC
+    prefix, and ``os.path.basename`` must return it unchanged. Anything else
+    is refused before a single descriptor is opened.
+    """
+    if not isinstance(operation_id, str) \
+            or not OPERATION_ID_RE.match(operation_id):
+        raise _record_conflict(
+            operation_id, "malformed operation id; refusing to derive a record "
+            "coordinate")
+    name = f"{operation_id}.json"
+    if "\x00" in name or "/" in name or "\\" in name:
+        raise _record_conflict(
+            operation_id, "the derived record coordinate contains a separator "
+            "or NUL; refusing a traversing record coordinate")
+    if name in (".", "..") or os.path.basename(name) != name:
+        raise _record_conflict(
+            operation_id, "the derived record coordinate is not a bare "
+            "basename; refusing a traversing record coordinate")
+    return name
+
+
+@dataclasses.dataclass(frozen=True)
+class RecordSnapshot:
+    """The ONE descriptor-relative, bounded, FD-bound RECORD snapshot.
+
+    B4-CXR7U9R48R1. Structurally parallel to SelectorSnapshot, and carrying
+    the SAME governed-directory identity, so the two can be proven to come
+    from one admission. ``record_digest`` is the SHA-256 of the exact bytes
+    read through the pinned descriptor, so the decision can be bound to
+    content rather than to a re-derivation of it.
+    """
+    operation_id: str
+    transition_dir: str
+    canonical_path: str
+    present: bool
+    governed_device: int
+    governed_inode: int
+    device: int
+    inode: int
+    size: int
+    mode: int
+    link_count: int
+    record: object
+    record_digest: str
+    raw_digest: str
+    read_error: object
+
+
+def _classify_record_coordinate(operation_id, probe_name, dir_fd):
+    """Census the canonical RECORD coordinate WITHOUT following a redirect."""
+    try:
+        st = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
+    except FileNotFoundError:
+        return None
+    except OSError as e:
+        raise _record_conflict(operation_id, f"record lstat failed: {e}")
+    if os.name == "nt" and bool(getattr(st, "st_file_attributes", 0)
+                                & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _record_conflict(
+            operation_id, "the canonical record is a reparse point; refusing "
+            "to follow a redirected record")
+    if not stat.S_ISREG(st.st_mode):
+        raise _record_conflict(
+            operation_id, "the canonical record is not a regular file")
+    if os.name != "nt":
+        mode = stat.S_IMODE(st.st_mode)
+        if mode & 0o077:
+            raise _record_conflict(
+                operation_id, f"the canonical record is not private "
+                f"(mode {mode:04o}); refusing a widened record")
+    return st
+
+
+def _assert_record_authority_names(info, dir_fd, canonical_name, operation_id):
+    """The admitted record inode must carry NO durable name but its own.
+
+    Same law as the selector: every directory entry of the governed directory
+    is stat'ed descriptor-relative and compared by (device, inode) with the
+    admitted object, and the number found must EQUAL ``st_nlink`` so that a
+    hard link planted OUTSIDE the governed directory cannot hide.
+    """
+    if dir_fd is None:
+        return
+    prefix = operation_id
+    census = []
+    try:
+        entries = os.listdir(dir_fd)
+    except OSError as e:
+        raise _record_conflict(
+            operation_id,
+            f"the governed directory could not be censused for other durable "
+            f"names of the record: {e}")
+    for entry in entries:
+        if entry == canonical_name:
+            census.append((entry, info))
+            continue
+        try:
+            other = os.stat(entry, dir_fd=dir_fd, follow_symlinks=False)
+        except OSError:
+            continue
+        if (other.st_dev, other.st_ino) == (info.st_dev, info.st_ino):
+            census.append((entry, other))
+    if len(census) != info.st_nlink:
+        raise _record_conflict(
+            operation_id,
+            f"the canonical record reports {info.st_nlink} durable names but "
+            f"{len(census)} of them are inside the governed directory; "
+            "refusing an unaccounted durable name")
+    for name, other in census:
+        if name == canonical_name:
+            continue
+        if not name.startswith(prefix):
+            raise _record_conflict(
+                operation_id, f"the canonical record is also published as the "
+                f"foreign durable name {name!r}")
+        if not stat.S_ISREG(other.st_mode) or (stat.S_IMODE(other.st_mode)
+                                               & 0o077):
+            raise _record_conflict(
+                operation_id, f"the publisher residue {name!r} is not a "
+                "private regular file")
+
+
+def _admit_record_descriptor(fd, dir_fd, name, operation_id):
+    """Admit the OPENED record descriptor against the PINNED directory.
+
+    ``name`` is the PROBE name: the bare basename when a directory descriptor
+    exists, otherwise the full canonical path. That distinction is load-bearing
+    on Windows, where ``dir_fd`` is ``None`` and a bare basename would resolve
+    against the process's working directory instead of the governed directory.
+    """
+    info = os.fstat(fd)
+    if os.name == "nt" and bool(getattr(info, "st_file_attributes", 0)
+                                & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _record_conflict(operation_id, "the opened record is a reparse point")
+    if not stat.S_ISREG(info.st_mode):
+        raise _record_conflict(operation_id, "the opened record is not a regular file")
+    if os.name != "nt":
+        mode = stat.S_IMODE(info.st_mode)
+        if mode & 0o077:
+            raise _record_conflict(
+                operation_id, f"the opened record is not private (mode {mode:04o})")
+    _assert_record_authority_names(info, dir_fd, os.path.basename(name),
+                                   operation_id)
+    recheck = os.fstat(fd)
+    if (info.st_ino, info.st_dev, info.st_size, info.st_mtime_ns) != \
+            (recheck.st_ino, recheck.st_dev, recheck.st_size,
+             recheck.st_mtime_ns):
+        raise _record_conflict(
+            operation_id, "the record changed while it was being admitted")
+    try:
+        proof = os.stat(name, dir_fd=dir_fd, follow_symlinks=False)
+    except OSError as e:
+        raise _record_conflict(
+            operation_id,
+            f"the canonical record name no longer names the opened record: {e}")
+    if os.name == "nt" and bool(getattr(proof, "st_file_attributes", 0)
+                                & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _record_conflict(
+            operation_id, "the canonical record name is a reparse point")
+    if (proof.st_ino, proof.st_dev) != (info.st_ino, info.st_dev):
+        raise _record_conflict(
+            operation_id, "the canonical record name was replaced after the "
+            "descriptor was opened")
+    return info
+
+
+def _read_admitted_record(operation_id, fd):
+    """Read, bound and parse the record from the ADMITTED descriptor only.
+
+    B4-CXR7U9R48R1. The size is bounded BEFORE the read (so an oversized
+    record never allocates a buffer) and DURING it (so a record that grows
+    while being read is refused at the first chunk past the bound). Nothing is
+    ever truncated and parsed. The exact admitted bytes are returned so the
+    snapshot can bind its digest to what was actually read.
+    """
+    try:
+        first = os.fstat(fd)
+        if first.st_size > _RECORD_MAX_BYTES:
+            raise _record_conflict(
+                operation_id,
+                f"the record is {first.st_size} bytes, above the "
+                f"{_RECORD_MAX_BYTES}-byte maximum; refusing to read an "
+                "oversized record")
+        chunks = []
+        total = 0
+        while True:
+            chunk = os.read(fd, 65536)
+            if not chunk:
+                break
+            total += len(chunk)
+            if total > _RECORD_MAX_BYTES:
+                raise _record_conflict(
+                    operation_id, f"the record grew past the "
+                    f"{_RECORD_MAX_BYTES}-byte maximum while it was being "
+                    "read; refusing a growing record")
+            chunks.append(chunk)
+        mid = os.fstat(fd)
+        if (first.st_ino, first.st_dev, first.st_size, first.st_mtime_ns) != \
+                (mid.st_ino, mid.st_dev, mid.st_size, mid.st_mtime_ns):
+            raise _record_conflict(
+                operation_id, "the record changed while it was being read")
+        raw = b"".join(chunks)
+        try:
+            return first, json.loads(raw.decode("utf-8")), raw
+        except ValueError as e:
+            raise _record_conflict(
+                operation_id, f"the record is not valid JSON: {e}")
+    except _ExecutionAuthorityConflict:
+        raise
+    except OSError as e:
+        raise _record_conflict(
+            operation_id, f"the record could not be read: {e}")
+
+
+def _read_record_snapshot_admitted(operation_id, governed, name, dir_fd,
+                                   identity):
+    """The ONE record read, against an ALREADY-admitted governed directory.
+
+    B4-CXR7U9R48R1. The caller OWNS ``dir_fd`` and does not close it here, so
+    the record read and the selector read can share ONE admission. Absence is
+    a documented outcome; every admission or parse failure fails closed.
+    """
+    canonical_path = os.path.join(governed, name)
+    probe_name = name if dir_fd is not None else canonical_path
+    fd = None
+    try:
+        if _classify_record_coordinate(operation_id, probe_name, dir_fd) is None:
+            return RecordSnapshot(
+                operation_id=operation_id, transition_dir=governed,
+                canonical_path=canonical_path, present=False,
+                governed_device=identity[0], governed_inode=identity[1],
+                device=0, inode=0, size=0, mode=0, link_count=0, record=None,
+                record_digest=None, raw_digest=None, read_error=None)
+        try:
+            if dir_fd is not None:
+                fd = os.open(name, _RECORD_OPEN_FLAGS, dir_fd=dir_fd)
+            else:
+                fd = os.open(probe_name, _RECORD_OPEN_FLAGS)
+        except FileNotFoundError:
+            raise _record_conflict(
+                operation_id, "the canonical record vanished between lstat "
+                "and open")
+        except OSError as e:
+            raise _record_conflict(
+                operation_id, "the canonical record could not be opened "
+                f"without following redirections: {e}")
+        _admit_record_descriptor(fd, dir_fd, probe_name, operation_id)
+        first, record, raw = _read_admitted_record(operation_id, fd)
+        os.close(fd)
+        fd = None
+        try:
+            final = os.stat(probe_name, dir_fd=dir_fd, follow_symlinks=False)
+        except OSError as e:
+            raise _record_conflict(
+                operation_id,
+                f"the canonical record name no longer names the read record: {e}")
+        if (final.st_ino, final.st_dev) != (first.st_ino, first.st_dev):
+            raise _record_conflict(
+                operation_id, "the canonical record name was replaced after "
+                "the record was read")
+        return RecordSnapshot(
+            operation_id=operation_id, transition_dir=governed,
+            canonical_path=canonical_path, present=True,
+            governed_device=identity[0], governed_inode=identity[1],
+            device=first.st_dev, inode=first.st_ino, size=first.st_size,
+            mode=stat.S_IMODE(first.st_mode), link_count=first.st_nlink,
+            record=record, record_digest=_receipt_digest(record)
+            if isinstance(record, dict) else None,
+            raw_digest=hashlib.sha256(raw).hexdigest(), read_error=None)
+    finally:
+        if fd is not None:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
+
+
+def _assert_one_directory_generation(operation_id, governed, dir_fd, identity,
+                                     record_snapshot, selector_snapshot):
+    """B4-CXR7U9R48R1: ONE decision, ONE governed-directory generation.
+
+    Requirement 7 made concrete. On POSIX the two reads are descriptor-
+    relative, so a whole-directory replacement cannot change what they read;
+    this re-fstats the admitted descriptor to prove the pin is still live. On
+    Windows there is no directory descriptor, so the governed coordinate is
+    re-identified without following a redirection and any change in identity
+    FAILS CLOSED. Neither platform can return a mixed-generation decision.
+    """
+    if (record_snapshot.governed_device,
+            record_snapshot.governed_inode) != identity:
+        raise _record_conflict(
+            operation_id, "the record was admitted from a different governed "
+            "directory generation than the one pinned for this decision")
+    if (selector_snapshot.governed_device,
+            selector_snapshot.governed_inode) != identity:
+        raise _record_conflict(
+            operation_id, "the selector was admitted from a different "
+            "governed directory generation than the one pinned for this "
+            "decision")
+    if dir_fd is not None:
+        try:
+            live = os.fstat(dir_fd)
+        except OSError as e:
+            raise _record_conflict(
+                operation_id, "the admitted governed directory descriptor "
+                f"could not be re-identified: {e}")
+        if (live.st_dev, live.st_ino) != identity:
+            raise _record_conflict(
+                operation_id, "the admitted governed directory descriptor no "
+                "longer names the pinned directory generation")
+        return
+    try:
+        again = os.stat(governed, follow_symlinks=False)
+    except OSError as e:
+        raise _record_conflict(
+            operation_id, "the governed transitions directory could not be "
+            f"re-identified after the reads: {e}")
+    if not stat.S_ISDIR(again.st_mode) or bool(
+            getattr(again, "st_file_attributes", 0)
+            & stat.FILE_ATTRIBUTE_REPARSE_POINT):
+        raise _record_conflict(
+            operation_id, "the governed transitions directory is no longer a "
+            "plain directory")
+    if (again.st_dev, again.st_ino) != identity:
+        raise _record_conflict(
+            operation_id, "the governed transitions directory was replaced "
+            "during the decision; refusing a mixed-generation decision")
+
+
 @dataclasses.dataclass(frozen=True)
 class RecoveryAuthoritySnapshot:
     """THE ONE COMPLETE, IMMUTABLE AUTHORITY SNAPSHOT OF A DECISION
@@ -1957,6 +2312,11 @@ class RecoveryAuthoritySnapshot:
     record_receipt_sha256: object
     selector: object
     expected_receipt_sha256: object
+    # B4-CXR7U9R48R1: the record's OWN admitted snapshot travels with the
+    # bundle so a consumer can prove, from the bundle alone, that the record
+    # and the selector were admitted through the SAME governed directory
+    # device and inode -- rather than being asked to trust a path.
+    record_snapshot: object = None
 
 
 def _acquire_recovery_authority(operation_id, promote=None, record=None):
@@ -1973,10 +2333,12 @@ def _acquire_recovery_authority(operation_id, promote=None, record=None):
             -> build the immutable RecoveryAuthoritySnapshot
 
     ``record`` may be supplied when the caller has ALREADY read and admitted
-    the durable record as part of this same decision -- that read IS the one
-    transition-record read, and passing it through keeps the count at one
-    instead of reading the same file twice under two generations. When it is
-    not supplied the record is read here, once.
+    the durable record as part of this same decision. B4-CXR7U9R48R1: it is now
+    used only as a CROSS-CHECK. The snapshot's record is always the one read
+    descriptor-relative through the pinned governed directory, and if a
+    supplied record disagrees with it the authority fails closed rather than
+    deciding from either one. A pathname-resolved record therefore never
+    participates in a decision.
 
     A record that cannot be admitted is carried as ``record=None`` rather than
     raised: a missing durable record is an ordinary outcome for a
@@ -1991,32 +2353,60 @@ def _acquire_recovery_authority(operation_id, promote=None, record=None):
     governed, name = _derive_claim_coordinate(operation_id)
     dir_fd, identity = _open_governed_directory(governed, operation_id)
     try:
-        if record is None:
-            try:
-                record = _load_transition_record(operation_id)
-            except (OSError, ValueError, RuntimeError, TypeError):
-                record = None
+        # B4-CXR7U9R48R1: ONE admitted directory descriptor owns BOTH reads.
+        # The record is opened descriptor-relative through this same dir_fd --
+        # `os.open(name, flags, dir_fd=dir_fd)` -- so a whole-directory
+        # replacement between the two reads cannot produce a decision that
+        # combines a record from one generation with a selector from another.
+        # `_load_transition_record`, which resolves a PATHNAME, is deliberately
+        # NOT called on this path: it would reintroduce exactly the window R47
+        # left open.
+        record_name = _derive_record_coordinate_name(operation_id)
+        try:
+            record_snapshot = _read_record_snapshot_admitted(
+                operation_id, governed, record_name, dir_fd, identity)
+            admitted_record = record_snapshot.record
+        except (OSError, ValueError, RuntimeError, TypeError,
+                _ExecutionAuthorityConflict):
+            admitted_record = None
+            record_snapshot = RecordSnapshot(
+                operation_id=operation_id, transition_dir=governed,
+                canonical_path=os.path.join(governed, record_name),
+                present=False, governed_device=identity[0],
+                governed_inode=identity[1], device=0, inode=0, size=0, mode=0,
+                link_count=0, record=None, record_digest=None,
+                raw_digest=None, read_error="refused")
         selector = _read_selector_snapshot_admitted(
             operation_id, governed, name, dir_fd, identity)
+        _assert_one_directory_generation(
+            operation_id, governed, dir_fd, identity, record_snapshot, selector)
     finally:
         if dir_fd is not None:
             try:
                 os.close(dir_fd)
             except OSError:
                 pass
+    if record is not None and admitted_record is not None \
+            and _receipt_digest(record) != _receipt_digest(admitted_record):
+        # The caller handed in a record that the pinned descriptor does not
+        # agree with. That is a crossed read, not a convenience: fail closed
+        # rather than decide from either one.
+        raise _ExecutionAuthorityConflict(
+            f"operation {operation_id} the supplied record and the record "
+            "admitted through the pinned governed directory disagree")
     return RecoveryAuthoritySnapshot(
         operation_id=operation_id,
         governed_dir=governed,
         governed_device=identity[0],
         governed_inode=identity[1],
-        record=record,
-        record_digest=(_receipt_digest(record)
-                       if isinstance(record, dict) else None),
-        record_receipt_sha256=(record.get("receipt_sha256")
-                               if isinstance(record, dict) else None),
+        record=admitted_record,
+        record_digest=record_snapshot.record_digest,
+        record_receipt_sha256=(admitted_record.get("receipt_sha256")
+                               if isinstance(admitted_record, dict) else None),
         selector=selector,
         expected_receipt_sha256=(_receipt_digest(promote)
-                                 if promote is not None else None))
+                                 if promote is not None else None),
+        record_snapshot=record_snapshot)
 
 
 class _ExecutionAuthorityConflict(RuntimeError):
@@ -3847,6 +4237,17 @@ def _classify_record_for_shell(record, promote=None):
             # The governed transition directory itself could not be admitted
             # without following a redirection. There is no authority root, so
             # there is nothing to decide: fail closed.
+            return 4
+        # B4-CXR7U9R48R1: DECIDE FROM THE ADMITTED RECORD. The record that
+        # reaches this function came from a pathname read by the caller; the
+        # record that reached the SAME pinned directory descriptor as the
+        # selector is the authority. From here on the decision reads
+        # `authority.record`, so the state judged and the selector judged can
+        # no longer come from two different directory generations.
+        record = authority.record
+        state = record.get("state") if isinstance(record, dict) else None
+        operation_id = authority.operation_id
+        if record is None:
             return 4
         # ONE SELECTOR CLASSIFICATION LAW (B4-CXR7U9R45R1). A canonical claim
         # that exists but is not EXACTLY bound to the supplied promote receipt
