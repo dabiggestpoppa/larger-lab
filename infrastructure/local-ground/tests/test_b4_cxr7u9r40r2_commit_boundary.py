@@ -156,8 +156,18 @@ def shell_law(tmp_path):
                     "at": "2026-09-24T00:00:01Z",
                 }
             promote.write_text(json.dumps(authority), encoding="utf-8")
-            (transitions / f"{opid}.json").write_text(
-                json.dumps(record), encoding="utf-8")
+            record_path = transitions / f"{opid}.json"
+            record_path.write_text(json.dumps(record), encoding="utf-8")
+            # The engine publishes transition records 0600
+            # (_write_transition_record), and B4-CXR7U9R48R1 admits the record
+            # descriptor-relative under the same POSIX privacy law the claim
+            # already had. A hand-written fixture left at the default umask
+            # (0644) is therefore refused on Linux as "not private", which made
+            # every durable state classify as UNKNOWABLE and broke all seven
+            # parameterizations of the rollback-legality law. Mirror the
+            # engine's own publication mode here, exactly as the claim above
+            # already does, so the fixture is admissible on Linux CI too.
+            os.chmod(record_path, 0o600)
         script = (
             "set -uo pipefail\n"
             f"OCE_PYTHON=\"{python_exe}\"\n"
