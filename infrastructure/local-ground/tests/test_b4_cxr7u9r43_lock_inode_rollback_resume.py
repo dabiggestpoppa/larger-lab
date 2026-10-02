@@ -531,26 +531,56 @@ def test_weakened_rolling_back_classifier_reopens_fresh_authority(tmp_path):
     assert real.returncode == 6
 
 
+# B4-CXR7U9R47S3: the post-unlock unlink control is built by rewriting the
+# engine's text, so its anchor is the engine's own layout. S2 restated
+# `_ExecutionLock.__exit__` with a guarded release, which moved the close from
+# twelve spaces to sixteen and silently turned this weakening into a no-op --
+# the control would then have run the SHIPPED engine and proved nothing. The
+# anchor is re-pointed at the shipped text, and the assertion below turns the
+# next silent no-op into an immediate, legible failure instead of a downstream
+# barrier timeout. The weakening itself is unchanged: still a post-unlock,
+# post-close unlink of the coordinate, still gated on the lock being active
+# with no committed metadata.
+_POST_UNLOCK_ANCHOR = (
+    "                os.close(self.fd)\n"
+    "                self.fd = None\n"
+    "        return False")
+
+_POST_UNLOCK_WEAKENED = (
+    "                os.close(self.fd)\n"
+    "                self.fd = None\n"
+    "                marker = os.environ.get('R43_WEAK_COORDINATE')\n"
+    "                if marker:\n"
+    "                    with open(marker + '.ready', 'w', encoding='utf-8') as stream:\n"
+    "                        stream.write(str(os.getpid()))\n"
+    "                    while not os.path.exists(marker + '.release'):\n"
+    "                        time.sleep(0.01)\n"
+    "                if self.activated and not self.metadata_committed:\n"
+    "                    try:\n"
+    "                        os.unlink(self.path)\n"
+    "                    except FileNotFoundError:\n"
+    "                        pass\n"
+    "        return False")
+
+
+def _post_unlock_unlink_transform(source):
+    """Rewrite the engine so the coordinate is unlinked after the unlock.
+
+    B4-CXR7U9R47S3: the anchor is asserted, not assumed. A stale anchor makes
+    `str.replace` return the source untouched, which would hand the negative
+    control the SHIPPED engine and turn its proof vacuous -- the control has to
+    fail at the rewrite, not quietly stop weakening anything.
+    """
+    source = source.replace("import tempfile\n", "import tempfile\nimport time\n")
+    assert _POST_UNLOCK_ANCHOR in source, (
+        "the post-unlock unlink control no longer matches the engine text; "
+        "this negative control would run the shipped engine unmodified and "
+        "prove nothing")
+    return source.replace(_POST_UNLOCK_ANCHOR, _POST_UNLOCK_WEAKENED)
+
+
 def _post_unlock_unlink_engine(tmp_path):
-    def transform(source):
-        source = source.replace("import tempfile\n", "import tempfile\nimport time\n")
-        return source.replace(
-            "            os.close(self.fd)\n            self.fd = None\n        return False",
-            "            os.close(self.fd)\n            self.fd = None\n"
-            "            marker = os.environ.get('R43_WEAK_COORDINATE')\n"
-            "            if marker:\n"
-            "                with open(marker + '.ready', 'w', encoding='utf-8') as stream:\n"
-            "                    stream.write(str(os.getpid()))\n"
-            "                while not os.path.exists(marker + '.release'):\n"
-            "                    time.sleep(0.01)\n"
-            "            if self.activated and not self.metadata_committed:\n"
-            "                try:\n"
-            "                    os.unlink(self.path)\n"
-            "                except FileNotFoundError:\n"
-            "                    pass\n"
-            "        return False",
-        )
-    return _weakened_engine(tmp_path, transform)
+    return _weakened_engine(tmp_path, _post_unlock_unlink_transform)
 
 
 def _coordinate_replacement_engine(tmp_path):
