@@ -85,6 +85,10 @@ TRANSITION_FORMAT = "oce-pg-recovery-transition-v1"
 STAMP_RE = re.compile(r"[0-9a-f]{12}\Z")
 SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 OPERATION_ID_RE = re.compile(r"[0-9a-f]{32}\Z")
+# B4-CXR7U9R47S2: one refusal message, one spelling. This literal was
+# concatenated into five separate fail-closed receipts, so a wording change
+# had five sites to miss and the receipts could drift apart.
+_REFUSING_RECOVERY_TARGET = "refusing recovery target: "
 REVISION_RE = re.compile(r"[0-9a-f]{7,64}\Z")
 
 # One durable recovery-operation state machine (B4-CXR7U9R39-R3, made
@@ -1545,7 +1549,9 @@ def _read_admitted_claim(operation_id, fd):
                 operation_id, "the claim changed while it was being read")
         try:
             return first, json.loads(b"".join(chunks).decode("utf-8"))
-        except (UnicodeDecodeError, ValueError) as e:
+        # B4-CXR7U9R47S2: UnicodeDecodeError IS a ValueError subclass, so
+        # naming both never added a case -- it only claimed to.
+        except ValueError as e:
             raise _selector_conflict(
                 operation_id, f"the claim is not valid JSON: {e}")
     except _ExecutionAuthorityConflict:
@@ -2372,21 +2378,23 @@ class _OperationExecutionAuthority:
         return self.acquire()
 
     def __exit__(self, exc_type, exc, tb):
-        if self.fd is None:
-            return False
-        try:
-            if self.activated and not self.metadata_committed:
-                self.clear_metadata()
-            os.lseek(self.fd, 0, os.SEEK_SET)
-            if os.name == "nt":
-                import msvcrt
-                msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
-            else:
-                import fcntl
-                fcntl.flock(self.fd, fcntl.LOCK_UN)
-        finally:
-            os.close(self.fd)
-            self.fd = None
+        # B4-CXR7U9R47S2: every path returns False (a lock release never
+        # suppresses the exception that is unwinding), so the release is
+        # guarded instead of returning early from a second place.
+        if self.fd is not None:
+            try:
+                if self.activated and not self.metadata_committed:
+                    self.clear_metadata()
+                os.lseek(self.fd, 0, os.SEEK_SET)
+                if os.name == "nt":
+                    import msvcrt
+                    msvcrt.locking(self.fd, msvcrt.LK_UNLCK, 1)
+                else:
+                    import fcntl
+                    fcntl.flock(self.fd, fcntl.LOCK_UN)
+            finally:
+                os.close(self.fd)
+                self.fd = None
         return False
 
 
@@ -2594,10 +2602,12 @@ def _validated_resume_finalize_receipt(path, db, user, container, inventory_path
             or claim.get("receipt_sha256") != _receipt_digest(promote):
         raise RuntimeError("existing finalize claim is missing, corrupt, or bound "
                            "to different authority")
-    if state == TRANSITION_STATE_PROMOTED:
-        pass
-    elif record.get("selected_transition") != "finalize" \
-            or not _valid_commit_intent(record, promote):
+    # B4-CXR7U9R47S2: the PROMOTED branch had nothing to do and said so with
+    # `pass`; stating the complement removes the empty branch without moving a
+    # single condition.
+    if state != TRANSITION_STATE_PROMOTED \
+            and (record.get("selected_transition") != "finalize"
+                 or not _valid_commit_intent(record, promote)):
         raise RuntimeError("durable finalize intent is missing, malformed, or bound "
                            "to different authority")
     if state in (TRANSITION_STATE_COMMIT_POINT, "FINALIZED"):
@@ -2902,7 +2912,7 @@ def phase_promote(archive, inventory_path, inventory_sha_path, db, user,
     receipt = _base_receipt("promote", db, user, container, inventory_path)
     targets = _governed_identity_problems(db, user, container)
     if targets:
-        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+        return _blocked(receipt, _REFUSING_RECOVERY_TARGET + "; ".join(targets))
     stamp = hashlib.sha256(os.urandom(8)).hexdigest()[:12]
     quarantine = QUARANTINE_PREFIX + stamp
     receipt["stamp"] = stamp
@@ -3066,7 +3076,7 @@ def _phase_finalize_locked(receipt_in_path, inventory_path, inventory_sha_path, 
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
     if targets:
-        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+        return _blocked(receipt, _REFUSING_RECOVERY_TARGET + "; ".join(targets))
 
     resumed = False
     durable_state = TRANSITION_STATE_FINALIZING
@@ -3291,8 +3301,7 @@ def _rollback_catalog_state(container, user, db, quarantine, staging):
 
 
 def _execute_rollback_by_catalog_state(catalog_state, container, user, db,
-                                       quarantine, staging, inventory, probe,
-                                       floor):
+                                       quarantine, inventory, probe, floor):
     """The catalog-state decision table for the rollback phase
     (B4-CXR7U9R46R6 helper; authority law preserved verbatim).
 
@@ -3366,7 +3375,7 @@ def _advance_dead_claim_state(operation_id, promote, durable_state,
 
 
 def _execute_rollback_verdict(durable_state, catalog_state, container, user,
-                              db, quarantine, staging, inventory, probe, floor):
+                              db, quarantine, inventory, probe, floor):
     """The rollback decision table, selected by the DURABLE state (R46R6).
 
     A ROLLED_BACK operation is admitted only when the catalog still holds
@@ -3379,8 +3388,8 @@ def _execute_rollback_verdict(durable_state, catalog_state, container, user,
                 "ROLLED_BACK catalog does not contain only old canonical")
         return _verify_against_floor(container, db, user, floor)
     return _execute_rollback_by_catalog_state(
-        catalog_state, container, user, db, quarantine, staging, inventory,
-        probe, floor)
+        catalog_state, container, user, db, quarantine, inventory, probe,
+        floor)
 
 
 def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, db,
@@ -3391,7 +3400,7 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
     if targets:
-        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+        return _blocked(receipt, _REFUSING_RECOVERY_TARGET + "; ".join(targets))
     durable_state = None
     floor = None
     try:
@@ -3431,7 +3440,7 @@ def _phase_rollback_locked(receipt_in_path, inventory_path, inventory_sha_path, 
 
         ok, problems, detail = _execute_rollback_verdict(
             durable_state, catalog_state, container, user, db, quarantine,
-            staging, inventory, probe, floor)
+            inventory, probe, floor)
 
         detail.setdefault("rollback_succeeded", ok)
         detail.setdefault("rollback_failed", not ok)
@@ -3501,7 +3510,7 @@ def phase_preintent_rollback(receipt_in_path, inventory_path, inventory_sha_path
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
     if targets:
-        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+        return _blocked(receipt, _REFUSING_RECOVERY_TARGET + "; ".join(targets))
     try:
         (promote, _stamp, _quarantine, _staging,
          operation_id, _floor) = _validated_preintent_abort_receipt(
@@ -3616,7 +3625,7 @@ def phase_reconcile(receipt_in_path, inventory_path, inventory_sha_path, db,
     receipt["promote_receipt"] = receipt_in_path
     targets = _governed_identity_problems(db, user, container)
     if targets:
-        return _blocked(receipt, "refusing recovery target: " + "; ".join(targets))
+        return _blocked(receipt, _REFUSING_RECOVERY_TARGET + "; ".join(targets))
     try:
         # Read-only authority inspection: NO claim is taken, nothing consumed.
         promote = _load_receipt(receipt_in_path)
