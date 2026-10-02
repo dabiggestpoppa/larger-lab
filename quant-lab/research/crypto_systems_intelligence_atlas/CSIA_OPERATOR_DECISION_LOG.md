@@ -1807,3 +1807,158 @@ change, any re-ratification, any amendment edit, any new policy, value domain,
 contract class or absent state, any decision on GAP-1..GAP-5, Book 7 or Book 8
 ratification or implementation, D8, live acquisition, RPC, network, database,
 graph database, branch creation, force-push, rebase or history rewrite.
+
+---
+
+## BOOK6-SUBSTRATE-GAP-RESOLUTION-v0.1 — 2026-10-02
+
+```text
+DECISION_ID   = BOOK6-SUBSTRATE-GAP-RESOLUTION-v0.1
+KIND          = PROPOSED RESOLUTIONS (DRAFT — NOT RATIFIED)
+REQUESTED BY  = operator, this session
+SCOPE         = Book 6 Comparison/Change implementation-substrate gap
+                resolution planning ONLY
+STATUS        = DRAFT_PENDING_OPERATOR_RATIFICATION
+```
+
+```text
+PROPOSED_RESOLUTION_GAP_1 = 1A-STRICT
+PROPOSED_RESOLUTION_GAP_2 = 2D  SAME_METRIC_EXACT_UNIT_IDENTITY
+PROPOSED_RESOLUTION_GAP_3 = 3C  COVERAGE_RULE_PRESENCE_DERIVATION
+PROPOSED_RESOLUTION_GAP_4 = 4D  EXPLICIT_TEMPORAL_COMPARABILITY
+```
+
+```text
+GAP_1  CANONICAL_NUMERIC_REPRESENTATION
+  CANONICAL_VALUE   = FINITE_STORED_BINARY64
+  CANONICAL_EQUALITY = EXACT_EQUALITY_OF_STORED_CANONICAL_BINARY64
+  REAL_NUMBER_EXACTNESS_CLAIM  = FALSE
+  STORED_VALUE_EXACTNESS_CLAIM = TRUE
+  MeasurementObservation.value type change = NONE (float | None unchanged)
+  EPSILON / ISCLOSE / TOLERANCE / Decimal / Fraction = NOT PERMITTED
+  FINITE_NUMERIC_INPUT_REQUIRED = TRUE
+  non-finite (NaN, +Inf, -Inf) -> INSUFFICIENT_DATA
+  BOOK6_NAN_SENTINEL_INHERITED  = FALSE (book6_core.py:181 not reused)
+  CANONICAL_ZERO   = (value == 0.0); +0.0 == -0.0
+  SIGNED_ZERO_SEMANTIC_DISTINCTION = NOT CREATED
+
+GAP_2  UNIT_ARITHMETIC_SOURCE
+  TEMPORAL_UNIT_COMPATIBILITY = EXACT SAME-METRIC UNIT IDENTITY
+  arithmetic permitted only when both observations resolve to the bound
+  metric_definition_ref AND both carry MetricDefinition.unit
+  substrate: book6_definitions.py:148 (unit, non-nullable),
+             book6_records.py:114 (unit)
+  UNIT_CONVERSION = NOT PERMITTED
+  UNIT_CONTRACT_CLASS_ADDED = FALSE
+  NEW_AUTHORITY_BEARING_CONTRACT_CLASS_FOR_UNITS = FALSE
+  HIDDEN_THIRD_CONTRACT = NONE
+  policy P3 unit_requirements = WITHDRAWN (its cited contract does not exist)
+
+GAP_3  COVERAGE_APPLICABILITY_DERIVATION
+  IF current + ratified + exact-metric-scoped CoverageSufficiencyRule exists:
+      coverage_requirement_status = REQUIRED
+      coverage_applicability_source_ref = that rule's authority
+  ELSE:
+      coverage_requirement_status = UNRESOLVED
+      coverage_applicability_source_ref = ABSENT
+          (NO_UPSTREAM_DETERMINATION_EXISTS, single meaning)
+  substrate: book6_coverage_rules.py:112 CoverageRuleRegistry;
+             rules_for_metric:215, ratification_of:194, authorize:227
+  CAN_DERIVE_NOT_APPLICABLE = FALSE (intentional)
+  NOT_APPLICABLE_FROM_ABSENCE = FORBIDDEN
+  COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0 (canonical)
+  SYNTHETIC_TEST_RULES_ALLOWED  = TRUE
+  SYNTHETIC_RULES_ARE_CANONICAL = FALSE
+
+GAP_4  TEMPORAL_COMPARABILITY
+  TemporalComparabilityStatus = COMPARABLE | NOT_COMPARABLE | UNRESOLVED
+  distinct from CorpusVerdict, ComparabilityClass, StateName, ClaimState
+  NOT_COMPARABLE has a producing check (new replay check 19)
+  UNRESOLVED -> change_kind = INSUFFICIENT_DATA
+  UNRESOLVED -> NOT_COMPARABLE = FORBIDDEN
+  FALSE_COMPARISON_CORPUS = UNCHANGED
+  book6_comparability.py  = UNCHANGED
+```
+
+```text
+REPLAY_CHECK_COUNT = 20
+  1-18 unchanged from v0.4
+  19    TEMPORAL COMPARABILITY RESOLUTION          (NEW)
+  20    DETERMINISTIC COMPARISON/CHANGE RECOMPUTATION (was v0.4 check 19)
+AGGREGATE_ONLY = REJECTED
+all 20 independently falsifiable; 19 and 20 separately falsifiable
+
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+    ComparisonRule
+    ChangeObservation
+HIDDEN_THIRD_CONTRACT = NONE
+```
+
+```text
+PRE_RATIFICATION_REVIEW      = 20 / 20 PASS
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1
+                             = HOLD / SUPERSEDED_BY_GAP_RESOLUTION_REVIEW
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.2
+                             = READY_PENDING_SUBSTRATE_CLARIFICATION_RATIFICATION
+                               9 TRUE / 1 NOT_SUPPORTABLE / 0 FALSE
+  NO_UNRATIFIED_POLICY_NEEDED        = TRUE
+  NO_RUNTIME_AUTHORITY_GAP            = TRUE
+  NUMERIC_REPRESENTATION_SUFFICIENT   = TRUE
+  UNIT_ARITHMETIC_SOURCE_SUFFICIENT   = TRUE
+  BENCHMARK_RUNTIME_PATH_SUFFICIENT   = NOT_SUPPORTABLE  (GAP-5 OPEN)
+  COVERAGE_RUNTIME_PATH_SUFFICIENT    = TRUE
+  ALL_20_REPLAY_CHECKS_IMPLEMENTABLE  = TRUE
+  NEGATIVE_SURFACE_TESTS_SPECIFIED    = TRUE
+  TRACEABILITY_PLAN_COMPLETE          = TRUE
+  UPSTREAM_FREEZE_PRESERVABLE         = TRUE
+```
+
+```text
+GAP_5 = OPEN — accepted benchmark-rule namespace
+  Zero Benchmark* symbols across all 62 runtime modules.
+  BENCHMARK_RULES_RATIFIED = 0.
+  baseline_selection_methodology_ref is REQUIRED, has no absent state, and
+  is unsatisfiable. NOT resolved by this session's direction, which named
+  four gaps only. Recorded as NOT_SUPPORTABLE rather than smoothed to TRUE.
+```
+
+Artifacts produced:
+
+```text
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_SUBSTRATE_CLARIFICATION_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.5.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.5.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_TEST_SPEC_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_SUBSTRATE_PRE_RATIFICATION_REVIEW_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_SUBSTRATE_RATIFICATION_PACKET_v0.1.md
+```
+
+Ratified v0.4 artifacts remain RATIFIED and UNCHANGED: amendment plan v0.4,
+grammar v0.4, boundary v0.3, seam v0.4, readiness v0.3, ratification record
+v0.1. v0.5 is an additive successor.
+
+```text
+STATUS                      = DRAFT_PENDING_OPERATOR_RATIFICATION
+GAP_1..GAP_4_CLOSED         = FALSE  (resolved in draft, NOT ratified)
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+COMPARISON_RULES_RATIFIED       = 0
+BENCHMARK_RULES_RATIFIED        = 0
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0
+D6M_5                           = OPEN_DEFERRED
+
+NEXT = decide GAP-5 first (it changes the amendment's scope), then
+       RATIFY_SUBSTRATE_CLARIFICATION or HOLD, then re-run the
+       implementation authorization review including GAP-5's resolution.
+```
+
+**Not authorized and not performed:** any implementation, any source or test
+change, any float/Decimal/Fraction migration, any epsilon or isclose, any unit
+ontology or conversion, any cross-metric corpus mutation, any coverage
+applicability heuristic, any NOT_APPLICABLE by absence, any new canonical
+coverage rule, any rule ratification, Book 6 re-acceptance, Book 7 or Book 8
+ratification or implementation, D8, live acquisition, RPC, network, database,
+graph database, branch creation, force-push, rebase or history rewrite.

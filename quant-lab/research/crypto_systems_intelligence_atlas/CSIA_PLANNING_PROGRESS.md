@@ -3082,3 +3082,100 @@ force-push, rebase or history rewrite.
 review with GAP-5 included. GAP-5 should be decided **before** GAP-3, because
 options 5A/5B remove the entire baseline-bearing surface and therefore change
 what "all 19 replay checks implementable" means.
+
+---
+
+# CHECKPOINT — BOOK 6 COMPARISON/CHANGE GAP RESOLUTION PLANNING — 2026-10-02
+
+**Session scope:** implementation-substrate gap resolution planning ONLY.
+**Seven artifacts produced. Zero source, zero test code, zero implementation.**
+
+## Phase 0 — verification
+
+Planning branch `agent/crypto-systems-intelligence-atlas-plan`, local ==
+origin == ls-remote, worktree clean. Starting HEAD `f76cf9b95` (the commit
+before this session carried the phantom-citation sweep; the operator's stated
+`ca9bbdfe3` was its parent).
+
+Implementation branch `agent/crypto-systems-intelligence-atlas-book6-build` @
+`5f94c3f40cea4441470c57671f51454da7377361`, clean, remote matches. Accepted
+anchor `3919fb80` is an ancestor. The single commit after the anchor **is the
+acceptance commit itself** (`docs(csia): accept Book 6 fundamental measurement
+kernel`), so there is **zero implementation drift**.
+
+## The four resolutions
+
+All four were validated against the accepted runtime before being written down.
+The validation is what made them implementable rather than merely stated.
+
+**GAP-1 `1A-STRICT`.** Verified `MeasurementObservation.value: float | None`
+at `book6_records.py:113` and the NaN sentinel at `book6_core.py:181` are
+compatible with the resolution as specified — no type change, sentinel
+explicitly not inherited.
+
+**GAP-2 `2D`.** The decisive substrate finding: **`MetricDefinition.unit`
+already exists and is non-nullable** at `book6_definitions.py:148`, alongside
+`MeasurementObservation.unit` at `book6_records.py:114`. Same-metric exact-unit
+identity is therefore a plain exact string equality over two accepted fields —
+fully testable, and the mechanism by which GAP-2 closes without a contract
+class. Policy P3 is withdrawn rather than satisfied.
+
+**GAP-3 `3C`.** Verified `CoverageRuleRegistry` at
+`book6_coverage_rules.py:112` already exposes `rules_for_metric()` (215),
+`ratification_of()` (194) and `authorize()` (227), and that `authorize()`
+already refuses unregistered, unratified-for-current-version and scope-mismatched
+rules. 3C is an exact-identifier lookup against that registry, not a heuristic,
+so it adds no authority class.
+
+**GAP-4 `4D`.** Verified the cross-metric corpus is separately scoped:
+`FALSE_COMPARISON_CORPUS` (FC-01..FC-15), `CorpusVerdict`, and
+`ComparabilityClass` (`book6_definitions.py:69`, six members) are distinct from
+the new three-member `TemporalComparabilityStatus`. `book6_comparability.py` is
+untouched.
+
+## Results
+
+```text
+PRE_RATIFICATION_REVIEW        = 20 / 20 PASS
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.2
+                               = READY_PENDING_SUBSTRATE_CLARIFICATION_RATIFICATION
+                                 9 TRUE / 1 NOT_SUPPORTABLE / 0 FALSE
+TEST_SPEC_v0.2                 = 208 cases, 0 BLOCKED (14/14 resolved)
+REPLAY_CHECK_COUNT             = 20
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+HIDDEN_THIRD_CONTRACT          = NONE
+```
+
+## The one criterion that did not flip
+
+`BENCHMARK_RUNTIME_PATH_SUFFICIENT` was targeted at TRUE and is reported as
+**NOT_SUPPORTABLE**. GAP-5 (the phantom benchmark-rule namespace from the
+previous turn's sweep) is not among the four gaps this session was directed to
+resolve. It is recorded as open rather than smoothed to TRUE to hit a target.
+Plan v0.5 §1 states openly that v0.5 does **not** repeat v0.4's "accepted
+benchmark-rule namespace" claim.
+
+**This is the second time this defect class has been caught by refusing to let
+an unverified assertion pass as a reviewed one.** The first was the sweep's
+correction of the prior review's same criterion.
+
+## Ratified history preserved
+
+The ratified v0.4 artifacts (amendment plan, grammar, boundary, seam, readiness,
+ratification record) are untouched. v0.5 is an additive successor and calls none
+of them erroneous.
+
+## One tooling repair worth recording
+
+Three heredoc appends truncated near ~200 lines, and one truncation cut a
+section heading mid-artifact (authorization review v0.2 §6). Both were detected
+by structural checks — section-header enumeration and fence-count parity — and
+repaired in place. Every artifact was verified for section completeness and
+balanced code fences before being committed.
+
+**Not authorized and not performed:** any implementation, source or test change,
+float/Decimal/Fraction migration, epsilon, isclose, unit ontology or conversion,
+cross-metric corpus mutation, coverage applicability heuristic, NOT_APPLICABLE by
+absence, new canonical coverage rule, rule ratification, Book 6 re-acceptance,
+Book 7 or Book 8, live acquisition, branch creation, force-push, rebase or
+history rewrite.
