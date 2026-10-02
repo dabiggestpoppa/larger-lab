@@ -60,25 +60,52 @@ def _import(path, name):
     return module
 
 
-RECORD_READ_ANCHOR = """        record_name = _derive_record_coordinate_name(operation_id)
+RECORD_READ_ANCHOR = """    dir_fd, identity = _open_governed_directory(governed, operation_id)
+    try:
+        # B4-CXR7U9R48R1: ONE admitted directory descriptor owns BOTH reads.
+        # The record is opened descriptor-relative through this same dir_fd --
+        # `os.open(name, flags, dir_fd=dir_fd)` -- so a whole-directory
+        # replacement between the two reads cannot produce a decision that
+        # combines a record from one generation with a selector from another.
+        # `_load_transition_record`, which resolves a PATHNAME, is deliberately
+        # NOT called on this path: it would reintroduce exactly the window R47
+        # left open.
+        record_name = _derive_record_coordinate_name(operation_id)
         try:
             record_snapshot = _read_record_snapshot_admitted(
                 operation_id, governed, record_name, dir_fd, identity)
-            admitted_record = record_snapshot.record"""
-
-RECORD_READ_WEAKENED = """        record_name = _derive_record_coordinate_name(operation_id)
-        try:
-            admitted_record = _load_transition_record(operation_id)
+            admitted_record = record_snapshot.record
+        except (OSError, ValueError, RuntimeError, TypeError,
+                _ExecutionAuthorityConflict):
+            admitted_record = None
             record_snapshot = RecordSnapshot(
                 operation_id=operation_id, transition_dir=governed,
                 canonical_path=os.path.join(governed, record_name),
-                present=admitted_record is not None,
-                governed_device=identity[0], governed_inode=identity[1],
-                device=0, inode=0, size=0, mode=0, link_count=0,
-                record=admitted_record,
-                record_digest=(_receipt_digest(admitted_record)
-                               if isinstance(admitted_record, dict) else None),
-                raw_digest=None, read_error=None)"""
+                present=False, governed_device=identity[0],
+                governed_inode=identity[1], device=0, inode=0, size=0, mode=0,
+                link_count=0, record=None, record_digest=None,
+                raw_digest=None, read_error="refused")
+"""
+
+
+RECORD_READ_WEAKENED = """    record_name = _derive_record_coordinate_name(operation_id)
+    try:
+        admitted_record = _load_transition_record(operation_id)
+    except (OSError, ValueError, RuntimeError, TypeError,
+            _ExecutionAuthorityConflict):
+        admitted_record = None
+    dir_fd, identity = _open_governed_directory(governed, operation_id)
+    try:
+        record_snapshot = RecordSnapshot(
+            operation_id=operation_id, transition_dir=governed,
+            canonical_path=os.path.join(governed, record_name),
+            present=admitted_record is not None,
+            governed_device=identity[0],
+            governed_inode=identity[1], device=0, inode=0, size=0, mode=0,
+            link_count=0, record=admitted_record,
+            record_digest=None, raw_digest=None, read_error=None)
+"""
+
 
 COHERENCE_ANCHOR = """        _assert_one_directory_generation(
             operation_id, governed, dir_fd, identity, record_snapshot, selector)
