@@ -2005,3 +2005,208 @@ implementation, Book 6 re-acceptance, Book 7 ratification, Book 7
 implementation, Book 8, D8, live acquisition, any comparison-rule or
 coverage-rule ratification, any state/predicate/coverage-rule ratification,
 any usage or health research, any score, ranking, or trading authority.
+---
+
+## CHECKPOINT — BOOK 6 COMPARISON AMENDMENT v0.3 — DERIVATION BINDING CLOSED / READINESS HOLD
+
+```text
+CHECKPOINT_DATE                       = 2026-10-01
+BRANCH                                = agent/crypto-systems-intelligence-atlas-plan
+STARTING_HEAD                         = 1c090bba4366d5dbdfba39e34e29cd632473c3f2
+BOOK_6                                = FROZEN_ACCEPTED (unchanged)
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+
+--- EXTERNAL REVIEW FINDINGS ADDRESSED ---
+
+R6A-D4  DERIVATION_METHODOLOGY_DECAY_NOT_IN_AUTHORITY_REPLAY = REPAIRED
+        reproduced at: GRAMMAR_v0.2 §4 (the eleven checks)
+        the v0.2 replay re-resolved the ComparisonRule and the COVERAGE ref,
+        but never the baseline-selection or comparison methodology — the two
+        refs that decide which observations are the baseline and how they are
+        combined. A byte-identical rule could stay "apparently authoritative"
+        after either derivation was superseded, withdrawn, or lost
+        ratification, because the replay never looked.
+
+R6A-D5  COVERAGE_APPLICABILITY_AUTHORITY_UNDEFINED = REPAIRED
+        reproduced at: GRAMMAR_v0.2:60-62, :294
+        "required when the metric class requires a coverage verdict" named no
+        authority that decides *requires*, so setting the ref null skipped
+        gate G7 entirely. The v0.2 no-shortcut repair closed the SHORTCUT, not
+        the WAIVER — a rule that waives coverage produces no raw number at all.
+
+R6A-D6  BOUNDARY_CONTRACT_CLASS_COUNT_INCONSISTENT = REPAIRED
+        boundary v0.1:22 and :35 said "a single new contract class"; :189 said
+        two. Corrected by successor boundary v0.2 (v0.1 preserved).
+
+--- REPAIRS ---
+
+DERIVATION_METHODOLOGY_BINDING         = CLOSED
+  baseline_selection_methodology_ref  = typed as an ACCEPTED Book 6 benchmark
+                                        rule (namespace PRIOR_COMPARABLE_WINDOW |
+                                        ROLLING_MEAN | ROLLING_MEDIAN |
+                                        HISTORICAL_DISTRIBUTION |
+                                        BASELINE_EPOCH), individually
+                                        operator-ratified under D6M-3
+  comparison_methodology_ref          = REMOVED as an external object;
+                                        semantics embedded as a required
+                                        fingerprinted section OF ComparisonRule
+  ComparisonDerivationBinding         = registry-side binding over the rule,
+                                        both methodologies, coverage
+                                        applicability, coverage rule, metric
+                                        definition content, and input
+                                        methodology policy
+  RULE RATIFIED AGAINST METHODOLOGY X@1 != RULE AUTHORIZED AGAINST DIFFERENT
+    CONTENT UNDER X@1
+  AUTHORITY_REPLAY_CHECKS              = 19 (was 11)
+  METH ADVERSARIAL CASES               = 5 (METH-1 .. METH-5)
+  NO_METHODOLOGY_AUTO_FOLLOW           = TRUE
+  NO_LATE_BOUND_DERIVATION             = TRUE
+
+COVERAGE_APPLICABILITY_AUTHORITY       = CLOSED
+  COVERAGE_APPLICABILITY_OWNER = accepted MetricDefinition / bound
+                                  MeasurementMethodology semantics
+  COVERAGE_REQUIRED            != RULE_AUTHOR_DISCRETION
+  TRI-STATE = REQUIRED | NOT_APPLICABLE | UNRESOLVED
+    REQUIRED       → G7 evaluated; missing/insufficient → NOT_COMPARABLE
+    UNRESOLVED     → COMPARISON UNAVAILABLE (fail closed)
+    NOT_APPLICABLE → G7 skipped, upstream determination cited
+  NULL_MEANS_TWO_THINGS             = FALSE (nullable multi-meaning removed)
+  COMPARISONRULE_COVERAGE_WAIVER    = NONE
+  COV ADVERSARIAL CASES             = 12 (COV-1 .. COV-12; COV-9..12 new)
+  NO_APPLICABILITY_FIELD_ADDED_TO_ACCEPTED_METRIC_DEFINITION = TRUE
+    (upstream silence = UNRESOLVED = fail-closed, not permissive)
+
+HIDDEN_THIRD_CONTRACT                = NONE
+  NEW_AUTHORITY_BEARING_CONTRACT_CLASSES = 2 (ComparisonRule,
+                                               ChangeObservation)
+  BASELINE SELECTION                  → accepted namespace, not new
+  COMPARISON SEMANTICS                → inside the rule's fingerprint, not new
+  DERIVATION BINDING                  → registry-side digest, not a class
+  TRADE-OFF (stated) = comparison semantics are per-rule, not shared;
+    extracting a shared versioned class would be a FUTURE operator decision
+    admitting a third contract class — not decided here
+
+METRIC_DEFINITION_BINDING_AUDIT       = GAP IN ACCEPTED CONTRACT (recorded, not
+  papered over). The accepted MetricDefinition has no version field and no
+  canonical content fingerprint, so metric_definition_ref alone binds a NAME,
+  not CONTENT. Resolution binds the resolved semantic content fingerprint at
+  ratification and re-resolves it at use time (check 17) — mitigates without
+  modifying the accepted class. First-class MetricDefinition versioning would
+  be a SEPARATE amendment.
+
+D6M_3_AUTHORITY_BLEED                 = NONE
+  COMPARISON_RULE_RATIFICATION_AUTHORITY = OPERATOR_ONLY, established BY THIS
+  AMENDMENT using a D6M-3-CONSISTENT pattern. D6M-3 does not grant, extend,
+  or lend this authority. The accepted benchmark namespace is REUSED under
+  D6M-3's existing individual-ratification rule, unmodified.
+
+CHANGE_OBSERVATION_SELF_RATIFICATION   = PROHIBITED (unchanged)
+COMPARISON_RULE_SELF_RATIFICATION       = PROHIBITED (unchanged)
+
+--- CANONICAL COUNTS (all zero) ---
+
+COMPARISON_RULES_RATIFIED               = 0 canonical
+COVERAGE_SUFFICIENCY_RULES_RATIFIED     = 0 canonical
+CHANGE_OBSERVATION_CANONICAL_COUNT      = 0 canonical
+BOOK_7_RESPONSELINK_CANONICAL_COUNT     = 0 canonical
+
+--- PRE-RATIFICATION + READINESS ---
+
+PRE_RATIFICATION_REVIEW                 = v0.3 — 40 / 40 PASS
+  pattern: v0.1 20/20 missed D1+D2; v0.2 30/30 missed D4+D5; each round's gap
+  was an ABSENT QUESTION CLASS, not a wrong answer
+
+RATIFICATION_READINESS                  = NOT YET PASS
+AMENDMENT_PLAN                          = HOLD
+INDEPENDENT_READINESS_REVIEW_v0.1       = 12 structural surfaces audited
+  NEW_UNASKED_STRUCTURAL_DEFECTS        = 2   (required 0 → HOLD)
+    D-A  nullable-field-multi-meaning class has no question
+    D-B  policy-parameter-as-threshold class has no question
+  DEFECTS_FOUND_IN_v0.3_DESIGN          = 0  (all 12 surfaces verify clean)
+
+--- ARTIFACT VERSIONS ---
+
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.2 = SUPERSEDED / NOT RATIFIABLE
+BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.2        = SUPERSEDED (preserved)
+BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.2   = SUPERSEDED (preserved)
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.1 = SUPERSEDED (preserved;
+                                              count corrected by v0.2)
+PRE_RATIFICATION_REVIEW_v0.2                 = SUPERSEDED (30/30, preserved)
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN      = v0.3 DRAFT_PENDING_OPERATOR_RATIFICATION
+BOOK_6_COMPARISON_CHANGE_GRAMMAR             = v0.3
+BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM        = v0.3
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY  = v0.2
+PRE_RATIFICATION_REVIEW                      = v0.3 (40/40)
+DERIVATION_AUTHORITY_AUDIT                   = v0.1 (audit of record)
+RATIFICATION_READINESS_REVIEW                = v0.1 (HOLD)
+
+--- BOOK 7 IMPACT ---
+
+BOOK_7_PLAN                            = READY_PENDING_BOOK6_COMPARISON_AMENDMENT
+BOOK_7_ARCHITECTURE_CHANGE              = NONE
+NEW_D7N_DECISION_REQUIRED               = NONE
+D7N_7                                   = A (binding, unchanged)
+BOOK_7_RATIFICATION                     = BLOCKED_PENDING_BOOK6_AMENDMENT
+BOOK_7_USAGE_OF_RESPONSE_LADDER         = fail-closed CHANGE_NOT_MEASURABLE
+
+--- UNTOUCHED / INVARIANT ---
+
+STRUCTURAL_FAILURES_FOUND               = 2 (R6A-D4, R6A-D5) + 1 boundary
+                                          inconsistency (D6) + 2 unasked
+                                          question classes (readiness HOLD)
+BOOK_1_AMENDMENT_REQUIRED               = FALSE
+BOOK_2_AMENDMENT_REQUIRED               = FALSE
+BOOK_3_AMENDMENT_REQUIRED               = FALSE
+BOOK_4_AMENDMENT_REQUIRED               = FALSE
+BOOK_5_AMENDMENT_REQUIRED               = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED         = FALSE
+SENSOR_MUTATION                         = 0
+D2_6                                     = IN_FORCE
+D6M_1..D6M_4                             = UNCHANGED
+D6M_5                                    = OPEN_DEFERRED
+BOOK_6_IMPLEMENTATION_AUTHORITY         = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY         = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY         = FALSE
+LIVE_ACQUISITION_AUTHORITY              = FALSE
+
+NEXT = resolve the two unasked question classes (invariants AC-17 / AC-18 +
+      questions Q41 / Q42), re-run the independent readiness review, and only
+      if NEW_UNASKED_STRUCTURAL_DEFECTS = 0 put the amendment plan to the
+      operator for ratification review.
+
+ARTIFACTS_CREATED_THIS_CHECKPOINT
+  CSIA_BOOK_6_COMPARISON_CHANGE_DERIVATION_AUTHORITY_AUDIT_v0.1.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.2.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.3.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.3.md
+  CSIA_BOOK_6_TO_BOOK_7_CHANGE_RESPONSE_SEAM_v0.3.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PRE_RATIFICATION_REVIEW_v0.3.md
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_READINESS_v0.1.md
+ARTIFACTS_APPENDED_THIS_CHECKPOINT
+  CSIA_PLANNING_PROGRESS.md   (this checkpoint)
+```
+
+**Reading of this checkpoint.** The v0.2 amendment was caught one step before
+ratification because its authority replay re-resolved the rule it named but
+not the two methodologies that give the rule its meaning — so a rule could go
+stale while looking perfectly intact, and a rule author could exempt a
+comparison from coverage simply by declaring it exempt. v0.3 closes both by
+binding the derivation as fully as the rule itself and by moving coverage
+applicability upstream to the accepted metric semantics, where silence fails
+closed rather than passing. The amendment also resolved, rather than
+papered over, whether it was secretly adding more than two contract classes:
+it was not, once the two methodology refs were given types. The independent
+readiness review then held the plan anyway. Twelve structural surfaces verify
+clean, but two *classes* of defect have never been asked about across three
+review rounds — nullable fields with more than one meaning, and policy
+parameters that might act as disguised thresholds — and each of the four prior
+defects was an instance of exactly one of those two classes. A 40/40 pass on
+a question set that cannot see a whole defect class is not readiness, so the
+plan is held.
+
+**Not authorized and not performed:** amendment ratification, Book 6
+implementation, Book 6 re-acceptance, Book 7 ratification, Book 7
+implementation, Book 8, D8, live acquisition, any comparison-rule, benchmark
+rule, or coverage-rule ratification, any state/predicate/coverage-rule
+ratification, any usage or health research, any score, ranking, or trading
+authority.
