@@ -1501,3 +1501,103 @@ D7N-7's answer resolved a decision while creating a *different* kind of
 obligation — an upstream Book 6 amendment — which is tracked as
 `BOOK_7_RATIFICATION_BLOCKER`, not as an open D7N decision. Book 7 remains
 unratified.
+
+---
+
+# BOOK 6 COMPARISON / CHANGE AMENDMENT DECISION — DECISION SESSION 2026-10-02
+
+## Identifier note
+
+```text
+Identifier selected:  BOOK6-COMPARE-AMEND-v0.4
+Namespace collision:  NONE
+Existing namespaces left untouched: D1-D6 (Book 0); R-1A-5 (Book 1);
+  D2-1..D2-6; D3-1..D3-7; D4-1..D4-8; D7; D5CAP-1..D5CAP-3; D7N-1..D7N-7
+D6M-* series:  NOT extended. No D6M identifier was created or reused.
+D7N-* series:  NOT extended. No D7N identifier was created or reused.
+```
+
+This decision **closes no D6M and no D7N decision**. It records a distinct
+operator act: ratification of the Book 6 comparison / change amendment
+**PLAN v0.4**.
+
+DECISION LOG ENTRY {
+  decision_id:                  BOOK6-COMPARE-AMEND-v0.4
+  title:                        BOOK 6 COMPARISON / CHANGE AMENDMENT
+  operator_selection:           RATIFY
+  status:                       RATIFIED / CLOSED
+  scope:                        PLAN ONLY
+  implementation_authority:     FALSE
+  canonical comparison rules ratified:  0
+  canonical coverage-sufficiency rules ratified:  0
+  canonical benchmark rules ratified:   0
+
+  ratified_plan:                CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.4.md
+  ratified_plan_version:        v0.4
+  ratified_plan_anchor:         28bfac52c23c891ebb54e9924dedc925a859b359
+  ratified_plan_prior_status:   v0.4 DRAFT_PENDING_OPERATOR_RATIFICATION
+  prior_plan_disposition:       v0.3 SUPERSEDED / NOT RATIFIABLE
+
+  grammar:                      v0.4   (0bde9a5a8532a3b1f7adee7f67aa3da3a587eddb)
+  boundary:                     v0.3   (fbf9d3d8f50b8e427549cc882a0cf31059436966)
+  seam:                         v0.4   (fbf9d3d8f50b8e427549cc882a0cf31059436966)
+  pre_ratification_review:      v0.5 — 48 / 48 PASS
+  ratification_readiness:       v0.3 — PASS (16 / 16 surfaces)
+
+  new_unasked_structural_defects:      0
+  new_design_defects_found:            0
+  ambiguous_nullable_fields:           0
+  policy_parameters_with_ungoverned_authority:  0
+  every_known_defect_has_general_class_coverage: TRUE
+
+  record:                       CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_RECORD_v0.1.md
+
+  ratifies_principle:           DERIVED SEMANTIC > RULE-AUTHOR POLICY CHOICE
+  ratifies_invariants:          AC-17, AC-18, AC-18a, AC-18b, AC-19, AC-20
+  ratifies_doctrine:            closed delta operator set; direction from the
+                                 sign of the canonical UNROUNDED absolute
+                                 delta; zero-baseline fail-closed; unit
+                                 arithmetic derived from the unit contract;
+                                 rounding presentation-only and outside the
+                                 canonical fingerprint and authority replay
+  new_authority_bearing_contract_classes: 2 (ComparisonRule,
+                                            ChangeObservation)
+  hidden_third_contract:        NONE
+
+  unchanged:                    D6M-1, D6M-2, D6M-3, D6M-4
+  open_deferred:                D6M-5
+  in_force_unchanged:           D2_6
+  books_1_to_5_amendment_required:     FALSE
+  constitution_amendment_required:      FALSE
+
+  does_not_authorize:           BOOK 6 IMPLEMENTATION; BOOK 6 RE-ACCEPTANCE;
+                                 BOOK 7 RATIFICATION; BOOK 7 IMPLEMENTATION;
+                                 BOOK 8; D8; LIVE ACQUISITION; RPC; NETWORK;
+                                 DATABASE; GRAPH DATABASE; COMPARISON-RULE
+                                 RATIFICATION; BENCHMARK-RULE RATIFICATION;
+                                 COVERAGE-RULE RATIFICATION; MATERIALITY OR
+                                 TOLERANCE METHODOLOGY; HEALTH OR USAGE
+                                 THRESHOLDS; CAUSALITY SEMANTICS; SCORE; RANK;
+                                 BUY; SELL
+  must_not_be_inferred:         this ratification authorizes implementation;
+                                 it re-accepts Book 6; it ratifies any rule;
+                                 it unblocks Book 7; silence on a later gate
+
+  plan_ratified != implementation_authorized
+  plan_ratified != book_6_re_accepted
+
+  book_6:                       FROZEN_ACCEPTED (unchanged)
+  book_6_accepted_implementation_anchor:  3919fb8052e216e94034a753fb258d338c5fa0dc
+
+  book_6_implementation_authority:  FALSE
+  book_7_implementation_authority:  FALSE
+  book_8_implementation_authority:  FALSE
+  live_acquisition_authority:       FALSE
+  book_7_plan:                    READY_PENDING_BOOK6_COMPARISON_AMENDMENT_
+                                 IMPLEMENTATION_AND_REACCEPTANCE
+  book_7_ratification_blocker:    BOOK6_COMPARISON_CONTRACT_NOT_YET_ACCEPTED
+
+  effective_timestamp:          2026-10-02
+  binding_commit_sha:           (assigned at this ratification commit;
+                                 ratified plan anchor = 28bfac52c23c891ebb54e9924dedc925a859b359)
+}

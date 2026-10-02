@@ -2597,3 +2597,206 @@ implementation, Book 8, D8, live acquisition, any comparison-rule,
 benchmark-rule, or coverage-rule ratification, any state/predicate/coverage
 ratification, any usage or health research, any score, ranking, or trading
 authority.
+
+---
+
+## CHECKPOINT — BOOK 6 COMPARISON AMENDMENT v0.4 RATIFIED — PLAN ONLY, IMPLEMENTATION NOT AUTHORIZED
+
+```text
+CHECKPOINT_DATE                       = 2026-10-02
+BRANCH                                = agent/crypto-systems-intelligence-atlas-plan
+REMOTE_HEAD_AT_SESSION_START          = 8f87988a43c93c688db1ec6679fefd3297eb6727
+LOCAL_HEAD_AT_SESSION_START           = 5bb49e32c31dbe61665f2c6fecf328b604129dd0
+BOOK_6                                = FROZEN_ACCEPTED (unchanged)
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+
+--- PHASE 0 — LOCAL / REMOTE RECONCILIATION ---
+
+LOCAL-ONLY COMMIT 5bb49e32c VERIFIED BEFORE PUSH
+  files changed = CSIA_PLANNING_PROGRESS.md ONLY
+  13 insertions, 0 deletions (pure append)
+  content = plan-status bookkeeping only:
+    AMENDMENT_PLAN_v0.3 = SUPERSEDED / NOT RATIFIABLE
+    AMENDMENT_PLAN      = v0.4 READY_FOR_OPERATOR_RATIFICATION
+    NO_CHANGE_IS_MATERIALITY = FALSE
+    explicit "nothing was ratified" statement
+  no grammar / plan / seam / boundary edit
+  no architecture change
+  no source change
+FAST-FORWARD VERIFIED (8f87988a is an ancestor of 5bb49e32c)
+PUSHED as a normal fast-forward; no force; no reset; no rebase; no amend
+LOCAL == REMOTE after push
+
+--- OPERATOR DECISION ---
+
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.3 = SUPERSEDED / NOT RATIFIABLE
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN       = v0.4 RATIFIED
+BOOK_6_COMPARISON_CHANGE_AMENDMENT_OPERATOR_RATIFIED = TRUE
+OPERATOR_DECISION_ID              = BOOK6-COMPARE-AMEND-v0.4
+OPERATOR_SELECTION                = RATIFY
+OPERATOR_STATUS                   = RATIFIED / CLOSED
+SCOPE                             = PLAN ONLY
+IMPLEMENTATION_AUTHORITY          = FALSE
+RATIFIED_PLAN_ANCHOR              = 28bfac52c23c891ebb54e9924dedc925a859b359
+RATIFICATION_RECORD               = CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_RECORD_v0.1.md
+
+--- RATIFICATION BASIS (verified before ratifying) ---
+
+PRE_RATIFICATION_REVIEW            = v0.5 — 48 / 48 PASS
+RATIFICATION_READINESS             = v0.3 — PASS
+INDEPENDENT_READINESS_SURFACES     = 16 / 16 PASS
+NEW_UNASKED_STRUCTURAL_DEFECTS     = 0
+NEW_DESIGN_DEFECTS_FOUND           = 0
+AMBIGUOUS_NULLABLE_FIELDS          = 0
+POLICY_PARAMETERS_WITH_UNGOVERNED_AUTHORITY = 0
+FREE_STRING_POLICY_AUTHORITY       = 0
+ARBITRARY_NUMERIC_THRESHOLD_PARAMETERS = 0
+EVERY_KNOWN_DEFECT_HAS_GENERAL_CLASS_COVERAGE = TRUE
+
+--- RATIFIED DOCTRINE (unchanged from the reviewed plan) ---
+
+DELTA OPERATORS   = ABSOLUTE_DELTA | RELATIVE_DELTA   (closed set of two)
+DIRECTION         = SIGN(canonical UNROUNDED absolute_delta)
+                    >0 INCREASE | <0 DECREASE | =0 NO_CHANGE
+DIRECTION_DERIVATION_RULE      = FIXED / NON-CONFIGURABLE
+ZERO_BASELINE_POLICY           = FIXED_FAIL_CLOSED
+UNIT_ARITHMETIC_VALIDITY       = DERIVED_FROM_UNIT_CONTRACT
+ROUNDING_AFFECTS_CHANGE_CLASSIFICATION = FALSE
+DISPLAY_ROUNDING_IS_AUTHORITY          = FALSE
+NO_CHANGE != NOT_MATERIAL_CHANGE
+NO EPSILON / TOLERANCE / MATERIALITY / SIGNIFICANCE FIELD EXISTS
+
+AC_17 SATISFIED   AC_18 SATISFIED   AC_18a SATISFIED   AC_18b SATISFIED
+AC_19 TRUE (no tolerance/materiality in comparison)
+AC_20 TRUE (display is not authority)
+
+--- GOVERNANCE BOUNDARY ---
+
+NEW_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+  ComparisonRule
+  ChangeObservation
+HIDDEN_THIRD_CONTRACT                 = NONE
+COMPARISON_RULE_RATIFICATION_AUTHORITY = OPERATOR_ONLY, established by THIS
+  amendment; D6M-3 is a governance-PATTERN precedent only and grants,
+  extends, or lends NO comparison-rule authority
+NEW_AUTHORITY_BEARING_CONTRACT_CLASSES_ADDED_BY_THIS_CHECKPOINT = 0
+
+--- DERIVATION BINDING + AUTHORITY REPLAY (ratified, unchanged) ---
+
+RATIFICATION OF A COMPARISON RULE BINDS:
+  rule identity / version / canonical fingerprint
+  baseline benchmark methodology identity / version / canonical fingerprint
+  delta operator (closed set)
+  coverage applicability determination
+  coverage-sufficiency rule identity / version / fingerprint (where REQUIRED)
+  metric-definition semantic fingerprint
+  compatible input methodology policy
+  NO LATE-BOUND DEPENDENCY · NO AUTO-FOLLOW · NO BARE-NAME DRIFT
+
+NINETEEN-CHECK REPLAY remains binding and is re-resolved at each use.
+  any check fails -> current_authority = FALSE; history preserved
+  RATIFIED THEN != AUTHORITATIVE NOW
+
+CHANGEOBSERVATION = BOOK 6-LOCAL DERIVED RECORD
+  NOT a Book 2 Claim · NOT independently ratified · NOT self-authorizing
+  RULE RATIFIED != CHANGE EXISTS
+  CHANGE EXISTS != CURRENTLY AUTHORITATIVE
+  OBJECT STATUS != AUTHORITY
+
+BOOK 7 SEAM
+  SOURCE_VALUE_PRESENT -> SEAM_QUOTE_PRESENT
+  SILENCE_ABOUT_KNOWN_COVERAGE = INVALID
+  Book 7 may not recompute, re-round, apply epsilon or tolerance,
+  reclassify a small change, omit known coverage, or overwrite Book 6 output
+
+--- ACCEPTED RESIDUAL LIMITATIONS (limitations, not hidden features) ---
+
+no first-class MetricDefinition versioning (content fingerprint-bound instead)
+no tolerance / materiality methodology
+no shared versioned delta-operator class (set closed; new operator = contract)
+no causal methodology (D7N-4 OPEN / DEFERRED)
+no usage / health semantics (D6M-5 OPEN_DEFERRED)
+all canonical rule counts remain 0
+no historical Book 2 point-in-time authority replay
+
+--- INVARIANT / UNTOUCHED ---
+
+BOOK_1_AMENDMENT_REQUIRED           = FALSE
+BOOK_2_AMENDMENT_REQUIRED           = FALSE
+BOOK_3_AMENDMENT_REQUIRED           = FALSE
+BOOK_4_AMENDMENT_REQUIRED           = FALSE
+BOOK_5_AMENDMENT_REQUIRED           = FALSE
+CONSTITUTION_AMENDMENT_REQUIRED     = FALSE
+SENSOR_MUTATION                     = 0
+D6M_1..D6M_4                        = UNCHANGED
+D6M_5                               = OPEN_DEFERRED
+D2_6                                = IN_FORCE (unmodified)
+GRAMMAR_EDITED_THIS_CHECKPOINT      = NO
+PLAN_EDITED_THIS_CHECKPOINT         = NO
+SEAM_EDITED_THIS_CHECKPOINT         = NO
+BOUNDARY_EDITED_THIS_CHECKPOINT     = NO
+SOURCE_OR_TESTS_EDITED              = NO
+
+--- CANONICAL COUNTS (unchanged by ratification) ---
+
+COMPARISON_RULES_RATIFIED           = 0 canonical
+COVERAGE_SUFFICIENCY_RULES_RATIFIED = 0 canonical
+BENCHMARK_RULES_RATIFIED            = 0 canonical
+CHANGE_OBSERVATION_CANONICAL_COUNT  = 0 canonical
+
+--- AUTHORITY (all still FALSE after ratification) ---
+
+BOOK_6_IMPLEMENTATION_AUTHORITY     = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY     = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY     = FALSE
+LIVE_ACQUISITION_AUTHORITY          = FALSE
+BOOK_7_PLAN                         = READY_PENDING_BOOK6_COMPARISON_AMENDMENT_
+                                      IMPLEMENTATION_AND_REACCEPTANCE
+BOOK_7_RATIFICATION_BLOCKER         = BOOK6_COMPARISON_CONTRACT_NOT_YET_ACCEPTED
+
+```text
+PLAN RATIFIED
+!=
+IMPLEMENTATION AUTHORIZED
+!=
+BOOK 6 RE-ACCEPTED
+```
+
+NEXT = BOOK 6 COMPARISON / CHANGE AMENDMENT OFFLINE IMPLEMENTATION
+      AUTHORIZATION REVIEW
+
+This NEXT grants nothing by existing. It names the next operator act; that
+act has not occurred and is not authorized. The five-step ladder is:
+  1. plan ratification .................... DONE (this checkpoint)
+  2. separate implementation authorization  PENDING — not authorized here
+  3. implementation on the accepted lineage
+  4. regression / hardening review
+  5. formal Book 6 re-acceptance
+
+ARTIFACTS_CREATED_THIS_CHECKPOINT
+  CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_RECORD_v0.1.md
+ARTIFACTS_APPENDED_THIS_CHECKPOINT
+  CSIA_OPERATOR_DECISION_LOG.md   (entry BOOK6-COMPARE-AMEND-v0.4)
+  CSIA_PLANNING_PROGRESS.md       (this checkpoint)
+```
+
+**Reading of this checkpoint.** The operator ratified a plan. That is the
+whole of what happened: an architecture that had spent five review rounds
+closing eleven nullable and policy defects became binding design law, and
+nothing was built. The distinction is recorded three times in three artifacts
+— plan, record, decision log — because the failure mode this program has
+already caught once is an authority boundary that is stated and then quietly
+inferred. Ratifying the design of a comparison contract is not implementing
+it, is not re-accepting Book 6, and ratifies no rule of any kind: the
+canonical counts for comparison, coverage-sufficiency, and benchmark rules all
+remain zero, so the operative posture is still fail-closed
+`CHANGE_NOT_MEASURABLE`. The next step is not implementation; it is the
+separate authorization review that would have to ask the implementation
+question on its own merits.
+
+**Not authorized and not performed:** Book 6 implementation, Book 6
+re-acceptance, Book 7 ratification, Book 7 implementation, Book 8, D8, live
+acquisition, RPC, network, database, graph database, any comparison-rule,
+benchmark-rule, or coverage-rule ratification, any materiality or tolerance
+methodology, any health or usage threshold, any causality semantics, any
+score, ranking, grade, buy, or sell authority.
