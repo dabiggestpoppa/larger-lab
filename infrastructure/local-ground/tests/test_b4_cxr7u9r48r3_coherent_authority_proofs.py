@@ -136,7 +136,7 @@ GENERATION_B_STATE = "STAGED"
 
 
 def _swap_whole_directory(transitions, opid, new_transition,
-                          new_state=GENERATION_B_STATE):
+                          new_state=GENERATION_B_STATE, publish_record=True):
     """Replace the ENTIRE governed directory with a COMPLETE new generation.
 
     Two properties matter for the proofs below to mean anything:
@@ -162,11 +162,17 @@ def _swap_whole_directory(transitions, opid, new_transition,
     fresh.mkdir(mode=0o700)
     origin = json.loads(
         (aside / f"{opid}.json").read_text(encoding="utf-8"))
-    record_path = fresh / f"{opid}.json"
-    record_path.write_text(json.dumps(
-        {**origin, "state": new_state, "selected_transition": new_transition}),
-        encoding="utf-8")
-    os.chmod(record_path, 0o600)
+    # `publish_record=False` publishes a generation that carries a selector
+    # but NO admissible record. That is a real generation, not a missing
+    # file: without it the no-record branch below is dormant, because the
+    # helper would always publish one.
+    if publish_record:
+        record_path = fresh / f"{opid}.json"
+        record_path.write_text(json.dumps(
+            {**origin, "state": new_state,
+             "selected_transition": new_transition}),
+            encoding="utf-8")
+        os.chmod(record_path, 0o600)
     _publish(fresh, {"format": pgrec._CLAIM_FORMAT,
                      "operation_id": opid,
                      "transition": new_transition,
@@ -383,14 +389,19 @@ def test_b_every_replacement_window_is_coherent_or_denied(tmp_path, window):
                     bundle.selector.governed_inode) == replacement_identity, (
                 "the selector snapshot does not name the replacement "
                 "directory")
-            if bundle.record is None:
-                # A replacement that publishes no admissible record must leave
-                # the bundle with NO record, and the decision must fail closed
-                # rather than fall back to anything.
-                assert pgrec._classify_record_for_shell(bundle, None) == 4
-            else:
-                assert _authority_pair(bundle) == (GENERATION_B_STATE,
-                                                   "finalize")
+            # This window always publishes a record, so there is no
+            # `bundle.record is None` case here to assert. The branch that
+            # used to sit in this place called
+            # `_classify_record_for_shell(bundle, None)`, handing the
+            # classifier an authority BUNDLE where it expects a record
+            # object. It returned 4 purely because a bundle is not a dict,
+            # so it proved a type check, not fail-closed authority -- and it
+            # never ran, because the replacement helper always publishes a
+            # record. The genuine no-record generation is now exercised,
+            # through the real shell route, in
+            # `test_b_a_no_record_generation_fails_closed_through_the_shell_route`.
+            assert _authority_pair(bundle) == (GENERATION_B_STATE,
+                                               "finalize")
             assert not _cross_generation(bundle), (
                 "the before-admission window accepted a mixed generation")
         return
@@ -432,6 +443,45 @@ def test_b_after_both_reads_the_bundle_is_already_coherent(tmp_path):
 # ===================================================================== #
 # C. RECORD ATTACKS
 # ===================================================================== #
+
+def test_b_a_no_record_generation_fails_closed_through_the_shell_route(
+        tmp_path):
+    """A generation publishing NO record fails closed for the authority
+    reason, through the real public route with correct argument types.
+
+    This is the case the deleted dormant branch pretended to cover. The
+    authority bundle is a frozen snapshot, not a record, so passing it to
+    `_classify_record_for_shell` returned `_VERDICT_FAIL_CLOSED` through its
+    `isinstance(record, dict)` guard. That is a type check, not a decision
+    about missing durable authority, and it would have passed identically
+    for a bundle, a string, or an integer.
+
+    So the case is driven the way restore.sh drives it: a replacement
+    generation that carries a selector but publishes no record, judged by
+    `_classify_rollback_for_shell(receipt_path)`.
+    """
+    transitions, _record, promote, receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+    fresh = _swap_whole_directory(transitions, OPID, "finalize",
+                                  publish_record=False)
+    assert not (fresh / f"{OPID}.json").exists(), (
+        "the no-record generation published a record")
+    assert _census(pgrec._transitions_dir()), "the selector was not published"
+
+    verdict = pgrec._classify_rollback_for_shell(str(receipt))
+    assert verdict == 4, (
+        "a generation with no durable record must fail closed, not decide")
+
+    # The refusal is for the AUTHORITY reason, not a type check: the durable
+    # record the receipt would bind to is genuinely absent at the governed
+    # coordinate, which is what _bound_operation refuses on.
+    with pytest.raises(RuntimeError) as caught:
+        pgrec._load_transition_record(OPID)
+    assert "no durable recovery operation record" in str(caught.value), (
+        "the refusal was not about missing durable authority")
+    # And the failure is a refusal, not a crash or a silent success.
+    assert verdict not in (0, 5, 6), verdict
+
 
 def test_c_oversized_record_is_refused(tmp_path):
     """C.1 An over-bound record is refused whole, before any buffer grows."""
@@ -801,6 +851,104 @@ def test_f_every_verdict_row_stays_coherent(tmp_path):
 # G. ZERO SIDE EFFECTS
 # ===================================================================== #
 
+def _census_outside(root, *excluded_names):
+    """A byte census of `root` EXCLUDING the subtree the attacker replaces.
+
+    `_census` walks the whole recovery root, which contains the governed
+    transitions directory. In the replacement proofs that directory is the
+    ATTACKER's to rewrite, so comparing it before and after measures the
+    attack rather than the engine. The attacker also leaves generation A
+    behind under `<name>.aside`, so both subtrees are excluded.
+
+    This keeps everything else -- above all the promote receipt, which lives
+    outside the transitions directory and which a decision has no licence to
+    touch.
+    """
+    excluded = set(excluded_names)
+    return {
+        name: value
+        for name, value in _census(root).items()
+        if name.split(os.sep)[0] not in excluded
+    }
+
+
+class _MutationTripwire:
+    """Record every MUTATION the engine attempts, and nothing else.
+
+    Distinguishing attacker mutations from engine mutations is the whole
+    point, and it is done structurally rather than by convention. The
+    attacker here is `_swap_whole_directory`, which runs in THIS module and
+    therefore uses the real `os`. The engine reaches the filesystem through
+    its own `pgrec.os` global, so binding that one name to a proxy separates
+    the two without any allow-list of "expected" writes: if the engine
+    unlinks, renames, replaces, truncates, chmods, links, mkdirs or opens
+    anything for writing, it is recorded -- and the attacker's identical
+    syscall through the real `os` is not.
+
+    On top of the syscall surface, the engine's own durable-write helpers
+    are wrapped, because a write performed entirely through `os.fdopen`
+    would otherwise be visible only as a helper call.
+    """
+
+    MUTATORS = frozenset({
+        "unlink", "remove", "rmdir", "removedirs", "truncate", "chmod",
+        "chown", "link", "symlink", "rename", "replace", "mkdir",
+        "makedirs", "rmtree", "write", "fsync",
+    })
+
+    WRITE_HELPERS = (
+        "_write_transition_record", "_record_transition", "_commit_receipt",
+        "_exclusive_copy", "_publish_no_replace", "_fsync_dir",
+    )
+
+    def __init__(self, engine):
+        self.engine = engine
+        self.real_os = engine.os
+        self.real_helpers = {}
+        self.mutations = []
+
+    def __enter__(self):
+        tripwire = self
+
+        class _OsProxy:
+            """Forwards everything; intercepts only the mutating names."""
+
+            def __getattr__(self, name):
+                if name in tripwire.MUTATORS:
+                    def intercepted(*args, **kwargs):
+                        tripwire.mutations.append(
+                            ("os." + name, [str(a) for a in args[:2]]))
+                        return getattr(tripwire.real_os, name)(*args, **kwargs)
+                    return intercepted
+                return getattr(tripwire.real_os, name)
+
+        self.engine.os = _OsProxy()
+        for name in self.WRITE_HELPERS:
+            real = getattr(self.engine, name, None)
+            if real is None:
+                continue
+            self.real_helpers[name] = real
+
+            def make(name=name, real=real):
+                def intercepted(*args, **kwargs):
+                    tripwire.mutations.append(
+                        (name, [str(a) for a in args[:2]]))
+                    return real(*args, **kwargs)
+                return intercepted
+
+            setattr(self.engine, name, make())
+        return self
+
+    def __exit__(self, *exc_info):
+        self.engine.os = self.real_os
+        for name, real in self.real_helpers.items():
+            setattr(self.engine, name, real)
+        return False
+
+    def kinds(self):
+        return [kind for kind, _args in self.mutations]
+
+
 def test_g_a_denied_authority_mutates_nothing(tmp_path):
     """G.1 A replacement is refused or fully pinned, and never mutates.
 
@@ -811,15 +959,44 @@ def test_g_a_denied_authority_mutates_nothing(tmp_path):
     changed the directory the coordinate names. On POSIX it does not need to:
     a pinned descriptor keeps naming the admitted generation even after the
     directory is renamed away, so the decision completes coherently on
-    generation A. Neither path may accept a mixed generation, and neither may
-    write anything.
+    generation A.
+
+    What this used to prove was weaker than its name. It compared only the
+    resulting FILENAME SET, after the attacker had already replaced the whole
+    directory, and its `fingerprint` loop variable was bound and then never
+    asserted. A census of names cannot see a truncate, an in-place rewrite,
+    a receipt edited outside the transitions directory, or a temporary file
+    that was created and then removed again -- and generation B
+    legitimately republishes the same two coordinates, so the comparison was
+    comparing the attacker's work, not the engine's.
+
+    So the mutation claim is now an executable tripwire. `_MutationTripwire`
+    binds the ENGINE's `os` global and its durable-write helpers, and nothing
+    else: the attacker's rename/mkdir/chmod run through the real `os` in this
+    module and are structurally unobservable to it. Zero recorded mutations
+    therefore means zero engine mutations, not "the names look unchanged".
     """
-    transitions, _record, promote, _receipt = _build(
+    transitions, _record, promote, receipt = _build(
         tmp_path, "PROMOTED", "rollback")
-    before = _census(pgrec._transitions_dir())
-    outcome, bundle = _capture(
-        pgrec, OPID, promote,
-        lambda: _swap_whole_directory(transitions, OPID, "finalize"))
+    # The authority artifacts that live OUTSIDE the replaced directory, so
+    # an edit to the promote receipt cannot hide behind the attacker's swap.
+    outside_before = _census_outside(
+        receipt.parent, transitions.name, transitions.name + ".aside")
+    census_before = _census(pgrec._transitions_dir())
+
+    with _MutationTripwire(pgrec) as trip:
+        # A tripwire that silently failed to install would report zero
+        # mutations and look exactly like a clean run, so prove it is LIVE:
+        # the engine is currently routed through the proxy, not the real os.
+        assert pgrec.os is not trip.real_os, (
+            "the mutation tripwire was not installed on the engine")
+        assert pgrec._write_transition_record is not trip.real_helpers[
+            "_write_transition_record"], (
+            "the durable-write helper tripwire was not installed")
+        outcome, bundle = _capture(
+            pgrec, OPID, promote,
+            lambda: _swap_whole_directory(transitions, OPID, "finalize"))
+
     if outcome == "acquired":
         # A coherent pin to the OLD generation is a legal result, not a
         # defect, so it is accepted -- but only once the bundle is shown to be
@@ -833,21 +1010,173 @@ def test_g_a_denied_authority_mutates_nothing(tmp_path):
             assert bundle.record.get("operation_id") == OPID
     else:
         assert isinstance(bundle, pgrec._ExecutionAuthorityConflict), bundle
+
+    assert trip.mutations == [], (
+        "the engine mutated durable authority during a read-only decision: "
+        f"{trip.mutations!r}")
+
+    # The census still has a job, but a smaller one: it proves the attacker's
+    # replacement did not smuggle in a coordinate the engine invented, and
+    # it is taken against the pre-swap census rather than against itself.
     after = set(_census(pgrec._transitions_dir()))
-    # The directory replacement is the ATTACKER's doing and is not an engine
-    # mutation, so the governed NAME SET is compared rather than the bytes:
-    # generation B legitimately republishes the same two coordinates. What
-    # must not appear is any coordinate the engine invented, and the receipt
-    # (which lives outside the transitions directory) must be untouched.
-    assert after - set(before) == set(), (
-        f"the engine created governed files: {sorted(after - set(before))}")
-    for name, fingerprint in _census(pgrec._transitions_dir()).items():
-        assert name in before, f"ungoverned write: {name}"
+    assert after - set(census_before) == set(), (
+        f"the engine created governed files: {sorted(after - set(census_before))}")
+
+    # Byte-identical authority outside the replaced directory. The receipt
+    # lives here, and the attacker's swap does not touch it, so this is a
+    # real comparison rather than a restatement of the attack.
+    assert _census_outside(
+        receipt.parent, transitions.name,
+        transitions.name + ".aside") == outside_before, (
+        "an authority artifact outside the replaced directory changed")
+    assert (receipt.parent / "promote-receipt.json").exists()
+
+
+def test_g_a_the_mutation_tripwire_detects_a_real_engine_mutation(tmp_path):
+    """G.2 A tripwire nobody has seen fire is not evidence.
+
+    So the tripwire is required to fire, on a mutation the ENGINE makes:
+    `_write_transition_record` is the production publisher of the durable
+    transition record, and calling it directly performs a genuine write,
+    a genuine os.replace and a genuine os.chmod through `pgrec.os`.
+    """
+    transitions, record, promote, _receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+
+    with _MutationTripwire(pgrec) as trip:
+        assert trip.mutations == []
+        record["state"] = "PROMOTED"
+        pgrec._write_transition_record(OPID, record)
+        assert trip.mutations, (
+            "the tripwire did not fire on a real engine write; every "
+            "zero-mutation assertion built on it would be vacuous")
+        kinds = trip.kinds()
+        assert "_write_transition_record" in kinds, kinds
+        # The syscall layer is wired too, not just the helper layer: the
+        # engine's own durability primitives must appear.
+        assert any(kind.startswith("os.") for kind in kinds), kinds
+
+    # And it disarms cleanly, so a later test cannot inherit a live proxy.
+    recorded = len(trip.mutations)
+    pgrec._write_transition_record(OPID, record)
+    assert len(trip.mutations) == recorded, "the tripwire stayed armed"
+    assert pgrec.os is trip.real_os
+
+
+# The size bound the denial proof depends on. Both the BEFORE-read and the
+# DURING-read comparison are anchored, each asserted to occur exactly once,
+# so a drifted engine makes the control fail loudly instead of quietly
+# rebuilding the shipped engine and proving nothing.
+RECORD_SIZE_ANCHORS = (
+    ("        if first.st_size > _RECORD_MAX_BYTES:",
+     "        if False and first.st_size > _RECORD_MAX_BYTES:"),
+    ("            if total > _RECORD_MAX_BYTES:",
+     "            if False and total > _RECORD_MAX_BYTES:"),
+)
+
+
+def _unbounded_record_engine(tmp_path):
+    """A copy of the engine with the record size bound removed."""
+    source = CLI.read_text(encoding="utf-8")
+    for old, new in RECORD_SIZE_ANCHORS:
+        assert source.count(old) == 1, (
+            f"the record size anchor is stale or ambiguous: {old!r} occurs "
+            f"{source.count(old)} times")
+        source = source.replace(old, new)
+    path = Path(tmp_path) / "unbounded-record-pg-recovery.py"
+    path.write_text(source, encoding="utf-8")
+    compile(source, str(path), "exec")
+    return path
+
+
+def _oversized_record(transitions, record):
+    """Publish a CANONICAL record above `_RECORD_MAX_BYTES`.
+
+    Valid JSON on purpose. A record that is merely invalid JSON would be
+    refused by the parser, and the refusal would prove nothing about the
+    size bound.
+    """
+    padded = dict(record)
+    padded["_oversize_padding"] = "x" * (pgrec._RECORD_MAX_BYTES + 4096)
+    path = transitions / f"{OPID}.json"
+    path.write_bytes(_bytes(padded))
+    os.chmod(path, 0o600)
+    return path
 
 
 def test_g_an_oversized_record_denial_is_inert(tmp_path):
-    transitions, _record, promote, _receipt = _build(
+    """G.3 An actually oversized record is refused, and nothing moves.
+
+    This test used to build a NORMAL record, call acquisition, and assert
+    only that the census was unchanged -- so acquisition SUCCEEDED, the
+    oversized case was never exercised, and a rename of the test would have
+    kept passing. The name described an event that did not occur.
+    """
+    transitions, record, promote, receipt = _build(
         tmp_path, "PROMOTED", "rollback")
-    before = _census(pgrec._transitions_dir())
-    pgrec._acquire_recovery_authority(OPID, promote)   # absent/oversized shape
-    assert _census(pgrec._transitions_dir()) == before
+    path = _oversized_record(transitions, record)
+    assert path.stat().st_size > pgrec._RECORD_MAX_BYTES, (
+        "the fixture is not actually oversized")
+    # The governed coordinate and the required permissions are preserved, so
+    # the ONLY thing wrong with this record is its size.
+    assert path.name == f"{OPID}.json"
+    if os.name != "nt":
+        assert (path.stat().st_mode & 0o777) == 0o600
+
+    census_before = _census(pgrec._transitions_dir())
+    outside_before = _census(receipt.parent)
+
+    with _MutationTripwire(pgrec) as trip:
+        bundle = pgrec._acquire_recovery_authority(OPID, promote)
+        # The public classification routes must fail closed too, and must not
+        # reach a decision from the bytes that were on disk.
+        direct = pgrec._classify_record_for_shell(record, promote)
+        shell = pgrec._classify_rollback_for_shell(str(receipt))
+
+    # The oversized record is refused, whole.
+    assert bundle.record is None, "an oversized record was admitted"
+    assert bundle.record_snapshot.present is False
+    assert bundle.record_digest is None
+    # No truncated record is admitted: the refusal is RECORDED on the
+    # snapshot, and no digest binds the bytes that were on disk.
+    assert bundle.record_snapshot.read_error, (
+        "the oversized record was not recorded as refused: "
+        f"{bundle.record_snapshot}")
+    # No downstream decision uses partial bytes.
+    assert direct == 4, f"the direct route decided on an oversized record: {direct}"
+    assert shell == 4, f"the shell route decided on an oversized record: {shell}"
+    # And the engine wrote nothing to make any of that true.
+    assert trip.mutations == [], f"the denial mutated authority: {trip.mutations!r}"
+
+    # Every governed artifact -- record, claim, receipt, any temporary --
+    # byte-identical. Nothing created, removed, replaced or rewritten.
+    assert _census(pgrec._transitions_dir()) == census_before
+    assert _census(receipt.parent) == outside_before
+
+
+def test_g_an_oversized_control_becomes_reachable_without_the_bound(
+        tmp_path):
+    """G.4 Without the size bound, the oversized record IS admitted.
+
+    The denial proof in G.3 is only meaningful if the bound is what refuses
+    the record. This control removes both size comparisons from a copy of
+    the shipped engine and requires the same record to become observably
+    reachable, so a green G.3 means "the bound held", not "the test setup
+    happened to be refused for some other reason".
+    """
+    transitions, record, promote, _receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+    path = _oversized_record(transitions, record)
+    assert path.stat().st_size > pgrec._RECORD_MAX_BYTES
+
+    weak = _import(_unbounded_record_engine(tmp_path), "r48r3_g_oversized_weak")
+    weak._bind_test_recovery_root(str(transitions.parents[0]))
+
+    bundle = weak._acquire_recovery_authority(OPID, promote)
+    assert bundle.record is not None, (
+        "removing the record size bound did not make the oversized record "
+        "reachable, so the denial proof discriminates nothing")
+    assert bundle.record.get("_oversize_padding"), (
+        "the admitted record is not the oversized one")
+    assert bundle.record_snapshot.present is True
+    assert bundle.record_digest, "an admitted record must bind a digest"
