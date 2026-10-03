@@ -2414,3 +2414,111 @@ NEXT = operator decision on GAP-7 shape (7A-KERNEL / 7B-COMPARISON-LOCAL / HOLD)
        plus status-semantics option (A / B / C) if 7A is chosen.
        GAP-6 ratification remains NOT authorized and stays on hold.
 ```
+
+---
+
+## PROPOSED ENTRY — `BOOK6-GAP7-v0.2` — NOT A DECISION
+
+**Recorded:** 2026-10-03
+**Type:** PROPOSED GOVERNANCE CLOSURE / IMPLEMENTATION-READINESS PACKAGE.
+Ratified by no one. Decided by no one.
+**Authorized scope:** `GAP-7 GOVERNANCE CLOSURE / IMPLEMENTATION-READINESS PLANNING` ONLY.
+
+**Package:**
+
+```text
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_CLARIFICATION_v0.1.md
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_TEST_SPEC_v0.1.md
+CSIA_BOOK_6_GAP7_PRE_RATIFICATION_REVIEW_v0.1.md
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_DECISION_PACKET_v0.2.md
+```
+
+**Supersedes (not withdrawn):**
+`CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_DECISION_PACKET_v0.1.md` — its
+evidence stands; 7B is no longer offered because the global impact still stands.
+
+```text
+GAP_7 = OPEN
+
+RECOMMENDED = 7A-KERNEL + STATUS B-STRICT
+              recommendation only; operator decides
+
+SINGLE_MEANING_OF_CURRENT                   = TRUE
+COMPARISON_LOCAL_CURRENTNESS                = PROHIBITED
+OBSERVATION_STATUS_IS_CURRENTNESS_AUTHORITY = FALSE
+OBSERVATION_STATUS_NOT_AUTHORITY_BEARING    = TRUE
+SUPERSESSION_CURRENTNESS_SOURCE             = REGISTERED LINEAGE TERMINALITY
+TERMINALITY                                 = STRUCTURAL PROPERTY OF REGISTERED LINEAGE
+SUPERSEDED_PREDECESSOR_NEVER_RESURRECTS     = TRUE
+MULTIPLE_SUCCESSOR_LINEAGE                  = INVALID (fail closed)
+
+NON_VALUE_BEARING_AUTHORITY = NV-A  (RESOLVED from accepted doctrine)
+```
+
+**Why NV-A is a clarification, not an invention.** All eight non-value-bearing
+states were measured to REGISTER and RESOLVE with `source_claim_refs=()`.
+`book6_records.py:152-155` requires cited refs only inside the
+`VALUE_BEARING_MISSINGNESS` branch, and
+`test_book6_missingness.py:111` registers a `NOT_COLLECTED` record with
+`claim_refs=()` and asserts only that `current_value` refuses. NV-A is the
+already-accepted behaviour, written down. NV-B would be a new policy and is
+surfaced separately in packet v0.2 section 5.1.
+
+**Correction recorded to the audit brief.** The Phase 12 instruction stated that a
+non-value-bearing record citing a decayed Book 2 claim already behaved correctly.
+It does not. Measured: `is_value_bearing=False`, `source_claim_refs=('...a',)`,
+cited claim decayed to `STALE`, `is_authoritative_now = True`; the value-bearing
+control with identical decay returns `False`. The early return at
+`book6_registry.py:203` is gated on `is_value_bearing` alone, not on
+`source_claim_refs`, so the bypass is broader than first recorded and defeats
+cited Book 2 authority too.
+
+```text
+GAP_6_6E_TEMPORAL_DESIGN   = VALID
+GAP_6_RATIFICATION         = HOLD_PENDING_GAP7_RATIFICATION
+PRE_RAT_7_v0.1             = 15 / 15 PASS
+GAP_7_PRE_RAT_15_15        = PASS (review verdict, NOT an authorization)
+TEST_SPEC_v0.1_CASES       = 24  (15 carried + 9 added)
+TEST_SPEC_IMPLEMENTED      = 0
+```
+
+**Untracked tooling present, outside this authorization, not deleted:**
+
+```text
+quant-lab/research/crypto_systems_intelligence_atlas/CSIA_DEFECT_CLASS_SWEEP_v0.1.md
+quant-lab/research/crypto_systems_intelligence_atlas/CSIA_RUNTIME_GROUNDING_CHECK_FINDINGS_v0.1.md
+tools/csia_defect_class_sweep.py
+tools/csia_grounding_check.py
+tools/csia_grounding_manifest.json
+tools/csia_ratified_corpus.py
+UNTRACKED_PRIOR_TOOLING = 6 files, PRESENT, NOT COMMITTED, NOT DELETED
+```
+
+**Unchanged by this entry:**
+
+```text
+BOOK6-COMPARE-SUBSTRATE-v0.2    = RATIFIED, STANDS
+GAP_1..GAP_5                    = CLOSED
+GAP_6_6E                        = DESIGN VALID / RATIFICATION ON HOLD
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+CHOIR_PLAN_PRESERVED            = TRUE
+ACCEPTED_BOOK_6_ANCHOR          = 5f94c3f40cea4441470c57671f51454da7377361
+```
+
+**Not authorized and not performed:** GAP-6 ratification; GAP-7 ratification; any
+implementation; any source edit; any test code; any `ObservationStatus` rename,
+deletion, reinterpretation or validator change; any `ObservationStatus` authority;
+any predecessor mutation; any predecessor resurrection; any comparison-local
+currentness; any non-value-bearing early authority bypass; any invented
+source-less missingness policy; any definition versioning; any reopening of
+GAP-1..GAP-5; any reversal of `BOOK6-COMPARE-SUBSTRATE-v0.2`; any Choir proof
+work; force-push; rebase; amend; history rewrite.
+
+```text
+NEXT = operator decision on BOOK6-GAP7-v0.2
+       (RATIFY_7A_KERNEL_WITH_STATUS_B_STRICT / HOLD), optionally confirming
+       NV-A over NV-B. Implementation remains a SEPARATE later decision.
+       GAP-6 ratification stays NOT authorized.
+```
