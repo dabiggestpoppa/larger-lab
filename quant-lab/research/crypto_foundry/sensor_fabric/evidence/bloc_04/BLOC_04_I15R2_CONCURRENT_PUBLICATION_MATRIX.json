@@ -1,0 +1,145 @@
+{
+  "cases": [
+    {
+      "case_id": "baseline_reproduction_at_start_head",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "at the mandatory I15R2 start head 67fd2271a4137403d68c236e3e46dc2a97528389, 8 barrier-started identical writers on one LocalBlobStore failed in 7/15 trials with two fail-closed classes: a false UnsafeObjectKey from raw Path.resolve() Windows extended-length prefix instability, and ValueError('components must be nonempty') from the ensure_durable_directory walk-up race (§1)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "failure_classes": {
+          "ATOMIC_PUBLISH_SECURITY_ERROR": 0,
+          "OTHER": 0,
+          "UNSAFE_OBJECT_KEY": 12,
+          "VALUE_ERROR_COMPONENTS_EMPTY": 4
+        },
+        "green_trials": 8,
+        "head": "67fd2271a4137403d68c236e3e46dc2a97528389",
+        "red_trials": 7,
+        "total_workers": 120,
+        "trials": 15,
+        "writers_per_trial": 8
+      },
+      "result": "RED_AT_START_HEAD"
+    },
+    {
+      "case_id": "directory_create_race_reproduced",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the pre-I15R2 walk-up raises ValueError('components must be nonempty') when another writer creates the complete target chain between the entry-guard probe and the walk-up probe; the counterfactual re-executes the verbatim pre-repair logic to prove the seal is earned by the repair (§8)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "counterfactual_raises": true,
+        "exception": "ValueError: components must be nonempty",
+        "sleeps_used": 0
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "directory_create_race_idempotent",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "concurrent creation of the SAME valid directory succeeds: the target is re-checked and returned as a plain directory, and the chain builder is never called with empty components (§9)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "empty_components_calls": 0,
+        "seam_repair_returns_target": true,
+        "sleeps_used": 0,
+        "threaded_peer_created_chain": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "directory_race_onto_link_or_file_fails_closed",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the benign direction is only tolerated towards an existing PLAIN directory; a link or a file appearing at the target is refused typed and left untouched (§9/§10)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "conflicting_object_removed": false,
+        "file_refused": true,
+        "link_refused": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "name_max_probe_race_fails_closed",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a vanishing probed parent fails closed with DurabilityUnsupported and creates nothing; no guessed 255 fallback is introduced, and the parent identity is revalidated around the probe (§11)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "guessed_fallback_used": false,
+        "identity_revalidated": true,
+        "vanished_parent_raises": "DurabilityUnsupported"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "identical_writer_stress_after_repair",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "100 trials x 8 barrier-started identical writers on one LocalBlobStore per trial: every trial is exactly 1 COMMITTED_NEW, 7 REUSED_EXISTING, 0 unexpected exceptions, 1 final immutable object, final hash verified (§4/§13)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "atomic_publish_security_error": 0,
+        "committed_new_total": 100,
+        "failure_classes": {},
+        "final_object_count_violations": 0,
+        "green_trials": 100,
+        "hash_violations": 0,
+        "red_trials": 0,
+        "reused_existing_total": 700,
+        "trials": 100,
+        "unexpected_exceptions": 0,
+        "unsafe_object_key": 0,
+        "value_error_components_empty": 0,
+        "writers_per_trial": 8
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "distinct_writer_stress_after_repair",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "8 concurrent DISTINCT payloads per trial: every expected SHA appears exactly once as a durable content identity, no crosstalk, all hashes verify — the repair is not overfit to the same-hash race (§14)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "crosstalk": 0,
+        "each_sha_exactly_once": true,
+        "hash_failures": 0,
+        "security_false_positives": 0,
+        "trials": 5,
+        "writers_per_trial": 8
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "same_hash_final_race_law",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a benign same-hash publication-race loser raises AtomicPublishTargetExists (verify winner -> REUSED_EXISTING) and is never converted into a generic security refusal (§16)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "loser_exception": "AtomicPublishTargetExists",
+        "security_refusals": 0,
+        "winner_intact": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "worker_exception_capture",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "every worker ends in exactly one of COMMITTED_NEW / REUSED_EXISTING / EXPECTED_TYPED_SECURITY_REFUSAL / UNEXPECTED_EXCEPTION, and its exception is collected explicitly rather than surfacing as an unhandled thread warning (§3)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "barrier_start": true,
+        "exception_capture": "explicit_try_except_per_worker",
+        "outcomes_declared": 4,
+        "unhandled_thread_exceptions": 0
+      },
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I15R2",
+  "platform": {
+    "machine": "AMD64",
+    "os_name": "nt",
+    "python": "3.11.9",
+    "release": "10",
+    "system": "Windows"
+  },
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

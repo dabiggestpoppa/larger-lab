@@ -301,6 +301,15 @@ OP_FINAL_PARENT_FSYNC = "final_parent_fsync"
 
 ComponentValidator = Callable[[str, int], str]
 
+#: Existence probe used by the walk-up in :func:`ensure_durable_directory`.
+#: Injected so §8's concurrent-creation interleaving can be driven
+#: deterministically without a sleep; production always uses ``Path.exists``.
+ExistsProbe = Callable[[Path], bool]
+
+
+def _path_exists(candidate: Path) -> bool:
+    return candidate.exists()
+
 
 def ensure_durable_directory_chain(
     base: str | Path,
@@ -368,7 +377,40 @@ def ensure_durable_directory_chain(
             continue
         # Validate BEFORE creating, using the limit of the EXISTING parent
         # (I03R1 §18) — never a probe of a directory that does not exist yet.
-        validator(component, name_max_probe(current))
+        #
+        # SENSOR-B4-I15R2 (§11): the probe is a filesystem observation, so the
+        # directory it is taken against is revalidated as the SAME plain
+        # directory immediately before and after.  If it was replaced, turned
+        # into a link, or vanished, the limit it reported cannot be attributed
+        # to the parent about to receive the new name, and the operation fails
+        # CLOSED.  No guessed fallback is ever substituted for filesystem
+        # truth (the I03 law).
+        parent_identity = _file_identity(current)
+        if current.is_symlink() or not current.is_dir():
+            raise AtomicPublishError(
+                f"namespace component {current!s} changed identity before the "
+                "component-limit probe; fail closed, NOT probed or replaced"
+            )
+        limit = name_max_probe(current)
+        if current.is_symlink() or not current.is_dir():
+            raise AtomicPublishError(
+                f"namespace component {current!s} changed identity during the "
+                "component-limit probe; fail closed, NOT probed or replaced"
+            )
+        try:
+            if _file_identity(current) != parent_identity:
+                raise AtomicPublishError(
+                    f"namespace component {current!s} was replaced while its "
+                    "component limit was being probed; fail closed, NOT "
+                    "probed or replaced"
+                )
+        except OSError as exc:
+            raise AtomicPublishError(
+                f"namespace component {current!s} disappeared while its "
+                f"component limit was being probed ({exc}); fail closed, NOT "
+                "probed or replaced"
+            ) from exc
+        validator(component, limit)
         try:
             child.mkdir()
         except FileExistsError:
@@ -403,6 +445,7 @@ def ensure_durable_directory(
     name_max_probe: NameMaxProbe = default_name_max,
     dir_fsync: Callable[[Path], None] | None = None,
     ops: OpRecorder | None = None,
+    exists_probe: ExistsProbe | None = None,
 ) -> Path:
     """Durably create ``target`` and any missing ancestors below an existing one.
 
@@ -411,9 +454,20 @@ def ensure_durable_directory(
     component via ``ensure_durable_directory_chain``.  If the deepest existing
     ancestor is not a plain directory, the operation FAILS CLOSED — nothing
     is deleted or replaced.
+
+    SENSOR-B4-I15R2 (§9/§10): the walk-up tolerates topology moving in the
+    benign direction only.  A component that transitions from MISSING to an
+    existing PLAIN DIRECTORY while the walk is in progress is accepted and the
+    walk continues; a component that becomes a symlink or a file fails closed
+    and is left untouched.
+
+    ``exists_probe`` is a test seam that lets §8's interleaving be driven
+    deterministically without a sleep.  Production passes nothing and uses
+    ``Path.exists``.
     """
     target_path = Path(target)
-    if target_path.exists():
+    exists = exists_probe if exists_probe is not None else _path_exists
+    if exists(target_path):
         # Already present: the durability boundary here is publication-time
         # parent fsync, not creation.  A non-directory fails closed.
         if target_path.is_symlink() or not target_path.is_dir():
@@ -424,7 +478,7 @@ def ensure_durable_directory(
         return target_path
     missing: list[str] = []
     current = target_path
-    while not current.exists():
+    while not exists(current):
         missing.append(current.name)
         parent = current.parent
         if parent == current:  # pragma: no cover - filesystem-root guard
@@ -432,6 +486,29 @@ def ensure_durable_directory(
                 f"no existing ancestor found for {target_path!s}"
             )
         current = parent
+    if not missing:
+        # SENSOR-B4-I15R2 (§9): the walk-up observed the target EXISTING even
+        # though the entry guard above saw it ABSENT — another writer created
+        # the COMPLETE chain inside that window.  That is the benign direction
+        # of the race, so it is idempotent: re-check the target and return it.
+        #
+        # Calling ``ensure_durable_directory_chain`` with an empty component
+        # list here is what raised
+        # ``ValueError("components must be nonempty")`` for a legitimate
+        # concurrent creation, and ``LocalBlobStore.put`` surfaced it as an
+        # unexpected failure of an ordinary safe write.  Correctness comes
+        # from idempotent creation, never from a retry loop (§25).
+        #
+        # Only an existing PLAIN DIRECTORY is accepted.  A symlink, a file or
+        # any other object appearing at the target is the non-benign direction
+        # and still fails closed, untouched.
+        if target_path.is_symlink() or not target_path.is_dir():
+            raise AtomicPublishError(
+                f"namespace component {target_path!s} appeared during a "
+                "concurrent creation race and is not a plain directory; fail "
+                "closed, NOT removed or replaced"
+            )
+        return target_path
     if current.is_symlink() or not current.is_dir():
         raise AtomicPublishError(
             f"deepest existing ancestor {current!s} of {target_path!s} is not "
