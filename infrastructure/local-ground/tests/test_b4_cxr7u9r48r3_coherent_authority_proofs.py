@@ -888,10 +888,10 @@ class _MutationTripwire:
     anything for writing, it is recorded -- and the attacker's identical
     syscall through the real `os` is not.
 
-    COVERAGE. The audited surface is enumerated by `_reachable_write_channels`,
-    which is the same closure the non-vacuity controls execute against, so the
-    claim below is anchored to a computation rather than to a reading of the
-    source. Three kinds of channel are covered:
+    COVERAGE. The audited surface is enumerated by the closed-world
+    call-site audit in `_audit_source`/`_assert_closed_world`,
+    which classifies EVERY reachable call site and fails closed on an
+    unrecognised one. Three kinds of channel are covered:
 
     1. `os.<name>` for the unconditionally-mutating names in `MUTATORS`.
     2. `os.open`/`os.fdopen`/builtin `open` -- CONDITIONAL on the flags or
@@ -1215,25 +1215,247 @@ def _engine_open_writer(engine, path):
 # The authority decision path this gate proves read-only. Every reachability
 # question below is asked of exactly these three functions, because they are
 # the ones `_MutationTripwire` is installed around.
+
+# ===================================================================== #
+# I. CLOSED-WORLD CALL-SITE AUDIT (B4-CXR7U9R48X6)
+# ===================================================================== #
+
+# X5 discovered mutation channels by ALLOWLIST: a call was reported only if
+# its rendered spelling matched a selected os/tempfile/shutil/builtin list,
+# and anything else was silently ignored. Measured on this engine, X5
+# recognised 2 of 59 distinct external callees reachable from the authority
+# entry points and ignored the other 57 -- 194 call sites. An injected
+# `Path(target).write_text(...)` inside a reachable function therefore
+# vanished from the audited set while H.1, H.2 and H.7 all stayed green.
+#
+# The audit below is closed-world in the only sense a static analysis can be:
+# EVERY reachable call site is assigned exactly one classification, and a
+# call matching no registry entry becomes UNKNOWN_OR_DYNAMIC, which fails the
+# proof. A new attribute call can no longer disappear; it can only be
+# reviewed and admitted.
+
 AUTHORITY_ENTRY_POINTS = (
     "_acquire_recovery_authority",
     "_classify_record_for_shell",
     "_classify_rollback_for_shell",
 )
 
-# Unconditional os.* mutators.
-_UNCONDITIONAL_OS = frozenset({
-    "unlink", "remove", "rmdir", "removedirs", "truncate", "chmod", "chown",
-    "link", "symlink", "rename", "replace", "mkdir", "makedirs", "rmtree",
-    "write", "fsync",
+CLASS_INTERNAL = "INTERNAL_CALL"
+CLASS_READ_ONLY = "PROVEN_READ_ONLY_OR_PURE"
+CLASS_MUTATION = "INSTRUMENTED_MUTATION_CHANNEL"
+CLASS_UNKNOWN = "UNKNOWN_OR_DYNAMIC"
+
+CLASSIFICATIONS = (CLASS_INTERNAL, CLASS_READ_ONLY, CLASS_MUTATION,
+                   CLASS_UNKNOWN)
+
+
+class _ClassifiedCall:
+    """One reachable call site, classified exactly once."""
+
+    __slots__ = ("owner", "lineno", "col", "callee", "classification",
+                 "observer")
+
+    def __init__(self, owner, lineno, callee, classification, observer=None,
+                 col=0):
+        self.owner = owner
+        self.lineno = lineno
+        self.col = col
+        self.callee = callee
+        self.classification = classification
+        self.observer = observer
+
+    @property
+    def identity(self):
+        """Stable identity: owner + rendered callee + line + column.
+
+        Line alone is NOT sufficient: `pg-recovery.py:2518` reads
+            and _receipt_digest(record) != _receipt_digest(admitted_record):
+        and calls the same callee twice on one line. The column offset
+        separates them, so the uniqueness assertion in `_assert_closed_world`
+        is a real check rather than a formality. A shifted line or column
+        changes the identity string; it never silently re-binds.
+        """
+        return f"{self.owner}|{self.callee}|{self.lineno}:{self.col}"
+
+    def as_row(self):
+        return (f"{self.owner}:{self.lineno}:{self.col} {self.callee} "
+                f"{self.classification} observer={self.observer or '-'}")
+
+    def __repr__(self):  # pragma: no cover - diagnostics only
+        return f"<{self.identity} {self.classification}>"
+
+
+# Reviewed registry of external calls that provably do not mutate the
+# filesystem on the authority decision path. This is a REVIEWED list, not a
+# heuristic: entries are admitted deliberately and anything absent is
+# UNKNOWN_OR_DYNAMIC. Justifications, at the level the classifier can
+# actually guarantee:
+#   * os.stat / os.fstat / os.lstat -- metadata read, no write descriptor;
+#   * os.read / os.close -- consume or close an ALREADY OPEN descriptor;
+#   * os.scandir / os.listdir -- enumeration;
+#   * os.path.* / os.environ.get -- pure string or environment reads;
+#   * stat.S_* -- pure mode-bit predicates;
+#   * get/items/startswith/endswith/strip/split/join/encode/decode/match/
+#     hexdigest -- in-memory operations on already-admitted values;
+#   * append/update/copy -- mutate IN-MEMORY containers only;
+#   * json.* / hashlib.* -- pure (de)serialisation and hashing;
+#   * constructors, predicates and aggregation builtins.
+#
+# The boundary this registry does NOT cross: it says nothing about code
+# paths outside the authority closure, and it does not assert that a
+# reviewed call is safe in general -- only that it performs no filesystem
+# mutation at these call sites.
+READ_ONLY_REGISTRY = frozenset({
+    "os.stat", "os.fstat", "os.lstat",
+    "os.read", "os.close",
+    "os.scandir", "os.listdir",
+    "os.path.abspath", "os.path.basename", "os.path.commonpath",
+    "os.path.dirname", "os.path.isdir", "os.path.isfile", "os.path.join",
+    "os.path.realpath", "os.path.samefile", "os.path.split",
+    "os.path.exists", "os.path.lexists", "os.path.relpath",
+    "os.environ.get", "os.getenv",
+    "stat.S_IMODE", "stat.S_ISDIR", "stat.S_ISREG", "stat.S_ISLNK",
+    "get", "items", "keys", "values", "startswith", "endswith", "strip",
+    "lstrip", "rstrip", "split", "rsplit", "splitlines", "join", "replace",
+    "encode", "decode", "match", "search", "fullmatch", "hexdigest",
+    "update", "copy", "count", "find", "format", "casefold", "lower",
+    "upper", "isidentifier", "append",
+    # os.DirEntry.stat -- metadata read on a directory entry; opens no
+    # descriptor for writing and cannot mutate the tree.
+    "stat",
+    "json.dumps", "json.load", "json.loads",
+    "hashlib.sha256", "hashlib.sha1", "hashlib.md5", "hashlib.new",
+    "len", "bool", "int", "str", "bytes", "float", "tuple", "list", "dict",
+    "set", "frozenset", "sorted", "any", "all", "isinstance", "issubclass",
+    "type", "repr", "range", "enumerate", "zip", "min", "max", "sum", "abs",
+    "divmod", "round", "hasattr", "getattr", "id", "hash", "iter", "next",
+    "callable", "chr", "ord",
+    "RuntimeError", "ValueError", "TypeError", "OSError", "Exception",
+    "NotImplementedError", "StopIteration",
+    "_FrozenDict", "_STATE_DISPATCH",
+})
+
+# In-memory snapshot construction, reviewed and admitted separately so the
+# reason for admission stays legible next to the registry.
+PURE_CONSTRUCTORS = frozenset({
+    "RecordSnapshot", "SelectorSnapshot", "RecoveryAuthoritySnapshot",
+})
+
+# Bare LOCAL names that hold a value looked up from a dispatch table. The
+# callee is therefore not statically knowable from the spelling alone, and a
+# bare name could in principle hold anything -- so admission is conditional
+# on an executable proof, not on the name: `_assert_dispatch_is_pure`
+# (test I.G) asserts that every value of the engine's `_STATE_DISPATCH` is a
+# function DEFINED BY THE ENGINE, and each such handler's own body is audited
+# by the closure walk because it is itself reachable.
+#
+# If the engine ever dispatched to a non-engine callable under one of these
+# names, I.G fails and this admission is withdrawn with it.
+REVIEWED_DISPATCH_LOCALS = frozenset({"handler"})
+
+
+def _qualified_callee(call):
+    """Render `a.b.c(...)` as 'a.b.c'; a bare name as itself."""
+    parts = []
+    node = call.func
+    while isinstance(node, ast.Attribute):
+        parts.append(node.attr)
+        node = node.value
+    if isinstance(node, ast.Name):
+        parts.append(node.id)
+    return ".".join(reversed(parts)) if parts else None
+
+
+def _observer_for(callee):
+    """Map a mutation channel to the tripwire observer that would catch it.
+
+    Returns None when a channel is not observed, which is exactly the
+    condition the proof must refuse to tolerate.
+    """
+    head, _, attr = callee.rpartition(".")
+    if head == "os":
+        if attr in _MutationTripwire.MUTATORS:
+            return f"os.{attr}"
+        if attr == "open":
+            return "os.open (write-capable flags only)"
+        if attr == "fdopen":
+            return "os.fdopen (write-capable mode only)"
+    if head == "tempfile" and attr in _MutationTripwire.TEMPFILE_MUTATORS:
+        return f"tempfile.{attr}"
+    if head == "shutil" and attr in _MutationTripwire.SHUTIL_MUTATORS:
+        return f"shutil.{attr}"
+    if callee == "open":
+        return "builtins.open (write-capable mode, engine-frame only)"
+    return None
+
+
+# Modules whose attribute names are NOT bare method names. Anything with one
+# of these heads is matched on the FULL dotted spelling only, so a registry
+# entry like "open" can never admit `shutil.open` or `io.open`.
+QUALIFIED_MODULES = frozenset({
+    "os", "os.path", "tempfile", "shutil", "stat", "json", "hashlib", "io",
+    "subprocess", "sys", "fcntl", "msvcrt", "pathlib",
 })
 
 
-def _engine_source():
-    return Path(pgrec.__file__).read_text(encoding="utf-8")
+def _classify_call(owner, call, engine_definitions):
+    """Assign exactly one classification to a single reachable call site.
+
+    Matching order matters and is deliberate:
+      1. no renderable callee            -> UNKNOWN (dynamic call)
+      2. maps to a tripwire observer      -> MUTATION
+      3. defined in this module           -> INTERNAL (the closure walk
+                                            audits its own body separately)
+      4. explicitly reviewed constructor  -> READ_ONLY
+      5. reviewed READ_ONLY registry      -> READ_ONLY
+      6. anything else                    -> UNKNOWN, which fails the proof
+
+    A METHOD call is matched on its bare attribute name only when the
+    receiver is not a known module, so `record.get` is reviewed as the
+    reviewed operation "get", while `os.open` can never be admitted by the
+    bare name "open".
+    """
+    callee = _qualified_callee(call)
+    col = getattr(call, "col_offset", 0)
+    if callee is None:
+        return _ClassifiedCall(owner, call.lineno, "<dynamic>", CLASS_UNKNOWN,
+                               col=col)
+    observer = _observer_for(callee)
+    if observer is not None:
+        return _ClassifiedCall(owner, call.lineno, callee, CLASS_MUTATION,
+                               observer, col=col)
+    if callee in engine_definitions:
+        # Its own call sites are audited independently by the closure walk,
+        # so classifying the edge here neither double-counts nor hides it.
+        return _ClassifiedCall(owner, call.lineno, callee, CLASS_INTERNAL,
+                               col=col)
+    if callee in PURE_CONSTRUCTORS:
+        return _ClassifiedCall(owner, call.lineno, callee,
+                               CLASS_READ_ONLY, col=col)
+    head, _, attr = callee.rpartition(".")
+    if head in QUALIFIED_MODULES:
+        # Known module: only the full dotted spelling may be admitted, so a
+        # new module call cannot be absorbed by a bare-name registry entry.
+        if callee in READ_ONLY_REGISTRY:
+            return _ClassifiedCall(owner, call.lineno, callee,
+                                   CLASS_READ_ONLY, col=col)
+        return _ClassifiedCall(owner, call.lineno, callee,
+                               CLASS_UNKNOWN, col=col)
+    # A bare local name holding a dispatch-table value. Admitted only under
+    # the REVIEWED_DISPATCH_LOCALS contract, which I.G proves executably.
+    if not head and callee in REVIEWED_DISPATCH_LOCALS:
+        return _ClassifiedCall(owner, call.lineno, callee, CLASS_INTERNAL,
+                               "engine dispatch table (proven by I.G)",
+                               col=col)
+    # Receiver is a local value, not a module: review the method name.
+    if attr and attr in READ_ONLY_REGISTRY:
+        return _ClassifiedCall(owner, call.lineno, callee,
+                               CLASS_READ_ONLY, col=col)
+    return _ClassifiedCall(owner, call.lineno, callee, CLASS_UNKNOWN,
+                           col=col)
 
 
-def _reachable_functions(tree):
+def _authority_closure(tree):
     """Transitive intra-module call closure from the authority entry points."""
     funcs = {}
     for node in ast.walk(tree):
@@ -1256,102 +1478,501 @@ def _reachable_functions(tree):
     return funcs, seen
 
 
-def _qualified_callee(call):
-    """Render `a.b.c(...)` as 'a.b.c'; a bare name as itself."""
-    parts = []
-    node = call.func
-    while isinstance(node, ast.Attribute):
-        parts.append(node.attr)
-        node = node.value
-    if isinstance(node, ast.Name):
-        parts.append(node.id)
-    return ".".join(reversed(parts)) if parts else None
+def _engine_definitions(tree):
+    """Names DEFINED by this module: functions and classes.
 
-
-def _reachable_write_channels():
-    """Every write-capable channel reachable from the authority entry points.
-
-    Returns a sorted list of `qualname` strings. This is the AUDITED SURFACE:
-    the tripwire claims to observe these and provably does not claim to cover
-    anything outside them.
+    A module-level class such as `_ExecutionAuthorityConflict` is defined
+    here, so calling it is an internal edge rather than an unknown one. It is
+    also instantiated, which is why PURE_CONSTRUCTORS alone was not enough.
     """
-    funcs, seen = _reachable_functions(ast.parse(_engine_source()))
-    channels = set()
-    for name in seen:
-        for call in ast.walk(funcs[name]):
-            if not isinstance(call, ast.Call):
-                continue
-            qual = _qualified_callee(call)
-            if qual is None:
-                continue
-            head, _, attr = qual.rpartition(".")
-            if head == "os":
-                # `os.open`/`os.fdopen` are conditional on their flags/mode and
-                # are audited by channel, not by call site.
-                if attr in _UNCONDITIONAL_OS or attr in ("open", "fdopen"):
-                    channels.add(qual)
-            elif head in ("tempfile", "shutil"):
-                if (head == "tempfile" and attr in
-                        ("mkstemp", "NamedTemporaryFile", "mkdtemp")) or \
-                        (head == "shutil" and attr in
-                         ("copyfileobj", "copyfile", "copy2", "move",
-                          "rmtree", "copytree", "copymode")):
-                    channels.add(qual)
-            elif qual == "open":
-                channels.add("open")
-    return sorted(channels)
+    names = set()
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            names.add(node.name)
+        elif isinstance(node, ast.ClassDef):
+            names.add(node.name)
+    return names
+
+
+def _audit_source(source):
+    """Classify every reachable call site. Returns (closure, sites)."""
+    tree = ast.parse(source)
+    funcs, closure = _authority_closure(tree)
+    engine_definitions = _engine_definitions(tree)
+    sites = []
+    for owner in sorted(closure):
+        calls = [c for c in ast.walk(funcs[owner]) if isinstance(c, ast.Call)]
+        for call in sorted(calls,
+                           key=lambda c: (c.lineno, _qualified_callee(c) or "")):
+            sites.append(_classify_call(owner, call, engine_definitions))
+    return closure, sites
+
+
+def _unknown_sites(sites):
+    return [s for s in sites if s.classification == CLASS_UNKNOWN]
+
+
+def _assert_closed_world(source, label="engine"):
+    """Fail closed unless every reachable call site is classified.
+
+    The single choke point every X6 proof calls, so a newly added
+    unrecognised write API anywhere in the authority closure turns the
+    mutation proof red instead of quietly shrinking the audited set.
+    """
+    closure, sites = _audit_source(source)
+    unknown = _unknown_sites(sites)
+    assert not unknown, (
+        f"{label}: {len(unknown)} reachable call site(s) in the authority "
+        "closure are UNKNOWN_OR_DYNAMIC, so mutation-channel coverage is NOT "
+        "closed-world:\n" +
+        "\n".join("    " + s.as_row() for s in unknown[:25]) +
+        ("\n    ..." if len(unknown) > 25 else "") +
+        "\nReview each: either admit to READ_ONLY_REGISTRY / "
+        "PURE_CONSTRUCTORS with a stated reason, or prove it maps to a "
+        "tripwire observer.")
+    ids = [s.identity for s in sites]
+    assert len(ids) == len(set(ids)), (
+        "call-site identities are not unique; the audit cannot distinguish "
+        "structurally identical calls")
+    return closure, sites
+
+
+def _engine_source():
+    return Path(pgrec.__file__).read_text(encoding="utf-8")
+
+
+def _reachable_functions(tree):
+    return _authority_closure(tree)
+
+
+def _reachable_mutation_channels(sites):
+    """Reachable mutation CHANNELS (distinct rendered callees).
+
+    Deliberately distinct from total reachable call sites and from the
+    globally instrumented channel set.
+    """
+    return {s.callee for s in sites if s.classification == CLASS_MUTATION}
+
+
+def _globally_instrumented_channels():
+    """What the tripwire CAN observe, reachable or not.
+
+    A global capability is NOT automatically a reachable authority-path
+    channel: tempfile.* and shutil.* are instrumented yet currently have
+    zero reachable sites on this path.
+    """
+    channels = {"os." + n for n in _MutationTripwire.MUTATORS}
+    channels |= {"os.open", "os.fdopen", "open"}
+    channels |= {"tempfile." + n for n in _MutationTripwire.TEMPFILE_MUTATORS}
+    channels |= {"shutil." + n for n in _MutationTripwire.SHUTIL_MUTATORS}
+    return channels
+
+
+def _weakened_source(inject_into, injected_call):
+    """Engine source with `injected_call` added to `inject_into`.
+
+    The target function's NAME is preserved, so an anchor-only drift check
+    cannot notice the change -- the exact X5 blind spot control A exhibits.
+    """
+    source = _engine_source()
+    tree = ast.parse(source)
+    target = next((n for n in ast.walk(tree)
+                   if isinstance(n, ast.FunctionDef)
+                   and n.name == inject_into), None)
+    assert target is not None, f"{inject_into} not found in the engine"
+    lines = source.splitlines()
+    lines.insert(target.body[0].lineno - 1, "    " + injected_call)
+    mutated = "\n".join(lines) + "\n"
+    ast.parse(mutated)
+    return mutated
+
 
 
 def test_h_a_the_audited_channel_surface_is_not_empty(tmp_path):
-    """H.1 The closure must actually contain channels, or the rest is theatre.
+    """H.1 The closure must contain channels, or completeness is theatre.
 
     If the engine were pure, "the tripwire records nothing" would be
-    unfalsifiable and the completeness claim would be vacuous. So the audited
-    surface is asserted non-empty AND asserted to include the conditional
-    channels that motivated widening this tripwire in the first place.
+    unfalsifiable. So the surface is asserted non-empty AND asserted to
+    contain the conditional channels X5 added: `os.open` and builtin `open`.
     """
-    channels = _reachable_write_channels()
+    closure, sites = _assert_closed_world(_engine_source())
+    assert len(closure) > 1, "the authority closure collapsed to a stub"
+    assert sites, "no reachable call sites were audited"
+    channels = _reachable_mutation_channels(sites)
     assert channels, (
-        "no write-capable channel is reachable from the authority entry "
-        "points; the mutation proof has nothing to observe")
+        "no mutation channel is reachable from the authority entry points; "
+        "the mutation proof would have nothing to observe")
     for required in ("os.open", "open"):
         assert required in channels, (
-            f"{required!r} is not in the audited surface, so the tripwire "
-            f"does not claim it; measured surface: {channels}")
+            f"{required!r} is not a reachable mutation channel, so the "
+            f"tripwire does not claim it; measured: {sorted(channels)}")
 
 
-def test_h_b_the_tripwire_covers_the_whole_audited_surface():
-    """H.2 Completeness: instrumented == audited, by construction.
+def test_h_b_reachable_channels_are_a_subset_of_instrumented_channels():
+    """H.2 Set relation, stated as SUBSET coverage -- never equality.
 
-    Reads the tripwire's own class attributes rather than a restatement, so
-    adding a channel to the engine without adding it to the tripwire fails
-    here rather than silently weakening G.1.
+    X5's evidence claimed "instrumented set == audited set" while this test
+    only ever asserted containment, because the tripwire deliberately
+    instruments more than the authority path currently reaches
+    (`tempfile.*`/`shutil.*` have zero reachable sites here). Equality was
+    therefore never proven and is not claimed.
+
+    Four distinct quantities, deliberately not conflated:
+      1. reachable call sites          -- `_audit_source`
+      2. reachable mutation channels   -- `_reachable_mutation_channels`
+      3. globally instrumented channels-- `_globally_instrumented_channels`
+      4. executable probe coverage     -- asserted in H.C, not here
     """
-    channels = _reachable_write_channels()
-    instrumented = {"os." + n for n in _MutationTripwire.MUTATORS}
-    instrumented |= {"os.open", "os.fdopen", "open"}
-    instrumented |= {"tempfile." + n for n in _MutationTripwire.TEMPFILE_MUTATORS}
-    instrumented |= {"shutil." + n for n in _MutationTripwire.SHUTIL_MUTATORS}
+    _, sites = _assert_closed_world(_engine_source())
+    reachable = _reachable_mutation_channels(sites)
+    instrumented = _globally_instrumented_channels()
 
-    missing = [c for c in channels if c not in instrumented]
+    missing = sorted(reachable - instrumented)
     assert not missing, (
-        "reachable write-capable channels are NOT instrumented: "
-        f"{missing!r}; audited={channels!r} instrumented={sorted(instrumented)!r}")
-    assert _MutationTripwire._WRITE_FLAGS, "no write flags are classified"
+        "reachable mutation channels with NO tripwire observer: "
+        f"{missing!r}; reachable={sorted(reachable)} "
+        f"instrumented={sorted(instrumented)}")
+
+    # The superset direction is expected and must stay expected: a global
+    # capability is not automatically a reachable authority-path channel.
+    extra = sorted(instrumented - reachable)
+    assert extra, (
+        "the instrumented set no longer exceeds the reachable set; if that "
+        "is now genuinely true, equality must be asserted explicitly here "
+        "rather than implied")
+
+    # Every mutating site must name an observer, and the named observer must
+    # be one the tripwire really implements.
+    for site in sites:
+        if site.classification != CLASS_MUTATION:
+            continue
+        assert site.observer, f"{site.identity} is mutating with no observer"
+        assert _observer_for(site.callee) == site.observer, site.as_row()
 
 
-def test_h_c_every_audited_channel_is_observed_by_a_live_tripwire(tmp_path):
-    """H.3 Executable half of completeness.
+def test_i_a_an_unknown_mutation_call_fails_the_closed_world_audit():
+    """I.A (control A) An UNRECOGNISED write API must turn the proof RED.
 
-    For each audited channel, drive the real engine namespace through the
-    tripwire and require the channel to be RECORDED. This is what makes the
-    coverage claim executable rather than a set comparison: a channel can be
-    present in both sets and still be unwired.
+    Reproduces the X5 blind spot the audit is being built to close. The
+    target function's NAME is preserved, so an anchor-only drift check
+    cannot see the change -- yet the closed-world audit must fail, and must
+    name the offending call site.
     """
-    target = Path(tmp_path) / "h-c.bin"
-    seen_kinds = set()
+    weakened = _weakened_source(
+        "_load_transition_record",
+        "Path(operation_id).write_text('injected')",
+    )
+    # Sanity: the injection is real and the entry points are untouched.
+    for entry in AUTHORITY_ENTRY_POINTS:
+        assert f"def {entry}(" in weakened, (
+            f"the control weakened {entry}, so it no longer proves what it "
+            "claims")
+    closure, sites = _audit_source(weakened)
+    assert "_load_transition_record" in closure, (
+        "the injected call site is not in the closure; the control is not "
+        "exercising the reachable path")
 
-    # os.open with a write-capable flag, and os.fdopen in write mode.
+    unknown = _unknown_sites(sites)
+    assert unknown, (
+        "an unregistered Path.write_text in a reachable function was NOT "
+        "detected -- this is the exact failure mode X5 had")
+    write_text_sites = [s for s in unknown if s.callee == "write_text"]
+    assert write_text_sites, (
+        f"the audit failed closed, but did not identify the injected "
+        f"write_text; unknown callees: "
+        f"{sorted({s.callee for s in unknown})}")
+    assert all(s.owner == "_load_transition_record"
+               for s in write_text_sites), write_text_sites
+
+    # And the choke point itself must refuse the weakened source.
+    with pytest.raises(AssertionError) as excinfo:
+        _assert_closed_world(weakened)
+    message = str(excinfo.value)
+    assert "UNKNOWN_OR_DYNAMIC" in message
+    assert "write_text" in message, (
+        f"the failure message does not name the offending call: {message}")
+
+
+def test_i_b_a_known_mutation_maps_to_its_observer_and_loses_its_observer():
+    """I.B (control B) Known channels classify as mutations WITH observers.
+
+    Two directions are proven: a known write-capable channel is classified
+    and mapped, and REMOVING its observer makes the proof fail. The second
+    half is what stops the observer mapping from being decorative.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    by_callee = {}
+    for site in sites:
+        if site.classification == CLASS_MUTATION:
+            by_callee.setdefault(site.callee, []).append(site)
+
+    assert "os.open" in by_callee, sorted(by_callee)
+    for site in by_callee["os.open"]:
+        assert site.observer == "os.open (write-capable flags only)", (
+            site.as_row())
+
+    # os.chmod is instrumented by the tripwire but is NOT reachable from the
+    # authority entry points. Prove it maps to an observer, and that
+    # dropping the observer breaks the mapping.
+    assert "os.chmod" in _globally_instrumented_channels()
+    assert _observer_for("os.chmod") == "os.chmod"
+    assert "os.chmod" not in by_callee, (
+        "os.chmod became reachable; re-derive the reachable channel set")
+
+    saved = _MutationTripwire.MUTATORS
+    try:
+        _MutationTripwire.MUTATORS = frozenset(
+            n for n in saved if n != "chmod")
+        assert _observer_for("os.chmod") is None, (
+            "removing chmod from the tripwire did not remove its observer")
+        weakened = _weakened_source(
+            "_load_transition_record", "os.chmod(operation_id, 0o600)")
+        _, weak_sites = _audit_source(weakened)
+        chmod_sites = [s for s in weak_sites
+                       if s.callee == "os.chmod"]
+        assert chmod_sites, "the injected os.chmod was not audited"
+        for site in chmod_sites:
+            assert site.classification == CLASS_UNKNOWN, (
+                "os.chmod was classified as a mutation with no observer; it "
+                f"must fail closed instead: {site.as_row()}")
+    finally:
+        _MutationTripwire.MUTATORS = saved
+    assert _observer_for("os.chmod") == "os.chmod", (
+        "the observer was not restored")
+
+
+def test_i_c_read_only_channels_are_classified_but_stay_silent(tmp_path):
+    """I.C (control C) Read-capable opens are READY: silent and classified.
+
+    Two independent properties, both required:
+      * STATICALLY the read-only calls in the closure are classified
+        (as mutations where the channel is conditional, or as read-only
+        registry entries) -- never UNKNOWN;
+      * RUNTIME a read-mode open records nothing, so a non-zero mutation
+        count still means a real mutation.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    assert not _unknown_sites(sites), "closure is not closed-world"
+    read_only = {s.callee for s in sites
+                 if s.classification == CLASS_READ_ONLY}
+    for expected in ("os.stat", "os.read", "os.path.realpath", "json.loads"):
+        assert expected in read_only, (
+            f"{expected!r} should be classified read-only; got "
+            f"{sorted(read_only)}")
+
+    # Runtime silence.
+    probe = Path(tmp_path) / "i-c.txt"
+    probe.write_text("readable", encoding="utf-8")
+    with _MutationTripwire(pgrec) as trip:
+        fd = pgrec.os.open(str(probe), os.O_RDONLY)
+        os.close(fd)
+        with open(str(probe), encoding="utf-8") as handle:
+            assert handle.read() == "readable"
+        with pgrec.os.fdopen(os.open(str(probe), os.O_RDONLY), "rb") as h:
+            assert h.read() == b"readable"
+    assert trip.mutations == [], (
+        "a read-capable open was recorded as a mutation: "
+        f"{trip.mutations!r}")
+
+
+def test_i_d_builtin_open_attribution_limit_is_explicit(tmp_path):
+    """I.D (control D) Two-sided attribution, with its limit stated.
+
+    A write-capable builtin `open` is attributed by IMMEDIATE caller frame.
+    That is exact for a direct call, and this test states the boundary
+    rather than implying more: an indirect file API reached through another
+    callee is not covered by frame attribution, and must instead be rejected
+    by the closed-world audit unless separately instrumented.
+    """
+    probe = Path(tmp_path) / "i-d.txt"
+
+    _engine_open_writer(pgrec, probe)
+    assert probe.read_text(encoding="utf-8") == "engine-write"
+    probe.unlink()
+
+    with _MutationTripwire(pgrec) as trip:
+        _engine_open_writer(pgrec, probe)
+    assert "open" in trip.kinds(), sorted(trip.kinds())
+    probe.unlink()
+
+    with _MutationTripwire(pgrec) as trip:
+        with open(str(probe), "w", encoding="utf-8") as handle:
+            handle.write("attacker-write")
+    assert "open" not in trip.kinds(), (
+        f"a test-module write was attributed to the engine: {trip.mutations!r}")
+    probe.unlink()
+
+    # The limit: an indirect write API is NOT covered by frame attribution,
+    # so it must be refused by the audit. `write_text` is exactly such a
+    # channel and is unknown to the registry.
+    assert _observer_for("write_text") is None
+    assert _observer_for("io.open") is None, (
+        "io.open must not be treated as covered by the builtin-open "
+        "observer; it is a different call and stays unknown")
+    weakened = _weakened_source(
+        "_load_transition_record", "Path(operation_id).write_text('x')")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_i_e_body_drift_fails_even_when_every_anchor_is_present():
+    """I.E (control E) A real body-drift control, replacing anchor-only H.7.
+
+    X5's H.7 asserted only that the three entry-point NAMES appear in the
+    source. Keeping all three names while adding an unclassified call is
+    invisible to that check. Here the names are deliberately preserved and
+    the audit must still fail.
+    """
+    source = _engine_source()
+    # The shipped source IS closed-world; that is the baseline.
+    _assert_closed_world(source)
+
+    # Anchor-only truth: all three names are present before and after.
+    weakened = _weakened_source(
+        "_load_transition_record", "Path(operation_id).write_text('x')")
+    for entry in AUTHORITY_ENTRY_POINTS:
+        assert f"def {entry}(" in weakened
+        assert f"def {entry}(" in source
+
+    # Yet the audit fails on the drifted body.
+    with pytest.raises(AssertionError) as excinfo:
+        _assert_closed_world(weakened)
+    assert "write_text" in str(excinfo.value)
+
+    # And the reverse: removing a channel the audit depends on also fails,
+    # so the check is not vacuously satisfied.
+    renamed = source.replace("def _acquire_recovery_authority(",
+                             "def _acquire_recovery_authority_RENAMED(")
+    assert renamed != source
+    closure, _ = _audit_source(renamed)
+    assert "_acquire_recovery_authority" not in closure, (
+        "renaming an entry point should collapse the closure")
+
+
+def test_i_g_the_dispatch_local_admission_is_proven_executably():
+    """I.G `REVIEWED_DISPATCH_LOCALS` is backed by a real proof.
+
+    The bare local `handler` is admitted as an internal edge on the strength
+    of a claim about the engine's dispatch table. This test makes that claim
+    executable: every value of `_STATE_DISPATCH` must be a function DEFINED
+    BY THE ENGINE, and every one of those handlers must itself appear in the
+    authority closure, so its body is audited by the same closed-world check.
+
+    It also pins the reverse: a name NOT in the reviewed set stays unknown.
+    """
+    dispatch = pgrec._STATE_DISPATCH
+    assert isinstance(dispatch, dict) and dispatch, "no state dispatch table"
+    # The handlers must be DEFINED in the engine source, not
+    # merely importable from it, so an injected or monkeypatched
+    # callable cannot satisfy the reviewed-dispatch admission.
+    engine_source_names = _engine_definitions(
+        ast.parse(_engine_source()))
+
+    handlers = set()
+    for state, handler in dispatch.items():
+        assert callable(handler), (
+            f"state {state!r} dispatches to a non-callable {handler!r}")
+        assert handler.__name__ in engine_source_names, (
+            f"state {state!r} dispatches to {handler!r}, which is NOT defined "
+            "by the engine; the reviewed dispatch admission does not hold")
+        handlers.add(handler.__name__)
+    assert handlers, "no handler names resolved"
+
+    _, sites = _assert_closed_world(_engine_source())
+    closure, _ = _authority_closure(ast.parse(_engine_source()))
+    # Every dispatch handler is itself audited.
+    for name in sorted(handlers):
+        assert name in closure, (
+            f"dispatch handler {name!r} is not in the audited authority "
+            "closure, so its body is unclassified")
+
+    # And every reviewed dispatch local is genuinely classified as internal.
+    dispatch_sites = [s for s in sites if s.callee in REVIEWED_DISPATCH_LOCALS]
+    assert dispatch_sites, "the reviewed dispatch local is not exercised"
+    for site in dispatch_sites:
+        assert site.classification == CLASS_INTERNAL, site.as_row()
+        assert "proven by I.G" in (site.observer or ""), site.as_row()
+
+    # A bare name outside the reviewed set stays unknown -- the admission is
+    # not a blanket allowance for bare locals.
+    assert _classify_call(
+        "_probe", ast.parse("handler(record)").body[0].value,
+        set()) .classification == CLASS_INTERNAL
+    assert _classify_call(
+        "_probe", ast.parse("rogue(value)").body[0].value,
+        set()).classification == CLASS_UNKNOWN
+
+
+def test_i_f_the_four_quantities_are_reported_separately():
+    """I.F The four counts are distinct, and the report keeps them apart.
+
+    Guards against re-conflating reachable call sites, reachable mutation
+    channels, globally instrumented channels and probe coverage -- the exact
+    conflation that made X5's evidence wrong.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    reachable_channels = _reachable_mutation_channels(sites)
+    instrumented = _globally_instrumented_channels()
+
+    counts = {
+        "reachable_call_sites": len(sites),
+        "reachable_mutation_channels": len(reachable_channels),
+        "globally_instrumented_channels": len(instrumented),
+    }
+    # Call sites are far more numerous than distinct channels.
+    assert counts["reachable_call_sites"] >         counts["reachable_mutation_channels"], counts
+    # The instrumented superset exceeds the reachable set.
+    assert counts["globally_instrumented_channels"] >         counts["reachable_mutation_channels"], counts
+    # tempfile/shutil are instrumented yet unreachable here: the concrete
+    # proof that a global capability is not a reachable channel.
+    unreachable_but_instrumented = sorted(
+        c for c in instrumented - reachable_channels
+        if c.split(".")[0] in ("tempfile", "shutil"))
+    assert unreachable_but_instrumented, (
+        "expected tempfile/shutil channels to be instrumented but "
+        f"unreachable; got {sorted(instrumented - reachable_channels)}")
+    for channel in unreachable_but_instrumented:
+        assert channel not in _reachable_mutation_channels(sites)
+
+
+
+def test_h_c_reachable_channels_are_probed_and_unreachable_ones_are_named(
+        tmp_path):
+    """H.3 Probe coverage, stated for exactly the channels that are reachable.
+
+    X5's version of this test asserted "every audited channel is observed
+    live" but probed `tempfile.mkstemp` and `shutil.copyfileobj`, which are
+    INSTRUMENTED yet have ZERO reachable sites on the authority path. It was
+    therefore measuring global tripwire capability while claiming reachable
+    coverage.
+
+    What is proven here, precisely:
+      * every channel the closed-world audit marks MUTATION is driven and
+        recorded on a live tripwire -- this is the reachable coverage claim;
+      * the instrumented-but-unreachable channels are named explicitly as
+        capability, not coverage, and each is still probed so the observer is
+        known to work when it is exercised.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    reachable = _reachable_mutation_channels(sites)
+    instrumented = _globally_instrumented_channels()
+
+    seen_kinds = set()
+    # The capability/reachable split, asserted here because it is the
+    # distinction H.C exists to draw: instrumented does NOT mean reachable.
+    unreachable_capability = sorted(instrumented - reachable)
+    assert unreachable_capability, (
+        "the instrumented set no longer exceeds the reachable set; the "
+        "capability-vs-coverage distinction in this test is now vacuous")
+    for channel in ("tempfile.mkstemp", "shutil.copyfileobj"):
+        assert channel in unreachable_capability, (
+            f"{channel!r} is no longer instrumented-but-unreachable: "
+            f"reachable={sorted(reachable)}")
+
+
+
+    # -- reachable channel 1: os.open with write-capable flags --------
+    target = Path(tmp_path) / "h-c.bin"
     with _MutationTripwire(pgrec) as trip:
         fd = pgrec.os.open(str(target), os.O_CREAT | os.O_WRONLY, 0o600)
         try:
@@ -1361,7 +1982,15 @@ def test_h_c_every_audited_channel_is_observed_by_a_live_tripwire(tmp_path):
         seen_kinds |= set(trip.kinds())
     target.unlink()
 
-    # tempfile.mkstemp, and shutil.copyfileobj.
+    # -- reachable channel 2: builtin open, engine-frame attribution --
+    engine_probe = Path(tmp_path) / "h-c-engine-open.txt"
+    with _MutationTripwire(pgrec) as trip:
+        _engine_open_writer(pgrec, engine_probe)
+    assert engine_probe.read_text(encoding="utf-8") == "engine-write"
+    engine_probe.unlink()
+    seen_kinds |= set(trip.kinds())
+
+    # -- instrumented but NOT reachable: probed as capability ---------
     with _MutationTripwire(pgrec) as trip:
         fd, name = pgrec.tempfile.mkstemp(prefix="h-c-")
         os.close(fd)
@@ -1371,40 +2000,24 @@ def test_h_c_every_audited_channel_is_observed_by_a_live_tripwire(tmp_path):
         dst = Path(tmp_path) / "h-c-dst"
         with open(src, "rb") as reader, open(dst, "wb") as writer:
             pgrec.shutil.copyfileobj(reader, writer)
-        seen_kinds |= set(trip.kinds())
+        capability_kinds = set(trip.kinds())
         src.unlink()
         dst.unlink()
 
-    # `open` is asserted separately above, because its engine-side
-    # observation is caller-attributed and is proved in both directions.
-    # `open` is attributed by CALLER, so the engine-side write must be
-    # issued from an engine frame to be observed at all. Driving the very
-    # same call from this module must NOT be recorded, or the attribution
-    # would be unconditional and the zero-mutation result meaningless.
-    engine_probe = Path(tmp_path) / "h-c-engine-open.txt"
-    _engine_open_writer(pgrec, engine_probe)
-    assert engine_probe.read_text(encoding="utf-8") == "engine-write"
-    engine_probe.unlink()
-    with _MutationTripwire(pgrec) as trip:
-        _engine_open_writer(pgrec, engine_probe)
-    assert "open" in trip.kinds(), (
-        "a write-capable open issued from the engine namespace was not "
-        f"recorded; observed kinds: {sorted(trip.kinds())}")
-    engine_probe.unlink()
-    with _MutationTripwire(pgrec) as trip:
-        with open(str(engine_probe), "w", encoding="utf-8") as handle:
-            handle.write("attacker-write")
-    assert "open" not in trip.kinds(), (
-        "a write issued from this test module was attributed to the "
-        f"engine: {trip.mutations!r}")
-    engine_probe.unlink()
-
-    for required in ("os.open", "tempfile.mkstemp", "shutil.copyfileobj"):
+    for required in sorted(reachable):
         assert required in seen_kinds, (
-            f"{required!r} was reachable and instrumented but never "
-            f"recorded; observed kinds: {sorted(seen_kinds)}")
+            f"reachable mutation channel {required!r} was never recorded on a "
+            f"live tripwire; observed: {sorted(seen_kinds)}")
 
-    # And the tripwire disarmed: a fresh engine write is unobserved.
+    for required in ("tempfile.mkstemp", "shutil.copyfileobj"):
+        assert required in capability_kinds, (
+            f"instrumented-but-unreachable channel {required!r} did not fire; "
+            f"its observer is not wired: {sorted(capability_kinds)}")
+        assert required not in reachable, (
+            f"{required!r} is now reachable; the capability/reachable split in "
+            "this test must be re-derived")
+
+    # And the tripwire disarmed after exit.
     with _MutationTripwire(pgrec) as trip:
         pass
     marker = Path(tmp_path) / "h-c-disarm.txt"
@@ -1482,27 +2095,6 @@ def test_h_f_the_attackers_own_writes_are_structurally_unobservable(
 
     moved.unlink()
 
-
-def test_h_g_source_drift_in_the_audited_surface_fails_loudly():
-    """H.7 A drifting engine must not silently re-narrow the audit.
-
-    `_reachable_write_channels` is the basis of the completeness claim, so it
-    is anchored to a literal string. If the engine's governing shape changes,
-    the anchor fails loudly here instead of quietly auditing a surface nobody
-    checked.
-    """
-    source = _engine_source()
-    anchors = (
-        "def _acquire_recovery_authority(",
-        "def _classify_record_for_shell(",
-        "def _classify_rollback_for_shell(",
-    )
-    for anchor in anchors:
-        assert anchor in source, (
-            f"anchor {anchor!r} no longer exists in the engine; the audited "
-            "surface and therefore the mutation proof's coverage claim must "
-            "be re-derived before this suite can be trusted")
-    assert AUTHORITY_ENTRY_POINTS[0] in source
 
 # The size bound the denial proof depends on. Both the BEFORE-read and the
 # DURING-read comparison are anchored, each asserted to occur exactly once,
