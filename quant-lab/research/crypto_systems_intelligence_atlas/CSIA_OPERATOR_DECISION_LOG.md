@@ -2334,3 +2334,83 @@ acquisition; branch creation; force-push; rebase; amend; history rewrite.
 NEXT = operator ratification decision on GAP-6 (6E), then implementation
        authorization remains a SEPARATE decision.
 ```
+
+---
+
+## PROPOSED ENTRY — `BOOK6-GAP7-v0.1` — NOT A DECISION
+
+**Recorded:** 2026-10-03
+**Type:** PROPOSED FINDING. Ratified by no one. Decided by no one.
+**Authorized scope:** `BOOK 6 MEASUREMENT SUPERSESSION / CURRENTNESS AUDIT` ONLY.
+**Evidence:** `CSIA_BOOK_6_MEASUREMENT_SUPERSESSION_CURRENTNESS_AUDIT_v0.1.md`
+**Options:** `CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_DECISION_PACKET_v0.1.md`
+**Reconciliation:**
+`CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_READINESS_RECONCILIATION_v0.1.md`
+
+```text
+GAP_7 = OPEN / MEASUREMENT_SUPERSESSION_CURRENTNESS
+
+GAP_7_REPRODUCED             = TRUE
+KERNEL_WIDE_DEFECT           = TRUE   (6 of 8 resolve_current sites are non-comparison)
+NO_RESURRECTION_BROKEN       = TRUE   (all three decay directions)
+STATUS_SEMANTICS_INCOHERENT  = TRUE
+SECOND_DEFECT_IN_SAME_FUNC   = TRUE   (non-value-bearing records bypass all authority checks)
+
+RECOMMENDED_RESOLUTION       = 7A-KERNEL
+                               (TERMINAL_SUPERSESSION_CURRENTNESS)
+                               recommendation only; operator decides
+STATUS_SEMANTICS_OPTION      = A | B | C   UNDECIDED
+```
+
+**Verified reproducer facts, executed against accepted `5f94c3f40c`:**
+
+```text
+A <- B, both OBSERVED, both Book 2 claims current
+measurement_history("A")          = ('A', 'B')        <-- lineage IS known
+registered_measurement("A").status = OBSERVED
+registered_measurement("B").status = OBSERVED
+resolve_current("A")              = 'A'               <-- predecessor resolves
+is_authoritative_now("A")         = True              <-- DEFECT
+is_authoritative_now("B")         = True
+current_value("A")                = 10.0              <-- stale value served
+ACCEPTED_SUITE                    = 2162 passed, 0 failed
+```
+
+**GAP-6 status after this finding:**
+
+```text
+GAP_6_6E_TEMPORAL_DESIGN   = VALID
+GAP_6_RATIFICATION         = HOLD_PENDING_GAP7
+PRE_RAT_15_15              = INCOMPLETE_CURRENTNESS_PREMISE
+AUTH_REVIEW_v0.5_10_10     = INCOMPLETE_CURRENTNESS_PREMISE
+```
+
+GAP-6 is **not discarded**. Its ordering-key design is sound. The chain
+`AUTHORITY_AND_RECORD_ELIGIBILITY -> ORDERING` rests on a record-currentness
+premise that is currently false for superseded predecessors. Both prior PASS
+verdicts were accurate within their stated scope; neither was fabricated nor
+withdrawn.
+
+**Unchanged by this entry:**
+
+```text
+BOOK6-COMPARE-SUBSTRATE-v0.2   = RATIFIED, STANDS
+GAP_1..GAP_5                   = CLOSED
+GAP_6_6E                       = PROPOSED / NOT RATIFIED
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+CHOIR_PLAN_PRESERVED            = TRUE
+```
+
+**Not authorized and not performed:** GAP-6 ratification; GAP-7 ratification; any
+implementation; any source edit; any test code; any accepted Book 6 mutation; any
+reopening of GAP-1..GAP-5; any reversal of `BOOK6-COMPARE-SUBSTRATE-v0.2`; any
+predecessor resurrection doctrine; any status-only currentness; any
+comparison-local fix; any Choir proof work; force-push; rebase; amend.
+
+```text
+NEXT = operator decision on GAP-7 shape (7A-KERNEL / 7B-COMPARISON-LOCAL / HOLD),
+       plus status-semantics option (A / B / C) if 7A is chosen.
+       GAP-6 ratification remains NOT authorized and stays on hold.
+```
