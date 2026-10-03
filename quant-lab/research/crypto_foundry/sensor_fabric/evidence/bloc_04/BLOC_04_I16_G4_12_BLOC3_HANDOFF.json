@@ -1,0 +1,35 @@
+{
+  "checkpoint": "SENSOR-B4-I16B",
+  "checkpoint_advances": 3,
+  "complete_transitions": 1,
+  "continuation_transitions": 2,
+  "current_head": "a4a11dec61752d141aaa9c06861fb4225e5a9109",
+  "current_pointer_count": 1,
+  "durable_manifests": 3,
+  "external_job_state_manipulation": 0,
+  "final_semantic_digest": "499d5d5694964572d7590e75f9359f62312ed45175d0c9cf6e1f2df9656dee96",
+  "final_status": "COMPLETE",
+  "frozen_definition": "PASS when adapter output persists and the resume checkpoint advances ONLY AFTER durable manifest commit",
+  "gate_id": "G4-12",
+  "historical_evidence_refs": [
+    "BLOC_04_I14_HANDOFF_MATRIX.json",
+    "BLOC_04_I14R1_EMPTY_VALID.json",
+    "BLOC_04_I12R1_QUERY_EVIDENCE.json"
+  ],
+  "manifest_before_checkpoint": true,
+  "manifest_versions": [
+    1,
+    2,
+    3
+  ],
+  "measured_case_count": 9,
+  "pages": 3,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.integration.Bloc3StorageHandoff.persist_batch + storage.jobs.DurableJobStateRepository.advance_checkpoint",
+  "restart_digest_stable": true,
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

@@ -1,0 +1,36 @@
+{
+  "atomic_final_root_promotion": true,
+  "checkpoint": "SENSOR-B4-I16B",
+  "current_head": "a4a11dec61752d141aaa9c06861fb4225e5a9109",
+  "frozen_definition": "PASS when fixture evidence pack restores into empty root and hashes/query results match",
+  "gate_id": "G4-11",
+  "hash_parity": true,
+  "historical_evidence_refs": [
+    "BLOC_04_I13_EXPORT_RESTORE.json",
+    "BLOC_04_I13R1_PACK_MANIFEST.json",
+    "BLOC_04_I13R2_DISK_CONSTRAINTS.json",
+    "BLOC_04_I13R3_ROOT_LAW.json"
+  ],
+  "identity_parity": true,
+  "lineage_parity": true,
+  "measured_case_count": 4,
+  "no_source_root_filesystem_assumption": true,
+  "pack_object_count": 13,
+  "pack_total_bytes": 11804,
+  "pack_verified": true,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.export.EvidencePackExporter.export_query + EvidencePackVerifier.verify_pack + EvidencePackRestorer.restore_pack",
+  "query_parity": true,
+  "restored_bytes": 37,
+  "restored_into_empty_root": true,
+  "restored_sha256": "3603d0188a3d3b0eb695a0d5c6dd81f98c8b5ae8264b463b333217a7d73e885d",
+  "result": "OK",
+  "revision_parity": true,
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "schema_carried": true,
+  "source_bytes": 37,
+  "source_sha256": "3603d0188a3d3b0eb695a0d5c6dd81f98c8b5ae8264b463b333217a7d73e885d"
+}

@@ -1,0 +1,41 @@
+{
+  "checkpoint": "SENSOR-B4-I16B",
+  "current_head": "a4a11dec61752d141aaa9c06861fb4225e5a9109",
+  "frozen_definition": "PASS when no acquisition / no data / failure / history unavailable are distinguishable and NONE become numeric zero",
+  "gate_id": "G4-07",
+  "historical_evidence_refs": [
+    "BLOC_04_I12_QUERY_MATRIX.json",
+    "BLOC_04_I12R2_FAIL_SAFE_MATRIX.json",
+    "BLOC_04_I09R1_ADMISSION_RETENTION.json"
+  ],
+  "measured": {
+    "coverage_state_vocabulary": [
+      "ACCESS_BLOCKED",
+      "COMPLETE_SOURCE_BOUNDARY",
+      "EMPTY_CONFIRMED",
+      "FAILED",
+      "HISTORY_UNAVAILABLE",
+      "KNOWN_GAP",
+      "NOT_ATTEMPTED",
+      "PARTIAL",
+      "QUARANTINED",
+      "REVISION_CONFLICT"
+    ],
+    "distinct_coverage_states": 10,
+    "empty_dataframe_ambiguity": false,
+    "empty_valid_blob_count": 0,
+    "empty_valid_coverage_state": "EMPTY_CONFIRMED",
+    "missingness_collapse": false,
+    "no_matching_evidence_is_typed": true,
+    "numeric_zero_fabrication": false,
+    "populated_inventory_returns_rows": 1
+  },
+  "measured_case_count": 5,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.query.RawEvidenceQueryService.execute + typed NoMatchingEvidence + storage.enums.CoverageState (9 frozen members) + integration.Bloc3StorageHandoff._persist_empty_valid",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

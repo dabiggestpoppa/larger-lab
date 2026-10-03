@@ -1,0 +1,44 @@
+{
+  "catalog_deleted_before_rebuild": true,
+  "checkpoint": "SENSOR-B4-I16B",
+  "corrupt_durable_source_refused": true,
+  "current_head": "a4a11dec61752d141aaa9c06861fb4225e5a9109",
+  "durable_inventory": {
+    "acquisitions": 1,
+    "blobs": 1,
+    "manifests": 1,
+    "projections": 1
+  },
+  "durable_source_file_count": 6,
+  "durable_truth_not_only_in_duckdb": true,
+  "frozen_definition": "PASS when DuckDB discovery is reconstructed from manifest/projection files on an empty catalog",
+  "gate_id": "G4-09",
+  "historical_evidence_refs": [
+    "BLOC_04_I10_DUCKDB_REBUILD.json",
+    "BLOC_04_I10R1_SCHEMA_CONTRACT.json",
+    "BLOC_04_I10R2_RELATIONS.json",
+    "BLOC_04_I13R3_ROOT_LAW.json"
+  ],
+  "identity_parity": true,
+  "manifest_visibility": true,
+  "measured_case_count": 5,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.duckdb_catalog.rebuild_duckdb_catalog + ReadOnlyDuckDBCatalog (derived index, never authority)",
+  "projection_visibility": true,
+  "result": "OK",
+  "row_parity": true,
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "view_row_counts": {
+    "v_t0_acquisitions": 1,
+    "v_t0_blobs": 1,
+    "v_t0_gaps": 0,
+    "v_t0_partitions": 1,
+    "v_t0_projections": 1,
+    "v_t0_quarantine": 0,
+    "v_t0_revisions": 1,
+    "v_t0_storage_usage": 3
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "checkpoint": "SENSOR-B4-I16B",
+  "current_head": "a4a11dec61752d141aaa9c06861fb4225e5a9109",
+  "distinct_sql_types": [
+    "bigint",
+    "boolean",
+    "double precision",
+    "integer",
+    "text",
+    "timestamptz"
+  ],
+  "dropping_postgres_loses_no_t0_evidence": true,
+  "dsn_redaction_verified": true,
+  "environment_limitation": "No PostgreSQL DSN available in this environment (SENSOR_FABRIC_POSTGRES_DSN / DATABASE_URL unset). Live DB execution was NOT performed and is NOT claimed; this gate is decided on the current-head schema + runtime contract test plus accepted I11 live evidence.",
+  "frozen_definition": "PASS when PostgreSQL contains metadata/state only and raw payload tables are absent",
+  "gate_id": "G4-10",
+  "historical_evidence_refs": [
+    "BLOC_04_I11_POSTGRES_METADATA.json",
+    "BLOC_04_I11_POSTGRES_EVIDENCE.json",
+    "BLOC_04_I11R1_POSTGRES_INTEGRATION.json",
+    "BLOC_04_I11R2_BINDING_AUDIT.json"
+  ],
+  "live_database_executed": false,
+  "measured_case_count": 6,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "postgres_is_operational_mirror_only": true,
+  "production_authority": "storage.postgres_metadata.TABLE_SCHEMAS (sole table-shape authority) + reconstruct_snapshot (durable-tree source) + PostgresMetadataRepository",
+  "raw_payload_columns": 0,
+  "raw_payload_tables": 0,
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "secret_bearing_columns": 0,
+  "snapshot_blob_count": 1,
+  "table_count": 13,
+  "table_names": [
+    "schema_metadata",
+    "provider_registry",
+    "adapter_readiness",
+    "storage_jobs",
+    "storage_job_transitions",
+    "blobs_current_metadata",
+    "acquisitions",
+    "partition_manifest_current",
+    "source_revisions",
+    "integrity_checks",
+    "quota_state",
+    "backup_state",
+    "recovery_runs"
+  ]
+}

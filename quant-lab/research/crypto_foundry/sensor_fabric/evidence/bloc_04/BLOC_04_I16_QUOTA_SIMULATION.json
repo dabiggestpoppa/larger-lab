@@ -1,0 +1,76 @@
+{
+  "absolute_free_floor_bytes": 268435456,
+  "capacity_bytes": 107374182400,
+  "checkpoint": "SENSOR-B4-I16B",
+  "current_head": "a4a11dec61752d141aaa9c06861fb4225e5a9109",
+  "floor_crossing_p0": {
+    "blocked_code": "STORAGE_CAPACITY_BLOCKED",
+    "disposition": "BLOCK"
+  },
+  "frozen_definition": "PASS when optional high-volume writes pause before critical P0 sensor evidence and no raw auto-deletion occurs",
+  "gate_id": "G4-08",
+  "historical_evidence_refs": [
+    "BLOC_04_I09_QUOTA_SIMULATION.json",
+    "BLOC_04_I09R1_QUOTA_AUTHORITY.json",
+    "BLOC_04_I09R1_ADMISSION_RETENTION.json"
+  ],
+  "measured_case_count": 17,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "pressure_priority_matrix": [
+    {
+      "dispositions": {
+        "P0": "PROCEED",
+        "P1": "PROCEED",
+        "P2": "PROCEED",
+        "P3": "PROCEED"
+      },
+      "free_bytes": 96636764160,
+      "pressure_state": "NORMAL",
+      "t0a_blobs_present": 4,
+      "utilization_ratio": 0.1
+    },
+    {
+      "dispositions": {
+        "P0": "WARN",
+        "P1": "WARN",
+        "P2": "WARN",
+        "P3": "WARN"
+      },
+      "free_bytes": 26843545600,
+      "pressure_state": "WATCH",
+      "t0a_blobs_present": 4,
+      "utilization_ratio": 0.75
+    },
+    {
+      "dispositions": {
+        "P0": "PROCEED",
+        "P1": "PROCEED",
+        "P2": "DEFER",
+        "P3": "PAUSE"
+      },
+      "free_bytes": 10737418240,
+      "pressure_state": "CONSTRAINED",
+      "t0a_blobs_present": 4,
+      "utilization_ratio": 0.9
+    },
+    {
+      "dispositions": {
+        "P0": "WARN",
+        "P1": "BLOCK",
+        "P2": "BLOCK",
+        "P3": "BLOCK"
+      },
+      "free_bytes": 1073741824,
+      "pressure_state": "CRITICAL",
+      "t0a_blobs_present": 4,
+      "utilization_ratio": 0.99
+    }
+  ],
+  "production_authority": "storage.quota.classify_storage + decide_storage_write (accepted I09 authority); deletion authority lives in storage.retention and is never invoked by the quota path",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "t0a_auto_delete_count": 0
+}
