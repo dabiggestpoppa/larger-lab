@@ -33,6 +33,7 @@ compression and NO network.
 
 from __future__ import annotations
 
+import os
 import re
 from datetime import date
 from pathlib import Path
@@ -49,6 +50,78 @@ _SAFE_SEGMENT_CHARS = frozenset(
 )
 
 _UPPERCASE_HEX = frozenset("0123456789ABCDEF")
+
+# Windows extended-length ("long path") spellings.  ``ntpath.realpath`` only
+# strips the prefix when its own post-strip re-resolution check succeeds, so
+# the SAME physical directory is returned with and without the prefix on
+# different calls (deterministically reproducible, and transiently observed
+# while another thread creates the namespace).
+_WINDOWS_EXTENDED_PREFIX = "\\\\?\\"
+_WINDOWS_EXTENDED_UNC_PREFIX = "\\\\?\\UNC\\"
+
+
+def strip_windows_extended_prefix(spelling: str) -> str:
+    """Remove the Windows extended-length prefix from a real-path SPELLING.
+
+    ``\\\\?\\UNC\\server\\share`` -> ``\\\\server\\share`` and
+    ``\\\\?\\C:\\dir`` -> ``C:\\dir``.  Any other spelling — including every
+    POSIX path — is returned unchanged, so this is a strict no-op off Windows.
+
+    Split out from :func:`canonical_real_path` so the UNC and drive forms are
+    provable as a pure string law, without requiring a live network share.
+    """
+    if spelling.startswith(_WINDOWS_EXTENDED_UNC_PREFIX):
+        return "\\\\" + spelling[len(_WINDOWS_EXTENDED_UNC_PREFIX) :]
+    if spelling.startswith(_WINDOWS_EXTENDED_PREFIX):
+        return spelling[len(_WINDOWS_EXTENDED_PREFIX) :]
+    return spelling
+
+
+def canonical_real_path(path: str | Path) -> Path:
+    """THE filesystem canonicalization authority for containment comparison.
+
+    SENSOR-B4-I15R2 §5/§6.  ``os.path.realpath`` resolves the physical
+    topology, but on Windows its result is spelled with the extended-length
+    ``\\\\?\\`` prefix (or the ``\\\\?\\UNC\\`` form) on some calls and without it
+    on others.  Two spellings of one physical path are the SAME authority and
+    must compare equal; a genuinely different path must still compare
+    different.
+
+    The prefix (and its UNC form) is therefore normalised away exactly once,
+    here, for every caller.  ``resolve_under_root`` and
+    ``atomic.publish_no_replace`` both compare through this function, so the
+    two modules cannot drift into inconsistent definitions of "real path".
+
+    Platform law (§7/§18):
+
+    - the prefix normalisation is a strict no-op off Windows;
+    - case is NEVER folded explicitly.  ``PureWindowsPath`` comparison is
+      already case-insensitive and ``PurePosixPath`` is not, so
+      ``Path``-based containment yields the correct per-platform law for
+      free.  Lowercasing POSIX paths would merge two genuinely different
+      directories and weaken containment, so it is never done;
+    - symlink resolution is still performed by ``realpath``: containment is
+      judged against the PHYSICAL target, so a link planted inside the root
+      still cannot widen the boundary.
+    """
+    real = os.path.realpath(path)
+    if os.name == "nt":
+        real = strip_windows_extended_prefix(real)
+    return Path(real)
+
+
+def is_within_real_root(path: str | Path, root_real: Path) -> bool:
+    """True iff ``path`` physically resolves to ``root_real`` or below it.
+
+    The one containment predicate, shared by ``resolve_under_root`` and
+    ``atomic.publish_no_replace``.  ``root_real`` is expected to already be
+    canonical (see :func:`canonical_real_path`).
+    """
+    try:
+        real = canonical_real_path(path)
+    except OSError:  # pragma: no cover - defensive
+        return False
+    return real == root_real or root_real in real.parents
 
 def escape_path_segment(value: str) -> str:
     """Deterministic reversible UTF-8-preserving percent-encoding (uppercase %HH).
@@ -278,12 +351,14 @@ def resolve_under_root(root: str | Path, object_key: str) -> Path:
     # Static escape rejection only — no TOCTOU race-safety claim is made.
     # Containment is relative to the RESOLVED root, so a root that is
     # itself a link stays valid while still bounding every child.
-    resolved_root = Path(root).resolve()
-    resolved_target = path.resolve()
-    if (
-        resolved_target != resolved_root
-        and resolved_root not in resolved_target.parents
-    ):
+    #
+    # SENSOR-B4-I15R2 (§5/§6): BOTH sides go through the ONE shared
+    # canonicalization authority.  A raw ``Path.resolve()`` comparison is not
+    # a containment authority on Windows: the same physical directory is
+    # spelled ``C:\\...`` by one call and ``\\\\?\\C:\\...`` by another, which
+    # produced a false "resolves outside the storage root" refusal under
+    # concurrent publication.
+    if not is_within_real_root(path, canonical_real_path(root)):
         raise ValueError(
             "object_key resolves outside the storage root (link escape "
             f"refused): {object_key!r}"
@@ -294,8 +369,11 @@ def resolve_under_root(root: str | Path, object_key: str) -> Path:
 __all__ = [
     "BLOB_KEY_PREFIX",
     "blob_object_key",
+    "canonical_real_path",
     "escape_path_segment",
+    "is_within_real_root",
     "projection_object_key",
     "resolve_under_root",
+    "strip_windows_extended_prefix",
     "unescape_path_segment",
 ]

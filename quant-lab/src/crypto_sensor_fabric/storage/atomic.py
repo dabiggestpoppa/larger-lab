@@ -39,6 +39,8 @@ from enum import Enum
 from pathlib import Path
 from typing import Protocol
 
+from .paths import canonical_real_path, is_within_real_root
+
 # ---------------------------------------------------------------------------
 # Typed errors
 # ---------------------------------------------------------------------------
@@ -571,26 +573,14 @@ def ensure_same_device(
 def _real_path(path: str | Path) -> Path:
     """``os.path.realpath`` normalised so two spellings compare equal.
 
-    SENSOR-B4-I15R1B: on Windows ``ntpath.realpath`` only strips the
-    extended-length ``\\\\?\\`` prefix when its post-strip re-resolution check
-    succeeds, so the SAME directory is returned spelled with the prefix on
-    some calls and without it on others (observed transiently while another
-    thread is creating the directory).  Comparing the raw results produces a
-    FALSE "resolves outside the containment root" refusal, which broke
-    legitimate concurrent publication.  The prefix (and its UNC form) is
-    therefore normalised away before any containment decision.  No-op on
-    POSIX, where ``realpath`` is stable.
+    SENSOR-B4-I15R1B introduced the Windows extended-length prefix
+    normalisation here; SENSOR-B4-I15R2 §5/§6 MOVED it to the single shared
+    authority :func:`paths.canonical_real_path`, which ``resolve_under_root``
+    also uses.  This alias is kept so the existing internal call sites read
+    unchanged — the prefix-stripping logic itself now exists exactly once in
+    the package and the two modules cannot drift apart again.
     """
-    real = os.path.realpath(path)
-    if os.name == "nt":
-        prefix = "\\\\?\\UNC\\"
-        if real.startswith(prefix):
-            real = "\\\\" + real[len(prefix) :]
-        else:
-            prefix = "\\\\?\\"
-            if real.startswith(prefix):
-                real = real[len(prefix) :]
-    return Path(real)
+    return canonical_real_path(path)
 
 
 def _file_identity(path: str | Path) -> tuple[int, int]:
@@ -606,11 +596,7 @@ def _file_identity(path: str | Path) -> tuple[int, int]:
 
 def _is_within(path: str | Path, root_real: Path) -> bool:
     """True iff ``path`` resolves to ``root_real`` or a descendant of it."""
-    try:
-        real = _real_path(path)
-    except OSError:  # pragma: no cover - defensive
-        return False
-    return real == root_real or root_real in real.parents
+    return is_within_real_root(path, root_real)
 
 
 def _open_parent_no_follow(

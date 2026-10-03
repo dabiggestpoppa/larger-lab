@@ -1,0 +1,124 @@
+{
+  "cases": [
+    {
+      "case_id": "single_canonicalization_authority",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "the Windows extended-length prefix normalisation exists exactly once in the storage package; both resolve_under_root and publish_no_replace compare through paths.canonical_real_path, and atomic._real_path is a delegating alias (§5/§6)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "atomic_real_path_delegates": true,
+        "prefix_logic_holders": [
+          "paths.py"
+        ],
+        "shared_predicate": "paths.is_within_real_root"
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "naive_resolve_is_not_a_containment_authority",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "Path.resolve() returns the SAME physical directory spelled with and without the \\\\?\\ prefix on Windows, so the raw root-not-in-target.parents test refuses a legitimate child; the shared canonicalization accepts exactly those paths (§1A counterfactual)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "canonical_contained": true,
+        "raw_resolve_contained": false,
+        "same_physical_path": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "windows_extended_prefix_same_authority",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "'C:\\dir' and '\\\\?\\C:\\dir' name the same directory and compare EQUAL through the shared authority; they remain distinct raw spellings (§5/§17)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "canonical_equal": true,
+        "platform": "nt",
+        "raw_spellings_differ": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "unc_and_extended_unc_spelling_law",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "'\\\\?\\UNC\\server\\share' normalises to '\\\\server\\share' and a plain UNC spelling is left unchanged; the law is proven as a pure string function so no live network share is required (§6/§22)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "extended_unc_normalised": true,
+        "plain_unc_unchanged": true,
+        "posix_spelling_unchanged": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "outside_root_still_refused",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "normalisation does not widen the boundary: a genuinely outside extended-length path is refused, and a traversal key is refused (§17)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "outside_refused": true,
+        "traversal_refused": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "root_as_link_law_a_preserved",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "a configured root that is ITSELF a link stays valid and still bounds its children, because containment is judged against the resolved root (§6 law A)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "root_link_accepted": true,
+        "root_link_still_bounds_children": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "symlink_containment_not_weakened",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "canonical_real_path still resolves links to their physical target, so an intermediate link is refused at resolve time and at publication time, with 0 outside-root mutations (§6/§18)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "link_mechanism": "junction",
+        "outside_root_mutations": 0,
+        "publish_refused": "AtomicPublishSecurityError",
+        "resolve_refused": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "case_law_platform_specific",
+      "category": "PRODUCTION_MEASURED",
+      "invariant": "no explicit normcase/lower in the comparison path: PureWindowsPath is case-insensitive and PurePosixPath is not, so containment is correct per platform and POSIX directories are never merged (§7/§18)",
+      "invariant_source": "PRODUCTION_MEASURED",
+      "measured": {
+        "explicit_case_folding_used": false,
+        "posix_path_case_sensitive": true,
+        "windows_path_case_insensitive": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "posix_descriptor_relative_structural_path",
+      "category": "STRUCTURAL_VERIFIED",
+      "invariant": "on a platform providing os.O_DIRECTORY, os.O_NOFOLLOW and os.supports_dir_fd the code selects the descriptor-relative path: the root plus every component are opened O_DIRECTORY|O_NOFOLLOW relative to their parent, and os.link is invoked with dst_dir_fd (§20)",
+      "invariant_source": "STRUCTURAL_VERIFIED",
+      "measured": {
+        "O_DIRECTORY_on_every_component": true,
+        "O_NOFOLLOW_on_every_component": true,
+        "dst_dir_fd_passed_to_link": true,
+        "per_component_opens": 3,
+        "runtime_result_on_this_host": "POSIX_RUNTIME_TOCTOU = NOT_MEASURED_ON_THIS_HOST (this is a Windows host: os.supports_dir_fd is empty and os.O_DIRECTORY is absent, so the descriptor-relative branch never executes here and no runtime result is claimed)"
+      },
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I15R2",
+  "platform": {
+    "machine": "AMD64",
+    "os_name": "nt",
+    "python": "3.11.9",
+    "release": "10",
+    "system": "Windows"
+  },
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}
