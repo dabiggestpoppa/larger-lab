@@ -842,3 +842,38 @@ $0; `capital.authority = none`; Book 5 and Atlas Program Block 4 untouched.
 **Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW` - internal implementation and
 authoritative CI are complete and green at the exact implementation head;
 `MERGE_AUTHORIZED = false` while SonarCloud and Kilo remain non-success.
+
+## B4-CXR7U9R48X5 - mutation-proof completeness (supersedes the R48X4 row)
+
+The R48X4 row above describes the tripwire accurately **for the `pgrec.os`
+attribute surface only**. Two write-capable channels reachable from the tested
+authority entry points were not instrumented, so "zero recorded mutations"
+could not have meant "zero engine mutations".
+
+| Channel | Reachable sites | R48X4 instrumented? | Now |
+|---|---|---|---|
+| `os.<MUTATORS>` (17 names) | many | yes | yes, plus `ftruncate`, `fchmod`, `lchmod`, `utime` |
+| `os.open` | 5 | **no** | yes, conditional on write-capable flags |
+| `os.fdopen` | 6 | **no** | yes, conditional on write-capable mode |
+| builtin `open` | 2 | **no** | yes, conditional on write-capable mode, attributed by caller frame |
+| `tempfile.mkstemp` / `mkdtemp` / `NamedTemporaryFile` | 5 | **no** | yes |
+| `shutil.copyfileobj` | 1 | **no** | yes |
+| six named durable-write helpers | - | yes | yes |
+
+| Test | Before | After |
+|---|---|---|
+| `test_g_a_denied_authority_mutates_nothing` | zero over a partial surface | zero over the **audited** surface, where "audited" is computed by call-closure from the three entry points |
+| `test_g_a_the_mutation_tripwire_detects_a_real_engine_mutation` | fires on a helper write | unchanged, and now sufficient because the surface behind it is complete |
+| `test_h_a` .. `test_h_g` | *(absent)* | surface non-emptiness; instrumented == audited; each channel observed live; read opens silent; attribution two-sided; attacker invisible; drift fails loudly |
+
+**Node accounting:** R48R3 44 -> **51**, R48R4 **39**, pair **90**, zero
+duplicate full node IDs. Test-only commit `c237caa3` (1 file, 0 files under
+`scripts/`); no production defect exposed.
+
+**Merge policy:** PR #4 targets `main`. Authenticated reads of `main`
+protection, repository rulesets, effective rulesets for both branches, and
+GraphQL `rulesets` all show **none**; the owner is a `User`, so no inherited
+organisation ruleset can apply. A bogus-branch control query distinguishes
+"unprotected" from "not found", so this is verified rather than inferred from a
+404. Neither SonarCloud nor Kilo is therefore a required merge check - but
+merge authority remains withheld on OCE policy grounds.

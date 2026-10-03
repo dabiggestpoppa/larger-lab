@@ -3656,3 +3656,203 @@ No force-push, amend, squash, rebase or reset. `origin/main` remains
 `MERGE_AUTHORIZED = false`** - SonarCloud `111213571196` is FAILURE and the Kilo
 review is not closed. PR #4 is OPEN, MERGEABLE, UNSTABLE, unmerged, and is not
 merged by this gate.
+
+## 10. B4-CXR7U9R48X5 - mutation-proof completeness and merge-policy truth
+
+The R48X4 zero-side-effect repair (§9.3) asserted that a tripwire "records
+every MUTATION the engine attempts". That claim was not literally true, and
+this section records what the tripwire now covers, how that coverage is
+proven rather than asserted, and what the merge policy actually is when read
+from the authenticated base branch rather than from the head.
+
+### 10.1 The completeness claim was overbroad and was found by audit, not by failure
+
+The R48X4 tripwire instrumented a fixed `MUTATORS` set of `os` attribute names
+plus six named durable-write helpers. It did not instrument every channel
+through which the engine can reach a write.
+
+Reachable-surface analysis (transitive intra-module call closure from the
+three authority entry points `_acquire_recovery_authority`,
+`_classify_record_for_shell` and `_classify_rollback_for_shell`, 35 functions)
+found two reachable write-capable channels that were **not** instrumented:
+
+| Uninstrumented channel | Reachable call sites | Consequence |
+|---|---|---|
+| `os.open` | 5 (`_open_governed_directory`, `_open_claim_descriptor` x2, `_read_record_snapshot_admitted` x2) | A write through `os.open(..., O_CREAT\|O_WRONLY)` was **invisible** to the tripwire |
+| builtin `open` | 2 (`_load_receipt`, `_load_transition_record`) | A write-capable builtin `open` was **invisible** to the tripwire |
+
+This is the material defect in the R48X4 claim. `os.open` is the exact channel
+`_exclusive_copy` uses to create a destination (`pg-recovery.py:659`,
+`os.O_CREAT | os.O_EXCL | os.O_WRONLY`). Had the engine written through it on the
+authority decision path, G.1 would still have reported `trip.mutations == []`
+and the proof would have passed while establishing nothing. The claim was
+unfalsifiable **in the engine's favour**.
+
+**No production defect was exposed.** All five `os.open` sites reachable from
+the entry points use read-only or no-follow flag constants
+(`_DIR_OPEN_NO_FOLLOW_FLAGS`, `_CLAIM_OPEN_FLAGS`, `_RECORD_OPEN_FLAGS`, all
+derived from `os.O_RDONLY`), and both builtin `open` sites open for reading.
+The gap was in the *proof*, not in the *engine*.
+
+### 10.2 Outcome chosen: A - instrument every reachable mutation surface
+
+Rather than narrowing the wording, the tripwire was widened, and the coverage
+claim is now anchored to a computation:
+
+- `os.open` and `os.fdopen` are intercepted **conditionally**, on
+  write-capable flags (`O_WRONLY`, `O_RDWR`, `O_CREAT`, `O_TRUNC`, `O_APPEND`)
+  or write-capable mode characters (`w`, `a`, `x`, `+`).
+- `builtins.open` is intercepted on write-capable mode.
+- `tempfile.mkstemp` / `NamedTemporaryFile` / `mkdtemp` and
+  `shutil.copyfileobj` / `copyfile` / `copy2` / `move` are intercepted, because
+  they mutate without touching `pgrec.os` at all.
+- `MUTATORS` gained `ftruncate`, `fchmod`, `lchmod`, `utime`.
+
+The conditional treatment is deliberate and load-bearing. The engine
+legitimately OPENS governed files in order to read them; a tripwire that
+recorded every open would report the read-only authority path as a mutation
+and make G.1's zero meaningless in the other direction. `H.4` asserts a
+read-mode open, `os.open(O_RDONLY)` and `os.fdopen(fd, "rb")` are all **silent**.
+
+### 10.3 `builtins.open` cannot be separated by namespace, so it is separated by caller
+
+`pgrec.os` can be rebound to a proxy because the engine resolves `os` through
+its own module global. `builtins.open` cannot: it is process-global, and the
+attacker runs in the *test module* and writes through the *same builtin*.
+
+A first implementation recorded the attacker's write as an engine mutation.
+`H.6` caught it, which is the control working. The shipped rule is
+`_caller_is_engine`: a write-capable `open` is recorded only when the frame
+that issued it has `f_globals is pgrec.__dict__`. An identical write from this
+test module's frames is not recorded.
+
+This is what makes zero a measurement rather than an artefact of
+instrumentation. `H.C` proves both directions: an engine-namespace probe write
+**is** recorded, and the same write issued from this module is **not**.
+
+### 10.4 Seven new tests make the coverage claim executable
+
+| Test | Establishes |
+|---|---|
+| `test_h_a_the_audited_channel_surface_is_not_empty` | The closure really contains channels (so completeness is not vacuous), and specifically contains `os.open` and `open` |
+| `test_h_b_the_tripwire_covers_the_whole_audited_surface` | Instrumented set == audited set, read from the tripwire's own class attributes |
+| `test_h_c_every_audited_channel_is_observed_by_a_live_tripwire` | Each channel is recorded on a live tripwire; `open` proved in both directions; tripwire disarms after exit |
+| `test_h_d_a_read_mode_open_is_NOT_recorded` | Read-capable opens are silent, so a non-zero count still means a real mutation |
+| `test_h_e_the_tripwire_attributes_a_helper_write_not_an_os_one` | Helper-layer and `os`-layer writes stay distinguishable |
+| `test_h_f_the_attackers_own_writes_are_structurally_unobservable` | The attacker's real-`os` write is invisible while the engine is provably proxied |
+| `test_h_g_source_drift_in_the_audited_surface_fails_loudly` | Anchor strings for the three entry points; engine drift fails loudly instead of silently re-narrowing the audit |
+
+**Node accounting after the repair:** R48R3 **51** (44 + 7 new), R48R4 **39**,
+pair **90**, **zero duplicate full node IDs**. Attribution is by owning module
+(`classname`), not by substring.
+
+**Test-only.** Commit `c237caa3`: 1 file, +452/-11, **0 files under
+`scripts/`**. `pg-recovery.py` is byte-identical to `7ecb8f99e`.
+
+### 10.5 Merge policy, read from the base branch with authenticated access
+
+The R48X4 pass checked protection on `oce-program-build`. That was insufficient:
+PR #4 targets **`main`**, and merge requirements apply to the **base** branch.
+Re-verified with the authenticated token (`gh auth status` -> account
+`dabiggestpoppa`; `X-Oauth-Scopes` includes `repo`, `admin:repo_hook`,
+`workflow`; `repos.permissions.admin = true`).
+
+| # | Query | Endpoint | HTTP / result | Conclusion |
+|---|---|---|---|---|
+| 1 | `main` protection | `GET /repos/:owner/:repo/branches/main/protection` | 404 `"Branch not protected"` | No classic protection on the base |
+| 2 | `oce-program-build` protection | `GET /repos/:owner/:repo/branches/oce-program-build/protection` | 404 `"Branch not protected"` | No classic protection on the head |
+| 3 | Repository rulesets | `GET /repos/:owner/:repo/rulesets` | **200 `[]`** | No rulesets |
+| 4 | Effective rulesets, `main` | `GET /repos/:owner/:repo/rules/branches/main` | **200 `[]`** | No rulesets apply to the base |
+| 5 | Effective rulesets, head | `GET /repos/:owner/:repo/rules/branches/oce-program-build` | **200 `[]`** | No rulesets apply to the head |
+| 6 | GraphQL `rulesets(first:50)` | `POST /graphql` | **200 `nodes: []`** | Confirms #3 by a second surface |
+| 7 | Inherited org rulesets | `GET /orgs/dabiggestpoppa/rulesets` | 404 `"Not Found"` | **Owner is a `User`, not an `Organization`** - no org ruleset can apply |
+| 8 | Owner type | `GET /repos/:owner/:repo` -> `.owner.type` | `User` | Rules out inherited org rulesets structurally |
+| 9 | Reviews on PR #4 | `GET /repos/:owner/:repo/pulls/4/reviews` | **200, length 0** | No reviews |
+| 10 | PR review decision | `gh pr view 4 --json reviewDecision` | `""` | No approval present |
+
+**Required status-check contexts: none** (no classic protection, no rulesets).
+**Required reviews: none configured, and none submitted.**
+**Conversation resolution: not required** (neither surface configures it).
+**Signed commits: not required.** **Linear history: not required.**
+
+**These are not inferences from a 401/404.** Every 404 above is
+distinguishable from an authorisation failure because a **control query** was
+run: `GET /repos/:owner/:repo/branches/definitely-not-a-branch-xyz/protection`
+returns 404 `"Branch **not found**"` - a different message from `"Branch not
+protected"` - proving the endpoint distinguishes "exists but unprotected" from
+"does not exist". The ruleset queries returned **200 with an empty array**,
+which is a positive "none configured" rather than a denial. Combined with
+`permissions.admin = true`, `MERGE_POLICY_VISIBILITY` is
+**`VERIFIED_NOT_INACCESSIBLE`**.
+
+### 10.6 Therefore neither external failure blocks the merge - and that is not sufficient
+
+Because there is no protection and no ruleset on `main`, **neither SonarCloud
+nor Kilo is a required merge check**, and neither failure prevents GitHub from
+merging PR #4 mechanically.
+
+That is a statement about GitHub's merge plumbing, not a grant of authority.
+OCE policy independently withholds merge authority while:
+
+- the SonarCloud quality gate is red on new code, and
+- although the completeness gap in §10.1 is now closed in `c237caa3`, closing
+  a proof gap is not the same as an operator decision to accept it.
+
+### 10.6.1 Internal runs on the X5 implementation head
+
+All five workflows passed on `c237caa382743b104626e2b94fe3df5ab1b139ca`:
+
+| Workflow | Run ID | Conclusion |
+|---|---|---|
+| `b1-local-ground-validation` | `37137632291` | success |
+| `b2-control-plane-validation` | `37137632283` | success |
+| `b3-worker-fabric-validation` | `37137632353` | success |
+| `b4-config-spine-validation` | `37137632296` | success |
+| `B1-I1R Validation` | `37137634587` | success |
+
+b1 artifact `b1-local-ground-evidence-b8e9252fe31d` from run `37137632291`:
+**689 tests, 0 failed, 0 errors, 0 skipped** (682 + the 7 new H tests), gate
+`"result": "PASS"`, `cleanup.json` = `{"cleanup": "ok", "disposable_removed":
+true}`, **zero duplicate full node IDs**, R48R3 = 51 / R48R4 = 39 = 90.
+
+The two external checks on the same SHA: SonarCloud `111245689722`
+`completed`/`failure`; Kilo `111245291182`. Neither is green.
+
+An agent may not self-waive OCE policy. **`MERGE_AUTHORIZED = false`** stands on
+policy grounds regardless of GitHub's technical ability to merge.
+
+### 10.7 Kilo's terminal conclusion, from the check-run payload
+
+At the R48X4 evidence head, check run `111216626788` is
+`completed`/`failure`, produced by the GitHub **App** `kilo-code-bot`
+(`external_id` empty - it is not a workflow run). Its `.output.summary` now
+carries the full provider error, superseding the earlier API state where
+`text` was `null`:
+
+> `Review failed: Workspace setup failed: sandbox storage full: termination
+> nonzero exit, exit code 128` followed by a `git-lfs` Go stack trace through
+> `lfs.(*GitFilter).downloadFile` -> `Smudge` -> `filterCommand`, ending in
+> `fatal: quant-lab/research/crypto_foundry/alt_rotation/data_1/
+> ALT_DATA_1_ASSET_MULTISCALE_FEATURES.parquet: smudge filter lfs failed` and
+> `warning: Clone succeeded, but checkout failed.`
+
+This is now **API-verifiable**, not console-derived. It confirms the LFS
+diagnosis in the Kilo operator runbook:
+
+- the clone succeeded and **checkout failed** - the failure is in materialising
+  LFS objects, before review begins;
+- `LocalMediaDir` points at the sandbox's `.git/lfs/objects`, i.e. the failure
+  is storage exhaustion **inside Kilo's own sandbox**, not on any runner;
+- `annotations_count = 0`, `text = null` - no code was reviewed.
+
+**Kilo did not review the code.** The check is provider-side; no in-repo
+lever reaches it. No in-repository Kilo workflow was added, and
+`.gitattributes` / `.lfsconfig` / LFS objects are untouched.
+
+### 10.8 Accounting
+
+cloud mutations = 0 · broker mutations = 0 · capital mutations = 0 ·
+execution mutations = 0 · recurring cost = $0 · `capital.authority = none`
+
+No cloud provisioning, no broker connection, no trading, no CEREBUS strategy
+change, no LFS migration, no Sonar suppression.
