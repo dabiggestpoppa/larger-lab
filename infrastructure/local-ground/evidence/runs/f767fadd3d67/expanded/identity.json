@@ -1,0 +1,15 @@
+{
+  "commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "branch": "oce-program-build",
+  "tested_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+  "tested_tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+  "repository": "dabiggestpoppa/larger-lab",
+  "observed_remote": "dabiggestpoppa/larger-lab",
+  "remote_url": "https://github.com/dabiggestpoppa/larger-lab",
+  "main_sha": "7e7ef7222c4ecdea568b34583fd81406165cc9b6",
+  "checkout_state": "attached",
+  "trusted_ci_ref": "oce-program-build",
+  "trusted_ci_repository": "dabiggestpoppa/larger-lab",
+  "run_id": "f767fadd3d67"
+}

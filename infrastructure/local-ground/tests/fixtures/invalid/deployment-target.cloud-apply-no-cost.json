@@ -1,0 +1,9 @@
+{
+  "name": "cloud-apply-no-cost",
+  "kind": "cloud",
+  "phase": "apply",
+  "mutates_external": true,
+  "public_exposure": false,
+  "requires_authorization_fields": ["AUTHORIZED_STAGE"],
+  "cost_ceiling_usd": 0
+}

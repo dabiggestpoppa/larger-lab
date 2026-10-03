@@ -1,0 +1,44 @@
+{
+  "schema_version": "3.6.0",
+  "run_id": "e33a841c6eb2",
+  "validator_version": "3.6.0",
+  "increment": "B1-I1R3H",
+  "generated_at": "2026-08-26T20:39:21Z",
+  "artifacts": [
+    {
+      "path": "static-validation-results.json",
+      "sha256": "dd47ae6644abb1fd0799e0a9b8235e224d08c44b076ed71e74f9e7175bb4473c",
+      "size": 10832
+    },
+    {
+      "path": "static-validation-summary.md",
+      "sha256": "3818e2f8214f77dff58979da0675ab02868ec1360f23585b823965d579579512",
+      "size": 2731
+    },
+    {
+      "path": "adversarial-results.json",
+      "sha256": "e2017bec0a1da2d7befd97b6b0a2fa85a373eb73023dddd656110cdea0296e86",
+      "size": 25028
+    },
+    {
+      "path": "stage-status.json",
+      "sha256": "a2afd3bb0e23bdffce68b14eeaff6c60b70026c4798a91cc22bf80ccf74405f5",
+      "size": 754
+    },
+    {
+      "path": "worktree-cleanup.json",
+      "sha256": "628d95097fe0d237a52188e02a05406c3696d7b9ce2269d3e3bffeedfd409750",
+      "size": 34
+    },
+    {
+      "path": "regression-output.txt",
+      "sha256": "23629fc8cc6438c4c374c3deaa790c743fda482ebcb3f4e0945d79f40e6e675d",
+      "size": 2482
+    },
+    {
+      "path": "stage-log.txt",
+      "sha256": "6aa11cefeb7b8ace70a33171571806ff303b385aed70e01b07b9aed805c4628e",
+      "size": 397
+    }
+  ]
+}

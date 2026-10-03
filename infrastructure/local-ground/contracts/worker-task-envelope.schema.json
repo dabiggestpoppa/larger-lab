@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/local-ground/worker-task-envelope.schema.json",
+  "title": "OCE Local Ground — Worker Task Envelope (bounded)",
+  "description": "Bounds every local worker task: identity, purpose, allowed paths/repos/tools, budget, time limit, expected outputs, forbidden actions.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "parent_agent", "purpose", "allowed_paths", "allowed_tools", "authority", "budget", "time_limit_s", "expected_outputs", "forbidden_actions"],
+  "properties": {
+    "task_id": { "type": "string", "minLength": 1 },
+    "parent_agent": { "enum": ["po", "hermes"] },
+    "purpose": { "type": "string", "minLength": 1 },
+    "allowed_paths": { "type": "array", "items": { "type": "string" } },
+    "allowed_tools": { "type": "array", "items": { "type": "string" } },
+    "authority": { "enum": ["read-only", "bounded"] },
+    "budget": { "type": "number", "minimum": 0 },
+    "time_limit_s": { "type": "number", "minimum": 1 },
+    "expected_outputs": { "type": "array", "items": { "type": "string" } },
+    "forbidden_actions": { "type": "array", "items": { "type": "string" } }
+  }
+}

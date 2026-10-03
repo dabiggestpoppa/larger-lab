@@ -1,0 +1,7 @@
+{
+  "cleanup": "ok",
+  "containers_removed": true,
+  "networks_removed": true,
+  "volumes_removed": true,
+  "disposable_removed": true
+}

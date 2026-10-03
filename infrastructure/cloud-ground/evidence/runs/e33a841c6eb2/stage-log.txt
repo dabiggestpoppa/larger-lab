@@ -1,0 +1,10 @@
+STEP d: source clean
+STEP e: regressions passed (48)
+STEP f: initial validation passed
+STEP g: worktree created at /tmp/oce-adversarial-parent-slIoZn/wt
+STEP h: adversarial suite passed
+STEP i: worktree removed and pruned
+STEP j: source still clean
+STEP k: adversarial evidence present
+STEP l/m: final validation wrote results, summary, manifest
+STEP n: independent gate READY_FOR_OPERATOR_REVIEW

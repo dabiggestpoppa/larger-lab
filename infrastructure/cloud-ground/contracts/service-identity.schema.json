@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/service-identity/v1.0.0",
+  "title": "OCE Service Identity",
+  "description": "Schema for machine actor identity and capability grants. Version 1.0.0 — B1-I1.",
+  "type": "object",
+  "required": [
+    "service_id",
+    "service_type",
+    "trust_zone",
+    "permissions",
+    "created_at",
+    "expires_at",
+    "revocation_path",
+    "schema_version"
+  ],
+  "properties": {
+    "service_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$"
+    },
+    "service_type": {
+      "type": "string",
+      "enum": ["control-plane", "database", "cache", "worker", "backup", "monitoring", "adapter"]
+    },
+    "trust_zone": {
+      "type": "string",
+      "enum": ["operator", "control", "worker-local", "worker-burst", "worker-windows", "backup", "external"]
+    },
+    "permissions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["resource", "actions"],
+        "properties": {
+          "resource": { "type": "string", "enum": ["postgresql", "redis", "object-storage", "compose", "filesystem", "network", "logs"] },
+          "actions": {
+            "type": "array",
+            "items": { "type": "string", "enum": ["read", "write", "execute", "admin"] }
+          },
+          "scope": { "type": "string", "description": "Narrowed scope within the resource" }
+        }
+      },
+      "minItems": 1
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "revocation_path": {
+      "type": "string",
+      "description": "How to revoke this identity"
+    },
+    "issuer": {
+      "type": "string",
+      "description": "Who created this identity"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

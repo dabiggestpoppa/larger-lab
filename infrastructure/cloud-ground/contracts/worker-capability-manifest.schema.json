@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/worker-capability-manifest/v1.0.0",
+  "title": "OCE Worker Capability Manifest",
+  "description": "Schema for worker self-declared capabilities. Version 1.0.0 — B1-I1.",
+  "type": "object",
+  "required": [
+    "worker_id",
+    "worker_class",
+    "os",
+    "architecture",
+    "runtime_versions",
+    "hardware",
+    "network_capabilities",
+    "image_digest",
+    "declared_at",
+    "expires_at",
+    "schema_version"
+  ],
+  "properties": {
+    "worker_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$"
+    },
+    "worker_class": {
+      "type": "string",
+      "enum": ["local", "burst-octaspace", "burst-runpod", "windows-mt5"]
+    },
+    "os": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string" },
+        "version": { "type": "string" }
+      }
+    },
+    "architecture": {
+      "type": "string",
+      "enum": ["x86_64", "aarch64"]
+    },
+    "runtime_versions": {
+      "type": "object",
+      "properties": {
+        "python": { "type": "string" },
+        "docker": { "type": "string" },
+        "cuda": { "type": "string" }
+      }
+    },
+    "hardware": {
+      "type": "object",
+      "required": ["cpu_cores", "memory_mb"],
+      "properties": {
+        "cpu_cores": { "type": "number", "minimum": 1 },
+        "memory_mb": { "type": "integer", "minimum": 512 },
+        "disk_gb": { "type": "integer", "minimum": 10 },
+        "gpu_type": { "type": "string" },
+        "gpu_count": { "type": "integer", "minimum": 0 },
+        "gpu_memory_mb": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "network_capabilities": {
+      "type": "object",
+      "required": ["outbound_allowed", "inbound_denied"],
+      "properties": {
+        "outbound_allowed": { "type": "boolean" },
+        "inbound_denied": { "type": "boolean" },
+        "allowed_destinations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "image_digest": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "declared_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

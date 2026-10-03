@@ -1,0 +1,30 @@
+{
+  "format": "oce-operation-index-latest-v1",
+  "operation_id": "b0bdef6e591c4dd8806d7d70f9e76916",
+  "entry": {
+    "operation_id": "b0bdef6e591c4dd8806d7d70f9e76916",
+    "operation_type": "backup",
+    "run_id": "f767fadd3d67",
+    "commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f",
+    "tree": "85cb2379f614dde118670194dc6a08c59b1f3f54",
+    "started_at": "2026-08-30T12:33:51Z",
+    "finished_at": "2026-08-30T12:33:51Z",
+    "backup_id": "b0bdef6e591c4dd8806d7d70f9e76916",
+    "backup_scope": "state-only",
+    "restore_mode": "-",
+    "source_database": "oce_local",
+    "target_database": "-",
+    "final_result": "success",
+    "rollback_result": "none",
+    "cloud_mutations": 0,
+    "cloud_cost_state": "ZERO",
+    "receipts": [
+      {
+        "path": "operations/b0bdef6e591c4dd8806d7d70f9e76916/backup-info.json",
+        "sha256": "a2acd8251c8043fc5ce5d2a4f6198b72983b5832d88626968a87000b9d6e323a",
+        "size": 466
+      }
+    ]
+  },
+  "note": "convenience pointer; NOT authoritative"
+}
