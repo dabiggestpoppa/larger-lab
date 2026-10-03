@@ -3383,3 +3383,276 @@ that has not been measured.
 
 **Status at `701da835c`: `MERGE_AUTHORIZED = false`** for the same two external
 reasons. The internal gate is satisfied on the exact evidence head.
+
+## 9. B4-CXR7U9R48X4 - proof-truth repair, node-accounting correction, blocker reclassification
+
+Implementation head: `f1b8e1d632e4efd0007607f0e93886f5eb4293fa`, tree
+`573613b875071c0a2b387d8a043bf5a2b5fb4b4b`. The commit is **test-only**: one
+file changed, +363 / -34, and **no file under `scripts/` was touched**. Every
+production file, including `pg-recovery.py`, is byte-identical to
+`3f5ebba2f8e7407f0a8048e4fe23a7d793eb9039`, and no production defect was
+exposed by the repair.
+
+### 9.1 The R48 node accounting was wrong twice, in different ways
+
+The claim carried in this record and in the PR body was
+`80 R48 nodes (43 R48R3 + 39 R48R4)`. That is arithmetically impossible:
+43 + 39 = 82. Recomputation from the two authoritative b1 JUnit artifacts shows
+the **total was right and the breakdown was wrong**, and that the breakdown was
+wrong for one specific, reproducible reason.
+
+Attribution is by **owning module** - the JUnit `classname`, joined to `name`
+as `classname::name`. A substring filter over the full node ID is wrong,
+because R48R4 parametrizes `test_the_anchor_resolves_in_its_intended_target`
+over anchors *named after* the R48R3 module. Those node IDs literally contain
+the string `r48r3` while belonging to the R48R4 file. Two such nodes exist:
+
+    ...test_b4_cxr7u9r48r4_classifier_and_anchors::test_the_anchor_resolves_in_its_intended_target[test_b4_cxr7u9r48r3_coherent_authority_proofs.RECORD_READ_ANCHOR]
+    ...test_b4_cxr7u9r48r4_classifier_and_anchors::test_the_anchor_resolves_in_its_intended_target[test_b4_cxr7u9r48r3_coherent_authority_proofs.COHERENCE_ANCHOR]
+
+That is the entire discrepancy: 41 + 2 = 43. The superseded figure was the
+output of the wrong filter, not a miscount of a correct one.
+
+| Measurement | b1 JUnit at `3f5ebba2f` (run `37071261583`) | b1 JUnit at `f1b8e1d63` (run `37126647171`) |
+|---|---|---|
+| R48R3 nodes (by `classname`) | 41 | **44** |
+| R48R4 nodes (by `classname`) | 39 | 39 |
+| R48 total (by `classname`) | 80 | **83** |
+| Whole suite | 679 | **682** |
+| Duplicate full node IDs | 0 | 0 |
+| Unattributed R48 node IDs | 0 | 0 |
+| *(wrong)* substring-filter R48R3 | *43* | *46* |
+
+**Corrected, superseding: 83 R48 nodes = 44 R48R3 + 39 R48R4; whole suite 682;
+zero duplicate full node IDs; every mandatory node selected exactly once.** The
++3 delta is the three tests added by this gate. The superseded `43` / `80` pair
+was internally inconsistent and is withdrawn; it is not restated as `43`.
+
+### 9.2 The oversized-denial proof did not test oversized denial
+
+`test_g_an_oversized_record_denial_is_inert` built a normal, valid record,
+called `_acquire_recovery_authority` - which **succeeded** - and asserted only
+that a census was unchanged. The oversized case was never exercised. The test
+name described an event that did not occur.
+
+It now builds a canonical transition record larger than `_RECORD_MAX_BYTES`
+(`262144`, `pg-recovery.py:2015`) through a fixture that preserves the governed
+coordinate and the required permissions, snapshots every governed artifact
+before acquisition, and drives the real authority-acquisition route. It asserts
+that the oversized record is refused, that no truncated record is admitted,
+that the public classification route fails closed, and that all governed
+artifacts - including those outside the replaced directory - remain
+byte-identical, with no receipt, claim, selector, temporary or transition
+artifact created, removed, replaced or rewritten.
+
+The negative control
+`test_g_an_oversized_control_becomes_reachable_without_the_bound` removes
+**both** size comparisons from a weakened copy of the engine and proves the
+oversized record then becomes observably reachable. It asserts its source
+anchor occurs exactly once, that the transform changes the source, that the
+weakened source compiles, that the weakened behaviour diverges, and that
+anchor drift fails loudly.
+
+**Established:** the size bound is enforced, enforcement is not a side effect
+of unrelated assertions, and removing the bound changes the outcome.
+**Not established:** anything beyond the fact that no downstream decision
+observed a truncated record.
+
+### 9.3 The zero-side-effect proof proved neither zero effects nor engine attribution
+
+`test_g_a_denied_authority_mutates_nothing` compared only the resulting
+*filename set* after the attacker replaced the directory, and bound
+`for name, fingerprint in _census(...)` while never asserting `fingerprint`. It
+could not distinguish an attacker mutation from an engine mutation.
+
+It is now built around an executable `_MutationTripwire`. Engine writes reach
+the filesystem through the engine's own `pgrec.os` global, so the tripwire binds
+that single name to a proxy: the attacker's replacements run through the test
+module's real `os` and are correctly *not* attributed to the engine, while any
+engine-owned write, truncate, replace or unlink is recorded at both the helper
+layer and the `os.` layer. The engine's durable-write surfaces
+(`_write_transition_record`, `_record_transition`, `_commit_receipt`,
+`_exclusive_copy`, `_publish_no_replace`, `_fsync_dir`) are enumerated. Authority
+artifacts outside the replaced directory are snapshotted pre-swap and compared
+by fingerprint.
+
+The test asserts the tripwire is **live** before trusting it, requires the
+engine result to be either one coherent pinned generation or a fail-closed
+refusal, prohibits a mixed-generation result, and requires `trip.mutations ==
+[]`.
+
+The negative control
+`test_g_a_the_mutation_tripwire_detects_a_real_engine_mutation` fires the
+tripwire on a real `_write_transition_record`, asserts the record appears on
+both layers, and asserts the tripwire disarms cleanly. A tripwire that is never
+demonstrated to fire is vacuous; this one is.
+
+### 9.4 The classifier path passed a bundle where a record was expected
+
+The before-admission branch called
+`pgrec._classify_record_for_shell(bundle, None)`, passing an authority **bundle**
+where a record object is required. It returned failure via
+`isinstance(record, dict)`, which proves nothing about fail-closed behaviour.
+It was also dormant, because the replacement helper always published a record.
+
+The dormant branch is deleted. The new test
+`test_b_a_no_record_generation_fails_closed_through_the_shell_route` drives
+`_classify_rollback_for_shell(str(receipt))` with correct argument types over a
+genuine no-record generation, published through a new
+`_swap_whole_directory(..., publish_record=False)` path. It asserts the verdict
+is 4 **and** that the refusal is for the *authority* reason, by requiring
+`_load_transition_record(OPID)` to raise
+`"no durable recovery operation record"` - not because a bundle failed a
+dictionary type check.
+
+### 9.5 Internal runs on the implementation head
+
+All five workflows are success on `f1b8e1d632e4efd0007607f0e93886f5eb4293fa`:
+
+| Workflow | Run ID | Conclusion |
+|---|---|---|
+| b1-local-ground-validation | `37126647171` | success |
+| b2-control-plane-validation | `37126647143` | success |
+| b3-worker-fabric-validation | `37126647113` | success |
+| b4-config-spine-validation | `37126647154` | success |
+| B1-I1R Validation | `37126650535` | success |
+
+b1 run `37126647171` reports `tests="682" failures="0" errors="0" skipped="0"`.
+Its `identity.json` records `tested_commit = f1b8e1d632e4efd0007607f0e93886f5eb4293fa`
+and `tested_tree = 573613b875071c0a2b387d8a043bf5a2b5fb4b4b`, matching the local
+tree exactly. The independent gate reports `"result": "PASS"` and `cleanup.json`
+reports `"cleanup": "ok"`. All five repaired/added tests appear in the JUnit, so
+they executed on Linux rather than being skipped.
+
+These ids are scoped to the SHA named above. GitHub issues fresh check-runs per
+commit, so the evidence head will carry different ids; those are recorded in the
+PR body and the operator handoff rather than in a further commit, so this loop
+does not repeat.
+
+### 9.6 SonarCloud - issue-level classification at `f1b8e1d63`
+
+Check run `111213571196`, completed 2026-10-03T13:36:54Z, **FAILURE**, "Quality
+Gate failed". Failed conditions: **D Security Rating on New Code** (required
+>= A) and **C Reliability Rating on New Code** (required >= A), scoped to
+`pullRequest=4&issueStatuses=OPEN,CONFIRMED&sinceLeakPeriod=true`.
+
+The GitHub annotation feed for this check run returns exactly **50 annotations
+(15 failure, 35 warning)**. That is GitHub's sample cap, **not** the complete
+issue set. No repository-wide finding count is claimed, and the identities of
+the un-sampled issues are not guessed.
+
+**Access blocker, named exactly:** `SONAR_TOKEN` is unset on this host and there
+is no Sonar workflow in `.github/workflows/`, so SonarQube Cloud analysis is
+configured externally. Adjudicating the complete new-code issue set therefore
+requires a SonarCloud credential (a `SONAR_TOKEN`, or an account with access to
+`dabiggestpoppa_larger-lab`) that is not present here. The remainder is
+`INACCESSIBLE_WITHOUT_CREDENTIALS`.
+
+All 15 failure-level issues in the sample, classified:
+
+| Issue | Classification |
+|---|---|
+| `pg-recovery.py:522` Command Argument Injection via faulty LLM-supplied CLI arguments | REQUIRES_OPERATOR_ADJUDICATION |
+| `independent-gate-b2.py:288` Path Traversal via faulty LLM-supplied CLI arguments | REQUIRES_OPERATOR_ADJUDICATION |
+| `worker_supervisor.py:127` Path Traversal in `WorkerSupervisor._load_state()` | REQUIRES_OPERATOR_ADJUDICATION |
+| `validate_engine.py:282` Cognitive Complexity 93 | REQUIRES_OPERATOR_ADJUDICATION |
+| `validate_engine.py:1396` Cognitive Complexity 21 | REQUIRES_OPERATOR_ADJUDICATION |
+| `independent-gate-b2.py:144` Cognitive Complexity 111 | REQUIRES_OPERATOR_ADJUDICATION |
+| `scheduler.py:144` Cognitive Complexity 36 | REQUIRES_OPERATOR_ADJUDICATION |
+| `pg-recovery.py:3428` Cognitive Complexity 29 | REQUIRES_OPERATOR_ADJUDICATION |
+| `pg-recovery.py:3589` Cognitive Complexity 46 | REQUIRES_OPERATOR_ADJUDICATION |
+| `validate_engine.py:1145` duplicate literal | REQUIRES_OPERATOR_ADJUDICATION |
+| `validate_engine.py:789` duplicate literal | REQUIRES_OPERATOR_ADJUDICATION |
+| `run_b2_validation.py:53` duplicate literal | REQUIRES_OPERATOR_ADJUDICATION |
+| `worker_supervisor.py:217` duplicate literal | REQUIRES_OPERATOR_ADJUDICATION |
+| `independent-gate.py:60` duplicate literal | REQUIRES_OPERATOR_ADJUDICATION |
+| `run-validation.sh:389` use `[[` instead of `[` | REQUIRES_OPERATOR_ADJUDICATION |
+| All issues beyond the 50-annotation sample | INACCESSIBLE_WITHOUT_CREDENTIALS |
+
+**None of the 15 failure-level issues falls inside the R48 gate's own files or
+code paths** - none is in `test_b4_cxr7u9r48r3_coherent_authority_proofs.py` or
+`test_b4_cxr7u9r48r4_classifier_and_anchors.py`, and none is in the authority,
+record-admission or classifier code repaired by this gate. The R48R4
+dispatch-table target `_classify_record_for_shell` is not in the failing set.
+Each of them is a real finding in code this PR newly adds, but repairing them is
+outside the mandate of this narrow gate and is not authorized here.
+
+Three **warning**-level annotations do fall in the R48R3 file (lines 333, 570,
+790). Two are the "use the monkeypatch fixture" rule, which fires on the file's
+pre-existing idiom of rebinding engine globals: the count of
+`pgrec._<name> = ` assignments is **6 before this gate and 6 after it**, so
+these are not introduced by R48X4. All three are
+REQUIRES_OPERATOR_ADJUDICATION. No issue in this pass is demonstrated to be a
+false positive, so none is labelled DEMONSTRATED_FALSE_POSITIVE.
+
+The sample composition is not stable: at the previous head `3f5ebba2f` the
+sample carried two different R48R3 warnings ("assertion is too broad", lines 608
+and 624) that are absent from this head's sample. That is further evidence the
+50-annotation feed is a sliding window, and no closure is inferred from either
+set.
+
+No NOSONAR, no exclusion, no quality-profile, rating, threshold or coverage
+change, and no test removal was applied. **Sonar closure is not claimed while
+the gate is red.** This blocker is not proven environmental.
+
+### 9.7 Kilo Code Review - provider blocker, and no in-repo remedy exists
+
+Check run `111213177104` is `in_progress` on `f1b8e1d63`. At the previous head
+`3f5ebba2f` the run was `111051006409`, **FAILURE**, "Review failed: Workspace
+setup failed". That check run exposes no detail to the GitHub API
+(`text = null`, `annotations_count = 0`), so this record does **not** restate a
+git-lfs or sandbox error that the API does not show; that detail came from the
+provider console and is operator-held.
+
+**Correction to earlier sections in this record:** the remedy "set
+`GIT_LFS_SKIP_SMUDGE=1` in the checkout environment" **cannot be applied from
+this repository**. The check run is produced by the GitHub App
+`kilo-code-bot` (`external_id` empty, `details_url` on `app.kilo.ai`), not by a
+workflow in this repository. The repository contains six workflows
+(`b1-i1r`, `b1-i1r3`, `b1-local-ground`, `b2-control-plane`,
+`b3-worker-fabric`, `b4-config-spine`) and no Kilo workflow or Kilo config.
+Kilo clones the repository inside its own sandbox, so no in-repo `env:` block can
+reach the checkout that fails. Adding such a job would be a green check that
+changes nothing, and it is not added. The six existing workflows are likewise
+already immune: `actions/checkout` defaults to `lfs: false` and no workflow sets
+`lfs: true`, so they check out pointers, not blobs.
+
+The payload is also larger than the single file earlier sections named. The
+branch carries **82 LFS objects totalling 3,231.9 MB**, with **11 objects over
+50 MB**, including two ~625 MB feature matrices. Excluding one parquet still
+leaves roughly 2.6 GB, so no per-file remedy is sufficient.
+
+Kilo's Code Review configuration surface (model, review style, repository
+selection, focus areas, `REVIEW.md`) documents no environment-variable or LFS
+field; environment variables are a Cloud Agent feature on a different product
+surface. Whether `GIT_LFS_SKIP_SMUDGE=1` is settable for the Code Review path
+must be confirmed in the operator console before it is relied on. The remedies
+that do exist are operator-side and outside this repository: expand the
+provider's sandbox/LFS quota, or use the per-repository override to disable
+review on this repository.
+
+Kilo has never succeeded on this branch: `a659584ea4` failure, `5cc57a0218`
+cancelled, `dee68028d` absent, `13d1d8361` cancelled, `dce32e666` cancelled,
+`701da835c` failure, `3f5ebba2f` failure, `f1b8e1d63` in progress. That is
+consistent with a provider-side resource limit rather than a per-commit defect.
+
+`oce-program-build` is **not protected** (`Branch not protected`, HTTP 404, no
+required status checks), so the Kilo failure is not a GitHub merge gate; it
+surfaces only in the PR aggregate as `mergeStateStatus: UNSTABLE`.
+
+No LFS migration was performed, no `.gitattributes` change was made, no
+`.lfsconfig` was added, and no LFS object was touched.
+
+### 9.8 Accounting
+
+cloud mutations = 0, broker mutations = 0, capital mutations = 0, execution
+mutations = 0, recurring cost = $0, `capital.authority = none`. No cloud
+provisioning, no broker connection, no paper or live trading, no execution
+expansion, no CEREBUS strategy change, no LFS migration, no Sonar suppression.
+No force-push, amend, squash, rebase or reset. `origin/main` remains
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`, untouched.
+
+**Status: internal gate green on the exact implementation head.
+`MERGE_AUTHORIZED = false`** - SonarCloud `111213571196` is FAILURE and the Kilo
+review is not closed. PR #4 is OPEN, MERGEABLE, UNSTABLE, unmerged, and is not
+merged by this gate.

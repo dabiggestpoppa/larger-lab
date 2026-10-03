@@ -776,3 +776,69 @@ operator-side - provider sandbox/LFS quota, or `GIT_LFS_SKIP_SMUDGE=1`.
 **Status: internal gate green on the exact evidence head. `MERGE_AUTHORIZED =
 false`** while SonarCloud `110912278869` and Kilo `110910907968` remain
 FAILURE.
+
+---
+
+## B4-CXR7U9R48X4 - superseding correction (implementation head `f1b8e1d63`)
+
+**Implementation head:** `f1b8e1d632e4efd0007607f0e93886f5eb4293fa` (tree
+`573613b875071c0a2b387d8a043bf5a2b5fb4b4b`). **Test-only**: one file changed,
++363 / -34, **0 files under `scripts/`**; every production file, including
+`pg-recovery.py`, is byte-identical to `3f5ebba2f8e7407f0a8048e4fe23a7d793eb9039`.
+
+**Superseded claims, corrected:**
+
+| Item | Superseded | Corrected | Authority |
+|---|---|---|---|
+| R48R3 nodes | 43 | **44** | b1 JUnit `37126647171`, by `classname` |
+| R48R4 nodes | 39 | 39 | b1 JUnit `37126647171`, by `classname` |
+| R48 total | 80 (from an impossible 43+39=82) | **83** | 44 + 39 |
+| Whole suite | 679 | **682** | b1 JUnit `37126647171` |
+| Duplicate full node IDs | not stated | **0** | verified |
+| Kilo remedy | `GIT_LFS_SKIP_SMUDGE=1`, in-repo | **operator-side only; no in-repo lever exists** | check run `111051006409`, app `kilo-code-bot` |
+
+The old `43` was the output of a **wrong attribution filter**: a substring match
+on the full node ID counts two R48R4-owned nodes whose parametrized IDs contain
+the string `r48r3`. 41 + 2 = 43. Attribution must use the owning module
+(`classname`). The corrected total of 83 is 44 R48R3 + 39 R48R4, suite 682,
+zero duplicates, every mandatory node selected exactly once.
+
+**Proof-truth repairs (what the three proofs now do and do not establish):**
+
+| Proof | Before | After |
+|---|---|---|
+| `test_g_an_oversized_record_denial_is_inert` | built a NORMAL valid record, acquisition SUCCEEDED, asserted only census equality; oversized never exercised | builds a record over `_RECORD_MAX_BYTES`, drives the real route, proves refusal, no truncated admission, no downstream partial-byte use, public route fails closed, all governed artifacts byte-identical |
+| `test_g_an_oversized_control_becomes_reachable_without_the_bound` | *(absent)* | removes both size comparisons; asserts single anchor, transform changes source, weakened source compiles, behaviour diverges, anchor drift fails loudly |
+| `test_g_a_denied_authority_mutates_nothing` | compared only the filename SET; bound `fingerprint` and never asserted it; could not separate attacker from engine | `_MutationTripwire` on the engine's `pgrec.os`; records engine mutations at helper and `os.` layer; asserts tripwire is live; coherent-pin-or-refusal; mixed generation prohibited; `trip.mutations == []`; outside artifacts compared by fingerprint pre-swap |
+| `test_g_a_the_mutation_tripwire_detects_a_real_engine_mutation` | *(absent)* | fires the tripwire on a real `_write_transition_record`, asserts both layers, asserts clean disarm |
+| `test_b_a_no_record_generation_fails_closed_through_the_shell_route` | dormant branch called `_classify_record_for_shell(bundle, None)` - a bundle where a record was expected; returned 4 via `isinstance(record, dict)` | branch deleted; real no-record generation via `publish_record=False`; `_classify_rollback_for_shell(str(receipt))` returns 4 **for the authority reason**, proved by `_load_transition_record` raising "no durable recovery operation record" |
+
+**Exact implementation-head workflows (all success):** b1 `37126647171`, b2
+`37126647143`, b3 `37126647113`, b4 `37126647154`, B1-I1R `37126650535`. b1
+reports 682 tests / 0 failures / 0 errors / 0 skipped, `tested_commit` and
+`tested_tree` matching the head and tree above, independent gate `PASS`,
+`cleanup: ok`, and all five repaired/added tests executed on Linux.
+
+**External truth at this head (not called green):** SonarCloud `111213571196`
+COMPLETED/**FAILURE** (D Security + C Reliability on New Code); the annotation
+feed is a 50-item sliding window (15 failure / 35 warning), the complete
+new-code issue set is `INACCESSIBLE_WITHOUT_CREDENTIALS` because `SONAR_TOKEN`
+is unset and Sonar is configured externally; **no** failure-level issue falls
+inside the R48 gate's own files or repaired code paths. Kilo `111213177104`
+in_progress; the completed run at the previous head was `111051006409`
+FAILURE, produced by the `kilo-code-bot` GitHub App in its own sandbox - so
+`GIT_LFS_SKIP_SMUDGE=1` **cannot be set from this repository**, and the payload
+is 82 LFS objects / 3,231.9 MB with 11 objects over 50 MB, not one 626 MB
+parquet. Operator-side remedy: expand the provider sandbox/LFS quota, or use
+the per-repository override. No NOSONAR, exclusion, severity, profile, threshold
+or coverage change, no test removal, no LFS migration, no `.lfsconfig`.
+
+**Authorization boundary:** PR #4 OPEN, MERGEABLE, UNSTABLE, unmerged; head
+`f1b8e1d63`; `main` untouched at `7c7816f382947bbc8a1f2154435fc436f2428fa8`;
+`oce-program-build` is not branch-protected, so neither external failure is a
+GitHub merge gate. cloud/broker/capital/execution mutations 0; recurring cost
+$0; `capital.authority = none`; Book 5 and Atlas Program Block 4 untouched.
+
+**Exit-gate truth:** `READY_FOR_OPERATOR_REVIEW` - internal implementation and
+authoritative CI are complete and green at the exact implementation head;
+`MERGE_AUTHORIZED = false` while SonarCloud and Kilo remain non-success.
