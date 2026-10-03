@@ -3748,3 +3748,125 @@ research                                                  = FROZEN
 ```
 
 No self-ratification. I16 not started. STOP after I15R1.
+
+## SENSOR-B4-I15R2 — Windows concurrent publication stability + path-normalization consistency
+
+**Operator review finding closed.** I15R1 closed the security defects, but
+concurrent identical writers remained ~50% unstable on Windows under the
+accepted `TestConcurrency::test_concurrent_identical_writers_one_final`. Both
+causes fail CLOSED, so no integrity property was violated — but a ~50% failure
+rate on an ordinary safe write is not acceptable for ratification. This
+microseal closes ONLY those two concurrency defects.
+
+**Defect A — the canonicalization authority was split.** `atomic._real_path()`
+normalized the Windows extended-length `\?\` prefix while `paths.resolve_under_root()`
+compared a RAW `Path.resolve()`. Raw `Path.resolve()` is not a canonicalization
+authority on Windows: `ntpath.realpath` strips the prefix only when its own
+post-strip re-resolution check succeeds, so the SAME physical directory is
+spelled `C:\...` by one call and `\?\C:\...` by the next. Reproduced
+DETERMINISTICALLY with no concurrency at all — the raw
+`root not in target.parents` test returns False for a legitimate child,
+surfacing as `UnsafeObjectKey`. `paths.canonical_real_path()` is now the single
+canonicalization authority and `paths.is_within_real_root()` the single
+containment predicate; `atomic._real_path()` is a delegating alias. A test row
+requires the prefix logic to exist in exactly ONE module. The `normcase` audit
+result is deliberate: NO explicit case folding, because `PureWindowsPath` is
+already case-insensitive and `PurePosixPath` is not — lowercasing would merge
+two genuinely different POSIX directories and WEAKEN containment.
+
+**Defect B — the `ensure_durable_directory` walk-up race.** The entry guard
+saw the target ABSENT; the walk-up loop re-probed the same path; another
+writer created the complete chain in that window; `missing` collapsed to `[]`;
+`ensure_durable_directory_chain(target, [])` raised
+`ValueError("components must be nonempty")` for a legitimate concurrent
+creation. Reproduced deterministically through an injected `exists_probe`
+seam with NO sleeps, by re-executing the verbatim pre-repair walk-up and
+asserting it raises. The repair makes concurrent creation of the same valid
+directory IDEMPOTENT: the target is re-checked and returned only if it is an
+existing PLAIN DIRECTORY; a symlink, file or other object still fails closed
+and is left untouched. Correctness comes from idempotent creation and atomic
+no-clobber publication — NEVER from a retry loop, and NEVER from catching
+`ValueError` / `UnsafeObjectKey` / `AtomicPublishSecurityError` at
+`LocalBlobStore.put`; no such catch exists in the writer. The NAME-MAX probe is
+now revalidated as the same plain directory immediately before and after, with
+NO guessed 255 fallback — the I03 filesystem-truth law is preserved.
+
+**Measured.** Baseline at start head `67fd2271a`: 15 trials x 8 identical
+writers = 11 green / 4 red, all `VALUE_ERROR_COMPONENTS_EMPTY`. After the
+repair: **100 trials x 8 identical writers, 100 green / 0 red**, every trial
+exactly 1 COMMITTED_NEW + 7 REUSED_EXISTING, 0 unexpected exceptions, 1 final
+immutable object, final hash verified. Distinct-payload stress: every expected
+SHA exactly once as a durable content identity, no crosstalk, all hashes
+verify — not overfit to the same-hash race. A benign same-hash publication-race
+loser still resolves `AtomicPublishTargetExists` -> verify winner ->
+REUSED_EXISTING and is never converted into a generic security refusal.
+
+**Security not traded for availability.** The I15R1 malicious TOCTOU matrix was
+re-run unchanged: 13 rows / 13 OK, outside-root mutations = 0, foreign bytes
+published = 0, and both synthetic counterfactuals still demonstrate the
+escapes they exist to prove. Root-as-link law A preserved; symlink containment
+not weakened.
+
+**One I15R1 row re-measures differently — reported, NOT rewritten.** The
+`final_name_preexisting_link` row's informational `refusal` field re-measures
+as `UnsafeObjectKey` where the committed I15R1 bytes say `NotADirectoryError`.
+Cause: the planted object is a broken reparse point, so `Path.resolve()` raised
+an untyped `OSError` that escaped `put()`; the shared `is_within_real_root()`
+now fails CLOSED on that `OSError` and refuses EARLIER and TYPED. The row's
+result is OK before and after, `outside_file_untouched` is true before and
+after, and outside-root / foreign-byte counts are unchanged. Per the
+append-only rule the committed I15R1 bytes are preserved and the delta is
+recorded in `BLOC_04_I15R2_EVIDENCE_CORRECTION.md` §5. Operational
+consequence: re-running the I15R1 suite leaves that one matrix dirty — revert
+it, never stage it.
+
+**Transient long-run failure window — reported, NOT hidden.** The FIRST
+full-storage run reported 29 failed / 1803 passed / 2 errors, all in three
+DuckDB-backed projection modules against hard-coded `C:\tmp_*` roots with
+Windows filesystem errors. Investigated rather than dismissed: those modules
+pass 89/89 in isolation; a full-storage run EXCLUDING only the two new I15R2
+test files (production changes still applied) is 1791 passed / 11 skipped / 0
+failed, exactly the I15R1 baseline, proving the production repair introduces no
+failure; a full-storage run INCLUDING them then re-ran 1832 passed / 13 skipped
+/ 0 failed. Conclusion: transient Windows filesystem/handle window, not a
+deterministic interaction with the repair and not caused by it. Not recorded as
+a "known flake".
+
+**Verification totals.** Focused I15R2 = 41 passed / 2 skipped / 0 failed (2
+platform skips: true symlinks need privilege on Windows, which uses junctions).
+I15R1 TOCTOU + fresh corruption + I15 hardening re-run = 30 passed / 0 failed.
+I11R2 governance-binding audit = 14 passed, regenerated mechanically for the 2
+new tracked test filenames (`python_files_scanned` 995 -> 997, no new
+unexpected hits) and BYTE-STABLE on the no-update re-run. Full storage = 1832
+passed / 13 skipped / 0 failed. Full project `quant-lab/tests` = 3211 passed /
+14 skipped / 0 failed. Ruff clean on the changed scope; compileall clean; mypy
+10 pre-existing errors in `providers/` and `probes/`, 0 in `paths.py` or
+`atomic.py`; secret scan clean. I03–I14, I15 and I15R1 matrices unchanged. The
+only historical artifact touched is the I11R2 binding audit, regenerated per the
+new-test-filename rule. POSIX runtime TOCTOU =
+NOT_MEASURED_ON_THIS_HOST (Windows host: `os.supports_dir_fd` empty, no
+`os.O_DIRECTORY`, so that branch never executes here) with POSIX_STRUCTURAL_PATH
+= VERIFIED (per-component `O_DIRECTORY|O_NOFOLLOW` relative opens and
+`dst_dir_fd` on `os.link`, proven structurally); no POSIX runtime result is
+fabricated. external_ci = NONE_OBSERVED (0 runs on this branch, 0 check-runs,
+0 statuses at head).
+
+**Scope honoured.** No change to staged-source inode anchoring, destination
+parent containment, post-commit revert, the POSIX descriptor-relative parent
+walk, the fresh-corruption matrix, secret safety or resource bounds. No retry
+added. No security error downgraded, swallowed or retried. No POSIX case
+folding. Research FROZEN. I16 NOT STARTED. No self-ratification.
+
+```
+SENSOR-B4-I15R2
+PASS_SENSOR_B4_I15_HARDENING_SECURITY_SEALED              = OPERATOR_HOLD
+PASS_SENSOR_B4_I15R1_TOCTOU_FRESH_CORRUPTION_SEALED       = OPERATOR_HOLD
+PASS_SENSOR_B4_I15R2_CONCURRENT_PUBLICATION_STABILITY_SEALED = PENDING_OPERATOR_REVIEW
+next_checkpoint_authorized                                = FALSE
+recommended_next                                          = OPERATOR REVIEW OF COMPLETE I15 -> I15R1 -> I15R2 CHAIN
+I16+                                                      = UNAUTHORIZED
+G4-13                                                     = NOT_YET_IMPLEMENTED / PENDING_LATER_CHECKPOINT
+research                                                  = FROZEN
+```
+
+No self-ratification. I16 not started. STOP after I15R2.
