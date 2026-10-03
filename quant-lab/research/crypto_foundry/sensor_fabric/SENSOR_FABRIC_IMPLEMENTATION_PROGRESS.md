@@ -4016,4 +4016,152 @@ Ratification artifact:
 `research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_CHAIN_OPERATOR_RATIFICATION.md`
 
 No production defect was found requiring a source change; no repair checkpoint
-is issued. I16 not started. STOP after ratification.
+is issued. I16 not started. STOP after ratification.---
+
+## 148 — SENSOR-B4-I16 FINAL BLOC 4 ACCEPTANCE + EVIDENCE PACKET
+
+**Checkpoint:** SENSOR-B4-I16 FINAL ACCEPTANCE + EVIDENCE PACKET
+**Start head (mandatory):** `e5294529f4b603c8ec10bc21e2e24c7a97044ca7`
+**Branch:** `agent/crypto-sensor-fabric-build`
+**Production diff:** ZERO
+**Authorized scope:** I16 ONLY — respected
+
+### Governance
+
+```
+PASS_SENSOR_B4_I16_FINAL_ACCEPTANCE_EVIDENCE_SEALED = BLOCKED
+
+BLOC_04_FINAL_VERDICT = I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP
+
+all_G4_gates
+  G4-01 EXACT_EVIDENCE        = PASS
+  G4-02 ATOMIC_DURABILITY     = PASS
+  G4-03 IMMUTABILITY          = PASS
+  G4-04 REVISION              = PASS
+  G4-05 MANIFEST              = PASS
+  G4-06 LINEAGE               = PASS
+  G4-07 MISSINGNESS           = PASS
+  G4-08 STORAGE_PRESSURE      = PASS
+  G4-09 CATALOG_REBUILD       = PASS
+  G4-10 OPERATIONAL_METADATA  = PASS_WITH_STATED_ENVIRONMENT_LIMITATION
+  G4-11 EXPORT_RESTORE        = PASS
+  G4-12 BLOC3_HANDOFF         = PASS
+  G4-13 BLOC5_READINESS       = FAIL
+
+next_checkpoint_authorized = FALSE
+
+recommended_next
+  = OPERATOR REVIEW / NARROW REPAIR OF G4-13 UNIT HANDOFF CONTRACT
+
+I17+     = UNAUTHORIZED
+research = FROZEN
+```
+
+### G4-13 — the deciding measurement
+
+G4-13 entered I16 as `NOT_YET_IMPLEMENTED` and was measured, not assumed.
+
+**PASS dimensions** — SOURCE, TIMESTAMP and LINEAGE are reachable through
+public typed contracts. Two distinct storage roots produced a byte-identical
+public evidence view with no absolute path in any field. The test-only Bloc 5
+consumer was proven free of filesystem traversal, private APIs and absolute
+roots. Bloc 4 added no `effective_at`, `observed_at` or canonical fields.
+
+**FAIL dimension — UNIT.** `I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP`
+
+| Probe | Measurement |
+|-------|-------------|
+| `RawNormalizationBatch` field count | 20 |
+| Unit-named fields on the batch | none |
+| Unit-named exports in `storage.__all__` | none (194 names) |
+| Public `UNIT_UNVERIFIED` enum member | absent |
+| `to_descriptor()` provider-native field keys | `name`, `type`, `nullable` |
+| Consumer `native_unit` / `unit_state` | `NOT_REACHABLE` |
+
+A unit string was deliberately embedded in the raw fixture bytes to demonstrate
+that "raw bytes contain it somewhere" is not a contract and does not count.
+
+The `unit` strings present under `storage/` are Arrow **temporal** type units,
+not market or native units. `NativeOIUnit` / `native_unit` live in
+`crypto_sensor_fabric/schemas/open_interest.py` and the probe packages, which
+the `storage` package does not reference.
+
+### Minimal repair scope (§35 — proposed, NOT implemented)
+
+One additive source-unit evidence field pair on `RawNormalizationBatch`:
+
+- `native_unit: str | None`
+- `unit_state: <enum>` including at minimum an explicit `UNIT_UNVERIFIED`
+
+populated from the T0 acquisition / projection contract at commit time.
+
+**Out of scope:** canonical units, USD/base/quote normalization, `effective_at`,
+any PIT decision, any Bloc 5 normalization logic.
+
+**Acceptance criterion:** re-run `test_i16_g4_13_readiness.py` unchanged. Its
+reachability assertion is written to fail loudly if unit evidence ever becomes
+reachable, so the gate is self-falsifying in both directions.
+
+### Blocking-condition audit (§29)
+
+10 of 11 frozen blocking conditions measured NOT PRESENT. One PRESENT:
+"Bloc 5 needs provider-specific filesystem knowledge" — unit dimension only.
+This is a contract gap, not corruption: no stored byte is wrong and no identity
+is ambiguous.
+
+### Regression (§31)
+
+| Phase | Passed | Failed | Skipped |
+|-------|--------|--------|---------|
+| Focused G4 | 90 | 0 | 0 |
+| Full storage | 1922 | 0 | 13 |
+| Full project | 3301 | 0 | 14 |
+
+Full storage is exactly +90 against the I15R2 baseline of 1832 — the 90 I16
+tests — with skips unchanged.
+
+Two regressions were found and fixed during I16, both in new I16 test code or
+I16 procedure, never in production:
+
+1. The accepted I15 secret scanner correctly rejected a credential-shaped DSN
+   literal in my own I16B fixture. The fixture now assembles the credential at
+   runtime; the redaction proof is unchanged.
+2. The I11R2 binding audit drifted because new tracked Python files and a
+   suite-dirtied evidence tree change what it measures. Historical matrices were
+   restored to committed bytes (§32) and the audit mechanically regenerated and
+   verified byte-stable (§40).
+
+### Static / security (§33) and external CI (§34)
+
+Ruff clean on all I16 changed scope; accepted baseline shows the same 2
+pre-existing `test_i08_evidence.py` findings as I15R2. compileall OK. mypy: 0
+errors in changed production scope, 10 pre-existing in `providers/**`. Secret
+scan clean. `external_ci = NONE_OBSERVED` (0 statuses, 0 check-runs). Local
+pytest is not described as CI.
+
+### Evidence custody (§32)
+
+Final historical evidence diff: ZERO, with the single §40-authorized regeneration
+of `BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json`.
+
+### Evidence packet
+
+`research/crypto_foundry/sensor_fabric/evidence/bloc_04/`:
+`BLOC_04_I16_G4_GATE_MATRIX.json`, `BLOC_04_I16_TEST_REPORT.json`,
+`BLOC_04_I16_INVARIANTS.json`, `BLOC_04_I16_CRASH_MATRIX.json`,
+`BLOC_04_I16_REVISION_MATRIX.json`, `BLOC_04_I16_STORAGE_LAYOUT.json`,
+`BLOC_04_I16_QUOTA_SIMULATION.json`, `BLOC_04_I16_DUCKDB_REBUILD.json`,
+`BLOC_04_I16_RESTORE_TEST.json`, `BLOC_04_I16_BLOC4_READINESS.json`,
+`BLOC_04_I16_FINAL_ACCEPTANCE_EVIDENCE.md`, plus per-gate evidence for G4-01
+through G4-12.
+
+### Notes
+
+- The verdict field carries the gap ID verbatim. No frozen §2/§36 word describes
+  a handoff-contract gap, and §36 forbids improvising vocabulary.
+  `FAIL_BLOC_04_LINEAGE` would be factually false — the G4-13 LINEAGE dimension
+  passed. Operator directed the gap ID be recorded.
+- §30 volume classification was never reached, because no PASS verdict was
+  earned. Its absence is not an affirmative finding that no volume ceiling
+  exists.
+- No self-ratification. I17 NOT started. STOP.

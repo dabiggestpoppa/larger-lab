@@ -1,0 +1,188 @@
+{
+  "schema": "sensor_fabric_invariant_registry_v1",
+  "checkpoint": "SENSOR-B4-I16D",
+  "current_head": "42cc77b6b30f829c4073757989df7422f8223a15",
+  "generated_for": "SENSOR-B4-I16 FINAL BLOC 4 ACCEPTANCE",
+  "note": "Every invariant below was measured at the current head during I16. `proof` names the I16 artifact or test that produced the measurement; older checkpoints appear only as supporting ancestry.",
+  "invariants": [
+    {
+      "id": "T0A_EXACT_BYTES",
+      "invariant": "Arbitrary provider source bytes are stored and retrieved byte-for-byte, including non-UTF8 and embedded NUL.",
+      "authority": "storage.blob_store.LocalBlobStore.put/open_blob + storage.paths.blob_object_key",
+      "proof": "BLOC_04_I16_G4_01_EXACT_EVIDENCE.json (8 awkward-source roundtrips + ZSTD transparency)",
+      "status": "HOLDS",
+      "failure_consequence": "Evidence becomes unfalsifiable: a re-fetch could not be distinguished from the original."
+    },
+    {
+      "id": "CONTENT_IDENTITY",
+      "invariant": "Content identity is the source SHA-256; it never depends on provider, sensor, date or wrapper encoding.",
+      "authority": "storage.paths.blob_object_key (blobs/sha256/<h0h1>/<h2h3>/<sha>[.zst])",
+      "proof": "BLOC_04_I16_G4_03_IMMUTABILITY.json (replay returns the same identity; divergent content is a separate identity)",
+      "status": "HOLDS",
+      "failure_consequence": "The same payload fetched twice would create two truths and break deduplication."
+    },
+    {
+      "id": "ATOMICITY",
+      "invariant": "No crash window yields a half-valid final object; publication is no-replace and durable before success is returned.",
+      "authority": "storage.atomic.publish_no_replace + FaultPoint/RaiseFaultHook",
+      "proof": "BLOC_04_I16_CRASH_MATRIX.json (6 blob windows + 5 pointer windows, 0 half-valid finals)",
+      "status": "HOLDS",
+      "failure_consequence": "A torn object could be read as complete evidence after a crash."
+    },
+    {
+      "id": "IMMUTABILITY",
+      "invariant": "A committed T0A object cannot be overwritten through any public storage API.",
+      "authority": "storage.atomic publish no-replace + LocalBlobStore._verify_existing (ExistingBlobIntegrityConflict)",
+      "proof": "BLOC_04_I16_G4_03_IMMUTABILITY.json + test_hostile_final_name_is_refused_not_followed + test_hardlink_mutation_is_detected_not_silently_accepted",
+      "status": "HOLDS",
+      "failure_consequence": "Accepted history could be silently rewritten by a later write or an attacker."
+    },
+    {
+      "id": "MANIFEST_CAUSALITY",
+      "invariant": "A partition pointer only becomes visible after the manifest it names is durable.",
+      "authority": "storage.manifests.PartitionManifestRepository.append_partition_manifest (PointerFaultPoint P1..P5)",
+      "proof": "BLOC_04_I16_CRASH_MATRIX.json manifest rows: P1-P3 leave no visible pointer; P4-P5 leave exactly one version",
+      "status": "HOLDS",
+      "failure_consequence": "A reader could observe a pointer to evidence that does not exist."
+    },
+    {
+      "id": "RESUME_CAUSALITY",
+      "invariant": "The resume checkpoint advances only after the durable manifest commit, and never on a torn pointer.",
+      "authority": "storage.integration.Bloc3StorageHandoff.persist_batch + DurableJobStateRepository.advance_checkpoint re-proof",
+      "proof": "BLOC_04_I16_G4_12_BLOC3_HANDOFF.json (3 advances, each gated on a manifest readable from disk)",
+      "status": "HOLDS",
+      "failure_consequence": "A restart could skip a page whose evidence was never written."
+    },
+    {
+      "id": "REVISION_PRESERVATION",
+      "invariant": "Same source key with different bytes creates an explicit numbered revision; both versions remain readable.",
+      "authority": "storage.revisions.SourceRevisionRegistry + RevisionSourceIdentityV1",
+      "proof": "BLOC_04_I16_REVISION_MATRIX.json (2 segments for one key; old and new bytes both verified after restart)",
+      "status": "HOLDS",
+      "failure_consequence": "A provider correction would silently erase the earlier observation."
+    },
+    {
+      "id": "GROUP_MEMBERSHIP",
+      "invariant": "Revising a non-first member of an envelope group leaves earlier members intact, and identical content refetch creates no revision.",
+      "authority": "storage.revisions register_acquisition / register_acquisition_group",
+      "proof": "test_non_first_member_mutation_creates_a_revision + test_same_content_refetch_does_not_create_a_revision",
+      "status": "HOLDS",
+      "failure_consequence": "Multi-page groups would lose or duplicate members on retry."
+    },
+    {
+      "id": "T0B_SUBORDINATE_LINEAGE",
+      "invariant": "Every T0B projection resolves completely to T0A blob and acquisition evidence before a manifest may reference it.",
+      "authority": "storage.projections.T0BProjectionService.commit_projection + ProjectionLineageResolver.validate_projection_ref",
+      "proof": "BLOC_04_I16_G4_06_LINEAGE.json; a projection-less manifest fails closed with ProjectionChainBroken",
+      "status": "HOLDS",
+      "failure_consequence": "Derived evidence could exist with no verifiable source."
+    },
+    {
+      "id": "MISSINGNESS_TRUTH",
+      "invariant": "No acquisition, confirmed-empty, known-gap, failure and history-unavailable are distinct typed states; none becomes a numeric zero.",
+      "authority": "storage.enums.CoverageState (9 members) + storage.query.NoMatchingEvidence",
+      "proof": "BLOC_04_I16_G4_07_MISSINGNESS.json",
+      "status": "HOLDS",
+      "failure_consequence": "An unobserved interval would be indistinguishable from a real price of zero."
+    },
+    {
+      "id": "QUOTA_P0_PROTECTION",
+      "invariant": "Optional high-volume writes pause before critical P0 sensor evidence, and no priority crosses the hard free-space floor.",
+      "authority": "storage.quota.classify_storage + decide_storage_write",
+      "proof": "BLOC_04_I16_QUOTA_SIMULATION.json (CONSTRAINED: P2 DEFERT, P3 PAUSE; CRITICAL: P0 WARN, P1-P3 BLOCK; floor blocks P0)",
+      "status": "HOLDS",
+      "failure_consequence": "Disk exhaustion would destroy the highest-value evidence first."
+    },
+    {
+      "id": "NO_T0A_AUTO_DELETE",
+      "invariant": "Quota and retention policy never auto-deletes raw T0A evidence.",
+      "authority": "storage.quota is side-effect-free; deletion authority lives only in storage.retention",
+      "proof": "BLOC_04_I16_QUOTA_SIMULATION.json t0a_auto_delete_count = 0 across all four pressure states",
+      "status": "HOLDS",
+      "failure_consequence": "Pressure response could destroy the raw evidence it is meant to protect."
+    },
+    {
+      "id": "DUCKDB_DISPOSABILITY",
+      "invariant": "DuckDB is a derived discovery index; deleting it loses no durable truth, and a corrupt durable source fails the rebuild loudly.",
+      "authority": "storage.duckdb_catalog.rebuild_duckdb_catalog (reads durable files only)",
+      "proof": "BLOC_04_I16_DUCKDB_REBUILD.json (delete + rebuild reached identity and row parity; corrupt source raised DuckDBCatalogError)",
+      "status": "HOLDS",
+      "failure_consequence": "A disposable index would become an unrecoverable single source of truth."
+    },
+    {
+      "id": "POSTGRES_NON_AUTHORITY",
+      "invariant": "PostgreSQL carries metadata and state only; it is an operational mirror and dropping it loses no T0 evidence.",
+      "authority": "storage.postgres_metadata.TABLE_SCHEMAS (sole table-shape authority) + reconstruct_snapshot",
+      "proof": "BLOC_04_I16_G4_10_OPERATIONAL_METADATA.json (scalar SQL types only; no bytea/blob; no secret column)",
+      "status": "HOLDS_WITH_STATED_ENVIRONMENT_LIMITATION",
+      "failure_consequence": "Postgres would become a bulk raw store and a competing authority.",
+      "limitation": "No PostgreSQL DSN was available in this environment, so no live DB execution was performed or claimed; the gate rests on the current-head schema and runtime contract test plus accepted I11 live evidence."
+    },
+    {
+      "id": "EXPORT_RESTORE_PARITY",
+      "invariant": "A verified evidence pack restores into an empty root with hash, identity, query, revision and lineage parity, and is promoted atomically.",
+      "authority": "storage.export.EvidencePackExporter / EvidencePackVerifier / EvidencePackRestorer",
+      "proof": "BLOC_04_I16_RESTORE_TEST.json",
+      "status": "HOLDS",
+      "failure_consequence": "A restore would silently produce different evidence than the source."
+    },
+    {
+      "id": "SECRET_SAFETY",
+      "invariant": "No credential or secret-bearing value is persisted in evidence metadata, and secrets are refused rather than stored.",
+      "authority": "storage.catalog.SecretBearingAcquisitionMetadata + I15 secret scanner (accepted, enforced repo-wide)",
+      "proof": "test_i15_hardening.py (48 passed) after the I16 fixture DSN was rebuilt at runtime",
+      "status": "HOLDS",
+      "failure_consequence": "Persisted evidence would leak credentials into backups and exports."
+    },
+    {
+      "id": "PATH_CONTAINMENT",
+      "invariant": "Resolved local paths are never canonical identity; the storage root is movable and object keys are portable and backend-neutral.",
+      "authority": "storage.paths.resolve_under_root + blob_object_key / projection_object_key",
+      "proof": "BLOC_04_I16_RESTORE_TEST.json (pack relocated to an unrelated root before restore) and the G4-13 path-independence proof",
+      "status": "HOLDS",
+      "failure_consequence": "Evidence identity would be bound to one workstation's filesystem layout."
+    },
+    {
+      "id": "TOCTOU_CUSTODY",
+      "invariant": "Destination and source are re-verified at commit time; a preplaced or tampered final name is refused, not followed.",
+      "authority": "storage.atomic no-replace publish + LocalBlobStore._verify_existing + I15 TOCTOU hardening",
+      "proof": "BLOC_04_I16_G4_03_IMMUTABILITY.json (ExistingBlobIntegrityConflict 'NOT overwritten'; hardlink mutation detected)",
+      "status": "HOLDS",
+      "failure_consequence": "An attacker could substitute bytes between verification and publication."
+    },
+    {
+      "id": "RESOURCE_BOUNDS",
+      "invariant": "Export, verify, restore and pack operations are bounded and fail with typed resource-limit errors rather than exhausting the host.",
+      "authority": "storage.export.ExportLimits / VerifyLimits / PackResourceLimitExceeded",
+      "proof": "Accepted I15 resource-bounds matrix (supporting) and the current-head restore path exercised under VerifyLimits",
+      "status": "HOLDS",
+      "failure_consequence": "A malformed or hostile pack could exhaust memory or disk during restore."
+    },
+    {
+      "id": "BLOC3_HANDOFF",
+      "invariant": "Adapter output persists through the public handoff and the job chain advances only on durable evidence, with no external job-state manipulation.",
+      "authority": "storage.integration.Bloc3StorageHandoff.persist_batch",
+      "proof": "BLOC_04_I16_G4_12_BLOC3_HANDOFF.json",
+      "status": "HOLDS",
+      "failure_consequence": "Bloc 3 would believe it had delivered evidence that Bloc 4 never committed."
+    },
+    {
+      "id": "BLOC5_READINESS",
+      "invariant": "The handoff exposes sufficient SOURCE, TIMESTAMP, UNIT and LINEAGE evidence for a Bloc 5 PIT normalization pass without filesystem or path assumptions.",
+      "authority": "storage.models.RawNormalizationBatch + storage.replay.Bloc5Handoff.to_batch + storage.query.RawEvidenceQueryService",
+      "proof": "BLOC_04_I16_BLOC4_READINESS.json",
+      "status": "FAILS_ON_UNIT",
+      "failure_consequence": "Bloc 5 cannot derive or verify a provider-native unit from the public handoff contract, so PIT normalization would have to guess a unit or read provider-specific files. SOURCE, TIME and LINEAGE are satisfied; only UNIT is not.",
+      "measured_detail": "RawNormalizationBatch has 20 fields and no unit field; crypto_sensor_fabric.storage.__all__ has 194 names and no unit-named export; no public enum member is UNIT_UNVERIFIED; ProjectionSchemaDefinition.to_descriptor() exposes exactly name/type/nullable per provider-native field. The test-only Bloc 5 consumer, restricted to public storage imports, reports unit native_unit and unit_state as NOT_REACHABLE."
+    }
+  ],
+  "summary": {
+    "total": 21,
+    "holds": 19,
+    "holds_with_stated_limitation": 1,
+    "fails": 1,
+    "failing_invariants": [
+      "BLOC5_READINESS"
+    ]
+  }
+}

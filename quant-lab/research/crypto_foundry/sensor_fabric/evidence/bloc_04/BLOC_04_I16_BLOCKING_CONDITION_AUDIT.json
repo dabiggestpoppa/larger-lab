@@ -1,0 +1,97 @@
+{
+  "schema": "sensor_fabric_blocking_condition_audit_v1",
+  "checkpoint": "SENSOR-B4-I16D",
+  "current_head": "42cc77b6b30f829c4073757989df7422f8223a15",
+  "frozen_law": "The frozen plan blocks Bloc 4 completion if ANY of the conditions below remains. One measured row is recorded for each, with the I16 current-head proof that decided it.",
+  "rows": [
+    {
+      "id": 1,
+      "condition": "raw bytes can be overwritten",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_G4_03_IMMUTABILITY.json; test_hostile_final_name_is_refused_not_followed raised ExistingBlobIntegrityConflict('... NOT overwritten') and left the attacker bytes intact; the 6-thread same-hash race converged on one identity with 5 REUSED_EXISTING and one COMMITTED_NEW.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG403Immutability"
+    },
+    {
+      "id": 2,
+      "condition": "checksum identity is ambiguous",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_G4_01_EXACT_EVIDENCE.json: input SHA equals retrieved SHA for all 8 awkward source classes; ZSTD wrapper produced the same source identity as NONE.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG401ExactEvidence"
+    },
+    {
+      "id": 3,
+      "condition": "resume token can advance ahead of durable evidence",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_G4_12_BLOC3_HANDOFF.json: each of the 3 advances named a manifest already readable from a freshly reconstructed repository; BLOC_04_I16_CRASH_MATRIX.json: pointer windows P1-P3 left no visible pointer at all, so no checkpoint could be reached.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG412Bloc3Handoff"
+    },
+    {
+      "id": 4,
+      "condition": "same request / different bytes silently replaces history",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_REVISION_MATRIX.json: one source key with two different payloads produced 2 segments with explicit revision numbers; both blobs verified readable after a full restart. Identical-content refetch produced a single segment.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG404Revision"
+    },
+    {
+      "id": 5,
+      "condition": "a manifest points to a missing object without loud failure",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_G4_05_MANIFEST.json: every current and historical ref exists and verifies after a fresh restart, dangling_refs = 0. A projection-bearing manifest whose projection is absent fails closed with ProjectionChainBroken rather than committing.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG405Manifest"
+    },
+    {
+      "id": 6,
+      "condition": "T0B lineage is incomplete",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_G4_06_LINEAGE.json: a non-vacuous projection resolves to its source blob and acquisition, which physically verify; no orphan projection exists and no hidden private map is required.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG406Lineage"
+    },
+    {
+      "id": 7,
+      "condition": "disk pressure auto-deletes T0A",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_QUOTA_SIMULATION.json: t0a_auto_delete_count = 0 across NORMAL, WATCH, CONSTRAINED and CRITICAL; every T0A blob remained present and the durable inventory was unchanged. The quota path is side-effect-free and holds no deletion authority.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG408StoragePressure"
+    },
+    {
+      "id": 8,
+      "condition": "PostgreSQL becomes a bulk raw store",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_G4_10_OPERATIONAL_METADATA.json: the schema declares only bigint, boolean, double precision, integer, text and timestamptz; no bytea/blob column or raw payload table exists; reconstruction from the durable tree reproduces every row, so dropping Postgres loses no T0 evidence.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG410OperationalMetadata",
+      "environment_limitation": "No PostgreSQL DSN was available, so no live DB execution was performed or claimed. The decision rests on the current-head schema and runtime contract test plus accepted I11 live evidence."
+    },
+    {
+      "id": 9,
+      "condition": "DuckDB becomes a unique source of truth",
+      "measured": "NOT PRESENT",
+      "evidence": "BLOC_04_I16_DUCKDB_REBUILD.json: the catalog file was deleted, then rebuilt from durable manifest/projection files to the same identity and row counts; T0A bytes, the manifest and the projection artifact all survived the deletion. A corrupted durable source made the rebuild raise rather than emit a quiet catalog.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG409CatalogRebuild"
+    },
+    {
+      "id": 10,
+      "condition": "secret credentials appear in persisted evidence metadata",
+      "measured": "NOT PRESENT",
+      "evidence": "The accepted I15 repository secret scanner and runtime sentinel pass across the repository. During I16 the scanner correctly rejected a credential-shaped DSN literal that I had written into a fixture; the fixture now assembles the credential at runtime and the scanner passes. This is recorded as a caught-and-fixed finding, not an unresolved one.",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i15_hardening.py (48 passed)"
+    },
+    {
+      "id": 11,
+      "condition": "Bloc 5 needs provider-specific filesystem knowledge",
+      "measured": "PRESENT (unit dimension only)",
+      "evidence": "BLOC_04_I16_BLOC4_READINESS.json: the test-only Bloc 5 consumer, restricted to public crypto_sensor_fabric.storage imports and proven free of filesystem traversal, private APIs and absolute roots, reaches SOURCE, TIME and LINEAGE and reports unit native_unit and unit_state as NOT_REACHABLE. RawNormalizationBatch has 20 fields and no unit field; the package exports 194 names with no unit-named entry; no public enum member is UNIT_UNVERIFIED; the projection schema descriptor exposes only name/type/nullable.",
+      "gap_id": "I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP",
+      "proof_test": "tests/crypto_sensor_fabric/storage/test_i16_g4_13_readiness.py and tests/crypto_sensor_fabric/storage/i16_bloc5_consumer_probe.py",
+      "note": "This is the ONLY frozen blocking condition that remains. It is a contract gap, not corruption: no evidence is wrong, evidence is simply not publicly discoverable."
+    }
+  ],
+  "summary": {
+    "conditions_total": 11,
+    "not_present": 10,
+    "present": 1,
+    "present_ids": [11],
+    "bloc_4_completion_blocked": true,
+    "blocking_gate": "G4-13",
+    "blocking_dimension": "UNIT"
+  }
+}

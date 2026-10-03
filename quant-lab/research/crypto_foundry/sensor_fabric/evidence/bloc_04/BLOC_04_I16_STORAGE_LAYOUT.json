@@ -1,0 +1,96 @@
+{
+  "schema": "sensor_fabric_storage_layout_v1",
+  "checkpoint": "SENSOR-B4-I16D",
+  "current_head": "42cc77b6b30f829c4073757989df7422f8223a15",
+  "contract_law": "Machine-specific local paths are NEVER part of the contract. What is frozen here is the LOGICAL layout and the authority relationship between layers. A storage root is movable: the G4-11 restore and the G4-13 path-independence proofs both relocate the whole tree and obtain identical public evidence views.",
+  "identity_separation": {
+    "content_id": "blob_sha256 — the 64-character source SHA-256 of the exact provider bytes",
+    "storage_object_key": "portable, backend-neutral, slash-separated key under a root",
+    "resolved_local_path": "machine-specific root + object key; derived, never canonical",
+    "note": "Absolute workstation paths are never evidence identity (storage.paths module law)."
+  },
+  "logical_layers": [
+    {
+      "layer": "T0A_BLOBS",
+      "purpose": "Exact, immutable, content-addressed provider source bytes.",
+      "object_key_shape": "blobs/sha256/<h0h1>/<h2h3>/<full_sha256>.blob  (wrapper encoding NONE)",
+      "alternate_object_key_shape": "blobs/sha256/<h0h1>/<h2h3>/<full_sha256>.blob.zst  (wrapper encoding ZSTD)",
+      "authority": "AUTHORITATIVE for source bytes. The wrapper suffix is metadata only; the source content id is identical for both encodings.",
+      "mutability": "Write-once. A committed object can never be replaced through a public API.",
+      "deletion_authority": "None automatic. Retention is a separate, explicitly invoked policy."
+    },
+    {
+      "layer": "T0A_METADATA_CATALOG",
+      "purpose": "Typed records describing T0 evidence: blob metadata, acquisitions, partition manifests, current pointers, revisions, jobs, transitions, quota and recovery state.",
+      "object_key_shape": "catalogs/** (per-record JSON fragments published atomically, plus current-pointer files)",
+      "authority": "AUTHORITATIVE for evidence identity, acquisition provenance, manifest history and the revision chain.",
+      "properties": [
+        "Append-only per record; a partition keeps every historical manifest version.",
+        "The current pointer is advanced only after its manifest is durable.",
+        "CAS on (manifest_id, version); divergence raises a typed conflict, never a silent retry."
+      ]
+    },
+    {
+      "layer": "T0B_PROJECTIONS",
+      "purpose": "Parsed/derived projections committed from T0A, with their schemas, contexts and lineage.",
+      "object_key_shape": "projections/** plus catalogs/manifests/projections, projection_context, projection_lineage, projection_schemas",
+      "authority": "SUBORDINATE. A projection may never be referenced by a manifest unless its lineage resolves completely to existing T0A blob and acquisition evidence.",
+      "properties": [
+        "T0B never supersedes T0A; deleting T0B loses derived data only.",
+        "The projection schema descriptor exposes provider-native fields as name/type/nullable and carries NO unit metadata (see BLOC_04_I16_BLOC4_READINESS.json)."
+      ]
+    },
+    {
+      "layer": "REVISIONS",
+      "purpose": "Per-source-key revision segments, observations and provider declarations.",
+      "object_key_shape": "revisions/**",
+      "authority": "AUTHORITATIVE for 'same source, different bytes' history. Reconstructing a revision list never re-derives identity from descriptors; it replays durable acquisitions.",
+      "public_surface_note": "SourceRevisionRegistry and RevisionSourceIdentityV1 are not in the package __all__; downstream consumers read revision state through the public RawEvidenceResult.revision_state."
+    },
+    {
+      "layer": "JOBS",
+      "purpose": "Bloc 3 job state and its transition log, including the resume checkpoint.",
+      "object_key_shape": "catalogs/jobs_state/**",
+      "authority": "DERIVED STATE, gated. A checkpoint advance re-proves exact acquisition, physically verified blob and manifest/acquisition source identity from the repositories themselves before it is recorded.",
+      "prohibited": "No external job-state manipulation; the job chain may only advance through the durable handoff."
+    },
+    {
+      "layer": "RECOVERY_AND_QUARANTINE",
+      "purpose": "Detected integrity failures and registered recovery actions.",
+      "object_key_shape": "recovery/**, quarantine/**",
+      "authority": "Detection only. A quarantined object is recorded, never silently repaired.",
+      "properties": ["Absent object is not corruption; they are distinct states."]
+    },
+    {
+      "layer": "DUCKDB_CATALOG",
+      "purpose": "Derived discovery index over the durable records, for fast enumeration.",
+      "object_key_shape": "a single catalog file outside the durable tree",
+      "authority": "DERIVED AND DISPOSABLE. Deleting it loses no durable truth; it is rebuilt from the manifest and projection files on an empty catalog. Corrupting a durable source makes the rebuild fail loudly rather than emit a quiet catalog.",
+      "prohibited": "It must never become the unique source of truth."
+    },
+    {
+      "layer": "POSTGRESQL_METADATA",
+      "purpose": "Operational metadata mirror: registry, readiness, jobs, blob/acquisition/manifest metadata, quota and recovery summaries.",
+      "authority": "OPERATIONAL MIRROR AND STATE ONLY. It is reconstructible from the durable tree, and dropping it loses no T0 evidence.",
+      "prohibited": "No raw byte payload column or table, no secret-bearing metadata, no resume-token authority, and no bulk raw storage."
+    },
+    {
+      "layer": "EXPORT_PACKS",
+      "purpose": "Portable, self-verifying evidence packs containing T0A bytes, T0B, manifests, revisions, schemas, lineage and the query specification.",
+      "object_key_shape": "a pack root outside the source tree, with a manifest listing every object by role and checksum",
+      "authority": "DERIVED PORTABLE COPY. Verified completely before any destination mutation; restored into an EMPTY root through a staging tree promoted atomically.",
+      "properties": [
+        "No source-root filesystem assumption: a pack can be exported from one root and restored under an unrelated one.",
+        "Unlisted files in a pack are refused; there is no best-effort recovery."
+      ]
+    }
+  ],
+  "authority_relationships": {
+    "content_identity": "T0A bytes define content identity; nothing else may claim to.",
+    "evidence_identity": "The T0A metadata catalog is authoritative for identity and history.",
+    "derived_data": "T0B, DuckDB and PostgreSQL are all subordinate to T0A and all reconstructible from it.",
+    "checkpoint": "Job checkpoints are derived state and may only advance on re-proven durable truth.",
+    "backup": "Export packs are verified copies, never a new authority.",
+    "removal": "Deleting DuckDB, PostgreSQL or T0B loses derived state only. Deleting T0A is a loss of truth and is never automatic."
+  }
+}
