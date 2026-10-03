@@ -877,3 +877,88 @@ organisation ruleset can apply. A bogus-branch control query distinguishes
 "unprotected" from "not found", so this is verified rather than inferred from a
 404. Neither SonarCloud nor Kilo is therefore a required merge check - but
 merge authority remains withheld on OCE policy grounds.
+
+## B4-CXR7U9R48X6 - closed-world mutation-channel proof (supersedes the X5 row)
+
+The X5 row above is **kept and corrected, not replaced**. X5 fixed two real
+omissions - `os.open` and builtin `open` - and both repairs remain. But X5
+**discovered** channels from a fixed allowlist, so an unrecognised reachable
+write was silently ignored instead of rejected.
+
+**Reproduced before repair:** injecting one
+`Path(target).write_text("injected")` into the reachable
+`_load_transition_record`, with all function names preserved, left the X5
+channel set at `[open, os.open]` and kept **H.1, H.2 and H.7 passing**.
+
+| X5 claim | X6 status |
+|---|---|
+| "instrument every reachable mutation surface" | **withdrawn** - a wider list still cannot be closed |
+| "instrumented set == audited set" | **restated as SUBSET** - H.2 asserts reachable ⊆ instrumented; equality is false (2 reachable vs 33 instrumented) |
+| "each channel is observed live" | **restated** - each of the **2 reachable** channels is; the other 31 instrumented are capability |
+| "drift fails loudly" | **withdrawn** - H.G tested name existence only; replaced by I.E (body drift) |
+| per-channel "reachable sites" table | **corrected** - `os.fdopen` (6), `tempfile.*` (5), `shutil.copyfileobj` (1) and the six durable-write helpers are **whole-file** counts with **0 authority-closure sites** |
+| H.7 | **deleted** - anchor-existence is not drift detection |
+
+**Four quantities, separately measured at `ab34dada`:**
+
+| Quantity | Value |
+|---|---|
+| reachable call sites (35-function closure, each classified once) | **312** |
+| reachable mutation call sites | **7** |
+| reachable mutation channels (distinct callees) | **2** - `open`, `os.open` |
+| globally instrumented channels | **33** |
+
+Classification of the 312 sites: 176 `PROVEN_READ_ONLY_OR_PURE`,
+129 `INTERNAL_CALL`, 7 `INSTRUMENTED_MUTATION_CHANNEL`, **0**
+`UNKNOWN_OR_DYNAMIC`. Call-site identity is `owner|callee|line:col` ->
+**312 distinct over 312 sites, 0 ambiguous**. Unknown or dynamic calls now
+**fail closed**; module receivers must match full dotted spelling, so a
+bare `"open"` entry cannot admit `shutil.open` or `io.open`.
+
+| Test | Establishes | Discriminated by mutation |
+|---|---|---|
+| `test_i_a_an_unknown_mutation_call_fails_the_closed_world_audit` | an unregistered write API makes the proof red and names the site | **yes** |
+| `test_i_b_a_known_mutation_maps_to_its_observer_and_loses_its_observer` | observer mapping, and that losing the observer fails | **yes** |
+| `test_i_c_read_only_channels_are_classified_but_stay_silent` | read-only calls are classified and silent at runtime | yes |
+| `test_i_d_builtin_open_attribution_limit_is_explicit` | two-sided attribution **and its exact limit** | yes |
+| `test_i_e_body_drift_fails_even_when_every_anchor_is_present` | real body drift, replacing H.7 | **yes** |
+| `test_i_f_the_four_quantities_are_reported_separately` | reachable / global / instrumented are not conflated | **yes** |
+| `test_i_g_the_dispatch_local_admission_is_proven_executably` | the `handler` dispatch-local admission | yes |
+
+Two honest negative results: neutering `_assert_closed_world` leaves **H.1
+passing** (it had nothing to catch), and **H.2's subset assertion does not
+discriminate in isolation** (no orphan channel exists in shipped source).
+The controls, not the prior tests, carry the discrimination.
+
+**Attribution limit:** immediate engine-frame attribution covers **direct
+builtin `open` calls only**; any indirect file API is rejected by the
+closed-world audit unless separately instrumented.
+
+**No production mutation defect was discovered.** The gap was in the proof,
+not the engine. `pg-recovery.py` is untouched; `ab34dada` changes 1 file with
+**0 files under `scripts/`**.
+
+**Node accounting:** R48R3 51 -> **57**, R48R4 **39**, pair **96**, **0**
+duplicate full node IDs. Test-only commit `ab34dada`.
+
+**Authoritative runs:** all five workflows `success` on `ab34dada` - b1
+`37144654562`, b2 `37144654601`, b3 `37144654574`, b4 `37144654554`,
+B1-I1R `37144656252`. b1 artifact `b1-local-ground-evidence-eedfb77a97f9`:
+**695 tests, 0 failed, 0 errors, 0 skipped** (`689 - 1 + 7` against the X5
+baseline run `37138807973`), gate `"result": "PASS"`, `AUTHORITATIVE_CI`,
+tested commit = `ab34dada`, source clean before and after, zero mandatory
+skips, cleanup `"ok"`.
+
+**External checks at `ab34dada` - unchanged, still red, unsuppressed:**
+SonarCloud `111266350750` `completed`/`failure` (D Security and C
+Reliability on new code); Kilo `111265992217` `completed`/`failure`
+(provider-side `git-lfs` smudge exit 128, `annotations_count = 0`, no code
+reviewed). Neither is weakened, suppressed, excluded, waived or relabelled,
+and neither is claimed green.
+
+**Merge policy (§10.5) reverified and unchanged:** no classic protection on
+`main` or the head, repository rulesets `[]`, effective rulesets `[]`,
+owner type `User`, `permissions.admin = true`, `reviewDecision = ""`. So
+neither external check is GitHub-required - **which is not merge
+authority**. PR #4 is `OPEN`, `mergedAt = null`, `MERGEABLE`,
+`UNSTABLE`. **`MERGE_AUTHORIZED = false`**.

@@ -3856,3 +3856,261 @@ execution mutations = 0 · recurring cost = $0 · `capital.authority = none`
 
 No cloud provisioning, no broker connection, no trading, no CEREBUS strategy
 change, no LFS migration, no Sonar suppression.
+
+## 11. B4-CXR7U9R48X6 - closed-world mutation-channel proof and X5 evidence correction
+
+**This section supersedes §10. It does not delete or rewrite it.** §10
+remains the record of what X5 claimed and what X5 fixed. §11 records
+which of those claims were stronger than what X5 actually proved, and
+what is now proven instead.
+
+### 11.1 The X5 discovery logic was not closed-world
+
+X5 (§10.2) closed two **concrete** omissions: `os.open` (5 reachable call
+sites) and builtin `open` (2 reachable call sites). Both repairs are kept.
+
+X5's *discovery* logic was the problem. `_reachable_write_channels()`
+recognised a fixed allowlist of selected `os.*` / `tempfile.*` /
+`shutil.*` spellings plus bare builtin `open`. A reachable call whose
+spelling was not on that list was **silently ignored** rather than
+rejected. X5 therefore proved *every channel X5 knew about is
+instrumented*; it did not prove *every reachable channel is known*.
+
+**Reproduced on an isolated scratch copy before any repair.** A single
+`Path(target).write_text("injected")` was injected into the reachable
+`_load_transition_record` with all function names preserved. X5's auditor
+reported the channel set `[open, os.open]` - unchanged - and **H.1, H.2
+and H.7 all still passed.** The mutation had disappeared from the
+audited set with the proof fully green. The scratch copy was deleted and
+nothing from it was committed.
+
+This is the exact failure mode X6 exists to remove: a proof that is
+unfalsifiable **in the engine's favour**.
+
+### 11.2 The X5 site table mixed whole-file counts with authority-closure counts
+
+The X5 table in `B4-ACCEPTANCE-MATRIX.md` §X5 listed "Reachable sites"
+per channel. Measured against the authority closure at `ab34dada`, only
+two of those rows were closure counts; the rest were whole-file counts
+presented as closure counts:
+
+| Channel | X5 "reachable sites" | Authority-closure sites at `ab34dada` |
+|---|---|---|
+| `os.open` | 5 | **5** - correct |
+| builtin `open` | 2 | **2** - correct |
+| `os.fdopen` | 6 | **0** - not reachable |
+| `tempfile.mkstemp` / `mkdtemp` / `NamedTemporaryFile` | 5 | **0** - not reachable |
+| `shutil.copyfileobj` | 1 | **0** - not reachable |
+| six named durable-write helpers | `-` | **0** - not reachable |
+
+`os.fdopen`, `tempfile.*` and `shutil.*` are instrumented but **unreached**
+by the three authority entry points. They remain instrumented - a global
+capability that costs nothing - but they are not authority-path channels
+and must not be counted as such.
+
+### 11.3 Four quantities, kept separate and separately measured
+
+X5's phrasing "instrument every reachable mutation surface" collapsed
+these into one number. They are four different numbers:
+
+| # | Quantity | Value at `ab34dada` | Meaning |
+|---|---|---|---|
+| 1 | reachable **call sites** | **312** | every `ast.Call` in the 35-function closure, each classified exactly once |
+| 2 | reachable **mutation call sites** | **7** | sites classified `INSTRUMENTED_MUTATION_CHANNEL` |
+| 3 | reachable **mutation channels** | **2** | distinct rendered callees among those sites: `open`, `os.open` |
+| 4 | **globally instrumented channels** | **33** | what the tripwire *can* observe, reachable or not |
+
+Classification breakdown of the 312 sites: **176**
+`PROVEN_READ_ONLY_OR_PURE`, **129** `INTERNAL_CALL`, **7**
+`INSTRUMENTED_MUTATION_CHANNEL`, **0** `UNKNOWN_OR_DYNAMIC`.
+Call-site identities are `owner|callee|line:col`; **312 distinct
+identities over 312 sites, so 0 ambiguous matches.** Column offset is
+part of the identity because `pg-recovery.py:2518` calls `_receipt_digest`
+twice on one line.
+
+The 7 mutation call sites, each with its owning function, line and real
+observer:
+
+| Owner | Line | Callee | Observer |
+|---|---|---|---|
+| `_open_governed_directory` | 1315 | `os.open` | `os.open` (write-capable flags only) |
+| `_open_claim_descriptor` | 1573 | `os.open` | `os.open` (write-capable flags only) |
+| `_open_claim_descriptor` | 1574 | `os.open` | `os.open` (write-capable flags only) |
+| `_read_record_snapshot_admitted` | 2296 | `os.open` | `os.open` (write-capable flags only) |
+| `_read_record_snapshot_admitted` | 2298 | `os.open` | `os.open` (write-capable flags only) |
+| `_load_receipt` | 710 | `open` | `builtins.open` (write-capable mode, engine-frame only) |
+| `_load_transition_record` | 858 | `open` | `builtins.open` (write-capable mode, engine-frame only) |
+
+### 11.4 X5 claims that are withdrawn or restated
+
+| X5 claim (§10) | Status after X6 |
+|---|---|
+| "Outcome A - instrument every reachable mutation surface" | **Withdrawn as written.** The right repair was a closed-world audit, not a wider list. A list can always be outgrown. |
+| "Instrumented set == audited set" (H.2) | **Restated as SUBSET coverage.** H.2 asserts `audited reachable channels ⊆ instrumented channels`. Equality is not asserted and is not true: 2 reachable vs 33 instrumented. |
+| "Each channel is recorded on a live tripwire" (H.C) | **Restated.** Each of the **2 reachable** channels is observed live. The other 31 instrumented channels are capability, not observed coverage. |
+| "Source drift fails loudly" (H.G) | **Withdrawn.** H.G tested that the three entry-point **names** exist. Name-preserving body drift was not detected. Replaced by I.E. |
+| "H.1 .. H.7" | **H.7 deleted.** Anchor-existence is not drift detection and reads as a stronger control than it is. |
+| Reachability table with per-channel site counts | **Corrected in §11.2.** Whole-file counts were presented as closure counts. |
+| "complete" | **Now earned, and only for the authority closure.** Closed-world classification covers every reachable call site and unknown calls fail closed. This is a statement about the classifier's explicit boundary, not about the whole engine. |
+
+**H.2's subset assertion was also checked for discrimination in isolation
+and it does NOT discriminate**: with no orphan channel in the shipped
+source there is nothing for it to catch. It is retained because it
+documents the real set relation, and its teeth are supplied by I.B, which
+removes an observer *and* injects a channel. This is recorded rather than
+glossed.
+
+### 11.5 What X6 actually proves: fail closed on the unknown
+
+Discovery is no longer an allowlist. For every `ast.Call` in the
+transitive intra-module closure from `_acquire_recovery_authority`,
+`_classify_record_for_shell` and `_classify_rollback_for_shell`,
+exactly one classification is assigned:
+
+- `INTERNAL_CALL` - resolved against module **functions and classes**;
+- `PROVEN_READ_ONLY_OR_PURE` - admitted only through the explicit
+  `READ_ONLY_REGISTRY` / `PURE_CONSTRUCTORS` / `REVIEWED_DISPATCH_LOCALS`;
+- `INSTRUMENTED_MUTATION_CHANNEL` - must carry a real observer;
+- `UNKNOWN_OR_DYNAMIC` - **fails the proof**.
+
+Module receivers must match full dotted spelling. `QUALIFIED_MODULES`
+contains `os`, `os.path`, `tempfile`, `shutil`, `stat`, `json`, `hashlib`,
+`io`, `subprocess`, `sys`, `fcntl`, `msvcrt`, `pathlib`. A bare `"open"`
+entry can therefore never admit `shutil.open` or `io.open`.
+
+**The classifier's boundary, stated exactly.** It proves that every
+reachable call site in the intra-module closure is classified and that
+every reachable mutation channel is instrumented. It does **not** prove
+anything about call sites in modules the closure does not enter, about
+mutations performed by the operating system on the engine's behalf, or
+about semantic equivalence of the read-only registry. No claim is made
+beyond that boundary.
+
+### 11.6 Seven controls, each verified to discriminate
+
+Every control was checked against a **mutated** copy of the auditor, not
+only against the shipped one. A control that cannot fail proves nothing.
+
+| Test | Proves | Discriminated by mutation |
+|---|---|---|
+| I.A | an unregistered write API fails the audit and names the site | **yes** - admitting `write_text`/`write_bytes` makes I.A fail |
+| I.B | a known channel maps to its observer, and losing the observer fails | **yes** - unmapping the `os.chmod` observer makes I.B fail |
+| I.C | read-only channels are classified but stay silent at runtime | yes |
+| I.D | the two-sided builtin-`open` attribution and its exact limit | yes |
+| I.E | body drift fails even with every anchor present | **yes** - neutering `_weakened_source` makes I.E fail |
+| I.F | reachable, global and instrumented counts are not conflated | **yes** - conflating reachable with instrumented makes I.F fail |
+| I.G | the `handler` dispatch-local admission is proven executably | yes |
+
+Two honest negative results:
+
+- **Neighbouring `_assert_closed_world` does not rescue H.1.** With the
+  choke point neutered, **H.1 still passes** - it had nothing to catch,
+  because the shipped source has no orphan channel. I.A and I.E do fail.
+  The two-sided structure is deliberate: the controls, not the previous
+  test, carry the discrimination.
+- **H.2 did not discriminate in isolation** (see §11.4).
+
+**I.D's exact limit, as required:** immediate engine-frame attribution
+covers **direct builtin `open` calls only**. Any indirect file API is now
+rejected by the closed-world audit unless it is separately instrumented.
+
+### 11.7 No production mutation defect was discovered
+
+The closed-world audit classified all 312 reachable call sites with **0**
+unknowns, and all 7 reachable mutation sites are read-only in practice:
+the 5 `os.open` sites use read-only/no-follow flag constants
+(`_DIR_OPEN_NO_FOLLOW_FLAGS`, `_CLAIM_OPEN_FLAGS`, `_RECORD_OPEN_FLAGS`,
+all derived from `os.O_RDONLY`) and both builtin `open` sites open for
+reading. **The gap was in the proof, not in the engine.**
+
+`pg-recovery.py` is **untouched** by X6. Commit `ab34dada` changes 1 file,
+the test module: **0 files under `scripts/`**.
+
+### 11.8 Authoritative runs on the X6 implementation head `ab34dada`
+
+| Workflow | Run ID | Conclusion |
+|---|---|---|
+| `b1-local-ground-validation` | `37144654562` | success |
+| `b2-control-plane-validation` | `37144654601` | success |
+| `b3-worker-fabric-validation` | `37144654574` | success |
+| `b4-config-spine-validation` | `37144654554` | success |
+| `B1-I1R Validation` | `37144656252` | success |
+
+b1 artifact `b1-local-ground-evidence-eedfb77a97f9`, run `37144654562`,
+verified by parsing `junit.xml` and attributing by `classname`:
+
+- **695 tests, 0 failed, 0 errors, 0 skipped.** Arithmetic against the X5
+  baseline run `37138807973` @ `4b1b03a3` (**689**):
+  `689 - 1 (H.7 deleted) + 7 (I.A-I.G) = 695`. Verified, not assumed.
+- R48R3 **57** (`51 + 6`: H.7 out, H.1-H.6 and I.A-I.G in), R48R4 **39**
+  unchanged, pair **96**.
+- **0 duplicate full node IDs** (`classname::name`), independent of the
+  gate's own `collected=695 unique=695`.
+- All 7 `I.*` controls are present in the authoritative run - they are
+  selected by the existing canonical runner; no new workflow was created.
+- gate `"result": "PASS"`, `"mode": "AUTHORITATIVE_CI"`, implementation
+  commit `ab34dada...` = tested checkout, tree `bb71a97e...`, source clean
+  before and after (`dirty_pre 0`, `dirty_post 0`), zero mandatory CI
+  skips, container-backed tests executed 27/27.
+- `cleanup.json` = `{"cleanup": "ok", "disposable_removed": true}`.
+
+Local validation: **93 passed, 3 skipped** for the R48R3+R48R4 selection;
+R40 state matrix **34 passed, 1 skipped**; Ruff **All checks passed**;
+`py_compile` clean; `git diff --check` clean.
+
+### 11.9 External checks at `ab34dada` - unchanged, still red, unsuppressed
+
+| Check | ID | State |
+|---|---|---|
+| SonarCloud Code Analysis | `111266350750` | `completed` / **`failure`** |
+| Kilo Code Review | `111265992217` | `completed` / **`failure`** |
+| `validate` x5 (GitHub Actions) | see §11.8 | `completed` / `success` |
+
+**Neither external check was weakened, suppressed, excluded, waived or
+relabelled, and neither is claimed green.**
+
+Carried-over SonarCloud truth, still current: project
+`dabiggestpoppa_larger-lab`; failed conditions **D - Security Rating on
+New Code** and **C - Reliability Rating on New Code** (both require >= A).
+No `SONAR_TOKEN` is available in this environment and the analysis is
+configured externally, so the complete new-code issue set is
+`INACCESSIBLE_WITHOUT_CREDENTIALS`. The GitHub annotation feed is hard-capped
+at 50 entries, so the observed issue set is a **sample, not a census**.
+27 distinct failure-level issues were observed across two samples; **0 are
+`BUG`-class**, yet Reliability still fails - so at least one unseen bug is
+likely to exist. This is unresolved and is not something X6 can fix from
+inside the repository.
+
+Kilo remains provider-side: `git-lfs` smudge exit 128 on
+`quant-lab/research/crypto_foundry/alt_rotation/data_1/
+ALT_DATA_1_ASSET_MULTISCALE_FEATURES.parquet`, "Clone succeeded, but
+checkout failed", `annotations_count = 0`. **Kilo did not review the
+code.** No in-repo lever reaches it; `.gitattributes`, `.lfsconfig` and the
+LFS objects are untouched, and no Kilo workflow was added.
+
+### 11.10 Merge policy, freshly reverified at `ab34dada`
+
+§10.5's ten-row authenticated reading stands unchanged: no classic
+protection on `main` or `oce-program-build`, repository rulesets `[]`,
+effective rulesets `[]` on both branches, owner type `User` (so no
+inherited organisation ruleset can apply), `permissions.admin = true`, no
+reviews submitted, `reviewDecision = ""`. Each 404 was distinguished from
+an authorisation failure by a bogus-branch control query returning
+"Branch **not found**" instead of "Branch not protected". So
+`MERGE_POLICY_VISIBILITY = VERIFIED_NOT_INACCESSIBLE`.
+
+**Neither SonarCloud nor Kilo is a GitHub-required merge check. That is a
+fact about GitHub's merge plumbing, not a grant of merge authority.**
+
+PR #4 at `ab34dada`: state `OPEN`, `mergedAt = null`, base `main`,
+`mergeStateStatus = UNSTABLE`, `mergeable = MERGEABLE`,
+`reviewDecision = ""`. **Not merged, and not to be merged by this pass.**
+
+### 11.11 Accounting
+
+cloud mutations = 0 - broker mutations = 0 - capital mutations = 0 -
+execution mutations = 0 - recurring cost = $0 - `capital.authority = none`.
+
+No cloud provisioning, no broker connection, no trading, no CEREBUS
+strategy change, no LFS migration, no Sonar suppression, no R49, no
+Book 5, no Atlas Program Block 4.
