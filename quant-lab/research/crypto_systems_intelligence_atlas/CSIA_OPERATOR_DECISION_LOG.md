@@ -2522,3 +2522,156 @@ NEXT = operator decision on BOOK6-GAP7-v0.2
        NV-A over NV-B. Implementation remains a SEPARATE later decision.
        GAP-6 ratification stays NOT authorized.
 ```
+
+---
+
+# CSIA — GAP-7 CONSISTENCY REPAIR AND NV AUTHORITY DECISION PREPARATION
+
+**Date:** 2026-10-03
+**Authorization:** `GAP-7 CONSISTENCY REPAIR + NON-VALUE-BEARING AUTHORITY
+DECISION PREPARATION` ONLY.
+**Decision id:** none. This entry records **no** operator decision.
+**Nature of this entry:** CORRECTION of the preceding GAP-7 entry, triggered by
+an external review that found two concrete defects and **refused ratification**.
+
+```text
+STARTING_HEAD_PLANNING = 2bb7700e577d6a453006e15861735faa6bf7262d
+STARTING_HEAD_IMPL     = 5f94c3f40cea4441470c57671f51454da7377361
+ACCEPTED_BOOK_6_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc (ancestor, 1 commit behind impl)
+BASELINE_SUITE         = 2162 passed (re-measured this round)
+```
+
+## Why this correction exists
+
+The external review identified two defects in the preceding GAP-7 package.
+
+```text
+DEFECT_A = CURR-7 and CURR-24 in TEST_SPEC_v0.1 demand opposite outcomes.
+DEFECT_B = NV-A was asserted as accepted current-authority doctrine on the
+           strength of construction and registration evidence only.
+```
+
+Both were conceded on re-verification. The evidence for Defect B was traced and
+found to be the defective early return itself, which this program is repairing.
+
+## Corrected state
+
+```text
+GAP_7_KERNEL_SHAPE     = 7A-KERNEL
+GAP_7_KERNEL_WIDE_DEFECT = TRUE
+STATUS                 = B-STRICT
+STATUS_ONLY_CHANGES_CURRENTNESS = FALSE
+
+NV_AUTHORITY           = UNRESOLVED
+NV_POLICY              = <UNRATIFIED: A | B | C | D>
+PRE_RAT_v0.1           = SUPERSEDED_BY_v0.2_DUE_TO_INTERNAL_CONTRADICTION
+PRE_RAT_v0.2_VERDICT   = HOLD_PENDING_NV_DECISION
+TEST_SPEC_v0.2_CASES   = 27 (19 carried + 3 status + 5 NV); 0 implemented
+
+GAP_6                  = VALID / HOLD_PENDING_GAP7
+GAP_7_RATIFIED         = FALSE
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## The three classifications this entry corrects
+
+```text
+PRE_RAT_v0.1                    = SUPERSEDED / INTERNAL CONTRADICTION FOUND
+SOURCELESS_MISSINGNESS_CONSTRUCTIBILITY  = ACCEPTED
+SOURCELESS_MISSINGNESS_CURRENT_AUTHORITY = UNRESOLVED
+```
+
+`PRE_RAT_v0.1` is **not** false evidence. Its executed probes were sound and are
+preserved. It is not ratifiable, because its subject spec contradicted itself
+and its 15/15 score cannot be a reliable summary of a self-contradictory
+contract.
+
+## Binding evidence rules introduced this round
+
+```text
+DEFECTIVE_BEHAVIOR_IS_NORMATIVE_EVIDENCE       = FALSE
+ACCEPTED_CONSTRUCTION_BEHAVIOR
+    != ACCEPTED_CURRENT_AUTHORITY_DOCTRINE
+```
+
+## Measurements that do not depend on the operator decision
+
+```text
+STATUS_NOT_AUTHORITY_MEASURED        = status OBSERVED vs SUPERSEDED, identical
+                                       facts -> BOTH CURRENT (kernel already compliant)
+CITED_REF_BYPASS_MEASURED            = cited+decayed non-value-bearing -> STILL CURRENT
+                                       on all 8 states
+METHODOLOGY_BYPASS_MEASURED          = methodology invalidated -> value-bearing REFUSED,
+                                       non-value-bearing CURRENT
+LINEAGE_NEVER_CONSULTED_MEASURED     = superseded NV predecessor -> STILL CURRENT
+BRANCHING_ACCEPTED_AT_REGISTRATION    = multiple successors accepted; refused only at
+                                       measurement_history
+NV_MATRIX_UNIFORMITY                 = all 8 states identical on all 6 measured axes
+                                       (uniformity is an artifact of the defect, not doctrine)
+```
+
+## Status quarantine boundary recorded
+
+```text
+B-STRICT asserts ONLY that ObservationStatus is ignored for authority.
+It does NOT assert that the name SUPERSEDED is correctly placed.
+
+Measured incoherence (recorded, NOT repaired):
+  book6_grammar.py:264-268  "the prior observation is retained with SUPERSEDED"
+  book6_records.py:203      a SUPERSEDED observation MUST name what it superseded
+                            -> a correctly-marked predecessor is REFUSED
+This is a SEPARATE FUTURE LIFECYCLE-CLEANUP ITEM and is out of GAP-7 scope.
+```
+
+## Artifacts created this round (docs only)
+
+```text
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_TEST_SPEC_v0.2.md      supersedes v0.1
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_CLARIFICATION_v0.2.md  supersedes v0.1
+CSIA_BOOK_6_GAP7_PRE_RATIFICATION_REVIEW_v0.2.md               supersedes v0.1
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_DECISION_PACKET_v0.3.md supersedes v0.1/v0.2
+CSIA_OPERATOR_DECISION_LOG.md                                  appended (this entry)
+```
+
+Prior GAP-6 artifacts and the GAP-7 audit evidence are **preserved unchanged**.
+
+## Untracked tooling — outside this authorization, not committed, not deleted
+
+```text
+CSIA_DEFECT_CLASS_SWEEP_v0.1.md
+CSIA_RUNTIME_GROUNDING_CHECK_FINDINGS_v0.1.md
+tools/csia_defect_class_sweep.py
+tools/csia_grounding_check.py
+tools/csia_grounding_manifest.json
+tools/csia_ratified_corpus.py
+UNTRACKED_PRIOR_TOOLING = 6 files, PRESENT, NOT COMMITTED, NOT DELETED (md5 verified unchanged)
+```
+
+## Unchanged by this entry
+
+```text
+BOOK6-COMPARE-SUBSTRATE-v0.2    = RATIFIED, STANDS
+GAP_1..GAP_5                    = CLOSED
+GAP_6_6E                        = DESIGN VALID / RATIFICATION ON HOLD
+CHOIR_PLAN_PRESERVED            = TRUE
+ACCEPTED_BOOK_6_ANCHOR          = 5f94c3f40cea4441470c57671f51454da7377361
+```
+
+## Not authorized and not performed
+
+GAP-6 ratification; GAP-7 ratification; any implementation; any source edit; any
+test code; any status rename, deletion, reinterpretation or validator repair; any
+status-based currentness; any use of defective early-return behaviour as
+normative evidence; any silent NV policy; any comparison-local currentness; any
+predecessor resurrection; any reopening of GAP-1..GAP-5; any Choir work; any
+force-push, rebase, amend or history rewrite.
+
+```text
+NEXT = operator selects NV policy from DECISION_PACKET_v0.3:
+         A (7A+B-STRICT+NV-A) / B (...+NV-B, recommended)
+         C (...+NV-C, requires the 8-row per-state table) / D (HOLD)
+       Then GAP-7 ratification becomes possible; GAP-6 follows separately.
+       Implementation of the 7A-KERNEL repair remains a LATER, separate decision.
+```
