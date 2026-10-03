@@ -2242,3 +2242,95 @@ rewrite.
 ```text
 NEXT = POST-RATIFICATION IMPLEMENTATION AUTHORIZATION REVIEW (v0.4)
 ```
+
+## BOOK6-GAP6-v0.1 — 2026-10-03 (PROPOSED — NOT A DECISION)
+
+```text
+DECISION_ID   = BOOK6-GAP6-v0.1
+DATE          = 2026-10-03
+DECISION_TYPE = PROPOSED_PENDING_OPERATOR_RATIFICATION
+STATUS        = DRAFT_PENDING_OPERATOR_RATIFICATION
+COLLISION_FREE = TRUE  (no prior BOOK6-GAP6-* id exists)
+SELECTED_BY   = OPERATOR_DIRECTION (not by this agent)
+
+GAP_6 = 6E WINDOW_CLASS_AWARE_ORDERING_KEYS   PROPOSED / NOT RATIFIED
+```
+
+This entry records a **proposal**, not a decision. The operator directed the
+`6E` resolution; the operator has not yet ratified it.
+
+```text
+GAP_1 = CLOSED / UNCHANGED / NOT REOPENED
+GAP_2 = CLOSED / UNCHANGED / NOT REOPENED
+GAP_3 = CLOSED / UNCHANGED / NOT REOPENED
+GAP_4 = CLOSED / UNCHANGED / NOT REOPENED
+GAP_5 = CLOSED / UNCHANGED / NOT REOPENED
+
+SUBSTRATE_RATIFICATION        = STANDS
+SUBSTRATE_RATIFICATION_REVERSED = FALSE
+GAP_6_IS_NEW                  = TRUE
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_8_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**The defect GAP-6 addresses** (found by `..._AUTHORIZATION_REVIEW_v0.4.md`,
+independently re-derived from AST by `tools/csia_grounding_check.py`):
+
+```text
+Ratified ordering keys on window_end, then window_start.
+Accepted model FORBIDS both fields for WindowClass.INSTANTANEOUS
+    (book6_records.py:169-175)
+INSTANTANEOUS is the DEFAULT in canonical fixtures
+    (book6_support.py:356, :393)
+=> ordering keys 1 and 2 have no value for the runtime's default window class
+```
+
+**The `6E` resolution, in one line:** derive selector-local `effective_end` /
+`effective_start` — from window fields for the nine interval classes, from
+`valid_time` for `INSTANTANEOUS` — leaving the record untouched.
+
+```text
+ORDERING_KEYS_ARE_DERIVED     = TRUE
+OBSERVATION_MUTATION          = FALSE
+SYNTHETIC_ZERO_WIDTH_INTERVAL = FALSE
+ONE_DAY_CONVENTION            = FALSE
+BLANKET_EXCLUSION_OF_INSTANTANEOUS = FALSE
+BLANKET_REFUSAL_OF_INSTANTANEOUS   = FALSE
+WINDOW_CLASS_CONVERSION       = FALSE
+OBSERVED_AT_ORDERING          = FALSE
+CALLER_ORDER_ORDERING         = FALSE
+STRICT_TEMPORAL_PRECEDENCE    = TRUE
+MEASUREMENT_OBSERVATION_CONTRACT_CHANGED = FALSE
+
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+HIDDEN_THIRD_CONTRACT = NONE
+```
+
+**Basis recorded (not a verdict to adopt):**
+
+```text
+INSTANTANEOUS_ORDERING_PRE_RATIFICATION_REVIEW = 15 / 15 PASS
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.5      = 10 TRUE / 0 FALSE
+                                                  (READY_PENDING_GAP6_RATIFICATION)
+TEST_SPEC_v0.4_CASES = 252  (237 carried + 15 TIME)
+TEST_SPEC_BLOCKED = 0
+```
+
+**AWAITING OPERATOR DECISION:**
+`RATIFY_GAP6_6E_WINDOW_CLASS_AWARE_ORDERING` **or** `HOLD`.
+
+**Not authorized and not performed:** ratification of GAP-6; any implementation;
+any source or test change; any change to `MeasurementObservation`; any fabricated
+interval; any one-day convention; any exclusion of `INSTANTANEOUS`; any
+`observed_at` or caller-order ordering; any window-class coercion; any
+aggregation invention; any reopening of GAP-1..GAP-5; any reversal of
+`BOOK6-COMPARE-SUBSTRATE-v0.2`; Book 6 re-acceptance; Book 7 or Book 8; live
+acquisition; branch creation; force-push; rebase; amend; history rewrite.
+
+```text
+NEXT = operator ratification decision on GAP-6 (6E), then implementation
+       authorization remains a SEPARATE decision.
+```
