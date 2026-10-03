@@ -1,0 +1,30 @@
+{
+  "checkpoint": "SENSOR-B4-I16A",
+  "current_head": "e5294529f4b603c8ec10bc21e2e24c7a97044ca7",
+  "frozen_definition": "PASS when all current manifests reference existing valid objects and historical versions remain available",
+  "gate_id": "G4-05",
+  "historical_evidence_refs": [
+    "BLOC_04_I04_CATALOG_SCHEMAS.json",
+    "BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+    "BLOC_04_I04R1_POINTER_SCHEMA.json",
+    "BLOC_04_I15_MANIFEST_SCAN_MATRIX.json"
+  ],
+  "measured": {
+    "cas_semantics_intact": true,
+    "current_manifest_id": "pm-v2",
+    "current_pointers": 1,
+    "dangling_refs": 0,
+    "fresh_restart_verified": true,
+    "historical_lookup_resolves": true,
+    "manifest_versions_committed": 2,
+    "refs_exist_and_verify": 2
+  },
+  "measured_case_count": 6,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.manifests.PartitionManifestRepository.commit_manifest/list_all_current_manifests/get_manifest",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

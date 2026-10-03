@@ -1,0 +1,117 @@
+{
+  "cases": [
+    {
+      "case_id": "all_byte_values",
+      "measured": {
+        "byte_count": 256,
+        "byte_equality": true,
+        "input_sha256": "40aff2e9d2d8922e47afd4648e6967497158785fbd1da870e7110266bf944880",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "40aff2e9d2d8922e47afd4648e6967497158785fbd1da870e7110266bf944880",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "embedded_nul_text",
+      "measured": {
+        "byte_count": 16,
+        "byte_equality": true,
+        "input_sha256": "72b41d89240da9b2c23dae152ab01496b80fc787b27f7e29a3aa7d0670ccd8e3",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "72b41d89240da9b2c23dae152ab01496b80fc787b27f7e29a3aa7d0670ccd8e3",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "empty",
+      "measured": {
+        "byte_count": 0,
+        "byte_equality": true,
+        "input_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "high_bit_random_like",
+      "measured": {
+        "byte_count": 4096,
+        "byte_equality": true,
+        "input_sha256": "4e441a3533bb2c10cd5649981d395744213e09a336746b5a3458fee4057205ec",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "4e441a3533bb2c10cd5649981d395744213e09a336746b5a3458fee4057205ec",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "invalid_utf8_sequence",
+      "measured": {
+        "byte_count": 8,
+        "byte_equality": true,
+        "input_sha256": "8b5190e89898687428e1fae9cfe5c41a2343071974217086b8c3bb5ee26579b9",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "8b5190e89898687428e1fae9cfe5c41a2343071974217086b8c3bb5ee26579b9",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "json_like_binary",
+      "measured": {
+        "byte_count": 19,
+        "byte_equality": true,
+        "input_sha256": "aa9860a0ca9caae5934bb3aeabfc9cac7fe552d36fdda8605876fe77d05ae767",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "aa9860a0ca9caae5934bb3aeabfc9cac7fe552d36fdda8605876fe77d05ae767",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "non_utf8_latin1",
+      "measured": {
+        "byte_count": 131,
+        "byte_equality": true,
+        "input_sha256": "93cfcaac1fcb0cc160a69110357faa1f0c851e31a53a8eaea59226b2e68ce397",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "93cfcaac1fcb0cc160a69110357faa1f0c851e31a53a8eaea59226b2e68ce397",
+        "sha_equality": true
+      },
+      "result": "OK"
+    },
+    {
+      "case_id": "single_nul",
+      "measured": {
+        "byte_count": 1,
+        "byte_equality": true,
+        "input_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+        "integrity_state": "LOCAL_HASH_VERIFIED",
+        "retrieved_sha256": "6e340b9cffb37a989ca544e6bb780a2c78901d3fb33738768511a30617afa01d",
+        "sha_equality": true
+      },
+      "result": "OK"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I16A",
+  "current_head": "e5294529f4b603c8ec10bc21e2e24c7a97044ca7",
+  "frozen_definition": "PASS when arbitrary source bytes can be stored/retrieved exactly with verified source SHA256",
+  "gate_id": "G4-01",
+  "historical_evidence_refs": [
+    "BLOC_04_I01_BLOB_STORE_MATRIX.json",
+    "BLOC_04_I02_COMPRESSION_MATRIX.json",
+    "BLOC_04_I03_ATOMIC_ORDER.json"
+  ],
+  "measured_case_count": 8,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "crypto_sensor_fabric.storage.blob_store.LocalBlobStore.put/open_blob/verify_blob; checksum domain law in storage.enums.StorageEncoding",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

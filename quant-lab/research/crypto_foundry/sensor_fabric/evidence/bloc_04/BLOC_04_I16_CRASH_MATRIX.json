@@ -1,0 +1,161 @@
+{
+  "cases": [
+    {
+      "crashed": true,
+      "final_object_exact": null,
+      "final_object_present": false,
+      "half_valid_final": false,
+      "window": "blob:STAGE_WRITE"
+    },
+    {
+      "crashed": true,
+      "final_object_exact": null,
+      "final_object_present": false,
+      "half_valid_final": false,
+      "window": "blob:BEFORE_FILE_FSYNC"
+    },
+    {
+      "crashed": true,
+      "final_object_exact": null,
+      "final_object_present": false,
+      "half_valid_final": false,
+      "window": "blob:BEFORE_STAGE_VERIFY"
+    },
+    {
+      "crashed": true,
+      "final_object_exact": null,
+      "final_object_present": false,
+      "half_valid_final": false,
+      "window": "blob:BEFORE_PUBLISH"
+    },
+    {
+      "crashed": true,
+      "final_object_exact": true,
+      "final_object_present": true,
+      "half_valid_final": false,
+      "window": "blob:AFTER_PUBLISH_BEFORE_DIR_FSYNC"
+    },
+    {
+      "crashed": true,
+      "final_object_exact": true,
+      "final_object_present": true,
+      "half_valid_final": false,
+      "window": "blob:AFTER_DIR_FSYNC_BEFORE_RETURN"
+    },
+    {
+      "all_visible_refs_exist": true,
+      "committed_versions_after_retry": [
+        1
+      ],
+      "committed_versions_before_retry": [],
+      "crashed": true,
+      "cursor_skip": false,
+      "false_checkpoint_progress": false,
+      "retry_disposition": "COMMITTED_NEW",
+      "visible_current_manifests": 0,
+      "window": "manifest:P1"
+    },
+    {
+      "all_visible_refs_exist": true,
+      "committed_versions_after_retry": [
+        1
+      ],
+      "committed_versions_before_retry": [],
+      "crashed": true,
+      "cursor_skip": false,
+      "false_checkpoint_progress": false,
+      "retry_disposition": "COMMITTED_NEW",
+      "visible_current_manifests": 0,
+      "window": "manifest:P2"
+    },
+    {
+      "all_visible_refs_exist": true,
+      "committed_versions_after_retry": [
+        1
+      ],
+      "committed_versions_before_retry": [],
+      "crashed": true,
+      "cursor_skip": false,
+      "false_checkpoint_progress": false,
+      "retry_disposition": "COMMITTED_NEW",
+      "visible_current_manifests": 0,
+      "window": "manifest:P3"
+    },
+    {
+      "all_visible_refs_exist": true,
+      "committed_versions_after_retry": [
+        1
+      ],
+      "committed_versions_before_retry": [
+        1
+      ],
+      "crashed": true,
+      "cursor_skip": false,
+      "false_checkpoint_progress": false,
+      "retry_disposition": "IDEMPOTENT_COMPLETION",
+      "visible_current_manifests": 1,
+      "window": "manifest:P4"
+    },
+    {
+      "all_visible_refs_exist": true,
+      "committed_versions_after_retry": [
+        1
+      ],
+      "committed_versions_before_retry": [
+        1
+      ],
+      "crashed": true,
+      "cursor_skip": false,
+      "false_checkpoint_progress": false,
+      "retry_disposition": "IDEMPOTENT_COMPLETION",
+      "visible_current_manifests": 1,
+      "window": "manifest:P5"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I16A",
+  "current_head": "e5294529f4b603c8ec10bc21e2e24c7a97044ca7",
+  "cursor_skip_total": 0,
+  "durability_operation_order": [
+    "stage_write",
+    "file_flush",
+    "file_fsync",
+    "stage_verify",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "dir_create",
+    "dir_fsync",
+    "parent_namespace_fsync",
+    "device_check",
+    "atomic_publish",
+    "final_link",
+    "parent_dir_fsync",
+    "final_parent_fsync",
+    "staging_cleanup",
+    "success_return"
+  ],
+  "fresh_restart_convergent": true,
+  "frozen_definition": "PASS when crash matrix produces no cursor skip or half-valid final object",
+  "gate_id": "G4-02",
+  "half_valid_final_total": 0,
+  "historical_evidence_refs": [
+    "BLOC_04_I03_ATOMIC_ORDER.json",
+    "BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+    "BLOC_04_I08R1_CRASH_TRUTH_MATRIX.json",
+    "BLOC_04_I14_HANDOFF_MATRIX.json"
+  ],
+  "measured_case_count": 11,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.atomic.publish_no_replace fault seams (FaultPoint/RaiseFaultHook) + storage.manifests.PartitionManifestRepository pointer publication (PointerFaultPoint P1..P5/RaisePointerFaultHook)",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

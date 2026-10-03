@@ -1,0 +1,34 @@
+{
+  "checkpoint": "SENSOR-B4-I16A",
+  "current_head": "e5294529f4b603c8ec10bc21e2e24c7a97044ca7",
+  "frozen_definition": "PASS when same source key / different bytes creates explicit revision and preserves both versions",
+  "gate_id": "G4-04",
+  "historical_evidence_refs": [
+    "BLOC_04_I06_REVISION_MATRIX.json",
+    "BLOC_04_I06R1_EVIDENCE.json",
+    "BLOC_04_I12R1_QUERY_EVIDENCE.json"
+  ],
+  "measured": {
+    "distinct_blobs_after_restart": 2,
+    "new_bytes_preserved": true,
+    "non_first_member_mutation_preserves_earlier": true,
+    "old_bytes_preserved": true,
+    "order_permutation_safe": true,
+    "revision_numbers": [
+      1,
+      2
+    ],
+    "same_content_refetch_is_single_revision": true,
+    "segment_count": 2,
+    "silent_replacement": false,
+    "source_revision_key_present": true
+  },
+  "measured_case_count": 6,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.revisions.SourceRevisionRegistry + RevisionSourceIdentityV1 (accepted I06 authority)",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

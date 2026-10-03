@@ -1,0 +1,29 @@
+{
+  "checkpoint": "SENSOR-B4-I16A",
+  "current_head": "e5294529f4b603c8ec10bc21e2e24c7a97044ca7",
+  "frozen_definition": "PASS when committed T0A cannot be overwritten through public storage APIs",
+  "gate_id": "G4-03",
+  "historical_evidence_refs": [
+    "BLOC_04_I03_ATOMIC_ORDER.json",
+    "BLOC_04_I04_CATALOG_SCHEMAS.json",
+    "BLOC_04_I15_CORRUPTION_MATRIX.json",
+    "BLOC_04_I15R1_TOCTOU_MATRIX.json"
+  ],
+  "measured": {
+    "committed_bytes_survive_fresh_restart": true,
+    "committed_sha256": "65cc0b00e6bbfa64575533463e20fd7801fe2b463e47a09e3759f070c961dc06",
+    "divergent_content_is_separate_identity": true,
+    "hardlink_mutation_detected": "QUARANTINED_INTEGRITY_FAILURE",
+    "hostile_final_name_refusal": "ExistingBlobIntegrityConflict('... NOT overwritten')",
+    "public_api_can_overwrite": false,
+    "replay_is_same_identity": true
+  },
+  "measured_case_count": 6,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.atomic.publish_no_replace (no-clobber final link) + storage.blob_store.LocalBlobStore.put_bytes",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

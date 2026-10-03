@@ -1,0 +1,35 @@
+{
+  "checkpoint": "SENSOR-B4-I16A",
+  "current_head": "e5294529f4b603c8ec10bc21e2e24c7a97044ca7",
+  "frozen_definition": "PASS when every T0B projection resolves completely to T0A blob/acquisition evidence",
+  "gate_id": "G4-06",
+  "historical_evidence_refs": [
+    "BLOC_04_I05_PROJECTION_MATRIX.json",
+    "BLOC_04_I05R1_SCHEMA_REGISTRY.json",
+    "BLOC_04_I12R2_FAIL_SAFE_MATRIX.json"
+  ],
+  "measured": {
+    "acquisition_resolves_to_source_blob": true,
+    "hidden_private_map_required": false,
+    "lineage_chain_complete": true,
+    "manifest_projection_refs": [
+      "proj-lin"
+    ],
+    "orphan_projections": 0,
+    "parser_version": "1.0.0",
+    "projection_id": "proj-lin",
+    "schema_identity": "i16.g4.projection@1.0.0",
+    "source_blob_refs": [
+      "578ff72d8c568cd46e8488dc3c3dfb573f3d793ccf55b431e73c14115606eb37"
+    ],
+    "t0a_physically_verified": true
+  },
+  "measured_case_count": 6,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.projections.T0BProjectionService.commit_projection + storage.projection_resolver.ProjectionLineageResolver + storage.projection_lineage.ProjectionLineageRepository",
+  "result": "OK",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}
