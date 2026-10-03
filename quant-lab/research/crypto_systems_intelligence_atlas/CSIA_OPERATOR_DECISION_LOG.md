@@ -2137,3 +2137,108 @@ baseline epoch implementation, any `observed_at` baseline ordering, any random
 or caller-order selection, any caller-selected authoritative baseline, Book 6
 re-acceptance, Book 7 or Book 8, live acquisition, branch creation, force-push,
 rebase or history rewrite.
+
+## BOOK6-COMPARE-SUBSTRATE-v0.2 — 2026-10-03
+
+```text
+DECISION_ID   = BOOK6-COMPARE-SUBSTRATE-v0.2
+DATE          = 2026-10-03
+DECISION_TYPE = OPERATOR_RATIFICATION
+SUPERSEDES_AS_A_DECISION = NONE  (first ratification of the successor substrate)
+COLLISION_FREE = TRUE  (existing ids: BOOK6-COMPARE-AMEND-v0.4,
+                        BOOK6-COMPARE-AMEND-IMPL-AUTHZ-v0.1)
+
+operator_selection = RATIFY
+status             = RATIFIED / CLOSED
+scope              = SUBSTRATE GOVERNANCE ONLY
+implementation_authority = FALSE
+```
+
+The operator **RATIFIES** the Book 6 Comparison / Change implementation-substrate
+successor package — six artifacts, ratified **as written**, with **no edit** to
+any of them:
+
+```text
+1. CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_SUBSTRATE_CLARIFICATION_v0.2.md
+2. CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.6.md
+3. CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_PLAN_v0.6.md
+4. CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_BOUNDARY_v0.4.md
+5. CSIA_BOOK_6_COMPARISON_CHANGE_AMENDMENT_RATIFICATION_RECORD_ERRATUM_v0.1.md
+6. CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_TEST_SPEC_v0.3.md
+```
+
+with these exact resolved gaps:
+
+```text
+GAP_1 = CLOSED / 1A-STRICT
+GAP_2 = CLOSED / 2D          SAME_METRIC_EXACT_UNIT_IDENTITY
+GAP_3 = CLOSED / 3C          COVERAGE_RULE_PRESENCE_DERIVATION
+GAP_4 = CLOSED / 4D          EXPLICIT_TEMPORAL_COMPARABILITY
+GAP_5 = CLOSED / 5E          COMPARISON_RULE_OWNED_BASELINE_SELECTOR
+
+GAP_1..GAP_5 = ALL CLOSED
+```
+
+Basis re-verified immediately before ratification:
+
+```text
+PRE_RATIFICATION_REVIEW_v0.2          = 20 / 20 PASS
+IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.3 = 10 TRUE / 0 FALSE
+TEST_SPEC_v0.3_CASES                  = 237
+TEST_SPEC_v0.3_BLOCKED                = 0
+REPLAY_CHECK_COUNT                    = 20
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2
+HIDDEN_THIRD_CONTRACT                 = NONE
+```
+
+Anchors:
+
+```text
+BASE_V0_4_PLAN_ANCHOR     = 28bfac52c23c891ebb54e9924dedc925a859b359
+BASE_V0_4_RATIFIED_IN     = 8557f4df82a67434951b2f9682142a59125f5153
+SUCCESSOR_PACKAGE_ANCHOR  = 4f2b6b1f52db8ba42f0bdf035cb80f2792868253
+BOOK_6_ACCEPTED_ANCHOR    = 3919fb8052e216e94034a753fb258d338c5fa0dc
+BOOK_6_ACCEPTANCE_COMMIT  = 5f94c3f40cea4441470c57671f51454da7377361
+IMPLEMENTATION_DRIFT     = ZERO
+```
+
+**CLASS C DECISION (explicit defer, recorded not designed):**
+
+```text
+CLASS_C_BENCHMARK = DEFERRED / NOT A BLOCKER
+
+BOOK6_CLASS_C_STATE_BENCHMARK_RUNTIME  = UNRATIFIED / UNIMPLEMENTED
+CLASS_C_BENCHMARK_GOVERNANCE            = DEFERRED
+CLASS_C_STATE_RULES_RATIFIED            = 0  (canonical)
+CLASS_C_BENCHMARK_METHODOLOGIES_RATIFIED = 0  (canonical)
+COMPARISON_BASELINE_SELECTOR_USES_CLASS_C_AUTHORITY = FALSE
+CLASS_C_BENCHMARK_BLOCKS_THIS_RATIFICATION = FALSE
+CLASS_C_BENCHMARK_BLOCKS_IMPLEMENTATION_AUTHORIZATION = FALSE
+```
+
+Reason: `StateRule.benchmark_methodology_ref` (`book6_states.py:178`, enforced
+at `:214`, serving `StateClass.C_THRESHOLD_BENCHMARK` at `book6_states.py:72`)
+is a **separate Class C mechanism**. `BaselineSelectorSpec` belongs only to
+`ComparisonRule`. The comparison amendment does NOT reuse StateRule benchmark
+authority, extend it, ratify it, implement it, or solve it. Accepted Book 6
+already fail-closes Class C pending ratified rules. Class C is therefore a
+separate deferred Book 6 concern and NOT a dependency of this amendment.
+
+**No Class C benchmark design was performed in this session.** The defer flags
+hold unless source implementation later demonstrates an actual dependency, in
+which case the question returns to the operator as a new decision.
+
+The formal record:
+`CSIA_BOOK_6_COMPARISON_CHANGE_SUBSTRATE_RATIFICATION_RECORD_v0.1.md`.
+
+**Not authorized and not performed:** any implementation; any source change; any
+test code; any Class C benchmark design; any `BenchmarkRule`; any
+`BenchmarkRuleRegistry`; any benchmark-rule ratification; any rolling mean /
+rolling median / historical distribution / baseline epoch; any coverage rule
+ratification; any `ComparisonRule` ratification; Book 6 re-acceptance; Book 7 or
+Book 8; live acquisition; branch creation; force-push; rebase; amend; history
+rewrite.
+
+```text
+NEXT = POST-RATIFICATION IMPLEMENTATION AUTHORIZATION REVIEW (v0.4)
+```
