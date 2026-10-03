@@ -3870,3 +3870,150 @@ research                                                  = FROZEN
 ```
 
 No self-ratification. I16 not started. STOP after I15R2.
+
+## SENSOR-B4-I15R2-RATIFY — OPERATOR ACCEPTANCE OF THE COMPLETE I15 -> I15R1 -> I15R2 CHAIN
+
+**Start gate verified at the mandatory head.** Branch
+`agent/crypto-sensor-fabric-build`, HEAD
+`2a856e656f9da4b2749fa1b999e58ae26f4234be`, origin build == local HEAD,
+origin/main `7c7816f382947bbc8a1f2154435fc436f2428fa8` untouched, worktree
+clean, and governance showing I15 = OPERATOR_HOLD, I15R1 = OPERATOR_HOLD,
+I15R2 = PENDING_OPERATOR_REVIEW, `next_checkpoint_authorized` = FALSE. All
+seven chain commits verified as strict linear ancestors with no merge, rebase,
+amend or squash.
+
+**REPORT_CORRECTION (§3) — prose understated the RED baseline incidence.** The
+prior prose summary reported the I15R2 baseline as 15 trials x 8 writers =
+11 green / 4 red with `UNSAFE_OBJECT_KEY` x0. The **committed authoritative**
+`BLOC_04_I15R2_CONCURRENT_PUBLICATION_MATRIX.json` records
+`baseline_reproduction_at_start_head` as trials 15, writers_per_trial 8,
+total_workers 120, **green_trials 8, red_trials 7**, failure classes
+**UNSAFE_OBJECT_KEY = 12, VALUE_ERROR_COMPONENTS_EMPTY = 4**,
+ATOMIC_PUBLISH_SECURITY_ERROR = 0, OTHER = 0. Both records sit at the same
+start head `67fd2271a`; the matrix row carries frozen `BASELINE_*` constants
+from the earlier I15R1-era probe while the prose came from a separate
+`run_identical_writer_trial` probe whose sample did not hit the
+`UnsafeObjectKey` class. **The matrix is authoritative and was NOT modified.**
+This correction does NOT change the post-repair verdict, which is separately
+measured and independently re-measured green. The correction strengthens the
+I15R2A repair case: the `UnsafeObjectKey` class is now attested at real
+incidence (12 worker failures) in the committed baseline.
+
+**RATIFIED.** Secret safety (13/13, repo scan clean, sentinel absent from
+durable metadata, URL/header/DSN credentials refused and redacted, no leak in
+errors, raw RESPONSE evidence exact and unredacted); traversal containment
+(36/36, outside-root mutations 0, 0 shell execution artifacts); static symlink
+escape (7/7); hardlink mutation as a typed integrity failure, never silent
+acceptance; fresh corruption R1 (10/10, every row `fresh_instance` true and
+`repair_on_read` false, no UNSAFE_SILENT_ACCEPTANCE); the DuckDB two-law model
+(A disposable/rebuild, B fail-closed, DuckDB non-authoritative); resource
+hardening (16/16) including **10,000 ACTUAL VALID manifest rows, 10,000
+scanned, 0 invalid, 0 duplicate logical IDs**, write throughput measured
+separately and NOT misrepresented as 10k append throughput, I09 disk watermark
+policy preserved; destination TOCTOU custody and staging-source substitution
+(I15R1 **13/13 OK, outside-root mutations 0, foreign bytes published 0**,
+both counterfactuals still demonstrating their escape); root-as-link law A
+preserved.
+
+**Shared canonical authority ratified.** `paths.canonical_real_path()` is THE
+canonical real-path authority and `paths.is_within_real_root()` THE shared
+containment predicate; `atomic._real_path`/`_is_within` are delegating aliases.
+Extended-prefix normalization logic exists in EXACTLY ONE module (`paths.py`),
+enforced by a test row scanning the storage package. `C:\dir` and `\\?\C:\dir`
+are one authority; `\\?\UNC\server\share` normalizes to `\\server\share` as a
+pure string law with no live share required; a genuine outside extended path is
+still refused. **No `normcase`/lowercase/casefold anywhere in `paths.py` or
+`atomic.py`** — deliberate, because `PureWindowsPath` is already
+case-insensitive while `PurePosixPath` is not, so folding would merge two
+genuinely different POSIX directories and WEAKEN containment. No POSIX
+authority widening.
+
+**Directory-race closure ratified.** The pre-repair `ValueError("components
+must be nonempty")` is reproduced deterministically with zero sleeps by
+re-executing the verbatim pre-repair walk-up. Post-repair: a target that
+appeared as a PLAIN DIRECTORY returns idempotent success; a file, link,
+junction or other non-directory still fails closed and is left untouched. No
+blind retry loops, no exception swallowing in `LocalBlobStore.put`. The
+NAME-MAX probe stays evidence-based with parent identity/type revalidated
+around it and no guessed 255 fallback; a vanished parent raises
+`DurabilityUnsupported`.
+
+**Availability proof ratified.** 100 trials x 8 identical writers: **100 green
+/ 0 red**, committed_new_total 100, reused_existing_total 700, 0 unexpected
+exceptions, 0 unsafe_object_key, 0 value_error_components_empty,
+0 atomic_publish_security_error, 0 final-object-count violations, 0 hash
+violations. Distinct-writer stress: crosstalk 0, hash_failures 0,
+security_false_positives 0, every expected SHA exactly once — the repair is not
+overfit to the same-hash race.
+
+**Recorded, NOT hidden.** The `final_name_preexisting_link` row re-measures its
+informational `refusal` as `UnsafeObjectKey` where the committed I15R1 bytes
+say `NotADirectoryError` (broken reparse point; the old raw `Path.resolve()`
+leaked an untyped `OSError` out of `put()`, the shared helper now fails closed
+earlier and typed). Invariant unchanged: result OK, outside target untouched,
+outside-root mutations 0. The I15R1 matrix was NOT modified. Windows junction
+`is_symlink() == False` noted as a known implementation fact that does not
+weaken security, since containment resolves the physical target — not a
+blocker, not broadened. POSIX truth: `POSIX_STRUCTURAL_PATH` = VERIFIED
+(`O_DIRECTORY`/`O_NOFOLLOW` per component, `dst_dir_fd` to `os.link`),
+`POSIX_RUNTIME_TOCTOU` = **NOT_MEASURED_ON_THIS_HOST**; no POSIX runtime
+evidence fabricated. The transient 29-failure run is recorded as **KNOWN
+TEST-ENVIRONMENT DEBT** only (hard-coded Windows `C:\tmp_*` projection roots
+under long/high-load runs): 89/89 isolated, 1791/11/0 excluding only the new
+R2 tests, 1832/13/0 including them, 3211/14/0 full project. Not fixed, and no
+production redesign authorized from it.
+
+**Verification truth at the accepted head.** Combined ratification battery
+(I15R2 focused, I15R1 TOCTOU + fresh corruption, I15 hardening, resource
+bounds, 10k manifest scan, I03 atomic/blob concurrency, path/canonicalization,
+I11R2 audit) = **253 passed / 2 skipped / 0 failed**. Full storage =
+**1832 passed / 13 skipped / 0 failed**. Full project =
+**3211 passed / 14 skipped / 0 failed**. ZERO deterministic failures. Ruff
+clean on every file the I15 chain changed (the only 2 repo-wide findings are
+pre-existing F401/F811 in `test_i08_evidence.py`, last touched at I08C and
+untouched by this chain); compileall clean; mypy 10 pre-existing errors in
+`providers/`+`probes/`, **0** in `paths.py` or `atomic.py`; secret scan clean.
+`external_ci = NONE_OBSERVED` (0 statuses, 0 check-runs, 0 runs on this branch).
+No new Python test was added, so the I11R2 binding audit was NOT republished
+and stays byte-stable at 997 scanned files.
+
+**Historical evidence law honoured.** Every informational rewrite produced by
+re-running the suites was inspected and the historical bytes RESTORED before
+diff and before commit; the remeasurement was never staged. All 256 evidence
+artifacts verified byte-identical to their committed state. **Production diff =
+ZERO.**
+
+```
+SENSOR-B4-I15R2-RATIFY
+PASS_SENSOR_B4_I15_HARDENING_SECURITY_SEALED              = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I15R1_TOCTOU_FRESH_CORRUPTION_SEALED       = OPERATOR_ACCEPTED
+PASS_SENSOR_B4_I15R2_CONCURRENT_PUBLICATION_STABILITY_SEALED = OPERATOR_ACCEPTED
+next_checkpoint_authorized                                = TRUE
+next_checkpoint                                           = SENSOR-B4-I16 FINAL ACCEPTANCE + EVIDENCE PACKET
+authorized_scope                                          = I16 ONLY
+I17+                                                      = UNAUTHORIZED
+G4-13                                                     = NOT_YET_IMPLEMENTED / PENDING_I16_OR_LATER_AS DEFINED
+research                                                  = FROZEN
+recommended_next                                          = SENSOR-B4-I16 IMPLEMENTATION
+```
+
+**I16 frozen contract.** I16 must RUN ALL G4 GATES and PRODUCE FINAL BLOC 4
+EVIDENCE. It was NOT implemented in this run. Its verdict must be EARNED from
+the gates, never preselected. Allowed Bloc 4 verdict vocabulary:
+`PASS_BLOC_04_IMPLEMENTED`,
+`PASS_BLOC_04_IMPLEMENTED_WITH_DATA_VOLUME_LIMITS`,
+`BLOCKED_BLOC_04_INTEGRITY`, `BLOCKED_BLOC_04_STORAGE_CAPACITY`,
+`FAIL_BLOC_04_ATOMICITY`, `FAIL_BLOC_04_LINEAGE`, `FAIL_BLOC_04_RESTORE`.
+G4-13 is NOT earned by this ratification and must be evaluated by I16 alongside
+all other G4 gates.
+
+**I17 firewall.** I16 authorization does NOT authorize I17 Bloc 5 handoff,
+normalization implementation, research restart, provider redesign, storage
+architecture redesign, new query semantics or new revision semantics. I17
+remains blocked until I16 final acceptance. Research stays FROZEN.
+
+Ratification artifact:
+`research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_CHAIN_OPERATOR_RATIFICATION.md`
+
+No production defect was found requiring a source change; no repair checkpoint
+is issued. I16 not started. STOP after ratification.
