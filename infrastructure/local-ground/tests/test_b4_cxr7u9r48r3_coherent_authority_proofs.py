@@ -16,9 +16,12 @@ vulnerable, a deliberately WEAKENED control is built from the shipped source
 and shown to fail, so a green suite means the proof discriminates rather than
 that the attack was impossible.
 """
+import ast
+import builtins
 import dataclasses
 import json
 import os
+import sys
 import tempfile
 from pathlib import Path
 
@@ -885,44 +888,136 @@ class _MutationTripwire:
     anything for writing, it is recorded -- and the attacker's identical
     syscall through the real `os` is not.
 
-    On top of the syscall surface, the engine's own durable-write helpers
-    are wrapped, because a write performed entirely through `os.fdopen`
-    would otherwise be visible only as a helper call.
+    COVERAGE. The audited surface is enumerated by `_reachable_write_channels`,
+    which is the same closure the non-vacuity controls execute against, so the
+    claim below is anchored to a computation rather than to a reading of the
+    source. Three kinds of channel are covered:
+
+    1. `os.<name>` for the unconditionally-mutating names in `MUTATORS`.
+    2. `os.open`/`os.fdopen`/builtin `open` -- CONDITIONAL on the flags or
+       mode, because the engine legitimately OPENS governed files to read
+       them, and a tripwire that recorded every open would report the
+       read-only authority path as a mutation. Only write-capable
+       flag/mode combinations are recorded.
+    3. `tempfile.mkstemp` and `shutil.copyfileobj`, which create or fill a
+       file without touching `pgrec.os` at all.
+
+    The engine's own durable-write helpers are wrapped for attribution, so a
+    helper-layer write is distinguishable from an `os` layer one.
     """
 
     MUTATORS = frozenset({
         "unlink", "remove", "rmdir", "removedirs", "truncate", "chmod",
         "chown", "link", "symlink", "rename", "replace", "mkdir",
-        "makedirs", "rmtree", "write", "fsync",
+        "makedirs", "rmtree", "write", "fsync", "ftruncate", "fchmod",
+        "lchmod", "utime", "rmtree",
     })
+
+    # os.O_* bits that make an open write-capable. O_RDONLY is 0 on both
+    # platforms, so an absent bit is a read.
+    _WRITE_FLAGS = tuple(
+        getattr(os, name, 0) for name in
+        ("O_WRONLY", "O_RDWR", "O_CREAT", "O_TRUNC", "O_APPEND"))
+
+    # Characters that make a mode string write-capable.
+    _WRITE_MODE_CHARS = frozenset("wax+")
 
     WRITE_HELPERS = (
         "_write_transition_record", "_record_transition", "_commit_receipt",
         "_exclusive_copy", "_publish_no_replace", "_fsync_dir",
     )
 
+    # Module-level channels that mutate without going through `os`.
+    TEMPFILE_MUTATORS = ("mkstemp", "NamedTemporaryFile", "mkdtemp")
+    SHUTIL_MUTATORS = ("copyfileobj", "copyfile", "copy2", "move",
+                        "rmtree", "copytree", "copymode")
+
     def __init__(self, engine):
         self.engine = engine
         self.real_os = engine.os
         self.real_helpers = {}
+        self.real_tempfile = getattr(engine, "tempfile", None)
+        self.real_shutil = getattr(engine, "shutil", None)
+        self.real_builtin_open = builtins.open
         self.mutations = []
 
     def __enter__(self):
         tripwire = self
 
+        def note(kind, args):
+            tripwire.mutations.append(
+                (kind, [str(a) for a in args[:2]]))
+
         class _OsProxy:
-            """Forwards everything; intercepts only the mutating names."""
+            """Forwards everything; intercepts only mutating names/args."""
 
             def __getattr__(self, name):
+                real = getattr(tripwire.real_os, name)
                 if name in tripwire.MUTATORS:
                     def intercepted(*args, **kwargs):
-                        tripwire.mutations.append(
-                            ("os." + name, [str(a) for a in args[:2]]))
-                        return getattr(tripwire.real_os, name)(*args, **kwargs)
+                        note("os." + name, args)
+                        return real(*args, **kwargs)
                     return intercepted
-                return getattr(tripwire.real_os, name)
+                if name == "open":
+                    def intercepted_open(*args, **kwargs):
+                        flags = args[1] if len(args) > 1 else 0
+                        if tripwire._is_write_flags(flags):
+                            note("os.open", args)
+                        return real(*args, **kwargs)
+                    return intercepted_open
+                if name == "fdopen":
+                    def intercepted_fdopen(*args, **kwargs):
+                        mode = args[1] if len(args) > 1 else kwargs.get("mode", "r")
+                        if tripwire._is_write_mode(mode):
+                            note("os.fdopen", args)
+                        return real(*args, **kwargs)
+                    return intercepted_fdopen
+                return real
 
         self.engine.os = _OsProxy()
+
+        class _ModuleProxy:
+            """Forwards everything; intercepts only the mutating names."""
+
+            def __init__(self, real, names):
+                self._real = real
+                self._names = names
+
+            def __getattr__(self, name):
+                real_attr = getattr(self._real, name)
+                if name in self._names:
+                    def intercepted(*args, **kwargs):
+                        note(self._prefix + "." + name, args)
+                        return real_attr(*args, **kwargs)
+                    return intercepted
+                return real_attr
+
+        if self.real_tempfile is not None:
+            proxy = _ModuleProxy(self.real_tempfile, self.TEMPFILE_MUTATORS)
+            proxy._prefix = "tempfile"
+            self.engine.tempfile = proxy
+        if self.real_shutil is not None:
+            proxy = _ModuleProxy(self.real_shutil, self.SHUTIL_MUTATORS)
+            proxy._prefix = "shutil"
+            self.engine.shutil = proxy
+
+        real_open = self.real_builtin_open
+
+        def intercepted_builtin_open(*args, **kwargs):
+            mode = args[1] if len(args) > 1 else kwargs.get("mode", "r")
+            # `builtins.open` is process-global, so unlike `pgrec.os` a
+            # rebind cannot separate the engine from this test module by
+            # namespace alone. Attributing by CALLER preserves the
+            # separation: a write-capable open issued from a frame whose
+            # globals are the engine module's dict is the engine's, and
+            # the attacker's identical write from this module's frames is
+            # not. Without this the zero-mutation result in G.1 would be
+            # unreachable rather than earned.
+            if self._is_write_mode(mode) and self._caller_is_engine():
+                note("open", args)
+            return real_open(*args, **kwargs)
+
+        builtins.open = intercepted_builtin_open
         for name in self.WRITE_HELPERS:
             real = getattr(self.engine, name, None)
             if real is None:
@@ -931,8 +1026,7 @@ class _MutationTripwire:
 
             def make(name=name, real=real):
                 def intercepted(*args, **kwargs):
-                    tripwire.mutations.append(
-                        (name, [str(a) for a in args[:2]]))
+                    note(name, args)
                     return real(*args, **kwargs)
                 return intercepted
 
@@ -943,10 +1037,39 @@ class _MutationTripwire:
         self.engine.os = self.real_os
         for name, real in self.real_helpers.items():
             setattr(self.engine, name, real)
+        if self.real_tempfile is not None:
+            self.engine.tempfile = self.real_tempfile
+        if self.real_shutil is not None:
+            self.engine.shutil = self.real_shutil
+        builtins.open = self.real_builtin_open
         return False
 
     def kinds(self):
         return [kind for kind, _args in self.mutations]
+
+    def _caller_is_engine(self):
+        """True when the frame that issued `open` is an engine frame.
+
+        Depth: 0 is this method, 1 is `intercepted_builtin_open`, and 2
+        is the frame that actually called `open`.
+        """
+        try:
+            frame = sys._getframe(2)
+        except ValueError:  # pragma: no cover - shallow stack
+            return False
+        return frame.f_globals is self.engine.__dict__
+
+    @classmethod
+    def _is_write_flags(cls, flags):
+        if not isinstance(flags, int) or isinstance(flags, bool):
+            return True  # unknown flag shape: assume write-capable
+        return any(flags & bit for bit in cls._WRITE_FLAGS)
+
+    @classmethod
+    def _is_write_mode(cls, mode):
+        if not isinstance(mode, str):
+            return True  # unknown mode shape: assume write-capable
+        return bool(set(mode) & cls._WRITE_MODE_CHARS)
 
 
 def test_g_a_denied_authority_mutates_nothing(tmp_path):
@@ -1062,6 +1185,324 @@ def test_g_a_the_mutation_tripwire_detects_a_real_engine_mutation(tmp_path):
     assert len(trip.mutations) == recorded, "the tripwire stayed armed"
     assert pgrec.os is trip.real_os
 
+
+
+def _engine_open_writer(engine, path):
+    """Issue a write-capable builtin `open` FROM the engine module.
+
+    `builtins.open` is process-global, so the tripwire attributes it by
+    caller (see `_caller_is_engine`). The probe below is compiled with the
+    ENGINE module's own globals dict -- that identity is exactly what the
+    attribution compares -- so its frame is an engine frame and the write
+    is recognised, while the same call from this test module is not.
+    """
+    name = "_r48x5_open_probe_%d" % id(path)
+    source = (
+        "def " + name + "(target):\n"
+        "    with open(target, 'w', encoding='utf-8') as h:\n"
+        "        h.write('engine-write')\n"
+    )
+    exec(compile(source, "<r48x5-engine-open-probe>", "exec"), engine.__dict__)
+    try:
+        engine.__dict__[name](str(path))
+    finally:
+        engine.__dict__.pop(name, None)
+
+# ===================================================================== #
+# H. TRIPWIRE COMPLETENESS
+# ===================================================================== #
+
+# The authority decision path this gate proves read-only. Every reachability
+# question below is asked of exactly these three functions, because they are
+# the ones `_MutationTripwire` is installed around.
+AUTHORITY_ENTRY_POINTS = (
+    "_acquire_recovery_authority",
+    "_classify_record_for_shell",
+    "_classify_rollback_for_shell",
+)
+
+# Unconditional os.* mutators.
+_UNCONDITIONAL_OS = frozenset({
+    "unlink", "remove", "rmdir", "removedirs", "truncate", "chmod", "chown",
+    "link", "symlink", "rename", "replace", "mkdir", "makedirs", "rmtree",
+    "write", "fsync",
+})
+
+
+def _engine_source():
+    return Path(pgrec.__file__).read_text(encoding="utf-8")
+
+
+def _reachable_functions(tree):
+    """Transitive intra-module call closure from the authority entry points."""
+    funcs = {}
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            funcs[node.name] = node
+    seen, stack = set(), list(AUTHORITY_ENTRY_POINTS)
+    while stack:
+        name = stack.pop()
+        if name in seen or name not in funcs:
+            continue
+        seen.add(name)
+        for call in ast.walk(funcs[name]):
+            if not isinstance(call, ast.Call):
+                continue
+            func = call.func
+            target = func.id if isinstance(func, ast.Name) else (
+                func.attr if isinstance(func, ast.Attribute) else None)
+            if target and target in funcs and target not in seen:
+                stack.append(target)
+    return funcs, seen
+
+
+def _qualified_callee(call):
+    """Render `a.b.c(...)` as 'a.b.c'; a bare name as itself."""
+    parts = []
+    node = call.func
+    while isinstance(node, ast.Attribute):
+        parts.append(node.attr)
+        node = node.value
+    if isinstance(node, ast.Name):
+        parts.append(node.id)
+    return ".".join(reversed(parts)) if parts else None
+
+
+def _reachable_write_channels():
+    """Every write-capable channel reachable from the authority entry points.
+
+    Returns a sorted list of `qualname` strings. This is the AUDITED SURFACE:
+    the tripwire claims to observe these and provably does not claim to cover
+    anything outside them.
+    """
+    funcs, seen = _reachable_functions(ast.parse(_engine_source()))
+    channels = set()
+    for name in seen:
+        for call in ast.walk(funcs[name]):
+            if not isinstance(call, ast.Call):
+                continue
+            qual = _qualified_callee(call)
+            if qual is None:
+                continue
+            head, _, attr = qual.rpartition(".")
+            if head == "os":
+                # `os.open`/`os.fdopen` are conditional on their flags/mode and
+                # are audited by channel, not by call site.
+                if attr in _UNCONDITIONAL_OS or attr in ("open", "fdopen"):
+                    channels.add(qual)
+            elif head in ("tempfile", "shutil"):
+                if (head == "tempfile" and attr in
+                        ("mkstemp", "NamedTemporaryFile", "mkdtemp")) or \
+                        (head == "shutil" and attr in
+                         ("copyfileobj", "copyfile", "copy2", "move",
+                          "rmtree", "copytree", "copymode")):
+                    channels.add(qual)
+            elif qual == "open":
+                channels.add("open")
+    return sorted(channels)
+
+
+def test_h_a_the_audited_channel_surface_is_not_empty(tmp_path):
+    """H.1 The closure must actually contain channels, or the rest is theatre.
+
+    If the engine were pure, "the tripwire records nothing" would be
+    unfalsifiable and the completeness claim would be vacuous. So the audited
+    surface is asserted non-empty AND asserted to include the conditional
+    channels that motivated widening this tripwire in the first place.
+    """
+    channels = _reachable_write_channels()
+    assert channels, (
+        "no write-capable channel is reachable from the authority entry "
+        "points; the mutation proof has nothing to observe")
+    for required in ("os.open", "open"):
+        assert required in channels, (
+            f"{required!r} is not in the audited surface, so the tripwire "
+            f"does not claim it; measured surface: {channels}")
+
+
+def test_h_b_the_tripwire_covers_the_whole_audited_surface():
+    """H.2 Completeness: instrumented == audited, by construction.
+
+    Reads the tripwire's own class attributes rather than a restatement, so
+    adding a channel to the engine without adding it to the tripwire fails
+    here rather than silently weakening G.1.
+    """
+    channels = _reachable_write_channels()
+    instrumented = {"os." + n for n in _MutationTripwire.MUTATORS}
+    instrumented |= {"os.open", "os.fdopen", "open"}
+    instrumented |= {"tempfile." + n for n in _MutationTripwire.TEMPFILE_MUTATORS}
+    instrumented |= {"shutil." + n for n in _MutationTripwire.SHUTIL_MUTATORS}
+
+    missing = [c for c in channels if c not in instrumented]
+    assert not missing, (
+        "reachable write-capable channels are NOT instrumented: "
+        f"{missing!r}; audited={channels!r} instrumented={sorted(instrumented)!r}")
+    assert _MutationTripwire._WRITE_FLAGS, "no write flags are classified"
+
+
+def test_h_c_every_audited_channel_is_observed_by_a_live_tripwire(tmp_path):
+    """H.3 Executable half of completeness.
+
+    For each audited channel, drive the real engine namespace through the
+    tripwire and require the channel to be RECORDED. This is what makes the
+    coverage claim executable rather than a set comparison: a channel can be
+    present in both sets and still be unwired.
+    """
+    target = Path(tmp_path) / "h-c.bin"
+    seen_kinds = set()
+
+    # os.open with a write-capable flag, and os.fdopen in write mode.
+    with _MutationTripwire(pgrec) as trip:
+        fd = pgrec.os.open(str(target), os.O_CREAT | os.O_WRONLY, 0o600)
+        try:
+            os.write(fd, b"x")
+        finally:
+            os.close(fd)
+        seen_kinds |= set(trip.kinds())
+    target.unlink()
+
+    # tempfile.mkstemp, and shutil.copyfileobj.
+    with _MutationTripwire(pgrec) as trip:
+        fd, name = pgrec.tempfile.mkstemp(prefix="h-c-")
+        os.close(fd)
+        Path(name).unlink()
+        src = Path(tmp_path) / "h-c-src"
+        src.write_bytes(b"payload")
+        dst = Path(tmp_path) / "h-c-dst"
+        with open(src, "rb") as reader, open(dst, "wb") as writer:
+            pgrec.shutil.copyfileobj(reader, writer)
+        seen_kinds |= set(trip.kinds())
+        src.unlink()
+        dst.unlink()
+
+    # `open` is asserted separately above, because its engine-side
+    # observation is caller-attributed and is proved in both directions.
+    # `open` is attributed by CALLER, so the engine-side write must be
+    # issued from an engine frame to be observed at all. Driving the very
+    # same call from this module must NOT be recorded, or the attribution
+    # would be unconditional and the zero-mutation result meaningless.
+    engine_probe = Path(tmp_path) / "h-c-engine-open.txt"
+    _engine_open_writer(pgrec, engine_probe)
+    assert engine_probe.read_text(encoding="utf-8") == "engine-write"
+    engine_probe.unlink()
+    with _MutationTripwire(pgrec) as trip:
+        _engine_open_writer(pgrec, engine_probe)
+    assert "open" in trip.kinds(), (
+        "a write-capable open issued from the engine namespace was not "
+        f"recorded; observed kinds: {sorted(trip.kinds())}")
+    engine_probe.unlink()
+    with _MutationTripwire(pgrec) as trip:
+        with open(str(engine_probe), "w", encoding="utf-8") as handle:
+            handle.write("attacker-write")
+    assert "open" not in trip.kinds(), (
+        "a write issued from this test module was attributed to the "
+        f"engine: {trip.mutations!r}")
+    engine_probe.unlink()
+
+    for required in ("os.open", "tempfile.mkstemp", "shutil.copyfileobj"):
+        assert required in seen_kinds, (
+            f"{required!r} was reachable and instrumented but never "
+            f"recorded; observed kinds: {sorted(seen_kinds)}")
+
+    # And the tripwire disarmed: a fresh engine write is unobserved.
+    with _MutationTripwire(pgrec) as trip:
+        pass
+    marker = Path(tmp_path) / "h-c-disarm.txt"
+    marker.write_text("x", encoding="utf-8")
+    assert not trip.mutations, "the tripwire stayed armed after exit"
+    marker.unlink()
+
+
+def test_h_d_a_read_mode_open_is_NOT_recorded(tmp_path):
+    """H.4 The tripwire must not cry wolf on the read-only authority path.
+
+    G.1 asserts zero mutations. If the tripwire recorded every `open`, that
+    assertion would pass only because the engine never opens anything --
+    which would make it a measure of the engine's I/O style rather than of
+    its side effects. So a genuinely read-capable open is asserted silent.
+    """
+    probe = Path(tmp_path) / "h-d.txt"
+    probe.write_text("readable", encoding="utf-8")
+
+    with _MutationTripwire(pgrec) as trip:
+        fd = pgrec.os.open(str(probe), os.O_RDONLY)
+        os.close(fd)
+        with open(str(probe), encoding="utf-8") as handle:
+            assert handle.read() == "readable"
+        with pgrec.os.fdopen(os.open(str(probe), os.O_RDONLY), "rb") as handle:
+            assert handle.read() == b"readable"
+
+    assert trip.mutations == [], (
+        "a read-only open was recorded as a mutation; the zero-mutation "
+        f"assertion in G.1 is measuring the wrong thing: {trip.mutations!r}")
+
+
+def test_h_e_the_tripwire_attributes_a_helper_write_not_an_os_one(tmp_path):
+    """H.5 Attribution: attacker, helper and os layers stay distinguishable.
+
+    The engine's own publisher is wrapped as a helper, so its write is
+    recorded under the helper's name even though it also performs os.replace
+    and os.chmod underneath. A caller must be able to tell WHICH layer did it.
+    """
+    transitions, record, promote, _receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+
+    with _MutationTripwire(pgrec) as trip:
+        pgrec._write_transition_record(OPID, record)
+
+    kinds = trip.kinds()
+    assert "_write_transition_record" in kinds, kinds
+    assert any(k.startswith("os.") for k in kinds), kinds
+
+
+def test_h_f_the_attackers_own_writes_are_structurally_unobservable(
+        tmp_path):
+    """H.6 The separation that makes zero meaningful is two-sided.
+
+    The attacker runs in THIS module and writes through the real `os`. If it
+    were recorded, a non-zero mutation count would conflate the attack with an
+    engine side effect. Assert the real `os` write is invisible to the
+    tripwire while the engine namespace is provably proxied.
+    """
+    transitions, _record, _promote, _receipt = _build(
+        tmp_path, "PROMOTED", "rollback")
+    victim = Path(tmp_path) / "attacker-owned.txt"
+
+    with _MutationTripwire(pgrec) as trip:
+        assert pgrec.os is not trip.real_os, "the tripwire is not installed"
+        # The attacker's own mutation, through the REAL os.
+        with open(victim, "w", encoding="utf-8") as handle:
+            handle.write("attacker")
+        moved = Path(tmp_path) / "attacker-owned-2.txt"
+        os.replace(victim, moved)
+        os.chmod(moved, 0o600)
+        assert trip.mutations == [], (
+            "an attacker mutation was attributed to the engine: "
+            f"{trip.mutations!r}")
+
+    moved.unlink()
+
+
+def test_h_g_source_drift_in_the_audited_surface_fails_loudly():
+    """H.7 A drifting engine must not silently re-narrow the audit.
+
+    `_reachable_write_channels` is the basis of the completeness claim, so it
+    is anchored to a literal string. If the engine's governing shape changes,
+    the anchor fails loudly here instead of quietly auditing a surface nobody
+    checked.
+    """
+    source = _engine_source()
+    anchors = (
+        "def _acquire_recovery_authority(",
+        "def _classify_record_for_shell(",
+        "def _classify_rollback_for_shell(",
+    )
+    for anchor in anchors:
+        assert anchor in source, (
+            f"anchor {anchor!r} no longer exists in the engine; the audited "
+            "surface and therefore the mutation proof's coverage claim must "
+            "be re-derived before this suite can be trusted")
+    assert AUTHORITY_ENTRY_POINTS[0] in source
 
 # The size bound the denial proof depends on. Both the BEFORE-read and the
 # DURING-read comparison are anchored, each asserted to occur exactly once,
