@@ -364,6 +364,10 @@ class Lake:
     def fresh(self) -> "Lake":
         return Lake(self.root)
 
+    def resolver_backed_manifests(self) -> PartitionManifestRepository:
+        """The manifest repository that VALIDATES T0B projection refs."""
+        return self._manifests_with_resolver
+
 
 # ---------------------------------------------------------------------------
 # G4-01 — EXACT EVIDENCE

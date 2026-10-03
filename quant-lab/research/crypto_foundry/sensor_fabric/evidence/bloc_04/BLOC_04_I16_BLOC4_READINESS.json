@@ -1,0 +1,106 @@
+{
+  "bloc_5_consumer_module": "i16_bloc5_consumer_probe.py",
+  "checkpoint": "SENSOR-B4-I16C",
+  "current_head": "051b6dd1a297d49b59ba504f4da8536211f8911d",
+  "dimension_reachability": {
+    "LINEAGE": true,
+    "SOURCE": true,
+    "TIME": true,
+    "UNIT": false
+  },
+  "dimensions_missing": [
+    "UNIT"
+  ],
+  "frozen_definition": "PASS when RawNormalizationBatch exposes sufficient SOURCE / TIMESTAMP / UNIT / LINEAGE evidence for PIT normalization WITHOUT filesystem/path assumptions",
+  "gap_id": "I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP",
+  "gate_id": "G4-13",
+  "historical_evidence_refs": [
+    "BLOC_04_I12R1_QUERY_EVIDENCE.json",
+    "BLOC_04_I13_HANDOFF_REPLAY.json"
+  ],
+  "lineage_proof": {
+    "acquisition_id": "acq-handoff",
+    "blob_sha256": "cd112f933c37954f24c9f0487be36a24f371b3f4ce9ec45b8025d4511f5c28be",
+    "chain": "batch -> acquisition -> blob -> projection -> revision",
+    "manifest_id": "pm-handoff",
+    "path_parsing_used": false,
+    "private_map_used": false,
+    "projection_refs": [
+      "proj-handoff"
+    ],
+    "reachable_via": "public repositories only",
+    "revision_numbers": "STABLE",
+    "segment_level_revision_numbers": "NOT_REACHABLE"
+  },
+  "measured_case_count": 16,
+  "minimal_contract_repair_proposed": "RawNormalizationBatch: add ONE additive source-unit evidence reference/state field (native_unit: str | None and unit_state exposing UNIT_UNVERIFIED when the T0 source unit is unknown), populated from the T0 acquisition/projection contract. No canonical unit, no base/quote normalization, no effective_at.",
+  "negative_import_check": {
+    "absolute_root_references": 0,
+    "consumer_imports_only_public_storage": true,
+    "filesystem_traversal_calls": 0,
+    "private_api_accesses": 0
+  },
+  "path_independence": {
+    "absolute_path_in_view": false,
+    "consumer_logic_unchanged": true,
+    "evidence_views_identical": true,
+    "two_distinct_roots_compared": true
+  },
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.models.RawNormalizationBatch + storage.replay.Bloc5Handoff.to_batch + storage.query.RawEvidenceQueryService (public contract surface only)",
+  "result": "GAP",
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "source_proof": {
+    "fields": [
+      "native_instrument",
+      "projection_refs",
+      "provider",
+      "reachable",
+      "sensor_family",
+      "source_granularity",
+      "venue"
+    ],
+    "reachable_via": "RawEvidenceResult public fields"
+  },
+  "timestamp_proof": {
+    "absent_facts": [
+      "actual_end",
+      "actual_start",
+      "provider_publication_time",
+      "provider_time_parsed",
+      "provider_time_raw",
+      "provider_time_unit_assumption"
+    ],
+    "canonical_pit_semantics_added": false,
+    "preserved_facts": [
+      "date_basis",
+      "ingested_at",
+      "logical_time_end",
+      "logical_time_start",
+      "reachable",
+      "request_started_at",
+      "requested_end",
+      "requested_start",
+      "response_observed_at"
+    ],
+    "reachable_via": "AcquisitionRecord + PartitionManifest.date_basis + RawEvidenceResult logical range"
+  },
+  "unit_proof": {
+    "projection_schema_descriptor_exposes_unit": false,
+    "provider_native_field_keys": [
+      "name",
+      "type",
+      "nullable"
+    ],
+    "raw_bytes_contain_unit_string": true,
+    "raw_bytes_count_as_proof": false,
+    "raw_normalization_batch_field_count": 20,
+    "reachable": false,
+    "unit_named_fields_on_batch": [],
+    "unit_named_public_exports": [],
+    "unit_unverified_state_available": false
+  }
+}
