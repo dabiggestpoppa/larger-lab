@@ -4643,3 +4643,218 @@ none`. SonarCloud API calls: read-only, unauthenticated, and **no token
 was used, printed or stored**. No `NOSONAR`, no exclusion, no quality-
 profile, rating, threshold or coverage change, no test deletion, no LFS
 migration. No R49, no Book 5, no Atlas Program Block 4.
+
+---
+
+## 15. X7X - receiver-name binding provenance (B4-CXR7U9R48X7X1)
+
+### 15.1 The question, and why it needed asking
+
+X7 bound a reviewed METHOD to a reviewed receiver NAME. It did not bind
+that NAME to a VALUE. So the spelling hole X6 exposed was closed one level
+up rather than closed: any binding form that rebinds a reviewed receiver
+name inherits the whole review, because the review was carried by the
+spelling.
+
+The instruction for this follow-on named four shapes - tuple unpacking,
+walrus, comprehension and lambda receivers. Those turn out to split into two
+different questions, and answering only the first would have left a hole
+open while the evidence read as a clean pass.
+
+### 15.2 Q1: can a receiver that IS one of those shapes be admitted? NO.
+
+Measured receiver AST kinds across the 35-function authority closure, 129
+method calls with a receiver:
+
+| receiver kind | count |
+|---|---|
+| `Name` | 100 |
+| `Attribute` | 23 |
+| `Call` | 4 |
+| `Constant` | 2 |
+
+**Zero** `Tuple`, `NamedExpr`, `ListComp`, `SetComp`, `DictComp`,
+`GeneratorExp` or `Lambda` receivers exist in the closure today. Each shape
+normalizes to a spelling absent from every reviewed registry and is refused:
+
+| shape | normalizes to | verdict |
+|---|---|---|
+| `(a, b).replace(dst)` | `tuple.replace` | refused |
+| `(*a, b).replace(dst)` | `tuple.replace` | refused |
+| `(x := f()).replace(dst)` | `ast.NamedExpr.replace` | refused |
+| `[f(i) for i in xs].append(v)` | `ast.ListComp.append` | refused |
+| `{f(i) for i in xs}.append(v)` | `ast.SetComp.append` | refused |
+| `{k: v for k, v in xs}.update(v)` | `ast.DictComp.update` | refused |
+| `(f(i) for i in xs).append(v)` | `ast.GeneratorExp.append` | refused |
+| `(lambda: obj)().replace(dst)` | `ast.Lambda(...).replace` | refused |
+
+This was already true at `df19763a3`. K.A proves it executably; K.B proves
+the shapes are **absent** from the real closure, so the controls are
+necessary rather than decorative and the green suite is **not** read as
+coverage the engine exercises today.
+
+### 15.3 Q2: can one of those shapes, as the BINDING, forge the review? YES - it did.
+
+Reproduced against the shipped classifier at `df19763a3`, each injected into
+a reachable function with the target function's name preserved. Every one
+classified `PROVEN_READ_ONLY_OR_PURE`:
+
+| injected | normalizes to | verdict at `df19763a3` |
+|---|---|---|
+| `[record.get(k) for record in externals]` | `record.get` | **ADMITTED** |
+| `{entry.stat() for entry in scanned}` | `entry.stat` | **ADMITTED** |
+| `record, sink = unpacked(a); record.get('x')` | `record.get` | **ADMITTED** |
+| `if (record := attacker): record.get('x')` | `record.get` | **ADMITTED** |
+| `sorted(xs, key=lambda record: record.get('x'))` | `record.get` | **ADMITTED** |
+| `for record in attacker: record.get('x')` | `record.get` | **ADMITTED** |
+| `with attacker as record: record.get('x')` | `record.get` | **ADMITTED** |
+
+A comprehension target, a walrus target, a tuple-unpacking target, a lambda
+parameter, a for/with target and an augmented assignment all bought X7 review
+authority from a spelling alone. **This is the X6 failure family one level
+up**, so the guarantee X7 recorded did not hold as written. It is recorded
+here as a correction to X7, not as an extension of it.
+
+### 15.4 The repair: two independently discriminated rules
+
+Admission of a reviewed pair now additionally requires:
+
+* **the binding FORM rule** - the receiver name must be bound in that owner
+  only by forms the review covers. Forms are measured from the source UNDER
+  AUDIT by `_binding_form_index` and compared against the **frozen**
+  `REVIEWED_RECEIVER_BINDINGS` (15 entries), so an injected form cannot
+  define itself admissible. `lambda-param` is tracked separately from `param`:
+  `sorted(xs, key=lambda record: record.get(..))` binds `record` in a scope
+  the caller never sees.
+* **the SITE rule** - the owning function must be one of the 27 measured
+  `(owner, receiver, method)` triples in `REVIEWED_RECEIVER_SITES`.
+
+Both are needed, and the ordering fact is proven rather than assumed (K.F):
+`record` legitimately uses `assign-unpack` elsewhere in the closure, so the
+**form rule alone cannot catch** tuple-unpacking of `record`. Owner-scoping is
+what closes it. K.K loosens only the form registry (every form admitted) and
+K.L loosens only the site rule; each must fail the other's controls.
+
+### 15.5 Forgery matrix after the repair
+
+| injection | caught by |
+|---|---|
+| comprehension target | form rule |
+| comprehension set / tuple target | form rule |
+| walrus target | form rule |
+| lambda parameter | form rule |
+| for target | form rule |
+| with target | form rule |
+| augmented assignment | form rule |
+| `except E as record` | form rule |
+| tuple-unpack target | **site rule** |
+| assignment in an unreviewed owner | **site rule** |
+
+Every row turns `_assert_closed_world` RED.
+
+### 15.6 What is STILL open, enumerated executably
+
+Closing the four named shapes does **not** close value provenance. The
+classifier has no value flow, so a reviewed receiver rebound by a form the
+review *does* cover, inside a function that *did* review that pair, remains
+admitted. Two instances, both asserted to be still open by K.M:
+
+1. `record = externals[0]; record.get('x')` in `_classify_record_for_shell`
+   - `assign` is a reviewed form for `record` there;
+2. `for entry in attacker: entry.stat()` in
+   `_assert_selector_authority_names` - `for` is a reviewed form for `entry`
+   there, so a second for-binding adds no new form.
+
+K.M asserts each is still admitted AND that nothing else is. If either ever
+closes, K.M fails and the evidence must be rewritten before the claim is
+retired - the control is not to be deleted. This follows the convention
+`_engine_definitions` already set for class bodies: a boundary that is not
+crossed is recorded, not asserted away.
+
+### 15.7 A separate text-integrity defect, found and repaired
+
+`ac49bb75` garbled `_classify_call`'s own docstring: the replacement absorbed
+the closing triple-quote delimiter, fusing two paragraphs into item 6 of the
+matching-order list. The file stayed syntactically valid, so no test failed
+and nothing was caught - but the classifier's description of its own rule
+order was truncated and omitted the method-receiver rules entirely.
+Introduced by `ac49bb75` (verified against `ab34dada4`, where the docstring
+closed correctly), and repaired in `6f088e6b9`.
+
+### 15.8 Classification totals - unchanged by the repair
+
+| measure | X6 `ab34dada4` | X7 `ac49bb752` | X7X `6f088e6b9` |
+|---|---|---|---|
+| closure functions | 35 | 35 | **35** |
+| reachable call sites | 312 | 312 | **312** |
+| distinct identities / ambiguous | 312 / 0 | 312 / 0 | **312 / 0** |
+| READ_ONLY / INTERNAL / MUTATION / UNKNOWN | 176 / 129 / 7 / 0 | 182 / 123 / 7 / 0 | **182 / 123 / 7 / 0** |
+| reachable mutation channels | 2 | 2 | **2** (`open`, `os.open`) |
+
+READ_ONLY admission reasons at `6f088e6b9`: 78 reviewed dotted module call,
+52 reviewed bare builtin, **40** reviewed (owner, receiver, method) triple,
+6 reviewed pure constructor, 4 reviewed expression receiver. The repair
+added two refusal conditions that the real engine never trips, so no
+classification moved.
+
+Binding forms measured across the closure: `param` 77, `assign` 71,
+`assign-unpack` 15, `except` 13, `for` 5, `comprehension-unpack` 4,
+`for-unpack` 4, `comprehension` 3, `with` 3, `augassign` 2. The closure
+**does** use comprehension, except, with and augmented binding - just never on
+a reviewed receiver name.
+
+### 15.9 Controls and discrimination
+
+Section K adds 14 controls: K.A shape receivers fail closed; K.B shapes absent
+from the real closure; K.C comprehension target; K.D walrus; K.E lambda
+parameter is not a function parameter; K.F tuple-unpack caught by the site
+rule; K.G every remaining form, each asserted to be caught by the RIGHT rule;
+K.H `except` binding; K.I all 27 triples and 40 sites still admitted (the
+policy did not become too strict); K.J binding-form registry measured, not
+invented, with no dead tolerance and every forgery proven to bind something;
+K.K form rule load-bearing; K.L site rule load-bearing; K.M the residual,
+enumerated; K.X refusal diagnostics name owner, expression, form and
+coordinate.
+
+Discrimination harness: **16 mutations, 36 mutation/control pairs, 17
+controls, 0 vacuous, 0 invalid**, PASS. The 9 X7 mutations are retained; 7
+are new (`drop-binding-form-rule`, `allow-all-binding-forms`,
+`drop-receiver-site-rule`, `widen-site-rule-to-any-owner`,
+`restore-x7x-hole`, `drop-forged-receiver-tolerance`,
+`shadow-lambda-param-with-param`). The harness now also reports a mutant that
+fails to **import** as INVALID rather than as discrimination - a collection
+error is not a proof, and counting it would manufacture a green harness out
+of a typo. One pair is reported honestly: `restore-x6-defect` does not make
+J.A fail, because an expression receiver guard fires first; J.A is
+discriminated by `disable-expression-receiver-rule`.
+
+### 15.10 Validation at `6f088e6b9`
+
+| check | result |
+|---|---|
+| b1 JUnit artifact at `6f088e6b9` | **722 collected / 722 executed / 0 failed / 0 errors / 0 duplicate node IDs** (13 J + 14 K controls) |
+| R48R3 + R48R4 local selection | **120 passed, 3 skipped** (was 106 + 3; +14 K controls) |
+| R40 selection | **34 passed, 1 skipped** (unchanged) |
+| Ruff on the changed file | `All checks passed!` |
+| Ruff across `tests/` + `scripts/` | 13 pre-existing findings, all in five untouched files; identical to the `df19763a3` baseline |
+| `py_compile` | OK |
+| `git diff --check` | clean |
+| duplicate full node IDs | 722 collected / 722 unique / **0 duplicates** (was 708) |
+| line endings | 3305 CRLF / **0 bare LF**, CRLF preserved |
+
+### 15.11 Run IDs at `6f088e6b9`
+
+b1 `37227929461`, b2 `37227929575`, b3 `37227929460`, b4 `37227929507`,
+B1-I1R `37227932465` - **all `success`**. No commit was made solely to embed
+a check ID.
+
+### 15.12 Accounting
+
+cloud mutations = 0 - broker mutations = 0 - capital mutations = 0 -
+execution mutations = 0 - recurring cost = $0 - `capital.authority =
+none`. **No production change**: `scripts/pg-recovery.py` is byte-identical
+to `df19763a3`; the commit touches one file, a test module. No SonarCloud or
+Kilo suppression, exclusion, waiver or relabelling; no `NOSONAR`; no test
+deletion. No R49, no Book 5, no Atlas Program Block 4. No merge, no force
+push, no amend, squash, rebase or reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`.

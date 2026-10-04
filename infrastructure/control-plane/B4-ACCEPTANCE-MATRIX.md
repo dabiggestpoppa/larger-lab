@@ -1169,3 +1169,75 @@ Neither external check is weakened, suppressed, excluded, waived or
 relabelled, neither is claimed green, and neither is a GitHub-required
 check - which is **not** merge authorization. **`MERGE_AUTHORIZED =
 false`.**
+
+---
+
+## X7X - receiver-name binding provenance (`6f088e6b9`, B4-CXR7U9R48X7X1)
+
+**Question put to the classifier:** does the receiver-bound policy handle
+tuple-unpacking, walrus, comprehension and lambda receivers **without
+reopening the X6 hole**?
+
+**Answer, in two parts. The first is yes; the second was no until this
+commit.**
+
+**Q1 - a receiver that IS one of those shapes: refused, already.** No
+`Tuple`, `NamedExpr`, `ListComp`, `SetComp`, `DictComp`, `GeneratorExp` or
+`Lambda` receiver exists anywhere in the 35-function closure (129 method
+calls with a receiver: `Name` 100, `Attribute` 23, `Call` 4, `Constant` 2).
+Each normalizes to a spelling absent from every reviewed registry. K.A proves
+it executably; K.B proves the shapes are absent from the real closure, so the
+green suite is **not** coverage the engine exercises today.
+
+**Q2 - one of those shapes used as the BINDING that produces a receiver
+name: it FORGED the review.** At `df19763a3`, comprehension targets, walrus
+targets, tuple-unpacking targets, lambda parameters, for/with targets and
+augmented assignment were **all** classified `PROVEN_READ_ONLY_OR_PURE`.
+X7 bound a method to a receiver NAME and never bound the NAME to a VALUE, so
+the X6 failure family survived one level up. **This corrects the guarantee
+X7 recorded.**
+
+**Repair.** A reviewed pair is now admitted only when (a) the receiver name
+is bound in that owner solely by **reviewed binding forms**, measured from the
+source under audit against a frozen 15-entry registry, and (b) the owning
+function is one of 27 measured `(owner, receiver, method)` triples. The two
+rules are independently discriminated: the form rule **cannot** catch
+tuple-unpacking of `record`, because `assign-unpack` is legitimate elsewhere
+in the closure, so owner-scoping is what closes it.
+
+**Discrimination: 16 mutations, 36 pairs, 17 controls, 0 vacuous, 0 invalid,
+PASS.** The harness now reports a mutant that fails to *import* as INVALID
+rather than as discrimination.
+
+**Totals unchanged by the repair** - 312 sites, 182/123/7/0, 2 reachable
+mutation channels - because the two new refusal conditions are never tripped
+by the real engine. **40 sites** sit behind the 27 triples.
+
+**Still open, enumerated rather than asserted away (K.M):** a reviewed
+receiver rebound by a form the review *does* cover, inside a function that
+*did* review that pair, remains admitted - `record = externals[0];
+record.get('x')` in `_classify_record_for_shell`, and a second `for`-binding
+of `entry` in `_assert_selector_authority_names`. The classifier has no value
+flow. K.M fails if either ever closes, so the evidence is rewritten rather
+than the control deleted.
+
+**Also repaired:** `_classify_call`'s docstring, garbled by `ac49bb75`
+absorbing its own closing delimiter. Syntactically valid, so no test caught
+it - but the classifier's description of its rule order was truncated.
+
+**Validation at `6f088e6b9`:** R48R3+R48R4 **120 passed / 3 skipped**;
+R40 **34 passed / 1 skipped**; Ruff `All checks passed!` on the changed file
+(13 pre-existing findings elsewhere, identical to baseline); `py_compile` OK;
+`git diff --check` clean; **722 collected / 722 unique / 0 duplicate** node
+IDs; CRLF preserved.
+
+**Scope: one test module. `scripts/pg-recovery.py` is byte-identical to
+`df19763a3` - no production change.** No SonarCloud or Kilo suppression,
+exclusion, waiver or relabelling; no `NOSONAR`; no test deletion. No merge,
+no force push, no amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`.
+
+**External truth at `6f088e6b9`:** five `validate` all `success`; SonarCloud
+and Kilo outcomes recorded in the operator handoff - neither is a
+GitHub-required check, which is **not** merge authorization.
+**`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
