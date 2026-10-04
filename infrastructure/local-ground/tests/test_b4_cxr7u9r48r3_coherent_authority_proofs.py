@@ -1407,6 +1407,182 @@ LITERAL_RECEIVER_METHODS = frozenset({
 })
 
 
+# X7X: RECEIVER-NAME BINDING PROVENANCE.
+#
+# X7 bound a reviewed METHOD to a reviewed receiver NAME. It did not bind that
+# NAME to a VALUE, so the same failure X6 exposed one level up remained open:
+# any binding form that rebinds a reviewed receiver name inherits the review
+# outright. Measured against the classifier as shipped at df19763a3, ALL of
+# these were ADMITTED as PROVEN_READ_ONLY_OR_PURE:
+#
+#     [record.get(k) for record in externals]   # comprehension target
+#     {entry.stat() for entry in out}           # comprehension target
+#     record, sink = unpacked(a); record.get(..)# tuple unpack
+#     if (record := attacker): record.get(..)   # walrus
+#     sorted(xs, key=lambda record: record.get)# lambda parameter
+#     for record in attacker: record.get(..)    # for target
+#     with attacker as record: record.get(..)   # with target
+#
+# A method call whose receiver is a TUPLE, NAMED EXPR, COMPREHENSION or
+# LAMBDA already failed closed -- those shapes are refused as receivers. The
+# hole was one level down: the SHAPE OF THE BINDING, not the shape of the
+# receiver. This registry closes it.
+#
+# `REVIEWED_RECEIVER_BINDINGS` maps each reviewed receiver to the binding forms
+# measured for that name across the 35-function closure. It is a FROZEN literal
+# -- the reviewed baseline, not a value recomputed from whatever source is
+# being audited -- so an injected binding form cannot define itself admissible.
+# `REVIEWED_RECEIVER_SITES` then narrows admission to the specific
+# (owner, receiver, method) triples measured at this head, because a name that
+# legitimately unpacks a tuple SOMEWHERE must not inherit that tolerance
+# EVERYWHERE.
+REVIEWED_RECEIVER_BINDINGS = {
+    "OPERATION_ID_RE": frozenset(),
+    "_STATE_DISPATCH": frozenset(),
+    "admitted_record": frozenset({"assign"}),
+    "canonical": frozenset({"assign"}),
+    "census": frozenset({"assign"}),
+    "chunks": frozenset({"assign"}),
+    "claim": frozenset({"assign", "assign-unpack"}),
+    "entry": frozenset({"for"}),
+    "name": frozenset({"assign", "assign-unpack", "for-unpack", "param"}),
+    "part": frozenset({"for"}),
+    "promote": frozenset({"assign", "param"}),
+    "raw": frozenset({"assign", "assign-unpack"}),
+    "record": frozenset({"assign", "assign-unpack", "param"}),
+    "roots": frozenset({"assign"}),
+    "value": frozenset({"param"}),
+}
+
+# Measured, not guessed: every (owner, receiver, method) triple admitted by the
+# rule above at this head. 27 entries, 40 call sites. Anything else -- the same
+# receiver name used in a function that did not review it -- is refused.
+REVIEWED_RECEIVER_SITES = frozenset({
+    ("_acquire_recovery_authority", "OPERATION_ID_RE", "match"),
+    ("_acquire_recovery_authority", "admitted_record", "get"),
+    ("_approved_roots", "part", "strip"),
+    ("_approved_roots", "roots", "append"),
+    ("_assert_record_authority_names", "census", "append"),
+    ("_assert_record_authority_names", "name", "startswith"),
+    ("_assert_record_identity", "record", "get"),
+    ("_assert_selector_authority_names", "census", "append"),
+    ("_assert_selector_authority_names", "entry", "stat"),
+    ("_assert_selector_authority_names", "name", "endswith"),
+    ("_assert_selector_authority_names", "name", "startswith"),
+    ("_bound_operation", "OPERATION_ID_RE", "match"),
+    ("_bound_operation", "promote", "get"),
+    ("_bound_operation", "record", "get"),
+    ("_classify_claim_content", "claim", "get"),
+    ("_classify_record_for_shell", "OPERATION_ID_RE", "match"),
+    ("_classify_record_for_shell", "_STATE_DISPATCH", "get"),
+    ("_classify_record_for_shell", "record", "get"),
+    ("_classify_rollback_for_shell", "promote", "get"),
+    ("_deep_freeze", "value", "items"),
+    ("_derive_claim_coordinate", "OPERATION_ID_RE", "match"),
+    ("_derive_record_coordinate_name", "OPERATION_ID_RE", "match"),
+    ("_read_admitted_claim", "chunks", "append"),
+    ("_read_admitted_record", "chunks", "append"),
+    ("_read_admitted_record", "raw", "decode"),
+    ("_receipt_digest", "canonical", "encode"),
+    ("_thaw", "value", "items"),
+})
+
+
+# Every binding-form label `_binding_form_index` can emit. Used by the K.K
+# loosening (which must permit every form, not merely the ones the engine
+# happens to use today) and asserted against the walker in K.J so the list
+# cannot rot into permitting less than it claims.
+ALL_BINDING_FORMS = frozenset({
+    "assign", "assign-unpack", "augassign", "annassign", "walrus",
+    "for", "for-unpack", "comprehension", "comprehension-unpack",
+    "with", "with-unpack", "except", "param", "lambda-param",
+})
+
+
+def _note_arg_names(args, form, note):
+    """Record every name a signature binds under `form`."""
+    for arg in (list(args.posonlyargs) + list(args.args)
+                + list(args.kwonlyargs)):
+        note(arg.arg, form)
+    if args.vararg:
+        note(args.vararg.arg, form)
+    if args.kwarg:
+        note(args.kwarg.arg, form)
+
+
+def _binding_form_index(node):
+    """Every name BOUND anywhere inside `node`, mapped to its binding forms.
+
+    X7X. Deliberately conservative: it collects forms for the WHOLE owning
+    function, not just those dominating a particular call site, because the
+    classifier has no value flow and a call site cannot prove which binding
+    reached it. Refusing on ambiguity is the fail-closed direction.
+
+    The forms are the ones that can rebind a name without the receiver's
+    spelling changing: assignment (plain and container-target), augmented
+    assignment, annotated assignment, walrus, for target (plain and unpacked),
+    comprehension target (plain and unpacked), with target, except handler
+    name, function parameter, and lambda parameter. A plain function parameter
+    is tracked SEPARATELY from a lambda parameter on purpose -- `sorted(xs,
+    key=lambda record: record.get(..))` binds `record` at a scope the caller
+    never sees, and X7X requires it refused.
+    """
+    forms = {}
+
+    def note(name, form):
+        forms.setdefault(name, set()).add(form)
+
+    def note_target(target, form):
+        if isinstance(target, ast.Name):
+            note(target.id, form)
+        elif isinstance(target, (ast.Tuple, ast.List)):
+            for element in target.elts:
+                note_target(element, form + "-unpack")
+        elif isinstance(target, ast.Starred):
+            note_target(target.value, form + "-unpack")
+
+    for sub in ast.walk(node):
+        if isinstance(sub, ast.Assign):
+            for target in sub.targets:
+                note_target(target, "assign")
+        elif isinstance(sub, ast.AugAssign):
+            note_target(sub.target, "augassign")
+        elif isinstance(sub, ast.AnnAssign):
+            note_target(sub.target, "annassign")
+        elif isinstance(sub, ast.NamedExpr):
+            note_target(sub.target, "walrus")
+        elif isinstance(sub, (ast.For, ast.AsyncFor)):
+            note_target(sub.target, "for")
+        elif isinstance(sub, ast.comprehension):
+            note_target(sub.target, "comprehension")
+        elif isinstance(sub, ast.withitem):
+            if sub.optional_vars is not None:
+                note_target(sub.optional_vars, "with")
+        elif isinstance(sub, ast.ExceptHandler):
+            if sub.name:
+                note(sub.name, "except")
+        elif isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            _note_arg_names(sub.args, "param", note)
+        elif isinstance(sub, ast.Lambda):
+            _note_arg_names(sub.args, "lambda-param", note)
+    return forms
+
+
+def _receiver_binding_forms(funcs, closure):
+    """Per closure function: name -> frozenset of binding forms in that scope.
+
+    Measured from the source BEING AUDITED, so a weakened or injected engine
+    reports its own bindings and is judged against the frozen
+    REVIEWED_RECEIVER_BINDINGS baseline rather than against itself.
+    """
+    out = {}
+    for owner in closure:
+        index = _binding_form_index(funcs[owner])
+        out[owner] = {name: frozenset(forms)
+                      for name, forms in index.items()}
+    return out
+
+
 def _qualified_callee(call):
     """Render `a.b.c(...)` as 'a.b.c'; a bare name as itself."""
     parts = []
@@ -1504,20 +1680,32 @@ QUALIFIED_MODULES = frozenset({
 })
 
 
-def _classify_call(owner, call, engine_definitions):
+def _classify_call(owner, call, engine_definitions, receiver_bindings):
     """Assign exactly one classification to a single reachable call site.
 
     Matching order matters and is deliberate:
       1. no renderable callee            -> UNKNOWN (dynamic call)
       2. maps to a tripwire observer      -> MUTATION
-      3. defined in this module           -> INTERNAL (the closure walk
-                                            audits its own body separately)
-      4. explicitly reviewed constructor  -> READ_ONLY
-      5. reviewed READ_ONLY registry      -> READ_ONLY
-      6. anything else                    -> UNKNOWN, which fails the proofX7: a METHOD call is no longer admitted on its attribute name alone. The
+      3. explicitly reviewed constructor  -> READ_ONLY
+      4. reviewed dotted module call      -> READ_ONLY
+      5. bare local name                  -> dispatch seam / module-level
+                                            engine definition / reviewed
+                                            builtin, else UNKNOWN
+      6. method call on a receiver        -> literal receiver, expression
+                                            receiver, or the reviewed
+                                            (owner, receiver, method)
+                                            triple with reviewed binding
+                                            forms -- else UNKNOWN
+
+    X7: a METHOD call is no longer admitted on its attribute name alone. The
     receiver is normalized and the (receiver, method) PAIR must be reviewed, so
     `record.get` is admitted while `Path(src).replace(dst)` and
     `external.update(...)` are refused.
+
+    X7X: step 6 is further bound to the OWNING FUNCTION and to the binding
+    FORMS that name is allowed to take, so a reviewed receiver name rebound by
+    a walrus, comprehension target, tuple unpack, lambda parameter or with
+    target no longer inherits the review.
     """
     callee = _qualified_callee(call)
     expr = _normalized_call_expression(call)
@@ -1583,7 +1771,29 @@ def _classify_call(owner, call, engine_definitions):
                     f"expression receiver {expr!r} is not in "
                     f"REVIEWED_EXPRESSION_RECEIVERS")
     if expr in REVIEWED_RECEIVER_METHODS:
-        return _ret(CLASS_READ_ONLY, "reviewed (receiver, method) pair")
+        # X7X rule G: the reviewed pair is not enough on its own. The receiver
+        # NAME must be bound here only by forms the review covers, and this
+        # OWNING FUNCTION must be one that reviewed this pair.
+        recv, _, meth = expr.rpartition(".")
+        allowed = REVIEWED_RECEIVER_BINDINGS.get(recv)
+        if allowed is None:
+            return _ret(CLASS_UNKNOWN,
+                        f"receiver {recv!r} has no reviewed binding forms")
+        forms = receiver_bindings.get(recv, frozenset())
+        extra = sorted(forms - allowed)
+        if extra:
+            return _ret(CLASS_UNKNOWN,
+                        f"receiver {recv!r} is bound in {owner!r} by "
+                        f"unreviewed binding form(s) {extra!r}; reviewed "
+                        f"forms are {sorted(allowed)!r}")
+        if (owner, recv, meth) not in REVIEWED_RECEIVER_SITES:
+            return _ret(CLASS_UNKNOWN,
+                        f"(owner, receiver, method) "
+                        f"{(owner, recv, meth)!r} is not in "
+                        f"REVIEWED_RECEIVER_SITES")
+        return _ret(CLASS_READ_ONLY,
+                    "reviewed (owner, receiver, method) triple, receiver "
+                    "bound only by reviewed forms")
     return _ret(CLASS_UNKNOWN,
                 f"(receiver, method) pair {expr!r} is not in "
                 f"REVIEWED_RECEIVER_METHODS")
@@ -1641,12 +1851,14 @@ def _audit_source(source):
     tree = ast.parse(source)
     funcs, closure = _authority_closure(tree)
     engine_definitions = _engine_definitions(tree)
+    receiver_bindings = _receiver_binding_forms(funcs, closure)
     sites = []
     for owner in sorted(closure):
         calls = [c for c in ast.walk(funcs[owner]) if isinstance(c, ast.Call)]
         for call in sorted(calls,
                            key=lambda c: (c.lineno, _qualified_callee(c) or "")):
-            sites.append(_classify_call(owner, call, engine_definitions))
+            sites.append(_classify_call(owner, call, engine_definitions,
+                                        receiver_bindings.get(owner, {})))
     return closure, sites
 
 
@@ -2039,10 +2251,10 @@ def test_i_g_the_dispatch_local_admission_is_proven_executably():
     # not a blanket allowance for bare locals.
     assert _classify_call(
         "_probe", ast.parse("handler(record)").body[0].value,
-        set()) .classification == CLASS_INTERNAL
+        set(), {}).classification == CLASS_INTERNAL
     assert _classify_call(
         "_probe", ast.parse("rogue(value)").body[0].value,
-        set()).classification == CLASS_UNKNOWN
+        set(), {}).classification == CLASS_UNKNOWN
 
 
 def test_i_f_the_four_quantities_are_reported_separately():
@@ -2522,6 +2734,461 @@ def test_j_m_the_reviewed_constructor_policy_is_reachable_and_not_dead():
         "no reviewed constructor classified via the constructor rule, so the "
         "rule is dead again: " +
         str({n: by_reason.get(n) for n in PURE_CONSTRUCTORS}))
+
+
+# --------------------------------------------------------------------- #
+# X7X: receiver BINDING provenance -- tuple, walrus, comprehension, lambda
+# --------------------------------------------------------------------- #
+#
+# The question this section answers is two questions wearing one coat:
+#   (1) can a receiver that IS a tuple / walrus / comprehension / lambda be
+#       admitted?  -> K.A, and the answer is no;
+#   (2) can one of those shapes, used as the BINDING that produces a reviewed
+#       receiver NAME, inherit the review? -> K.B..K.F, and at df19763a3 the
+#       answer was YES for all of them. K.G..K.M then show the repair did not
+#       cost the real engine anything, and record what is still open.
+#
+# Every injection preserves the target function's NAME, so an anchor-only
+# drift check cannot notice (the X5 blind spot).
+
+_SHAPE_RECEIVERS = (
+    # (label, injected source, normalized expression the refusal must name)
+    ("tuple", "(a, b).replace(dst)", "tuple.replace"),
+    ("tuple starred", "(*a, b).replace(dst)", "tuple.replace"),
+    ("walrus", "(x := f()).replace(dst)", "ast.NamedExpr.replace"),
+    ("list comprehension", "[f(i) for i in xs].append(v)",
+     "ast.ListComp.append"),
+    ("set comprehension", "{f(i) for i in xs}.append(v)",
+     "ast.SetComp.append"),
+    ("dict comprehension", "{k: v for k, v in xs}.update(v)",
+     "ast.DictComp.update"),
+    ("generator expression", "(f(i) for i in xs).append(v)",
+     "ast.GeneratorExp.append"),
+    ("lambda call", "(lambda: obj)().replace(dst)",
+     "ast.Lambda(...).replace"),
+)
+
+# (label, owner, injected source, normalized expression, rule that must catch it)
+#
+# Every row is injected into an owner that DID review that exact triple, so the
+# owner-scoping rule cannot mask the binding-form rule (which is what K.K and
+# K.L need in order to discriminate them independently). The one row marked
+# "site" is the exception and exists precisely because it is caught by the
+# OTHER rule -- see K.F.
+_BINDING_FORGERIES = (
+    ("comprehension target", "_classify_record_for_shell",
+     "[record.get(k) for record in externals]", "record.get", "form"),
+    ("comprehension set target", "_assert_selector_authority_names",
+     "{entry.stat() for entry in scanned}", "entry.stat", "form"),
+    ("comprehension tuple target", "_approved_roots",
+     "[part.strip() for part, other in pairs]", "part.strip", "form"),
+    ("comprehension over unpacked name", "_assert_record_authority_names",
+     "[name.startswith(x) for name, other in pairs]", "name.startswith",
+     "form"),
+    ("walrus target", "_classify_record_for_shell",
+     "if (record := attacker): record.get('x')", "record.get", "form"),
+    ("lambda parameter", "_bound_operation",
+     "sorted(xs, key=lambda record: record.get('x'))", "record.get", "form"),
+    ("for target", "_classify_record_for_shell",
+     "for record in attacker: record.get('x')", "record.get", "form"),
+    ("with target", "_classify_rollback_for_shell",
+     "with attacker as promote: promote.get('x')", "promote.get", "form"),
+    ("augmented assignment", "_thaw",
+     "value += externals[0]; value.items()", "value.items", "form"),
+    ("tuple unpack target", "_load_transition_record",
+     "record, sink = unpacked(a); record.get('x')", "record.get", "site"),
+)
+
+
+def _measured_binding_forms():
+    """Every binding form the closure actually uses. For the K.K loosening."""
+    tree = ast.parse(_engine_source())
+    funcs, closure = _authority_closure(tree)
+    forms = set()
+    for owner_bindings in _receiver_binding_forms(funcs, closure).values():
+        for names in owner_bindings.values():
+            forms |= set(names)
+    return forms
+
+
+def test_k_a_tuple_walrus_comprehension_and_lambda_receivers_fail_closed():
+    """K.A A receiver that IS one of those four shapes is never admitted.
+
+    Each shape normalizes to a spelling that is absent from every reviewed
+    registry, so the receiver itself cannot buy authority. The expression the
+    refusal MUST name is asserted, because a refusal for some unrelated reason
+    (a refused helper, say) would not prove the receiver was checked.
+    """
+    for label, injected, expected in _SHAPE_RECEIVERS:
+        weakened = _inject_into_reachable(injected)
+        refusals = _refusals(weakened)
+        assert expected in refusals, (
+            f"{label} receiver {injected!r} was not refused as {expected!r}; "
+            f"refused instead: {sorted(refusals)}")
+        hit = refusals[expected]
+        assert hit.owner == "_load_transition_record", hit.as_row()
+        assert hit.classification == CLASS_UNKNOWN
+        with pytest.raises(AssertionError):
+            _assert_closed_world(weakened)
+
+
+def test_k_b_the_named_shapes_are_absent_as_receivers_in_the_real_closure():
+    """K.B Measured, not assumed: the real closure uses none of them.
+
+    So K.A guards a shape the engine does not currently contain. That makes
+    these controls NECESSARY rather than decorative -- a future comprehension
+    receiver would otherwise be unproven -- and it is stated so nobody reads
+    the green suite as coverage the engine actually exercises today.
+    """
+    tree = ast.parse(_engine_source())
+    funcs, closure = _authority_closure(tree)
+    banned = (ast.Tuple, ast.NamedExpr, ast.ListComp, ast.SetComp,
+              ast.DictComp, ast.GeneratorExp, ast.Lambda)
+    found = []
+    for owner in sorted(closure):
+        for call in ast.walk(funcs[owner]):
+            if not isinstance(call, ast.Call):
+                continue
+            if not isinstance(call.func, ast.Attribute):
+                continue
+            if isinstance(call.func.value, banned):
+                found.append((owner, call.lineno,
+                              type(call.func.value).__name__))
+    assert not found, (
+        f"a tuple/walrus/comprehension/lambda receiver now exists in the "
+        f"closure and must be reviewed explicitly: {found!r}")
+
+
+def test_k_c_a_comprehension_target_cannot_forge_a_reviewed_receiver():
+    """K.C `[record.get(k) for record in externals]` was ADMITTED at X7.
+
+    X7 bound the method to the receiver NAME and never to the VALUE, so a
+    comprehension target that happens to spell a reviewed receiver inherits
+    the whole review. The binding FORM is now part of the rule.
+    """
+    weakened = _inject_into_reachable(
+        "[record.get(k) for record in externals]",
+        into="_classify_record_for_shell")
+    refusals = _refusals(weakened)
+    assert "record.get" in refusals, (
+        f"a comprehension target still forges the reviewed receiver; "
+        f"refused: {sorted(refusals)}")
+    reason = refusals["record.get"].reason
+    assert "comprehension" in reason, (
+        "the refusal does not name the binding form that forged the "
+        f"receiver: {reason}")
+    assert "_classify_record_for_shell" in reason, reason
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_k_d_a_walrus_target_cannot_forge_a_reviewed_receiver():
+    """K.D `if (record := attacker): record.get(..)` was ADMITTED at X7."""
+    weakened = _inject_into_reachable(
+        "if (record := attacker): record.get('x')",
+        into="_classify_record_for_shell")
+    refusals = _refusals(weakened)
+    assert "record.get" in refusals, (
+        f"a walrus target still forges the reviewed receiver; refused: "
+        f"{sorted(refusals)}")
+    assert "walrus" in refusals["record.get"].reason, (
+        refusals["record.get"].reason)
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_k_e_a_lambda_parameter_cannot_forge_a_reviewed_receiver():
+    """K.E A lambda parameter is NOT a function parameter.
+
+    `record` is legitimately a function parameter in the closure, so a rule
+    that merely allowed `param` would admit `key=lambda record: record.get`.
+    The lambda's own scope is invisible to the caller, which is why it is a
+    separate form.
+    """
+    weakened = _inject_into_reachable(
+        "sorted(xs, key=lambda record: record.get('x'))",
+        into="_bound_operation")
+    refusals = _refusals(weakened)
+    assert "record.get" in refusals, (
+        f"a lambda parameter still forges the reviewed receiver; refused: "
+        f"{sorted(refusals)}")
+    assert "lambda-param" in refusals["record.get"].reason, (
+        refusals["record.get"].reason)
+    index = _binding_form_index(ast.parse("f = lambda record: record"))
+    assert index.get("record") == {"lambda-param"}, index
+    index = _binding_form_index(ast.parse("def f(record): return record"))
+    assert index.get("record") == {"param"}, index
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_k_f_tuple_unpacking_is_caught_by_the_site_rule_not_the_form_rule():
+    """K.F Ordering fact, proven rather than assumed.
+
+    `record` legitimately uses assign-unpack SOMEWHERE in the closure, so the
+    form rule alone CANNOT catch `record, sink = unpacked(a)`. It is caught
+    because that owner never reviewed `record.get`. If the reason here ever
+    names the form rule instead, the proof has gone quiet on the real cause.
+    """
+    assert "assign-unpack" in REVIEWED_RECEIVER_BINDINGS["record"], (
+        "this control assumes `record` tolerates assign-unpack; if that "
+        "changed, re-derive which rule does the work")
+    weakened = _inject_into_reachable(
+        "record, sink = unpacked(a); record.get('x')")
+    refusals = _refusals(weakened)
+    assert "record.get" in refusals, (
+        f"tuple-unpack target forging is no longer refused; refused: "
+        f"{sorted(refusals)}")
+    reason = refusals["record.get"].reason
+    assert "REVIEWED_RECEIVER_SITES" in reason, (
+        f"the refusal did not come from owner-scoping, so this control no "
+        f"longer exercises what it claims: {reason}")
+    assert "_load_transition_record" in reason, reason
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_k_g_for_with_and_augmented_targets_cannot_forge_a_receiver():
+    """K.G Every binding form, refused, and by the RIGHT rule.
+
+    Driven from the shared table, so each row also asserts which rule fired. A
+    row silently caught by the other rule would still be green here, which is
+    exactly the ordering mistake K.F is about.
+    """
+    for label, owner, injected, expr, rule in _BINDING_FORGERIES:
+        weakened = _inject_into_reachable(injected, into=owner)
+        refusals = _refusals(weakened)
+        assert expr in refusals, (
+            f"{label} forging is no longer refused as {expr!r}; refused: "
+            f"{sorted(refusals)}")
+        reason = refusals[expr].reason
+        assert owner in reason, (
+            f"{label}: the refusal does not name the owning function: "
+            f"{reason}")
+        if rule == "form":
+            assert "unreviewed binding form" in reason, (
+                f"{label} was expected to be caught by the binding-form "
+                f"rule, not: {reason}")
+        else:
+            assert "REVIEWED_RECEIVER_SITES" in reason, (
+                f"{label} was expected to be caught by owner-scoping, "
+                f"not: {reason}")
+        with pytest.raises(AssertionError):
+            _assert_closed_world(weakened)
+
+
+def test_k_h_an_except_handler_name_cannot_forge_a_reviewed_receiver():
+    """K.H `except E as record:` binds `record`, and is measured as `except`."""
+    index = _binding_form_index(ast.parse(
+        "try:\n    pass\nexcept OSError as record:\n    record.get('x')\n"))
+    assert index.get("record") == {"except"}, index
+    assert "except" not in REVIEWED_RECEIVER_BINDINGS["record"], (
+        "the except form is allowed for `record`, so this control no longer "
+        "discriminates anything")
+
+
+def test_k_i_every_real_reviewed_receiver_is_still_admitted():
+    """K.I The repair must not make the policy too strict for real code.
+
+    The mirror of J.E/J.F: a proof that refuses everything would also be
+    closed-world. All 27 measured triples and all 40 sites behind them must
+    still classify, through the reviewed rule.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    assert not _unknown_sites(sites), (
+        f"{len(_unknown_sites(sites))} reachable call site(s) became "
+        "UNKNOWN; the X7X repair is too strict for the real engine")
+    by_reason = {}
+    for site in sites:
+        by_reason.setdefault(site.reason, []).append(site)
+    triple_sites = [s for r, group in by_reason.items() if "triple" in r
+                    for s in group]
+    assert len(triple_sites) == 40, (
+        f"expected 40 sites admitted by the owner-scoped rule, got "
+        f"{len(triple_sites)}; reasons: "
+        + str({k: len(v) for k, v in sorted(by_reason.items())}))
+    measured = {(s.owner, s.expression.split(".", 1)[0],
+                 s.expression.rsplit(".", 1)[1]) for s in triple_sites}
+    assert measured == set(REVIEWED_RECEIVER_SITES), (
+        "the admitted triples drifted from the reviewed registry: "
+        f"only-measured={sorted(measured - set(REVIEWED_RECEIVER_SITES))} "
+        f"only-reviewed={sorted(set(REVIEWED_RECEIVER_SITES) - measured)}")
+
+
+def test_k_j_the_reviewed_binding_forms_are_measured_not_invented():
+    """K.J No dead tolerance: every allowed form is one the engine uses.
+
+    A registry that grants a form nobody exercises is latent permission. Both
+    directions are asserted: no allowed form is unused, and no measured form
+    is missing from the registry (that would have made K.C..K.G vacuous).
+    """
+    tree = ast.parse(_engine_source())
+    funcs, closure = _authority_closure(tree)
+    bindings = _receiver_binding_forms(funcs, closure)
+    measured = {}
+    for owner in closure:
+        for name, forms in bindings[owner].items():
+            measured.setdefault(name, set()).update(forms)
+
+    for receiver, allowed in sorted(REVIEWED_RECEIVER_BINDINGS.items()):
+        assert any(receiver == r for _, r, _ in REVIEWED_RECEIVER_SITES), (
+            f"{receiver!r} has binding forms reviewed but no reviewed "
+            f"triple; the form registry is dead permission")
+        got = measured.get(receiver, set())
+        assert got == set(allowed), (
+            f"binding-form registry drifted for {receiver!r}: measured="
+            f"{sorted(got)} reviewed={sorted(allowed)}")
+    assert set(measured) >= set(REVIEWED_RECEIVER_BINDINGS) - {
+        "OPERATION_ID_RE", "_STATE_DISPATCH"}, (
+        "a reviewed receiver name was not found in the closure at all")
+
+    # Every form the walker can emit must be a label the module knows about,
+    # or the K.K loosening would silently permit less than it claims.
+    used = _measured_binding_forms()
+    assert used <= ALL_BINDING_FORMS, (
+        f"the closure emits binding form(s) outside ALL_BINDING_FORMS: "
+        f"{sorted(used - ALL_BINDING_FORMS)}")
+    # And every forgery must actually BIND something, or it discriminates
+    # nothing no matter how the registry is loosened.
+    for label, _owner, injected, _expr, _rule in _BINDING_FORGERIES:
+        forged = set()
+        for names in _binding_form_index(ast.parse(injected)).values():
+            forged |= set(names)
+        assert forged, (
+            f"the {label!r} forgery binds no name, so it cannot discriminate")
+        assert forged <= ALL_BINDING_FORMS, (
+            f"the {label!r} forgery produced binding form(s) outside "
+            f"ALL_BINDING_FORMS: {sorted(forged - ALL_BINDING_FORMS)}")
+
+
+def test_k_k_dropping_the_binding_form_rule_reopens_the_hole(monkeypatch):
+    """K.K The binding-form rule is load-bearing, not decorative.
+
+    Same shape as J.J: allow every form the engine uses and the forging
+    injections -- each injected into an owner that DID review the triple, so
+    owner-scoping cannot mask the result -- must become ADMITTED again. Then
+    restore the registry and the proof must go green.
+    """
+    saved = dict(REVIEWED_RECEIVER_BINDINGS)
+    every_form = ALL_BINDING_FORMS
+    loosened = {name: frozenset(every_form) for name in saved}
+    assert loosened["record"] != saved["record"], (
+        "the loosening is a no-op; this control would be vacuous")
+    monkeypatch.setattr(
+        sys.modules[__name__], "REVIEWED_RECEIVER_BINDINGS", loosened)
+    try:
+        for label, owner, injected, expr, rule in _BINDING_FORGERIES:
+            if rule != "form":
+                continue  # caught by owner-scoping, not by the form rule
+            refusals = _refusals(_inject_into_reachable(injected, into=owner))
+            assert expr not in refusals, (
+                f"loosening the binding-form rule did NOT re-open the hole "
+                f"for {label!r}; the rule is not load-bearing")
+    finally:
+        monkeypatch.setattr(sys.modules[__name__],
+                            "REVIEWED_RECEIVER_BINDINGS", saved)
+    _assert_closed_world(_engine_source())
+
+
+def test_k_l_dropping_the_site_rule_reopens_cross_function_forging(
+        monkeypatch):
+    """K.L Owner-scoping is load-bearing too, and separately so.
+
+    Loosening only the FORM registry must not admit `record.get` in a
+    function that never reviewed it -- that is what K.F relies on.
+    """
+    saved = dict(REVIEWED_RECEIVER_BINDINGS)
+    every_form = ALL_BINDING_FORMS
+    loosened = {name: frozenset(every_form) for name in saved}
+    monkeypatch.setattr(
+        sys.modules[__name__], "REVIEWED_RECEIVER_BINDINGS", loosened)
+    try:
+        refusals = _refusals(_inject_into_reachable(
+            "record = externals[0]; record.get('x')"))
+        assert "record.get" in refusals, (
+            "owner-scoping failed to refuse record.get in "
+            "_load_transition_record; K.F is no longer discriminated by the "
+            "site rule")
+        assert "REVIEWED_RECEIVER_SITES" in refusals["record.get"].reason
+    finally:
+        monkeypatch.setattr(sys.modules[__name__],
+                            "REVIEWED_RECEIVER_BINDINGS", saved)
+    _assert_closed_world(_engine_source())
+
+
+def test_k_m_the_unclosed_value_provenance_residual_is_recorded():
+    """K.M What is STILL admitted, stated and executable.
+
+    X7X refuses a reviewed receiver name bound by a form the review does not
+    cover. What it CANNOT do is follow the VALUE: a receiver rebound by a form
+    the review DOES cover, inside a function that DID review that pair, is
+    still admitted. Two instances, both demonstrated here:
+
+      * `record = externals[0]; record.get('x')` in `_classify_record_for_shell`
+        -- `assign` is a reviewed form for `record` there;
+      * `for entry in attacker: entry.stat()` in
+        `_assert_selector_authority_names` -- `for` is a reviewed form for
+        `entry` there, so a SECOND for-binding adds no new form.
+
+    The classifier has no value flow and cannot tell the second from the real
+    loop four lines above it. This is the same convention `_engine_definitions`
+    follows: a boundary that is not crossed is RECORDED, not asserted away.
+
+    The assertions below are that each residual is still OPEN and that nothing
+    ELSE is open. If one ever closes, this control fails and the evidence must
+    be rewritten before the claim is retired -- not the test deleted.
+    """
+    residuals = (
+        ("assign in a reviewed owner",
+         "record = externals[0]; record.get('x')",
+         "_classify_record_for_shell", "record.get"),
+        ("repeat for-binding of a reviewed receiver",
+         "for entry in attacker: entry.stat()",
+         "_assert_selector_authority_names", "entry.stat"),
+    )
+    for label, injected, owner, expr in residuals:
+        weakened = _inject_into_reachable(injected, into=owner)
+        refusals = _refusals(weakened)
+        assert expr not in refusals, (
+            f"the value-provenance residual {label!r} is now CLOSED. That is "
+            "an improvement, but the evidence claiming it is open must be "
+            f"rewritten first; refused instead: {sorted(refusals)}")
+        _assert_closed_world(weakened)
+
+    # And every OTHER forging shape is genuinely closed, so the residual is a
+    # named, enumerated case rather than a vague disclaimer.
+    still_open = []
+    for label, owner, injected, expr, _rule in _BINDING_FORGERIES:
+        if _refusals(_inject_into_reachable(injected, into=owner)).get(
+                expr) is None:
+            still_open.append(label)
+    assert still_open == [], (
+        f"these forging shapes are still open, so the residual is not the "
+        f"enumerated set above: {still_open!r}")
+
+
+def test_k_n_a_refusal_names_the_owner_expression_form_and_coordinate():
+    """K.X An operator must be able to adjudicate a refusal without the source.
+
+    X7 required owner + normalized expression + coordinate + reason. X7X adds
+    the binding form, because "record.get is refused" without "because
+    `record` is walrus-bound here" does not say what to fix.
+    """
+    weakened = _inject_into_reachable(
+        "if (record := attacker): record.get('x')",
+        into="_classify_record_for_shell")
+    refusals = _refusals(weakened)
+    hit = refusals["record.get"]
+    for required in ("_classify_record_for_shell", "record.get", "walrus",
+                     "reviewed forms"):
+        assert required in hit.reason or required in hit.as_row(), (
+            f"the diagnostic omits {required!r}: {hit.as_row()}")
+    with pytest.raises(AssertionError) as excinfo:
+        _assert_closed_world(weakened)
+    message = str(excinfo.value)
+    for required in ("_classify_record_for_shell", "record.get", "walrus"):
+        assert required in message, (
+            f"the failure message omits {required!r}: {message}")
 
 
 RECORD_SIZE_ANCHORS = (
