@@ -88,7 +88,7 @@ def _seed(lake) -> str:
 
 
 def _commit(lake, sha: str, rows, *, projection_id: str = "proj-r1"):
-    return lake.projection_service.commit_projection(
+    result = lake.projection_service.commit_projection(
         rows=rows,
         schema_definition=lake.schema_definition,
         projection_id=projection_id,
@@ -106,6 +106,10 @@ def _commit(lake, sha: str, rows, *, projection_id: str = "proj-r1"):
         logical_day=15,
         lineage_manifest_id=f"lm-{projection_id}",
     )
+    lake.commit_manifest(
+        "pm-r1", blob_refs=[sha], projection_refs=[projection_id]
+    )
+    return result
 
 
 def _read_back(lake, projection_id: str = "proj-r1") -> list:

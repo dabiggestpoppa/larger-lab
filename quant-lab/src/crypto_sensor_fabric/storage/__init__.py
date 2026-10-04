@@ -100,7 +100,9 @@ from .enums import (
     ProjectionState,
     RevisionPolicy,
     RevisionState,
+    SourceUnitContract,
     SourceUnitState,
+    SourceUnitVariability,
     StorageEncoding,
     StorageJobStatus,
     StorageObjectType,
@@ -195,6 +197,10 @@ from .projection_schema import (
     ReservedProjectionColumn,
     compute_schema_fingerprint,
     compute_schema_key,
+    resolve_unit_field_path,
+)
+from .projections import (
+    ProjectionUnitEvidenceConflict,
 )
 
 # SENSOR-B4-I12A — raw-evidence query/replay boundary (F19).  Read-only
@@ -270,6 +276,7 @@ __all__ = [
     "ReservedProjectionColumn",
     "compute_schema_fingerprint",
     "compute_schema_key",
+    "resolve_unit_field_path",
     # paths / addressing
     "BLOB_KEY_PREFIX",
     "BLOB_SCHEMA",
@@ -357,8 +364,10 @@ __all__ = [
     "SecretBearingAcquisitionMetadata",
     "Sha256Result",
     "SourceRevision",
+    "SourceUnitContract",
     "SourceUnitEvidence",
     "SourceUnitState",
+    "SourceUnitVariability",
     "StagedVerificationError",
     "StagingWriteError",
     "StorageEncoding",
@@ -423,6 +432,7 @@ __all__ = [
     "LineageIncomplete",
     "NoMatchingEvidence",
     "ProjectionSchemaUnsupported",
+    "ProjectionUnitEvidenceConflict",
     "QueryBlobMissing",
     "QueryOutcome",
     "QueryValidationError",

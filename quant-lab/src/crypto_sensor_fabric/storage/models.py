@@ -46,7 +46,9 @@ from .enums import (
     ProjectionState,
     RevisionPolicy,
     RevisionState,
+    SourceUnitContract,
     SourceUnitState,
+    SourceUnitVariability,
     StorageEncoding,
     StorageJobStatus,
     StorageObjectType,
@@ -776,11 +778,31 @@ class SourceUnitEvidence(StorageModelBase):
     multi-field (e.g. a trade's quantity unit and a book metric's measurement
     unit; book snapshots carry a unit per price level) and several families
     (funding / basis / positioning) carry no unit field at all.
+
+    I16R2 additive extension — the LOCATION contract:
+
+    - ``field_path`` (optional): a deterministic structural path
+      (``tuple[str, ...]``) addressing a nested unit-bearing field, e.g.
+      ``("bids", "item", "quantity_unit")`` for a per-level book unit.
+      Absent means the single-component path ``(field_name,)``.  Paths are
+      structural (never dotted strings), must resolve against the
+      registered Arrow schema, and never use the reserved ``_t0_``
+      namespace.
+    - ``variability`` (optional): the explicit claim form.  Absent
+      preserves the I16R1 pair semantics exactly.
+
+    A static ``VERIFIED_NATIVE`` claim is TRUTH-BOUND: the T0B commit
+    proves every non-null value at the declared location agrees with the
+    declared lexeme before any durable projection publication (I16R2 §4/§9/
+    §14).  A row-varying/nested unit is NEVER represented as a falsely
+    static lexeme — it is declared as ``ROW_NATIVE`` location evidence.
     """
 
     field_name: str = Field(min_length=1)
     native_unit_lexeme: str | None = None
     state: SourceUnitState
+    field_path: tuple[str, ...] | None = None
+    variability: SourceUnitVariability | None = None
 
     @model_validator(mode="after")
     def _validate_field_identity(self) -> SourceUnitEvidence:
@@ -791,6 +813,28 @@ class SourceUnitEvidence(StorageModelBase):
                 "field_name must not use the reserved _t0_ namespace; "
                 "source-unit evidence names provider-native fields only"
             )
+        if self.field_path is not None:
+            if not self.field_path:
+                raise ValueError(
+                    "field_path must be a nonempty structural path; omit it "
+                    "for the single-component (field_name,) location"
+                )
+            for component in self.field_path:
+                if not isinstance(component, str) or not component.strip():
+                    raise ValueError(
+                        "every field_path component must be a non-blank string"
+                    )
+                if component.startswith("_t0_"):
+                    raise ValueError(
+                        "field_path components must not use the reserved "
+                        "_t0_ namespace; source-unit evidence names "
+                        "provider-native fields only"
+                    )
+            if self.field_path[0] != self.field_name:
+                raise ValueError(
+                    "field_path must start at field_name (the root "
+                    "provider-native field); two competing roots fail closed"
+                )
         return self
 
     @model_validator(mode="after")
@@ -809,23 +853,57 @@ class SourceUnitEvidence(StorageModelBase):
                 "UNIT_UNVERIFIED must not carry a native_unit_lexeme; "
                 "unknown must never be guessed"
             )
+        if self.variability is SourceUnitVariability.STATIC_VERIFIED:
+            if self.state is not SourceUnitState.VERIFIED_NATIVE:
+                raise ValueError(
+                    "variability=STATIC_VERIFIED requires "
+                    "state=VERIFIED_NATIVE; a static claim must carry a "
+                    "proven lexeme"
+                )
+        elif self.variability in (
+            SourceUnitVariability.ROW_NATIVE,
+            SourceUnitVariability.UNIT_UNVERIFIED,
+        ):
+            if self.state is not SourceUnitState.UNIT_UNVERIFIED:
+                raise ValueError(
+                    f"variability={self.variability.value} requires "
+                    "state=UNIT_UNVERIFIED; location-only and unknown "
+                    "evidence never asserts a batch-level lexeme"
+                )
         return self
 
+    @property
+    def resolved_field_path(self) -> tuple[str, ...]:
+        """The declared unit location: the explicit path or the field itself."""
+        return self.field_path if self.field_path is not None else (self.field_name,)
+
     def to_descriptor(self) -> dict[str, Any]:
-        """Language-neutral JSON-serializable descriptor (deterministic)."""
-        return {
+        """Language-neutral JSON-serializable descriptor (deterministic).
+
+        I16R2 keys are emitted only when set, so an I16R1-era evidence entry
+        serializes byte-identically under the historical contract.
+        """
+        descriptor: dict[str, Any] = {
             "field_name": self.field_name,
             "native_unit_lexeme": self.native_unit_lexeme,
             "state": self.state.value,
         }
+        if self.field_path is not None:
+            descriptor["field_path"] = list(self.field_path)
+        if self.variability is not None:
+            descriptor["variability"] = self.variability.value
+        return descriptor
 
     @classmethod
     def from_descriptor(cls, descriptor: dict[str, Any]) -> SourceUnitEvidence:
         """Reconstruct with full self-validation (fail closed on drift)."""
+        raw_path = descriptor.get("field_path")
         return cls(
             field_name=descriptor["field_name"],
             native_unit_lexeme=descriptor.get("native_unit_lexeme"),
             state=descriptor["state"],
+            field_path=tuple(raw_path) if raw_path is not None else None,
+            variability=descriptor.get("variability"),
         )
 
 
@@ -836,10 +914,15 @@ class RawNormalizationBatch(StorageModelBase):
     fields: those belong to Bloc 5.
 
     ``source_unit_evidence`` (I16R1) is the ADDITIVE durable source-unit
-    handoff: one entry per unit-bearing provider-native field, copied
-    verbatim from the registered projection-schema contract by
-    ``Bloc5Handoff.to_batch``.  An EMPTY list is the historical contract
-    (nothing declared) and never means VERIFIED_NATIVE.
+    handoff: one entry per unit-bearing provider-native field (I16R2: per
+    unit-bearing structural field location), copied verbatim from the
+    registered projection-schema contract by ``Bloc5Handoff.to_batch``.
+
+    ``source_unit_contract`` (I16R2) is the explicit contract marker: a
+    batch with ``NO_UNIT_FIELDS`` and an empty evidence list deliberately
+    carries no unit-bearing field, while an absent marker with an empty
+    list is ``HISTORICAL_UNIT_CONTRACT_ABSENT`` — neither ever means
+    VERIFIED_NATIVE.
     """
 
     batch_id: str = Field(min_length=1)
@@ -863,6 +946,7 @@ class RawNormalizationBatch(StorageModelBase):
     source_granularity: Granularity | None = None
     history_boundary: str | None = None
     source_unit_evidence: list[SourceUnitEvidence] = Field(default_factory=list)
+    source_unit_contract: SourceUnitContract | None = None
 
     @model_validator(mode="after")
     def _normalize_timestamps(self) -> RawNormalizationBatch:
@@ -893,17 +977,42 @@ class RawNormalizationBatch(StorageModelBase):
     ) -> list[SourceUnitEvidence]:
         # I16R1 §16/§17: one entry per field, no silent dedupe, and a
         # canonical (field_name-sorted) order so equal semantics serialize
-        # byte-identically regardless of construction order.
-        seen: set[str] = set()
+        # byte-identically regardless of construction order.  I16R2 §12:
+        # the identity of an entry is its resolved STRUCTURAL PATH, so two
+        # declarations may not address the same nested leaf twice.
+        seen: set[tuple[str, ...]] = set()
         for evidence in value:
-            if evidence.field_name in seen:
+            path = evidence.resolved_field_path
+            if path in seen:
                 raise ValueError(
-                    "duplicate source-unit evidence for field "
-                    f"{evidence.field_name!r}; conflicting/duplicate unit "
-                    "evidence fails closed (no silent dedupe)"
+                    "duplicate source-unit evidence for field path "
+                    f"{list(path)!r}; conflicting/duplicate unit evidence "
+                    "fails closed (no silent dedupe)"
                 )
-            seen.add(evidence.field_name)
-        return sorted(value, key=lambda e: e.field_name)
+            seen.add(path)
+        return sorted(value, key=lambda e: e.resolved_field_path)
+
+    @model_validator(mode="after")
+    def _validate_source_unit_contract(self) -> RawNormalizationBatch:
+        # I16R2 §19: the contract marker and the evidence list must agree;
+        # an explicit no-unit-fields declaration is not an empty accident.
+        if (
+            self.source_unit_contract is SourceUnitContract.NO_UNIT_FIELDS
+            and self.source_unit_evidence
+        ):
+            raise ValueError(
+                "source_unit_contract=NO_UNIT_FIELDS forbids source-unit "
+                "evidence entries; fail closed"
+            )
+        if (
+            self.source_unit_contract is SourceUnitContract.UNIT_EVIDENCE_DECLARED
+            and not self.source_unit_evidence
+        ):
+            raise ValueError(
+                "source_unit_contract=UNIT_EVIDENCE_DECLARED requires at "
+                "least one evidence entry; fail closed"
+            )
+        return self
 
 
 # ---------------------------------------------------------------------------

@@ -44,6 +44,7 @@ from .json_catalog import (
     JsonCatalogCorrupt,
     DurableJsonCatalog,
 )
+from .enums import SourceUnitContract
 from .models import SourceUnitEvidence
 
 
@@ -385,9 +386,77 @@ def _field_descriptor(field: pa.Field) -> dict[str, Any]:
     }
 
 
+def resolve_unit_field_path(
+    schema: pa.Schema, field_path: Iterable[str]
+) -> tuple[tuple[str, str], ...]:
+    """Resolve one structural source-unit path against an Arrow schema.
+
+    I16R2 §12: a source-unit location is a deterministic structural path
+    (never a dotted string).  Traversal is type-driven and fails closed:
+
+    * component 0 must be a top-level provider-native field;
+    * a component under a ``list``/``large_list`` type must equal the Arrow
+      list value-field name (Arrow's default element name is ``item``);
+    * a component under a ``struct`` type must name a struct child field;
+    * any other intermediate type is not traversable;
+    * the terminal field must be a string (the native unit lexeme).
+
+    Returns the ordered traversal steps for value walking:
+    ``("struct_field", name)`` / ``("list_element", name)``.
+    """
+    components = tuple(field_path)
+    if not components:
+        raise ValueError(
+            "unit evidence field_path must be a nonempty structural path"
+        )
+    root = components[0]
+    try:
+        field = schema.field(root)
+    except KeyError as exc:
+        raise ValueError(
+            f"unit evidence path root {root!r} is not a provider-native "
+            "field of this schema; fail closed"
+        ) from exc
+    current: pa.DataType = field.type
+    steps: list[tuple[str, str]] = []
+    for component in components[1:]:
+        if pa.types.is_list(current) or pa.types.is_large_list(current):
+            if component != current.value_field.name:
+                raise ValueError(
+                    f"unit evidence path step {component!r} must equal the "
+                    f"Arrow list value-field name "
+                    f"{current.value_field.name!r} at {current!s}; fail closed"
+                )
+            steps.append(("list_element", component))
+            current = current.value_field.type
+        elif pa.types.is_struct(current):
+            try:
+                child = current.field(component)
+            except KeyError as exc:
+                raise ValueError(
+                    f"unit evidence path step {component!r} is not a child "
+                    f"field of {current!s}; fail closed"
+                ) from exc
+            steps.append(("struct_field", component))
+            current = child.type
+        else:
+            raise ValueError(
+                f"unit evidence path step {component!r} cannot address "
+                f"Arrow type {current!s}; only list/struct nesting is "
+                "traversable; fail closed"
+            )
+    if not (pa.types.is_string(current) or pa.types.is_large_string(current)):
+        raise ValueError(
+            "unit evidence path must terminate at a string field (the "
+            f"native unit lexeme); got {current!s}; fail closed"
+        )
+    return tuple(steps)
+
+
 def compute_schema_fingerprint(
     schema: pa.Schema,
     source_unit_evidence: Iterable[SourceUnitEvidence] | None = None,
+    source_unit_contract: SourceUnitContract | None = None,
 ) -> str:
     """Deterministic structural fingerprint of an Arrow schema.
 
@@ -398,10 +467,11 @@ def compute_schema_fingerprint(
 
     I16R1 ADDITIVE extension: when the definition declares durable
     source-unit evidence, the canonical declaration list (sorted by field
-    name) is part of the fingerprinted contract too, so a changed unit
-    declaration is a changed schema contract.  When NO declaration exists
-    the fingerprint is byte-identical to the pre-I16R1 formula — historical
-    descriptors keep verifying under their historical contract.
+    name / structural path) is part of the fingerprinted contract too, so a
+    changed unit declaration is a changed schema contract.  I16R2 extends
+    the same law to the explicit unit-contract marker.  When NO declaration
+    exists the fingerprint is byte-identical to the pre-I16R1 formula —
+    historical descriptors keep verifying under their historical contract.
 
     Returns full 64-char lowercase SHA-256 hex.  The fingerprint answers:
     WHAT EXACT FIELD STRUCTURE WAS REGISTERED?  It is separate from
@@ -416,8 +486,10 @@ def compute_schema_fingerprint(
     if evidence:
         descriptor["source_unit_evidence"] = [
             e.to_descriptor()
-            for e in sorted(evidence, key=lambda e: e.field_name)
+            for e in sorted(evidence, key=lambda e: e.resolved_field_path)
         ]
+    if source_unit_contract is not None:
+        descriptor["source_unit_contract"] = source_unit_contract.value
     canonical = json.dumps(
         descriptor, sort_keys=True, ensure_ascii=False, separators=(",", ":")
     ).encode("utf-8")
@@ -466,6 +538,7 @@ class ProjectionSchemaDefinition:
         projection_schema_version: str,
         provider_native_schema: pa.Schema,
         source_unit_evidence: Iterable[SourceUnitEvidence] | None = None,
+        source_unit_contract: SourceUnitContract | str | None = None,
     ) -> None:
         _validate_nonempty_string(projection_schema_id, "projection_schema_id")
         validate_semver(projection_schema_version)
@@ -488,9 +561,12 @@ class ProjectionSchemaDefinition:
         # I16R1: durable source-unit declarations.  Each declaration must
         # name a REAL provider-native field of THIS schema (fail closed on
         # contradictions) and appear at most once (no silent dedupe).
+        # I16R2 §12: a nested declaration must RESOLVE against this Arrow
+        # schema (list/struct traversal, string terminal) at registration
+        # time — an unresolvable structural path never registers.
         native_names = {field.name for field in provider_native_schema}
         evidence_list: list[SourceUnitEvidence] = []
-        seen_fields: set[str] = set()
+        seen_fields: set[tuple[str, ...]] = set()
         for entry in source_unit_evidence or ():
             evidence = (
                 entry
@@ -503,26 +579,51 @@ class ProjectionSchemaDefinition:
                     f"{evidence.field_name!r}, which is not a provider-native "
                     "field of this schema; fail closed"
                 )
-            if evidence.field_name in seen_fields:
+            if evidence.field_path is not None:
+                resolve_unit_field_path(provider_native_schema, evidence.field_path)
+            path = evidence.resolved_field_path
+            if path in seen_fields:
                 raise ValueError(
-                    "duplicate source-unit evidence for field "
-                    f"{evidence.field_name!r}; conflicting declarations "
-                    "fail closed (no silent dedupe)"
+                    "duplicate source-unit evidence for field path "
+                    f"{list(path)!r}; conflicting declarations fail closed "
+                    "(no silent dedupe)"
                 )
-            seen_fields.add(evidence.field_name)
+            seen_fields.add(path)
             evidence_list.append(evidence)
+
+        if isinstance(source_unit_contract, str):
+            source_unit_contract = SourceUnitContract(source_unit_contract)
+        if (
+            source_unit_contract is SourceUnitContract.NO_UNIT_FIELDS
+            and evidence_list
+        ):
+            raise ValueError(
+                "source_unit_contract=NO_UNIT_FIELDS forbids source-unit "
+                "evidence entries; fail closed"
+            )
+        if (
+            source_unit_contract is SourceUnitContract.UNIT_EVIDENCE_DECLARED
+            and not evidence_list
+        ):
+            raise ValueError(
+                "source_unit_contract=UNIT_EVIDENCE_DECLARED requires at "
+                "least one evidence entry; fail closed"
+            )
 
         self.projection_schema_id = projection_schema_id
         self.projection_schema_version = projection_schema_version
         self.provider_native_schema = provider_native_schema
         self.source_unit_evidence: tuple[SourceUnitEvidence, ...] = tuple(
-            sorted(evidence_list, key=lambda e: e.field_name)
+            sorted(evidence_list, key=lambda e: e.resolved_field_path)
         )
+        self.source_unit_contract: SourceUnitContract | None = source_unit_contract
         self.schema_key = compute_schema_key(
             projection_schema_id, projection_schema_version
         )
         self.schema_fingerprint = compute_schema_fingerprint(
-            provider_native_schema, self.source_unit_evidence
+            provider_native_schema,
+            self.source_unit_evidence,
+            self.source_unit_contract,
         )
 
     @property
@@ -552,7 +653,10 @@ class ProjectionSchemaDefinition:
 
         I16R1: ``source_unit_evidence`` appears only when the definition
         declares at least one source-unit field; a definition with no
-        declaration serializes exactly as it did before I16R1.
+        declaration serializes exactly as it did before I16R1.  I16R2:
+        ``source_unit_contract`` appears only when an explicit marker was
+        declared — an absent marker plus an empty list is
+        HISTORICAL_UNIT_CONTRACT_ABSENT and serializes exactly as before.
         """
         fields = [_field_descriptor(field) for field in self.provider_native_schema]
         descriptor = {
@@ -568,6 +672,8 @@ class ProjectionSchemaDefinition:
             descriptor["source_unit_evidence"] = [
                 e.to_descriptor() for e in self.source_unit_evidence
             ]
+        if self.source_unit_contract is not None:
+            descriptor["source_unit_contract"] = self.source_unit_contract.value
         return descriptor
 
     @classmethod
@@ -590,15 +696,24 @@ class ProjectionSchemaDefinition:
         schema = pa.schema(pa_fields)
         # I16R1 additive source-unit declarations.  A historical descriptor
         # without the key loads under its historical contract: absence means
-        # UNKNOWN HISTORICAL CONTRACT, never VERIFIED_NATIVE.
+        # UNKNOWN HISTORICAL CONTRACT, never VERIFIED_NATIVE.  I16R2 adds
+        # the optional explicit contract marker on the same law.
         raw_units = descriptor.get("source_unit_evidence")
         unit_evidence = (
             [SourceUnitEvidence.from_descriptor(entry) for entry in raw_units]
             if raw_units is not None
             else None
         )
+        raw_contract = descriptor.get("source_unit_contract")
+        unit_contract = (
+            SourceUnitContract(raw_contract) if raw_contract is not None else None
+        )
         definition = cls(
-            schema_id, schema_version, schema, source_unit_evidence=unit_evidence
+            schema_id,
+            schema_version,
+            schema,
+            source_unit_evidence=unit_evidence,
+            source_unit_contract=unit_contract,
         )
         # Fingerprint integrity (I05R1 §38).
         if definition.schema_fingerprint != descriptor["schema_fingerprint"]:
@@ -756,6 +871,7 @@ __all__ = [
     "T0_METADATA_SCHEMA",
     "compute_schema_fingerprint",
     "compute_schema_key",
+    "resolve_unit_field_path",
     "t0_metadata_descriptor",
     "validate_semver",
 ]

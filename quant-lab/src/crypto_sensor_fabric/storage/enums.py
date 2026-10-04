@@ -267,3 +267,48 @@ class SourceUnitState(_StrEnum):
 
     VERIFIED_NATIVE = "VERIFIED_NATIVE"
     UNIT_UNVERIFIED = "UNIT_UNVERIFIED"
+
+
+class SourceUnitVariability(_StrEnum):
+    """How declared source-unit evidence behaves across committed rows (I16R2).
+
+    ADDITIVE I16R2 vocabulary.  The frozen ``SourceUnitState`` pair stays
+    unchanged; this companion vocabulary makes the CLAIM PROOF LAW explicit
+    where a scalar pair is not enough:
+
+    ``STATIC_VERIFIED`` — one declared provider-native lexeme, proven
+    invariant across the committed projection evidence governed by the
+    declaration (paired with ``state=VERIFIED_NATIVE``).
+    ``ROW_NATIVE`` — the declared location carries per-row / per-level
+    native unit tokens; Bloc 4 asserts NO batch-level lexeme and Bloc 5
+    interprets each row/level (paired with ``state=UNIT_UNVERIFIED``; never
+    a guessed value).
+    ``UNIT_UNVERIFIED`` — explicit unknown (paired with
+    ``state=UNIT_UNVERIFIED``).
+
+    Absence of ``variability`` preserves the I16R1 pair semantics exactly.
+    """
+
+    STATIC_VERIFIED = "STATIC_VERIFIED"
+    ROW_NATIVE = "ROW_NATIVE"
+    UNIT_UNVERIFIED = "UNIT_UNVERIFIED"
+
+
+class SourceUnitContract(_StrEnum):
+    """Explicit source-unit contract state for a schema / batch (I16R2).
+
+    Distinguishes an explicit declaration from historical absence, so an
+    EMPTY ``source_unit_evidence`` list is never ambiguous (I16R2 §19):
+
+    ``NO_UNIT_FIELDS`` — this schema declares that it has no unit-bearing
+    field; the empty evidence list is deliberate.
+    ``UNIT_EVIDENCE_DECLARED`` — this schema explicitly governs unit
+    evidence (the evidence list is non-empty).
+
+    Absence of BOTH this marker and the evidence list is
+    ``HISTORICAL_UNIT_CONTRACT_ABSENT`` — an old descriptor under an unknown
+    historical contract, never a claim.
+    """
+
+    NO_UNIT_FIELDS = "NO_UNIT_FIELDS"
+    UNIT_EVIDENCE_DECLARED = "UNIT_EVIDENCE_DECLARED"

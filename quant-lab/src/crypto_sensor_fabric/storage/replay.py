@@ -419,6 +419,12 @@ class Bloc5Handoff:
     raw bytes.  Without a registry the batch keeps the historical contract
     (no unit evidence), which means UNKNOWN HISTORICAL CONTRACT and never
     VERIFIED_NATIVE.
+
+    I16R2 adds the explicit ``source_unit_contract`` marker on the same
+    verbatim-copy law, so the consumer can distinguish an explicit
+    ``NO_UNIT_FIELDS`` declaration from historical absence.  ``to_batch``
+    NEVER scans projection rows: unit truth is established at the T0B commit
+    boundary and is only carried here.
     """
 
     def __init__(
@@ -461,6 +467,7 @@ class Bloc5Handoff:
         # the schema the projections claim is a real inconsistency: fail
         # closed rather than silently dropping unit evidence.
         source_unit_evidence: list[Any] = []
+        source_unit_contract: Any = None
         if self._schema_registry is not None:
             try:
                 definition = self._schema_registry.resolve_by_id(
@@ -473,6 +480,7 @@ class Bloc5Handoff:
                     f"registered: {exc}"
                 ) from exc
             source_unit_evidence = list(definition.source_unit_evidence)
+            source_unit_contract = definition.source_unit_contract
         known_gaps: list[str] = []
         if result.coverage_state.value in ("PARTIAL", "KNOWN_GAP"):
             known_gaps.append(f"coverage_state={result.coverage_state.value}")
@@ -503,6 +511,7 @@ class Bloc5Handoff:
             source_granularity=result.source_granularity,
             history_boundary=history_boundary,
             source_unit_evidence=source_unit_evidence,
+            source_unit_contract=source_unit_contract,
         )
 
 

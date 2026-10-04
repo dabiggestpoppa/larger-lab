@@ -53,6 +53,7 @@ from .atomic import (
     publish_no_replace,
 )
 from .checksums import sha256_file, validate_sha256_hex
+from .enums import SourceUnitState
 from .json_catalog import (
     JsonCatalogCorrupt,
     DurableJsonCatalog,
@@ -63,6 +64,7 @@ from .projection_schema import (
     ProjectionSchemaDefinition,
     ProjectionSchemaRegistry,
     T0_METADATA_SCHEMA,
+    resolve_unit_field_path,
 )
 from ..providers.base.enums import QualityFlagAcquisition
 
@@ -122,6 +124,44 @@ class ProjectionPreconditionError(ProjectionWriteError):
 
 class ProjectionSourceNotUsable(ProjectionWriteError):
     """A selected source acquisition is not usable manifest provenance."""
+
+
+class ProjectionUnitEvidenceConflict(ProjectionWriteError):
+    """A static VERIFIED_NATIVE source-unit claim is NOT proven by the rows.
+
+    I16R2 §4/§9/§14/§17: a static claim means only that the declared
+    provider-native lexeme is proven invariant across the committed
+    projection evidence.  Mismatch, mixed distinct lexemes or an all-null
+    location are typed refusals BEFORE durable publication.  Carries SAFE
+    METADATA ONLY — the declared location/state/lexeme and the observed
+    conflict class with counts; never row payloads.
+    """
+
+    def __init__(
+        self,
+        *,
+        field_path: tuple[str, ...],
+        declared_state: str,
+        declared_lexeme: str,
+        conflict_class: str,
+        rows_inspected: int,
+        null_count: int,
+        distinct_lexeme_count: int,
+    ) -> None:
+        self.field_path = tuple(field_path)
+        self.declared_state = declared_state
+        self.declared_lexeme = declared_lexeme
+        self.conflict_class = conflict_class
+        self.rows_inspected = rows_inspected
+        self.null_count = null_count
+        self.distinct_lexeme_count = distinct_lexeme_count
+        super().__init__(
+            f"source-unit claim {declared_lexeme!r} for path "
+            f"{list(self.field_path)!r} is not proven by committed row "
+            f"evidence: {conflict_class} (rows inspected="
+            f"{rows_inspected}, nulls={null_count}, distinct non-null "
+            f"lexemes={distinct_lexeme_count})"
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -686,6 +726,12 @@ def write_projection(
         raise ProjectionSchemaMismatch(
             f"table schema mismatch: expected {full_schema}, got {table.schema}"
         )
+
+    # ---- 2b. Source-unit claim proof (I16R2 §4/§9/§14) --------------------
+    # Every static VERIFIED_NATIVE declaration must be PROVEN by this
+    # projection's evidence BEFORE any durable publication.  Bounded
+    # distinct-state scanning (0 / 1 / >1) — never an all-values collection.
+    _validate_source_unit_claims(table, schema_definition)
 
     # ---- 3. Staging + write ------------------------------------------------
     # Staging at root level (same filesystem) to stay within Windows MAX_PATH
@@ -1441,6 +1487,129 @@ class T0BProjectionService:
         return committed_artifact, final_path
 
 
+def _iter_unit_values(
+    value: Any, steps: tuple[tuple[str, str], ...], index: int
+) -> Iterator[Any]:
+    """Lazily walk one row value down a resolved structural unit path.
+
+    A ``None`` intermediate yields nothing (no fabricated leaf); a ``None``
+    leaf IS yielded so the null law can count it.
+    """
+    if index == len(steps):
+        yield value
+        return
+    kind, name = steps[index]
+    if value is None:
+        return
+    if kind == "struct_field":
+        yield from _iter_unit_values(value.get(name), steps, index + 1)
+    else:  # list_element
+        for item in value:
+            yield from _iter_unit_values(item, steps, index + 1)
+
+
+class _UnitClaimScan:
+    """Bounded distinct-state scan for one static unit claim (I16R2 §15).
+
+    Remembers at most ONE observed lexeme, a null count and a row count —
+    the state is O(1) regardless of projection size and the walk is chunked
+    and short-circuits on the first proven conflict.
+    """
+
+    __slots__ = (
+        "conflict_class",
+        "declared_lexeme",
+        "distinct_lexeme_count",
+        "null_count",
+        "observed_lexeme",
+        "rows_inspected",
+    )
+
+    def __init__(self, declared_lexeme: str) -> None:
+        self.declared_lexeme = declared_lexeme
+        self.rows_inspected = 0
+        self.null_count = 0
+        self.distinct_lexeme_count = 0
+        self.observed_lexeme: str | None = None
+        self.conflict_class: str | None = None
+
+    def observe(self, value: str | None) -> None:
+        if self.conflict_class is not None:
+            return
+        if value is None:
+            self.null_count += 1
+            return
+        if self.distinct_lexeme_count == 0:
+            self.distinct_lexeme_count = 1
+            self.observed_lexeme = value
+            if value != self.declared_lexeme:
+                self.conflict_class = "MISMATCH"
+            return
+        if value != self.observed_lexeme:
+            self.distinct_lexeme_count = 2
+            self.conflict_class = "MIXED"
+
+    def finish(self) -> None:
+        if self.conflict_class is None and self.distinct_lexeme_count == 0:
+            self.conflict_class = "ALL_NULL"
+
+
+def _scan_source_unit_claim(
+    column: pa.ChunkedArray,
+    steps: tuple[tuple[str, str], ...],
+    declared_lexeme: str,
+) -> _UnitClaimScan:
+    scan = _UnitClaimScan(declared_lexeme)
+    for chunk in column.chunks:
+        for row_value in chunk.to_pylist():
+            scan.rows_inspected += 1
+            for leaf in _iter_unit_values(row_value, steps, 0):
+                scan.observe(leaf)
+            if scan.conflict_class is not None:
+                return scan
+    scan.finish()
+    return scan
+
+
+def _validate_source_unit_claims(
+    table: pa.Table, schema_definition: ProjectionSchemaDefinition
+) -> None:
+    """Prove every static VERIFIED_NATIVE claim against this projection.
+
+    I16R2 §4/§9: a claim the committed evidence does not prove is a typed
+    refusal — never silently downgraded to UNIT_UNVERIFIED.  §18: claims
+    that carry no lexeme (UNIT_UNVERIFIED / ROW_NATIVE locations) are not
+    value-proved here; they assert nothing about row values.
+    """
+    for evidence in schema_definition.source_unit_evidence:
+        if evidence.state is not SourceUnitState.VERIFIED_NATIVE:
+            continue
+        declared_lexeme = evidence.native_unit_lexeme
+        # Model law: VERIFIED_NATIVE always carries a non-blank lexeme.
+        assert declared_lexeme is not None
+        path = evidence.resolved_field_path
+        steps = (
+            resolve_unit_field_path(
+                schema_definition.provider_native_schema, evidence.field_path
+            )
+            if evidence.field_path is not None
+            else ()
+        )
+        scan = _scan_source_unit_claim(
+            table.column(path[0]), steps, declared_lexeme
+        )
+        if scan.conflict_class is not None:
+            raise ProjectionUnitEvidenceConflict(
+                field_path=path,
+                declared_state=evidence.state.value,
+                declared_lexeme=declared_lexeme,
+                conflict_class=scan.conflict_class,
+                rows_inspected=scan.rows_inspected,
+                null_count=scan.null_count,
+                distinct_lexeme_count=scan.distinct_lexeme_count,
+            )
+
+
 __all__ = [
     "ProjectionArtifactCatalogCorrupt",
     "ProjectionArtifactRepository",
@@ -1453,6 +1622,7 @@ __all__ = [
     "ProjectionSchemaMismatch",
     "ProjectionSchemaNotFound",
     "ProjectionSourceNotUsable",
+    "ProjectionUnitEvidenceConflict",
     "ProjectionWriteError",
     "RowProjectionLineage",
     "T0BProjectionService",
