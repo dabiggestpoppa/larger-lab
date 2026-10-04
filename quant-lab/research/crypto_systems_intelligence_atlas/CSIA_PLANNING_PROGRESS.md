@@ -3856,3 +3856,86 @@ LIVE_ACQUISITION_AUTHORITY      = FALSE
 any branch or worktree creation; any mutation of the frozen accepted Book 6
 worktree; any status-validator edit; any rename or deletion of
 `ObservationStatus`; any edit to review v0.1 or packet v0.1; Book 7 or Choir work.
+
+---
+
+# STATUS VALIDATOR LIFECYCLE AMENDMENT — DEFERRED (LEDGER UPDATE)
+
+**Date:** 2026-10-04
+**Decision id:** none. Records a deferred incoherence; ratifies nothing.
+
+```text
+STATUS_VALIDATOR_SEMANTIC_INCOHERENCE  = KNOWN / HISTORICAL
+AUTHORITY_BEARING                      = FALSE
+OUT_OF_SCOPE_LIFECYCLE_CLEANUP         = TRUE
+REQUIRED_FOR_GAP7_CURRENTNESS_FIX      = FALSE
+REQUIRED_FOR_COMPARISON_IMPLEMENTATION = FALSE
+
+REMEDIES_POSED  = 5
+REMEDY_SELECTED = NONE
+DEFERRED        = TRUE
+```
+
+## The incoherence in one line
+
+```text
+ObservationStatus.SUPERSEDED means INCOMING ("I was superseded")
+the validator binds it toOUTGOING ("I superseded X")
+```
+
+## Why it is deferred rather than fixed now
+
+```text
+1  it is construction-time bookkeeping and decides no currency
+2  ObservationStatus is branched on exactly once in all accepted src/,
+   and that once IS the validator
+3  terminality comes from a forward lineage scan, not from status
+4  four accepted tests pin the current shape, so any repair is breaking
+```
+
+## Standing prohibitions, in force
+
+```text
+STATUS_VALIDATOR_EDIT_REQUIRED      = FALSE
+CURRENTNESS_RESOLVER_USES_STATUS    = FALSE
+RENAME_OBSERVATION_STATUS           = FORBIDDEN
+DELETE_OBSERVATION_STATUS           = FORBIDDEN
+SUPERSEDED_STATUS_REFUSES_AUTHORITY = FORBIDDEN
+```
+
+## Tripwire
+
+```text
+B_STRICT_IS_A_DEVIATION_FROM_LOCAL_CONVENTION = TRUE
+```
+
+Every other status enum in this codebase is authority-bearing. The ratified
+B-STRICT exception is the one place where "status looks like it should decide"
+and it must not. Recorded so an implementer does not "helpfully" correct it.
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_STATUS_VALIDATOR_LIFECYCLE_AMENDMENT_DEFERRED_v0.1.md  DEFERRED
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.2.md  (cross-ref)
+CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.1.md       (RUNG 2 cross-ref)
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Next operator action — unchanged
+
+```text
+1. BOOK6-IMPL-CONSOLIDATED-v0.2 = AUTHORIZE_OFFLINE_IMPLEMENTATION | HOLD
+2. (independent) RATIFY TIME-1..TIME-15  |  PROCEED WITHOUT THEM
+```
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**Not authorized and not performed:** implementation; any source or test change;
+any edit to the status validator or any accepted test; any remedy selection;
+any revision of B-STRICT; any GAP reopening; any branch or worktree creation;
+any mutation of the frozen accepted Book 6 worktree; Book 7 or Choir work.

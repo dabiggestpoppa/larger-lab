@@ -162,6 +162,14 @@ SUPERSEDED_STATUS_REFUSES_AUTHORITY = FORBIDDEN
 HISTORICAL_RECORDS_REINTERPRETED   = FALSE
 ```
 
+The incoherence is **recorded, not dropped**, in
+`CSIA_BOOK_6_STATUS_VALIDATOR_LIFECYCLE_AMENDMENT_DEFERRED_v0.1.md`, which
+poses five candidate remedies for a future lifecycle amendment and selects
+none. That record also notes why the prohibition needs writing down: every
+other status enum in this codebase *is* authority-bearing, so B-STRICT is an
+exception to the local convention and will read as a bug to anyone applying
+the house idiom.
+
 The prohibition is load-bearing, not tidiness. The tempting repair — make a
 `SUPERSEDED` record refuse authority so the validator agrees with terminality —
 would introduce exactly the status-to-currency mapping the ratified record
@@ -564,6 +572,7 @@ CSIA_BOOK_6_COMPARISON_CHANGE_SUBSTRATE_RATIFICATION_RECORD_v0.1.md RATIFIED
 CSIA_BOOK_6_COMPARISON_CHANGE_REPLAY_PRECEDENCE_ERRATUM_v0.1.md    RATIFIED
 CSIA_BOOK_6_SENSOR_REGRESSION_BASELINE_PIN_v0.1.md                 PINNED
 CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.1.md         RUNG 6 AMBER
+CSIA_BOOK_6_STATUS_VALIDATOR_LIFECYCLE_AMENDMENT_DEFERRED_v0.1.md      DEFERRED
 CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1.md  SUPERSEDED
 CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PACKET_v0.1.md  SUPERSEDED
 CSIA_OPERATOR_DECISION_LOG.md

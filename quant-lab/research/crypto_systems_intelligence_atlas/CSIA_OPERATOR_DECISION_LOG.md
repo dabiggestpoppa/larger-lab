@@ -3374,3 +3374,107 @@ mutation of the frozen accepted Book 6 worktree; any edit to the status
 validator; any rename or deletion of `ObservationStatus`; any reinterpretation
 of historical records; any edit to review v0.1 or packet v0.1; any GAP reopening;
 any Book 7 or Choir work.
+
+---
+
+# CSIA — STATUS VALIDATOR INCOHERENCE RECORDED AS DEFERRED LIFECYCLE AMENDMENT
+
+**Date:** 2026-10-04
+**Decision id:** none. Records a deferred incoherence; ratifies nothing and
+selects no remedy.
+**Status:** `DEFERRED — RECORDED, NOT ADOPTED`
+**Implementation authority:** `FALSE`
+
+## Why this entry exists
+
+Review v0.2 withdrew the instruction to "correct the polarity" of the
+`SUPERSEDED` validator. Withdrawing the instruction is right; dropping the
+observation would be wrong. The incoherence is real, and it is now written down
+somewhere an implementer will actually hit.
+
+```text
+THE_INSTRUCTION_WAS_WRONG = TRUE
+THE_DEFECT_IS_STILL_REAL   = TRUE
+```
+
+## The incoherence
+
+```text
+ObservationStatus.SUPERSEDED means  INCOMING  ("I was superseded")
+the validator binds it toOUTGOING  ("I superseded X")
+THE_TWO_ARE_OPOSITE_RELATIONS
+```
+
+A predecessor therefore has no field in which to record that it was superseded.
+Lineage is discoverable only by scanning forward.
+
+## Out of currentness scope — three proofs, not assertions
+
+```text
+1  the validator decides nothing about currency; it returns self
+2  ObservationStatus is branched on EXACTLY ONCE in all of accepted src/
+   (book6_records.py:203, the validator itself); all other uses are defaults
+3  terminality is computed by forward scan in measurement_history
+   (book6_registry.py:172-191), not by status
+
+CURRENTNESS_RESOLVER_USES_STATUS = FALSE
+STATUS_ON_ANY_AUTHORITY_PATH     = NONE
+```
+
+## The tripwire
+
+Every other status enum in this codebase **is** authority-bearing —
+`RuleRatificationStatus` (book6_states.py:235), `RegistryStatus`
+(architecture.py:260,267), `CoverageRuleRatificationStatus`
+(book6_coverage_rules.py:142), `RealizationStatus` (identity.py:311+).
+
+```text
+B_STRICT_IS_A_DEVIATION_FROM_LOCAL_CONVENTION = TRUE
+```
+
+`MeasurementObservation` is the only record type whose status carries no
+authority. An implementer applying the house idiom — *status drives authority,
+that is how records work here* — would reintroduce the withdrawn defect and
+would look reasonable while doing it. The ratified position is the
+counterintuitive one, which is why it is recorded rather than assumed.
+
+## Why it cannot be a drive-by fix
+
+Four accepted tests pin the present behaviour, including
+`test_a_superseded_observation_must_name_what_it_superseded`
+(`test_book6_adversarial.py:477`). Any repair is a breaking change to accepted
+tests — one that would break the `B1..B5` / `R1..R3` freeze contract
+*legitimately*, which is worse than breaking it illegitimately because it
+invites a last-minute exemption.
+
+## Standing state
+
+```text
+STATUS_VALIDATOR_SEMANTIC_INCOHERENCE  = KNOWN / HISTORICAL / NON-AUTHORITY-BEARING
+OUT_OF_SCOPE_LIFECYCLE_CLEANUP         = TRUE
+REMEDIES_POSED                         = 5
+REMEDY_SELECTED                        = NONE
+STATUS_VALIDATOR_EDIT_REQUIRED         = FALSE
+```
+
+Remedies are posed and none is selected: add an incoming edge field; retarget
+and rename the status; drop the status requirement; leave it permanently;
+deprecate the enum. Each requires its own ratification.
+
+## Unchanged
+
+```text
+AUTH_REVIEW_v0.2 = PASS (12 / 12 TRUE)
+B_STRICT         = UNCHANGED / RATIFIED (BOOK6-GAP7-v0.3)
+RUNG_6           = AMBER (TIME-1..TIME-15 still draft)
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Not authorized and not performed
+
+Implementation; any source or test change; any edit to the status validator or
+any accepted test; any remedy selection; any revision of B-STRICT; any GAP
+reopening; any branch or worktree creation; any mutation of the frozen Book 6
+worktree; Book 7 or Choir work.

@@ -134,6 +134,15 @@ engine; source-less missingness is **not** encoded there).
 line 203 currently returns a source-less non-value-bearing record **as
 current**, which is the precise thing NV-B forbids.
 
+**Explicitly out of this rung:** `book6_records.py:202-215`, the `SUPERSEDED`
+validator. It is construction-time bookkeeping on no authority path
+(`ObservationStatus` is branched on exactly once in all of accepted `src/`, and
+that once is the validator itself). Its real incoherence — the status names the
+incoming edge while the validator binds it to the outgoing one — is recorded as
+a **deferred lifecycle amendment** in
+`CSIA_BOOK_6_STATUS_VALIDATOR_LIFECYCLE_AMENDMENT_DEFERRED_v0.1.md`, with five
+remedies posed and none selected.
+
 **Exposition (not authority):** clarification v0.3 §8 gives the nine-step
 resolver order; the ratification record is what binds.
 
