@@ -962,3 +962,72 @@ owner type `User`, `permissions.admin = true`, `reviewDecision = ""`. So
 neither external check is GitHub-required - **which is not merge
 authority**. PR #4 is `OPEN`, `mergedAt = null`, `MERGEABLE`,
 `UNSTABLE`. **`MERGE_AUTHORIZED = false`**.
+
+## SonarCloud new-code census - supersedes the §11.9 "sample" framing
+
+The X6 §11.9 row is **kept and corrected**. It correctly called the
+annotation feed a sample; §12 measures that sample and shows exactly
+what it hid.
+
+| §11.9 statement | Correction |
+|---|---|
+| "hard-capped at 50 -> a sample, not a census" | **confirmed and quantified.** Cap is SonarCloud's, not GitHub's: **132/132** non-empty slices hold exactly 50, and **page 2 is empty on all 132**, so intra-run paging reveals nothing. Unioning **across** analyses is the lever. |
+| "complete new-code issue set is `INACCESSIBLE_WITHOUT_CREDENTIALS`" | **restated precisely:** the **count** is measured (**~324** current epoch); the **type** is still credential-gated. |
+| "27 distinct failure-level issues across two samples" | **severe undercount.** The converged window holds **108 failure-level** and **213 warning-level**. |
+| "0 are BUG-class" | **never a measurement.** The annotation object has 11 fields and **no rule key, no type**. |
+| "at least one unseen bug likely exists" | **understated - it is certain**, since Reliability derives only from BUG-type. |
+
+| Figure | Value |
+|---|---|
+| commits walked / analyses located | **882 / 170** |
+| analyses carrying annotations | **132** |
+| non-empty slices at exactly 50 | **132 / 132** |
+| slices truncated by GitHub | **0** |
+| distinct keys ever annotated | **1599** (1066 seen in exactly one analysis - historical) |
+| **distinct keys, current epoch (converged)** | **~324** |
+| keys visible in the newest single analysis | **50** |
+| **keys absent from that analysis** | **271 of 321 (84%)** |
+
+**The three figures are not interchangeable**: 1599 = ever annotated,
+~324 = current epoch, 50 = one published slice. The curve plateaus at
+~317-324 over the newest 40-80 analyses and then breaks open at K>80,
+which is an **epoch boundary into May 2026 code**, not more data.
+
+**Method.** Direct HTTPS to `api.github.com`; 1232 requests, 0 failures.
+Two rules enforced in code: **a failed fetch is never treated as
+absence**, and **page 2 is always fetched** to prove a slice is not
+truncated. Dedupe is on the SonarCloud issue key in the annotation
+message URL, never path+line. (An earlier `gh api` implementation
+silently 404'd and reported 69 analyses / 322 keys; that round is
+discarded.)
+
+**Type attribution is still blocked, and a tempting proxy was refuted.**
+`rules/show` -> 404, `rule_key` search -> `total 0`, `components/show` ->
+"Project doesn't exist" (private). No `SONAR_*` in the environment, no
+Sonar entry in `KEYS.md`, none among the 25 variables in `.env`, and
+the operator runbook holds a literal `<paste>`. **`annotation_level`
+is NOT a type proxy**: `failure` contains 17 `"[[ instead of ["` and
+~45 `Cognitive Complexity` rules, all CODE_SMELLS. Trap named for
+posterity: unauthenticated `issues/search` returns a clean **`total:
+0`** for a private project - reporting that as *no issues* would be
+false, and it was not used.
+
+**What the gate proves without the feed:** Reliability derives only from
+BUG-type and Security only from VULNERABILITY-type, and both are red -
+so **at least one BUG and at least one VULNERABILITY certainly exist**
+in the current new-code set, and the feed cannot say which.
+
+**Triage residual.** Of 108 failure-level issues, 75 match known
+CODE_SMELL names and 18 are shell `"[[ instead of ["` rules. The
+remaining **15** are security/bug-named: path traversal at
+`independent-gate-b2.py:82,135,288`, `oce_worker.py:66`,
+`worker_supervisor.py:127`, **`pg-recovery.py:448,710,1118,1154,1405,
+3302,3678`**, command-argument injection at **`pg-recovery.py:522`**,
+ReDoS at `schema_validator.py:85`, and a `CancelledError` re-raise at
+`http_api.py:137`. **Eight of the fifteen are in the recovery engine PR
+#4 exists to harden.** Type unverified; these are named candidates.
+
+Read-only. No `NOSONAR`, no exclusion, no quality-profile change, no
+workflow edit. SonarCloud `111270669563` and Kilo both remain
+`completed`/`failure` and neither is claimed green.
+**`MERGE_AUTHORIZED = false`.**

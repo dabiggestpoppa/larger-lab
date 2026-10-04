@@ -4114,3 +4114,201 @@ execution mutations = 0 - recurring cost = $0 - `capital.authority = none`.
 No cloud provisioning, no broker connection, no trading, no CEREBUS
 strategy change, no LFS migration, no Sonar suppression, no R49, no
 Book 5, no Atlas Program Block 4.
+
+## 12. SonarCloud new-code issue census - superseding the §11.9 sample
+
+**This section supersedes the framing in §11.9. It does not delete or
+rewrite it.** §11.9 correctly reported the annotation feed as a sample
+and recorded the new-code issue set as
+`INACCESSIBLE_WITHOUT_CREDENTIALS`. §12 measures that sample, shows what
+it hid, and corrects three undercounts. **Issue type is still not
+available**, and §12 records precisely why, including a hypothesis that
+was tested and refuted.
+
+### 12.1 The 50 is a SonarCloud publication cap, not a GitHub page limit
+
+Paged slices *within* one analysis reveal nothing:
+
+- `per_page=100` returns 50; **`page=2` returns `[]` on all 132**
+  non-empty slices, and no `Link` header is ever emitted. GitHub returns
+  everything SonarCloud published; there is no hidden page 2.
+- **132 of 132 non-empty slices contain exactly 50 annotations.** A
+  distribution with no other value is a cap, not a count.
+
+Because SonarCloud rotates which 50 it publishes, the only lever without
+a token is to **union across analyses**. That is the bounded-slice
+strategy, and it works.
+
+### 12.2 Method, and the correction it forced on itself
+
+The first implementation harvested via `gh api` subprocess calls and
+reported **69 analyses / 322 keys**, then claimed convergence. That was
+**silently wrong**: `gh api` returned HTTP 404 when spawned from the
+harness, and the script treated a failed fetch as *no analyses on this
+commit*. Every number from that round was unsound and none of it
+survives.
+
+The authoritative pass uses direct HTTPS against `api.github.com` and
+enforces two rules **in code**:
+
+1. **A failed fetch is not absence.** Every request is counted, any
+   non-200 is recorded and printed, and the run aborts rather than
+   concluding from a failed call. Final tally: **1232 requests, 1232 ok,
+   0 failed, 0 rate-limited.**
+2. **Slices are bounded and proven.** Explicit `per_page`, and page 2 is
+   always fetched to prove non-truncation.
+
+Dedupe is on the **SonarCloud issue key** embedded in each annotation's
+message URL (`?issues=<key>`), never on path+line, because line numbers
+drift between analyses. **0 of 6600 annotations** failed to yield a key.
+
+| Scope | Value |
+|---|---|
+| Commits walked (full branch history) | **882** |
+| SonarCloud analyses located | **170** |
+| Analyses carrying annotations | **132** |
+| Non-empty slices sitting exactly on 50 | **132 / 132** |
+| Slices truncated by GitHub (page 2 non-empty) | **0** |
+| Annotations harvested | **6600** |
+| Distinct keys **ever** annotated | **1599** |
+| **Distinct keys, current epoch (converged)** | **~324** |
+| Keys visible in the newest single analysis | **50** |
+| **Keys absent from the newest analysis** | **271 of 321 (84%)** |
+
+### 12.3 Three figures that must not be conflated
+
+Union over the newest K analyses, ordered newest-first:
+
+| K | distinct keys | delta |
+|---|---|---|
+| 1 | 50 | +50 |
+| 2 | 89 | +39 |
+| 5 | 170 | +44 |
+| 10 | 235 | +13 |
+| 20 | 263 | +11 |
+| 30 | 291 | +9 |
+| **40** | **315** | +24 |
+| **50** | **317** | **+2** |
+| **60** | **321** | **+4** |
+| **80** | **324** | **+3** |
+| 100 | 536 | +212 |
+| 132 | 1599 | +1063 |
+
+The curve **plateaus at ~317-324 between K=40 and K=80**, then breaks
+open. That break is an **epoch boundary, not more data**: the analyses
+behind it date from 2026-05-17 and ran against a substantially different
+codebase. **1066 of the 1599 keys appear in exactly one analysis.**
+
+So the three numbers mean three different things and are recorded
+separately for that reason:
+
+- **1599** - every issue key ever annotated on this branch in ~5
+  months. **Not the current set.**
+- **~324** - the current analysis epoch, converged. The working figure.
+- **50** - what any single analysis publishes. **84% of the current
+  epoch is invisible in one slice.**
+
+### 12.4 Corrections to §11.9
+
+| §11.9 statement | Correction |
+|---|---|
+| "the complete new-code issue set is `INACCESSIBLE_WITHOUT_CREDENTIALS`" | **Restated precisely.** The *count* is now measured (**~324**). The *type* remains credential-gated. These are different facts. |
+| "the annotation feed is hard-capped at 50, so the observed issue set is a sample, not a census" | **Confirmed and quantified.** The cap is real and is SonarCloud's. Slice-across-analyses turns the sample into a **converged census of ~324**. |
+| "27 distinct failure-level issues observed across two samples" | **Severe undercount.** Two 50-annotation slices sample ~79 of ~324. The current window contains **108 failure-level** and **213 warning-level**. |
+| "0 are `BUG`-class, yet Reliability fails" | **Never a measurement, and §12 says so.** The feed carries no type field (§12.5). It was absent data read as absent bugs. |
+| "at least one unseen bug **likely** exists" | **Understated.** From gate semantics it is **certain** (§12.6). |
+
+### 12.5 Issue type remains credential-gated - and a proxy was refuted
+
+The annotation object has exactly eleven fields: `annotation_level,
+`blob_href`, `end_column`, `end_line`, `message`, `path`,
+`raw_details`, `start_column`, `start_line`, `title`. **No rule key. No
+issue type.**
+
+Every metadata route is closed without a token:
+
+| Route | Result |
+|---|---|
+| `GET /api/rules/show?organization=...&key=python:S1547` | **404** |
+| `GET /api/rules/search?organization=...&rule_key=python:S1547` | 200, **total 0** |
+| `GET /api/rules/search?organization=...&languages=py` | 200, 535 rules, **0 observed titles match** |
+| `GET /api/components/show?component=...` | 404 *"Project doesn't exist"* - **private** |
+| `GET /api/issues/search?...&inNewCodePeriod=true` | 200, **total 0** |
+
+That last row is a trap and is named here so nobody repeats it:
+unauthenticated search against a private project returns a clean
+**`total: 0`**, not an error. Reporting that as *no new-code issues*
+would be flatly false. **It was not used.**
+
+**Credential search, exhaustive.** No `SONAR_*` variable in the
+environment; no Sonar entry in `KEYS.md`; the workspace `.env` holds 25
+variables (Anthropic, OpenAI, Discord, Telegram, MT5/OANDA, ...) and
+**none is Sonar-related**; `SONARCLOUD-OPERATOR-RUNBOOK.md` carries a
+literal `<paste>` placeholder. **No SonarCloud credential exists in this
+environment.**
+
+**A hypothesis was tested and refuted.** The feed's
+`annotation_level` is `warning` or `failure`, which looked like a
+possible type proxy: every rule name observed maps deterministically to
+exactly one level, with **0 rule names appearing at both**. That
+correlation is real but it does **not** mean what it appears to mean -
+the `failure` level contains **17** `"[[ instead of ["` rules, **~45**
+`Cognitive Complexity` rules and **~12** duplicate-literal rules, all
+of which are unambiguously **CODE_SMELLS**. `failure` therefore does
+**not** mark BUG or VULNERABILITY class, and `annotation_level` must
+not be used to infer type. This is recorded because the inference is
+tempting and wrong.
+
+### 12.6 What the gate itself proves, without the feed
+
+This deduction needs no type field and is sound:
+
+- SonarCloud's **Reliability Rating** is computed **exclusively from
+  BUG-type** issues. Code Smells and Vulnerabilities do not enter it.
+- SonarCloud's **Security Rating** is computed **exclusively from
+  VULNERABILITY-type** issues. Security *Hotspots* are reviewed but do
+  not enter it.
+
+Both conditions are red (D and C, each required >= A). Therefore the
+current new-code set contains **at least one BUG-class and at least one
+VULNERABILITY-class issue** - **certainly, not likely** - and the
+annotation feed cannot identify which annotations they are.
+
+### 12.7 The actionable triage set
+
+Within the converged current window (321 keys): **108 failure-level,
+213 warning-level.** Of the 108 failure-level, 75 match known
+CODE_SMELL rule names and 18 are shell `"[[ instead of ["` rules -
+also code smells. The residual **15** are named for security or bug
+semantics:
+
+| File:line | Rule name |
+|---|---|
+| `control-plane/scripts/independent-gate-b2.py:82,135,288` | Path Traversal via faulty LLM-supplied CLI arguments |
+| `control-plane/scripts/oce_worker.py:66` | Path Traversal ... in `oce_worker._runtime_dir()` |
+| `control-plane/src/oce_control/worker_supervisor.py:127` | Path Traversal ... in `WorkerSupervisor._load_state()` |
+| `control-plane/src/oce_control/schema_validator.py:85` | ReDoS via unsanitized user input in `_validate_string()` |
+| `control-plane/src/oce_control/http_api.py:137` | Ensure `asyncio.CancelledError` is re-raised after your cleanup |
+| **`local-ground/scripts/pg-recovery.py:448,710,1118,1154,1405,3302,3678`** | Path Traversal via faulty LLM-supplied CLI arguments |
+| **`local-ground/scripts/pg-recovery.py:522`** | Command Argument Injection via faulty LLM-supplied CLI arguments |
+
+**Eight of the fifteen are in `pg-recovery.py`** - the recovery engine
+that PR #4 exists to harden. These are SonarCloud flagging unvalidated
+path composition in the code under audit. **Their type is still
+unverified**; they are named candidates, not confirmed VULNERABILITYs.
+Confirming that requires the credential named in §12.5.
+
+### 12.8 Nothing was suppressed, and no lever was pulled
+
+This census is **read-only**. No `NOSONAR`, no rule exclusion, no quality-
+profile change, no workflow edit, no `.gitattributes`/`.lfsconfig`
+change. SonarCloud `111270669563` remains `completed`/`failure` at
+`68ff1be2` and is **not** claimed green. Kilo remains `completed`/
+`failure`. `MERGE_AUTHORIZED = false` stands. No production behaviour
+was changed. No R49, no Book 5, no Atlas Program Block 4.
+
+### 12.9 Accounting
+
+cloud mutations = 0 - broker mutations = 0 - capital mutations = 0 -
+execution mutations = 0 - recurring cost = $0 - `capital.authority =
+none`. API read calls: 1232, all authenticated, **0 writes**.
