@@ -1498,6 +1498,9 @@ ALL_BINDING_FORMS = frozenset({
     "assign", "assign-unpack", "augassign", "annassign", "walrus",
     "for", "for-unpack", "comprehension", "comprehension-unpack",
     "with", "with-unpack", "except", "param", "lambda-param",
+    # X9: PEP 695 type parameters are real lexical bindings, visible inside
+    # the generic function body, so they are a binding FORM like any other.
+    "type-param",
 })
 
 
@@ -2034,6 +2037,7 @@ def _audit_context(tree):
     return {
         "definitions": _engine_definitions(tree),
         "bindings": _receiver_binding_forms(funcs, closure),
+        "type_params": _type_param_bindings(funcs, closure),
         "digests": {o: _owner_ast_digest(funcs[o]) for o in closure},
         "counts": counts,
         "funcs": funcs,
@@ -2078,6 +2082,38 @@ def _note_arg_names(args, form, note):
         note(args.vararg.arg, form)
     if args.kwarg:
         note(args.kwarg.arg, form)
+
+
+def _type_parameter_name(node):
+    """The bound identifier of ONE PEP 695 type parameter.
+
+    CPython 3.12 documents `TypeVar(identifier name, expr? bound)`,
+    `ParamSpec(identifier name)` and `TypeVarTuple(identifier name)`, so
+    `name` is a plain string. Later interpreters moved it to an expression
+    (`ast.Name`); both shapes are read, because a name this walker cannot see
+    is a name that could shadow a reviewed one silently.
+    """
+    name = getattr(node, "name", None)
+    if isinstance(name, str):
+        return name
+    if isinstance(name, ast.Name):
+        return name.id
+    return None
+
+
+def _note_type_parameter_names(node, note):
+    """Record every type parameter on a definition as a `type-param` binding.
+
+    X9. Type parameters create a lexical scope inside the generic definition,
+    so they can silently take over a name the classifier matches as a string
+    (`os`, `hashlib`, a reviewed constructor, a module-level internal name, a
+    reviewed receiver). Recording them here makes that collision visible to
+    the binding proof and to `_type_param_shadow`.
+    """
+    for param in getattr(node, "type_params", None) or []:
+        name = _type_parameter_name(param)
+        if name:
+            note(name, "type-param")
 
 
 def _binding_form_index(node):
@@ -2133,6 +2169,9 @@ def _binding_form_index(node):
                 note(sub.name, "except")
         elif isinstance(sub, (ast.FunctionDef, ast.AsyncFunctionDef)):
             _note_arg_names(sub.args, "param", note)
+            _note_type_parameter_names(sub, note)
+        elif isinstance(sub, ast.ClassDef):
+            _note_type_parameter_names(sub, note)
         elif isinstance(sub, ast.Lambda):
             _note_arg_names(sub.args, "lambda-param", note)
     return forms
@@ -2151,6 +2190,55 @@ def _receiver_binding_forms(funcs, closure):
         out[owner] = {name: frozenset(forms)
                       for name, forms in index.items()}
     return out
+
+
+def _type_param_bindings(funcs, closure):
+    """Per closure function: the names bound by PEP 695 type parameters.
+
+    Derived from the SAME measured binding index as the receiver forms, so
+    the binding proof and the owner digest agree independently: a type
+    parameter changes the digest (its content is serialised) AND appears here
+    (its name is a binding), and either mechanism alone can refuse.
+    """
+    out = {}
+    for owner in closure:
+        index = _binding_form_index(funcs[owner])
+        out[owner] = frozenset(
+            name for name, forms in index.items() if "type-param" in forms)
+    return out
+
+
+def _referenced_names(call):
+    """Every name the CALLABLE expression reads, receiver included.
+
+    `os.stat` -> {"os"}; `record.get` -> {"record"}; `RecordSnapshot` -> its
+    own bare name; `os.path.join` -> {"os"}. Arguments are deliberately not
+    included: authority is about what the callee expression resolves to.
+    """
+    return {sub.id for sub in ast.walk(call.func)
+            if isinstance(sub, ast.Name)}
+
+
+def _type_param_shadow(owner, call, context):
+    """The reviewed name(s) this owner's type parameters shadow, or None.
+
+    X9, and deliberately INDEPENDENT of the owner digest: the refusal is
+    computed from the measured binding inventory, so the diagnostic can name
+    the actual binding form (`type-param`) and the shadowed name even if the
+    digest rule were ever weakened by a later edit. A type parameter is a real
+    lexical binding, so a generic definition cannot take authority for a name
+    it re-binds -- `def f[os](): os.stat(path)` does NOT call the `os` module.
+    """
+    shadowed = context.get("type_params", {}).get(owner, frozenset())
+    if not shadowed:
+        return None
+    hits = sorted(shadowed & _referenced_names(call))
+    if not hits:
+        return None
+    return (f"type parameter(s) {hits!r} declared by {owner!r} create a "
+            f"lexical binding with form 'type-param' that shadows the "
+            f"reviewed name(s); a generic definition cannot take authority "
+            f"for a name it re-binds")
 
 
 def _qualified_callee(call):
@@ -2308,6 +2396,12 @@ def _classify_call(owner, call, context):
             return _ret(CLASS_UNKNOWN, denied)
         return _ret(classification, reason, observer)
 
+    # X9: a PEP 695 type parameter is a real lexical binding, so it is refused
+    # BEFORE any rule can recognize the callee -- and independently of the
+    # owner digest, so the diagnostic always names the binding form.
+    shadow = _type_param_shadow(owner, call, context)
+    if shadow is not None:
+        return _ret(CLASS_UNKNOWN, shadow)
     if callee is None:
         return _ret(CLASS_UNKNOWN, "no renderable callee (dynamic call)")
     observer = _observer_for(callee)
@@ -4830,3 +4924,446 @@ def test_m_f_the_frozen_digests_validate_under_the_3_12_ast_shape():
     # The simulation left nothing behind: the real 3.11 shape still validates.
     _assert_closed_world(_engine_source())
 
+
+# --------------------------------------------------------------------- #
+# N: PEP 695 TYPE PARAMETERS ARE REAL AUTHORITY-RELEVANT BINDINGS (X9)
+# --------------------------------------------------------------------- #
+#
+# The X8 blind spot, reproduced before this repair (the measured probe is
+# recorded next to `_STABLE_AST_FIELDS`): `_INTERPRETER_FIELD_ADDITIONS`
+# excluded `type_params` as "merely interpreter metadata", so
+# `def f[os](): os.stat(path)` kept the reviewed digest, the binding walker
+# did not report `os`, the manifest and occurrence count were unchanged, and
+# the site still took PROVEN_READ_ONLY_OR_PURE. A PEP 695 type parameter
+# creates a lexical scope visible inside the generic body, so name resolution
+# really changed while every string-matching rule kept matching.
+#
+# N.A..N.G prove the repair against the REAL engine source, so the manifest,
+# occurrence counts and frozen digests all apply as they do in production.
+# The type-parameter refusal is deliberately INDEPENDENT of the owner digest:
+# N.B neutralises the exact-site gate and shows the binding rule alone still
+# refuses, naming the binding form `type-param` and the shadowed name. N.D and
+# N.E are the REAL PEP 695 syntax controls, gated to CPython 3.12+ -- the
+# interpreter b1 runs. On 3.11 they SKIP and the synthetic-shape controls run
+# instead; the boundary claim is exactly "validated on CPython 3.11 and 3.12",
+# never arbitrary future-version independence.
+PEP695_SYNTAX = sys.version_info >= (3, 12)
+
+
+def _snippet_binding_context(node, owner="f"):
+    """A minimal context for auditing a SNIPPET that is not in the closure.
+
+    Only the measured binding data is real. The manifest/digest maps are
+    deliberately empty: these controls prove the BINDING-side refusal, which
+    must fire BEFORE any site authority is consulted, so a snippet that has
+    no reviewed manifest entry can still be refused for the right reason.
+    """
+    index = _binding_form_index(node)
+    return {
+        "definitions": set(),
+        "bindings": {owner: {n: frozenset(f) for n, f in index.items()}},
+        "type_params": {owner: frozenset(
+            n for n, f in index.items() if "type-param" in f)},
+        "digests": {},
+        "counts": {},
+        "funcs": {},
+        "closure": set(),
+    }
+
+
+def _shadowed_owner_call(owner, expr, params):
+    """The engine tree with `owner` carrying `params`, plus the named call.
+
+    Returns `(tree, node, call, saved)`; the caller restores `saved` in a
+    finally block. The tree is the REAL engine source, so the manifest, the
+    occurrence count and the frozen digest all apply exactly as they do in
+    production.
+    """
+    tree = ast.parse(_engine_source())
+    funcs, _closure = _authority_closure(tree)
+    node = funcs[owner]
+    call = next(c for c in ast.walk(node)
+                if isinstance(c, ast.Call)
+                and _normalized_call_expression(c) == expr)
+    saved = _present_type_params(node, list(params))
+    return tree, node, call, saved
+
+
+def test_n_a_a_type_parameter_is_reported_as_a_real_binding():
+    """N.A The walker reports every type-parameter name with form `type-param`.
+
+    The refusal is computed from this walker, so it is tested directly, with
+    a negative control: with no type parameters the name is NOT bound; with
+    one presented it IS -- on whichever interpreter is running (native 3.12
+    shape or the exact 3.11 simulation). ClassDef is covered too, because
+    the language permits type parameters there as well.
+    """
+    assert "type-param" in ALL_BINDING_FORMS
+    for reviewed in REVIEWED_RECEIVER_BINDINGS.values():
+        assert "type-param" not in reviewed, (
+            "a type parameter must never be a REVIEWED form; it is a refusal "
+            "form, not an admissible one")
+    tree = ast.parse(_engine_source())
+    funcs, closure = _authority_closure(tree)
+    owner = "_admit_record_descriptor"
+    node = funcs[owner]
+    assert _type_param_bindings(funcs, closure)[owner] == frozenset()
+    saved = _present_type_params(node, [_synthetic_type_var("os")])
+    try:
+        funcs, closure = _authority_closure(tree)
+        assert _type_param_bindings(funcs, closure)[owner] == frozenset({"os"}), (
+            "the type parameter was not reported as a binding")
+        index = _binding_form_index(node)
+        assert "type-param" in index["os"], index
+        forms = _receiver_binding_forms(funcs, closure)
+        assert forms[owner]["os"] == frozenset({"type-param"}), forms[owner]
+    finally:
+        _restore_type_params(node, saved)
+    # The binding proof went back to the shipped state.
+    funcs, closure = _authority_closure(ast.parse(_engine_source()))
+    assert _type_param_bindings(funcs, closure)[owner] == frozenset()
+    # ClassDef definitions bind their type parameters the same way.
+    class_node = ast.parse("class _C:\n    pass\n").body[0]
+    class_saved = _present_type_params(class_node, [_synthetic_type_var("os")])
+    try:
+        assert "type-param" in _binding_form_index(class_node).get("os", set())
+    finally:
+        _restore_type_params(class_node, class_saved)
+
+
+@pytest.mark.parametrize("owner,expr,shadow", [
+    ("_admit_record_descriptor", "os.stat", "os"),
+    ("_receipt_digest", "hashlib.sha256", "hashlib"),
+    ("_read_record_snapshot_admitted", "RecordSnapshot", "RecordSnapshot"),
+    ("_derive_claim_coordinate", "_transitions_dir", "_transitions_dir"),
+])
+def test_n_b_a_type_parameter_cannot_shadow_a_reviewed_name(owner, expr, shadow):
+    """N.B A type parameter shadowing a reviewed name is refused, BY NAME.
+
+    The four cases are the ones the mission names: a qualified module head
+    (`os`), a second qualified module (`hashlib`), a reviewed constructor and
+    a module-level engine definition. Three independent facts are asserted:
+
+      * the owner digest moved (the field is serialised);
+      * with the exact-site gate AVAILABLE the site is refused;
+      * with the gate NEUTRALISED -- so the digest cannot refuse -- the
+        binding rule ALONE still refuses, naming `type-param` and the
+        shadowed name. That is the proof the refusal does not depend only on
+        the owner digest.
+
+    The negative control runs first: the same call without the type parameter
+    is granted, so the refusal is caused by the shadow.
+    """
+    tree = ast.parse(_engine_source())
+    funcs, _closure = _authority_closure(tree)
+    plain = _classify_call(owner, next(
+        c for c in ast.walk(funcs[owner])
+        if isinstance(c, ast.Call)
+        and _normalized_call_expression(c) == expr), _audit_context(tree))
+    assert plain.classification != CLASS_UNKNOWN, plain.as_row()
+
+    tree, node, call, saved = _shadowed_owner_call(
+        owner, expr, [_synthetic_type_var(shadow)])
+    try:
+        context = _audit_context(tree)
+        assert shadow in context["type_params"][owner]
+        assert context["digests"][owner] != REVIEWED_OWNER_DIGESTS[owner], (
+            "the type parameter did not move the owner digest")
+        refused = _classify_call(owner, call, context)
+        assert refused.classification == CLASS_UNKNOWN, refused.as_row()
+        saved_gate = _site_authority
+        try:
+            sys.modules[__name__]._site_authority = _gate_off()
+            bound_only = _classify_call(owner, call, context)
+        finally:
+            sys.modules[__name__]._site_authority = saved_gate
+        assert bound_only.classification == CLASS_UNKNOWN, (
+            "with the exact-site gate neutralised, a type parameter "
+            f"shadowing {shadow!r} was ADMITTED by the spelling rule: "
+            f"{bound_only.as_row()}")
+        assert "type-param" in bound_only.reason, bound_only.reason
+        assert shadow in bound_only.reason, bound_only.reason
+    finally:
+        _restore_type_params(node, saved)
+
+
+def test_n_c_a_harmless_type_parameter_still_requires_a_review_decision():
+    """N.C A type parameter with a NON-reviewed name still withdraws authority.
+
+    `def f[T]()` does not shadow a reviewed name, so the binding rule has
+    nothing to refuse -- but the definition is still generic, so the digest
+    must move and the exact-site gate must withdraw every grant in the owner
+    until an operator reviews the new syntax. This is the review-decision
+    direction: X9 requires the change to be VISIBLE, not refused by the
+    type-param rule.
+    """
+    owner = "_admit_record_descriptor"
+    plain_tree = ast.parse(_engine_source())
+    funcs, _closure = _authority_closure(plain_tree)
+    before = _classify_call(owner, next(
+        c for c in ast.walk(funcs[owner])
+        if isinstance(c, ast.Call)
+        and _normalized_call_expression(c) == "os.stat"),
+        _audit_context(plain_tree))
+    assert before.classification != CLASS_UNKNOWN, before.as_row()
+    assert before.reason == "reviewed dotted module call", before.reason
+
+    tree, node, call, saved = _shadowed_owner_call(
+        owner, "os.stat", [_synthetic_type_var("T")])
+    try:
+        context = _audit_context(tree)
+        after = _classify_call(owner, call, context)
+        assert after.classification == CLASS_UNKNOWN, after.as_row()
+        assert "source context changed" in after.reason, after.reason
+        assert REVIEWED_OWNER_DIGESTS[owner][:16] in after.reason
+        # And the binding rule itself does NOT fire: `T` shadows nothing.
+        assert _type_param_shadow(owner, call, context) is None
+    finally:
+        _restore_type_params(node, saved)
+
+
+def test_n_d_interpreter_field_order_cannot_move_the_digest():
+    """N.D Permuting `_fields` -- same values, same source -- is a no-op.
+
+    The shipped X8 serializer emitted fields in `ast.iter_fields` order, so
+    swapping two entries of `FunctionDef._fields` moved the digest of every
+    owner while every field VALUE stayed identical (measured before the
+    repair: c649a4c9df70b303... -> 4953c178717f43fe...). The canonical schema
+    emits in the proof's sorted order, so this control requires equality --
+    and the negative control requires the values to have really been
+    identical, so "no change" cannot be satisfied by a no-op permutation.
+    """
+    funcs, _closure = _authority_closure(ast.parse(_engine_source()))
+    node = funcs["_admit_record_descriptor"]
+    before = _owner_ast_digest(node)
+    values_before = {f: _canonical_field_value(node, f) for f in node._fields}
+    original = ast.FunctionDef._fields
+    permuted = list(original)
+    permuted[0], permuted[1] = permuted[1], permuted[0]
+    ast.FunctionDef._fields = tuple(permuted)
+    try:
+        after = _owner_ast_digest(node)
+        values_after = {f: _canonical_field_value(node, f)
+                        for f in node._fields}
+    finally:
+        ast.FunctionDef._fields = original
+    assert values_before == values_after, (
+        "the permutation changed a field VALUE, so this control is not "
+        "isolating field ORDER")
+    assert after == before, (
+        "permuting `_fields` moved the digest despite identical values, so "
+        "the serialization still consumes interpreter-provided field order")
+    # A nested ClassDef is covered too, so the rule is not FunctionDef-only.
+    snippet = "def _f():\n    class Local:\n        pass\n"
+    class_before = _digest_of_snippet(snippet)
+    class_original = ast.ClassDef._fields
+    class_permuted = list(class_original)
+    class_permuted[0], class_permuted[1] = class_permuted[1], class_permuted[0]
+    ast.ClassDef._fields = tuple(class_permuted)
+    try:
+        class_after = _digest_of_snippet(snippet)
+    finally:
+        ast.ClassDef._fields = class_original
+    assert class_after == class_before, (
+        "permuting ClassDef._fields moved the digest")
+
+
+def test_n_e_an_unknown_ast_field_fails_closed_with_kind_and_name():
+    """N.E A field outside the schema is RED, and the diagnostic names it.
+
+    Measured against the shipped X8 serializer before the repair: an unknown
+    meaning-bearing field on `Call` left the digest IDENTICAL for two
+    different values while `ast.dump` moved -- silently blind. The canonical
+    serializer must instead raise, naming the node type and the field, so a
+    future interpreter's addition forces an operator review; the negative
+    control proves the injected field was observable at all.
+    """
+    funcs, _closure = _authority_closure(ast.parse(_engine_source()))
+    node = funcs["_admit_record_descriptor"]
+    call = next(c for c in ast.walk(node) if isinstance(c, ast.Call))
+    original = ast.Call._fields
+    try:
+        ast.Call._fields = original + ("default_value",)
+        call.default_value = "attacker-controlled-1"
+        with pytest.raises(_UnreviewedAstFieldError) as caught:
+            _owner_ast_digest(node)
+        assert "Call.default_value" in str(caught.value), str(caught.value)
+        dump_a = ast.dump(node, annotate_fields=True,
+                          include_attributes=False)
+        call.default_value = "attacker-controlled-2"
+        dump_b = ast.dump(node, annotate_fields=True,
+                          include_attributes=False)
+        assert dump_a != dump_b, (
+            "the injected field was not observable even by `ast.dump`, so "
+            "the control does not reproduce a real field")
+        # A second kind, so the check is not `Call`-specific.
+        func_original = ast.FunctionDef._fields
+        try:
+            ast.FunctionDef._fields = func_original + ("default_value",)
+            with pytest.raises(_UnreviewedAstFieldError) as caught_func:
+                _owner_ast_digest(node)
+            assert "FunctionDef.default_value" in str(caught_func.value), \
+                str(caught_func.value)
+        finally:
+            ast.FunctionDef._fields = func_original
+    finally:
+        ast.Call._fields = original
+        if hasattr(call, "default_value"):
+            del call.default_value
+    # The shipped shape still digests to the frozen value.
+    assert _owner_ast_digest(node) == REVIEWED_OWNER_DIGESTS[
+        "_admit_record_descriptor"]
+
+
+def test_n_f_the_repaired_source_authority_keeps_every_x8_guarantee():
+    """N.F X9 preserves X8: exact sites, exact counts, full coverage.
+
+    The repair changes the serializer and the binding walker; it must not
+    change WHAT is authorized. The measured totals are asserted to be the
+    same as X8's (`X8_TOTALS`), the manifest is exact in both directions, the
+    two reachable mutation channels keep their observers, and every READ_ONLY
+    grant carries a reason.
+    """
+    closure, sites = _assert_closed_world(_engine_source())
+    counts = {}
+    for site in sites:
+        counts[site.classification] = counts.get(site.classification, 0) + 1
+    assert len(closure) == X8_TOTALS["closure_functions"]
+    assert len(sites) == X8_TOTALS["reachable_call_sites"]
+    assert counts.get(CLASS_READ_ONLY, 0) == X8_TOTALS["read_only"]
+    assert counts.get(CLASS_INTERNAL, 0) == X8_TOTALS["internal"]
+    assert counts.get(CLASS_MUTATION, 0) == X8_TOTALS["mutation"]
+    assert counts.get(CLASS_UNKNOWN, 0) == X8_TOTALS["unknown"]
+    observed = {}
+    for site in sites:
+        if site.classification != CLASS_UNKNOWN:
+            key = (site.owner, site.expression)
+            observed[key] = observed.get(key, 0) + 1
+    assert observed == EXACT_SITE_MANIFEST, (
+        "the manifest is no longer an exact record of the granted surface")
+    assert _reachable_mutation_channels(sites) == {"os.open", "open"}
+    assert len(_globally_instrumented_channels()) == 33
+    for site in sites:
+        if site.classification == CLASS_READ_ONLY:
+            assert site.reason, f"{site.identity} has no stated reason"
+
+
+@pytest.mark.skipif(not PEP695_SYNTAX,
+                    reason="real PEP 695 syntax requires CPython 3.12+")
+@pytest.mark.parametrize("shadow,callee", [
+    ("os", "os.stat(path)"),
+    ("hashlib", "hashlib.sha256(b'x')"),
+    ("RecordSnapshot", "RecordSnapshot(record)"),
+    ("_transitions_dir", "_transitions_dir()"),
+])
+def test_n_g_real_pep695_syntax_is_refused_for_every_reviewed_shape(
+        shadow, callee):
+    """N.G REAL 3.12 generic syntax, parsed and refused on the 3.12 runner.
+
+    The 3.11 simulation is compared against the real parser in N.H; this is
+    the end-to-end control on the interpreter b1 uses: an ACTUAL generic
+    function definition is parsed by CPython 3.12, its type parameter is
+    measured as a `type-param` binding, and the reviewed call under it is
+    refused by the binding rule, naming the shadow. The negative control is
+    the same source without the type parameter.
+    """
+    generic = ast.parse(f"def f[{shadow}]():\n    {callee}\n").body[0]
+    assert generic.type_params, "the real parser produced no type parameter"
+    call = next(c for c in ast.walk(generic) if isinstance(c, ast.Call))
+    context = _snippet_binding_context(generic)
+    verdict = _classify_call("f", call, context)
+    assert verdict.classification == CLASS_UNKNOWN, verdict.as_row()
+    assert "type-param" in verdict.reason, verdict.reason
+    assert shadow in verdict.reason, verdict.reason
+    # Negative control: the same call without the type parameter is NOT
+    # refused by the binding rule.
+    plain = ast.parse(f"def f():\n    {callee}\n").body[0]
+    plain_call = next(c for c in ast.walk(plain) if isinstance(c, ast.Call))
+    plain_context = _snippet_binding_context(plain)
+    assert _type_param_shadow("f", plain_call, plain_context) is None
+
+
+@pytest.mark.skipif(not PEP695_SYNTAX,
+                    reason="real PEP 695 syntax requires CPython 3.12+")
+def test_n_h_real_pep695_syntax_against_the_real_engine_source():
+    """N.H A real generic DEF LINE in the engine itself is refused by name.
+
+    This is the strongest form of the reproduction: the engine source is
+    rewritten to carry real PEP 695 syntax on a real reviewed owner and
+    re-audited end to end, so the manifest, the occurrence count and the
+    frozen digest all apply. The refusal must name `type-param` and the
+    shadowed name, and `_assert_closed_world` must go RED.
+    """
+    source = _engine_source()
+    # Negative control: the untouched engine audits green.
+    _assert_closed_world(source)
+    for owner, expr, shadow in (
+            ("_admit_record_descriptor", "os.stat", "os"),
+            ("_receipt_digest", "hashlib.sha256", "hashlib"),
+            ("_read_record_snapshot_admitted", "RecordSnapshot",
+             "RecordSnapshot"),
+            ("_derive_claim_coordinate", "_transitions_dir",
+             "_transitions_dir"),
+    ):
+        rewritten = source.replace(f"def {owner}(",
+                                   f"def {owner}[{shadow}](", 1)
+        assert rewritten != source, owner
+        _closure, sites = _audit_source(rewritten)
+        hits = [s for s in sites
+                if s.owner == owner and s.expression == expr]
+        assert hits, f"{expr} vanished from {owner}"
+        assert all(s.classification == CLASS_UNKNOWN for s in hits), (
+            f"a real generic definition still authorized {expr} in {owner}: "
+            + "; ".join(s.as_row() for s in hits))
+        assert all("type-param" in s.reason and shadow in s.reason
+                   for s in hits), "; ".join(s.reason for s in hits)
+        with pytest.raises(AssertionError) as caught:
+            _assert_closed_world(rewritten)
+        assert "type-param" in str(caught.value)
+    # The harmless-parameter case: real syntax, reviewed name untouched, and
+    # the DIGEST withdraws the grant (a review decision, not a shadow).
+    rewritten = source.replace("def _admit_record_descriptor(",
+                               "def _admit_record_descriptor[T](", 1)
+    _closure, sites = _audit_source(rewritten)
+    hits = [s for s in sites if s.owner == "_admit_record_descriptor"
+            and s.expression == "os.stat"]
+    assert hits and all(s.classification == CLASS_UNKNOWN for s in hits)
+    assert any("source context changed" in s.reason for s in hits), \
+        "; ".join(s.reason for s in hits)
+
+
+@pytest.mark.skipif(not PEP695_SYNTAX,
+                    reason="real PEP 695 syntax requires CPython 3.12+")
+def test_n_i_real_syntax_matches_the_simulated_shape_and_the_normalisation():
+    """N.I The 3.11 simulation is COMPARED against real 3.12 parsing.
+
+    X8's lesson was that a shape assertion made on one interpreter can be
+    false on the other, so the simulation may not be ASSUMED equivalent. On
+    the runner that can parse real generic syntax, the real tree is measured
+    and compared field by field with `_synthetic_type_var`; the real digest
+    moves; a plain 3.12 definition carries `type_params == []`; and deleting
+    that native attribute normalises to the SAME digest, which is the 3.11
+    direction of the version boundary exercised on 3.12 itself.
+    """
+    real = ast.parse("def f[os]():\n    os.stat(path)\n").body[0]
+    assert isinstance(real.type_params, list) and len(real.type_params) == 1
+    real_param = real.type_params[0]
+    synthetic = _synthetic_type_var("os")
+    assert tuple(real_param._fields) == tuple(synthetic._fields), (
+        (real_param._fields, synthetic._fields))
+    assert _type_parameter_name(real_param) == "os"
+    assert getattr(real_param, "bound", None) is None
+    for field in synthetic._fields:
+        assert _canonical_field_value(real_param, field) == \
+            _canonical_field_value(synthetic, field), field
+    plain = ast.parse("def f():\n    os.stat(path)\n").body[0]
+    assert plain.type_params == []
+    assert _owner_ast_digest(real) != _owner_ast_digest(plain)
+    # Deleting the NATIVE attribute still normalises to the empty list, so
+    # the 3.11 absence and the 3.12 empty list are one canonical value here
+    # too, not only in the simulation.
+    native = ast.parse("def f():\n    os.stat(path)\n").body[0]
+    natural = _owner_ast_digest(native)
+    del native.type_params
+    assert _owner_ast_digest(native) == natural, (
+        "a missing type_params did not normalise to the empty list on 3.12")
