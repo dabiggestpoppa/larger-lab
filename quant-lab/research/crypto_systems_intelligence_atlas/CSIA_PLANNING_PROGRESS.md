@@ -4186,3 +4186,100 @@ DECISIONS_OUTSTANDING = 0
 executed, no branch created, no worktree created, no GAP reopened, no Book 7 or
 Choir work. The frozen accepted Book 6 worktree remains at `5f94c3f40c` with 0
 drift.
+
+---
+
+# SUCCESSOR CURRENTNESS RATIFIED — NO INTERPRETIVE RESIDUE (LEDGER UPDATE)
+
+**Recorded:** 2026-10-04
+**Binding decision:** `BOOK6-GAP7-SUCCESSOR-CURRENTNESS-v0.1`
+**Planning HEAD at time of writing:** `f056a99e`
+
+## What changed
+
+The authorization round left one interpretive residue. Review v0.4 §6.3
+implemented `SUCCESSOR_CURRENTNESS_SCOPE = PER_RECORD` and said so plainly —
+that it was a reading, that the alternative existed, and that the operator could
+override it before the build. That is honest, but it left the implementation law
+resting on a derivation.
+
+It now rests on a ratification.
+
+```text
+SUCCESSOR_CURRENTNESS_SCOPE = PER_RECORD   (RATIFIED, not derived)
+COMPONENT_WIDE_FAIL_CLOSED  = NOT ADOPTED
+RATIFIED_DOCTRINE_CHANGED   = FALSE
+```
+
+## Why it was worth ratifying rather than leaving derived
+
+The corpus was **determinate but silent**. The five-conjunct `CURRENT` predicate
+is per-record and admits no sixth conjunct, so `PER_RECORD` was derivable — and
+`COMPONENT_WIDE` would have been new policy smuggled in through interpretation,
+exactly the move the `NV-A` withdrawal exists to prevent.
+
+Ratifying makes the choice explicit and, more usefully, makes it **falsifiable**.
+
+## `TERM-6`
+
+```text
+TERM-4  forbids UNDER-refusing   (A must not resolve current)
+TERM-6  forbids OVER-refusing    (B and C must resolve current)
+```
+
+Without `TERM-6`, an implementation that refused the entire branched family
+would pass `TERM-4` cleanly and the ratified scope would assert nothing testable.
+The two cases pin the boundary from both sides.
+
+```text
+PRIOR_RATIFIED_GAP7_CASES = 39
+RATIFIED_GAP7_CASES_NOW    = 40
+TERM_6_PRIOR_OCCURRENCES   = 0
+```
+
+## Authorization interaction
+
+`BOOK6-IMPL-CONSOLIDATED-v0.4` names the 39-case contract. No re-authorization
+is required: a falsification case is a prohibition, not a permission.
+
+```text
+AUTHORIZATION_REISSUED_REQUIRED = FALSE
+AUTHORIZED_SCOPE_CHANGED        = FALSE
+IMPLEMENTATION_FURTHER_CONSTRAINED = TRUE
+LAW_UNCHANGED = TRUE ; WARRANT_STRENGTHENED = TRUE
+```
+
+## Standing state
+
+```text
+GAP_1..GAP_7               = CLOSED / RATIFIED
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED         = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY  = FALSE
+OPEN_STRENGTHENINGS        = 1   (TIME-16)
+DECISIONS_OUTSTANDING      = 0
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_GAP7_SUCCESSOR_CURRENTNESS_RATIFICATION_RECORD_v0.1.md  RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Next operator action — unchanged
+
+```text
+1. Create branch agent/crypto-systems-intelligence-atlas-book6-comparison-change-build
+   from 5f94c3f40cea4441470c57671f51454da7377361
+2. Create a fresh worktree for it
+3. Execute the 11-rung build under packet v0.4 §3, now constrained by TERM-6
+```
+
+The build law is unchanged. It is simply better founded.
+
+**Not done in this round:** no source written, no test code written, no test
+executed, no branch created, no worktree created, no GAP reopened, no prior
+ratified artifact edited, no registration-policy change. The frozen accepted
+Book 6 worktree remains at `5f94c3f40c` with 0 drift.

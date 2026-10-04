@@ -3838,3 +3838,103 @@ NEXT_ACT = CREATE BRANCH agent/crypto-systems-intelligence-atlas-book6-compariso
            FROM 5f94c3f40cea4441470c57671f51454da7377361
            RE-VERIFY COLLISION-FREE IMMEDIATELY BEFORE CREATION
 ```
+
+---
+
+# SUCCESSOR CURRENTNESS SCOPE RATIFIED AS `PER_RECORD`
+
+**Recorded:** 2026-10-04
+**Decision id:** `BOOK6-GAP7-SUCCESSOR-CURRENTNESS-v0.1`
+**Operator selection:** `RATIFY_SUCCESSOR_CURRENTNESS_SCOPE_PER_RECORD`
+**Artifact:** `CSIA_BOOK_6_GAP7_SUCCESSOR_CURRENTNESS_RATIFICATION_RECORD_v0.1.md`
+
+## The question
+
+In `A <- B` and `A <- C`, `A` fails closed — settled by `TERM-4` and
+`MULTIPLE_SUCCESSOR_LINEAGE = FAIL_CLOSED`. The open question was the scope of
+that rule: may `B` and `C` independently resolve current, each being terminal and
+otherwise valid?
+
+| | Policy | Effect |
+|---|---|---|
+| **A** | `PER_RECORD` | `A` not current; `B`, `C` current if each terminal + other conjuncts |
+| **B** | `COMPONENT_WIDE` | `A`, `B`, `C` all not current |
+
+## The selection
+
+```text
+SUCCESSOR_CURRENTNESS_SCOPE = PER_RECORD
+COMPONENT_WIDE_FAIL_CLOSED  = NOT ADOPTED
+```
+
+Ratified because the prior corpus was determinate but silent: the five-conjunct
+`CURRENT` predicate is defined per record and admits no sixth conjunct, so
+component-wide refusal would have been new policy rather than doctrine recovery.
+The operator adopted the reading explicitly rather than leaving it derived.
+
+```text
+RATIFIED_DOCTRINE_CHANGED = FALSE   (the adoption confirms; it does not amend)
+PRIOR_RATIFICATIONS_UNTOUCHED = TRUE
+GAP_7_REOPENED = FALSE
+GAP_6_REOPENED = FALSE
+```
+
+## `TERM-6` — the falsification case
+
+```text
+TERM-6 | A <- B and A <- C | A not current (TERM-4); B current; C current
+```
+
+`TERM-4` forbids under-refusing. `TERM-6` forbids **over**-refusing. Without it,
+an implementation that refused the whole family would pass `TERM-4` cleanly and
+the ratified scope would be unfalsifiable.
+
+```text
+PRIOR_RATIFIED_GAP7_CASES = 39
+RATIFIED_GAP7_CASES_NOW    = 40
+TERM_6_PRIOR_OCCURRENCES   = 0   (checked corpus-wide before naming)
+```
+
+## Authorization interaction
+
+`BOOK6-IMPL-CONSOLIDATED-v0.4` names "the ratified GAP-7 39-case test contract".
+That figure is now 40. No re-authorization is required, because a falsification
+case is a prohibition and not a permission: it constrains the implementation and
+widens no scope.
+
+```text
+AUTHORIZATION_REISSUED_REQUIRED = FALSE
+AUTHORIZED_SCOPE_CHANGED        = FALSE
+IMPLEMENTATION_FURTHER_CONSTRAINED = TRUE
+LAW_UNCHANGED                   = TRUE
+WARRANT_STRENGTHENED            = FROM INTERPRETATION TO DOCTRINE
+```
+
+## What this discharges
+
+```text
+CAVEAT_DISCHARGED_BY_THIS_RECORD = TRUE
+REVIEW_v0.4_EDITED               = FALSE
+OPEN_STRENGTHENINGS              = 1   (TIME-16 only)
+```
+
+Review v0.4 §6.4 left the interpretive caveat open and invited override before
+implementation. It is answered now, by a later recorded decision, which is the
+mechanism this corpus is built on.
+
+## Standing state
+
+```text
+GAP_1..GAP_7 = CLOSED / RATIFIED
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED             = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+DECISIONS_OUTSTANDING           = 0
+```
+
+**Not authorized and not performed:** implementation; any source or test code;
+any test executed; any edit to a ratified record, to test spec v0.3, to review
+v0.4 or to packet v0.4; any registration-policy change; any status-validator
+edit; any GAP reopening; any branch or worktree creation; any mutation of the
+frozen accepted Book 6 worktree; Book 7 or Choir work.
