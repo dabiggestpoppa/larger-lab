@@ -1252,17 +1252,19 @@ CLASSIFICATIONS = (CLASS_INTERNAL, CLASS_READ_ONLY, CLASS_MUTATION,
 class _ClassifiedCall:
     """One reachable call site, classified exactly once."""
 
-    __slots__ = ("owner", "lineno", "col", "callee", "classification",
-                 "observer")
+    __slots__ = ("owner", "lineno", "col", "callee", "expression",
+                 "classification", "observer", "reason")
 
     def __init__(self, owner, lineno, callee, classification, observer=None,
-                 col=0):
+                 col=0, expression=None, reason=""):
         self.owner = owner
         self.lineno = lineno
         self.col = col
         self.callee = callee
+        self.expression = expression
         self.classification = classification
         self.observer = observer
+        self.reason = reason
 
     @property
     def identity(self):
@@ -1278,8 +1280,12 @@ class _ClassifiedCall:
         return f"{self.owner}|{self.callee}|{self.lineno}:{self.col}"
 
     def as_row(self):
-        return (f"{self.owner}:{self.lineno}:{self.col} {self.callee} "
-                f"{self.classification} observer={self.observer or '-'}")
+        # X7: a refusal must name the owning function, the NORMALIZED call
+        # expression, the source coordinate and the reason, so an operator can
+        # adjudicate it without re-deriving the classifier's internals.
+        return (f"{self.owner}:{self.lineno}:{self.col} {self.expression or self.callee} "
+                f"{self.classification} observer={self.observer or '-'} "
+                f"reason={self.reason or '-'}")
 
     def __repr__(self):  # pragma: no cover - diagnostics only
         return f"<{self.identity} {self.classification}>"
@@ -1295,11 +1301,17 @@ class _ClassifiedCall:
 #   * os.scandir / os.listdir -- enumeration;
 #   * os.path.* / os.environ.get -- pure string or environment reads;
 #   * stat.S_* -- pure mode-bit predicates;
-#   * get/items/startswith/endswith/strip/split/join/encode/decode/match/
-#     hexdigest -- in-memory operations on already-admitted values;
-#   * append/update/copy -- mutate IN-MEMORY containers only;
 #   * json.* / hashlib.* -- pure (de)serialisation and hashing;
 #   * constructors, predicates and aggregation builtins.
+#
+# X7 CORRECTION. This registry used to carry BARE METHOD NAMES -- "get",
+# "append", "update", "replace", "stat" and friends -- so ANY receiver could
+# inherit read-only authority from a spelling alone. That admitted
+# `Path(src).replace(dst)` (a filesystem rename) as the reviewed string
+# operation "replace", and let any object named `external` or `sink` use
+# .update/.append. Every bare method name has been REMOVED. Method calls are
+# now admitted only as a reviewed (receiver, method) PAIR, or as a reviewed
+# complete expression -- see REVIEWED_RECEIVER_METHODS below.
 #
 # The boundary this registry does NOT cross: it says nothing about code
 # paths outside the authority closure, and it does not assert that a
@@ -1315,14 +1327,6 @@ READ_ONLY_REGISTRY = frozenset({
     "os.path.exists", "os.path.lexists", "os.path.relpath",
     "os.environ.get", "os.getenv",
     "stat.S_IMODE", "stat.S_ISDIR", "stat.S_ISREG", "stat.S_ISLNK",
-    "get", "items", "keys", "values", "startswith", "endswith", "strip",
-    "lstrip", "rstrip", "split", "rsplit", "splitlines", "join", "replace",
-    "encode", "decode", "match", "search", "fullmatch", "hexdigest",
-    "update", "copy", "count", "find", "format", "casefold", "lower",
-    "upper", "isidentifier", "append",
-    # os.DirEntry.stat -- metadata read on a directory entry; opens no
-    # descriptor for writing and cannot mutate the tree.
-    "stat",
     "json.dumps", "json.load", "json.loads",
     "hashlib.sha256", "hashlib.sha1", "hashlib.md5", "hashlib.new",
     "len", "bool", "int", "str", "bytes", "float", "tuple", "list", "dict",
@@ -1332,7 +1336,6 @@ READ_ONLY_REGISTRY = frozenset({
     "callable", "chr", "ord",
     "RuntimeError", "ValueError", "TypeError", "OSError", "Exception",
     "NotImplementedError", "StopIteration",
-    "_FrozenDict", "_STATE_DISPATCH",
 })
 
 # In-memory snapshot construction, reviewed and admitted separately so the
@@ -1354,6 +1357,56 @@ PURE_CONSTRUCTORS = frozenset({
 REVIEWED_DISPATCH_LOCALS = frozenset({"handler"})
 
 
+# X7: RECEIVER-BOUND METHOD ADMISSION.
+#
+# A method name alone proves nothing about what it mutates. `record.get` reads a
+# dictionary; `Path(target).replace(other)` RENAMES A FILE and renders to the
+# same attribute spelling. So admission is by the PAIR (receiver, method), where
+# the receiver is the normalized name path at that call site.
+#
+# This set is MEASURED, not guessed: it is exactly the (receiver, method) pairs
+# present in the 35-function authority closure at this head. Each entry is a
+# deliberate review decision; a pair that appears anywhere else is refused.
+REVIEWED_RECEIVER_METHODS = frozenset({
+    # admitted JSON/dict reads on already-parsed, already-admitted material
+    "record.get", "promote.get", "claim.get", "admitted_record.get",
+    # the dispatch table lookup is the dynamic-dispatch seam; see I.G
+    "_STATE_DISPATCH.get",
+    # in-memory list construction for census/receipt payloads only
+    "census.append", "chunks.append", "roots.append",
+    # string predicates on an admitted record name
+    "name.startswith", "name.endswith", "part.strip",
+    # pure transforms on admitted values
+    "value.items", "canonical.encode", "raw.decode",
+    # os.DirEntry.stat -- metadata read on a directory entry; opens no
+    # descriptor for writing and cannot mutate the tree.
+    "entry.stat",
+    # compiled-pattern match on the operation-id pattern object
+    "OPERATION_ID_RE.match",
+})
+
+# Calls whose receiver is itself a CALL EXPRESSION. The receiver is normalized
+# with its arguments elided (`f(...)`), so this admits one specific shape and
+# refuses every other, including `Path(x).replace(y)`. Every entry was MEASURED
+# against the closure at this head, not guessed from the owning function:
+#   os.environ.get(...).split      -- read an env var, split it: pure
+#   bytes.join(...).decode         -- join admitted byte chunks, decode: pure
+#   hashlib.sha256(...).hexdigest  -- hash already-admitted bytes: pure
+REVIEWED_EXPRESSION_RECEIVERS = frozenset({
+    "os.environ.get(...).split",
+    "bytes.join(...).decode",
+    "hashlib.sha256(...).hexdigest",
+})
+
+# Receivers that are LITERALS (`b""`, `""`, `0`, ...). A literal cannot be
+# rebound, so it cannot denote a filesystem object; `b", ".join(...)` is
+# unambiguously an in-memory bytes join. Normalized to the literal's TYPE so
+# every bytes literal shares one reviewed entry.
+LITERAL_RECEIVER_METHODS = frozenset({
+    "bytes.join", "str.join",
+})
+
+
 def _qualified_callee(call):
     """Render `a.b.c(...)` as 'a.b.c'; a bare name as itself."""
     parts = []
@@ -1364,6 +1417,59 @@ def _qualified_callee(call):
     if isinstance(node, ast.Name):
         parts.append(node.id)
     return ".".join(reversed(parts)) if parts else None
+
+
+def _normalized_expression(node):
+    """Render an AST receiver canonically, with structure preserved.
+
+    X7. `_qualified_callee` collapses `Path(src).replace(dst)` to the bare name
+    `replace`, which is precisely how a filesystem rename acquired string
+    authority. This renderer keeps the receiver, so the pair can be reviewed:
+
+        Name                -> `record`
+        Attribute chain     -> `self.promote`
+        Call                -> `_receipt_digest(...)`   (arguments elided)
+        Constant            -> the literal's TYPE (`bytes`), never its content
+        Subscript           -> `record[...]`
+        anything else       -> `ast.<Kind>`
+
+    Argument lists are elided because the argument VALUES are what vary, and
+    the authority question is about the receiver, not the payload.
+    """
+    if node is None:
+        return "<none>"
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return f"{_normalized_expression(node.value)}.{node.attr}"
+    if isinstance(node, ast.Call):
+        return f"{_normalized_expression(node.func)}(...)"
+    if isinstance(node, ast.Constant):
+        return type(node.value).__name__
+    if isinstance(node, ast.Subscript):
+        return f"{_normalized_expression(node.value)}[...]"
+    if isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        return type(node).__name__.lower()
+    if isinstance(node, ast.Dict):
+        return "dict"
+    if isinstance(node, ast.Starred):
+        return f"{_normalized_expression(node.value)}[*]"
+    return f"ast.{type(node).__name__}"
+
+
+def _normalized_call_expression(call):
+    """`receiver.method` for a method call; the bare callee otherwise."""
+    callee = _qualified_callee(call)
+    if callee is None:
+        return "<dynamic>"
+    if isinstance(call.func, ast.Attribute):
+        return f"{_normalized_expression(call.func.value)}.{call.func.attr}"
+    return callee
+
+
+def _is_literal_receiver(node):
+    """True when the receiver is a literal constant (unrebindable by name)."""
+    return isinstance(node, ast.Constant)
 
 
 def _observer_for(callee):
@@ -1393,8 +1499,8 @@ def _observer_for(callee):
 # of these heads is matched on the FULL dotted spelling only, so a registry
 # entry like "open" can never admit `shutil.open` or `io.open`.
 QUALIFIED_MODULES = frozenset({
-    "os", "os.path", "tempfile", "shutil", "stat", "json", "hashlib", "io",
-    "subprocess", "sys", "fcntl", "msvcrt", "pathlib",
+    "os", "os.path", "os.environ", "tempfile", "shutil", "stat", "json",
+    "hashlib", "io", "subprocess", "sys", "fcntl", "msvcrt", "pathlib",
 })
 
 
@@ -1408,51 +1514,79 @@ def _classify_call(owner, call, engine_definitions):
                                             audits its own body separately)
       4. explicitly reviewed constructor  -> READ_ONLY
       5. reviewed READ_ONLY registry      -> READ_ONLY
-      6. anything else                    -> UNKNOWN, which fails the proof
-
-    A METHOD call is matched on its bare attribute name only when the
-    receiver is not a known module, so `record.get` is reviewed as the
-    reviewed operation "get", while `os.open` can never be admitted by the
-    bare name "open".
+      6. anything else                    -> UNKNOWN, which fails the proofX7: a METHOD call is no longer admitted on its attribute name alone. The
+    receiver is normalized and the (receiver, method) PAIR must be reviewed, so
+    `record.get` is admitted while `Path(src).replace(dst)` and
+    `external.update(...)` are refused.
     """
     callee = _qualified_callee(call)
+    expr = _normalized_call_expression(call)
     col = getattr(call, "col_offset", 0)
+
+    def _ret(classification, reason="", observer=None):
+        return _ClassifiedCall(owner, call.lineno, callee, classification,
+                               observer, col=col, expression=expr,
+                               reason=reason)
+
     if callee is None:
-        return _ClassifiedCall(owner, call.lineno, "<dynamic>", CLASS_UNKNOWN,
-                               col=col)
+        return _ret(CLASS_UNKNOWN, "no renderable callee (dynamic call)")
     observer = _observer_for(callee)
     if observer is not None:
-        return _ClassifiedCall(owner, call.lineno, callee, CLASS_MUTATION,
-                               observer, col=col)
-    if callee in engine_definitions:
-        # Its own call sites are audited independently by the closure walk,
-        # so classifying the edge here neither double-counts nor hides it.
-        return _ClassifiedCall(owner, call.lineno, callee, CLASS_INTERNAL,
-                               col=col)
+        return _ret(CLASS_MUTATION, "maps to a tripwire observer", observer)
+    # X7 rule F: a reviewed constructor must be decidable on its own reviewed
+    # merits. Previously engine_definitions was consulted first, so every name
+    # in PURE_CONSTRUCTORS was unreachable and the policy was dead.
     if callee in PURE_CONSTRUCTORS:
-        return _ClassifiedCall(owner, call.lineno, callee,
-                               CLASS_READ_ONLY, col=col)
+        return _ret(CLASS_READ_ONLY, "reviewed pure constructor")
     head, _, attr = callee.rpartition(".")
+    # X7: the receiver/method vs bare-name discriminator is the AST SHAPE, not
+    # the rendered spelling. `hashlib.sha256(x).hexdigest()` renders as the
+    # dotless "hexdigest" yet IS a method call on an expression receiver, so
+    # routing on the dot would misclassify it as a bare local name.
+    is_method = isinstance(call.func, ast.Attribute)
     if head in QUALIFIED_MODULES:
         # Known module: only the full dotted spelling may be admitted, so a
         # new module call cannot be absorbed by a bare-name registry entry.
         if callee in READ_ONLY_REGISTRY:
-            return _ClassifiedCall(owner, call.lineno, callee,
-                                   CLASS_READ_ONLY, col=col)
-        return _ClassifiedCall(owner, call.lineno, callee,
-                               CLASS_UNKNOWN, col=col)
-    # A bare local name holding a dispatch-table value. Admitted only under
-    # the REVIEWED_DISPATCH_LOCALS contract, which I.G proves executably.
-    if not head and callee in REVIEWED_DISPATCH_LOCALS:
-        return _ClassifiedCall(owner, call.lineno, callee, CLASS_INTERNAL,
-                               "engine dispatch table (proven by I.G)",
-                               col=col)
-    # Receiver is a local value, not a module: review the method name.
-    if attr and attr in READ_ONLY_REGISTRY:
-        return _ClassifiedCall(owner, call.lineno, callee,
-                               CLASS_READ_ONLY, col=col)
-    return _ClassifiedCall(owner, call.lineno, callee, CLASS_UNKNOWN,
-                           col=col)
+            return _ret(CLASS_READ_ONLY, "reviewed dotted module call")
+        return _ret(CLASS_UNKNOWN,
+                    f"module call {callee!r} is not in READ_ONLY_REGISTRY")
+    if not is_method:
+        # X7 rule E: the dispatch-table seam stays explicit and separately
+        # proven by I.G.
+        if callee in REVIEWED_DISPATCH_LOCALS:
+            return _ret(CLASS_INTERNAL,
+                        "engine dispatch table (proven by I.G)",
+                        "engine dispatch table (proven by I.G)")
+        # X7 rule D: only genuine MODULE-LEVEL engine functions and classes may
+        # take INTERNAL_CALL from a bare name. Nested defs and class methods are
+        # deliberately absent from engine_definitions, so `commit()` cannot be
+        # mistaken for an engine function.
+        if callee in engine_definitions:
+            return _ret(CLASS_INTERNAL, "module-level engine definition")
+        if callee in READ_ONLY_REGISTRY:
+            return _ret(CLASS_READ_ONLY, "reviewed bare builtin")
+        return _ret(CLASS_UNKNOWN,
+                    f"bare name {callee!r} is neither a module-level engine "
+                    f"definition nor a reviewed builtin")
+    # X7 rules B and C: method call on a non-module receiver.
+    receiver = call.func.value
+    if _is_literal_receiver(receiver):
+        if expr in LITERAL_RECEIVER_METHODS:
+            return _ret(CLASS_READ_ONLY, "literal receiver cannot be rebound")
+        return _ret(CLASS_UNKNOWN,
+                    f"literal-receiver call {expr!r} is not reviewed")
+    if isinstance(receiver, ast.Call):
+        if expr in REVIEWED_EXPRESSION_RECEIVERS:
+            return _ret(CLASS_READ_ONLY, "reviewed expression receiver")
+        return _ret(CLASS_UNKNOWN,
+                    f"expression receiver {expr!r} is not in "
+                    f"REVIEWED_EXPRESSION_RECEIVERS")
+    if expr in REVIEWED_RECEIVER_METHODS:
+        return _ret(CLASS_READ_ONLY, "reviewed (receiver, method) pair")
+    return _ret(CLASS_UNKNOWN,
+                f"(receiver, method) pair {expr!r} is not in "
+                f"REVIEWED_RECEIVER_METHODS")
 
 
 def _authority_closure(tree):
@@ -1479,19 +1613,27 @@ def _authority_closure(tree):
 
 
 def _engine_definitions(tree):
-    """Names DEFINED by this module: functions and classes.
+    """Names DEFINED at MODULE LEVEL by this engine: functions and classes.
 
     A module-level class such as `_ExecutionAuthorityConflict` is defined
     here, so calling it is an internal edge rather than an unknown one. It is
     also instantiated, which is why PURE_CONSTRUCTORS alone was not enough.
+
+    X7 rule D. This used to walk the WHOLE tree, so nested functions and class
+    METHODS entered the generic internal namespace: `commit`, `activate`,
+    `acquire`, `_refuse`, `__enter__` and friends all became "engine
+    functions". An injected bare `commit()` was therefore classified
+    INTERNAL_CALL. Only module-level definitions belong there now. Measured at
+    this head: narrowing to module level breaks no reachable call site.
+
+    Stated boundary: a class BODY is not itself walked by the closure. A
+    reviewed constructor is admitted as a pure construction; the calls inside
+    its `__init__` are outside the closure unless `__enter__`-style reachability
+    pulls them in. This is recorded, not asserted away.
     """
-    names = set()
-    for node in ast.walk(tree):
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-            names.add(node.name)
-        elif isinstance(node, ast.ClassDef):
-            names.add(node.name)
-    return names
+    return {node.name for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef,
+                                 ast.ClassDef))}
 
 
 def _audit_source(source):
@@ -2100,6 +2242,288 @@ def test_h_f_the_attackers_own_writes_are_structurally_unobservable(
 # DURING-read comparison are anchored, each asserted to occur exactly once,
 # so a drifted engine makes the control fail loudly instead of quietly
 # rebuilding the shipped engine and proving nothing.
+# ===================================================================== #
+# X7 -- RECEIVER-BOUND CALL-SITE AUTHORITY
+# ===================================================================== #
+# X6 made UNKNOWN SPELLINGS fail closed, but still admitted ambiguous KNOWN
+# method names without proving their receiver: the bare attribute name alone
+# bought read-only authority. So `Path(target).replace(dst)` -- a filesystem
+# RENAME -- was admitted as the reviewed string operation "replace", any object
+# named `external` could use `.update`, and a bare `commit()` was labelled an
+# engine function because class methods had been harvested into the generic
+# internal namespace.
+#
+# Every control below was verified to DISCRIMINATE: each was checked against a
+# deliberately weakened classifier, not only against the shipped one.
+
+
+def _inject_into_reachable(injected_call, into="_load_transition_record"):
+    """Weakened engine source with ONE added call, target NAME preserved."""
+    return _weakened_source(into, injected_call)
+
+
+def _refusals(source):
+    """Unknown sites keyed by normalized expression, for readable assertions."""
+    _, sites = _audit_source(source)
+    return {s.expression: s for s in _unknown_sites(sites)}
+
+
+def test_j_a_path_replace_cannot_inherit_string_authority():
+    """J.A `Path(src).replace(dst)` is a filesystem RENAME, not str.replace."""
+    weakened = _inject_into_reachable("Path(operation_id).replace('/tmp/x7')")
+    # The spelling collapse is real and is why this was exploitable at all.
+    callee = _qualified_callee(
+        ast.parse("Path(a).replace(b)").body[0].value)
+    assert callee == "replace", (
+        f"expected _qualified_callee to collapse Path(a).replace(b) to "
+        f"'replace', got {callee!r}; if this ever changes the X6 defect is no "
+        f"longer being reproduced")
+
+    refusals = _refusals(weakened)
+    assert refusals, (
+        "Path(src).replace(dst) in a reachable function was NOT detected; "
+        "a filesystem rename still inherits string authority")
+    hit = refusals.get("Path(...).replace")
+    assert hit is not None, (
+        f"the refusal does not name the normalized expression "
+        f"'Path(...).replace'; refused instead: {sorted(refusals)}")
+    assert hit.owner == "_load_transition_record"
+    assert hit.lineno > 0 and hit.col >= 0
+    assert "REVIEWED_RECEIVER_METHODS" in hit.reason or \
+        "REVIEWED_EXPRESSION_RECEIVERS" in hit.reason, hit.reason
+
+    with pytest.raises(AssertionError) as excinfo:
+        _assert_closed_world(weakened)
+    msg = str(excinfo.value)
+    for required in ("_load_transition_record", "Path(...).replace",
+                     "reason="):
+        assert required in msg, (
+            f"the diagnostic omits {required!r}; X7 requires the owning "
+            f"function, the normalized expression and the reason: {msg}")
+
+
+def test_j_b_arbitrary_update_cannot_inherit_dict_authority():
+    """J.B `.update` was reviewed for in-memory dicts; any receiver may use it."""
+    weakened = _inject_into_reachable("external.update(payload)")
+    refusals = _refusals(weakened)
+    assert "external.update" in refusals, (
+        f"an unreviewed .update receiver was admitted; refused: "
+        f"{sorted(refusals)}")
+    assert "update" not in READ_ONLY_REGISTRY, (
+        "the bare method name 'update' is back in READ_ONLY_REGISTRY, which "
+        "re-opens the X6 defect for every receiver")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_j_c_arbitrary_append_cannot_inherit_list_authority():
+    """J.C `.append` was reviewed for specific census/receipt lists only."""
+    weakened = _inject_into_reachable("sink.append(payload)")
+    refusals = _refusals(weakened)
+    assert "sink.append" in refusals, (
+        f"an unreviewed .append receiver was admitted; refused: "
+        f"{sorted(refusals)}")
+    assert "append" not in READ_ONLY_REGISTRY
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_j_d_expression_receiver_cannot_inherit_engine_internal_status():
+    """J.D A bare `commit()` must not be an engine function.
+
+    `_engine_definitions` used to walk the WHOLE tree, so every class method
+    (`commit`, `activate`, `acquire`, `_refuse`, `__enter__`, ...) entered the
+    generic internal namespace. Rule D restricts it to MODULE-LEVEL definitions.
+    """
+    tree = ast.parse(_engine_source())
+    defs = _engine_definitions(tree)
+    module_level = {n.name for n in tree.body
+                    if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef,
+                                      ast.ClassDef))}
+    assert defs == module_level, (
+        "engine_definitions drifted from module-level definitions; nested "
+        f"names re-entered the internal namespace: "
+        f"{sorted(defs - module_level)}")
+    for nested in ("commit", "activate", "acquire", "_refuse", "__enter__",
+                   "__exit__", "__init__", "_release_lock"):
+        assert nested not in defs, (
+            f"{nested!r} is a nested/method name and must not be able to take "
+            "INTERNAL_CALL from a bare call")
+
+    weakened = _inject_into_reachable("Factory().commit()")
+    refusals = _refusals(weakened)
+    assert "Factory(...).commit" in refusals, (
+        f"an expression-receiver .commit() was admitted; refused: "
+        f"{sorted(refusals)}")
+    # The constructor itself may be reviewed; the METHOD on it may not.
+    assert "Factory" in refusals, (
+        "Factory is not a reviewed constructor, so it should itself refuse")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_j_e_reviewed_dictionary_get_calls_remain_admitted():
+    """J.E The policy must not be so strict that real reads are refused."""
+    _, sites = _assert_closed_world(_engine_source())
+    admitted = {s.expression for s in sites
+                if s.classification == CLASS_READ_ONLY}
+    for pair in ("record.get", "promote.get", "claim.get",
+                 "admitted_record.get", "_STATE_DISPATCH.get"):
+        assert pair in admitted, (
+            f"the reviewed dictionary read {pair!r} is no longer admitted; "
+            f"the policy has become too strict and the real source would fail")
+    assert "record.get" in REVIEWED_RECEIVER_METHODS
+
+
+def test_j_f_reviewed_list_append_calls_remain_admitted():
+    """J.F `.append` stays admitted at its reviewed receivers only."""
+    _, sites = _assert_closed_world(_engine_source())
+    admitted = {s.expression for s in sites
+                if s.classification == CLASS_READ_ONLY}
+    for pair in ("census.append", "chunks.append", "roots.append"):
+        assert pair in admitted, (
+            f"the reviewed list append {pair!r} is no longer admitted")
+    for pair in ("census.append", "chunks.append", "roots.append"):
+        assert pair in REVIEWED_RECEIVER_METHODS
+
+
+def test_j_g_reviewed_string_methods_admitted_only_at_reviewed_receivers():
+    """J.G String methods are receiver-bound, exactly like everything else."""
+    _, sites = _assert_closed_world(_engine_source())
+    admitted = {s.expression for s in sites
+                if s.classification == CLASS_READ_ONLY}
+    for pair in ("name.startswith", "name.endswith", "part.strip",
+                 "canonical.encode", "raw.decode", "value.items"):
+        assert pair in admitted, f"reviewed string/pure call {pair!r} refused"
+    # The SAME method name at a DIFFERENT receiver must not be admitted.
+    weakened = _inject_into_reachable("record.startswith('x')")
+    assert "record.startswith" in _refusals(weakened), (
+        "a reviewed METHOD NAME at an unreviewed receiver was admitted")
+
+
+def test_j_h_direntry_stat_remains_admitted_at_its_reviewed_receiver():
+    """J.H `entry.stat` stays admitted; `other.stat` must not."""
+    _, sites = _assert_closed_world(_engine_source())
+    admitted = {s.expression for s in sites
+                if s.classification == CLASS_READ_ONLY}
+    assert "entry.stat" in admitted, (
+        "os.DirEntry.stat at its reviewed receiver is no longer admitted")
+    assert "entry.stat" in REVIEWED_RECEIVER_METHODS
+    weakened = _inject_into_reachable("other.stat()")
+    assert "other.stat" in _refusals(weakened), (
+        "an unreviewed .stat receiver was admitted")
+
+
+def test_j_i_reachable_os_open_still_maps_to_the_runtime_tripwire(tmp_path):
+    """J.I Removing receiver binding must not cost mutation coverage.
+
+    The 7 reachable mutation sites still classify as mutations WITH a real
+    observer, and the observer is proven live -- not merely named.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    mutations = [s for s in sites if s.classification == CLASS_MUTATION]
+    assert mutations, "the reachable mutation surface vanished"
+    for site in mutations:
+        assert site.observer, (
+            f"{site.identity} is a mutation with no observer; exit gate 7 "
+            f"requires every reachable mutation site to map to a tested "
+            f"observer")
+    os_open_sites = [s for s in mutations if s.callee == "os.open"]
+    assert os_open_sites, "os.open is no longer a reachable mutation channel"
+
+    target = Path(tmp_path) / "j-i.bin"
+    with _MutationTripwire(pgrec) as trip:
+        fd = pgrec.os.open(str(target), os.O_CREAT | os.O_WRONLY, 0o600)
+        try:
+            os.write(fd, b"x")
+        finally:
+            os.close(fd)
+        kinds = set(trip.kinds())
+    target.unlink()
+    assert "os.open" in kinds, (
+        f"the os.open observer did not fire on a live tripwire; observed: "
+        f"{sorted(kinds)}")
+
+
+def test_j_j_removing_the_os_open_observer_makes_the_proof_fail(monkeypatch):
+    """J.J A mutation channel with no observer must turn the audit RED."""
+    saved = _observer_for
+    monkeypatch.setattr(
+        sys.modules[__name__], "_observer_for",
+        lambda callee: None if callee == "os.open" else saved(callee))
+    try:
+        weakened_refused = False
+        try:
+            _assert_closed_world(_engine_source())
+        except AssertionError:
+            weakened_refused = True
+        assert weakened_refused, (
+            "removing the os.open observer did NOT fail the proof, so the "
+            "observer mapping is decorative")
+    finally:
+        monkeypatch.setattr(sys.modules[__name__], "_observer_for", saved)
+    # And the restored classifier is green again, so the control is reversible.
+    _assert_closed_world(_engine_source())
+
+
+def test_j_k_the_x6_unknown_write_control_remains_red():
+    """J.K Tightening the policy must not have blinded the X6 control."""
+    weakened = _inject_into_reachable(
+        "Path(operation_id).write_text('injected')")
+    refusals = _refusals(weakened)
+    assert "Path(...).write_text" in refusals, (
+        f"the X6 unknown-write control no longer fires; refused: "
+        f"{sorted(refusals)}")
+    with pytest.raises(AssertionError) as excinfo:
+        _assert_closed_world(weakened)
+    assert "write_text" in str(excinfo.value)
+
+
+def test_j_l_every_reachable_call_site_is_classified_exactly_once():
+    """J.L Completeness and uniqueness under the receiver-bound policy."""
+    closure, sites = _assert_closed_world(_engine_source())
+    assert not _unknown_sites(sites), (
+        f"{len(_unknown_sites(sites))} reachable call site(s) unclassified")
+    identities = [s.identity for s in sites]
+    assert len(identities) == len(set(identities)), (
+        "two reachable call sites share an identity, so 'exactly once' is "
+        "not actually established")
+    # Every READ_ONLY site carries a reason naming WHICH rule admitted it.
+    for site in sites:
+        if site.classification == CLASS_READ_ONLY:
+            assert site.reason, (
+                f"{site.identity} is READ_ONLY with no admission reason")
+        assert site.expression, (
+            f"{site.identity} has no normalized expression")
+
+
+def test_j_m_the_reviewed_constructor_policy_is_reachable_and_not_dead():
+    """J.M Rule F: `PURE_CONSTRUCTORS` must actually decide something.
+
+    X6 consulted `engine_definitions` BEFORE the constructor rule, and every
+    name in `PURE_CONSTRUCTORS` is a module-level class, so the rule was
+    unreachable: all three snapshot constructors classified INTERNAL_CALL and
+    the reviewed-constructor reason was dead text. The check now runs first, so
+    this asserts the policy is live rather than decorative.
+    """
+    tree = ast.parse(_engine_source())
+    defs = _engine_definitions(tree)
+    assert PURE_CONSTRUCTORS, "the reviewed constructor set is empty"
+    for name in PURE_CONSTRUCTORS:
+        assert name in defs, (
+            f"{name!r} is no longer an engine definition, so this control no "
+            "longer exercises the ordering it was written for")
+    _, sites = _assert_closed_world(_engine_source())
+    by_reason = {s.callee: s.reason for s in sites
+                 if s.classification == CLASS_READ_ONLY}
+    hits = [n for n in PURE_CONSTRUCTORS if by_reason.get(n) ==
+            "reviewed pure constructor"]
+    assert hits, (
+        "no reviewed constructor classified via the constructor rule, so the "
+        "rule is dead again: " +
+        str({n: by_reason.get(n) for n in PURE_CONSTRUCTORS}))
+
+
 RECORD_SIZE_ANCHORS = (
     ("        if first.st_size > _RECORD_MAX_BYTES:",
      "        if False and first.st_size > _RECORD_MAX_BYTES:"),
