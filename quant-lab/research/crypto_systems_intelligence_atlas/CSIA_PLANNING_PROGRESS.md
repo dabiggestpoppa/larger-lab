@@ -3489,3 +3489,71 @@ same commit, or the decision is anchored to a commit that cannot be checked.
 
 **Not authorized and not performed:** any amendment of `5ac1e0b14`; any history
 rewrite; any implementation; any source or test change; GAP-6 ratification.
+
+---
+
+# GAP-6 READINESS METHODOLOGY CORRECTED — LEDGER UPDATE
+
+**Date:** 2026-10-03
+**Decision id:** none — methodology correction; no ratification taken.
+
+## Two external-review defects, both conceded
+
+```text
+DEFECT_1 = GAP-7 ratification evidence was uncommitted at 5ac1e0b14
+DEFECT_2 = GAP-6 readiness v0.2 used implementation existence as the criterion
+```
+
+**Defect 1 — repaired.** Evidence package anchored at `748801060`; anchor
+erratum at `8722a17`. The ratification decision stands; `5ac1e0b14` was not
+rewritten.
+
+**Defect 2 — corrected.** v0.2 asked "does the code exist?" instead of "can the
+design be implemented without inventing policy?". Its measurements stand; its
+inference is superseded.
+
+## Corrected state
+
+```text
+GAP7_EVIDENCE_ANCHORED = TRUE
+GAP7_RATIFICATION      = STANDS
+GAP7_DECISION          = BOOK6-GAP7-v0.3
+
+GAP6_READINESS_v0.2 = SUPERSEDED / WRONG PRE-IMPLEMENTATION CRITERION
+GAP6_READINESS_v0.3 = PASS  (PRE_IMPLEMENTATION_IMPLEMENTABILITY, 12/12)
+
+SOURCE_ABSENCE_IS_READINESS_FAILURE = FALSE
+IMPOLICIES A=0  B=4  C=6
+
+IMPL_A_T_AUDIT:
+  IMPLEMENTABLE_FROM_RATIFIED_CONTRACT   = 16
+  DEPENDENCY_REQUIRES_GAP7_IMPLEMENTATION =  4  (N,O,P,Q)
+  POLICY_GAP                            =  0
+
+GAP_6 = 6E DESIGN VALID / RATIFICATION NOT TAKEN UP
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_READINESS_REVIEW_v0.3.md   PASS 12/12
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_READINESS_REVIEW_v0.2_ERRATUM.md
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_RATIFICATION_PACKET_v0.2.md  AWAITING_DECISION
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PREVIEW_v0.1.md  PREVIEW
+```
+
+## Next operator action
+
+```text
+1. GAP-6 ratification decision (packet v0.2: A ratify 6E | B hold)
+2. Book 6 implementation authorization (preview v0.1 as scope reference),
+   covering BOTH GAP-7 hardening AND comparison/change
+```
+
+**Not authorized and not performed:** GAP-6 ratification; any implementation;
+any branch or worktree creation; any mutation of the frozen accepted Book 6
+worktree; any source or test change; Book 7 or Choir work.
