@@ -3706,3 +3706,135 @@ any test executed; any edit to a ratified record, to review v0.2, packet v0.2,
 matrix v0.1 or test spec v0.4; any status-validator edit; any GAP reopening; any
 branch or worktree creation; any mutation of the frozen accepted Book 6
 worktree; Book 7 or Choir work.
+
+---
+
+# D2 ENFORCEMENT-LOCATION CORRECTED, AND BOOK 6 OFFLINE IMPLEMENTATION AUTHORIZED
+
+**Recorded:** 2026-10-04
+**Binding decision:** `BOOK6-IMPL-CONSOLIDATED-v0.4`
+
+## What was wrong
+
+Consolidated review v0.3 and packet v0.3 specified delta D2 as:
+
+```text
+D2  book6_registry.py:172-191  enforce lineage validity / terminality at the
+                               registry, so branching fails closed on WRITE
+```
+
+Three ratified artifacts contradict the enforcement location, and none of them
+was reopened:
+
+```text
+test spec v0.3 §5       TERM-4 must fail closed AT THE RESOLVER,
+                        not merely at measurement_history
+clarification v0.3 §8   lineage validity is resolver STEP 2 (a read gate)
+clarification v0.3 §4   REGISTRATION_IS_NOT_AUTHORITY = True
+```
+
+```text
+D2_DOCTRINE_CORRECT            = TRUE   (fail-closed branching stands)
+D2_ENFORCEMENT_LOCATION_CORRECT = FALSE  (WRITE was never ratified)
+WRITE_TIME_BRANCH_REJECTION_AS_GAP7_REQUIREMENT = UNRATIFIED / REMOVED
+```
+
+Branching itself is **not** unratified. Only the write-time location was wrong,
+and it was wrong in a way that would have changed registration legality,
+historical representability and ingestion behaviour.
+
+## Corrected D2
+
+```text
+D2  book6_registry.py:195-216  RESOLVER-LEVEL lineage validity + terminality
+                               (ratified resolver steps 2 and 3)
+                               NO NEW REGISTRATION REJECTION
+
+MULTIPLE_SUCCESSOR_LINEAGE   = FAIL_CLOSED_AT_CURRENT_AUTHORITY
+REGISTRATION_MUTATION        = NONE
+REGISTRATION_REJECTION_ADDED = FALSE
+HISTORICAL_RECORDS_PRESERVED = TRUE
+```
+
+`book6_registry.py:172-191` is `measurement_history`. It already refuses
+branching and has **zero callers in `src/`**. It was never the authority gate.
+
+## Successor currentness — scope decided as PER_RECORD
+
+```text
+SUCCESSOR_CURRENTNESS_SCOPE = PER_RECORD
+FAMILY_FAIL_CLOSED           = NOT RATIFIED
+```
+
+Ratification record v0.1 §3 defines `CURRENT` as an exhaustive five-conjunct
+predicate over each record's own attributes. `A` is non-terminal, so `A` is not
+current. `B` and `C` have no registered successor, so `TERMINAL` holds for each;
+if the other four conjuncts hold, each is current. Refusing them would require a
+sixth conjunct, and no ratification supplies one.
+
+The component-wide reading was considered and rejected for exactly that reason.
+It is recorded in review v0.4 §6.4 so the rejection is auditable.
+
+## Review and packet
+
+```text
+AUTH_REVIEW_v0.3 = SUPERSEDED / D2 WRITE-TIME OVERREACH
+AUTH_REVIEW_v0.4 = PASS 12 / 12
+
+CRITERIA = 12   TRUE = 12   FALSE = 0
+CRITERION_CHANGED_VALUE = 0
+GREEN_RUNGS          = 11 / 11
+KNOWN_EVIDENCE_GAPS  =  0
+
+GREEN_RUNGS         = 11 / 11
+AMBER_RUNGS         =  0
+RED_RUNGS           =  0
+```
+
+## The decision
+
+```text
+BOOK6-IMPL-CONSOLIDATED-v0.4 = AUTHORIZE_OFFLINE_IMPLEMENTATION
+```
+
+Authorized scope: GAP-7 kernel currentness hardening; comparison/change
+GAP-1..GAP-6; canonical 20-check replay; ratified GAP-7 39-case tests; ratified
+comparison 252-case contract; regression and traceability work.
+
+Excluded scope: status lifecycle cleanup; Class C benchmark; Book 7; live
+acquisition; reserved selectors; new aggregation semantics; **new registration
+policy**.
+
+## The law authorized
+
+```text
+BRANCHING_FAILS_CLOSED_AT_CURRENT_AUTHORITY = TRUE
+WRITE_TIME_BRANCH_REJECTION                = NOT AUTHORIZED
+STATUS_VALIDATOR_EDIT                      = FORBIDDEN
+OBSERVATION_STATUS_AUTHORITY               = FORBIDDEN
+SUCCESSOR_CURRENTNESS_SCOPE                = PER_RECORD
+TIME-1..TIME-15                            = RATIFIED
+ALL_RUNGS                                  = GREEN
+B-STRICT                                   = PRESERVED
+```
+
+## Standing state
+
+```text
+BOOK_6_DESIGN_COMPLETE          = TRUE
+BOOK_6_IMPLEMENTATION_AUTHORITY  = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED              = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY  = FALSE
+LIVE_ACQUISITION_AUTHORITY       = FALSE
+```
+
+Authority is granted; execution is a separate act. No source was written, no
+test code was written, no test was executed, no branch or worktree was created,
+and the frozen accepted Book 6 worktree is untouched at `5f94c3f40c` with 0
+drift.
+
+```text
+NEXT_ACT = CREATE BRANCH agent/crypto-systems-intelligence-atlas-book6-comparison-change-build
+           FROM 5f94c3f40cea4441470c57671f51454da7377361
+           RE-VERIFY COLLISION-FREE IMMEDIATELY BEFORE CREATION
+```

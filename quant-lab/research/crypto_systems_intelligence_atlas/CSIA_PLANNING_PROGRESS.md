@@ -4097,3 +4097,92 @@ DECISIONS_OUTSTANDING = 1
 any test executed; any edit to a ratified record or to any superseded artifact;
 any status-validator edit; any GAP reopening; any branch or worktree creation;
 any mutation of the frozen accepted Book 6 worktree; Book 7 or Choir work.
+
+---
+
+# BOOK 6 OFFLINE IMPLEMENTATION AUTHORIZED (LEDGER UPDATE)
+
+**Recorded:** 2026-10-04
+**Binding decision:** `BOOK6-IMPL-CONSOLIDATED-v0.4`
+**Planning HEAD at time of writing:** `5bb6eba8`
+
+## The defect this round caught
+
+The consolidated authorization review said the right doctrine and the wrong
+location. `D2` read *"enforce lineage validity / terminality at the registry, so
+branching fails closed on WRITE."* Three ratified artifacts said otherwise —
+`TERM-4` requires resolver-level refusal, the ratified resolver order puts
+lineage validity at step 2, and `REGISTRATION_IS_NOT_AUTHORITY = True` is stated
+outright.
+
+```text
+WRITE_TIME_BRANCH_REJECTION_AS_GAP7_REQUIREMENT = UNRATIFIED / REMOVED
+D2_DOCTRINE_CORRECT                            = TRUE
+D2_ENFORCEMENT_LOCATION_CORRECT                 = FALSE
+```
+
+What made it consequential: the line range D2 named,
+`book6_registry.py:172-191`, is `measurement_history` — which **already refuses
+branching** and has **zero callers in `src/`**. The delta pointed at inert code
+and described a write path no clause governs. Two different mistakes, in one
+line.
+
+## Corrected and authorized
+
+```text
+AUTH_REVIEW_v0.3 = SUPERSEDED / D2 WRITE-TIME OVERREACH
+AUTH_REVIEW_v0.4 = PASS 12 / 12
+
+BOOK6-IMPL-CONSOLIDATED-v0.4 = AUTHORIZE_OFFLINE_IMPLEMENTATION
+```
+
+```text
+D2 = RESOLVER-LEVEL LINEAGE VALIDITY (book6_registry.py:195-216)
+WRITE_TIME_BRANCH_REJECTION = NOT AUTHORIZED
+SUCCESSOR_CURRENTNESS_SCOPE = PER_RECORD
+FAMILY_FAIL_CLOSED           = NOT RATIFIED
+```
+
+## Standing state
+
+```text
+BOOK_6_DESIGN_COMPLETE          = TRUE
+BOOK_6_IMPLEMENTATION_AUTHORITY  = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED              = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY  = FALSE
+LIVE_ACQUISITION_AUTHORITY       = FALSE
+```
+
+This is the first round in the program where implementation authority is
+`TRUE`. It is scoped, dated, recorded and reversible only by a later recorded
+decision — never silently.
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.4.md  PASS 12/12
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PACKET_v0.4.md  DECIDED
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Next operator action — execute, do not re-litigate
+
+```text
+1. Create branch agent/crypto-systems-intelligence-atlas-book6-comparison-change-build
+   from 5f94c3f40cea4441470c57671f51454da7377361
+   (re-verify collision-free immediately before creation; 42 heads, 0 matches
+    as of this writing)
+2. Create a fresh worktree for it
+3. Execute the 11-rung build under the packet v0.4 §3 implementation law
+4. Bind regression to B1..B6 / R1..R3 and the pinned sensor baseline
+5. Re-accept Book 6 under a NEW acceptance commit
+```
+
+```text
+DECISIONS_OUTSTANDING = 0
+```
+
+**Not done in this round:** no source written, no test code written, no test
+executed, no branch created, no worktree created, no GAP reopened, no Book 7 or
+Choir work. The frozen accepted Book 6 worktree remains at `5f94c3f40c` with 0
+drift.
