@@ -1531,11 +1531,25 @@ ALL_BINDING_FORMS = frozenset({
 #     shadowing assignment, an added or duplicated call, a reordering --
 #     changes the digest and withdraws every grant in that owner.
 #
-# The digest deliberately uses `include_attributes=False`, so it is stable
-# under line and column shifts and cannot be satisfied by re-indenting, while
-# still changing under every semantic edit. Coordinates REMAIN DIAGNOSTIC
-# ONLY. The digest is intentionally coarse and fail-closed: it does not model
-# what each name holds, it refuses when anything in the owner changed.
+# The digest is a deterministic, interpreter-INDEPENDENT serialisation of the
+# owning function's AST: node kinds plus a frozen vocabulary of field names and
+# values, in the running interpreter's field order. Line and column numbers are
+# never emitted, so it is stable under line and column shifts and cannot be
+# satisfied by re-indenting, while still changing under every semantic edit --
+# including a bare rename, which an earlier vocabulary that omitted `id` could
+# not see at all. Coordinates REMAIN DIAGNOSTIC ONLY. The digest is
+# intentionally coarse and fail-closed: it does not model what each name
+# holds, it refuses when anything in the owner changed.
+#
+# Interpreter-independence is a REQUIREMENT rather than a nicety, and it was
+# learned the hard way. The first implementation used `ast.dump`, which is a
+# function of the source AND the interpreter: CPython 3.12 appended
+# `type_params` to `FunctionDef._fields`, so every frozen digest moved on the
+# Linux runner while every 3.11 local run stayed green -- same source, same
+# coordinates, same 312 reachable call sites, only the serialisation differed.
+# M.A..M.D prove the replacement cannot be moved that way, CAN still see every
+# edit the mission requires, and force a review decision if a future
+# interpreter adds a field that could blind it.
 #
 # Both registries are FROZEN literals measured from the shipped engine. An
 # audited source is judged against them, never against itself.
@@ -1754,53 +1768,132 @@ EXACT_SITE_MANIFEST = {
 }
 
 REVIEWED_OWNER_DIGESTS = {
-    "_acquire_recovery_authority": "6e90f2548fe4ad353f8af63b3680398f918fb84c9dd24b2431c715331ab112fb",
-    "_admit_record_descriptor": "fb4e99fea8002019dabe2832afa0236986a13d65767838694e900cbf9844023e",
-    "_admit_selector_descriptor": "113cd5eadc91c435444d555f6b7aac57043100816373e88108e992a6ce084c8b",
-    "_approved_roots": "9054ac48685e91440b18602a9e872e40dad449c4c30cf2b77ab18c0a57c833ff",
-    "_assert_one_directory_generation": "b040a2fb4411eca733722ddf5234938e31dc16dcc5b0ff280254b8af5fbc9b59",
-    "_assert_record_authority_names": "1658b1134b6be61e808d69550cbc8d852ba2d25cfc2326c361383b4298f7a841",
-    "_assert_record_identity": "c79ae13e85ddc62d64a483b003df58eb17e627fca5f2cdd3beb8ee2c462a1f06",
-    "_assert_selector_authority_names": "3aee57e5574beb6b1828bf0a0a2c0f1f29536bbff60f4625ccaad3eed8de48af",
-    "_bound_operation": "8cc3a300c95e6af2b892c2609eb14abee1cb55ccdac546185784d1cbe44acd42",
-    "_claim_state": "6f9c8b122b80820d3dfb5da4f8b92beaba68e0d2a86d283b6b97eb2c18ed34b9",
-    "_claim_temp_prefix": "eee817c6a81b589262f2e2e82eb751c5af718d3c72639eb230cb787fc2305cdb",
-    "_classify_claim_content": "582e865cb0a45d74aa6c9ec668c9822c0fd06d6fc0f85db97e4d8e70b0530639",
-    "_classify_claim_coordinate": "561bb63fae4d22c19d9f0614a3828cdc10f0f6d5e048cbaaa732f49f772be381",
-    "_classify_record_coordinate": "707fcde7fb7ed49f28aef746cef8a1c2650706669f99ba5f91965ef2c2579a3b",
-    "_classify_record_for_shell": "87fae53b1f3f8238f3b73e2c9a99ee7f24d86b7db139b018032f60da5c5ae85f",
-    "_classify_rollback_for_shell": "c69097a8fbb79314a0fad59d17fcf9232797a46709cd7f037b62b93448cbe3f2",
-    "_deep_freeze": "d8905b2215cd2c021b0d281f442acec1549e4d3323fd8fc826241193ff3fa619",
-    "_derive_claim_coordinate": "c67d8f3f49f6849984c3476533087670500ff5c124a0dae443cd9941d6f02b08",
-    "_derive_record_coordinate_name": "ba7b48d83e8e1a6454d502cbaab229c6e6093aa3a883465f25a4cbaf584ab8d9",
-    "_load_receipt": "7a3a146bde711d8acbdc36cd2104d36f01ac82ea15487c07ef184d0b5bd5e759",
-    "_load_transition_record": "4bde580c2e3765a038343d4bedad95d47ccaba415a40df1e036e54e36f6f7ffd",
-    "_open_claim_descriptor": "edd5a83f1bec9714293257bd8745d8ad8203bd1ed6bbad78cec351ae54e5e847",
-    "_open_governed_directory": "35900b55cf47fb6e78a4cc805f5d3b7263ca12685f01a46b8d23d58544f6833e",
-    "_read_admitted_claim": "e018b8f917feea992ad1d8c9ad25bcf643f31e217d21c5ce5149d76b2c9aa752",
-    "_read_admitted_record": "ee8da960dafe219acafe7723d8f8c381a46df9ad66c32f136259e4f8d2c49b1c",
-    "_read_record_snapshot_admitted": "38961ec849f2155e21f239d4736f4cb44a15587e1459b4dab17687cecdd3ac0f",
-    "_read_selector_snapshot": "88ca2e52e5ec51236108664b03fd9fe1e35b26fb80270649205dd02859cbf4e6",
-    "_read_selector_snapshot_admitted": "4078f272d81d25e0270dd368536467d800b017187746939f006eb09f19a6c864",
-    "_receipt_digest": "24aed40c1a6fd44cd2ddb3c535d99eff2d23536ea961c1cd7998304c247b0fc8",
-    "_record_conflict": "6190a0cd2752d36e6f172ddc334ed8b3b3bb5d4cb075385dad92caa7c0b87d1c",
-    "_recovery_state_dir": "4ccea432012075da29f00fae07153be4e3b49436bdf55ef67996c8f0e3ce4aab",
-    "_selector_conflict": "85054cb34f77d34d2abc837d0667e23add2bdaf4dd8a0fb439c91565f671fc6c",
-    "_thaw": "f1ca67f2b87f3177585a6ec3e4792aab3e446b4765b888ac4ff90e37d3aa6bfb",
-    "_transitions_dir": "74f342aa6ebcd42912085d68e268d4035f0079afaecc4b4635e0a94d94ddcb2e",
-    "_validated_open_path": "dc70eb27c0c6f3aeb568603914354c79ecb5c486d2908feee5d93ed348d994e0",
+    "_acquire_recovery_authority": "b5fe119488766542f59451ec9f7af24096fc8e7177610da6d37c0fad8a1f969d",
+    "_admit_record_descriptor": "dbb47ffe4249a39ee831459dc024317db3b908201b05eb2f75bc3b8e21dc8643",
+    "_admit_selector_descriptor": "1bcc0a8265ef22e90ca818d884311089047b6df58f64c5f65163147fb3cad3cd",
+    "_approved_roots": "2bea47f74b30e2935ab31c0207c1969654ea586cb5455b4b31d469fd8251d4e9",
+    "_assert_one_directory_generation": "71fd6c21158848ad68ad095932715323ff5aa34576f2cd152847a0b7762e23cd",
+    "_assert_record_authority_names": "69e0c0c74c1c422dda5e4c32faa0f05494cd8dac50a1582a9d1aed4ceb1fc163",
+    "_assert_record_identity": "09ea5d84163f6be3685ebaf88d11b6c17712dee771bc1981a3bbea15c4b533a8",
+    "_assert_selector_authority_names": "83f6a3a9df424d6fa84b1d368a1bffa110e31c4a18891835d36c6cc6561a61ac",
+    "_bound_operation": "de94afdb611104202530788cf70f52f17f78a89c009ec64aaef161748fd498fb",
+    "_claim_state": "6edf6da49d5841f3ccea11a738003dc849398bc11f1088e0d5fc1c39c3ce7878",
+    "_claim_temp_prefix": "c50d57b0118601d3a2db3eaca16e2cf4c2b26f44a91062cf2524dbc147777367",
+    "_classify_claim_content": "708d116d887e822f4bafae3d4e7fa8c90df66412127605b6ddd3fe66aa08151a",
+    "_classify_claim_coordinate": "c78e24ab68291ec21b7f957e9150d80566a7f99a04886307c41d8b566c28d8c7",
+    "_classify_record_coordinate": "9cc9f5f1954410c49d9ed4b983f356a4d22d2c316108bf89fc099ff49dba9b55",
+    "_classify_record_for_shell": "7a4ef9e015fa6e51650c6db9982b6669361cbba92bca3f2e780acb8064a536fc",
+    "_classify_rollback_for_shell": "6ac59375656201e3c5f93ddccac927b8a257c60a8bd9f069323149a3f06c7908",
+    "_deep_freeze": "d7780569f8e7a915f84206eb08db4423039db175e1434748b08619088ac449d9",
+    "_derive_claim_coordinate": "c649a4c9df70b303d9e1f9899d0fd87602d91b4cfe86cadf013892498881027d",
+    "_derive_record_coordinate_name": "8077e21110473b1d062b96610f99b4918c0c223cf5f1845636e33f13ae24c1c1",
+    "_load_receipt": "df813e47d13c01f3f89d6c9faafd23d233711a3ebd9fc16f648284d08e5c8f1f",
+    "_load_transition_record": "ac492b680e871105df905fb78921d36d662f8455c740350b5d48b32512533cc3",
+    "_open_claim_descriptor": "3e4a6982ba2bd091d898b1cf3bef7b3cc56c585860e726cdcbfd4b5050800643",
+    "_open_governed_directory": "2d95412e73e10e01026d7eda6b6326287e7c0760df534c87fa73fe3fb0f997c1",
+    "_read_admitted_claim": "a50091089da90c1e6faffa8c7916fe42d24e2aee787dcfe4a9edc06b098d6a80",
+    "_read_admitted_record": "f3a279fa23d7fe09db60a3a5830c7a7da2bc08c6b70bb5062b0a59bec6e3f88e",
+    "_read_record_snapshot_admitted": "3f3b7a13dc5bf6442183079b007d1899f05e7ba0749584d813e186c0e84f2321",
+    "_read_selector_snapshot": "421952da1ff5f2ef834131fe8fd31e73b7e944130f485bb5fb18e206925107b9",
+    "_read_selector_snapshot_admitted": "ab11ac927dacc3c666680845ea0ec736afce5e333cd1ccba758a3e88c62f0bc1",
+    "_receipt_digest": "caa35d97835adb172e040f3c1b56b9709c38b7fb6e3f866ec5290f9544b6003e",
+    "_record_conflict": "efdb681b43fddc130247233439b7e91355259115a9a39f2a339527ee867e86f9",
+    "_recovery_state_dir": "1b11deb70ce4669f219aacdf379802ec7a4295b9d4c4b8207ff083daf2038bb7",
+    "_selector_conflict": "dbeb26efd08681929383cae3b48accd26d6dc108e42e6e38b7b1306134821c15",
+    "_thaw": "624f757bd7370c0f7512f19d5282870e41d457135359ef67088bebbef66c5a35",
+    "_transitions_dir": "15c23b1230b58be899124cd7fd5fbd70fd9a019f4f0a7672d926f1c091b3f5ce",
+    "_validated_open_path": "c965e9625b32348a57c214aa214e33dae48b33a144a13625a169a7ff35a52631",
 }
+
+
+# The only AST fields the canonical serializer may read. FROZEN, deliberately.
+#
+# This started as `ast.dump`, and that was a defect with exactly the shape this
+# mission exists to find: `ast.dump` is not interpreter-stable, because CPython
+# 3.12 added `type_params` to function and class definitions. So the dump of a
+# `FunctionDef` silently gained a field, and every frozen digest became a claim
+# about the PYTHON VERSION rather than about the source.
+#
+# That is what turned the Linux runner red -- 33 failed, 704 passed -- while
+# every local run stayed green, with the SAME source, the SAME coordinates and
+# the SAME 312 reachable call sites. The parse agreed on both interpreters and
+# only the serialisation differed. `ast.dump` was therefore a second, hidden
+# baseline whose value depended on where the proof was executed, which is not a
+# property a reviewed baseline may have.
+#
+# Reading an ALLOW-LIST closes the vocabulary by construction: a field this
+# interpreter does not know is never read, and a field a FUTURE interpreter
+# adds is skipped because it is absent from the set. The reverse -- iterating
+# `node._fields` -- is what made the original version-dependent.
+#
+# The cost is stated plainly rather than hidden: a field added by some later
+# Python becomes invisible to the digest. That is a LOSS OF SENSITIVITY, and it
+# is bounded and controlled -- `test_m_*` proves the digest still moves on all
+# six conditions the mission requires, and `test_m_d_*` proves a 3.12-style
+# `type_params` attribute cannot change it.
+_STABLE_AST_FIELDS = frozenset({
+    "arg", "annotation", "args", "asname", "attr", "bases", "body",
+    "cases", "cause", "comparators", "context_expr", "conversion", "ctx",
+    "decorator_list", "decorators", "defaults", "elt", "elts", "exc",
+    "finalbody", "format_spec", "func", "generators", "guard", "handlers",
+    "id", "ifs", "is_async", "items", "iter", "key", "keys", "keywords",
+    "kind", "kw_defaults", "kwarg", "kwonlyargs", "left", "level", "lower",
+    "module",
+    "msg", "n", "name", "names", "op", "operand", "ops", "optional_vars",
+    "orelse",
+    "pattern", "patterns", "posonlyargs", "rest", "returns", "right", "s",
+    "simple", "slice", "step", "subject", "target", "targets", "test",
+    "type", "type_comment", "upper", "value", "values", "vararg",
+})
+
+
+def _canonical_ast_serialization(node):
+    """Deterministic, INTERPRETER-INDEPENDENT rendering of an AST subtree.
+
+    Emits node kinds, a frozen set of field names and their values, in the
+    interpreter's own field order (new fields are appended, and the allow-list
+    drops them). No line or column number is ever emitted, so re-indenting or
+    shifting the file leaves the digest unchanged.
+    """
+    parts = []
+
+    def emit(value):
+        if isinstance(value, ast.AST):
+            parts.append(type(value).__name__)
+            for field, child in ast.iter_fields(value):
+                if field not in _STABLE_AST_FIELDS:
+                    continue
+                parts.append(field)
+                emit(child)
+            parts.append(".")
+        elif isinstance(value, list):
+            parts.append("(")
+            for item in value:
+                emit(item)
+            parts.append(")")
+        elif value is None:
+            parts.append("-")
+        else:
+            # Exact, never truncated: a digest that could not see an edit would
+            # be a digest that could not withdraw a grant for that edit.
+            parts.append(repr(value))
+
+    emit(node)
+    return "".join(parts)
 
 
 def _owner_ast_digest(node):
     """Coordinate-independent digest of an owning function's AST.
 
-    `include_attributes=False` drops line and column numbers, so re-indenting
-    or shifting the file does not change the digest. Anything that could
-    change what a name MEANS inside the owner does.
+    Line and column numbers are excluded, so re-indenting or shifting the file
+    does not change the digest. Anything that could change what a name MEANS
+    inside the owner does.
+
+    Interpreter-INDEPENDENT by construction: see `_STABLE_AST_FIELDS` for why
+    that is a requirement and not a nicety.
     """
-    dumped = ast.dump(node, annotate_fields=True, include_attributes=False)
-    return hashlib.sha256(dumped.encode("utf-8")).hexdigest()
+    canonical = _canonical_ast_serialization(node)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
 def _audit_context(tree):
@@ -4262,3 +4355,198 @@ def test_g_an_oversized_control_becomes_reachable_without_the_bound(
         "the admitted record is not the oversized one")
     assert bundle.record_snapshot.present is True
     assert bundle.record_digest, "an admitted record must bind a digest"
+
+
+# --------------------------------------------------------------------- #
+# M: the owner digest must be a function of the SOURCE, not the INTERPRETER
+# --------------------------------------------------------------------- #
+#
+# X8's baseline is reviewed evidence only if its value depends on the source
+# alone. The first implementation used `ast.dump`, which depends on the source
+# AND the interpreter: CPython 3.12 appended `type_params` to
+# `FunctionDef._fields`, so all 35 frozen digests moved on the Linux runner
+# while all 35 stayed green on a 3.11 developer machine. Identical source,
+# identical coordinates, identical 312 reachable call sites, identical
+# manifest -- only the serialisation differed.
+#
+# The consequence was not cosmetic. Every grant in every owner was withdrawn,
+# the closure reported 313 UNKNOWN_OR_DYNAMIC sites against a baseline that
+# was correct, and b1 went 33-red. A baseline whose value depends on WHERE the
+# proof runs is a second, hidden baseline, and no reviewed artifact may have
+# one.
+#
+# M.A..M.E are the proof obligation that failure created. They are written
+# against the mechanism rather than the symptom: the vocabulary is ENUMERATED
+# from the real source (M.A), the digest is shown to still be sensitive enough
+# to be worth having (M.B), to still ignore coordinates (M.C), to be
+# unmovable by an interpreter-added field (M.D), and to depend for that on the
+# vocabulary itself (M.E).
+
+
+# Fields a NEWER interpreter added to some node's `_fields`, which the frozen
+# vocabulary therefore cannot read. Named and reasoned rather than silently
+# tolerated: M.A FAILS if the running interpreter drops any OTHER field, so an
+# addition by a future interpreter forces a review decision instead of quietly
+# blinding the digest.
+_INTERPRETER_FIELD_ADDITIONS = frozenset({
+    # CPython 3.12, PEP 695. Appears on FunctionDef, AsyncFunctionDef and
+    # ClassDef. It carries type-parameter syntax, which cannot change what a
+    # NAME in the owner means, so excluding it costs no required sensitivity.
+    "type_params",
+})
+
+
+def _digest_of_snippet(source):
+    """Digest the first module-level function of a source snippet."""
+    module = ast.parse(source)
+    func = next(node for node in module.body
+                if isinstance(node, ast.FunctionDef))
+    return _owner_ast_digest(func)
+
+
+def test_m_a_the_frozen_vocabulary_drops_no_meaning_bearing_field():
+    """M.A Every real field is in the vocabulary, or a named addition.
+
+    The vocabulary was first assembled by READING it, and reading missed
+    `id`. That made every identifier in the owner invisible to the digest, so
+    a rename or a rebound receiver could not withdraw anything -- the exact
+    sensitivity X8 exists to provide, absent, and completely invisible to
+    inspection. This control ENUMERATES the fields of the real closure and
+    fails on any dropped name that is not a documented interpreter addition.
+    """
+    funcs, closure = _authority_closure(ast.parse(_engine_source()))
+    dropped = {}
+    for owner in closure:
+        for node in ast.walk(funcs[owner]):
+            for field in node._fields:
+                if field not in _STABLE_AST_FIELDS:
+                    dropped.setdefault(field, set()).add(type(node).__name__)
+    unexplained = sorted(set(dropped) - _INTERPRETER_FIELD_ADDITIONS)
+    assert not unexplained, (
+        "the frozen vocabulary drops field(s) that carry meaning: "
+        + repr({name: sorted(dropped[name]) for name in unexplained}))
+    # The tolerated names are tolerated because they are version metadata. They
+    # may never become READABLE, or the interpreter could move the digest.
+    overlap = _INTERPRETER_FIELD_ADDITIONS & _STABLE_AST_FIELDS
+    assert not overlap, (
+        f"a version-specific field {sorted(overlap)} was added to the "
+        "vocabulary, so the digest is interpreter-dependent again")
+
+
+def test_m_b_the_digest_moves_on_every_condition_the_mission_requires():
+    """M.B Rebinding, shadowing, duplication, addition and reordering move it.
+
+    A digest that cannot move is a digest that cannot withdraw a grant. These
+    are the five edits X8 section 3 requires it to detect, plus a bare rename,
+    which the original vocabulary could not see at all.
+    """
+    base = _digest_of_snippet("def _f():\n    values.append(item)\n")
+    for label, source in (
+        ("a receiver rebound",
+         "def _f():\n    values = attacker\n    values.append(item)\n"),
+        ("a module shadowed",
+         "def _f():\n    os = attacker\n    os.stat(path)\n"),
+        ("a call duplicated",
+         "def _f():\n    values.append(item)\n    values.append(item)\n"),
+        ("a call added",
+         "def _f():\n    values.append(item)\n    roots.append(item)\n"),
+        ("statements reordered",
+         "def _f():\n    item = 1\n    values.append(item)\n"),
+        ("a bare rename",
+         "def _f():\n    values.append(other)\n"),
+        ("a receiver renamed",
+         "def _f():\n    externals.append(item)\n"),
+    ):
+        assert _digest_of_snippet(source) != base, (
+            f"the digest is INSENSITIVE to {label}, so that edit would not "
+            "withdraw a grant")
+
+
+def test_m_c_the_digest_ignores_coordinates_and_indentation():
+    """M.C Stable under shifts, so re-indenting cannot satisfy the baseline.
+
+    Section 3 requires coordinates to stay diagnostic. If the digest moved on
+    a line shift, every legitimate reformat would red the proof and the
+    baseline would be unusable; if it did NOT move on a semantic edit, it
+    would authorise nothing. Both halves are asserted together on purpose.
+    """
+    source = "def _f():\n    values.append(item)\n"
+    base = _digest_of_snippet(source)
+    assert _digest_of_snippet("\n\n\n\n" + source) == base, (
+        "a line shift moved the digest")
+    assert _digest_of_snippet(source.replace("\n    ", "\n        ")) == base, (
+        "re-indenting moved the digest")
+    assert _digest_of_snippet(source) != \
+        _digest_of_snippet(source.replace("item", "other")), (
+        "a rename did NOT move the digest while a shift did not either, so "
+        "this control discriminates nothing")
+
+
+def test_m_d_an_interpreter_added_field_cannot_move_the_digest():
+    """M.D The exact defect, reproduced and refused.
+
+    The simulation patches `_fields`, because that is the MECHANISM: CPython
+    3.12 appended `type_params` to the class's `_fields`, and `ast.dump`
+    iterates `_fields`. An earlier draft of this control attached a bare
+    attribute instead, observed that `ast.dump` was unchanged, and would have
+    certified the fix while reproducing nothing at all.
+    """
+    funcs, _closure = _authority_closure(ast.parse(_engine_source()))
+    node = funcs["_acquire_recovery_authority"]
+    original = ast.FunctionDef._fields
+    assert "type_params" not in original, (
+        "this interpreter already carries the 3.12 field, so the simulation "
+        "is unnecessary and this control would be vacuous")
+    saved = _owner_ast_digest(node)
+    saved_dump = ast.dump(node, annotate_fields=True, include_attributes=False)
+    try:
+        ast.FunctionDef._fields = original + ("type_params",)
+        node.type_params = []
+        moved = _owner_ast_digest(node)
+        moved_dump = ast.dump(node, annotate_fields=True,
+                              include_attributes=False)
+    finally:
+        ast.FunctionDef._fields = original
+        del node.type_params
+    # Negative control: the simulation is faithful, so the proof means
+    # something. `ast.dump` -- the implementation this replaced -- DOES move.
+    assert moved_dump != saved_dump, (
+        "patching `_fields` did not change `ast.dump`, so this control does "
+        "not reproduce the defect it claims to")
+    # The obligation: the shipped digest does NOT move.
+    assert moved == saved, (
+        "an interpreter-added AST field moved the reviewed digest, so the "
+        "baseline is a function of the interpreter again")
+    # And the simulation left nothing behind.
+    assert _owner_ast_digest(node) == saved, "the control leaked a mutation"
+
+
+def test_m_e_the_vocabulary_is_what_makes_that_immunity_real(monkeypatch):
+    """M.E Admitting the version field reddens M.D -- the guards are load-bearing.
+
+    M.D shows the digest ignores `type_params`. On its own that is equally
+    consistent with the digest ignoring EVERYTHING, which is why M.B exists.
+    This control closes the loop the other way: make the vocabulary READ the
+    version field and the digest moves again, so the immunity M.D reports is
+    produced by `_STABLE_AST_FIELDS` and not by accident.
+    """
+    funcs, _closure = _authority_closure(ast.parse(_engine_source()))
+    node = funcs["_acquire_recovery_authority"]
+    original = ast.FunctionDef._fields
+    saved_dump = ast.dump(node, annotate_fields=True, include_attributes=False)
+    monkeypatch.setattr(sys.modules[__name__], "_STABLE_AST_FIELDS",
+                        _STABLE_AST_FIELDS | {"type_params"})
+    saved = _owner_ast_digest(node)
+    try:
+        ast.FunctionDef._fields = original + ("type_params",)
+        node.type_params = []
+        moved = _owner_ast_digest(node)
+        moved_dump = ast.dump(node, annotate_fields=True,
+                              include_attributes=False)
+    finally:
+        ast.FunctionDef._fields = original
+        del node.type_params
+    assert moved_dump != saved_dump, "the simulation is not faithful here"
+    assert moved != saved, (
+        "reading the version field did NOT move the digest, so M.D's immunity "
+        "is not produced by the vocabulary and M.D proves nothing")
