@@ -3130,6 +3130,541 @@ def test_j_m_the_reviewed_constructor_policy_is_reachable_and_not_dead():
 
 
 # --------------------------------------------------------------------- #
+# X8: EXACT CALL-SITE AND BINDING AUTHORITY
+# --------------------------------------------------------------------- #
+#
+# Sections I, J and K all prove that a RULE recognizes or refuses a call. None
+# of them proves that the call is the one that was reviewed. X8's question is
+# narrower and harder: can a call be authorized that was never reviewed -- by
+# REUSING an approved spelling somewhere else, by DUPLICATING it, or by
+# REBINDING the name it is spelled with? At X7X the answer was yes to all
+# three, and the shadowing form (`os = attacker`) was the worst of them,
+# because every spelling-based rule in this file compares identifier strings.
+#
+# Each control below therefore asserts WHICH rule fired. A control caught by
+# the wrong rule would still be green while proving nothing about the rule it
+# is named for, which is the ordering mistake K.F exists to prevent.
+
+# Neutralizers used to isolate one rule from another. Each is a monkeypatch
+# target, never a weakening of the shipped classifier.
+_GATE_DENY_ALL = "NEUTRALIZED: the exact-site gate was removed"
+
+
+def _gate_off():
+    """The exact-site gate as a no-op, for isolating an older rule."""
+    return lambda *a, **k: None
+
+
+def test_l_a_a_known_pair_in_a_different_owner_fails_closed():
+    """L.A (section 4.1) `roots.append` is reviewed in `_approved_roots` ONLY.
+
+    X7 admitted any reviewed pair anywhere in the closure. X7X scoped it to
+    the owning function. This pins that, and asserts the refusal comes from
+    the owner comparison rather than from a missing manifest entry -- `roots`
+    still has an entry, just not with THIS owner.
+    """
+    weakened = _inject_into_reachable("roots.append(payload)")
+    refusals = _refusals(weakened)
+    assert "roots.append" in refusals, (
+        f"a reviewed pair was re-used in a different owner; refused: "
+        f"{sorted(refusals)}")
+    reason = refusals["roots.append"].reason
+    assert ("REVIEWED_RECEIVER_SITES" in reason
+            or "EXACT_SITE_MANIFEST" in reason), reason
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_b_a_duplicate_known_call_fails_closed():
+    """L.B (section 4.2) A SECOND identical call does not inherit the review.
+
+    X7X keyed authority on (owner, receiver, method), so duplicating an
+    approved call inside its own owner was admitted with no new decision. The
+    manifest records the reviewed OCCURRENCE COUNT, so the duplicate is a
+    different site identity even though every string matches.
+    """
+    key = ("_approved_roots", "roots.append")
+    assert EXACT_SITE_MANIFEST[key] == 1, (
+        f"this control assumes one reviewed occurrence, got "
+        f"{EXACT_SITE_MANIFEST[key]}")
+    # The source really changed, and the injected site exists exactly once.
+    weakened = _inject_into_reachable("roots.append(payload)",
+                                      into="_approved_roots")
+    assert weakened != _engine_source()
+    injected_sites = [c for c in ast.walk(
+        next(n for n in ast.parse(weakened).body
+             if isinstance(n, ast.FunctionDef)
+             and n.name == "_approved_roots"))
+        if isinstance(c, ast.Call)
+        and _normalized_call_expression(c) == "roots.append"]
+    assert len(injected_sites) == 2, (
+        f"the duplicate was not injected exactly once; found "
+        f"{len(injected_sites)} sites")
+
+    refusals = _refusals(weakened)
+    assert "roots.append" in refusals, (
+        "a duplicate of an approved call was admitted; a duplicate is a new "
+        "site and needs a new review decision")
+    assert "2 time(s)" in refusals["roots.append"].reason, (
+        "the refusal did not come from the occurrence count, so this control "
+        f"is not proving what it claims: {refusals['roots.append'].reason}")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_c_rebinding_a_reviewed_receiver_fails_closed():
+    """L.C (section 4.3) `roots = attacker` before `roots.append` is refused.
+
+    Two independent guards, proven separately rather than assumed:
+      * the injector's literal form also adds a second `.append` CALL, which
+        the occurrence count catches;
+      * a rebinding with NO new call leaves the count untouched, so only the
+        owner AST digest can catch it. That is the case X7X could not see at
+        all, because `assign` was already a reviewed binding form for `roots`.
+    """
+    weakened = _inject_into_reachable(
+        "roots = attacker; roots.append(payload)", into="_approved_roots")
+    refusals = _refusals(weakened)
+    assert "roots.append" in refusals, (
+        f"a rebound receiver still inherited the review; refused: "
+        f"{sorted(refusals)}")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+    # -- the digest rule on its own: a rebinding with no new call -------- #
+    rebind_only = _inject_into_reachable("roots = attacker",
+                                         into="_approved_roots")
+    _, sites = _audit_source(rebind_only)
+    keys = {(s.owner, s.expression) for s in sites}
+    assert ("_approved_roots", "roots.append") in keys, (
+        "the rebinding removed the site, so this control no longer isolates "
+        "the digest rule")
+    refusals = _refusals(rebind_only)
+    assert "roots.append" in refusals, (
+        "a rebinding with NO new call was admitted: the occurrence count is "
+        "unchanged, so only the owner digest can refuse it, and it did not")
+    reason = refusals["roots.append"].reason
+    assert "source context changed" in reason, (
+        f"the refusal did not come from the owner digest: {reason}")
+    assert REVIEWED_OWNER_DIGESTS["_approved_roots"][:16] in reason, reason
+
+
+def test_l_d_rebinding_a_reviewed_dict_receiver_fails_closed():
+    """L.D (section 4.4) `record = attacker` before `record.get` is refused.
+
+    `assign` is a reviewed binding form for `record`, so X7X's form rule
+    passed here by construction. This is the injection that X7X recorded as an
+    open residual; X8 closes it.
+    """
+    weakened = _inject_into_reachable(
+        "record = attacker; record.get('x')",
+        into="_classify_record_for_shell")
+    refusals = _refusals(weakened)
+    assert "record.get" in refusals, (
+        f"a rebound `record` still inherited the review; refused: "
+        f"{sorted(refusals)}")
+    assert "assign" in str(sorted(REVIEWED_RECEIVER_BINDINGS["record"])), (
+        "this control assumes `assign` is a reviewed form for `record`; "
+        "if it is not, the control is no longer exercising the X7X blind spot")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_e_shadowing_a_module_name_fails_closed():
+    """L.E (section 4.5) `os = attacker` before `os.stat` is refused.
+
+    `QUALIFIED_MODULES` matches the module HEAD as a string, so a shadowed
+    module name reached the reviewed dotted-module branch. Nothing compared
+    the string to the actual import. The exact-site gate is what refuses it.
+    """
+    weakened = _inject_into_reachable("os = attacker; os.stat(path)")
+    refusals = _refusals(weakened)
+    assert "os.stat" in refusals, (
+        f"a shadowed `os` still took module authority; refused: "
+        f"{sorted(refusals)}")
+    # Attribution: with the gate neutralized, the SAME injection is a plain
+    # reviewed dotted module call, i.e. X7X would have admitted it.
+    saved = _site_authority
+    try:
+        sys.modules[__name__]._site_authority = _gate_off()
+        assert "os.stat" not in _refusals(
+            _inject_into_reachable("os = attacker; os.stat(path)")), (
+            "the shadowed-module injection is refused even with the gate "
+            "neutralized, so this control does not isolate the gate")
+    finally:
+        sys.modules[__name__]._site_authority = saved
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_f_shadowing_a_hash_module_fails_closed():
+    """L.F (section 4.6) `hashlib = attacker` before a reviewed hash call.
+
+    Same shape as L.E for a second qualified module, because a single
+    example would not distinguish "the rule works" from "`os` is special".
+    """
+    weakened = _inject_into_reachable(
+        "hashlib = attacker; hashlib.sha256(b'x')", into="_receipt_digest")
+    refusals = _refusals(weakened)
+    assert "hashlib.sha256" in refusals, (
+        f"a shadowed `hashlib` still took module authority; refused: "
+        f"{sorted(refusals)}")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_g_shadowing_a_reviewed_constructor_fails_closed():
+    """L.G (section 4.7) `RecordSnapshot = attacker` before constructing it.
+
+    `PURE_CONSTRUCTORS` is a bare-name set, so the shadowing assignment made
+    the name denote anything at all while the rule went on admitting it as a
+    reviewed pure construction.
+    """
+    weakened = _inject_into_reachable(
+        "RecordSnapshot = attacker; RecordSnapshot(record)",
+        into="_read_record_snapshot_admitted")
+    refusals = _refusals(weakened)
+    assert "RecordSnapshot" in refusals, (
+        f"a shadowed constructor still took constructor authority; refused: "
+        f"{sorted(refusals)}")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_h_shadowing_a_module_level_internal_name_fails_closed():
+    """L.H (section 4.8) `_transitions_dir = attacker` before calling it.
+
+    INTERNAL_CALL was granted from a bare name being a module-level engine
+    definition. That is a string comparison, so rebinding the name won
+    internal authority for an arbitrary callable.
+    """
+    weakened = _inject_into_reachable(
+        "_transitions_dir = attacker; _transitions_dir()")
+    refusals = _refusals(weakened)
+    assert "_transitions_dir" in refusals, (
+        f"a shadowed engine function still took INTERNAL_CALL; refused: "
+        f"{sorted(refusals)}")
+    with pytest.raises(AssertionError):
+        _assert_closed_world(weakened)
+
+
+def test_l_i_the_unchanged_shipped_source_remains_green():
+    """L.I (section 4.9) The manifest is measured from this engine, so it holds.
+
+    A guard that refuses everything would also be closed-world. The shipped
+    source must still classify completely, and every site that was granted
+    before X8 must still be granted -- the guard adds a requirement, it does
+    not withdraw the reviewed surface.
+    """
+    closure, sites = _assert_closed_world(_engine_source())
+    assert len(closure) == 35, f"closure moved: {len(closure)}"
+    assert not _unknown_sites(sites), (
+        f"{len(_unknown_sites(sites))} site(s) became UNKNOWN; the X8 gate is "
+        f"too strict for the shipped engine")
+    assert len(sites) == 312, f"reachable site count moved: {len(sites)}"
+
+
+# The measured totals X8 section 4 requires to be reported. Asserted rather
+# than printed, so a drift in any of them fails the suite instead of quietly
+# changing the numbers in the evidence.
+X8_TOTALS = {
+    "closure_functions": 35,
+    "reachable_call_sites": 312,
+    "exact_site_manifest": 206,
+    "owner_digests": 35,
+    "duplicate_site_identities": 0,
+    "missing_manifest_entries": 0,
+    "surplus_manifest_entries": 0,
+    "provenance_mismatches": 0,
+    "read_only": 182,
+    "internal": 123,
+    "mutation": 7,
+    "unknown": 0,
+}
+
+
+def test_l_j_the_manifest_is_exact_in_both_directions():
+    """L.J (sections 4.10, 4.11) No missing entry, no surplus entry.
+
+    Both directions are defects. A MISSING entry means an authorized site
+    nobody reviewed. A SURPLUS entry means reviewed permission for a site that
+    does not exist -- latent authority that would silently apply if a future
+    edit happened to create it.
+    """
+    closure, sites = _assert_closed_world(_engine_source())
+    granted = [s for s in sites if s.classification != CLASS_UNKNOWN]
+
+    # Every authorized site is in the manifest, with the right count.
+    observed = {}
+    for site in granted:
+        key = (site.owner, site.expression)
+        observed[key] = observed.get(key, 0) + 1
+    assert observed == EXACT_SITE_MANIFEST, (
+        "the manifest is not an exact record of the granted surface: "
+        f"missing={sorted(set(observed) - set(EXACT_SITE_MANIFEST))} "
+        f"surplus={sorted(set(EXACT_SITE_MANIFEST) - set(observed))} "
+        f"count-mismatch="
+        f"{sorted(k for k in observed if k in EXACT_SITE_MANIFEST and observed[k] != EXACT_SITE_MANIFEST[k])}")
+    assert sum(EXACT_SITE_MANIFEST.values()) == len(granted), (
+        f"manifest counts total {sum(EXACT_SITE_MANIFEST.values())} but "
+        f"{len(granted)} sites are granted")
+
+    # Every owner digest corresponds to a closure function, and vice versa.
+    assert set(REVIEWED_OWNER_DIGESTS) == set(closure), (
+        "owner digests and the closure disagree: "
+        f"missing={sorted(set(closure) - set(REVIEWED_OWNER_DIGESTS))} "
+        f"surplus={sorted(set(REVIEWED_OWNER_DIGESTS) - set(closure))}")
+
+    # And no site identity is ambiguous, so "exactly once" is meaningful.
+    identities = [s.identity for s in sites]
+    assert len(identities) == len(set(identities)), (
+        "two reachable call sites share an identity")
+
+
+def test_l_k_no_grant_bypasses_the_exact_site_gate(monkeypatch):
+    """L.K (section 4.12) Every grant flows through the gate -- none bypasses.
+
+    If any rule granted authority without consulting `_site_authority`, making
+    the gate deny EVERYTHING would leave that site still classified. So with
+    the gate replaced by an unconditional denial, every one of the 312 sites
+    must become UNKNOWN. Nothing else can explain a green result.
+    """
+    closure, sites = _assert_closed_world(_engine_source())
+    assert sum(1 for s in sites
+               if s.classification != CLASS_UNKNOWN) == 312, (
+        "every reachable site is granted at this head (182 read-only, 123 "
+        "internal, 7 mutation), so a gate denial must remove all of them")
+
+    monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                        lambda *a, **k: _GATE_DENY_ALL)
+    try:
+        _, sites = _audit_source(_engine_source())
+        still_granted = [s for s in sites if s.classification != CLASS_UNKNOWN]
+        assert not still_granted, (
+            f"{len(still_granted)} site(s) were authorized WITHOUT consulting "
+            f"the exact-site gate, so an approved spelling can still "
+            f"authorize a replacement site: "
+            f"{[s.as_row() for s in still_granted[:8]]}")
+    finally:
+        monkeypatch.undo()
+    _assert_closed_world(_engine_source())
+
+    # And a pair the registry still recognises is refused once its manifest
+    # entry is withdrawn: recognition alone is never authority.
+    key = ("_approved_roots", "roots.append")
+    saved = dict(EXACT_SITE_MANIFEST)
+    try:
+        del EXACT_SITE_MANIFEST[key]
+        refusals = _refusals(_engine_source())
+        assert "roots.append" in refusals, (
+            "withdrawing the manifest entry did NOT refuse the site, so the "
+            "pair spelling is still sufficient on its own")
+        assert "REVIEWED_RECEIVER_METHODS" in refusals[
+            "roots.append"].reason or "EXACT_SITE_MANIFEST" in refusals[
+            "roots.append"].reason, refusals["roots.append"].reason
+    finally:
+        EXACT_SITE_MANIFEST.clear()
+        EXACT_SITE_MANIFEST.update(saved)
+    _assert_closed_world(_engine_source())
+
+
+def test_l_l_mutation_coverage_is_unchanged_and_non_vacuous(monkeypatch):
+    """L.L (section 4.13) Gating mutations must not cost the mutation proof.
+
+    Mutation sites are gated too, deliberately: `os.open` earns its observer
+    from the SPELLING `os.open`, and a shadowed `os` is not the real module,
+    so the runtime tripwire would never see a write issued through it.
+    """
+    _, sites = _assert_closed_world(_engine_source())
+    channels = _reachable_mutation_channels(sites)
+    assert channels == {"open", "os.open"}, (
+        f"the reachable mutation surface moved: {sorted(channels)}")
+    mutations = [s for s in sites if s.classification == CLASS_MUTATION]
+    assert len(mutations) == X8_TOTALS["mutation"], sorted(
+        s.identity for s in mutations)
+    for site in mutations:
+        assert site.observer, site.as_row()
+        assert _observer_for(site.callee) == site.observer, site.as_row()
+    missing = sorted(channels - _globally_instrumented_channels())
+    assert not missing, f"reachable channels with no observer: {missing}"
+
+    # Non-vacuous: mutation authority is gated like everything else, so an
+    # unconditional denial removes it entirely rather than silently keeping it.
+    monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                        lambda *a, **k: _GATE_DENY_ALL)
+    try:
+        _, denied = _audit_source(_engine_source())
+        assert _reachable_mutation_channels(denied) == set(), (
+            "a mutation site survived an unconditional gate denial, so it is "
+            "NOT gated and a shadowed module could still claim its observer")
+    finally:
+        monkeypatch.undo()
+    _assert_closed_world(_engine_source())
+
+
+def test_l_m_removing_the_exact_site_rule_lets_the_controls_through(
+        monkeypatch):
+    """L.M (section 4.14) The gate is load-bearing for the X8 controls.
+
+    Neutralizing it must re-open EVERY injection the X8 controls rely on, so
+    each control is discriminating rather than passing for an unrelated
+    reason. Restored, the proof goes green.
+    """
+    # The injections the X8 gate is RESPONSIBLE for: each is refused today,
+    # and every one of them must be admitted once the gate is off. If any is
+    # still refused, its control is passing for a different reason and is not
+    # discriminating the X8 rule at all.
+    gate_injections = (
+        ("roots.append(payload)", "_approved_roots", "roots.append"),
+        ("roots = attacker; roots.append(payload)", "_approved_roots",
+         "roots.append"),
+        ("record = attacker; record.get('x')",
+         "_classify_record_for_shell", "record.get"),
+        ("os = attacker; os.stat(path)", "_load_transition_record",
+         "os.stat"),
+        ("hashlib = attacker; hashlib.sha256(b'x')", "_receipt_digest",
+         "hashlib.sha256"),
+        ("RecordSnapshot = attacker; RecordSnapshot(record)",
+         "_read_record_snapshot_admitted", "RecordSnapshot"),
+        ("_transitions_dir = attacker; _transitions_dir()",
+         "_load_transition_record", "_transitions_dir"),
+    )
+    # Reported honestly rather than folded in: this one is caught by the X7X
+    # SITE rule, which fires before the gate, so the gate cannot re-open it.
+    # L.A is where it is proven; asserting it here keeps this control from
+    # claiming credit for a rule it does not exercise.
+    cross_owner = ("roots.append(payload)", "_load_transition_record",
+                   "roots.append")
+    refused = _refusals(_inject_into_reachable(cross_owner[0],
+                                               into=cross_owner[1]))
+    assert cross_owner[2] in refused, cross_owner
+    assert "REVIEWED_RECEIVER_SITES" in refused[cross_owner[2]].reason, (
+        f"the cross-owner case is no longer caught by the site rule: "
+        f"{refused[cross_owner[2]].reason}")
+
+    # Each must be refused BY THE GATE, not by an older rule that happens to
+    # cover it too. This half is what keeps L.M sensitive to a mutation that
+    # removes the gate -- without it, L.M would neutralize the gate itself and
+    # could not notice the gate being gone.
+    for injected, owner, expr in gate_injections:
+        refusals = _refusals(_inject_into_reachable(injected, into=owner))
+        assert expr in refusals, (
+            f"{injected!r} in {owner} is not refused at all")
+        reason = refusals[expr].reason
+        assert ("EXACT_SITE_MANIFEST" in reason
+                or "time(s)" in reason
+                or "source context changed" in reason), (
+            f"{injected!r} in {owner} is refused, but by an older rule rather "
+            f"than by the X8 gate, so L.M would not discriminate the gate: "
+            f"{reason}")
+
+    monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                        _gate_off())
+    try:
+        reopened = []
+        for injected, owner, expr in gate_injections:
+            refusals = _refusals(_inject_into_reachable(injected, into=owner))
+            if expr not in refusals:
+                reopened.append((injected, expr))
+        expected = [(i, e) for i, _, e in gate_injections]
+        assert sorted(reopened) == sorted(expected), (
+            f"neutralizing the gate did not re-open every X8-caught injection, "
+            f"so those controls are not discriminating: still refused "
+            f"{sorted(set(expected) - set(reopened))}")
+    finally:
+        monkeypatch.undo()
+    _assert_closed_world(_engine_source())
+
+
+def test_l_n_a_refusal_names_the_rule_and_both_identities():
+    """L.N (section 4.15) A refusal must be adjudicable without the source.
+
+    Required: owner, normalized expression, coordinate, the failed rule, and
+    the EXPECTED and OBSERVED provenance identity. "This site was refused" is
+    not enough to tell an unreviewed call from an edited owner.
+    """
+    claimed = REVIEWED_OWNER_DIGESTS["_approved_roots"]
+    weakened = _inject_into_reachable("roots = attacker",
+                                      into="_approved_roots")
+    refusals = _refusals(weakened)
+    hit = refusals["roots.append"]
+    row = hit.as_row()
+    for required in ("_approved_roots", "roots.append",
+                     claimed[:16], "source context changed"):
+        assert required in hit.reason or required in row, (
+            f"the diagnostic omits {required!r}: {row}")
+    assert hit.lineno > 0, row
+    # The OBSERVED digest is named too, so expected and observed are both
+    # present and an operator can see that the owner changed.
+    observed = _audit_context(ast.parse(weakened))["digests"]
+    assert observed["_approved_roots"] != claimed, (
+        "the owner digest did not change, so this control no longer "
+        "exercises the digest rule")
+    assert observed["_approved_roots"][:16] in hit.reason, (
+        f"the refusal does not name the observed provenance identity: "
+        f"{hit.reason}")
+
+    # The unreviewed-site case is a DIFFERENT diagnostic, not the same text.
+    other = _refusals(_inject_into_reachable("roots.extend(payload)"))
+    assert other["roots.extend"].reason != hit.reason
+    assert "REVIEWED_RECEIVER_METHODS" in other["roots.extend"].reason
+
+    with pytest.raises(AssertionError) as excinfo:
+        _assert_closed_world(weakened)
+    assert "roots.append" in str(excinfo.value)
+
+
+def test_l_o_the_x8_totals_are_measured_and_stable():
+    """L.O (section 4) The reported totals, asserted rather than narrated.
+
+    Every number the X8 evidence claims is computed here, so a drift fails the
+    suite instead of silently making the evidence wrong -- the failure mode
+    X5 exhibited and X6 corrected.
+    """
+    closure, sites = _assert_closed_world(_engine_source())
+    granted = [s for s in sites if s.classification != CLASS_UNKNOWN]
+    observed = {}
+    for site in granted:
+        key = (site.owner, site.expression)
+        observed[key] = observed.get(key, 0) + 1
+
+    context = _audit_context(ast.parse(_engine_source()))
+    mismatches = [s for s in granted
+                  if _site_authority(s.owner, s.expression, context)
+                  is not None]
+    measured = {
+        "closure_functions": len(closure),
+        "reachable_call_sites": len(sites),
+        "exact_site_manifest": len(EXACT_SITE_MANIFEST),
+        "owner_digests": len(REVIEWED_OWNER_DIGESTS),
+        "duplicate_site_identities":
+            len([s.identity for s in sites])
+            - len({s.identity for s in sites}),
+        "missing_manifest_entries": len(set(observed) -
+                                       set(EXACT_SITE_MANIFEST)),
+        "surplus_manifest_entries": len(set(EXACT_SITE_MANIFEST) -
+                                       set(observed)),
+        "provenance_mismatches": len(mismatches),
+        "read_only": sum(1 for s in sites
+                         if s.classification == CLASS_READ_ONLY),
+        "internal": sum(1 for s in sites
+                        if s.classification == CLASS_INTERNAL),
+        "mutation": sum(1 for s in sites
+                        if s.classification == CLASS_MUTATION),
+        "unknown": len(_unknown_sites(sites)),
+    }
+    assert measured == X8_TOTALS, (
+        "the X8 totals drifted from the recorded evidence: "
+        + str({k: (measured[k], X8_TOTALS[k]) for k in X8_TOTALS
+               if measured[k] != X8_TOTALS[k]}))
+    assert len(EXACT_SITE_MANIFEST) == len(observed), (
+        "manifest entries and distinct granted sites disagree")
+    assert max(EXACT_SITE_MANIFEST.values()) == 7, (
+        "the largest reviewed occurrence count moved; re-derive the evidence")
+    assert sorted(_reachable_mutation_channels(sites)) == ["open", "os.open"]
+
+
+# --------------------------------------------------------------------- #
 # X7X: receiver BINDING provenance -- tuple, walrus, comprehension, lambda
 # --------------------------------------------------------------------- #
 #
