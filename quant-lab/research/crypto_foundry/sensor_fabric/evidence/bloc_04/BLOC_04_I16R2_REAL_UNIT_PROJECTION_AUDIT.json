@@ -1,0 +1,208 @@
+{
+  "artifact": "real_unit_projection_authority_audit",
+  "audit_conclusions": {
+    "capability_vs_population": "I16R1 proved CONTRACT CAPABILITY, not current real-provider POPULATION. No production code in this repository constructs or registers a ProjectionSchemaDefinition at all (verified by exhaustive search of src/**/*.py); the registration path is exercised only by the accepted storage stacks. Registered schemas carrying source_unit_evidence = 0.",
+    "evidence_inconsistency_found": true,
+    "nested_path_support_required": true,
+    "static_claim_truth_binding_missing": true,
+    "v0_1_contract_insufficient": true
+  },
+  "book_snapshot_resolution": {
+    "decision": "ROW_LEVEL_NESTED_SUPPORT_REQUIRED",
+    "flat_alternative": "NOT PROVEN — no production book projection exists that flattens per-level unit evidence into a top-level provider-native column, so the audit may not claim flattening (I16R2 section 6/13). The canonical PriceLevel.quantity_unit shape is repeated/row-level nested.",
+    "physical_shape": "bids/asks carry per-level quantity_unit in the supported provider-native vocabulary (tests/crypto_sensor_fabric/fixtures/book_snapshot_l2.json); the T0B Arrow descriptor machinery supports list/large_list/struct losslessly, so a registered provider-native schema can carry list<struct<price, quantity, quantity_unit>>.",
+    "required_location_syntax": "deterministic structural path tuple (e.g. (\"bids\", \"item\", \"quantity_unit\")) resolved against the registered Arrow schema; list element step must equal the Arrow list value-field name; struct steps must equal struct child field names; terminal field must be a string; no _t0_ component; nonempty components; JSON list serialization (no dotted-string ambiguity)."
+  },
+  "checkpoint": "SENSOR-B4-I16R2A",
+  "current_head": "e8d1384d98771c39cb119e2cae0ff93296be02ec",
+  "family_unit_projection_matrix": {
+    "MECHANICAL_BASIS": {
+      "authority_source": "committed supported-family fixture basis_valid.json (no unit-bearing key); canonical schema schemas/basis.py MechanicalBasis (basis_native spread, basis_bps derived)",
+      "constant": null,
+      "current_declaration_representable": "NO_UNIT_FIELDS_REQUIRES_explicit_contract_marker (else indistinguishable from historical absence)",
+      "nested": false,
+      "physical_arrow_path": null,
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": false,
+      "top_level": null,
+      "truth_bound_current": null,
+      "unit_semantic_field": null
+    },
+    "MECHANICAL_BOOK_METRIC": {
+      "authority_source": "committed supported-family fixture book_metric_provider.json (metric_unit=\"BPS\"); canonical schema schemas/book.py MechanicalBookMetric.metric_unit",
+      "constant": false,
+      "current_declaration_representable": true,
+      "nested": false,
+      "physical_arrow_path": "metric_unit: string (top level)",
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": true,
+      "top_level": true,
+      "truth_bound_current": false,
+      "unit_semantic_field": "metric_unit"
+    },
+    "MECHANICAL_BOOK_SNAPSHOT": {
+      "authority_source": "committed supported-family fixture book_snapshot_l2.json (bids[].quantity_unit=\"BTC\", asks[].quantity_unit=\"BTC\"); canonical schema schemas/book.py PriceLevel.quantity_unit",
+      "constant": false,
+      "current_declaration_representable": false,
+      "nested": true,
+      "physical_arrow_path": "bids: list<struct<price, quantity, quantity_unit: string>>; asks: list<struct<...>> (per-level nested, repeated)",
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": true,
+      "top_level": false,
+      "truth_bound_current": false,
+      "unit_semantic_field": "PriceLevel.quantity_unit"
+    },
+    "MECHANICAL_FUNDING": {
+      "authority_source": "committed supported-family fixture funding_8h_native.json (no unit-bearing key); canonical schema schemas/funding.py MechanicalFunding (dimensionless rate; interval described by funding_interval_seconds)",
+      "constant": null,
+      "current_declaration_representable": "NO_UNIT_FIELDS_REQUIRES_explicit_contract_marker (else indistinguishable from historical absence)",
+      "nested": false,
+      "physical_arrow_path": null,
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": false,
+      "top_level": null,
+      "truth_bound_current": null,
+      "unit_semantic_field": null
+    },
+    "MECHANICAL_LIQUIDATION": {
+      "authority_source": "committed supported-family fixture liquidation_interval_aggregate.json (quantity_unit=null, optional); canonical schema schemas/liquidation.py MechanicalLiquidation.quantity_unit",
+      "constant": false,
+      "current_declaration_representable": true,
+      "nested": false,
+      "physical_arrow_path": "quantity_unit: string? (top level, nullable/optional)",
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": true,
+      "top_level": true,
+      "truth_bound_current": false,
+      "unit_semantic_field": "quantity_unit"
+    },
+    "MECHANICAL_OPEN_INTEREST": {
+      "authority_source": "committed supported-family fixture oi_contracts_native.json (native_unit=\"CONTRACTS\"); canonical schema schemas/open_interest.py MechanicalOpenInterest.native_unit with frozen vocabulary [BASE_ASSET, CONTRACTS, OTHER, QUOTE_ASSET, USD]",
+      "constant": false,
+      "current_declaration_representable": true,
+      "nested": false,
+      "physical_arrow_path": "native_unit: string (top level)",
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": true,
+      "top_level": true,
+      "truth_bound_current": false,
+      "unit_semantic_field": "native_unit"
+    },
+    "MECHANICAL_POSITIONING": {
+      "authority_source": "committed supported-family fixture positioning_top_trader.json (no unit-bearing key); canonical schema schemas/positioning.py MechanicalPositioning (ratios/counts; population_definition is not a unit)",
+      "constant": null,
+      "current_declaration_representable": "NO_UNIT_FIELDS_REQUIRES_explicit_contract_marker (else indistinguishable from historical absence)",
+      "nested": false,
+      "physical_arrow_path": null,
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": false,
+      "top_level": null,
+      "truth_bound_current": null,
+      "unit_semantic_field": null
+    },
+    "MECHANICAL_TRADE": {
+      "authority_source": "committed supported-family fixture trade_valid.json (quantity_native=0.25, quantity_unit=\"BTC\"); canonical schema schemas/trade.py MechanicalTrade.quantity_unit",
+      "constant": false,
+      "current_declaration_representable": true,
+      "nested": false,
+      "physical_arrow_path": "quantity_unit: string (top level)",
+      "projection_schema_id": null,
+      "projection_schema_registration": "NONE (no production registration exists in this repository)",
+      "row_varying_possible": true,
+      "top_level": true,
+      "truth_bound_current": false,
+      "unit_semantic_field": "quantity_unit"
+    }
+  },
+  "gate_id": "G4-13",
+  "g4_13_disposition": {
+    "condition_11_effect": "Condition 11 may remain NOT PRESENT only after R2B/R2C: real supported unit evidence must be reachable through public contracts. I16R2C drives every audited unit-shape class through the real registration + commit + handoff + public consumer path using offline supported-family fixtures.",
+    "frozen_g4_13": "PASS when RawNormalizationBatch exposes sufficient source/timestamp/unit/lineage evidence for PIT normalization without filesystem/path assumptions (bloc_04/06_ACCEPTANCE_TESTS §G4-13).",
+    "population_note": "The frozen G4-13 wording binds the PUBLIC HANDOFF SURFACE (capability), not a current registration census. The zero-production-registration finding is recorded explicitly; the registration path is validated by construction over real supported fixtures (offline). Capability and population are not conflated: population = 0 today and is reported as such."
+  },
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "red_reproduction": {
+    "probe": ".bu_tmp/i16r2_red_probe.py (throwaway outside the worktree; drives the accepted storage stack exactly as the I16R1 tests do)",
+    "red_1_static_mismatch": {
+      "committed_quantity_unit_values": [
+        "BTC"
+      ],
+      "commit_outcome": "COMMIT_SUCCEEDED",
+      "declaration": "SourceUnitEvidence(field_name=\"quantity_unit\", native_unit_lexeme=\"SOL\", state=VERIFIED_NATIVE)",
+      "handoff_source_unit_evidence": [
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE"
+        }
+      ],
+      "row_unit_values": [
+        "BTC"
+      ],
+      "verdict": "SEMANTIC_AUTHORITY_GAP — the durable projection rows say BTC while Bloc5Handoff exposes VERIFIED_NATIVE/SOL; the commit is not truth-bound to row evidence."
+    },
+    "red_2_mixed_row_units": {
+      "committed_quantity_unit_values": [
+        "SOL",
+        "BTC"
+      ],
+      "commit_outcome": "COMMIT_SUCCEEDED",
+      "declaration": "SourceUnitEvidence(field_name=\"quantity_unit\", native_unit_lexeme=\"SOL\", state=VERIFIED_NATIVE)",
+      "handoff_source_unit_evidence": [
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE"
+        }
+      ],
+      "row_unit_values": [
+        "SOL",
+        "BTC"
+      ],
+      "verdict": "MIXED_ROW_UNITS_SILENTLY_COLLAPSED — a static VERIFIED_NATIVE declaration is exposed although the committed batch contains two distinct provider-native unit lexemes."
+    },
+    "verdict": "OPERATOR_FINDING_REPRODUCED"
+  },
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "selected_repair_shape": {
+    "claim_truth_law": "VERIFIED_NATIVE means ONLY: the declared provider-native lexeme is proven invariant across the committed projection evidence for the declared unit-bearing field/path. T0B commit proves all non-null values agree with the declared lexeme before durable publication; mismatch, mixed distinct lexemes, or an all-null column are typed refusals (ProjectionUnitEvidenceConflict) with safe metadata only.",
+    "commit_boundary": "write_projection, after the Arrow table is built and schema-equality proven, before staging/publication. No row scanning in Bloc5Handoff; truth is established at the T0B commit boundary and remains re-provable from durable schema + durable rows.",
+    "contract_marker": "explicit source_unit_contract marker (NO_UNIT_FIELDS | UNIT_EVIDENCE_DECLARED) distinguishes an explicit no-unit-fields declaration from a historical/undeclared contract without rewriting historical descriptors.",
+    "empty_declaration": "absent marker + empty list = HISTORICAL_UNIT_CONTRACT_ABSENT; NO_UNIT_FIELDS marker + empty list = explicit no-unit-bearing-fields; UNIT_EVIDENCE_DECLARED + nonempty list = declared evidence. No inference from list emptiness where the marker is present.",
+    "evidence_fields_added": [
+      "field_path (optional structural tuple; absent = (field_name,))",
+      "variability (optional: STATIC_VERIFIED | ROW_NATIVE | UNIT_UNVERIFIED)"
+    ],
+    "null_law": "all values null => static claim REFUSED (no vacuous verification, no implicit fill); some null + all non-null values == declared lexeme => accepted (null is absence of a value, not disagreement); some null + any differing non-null value => REFUSED.",
+    "resource_law": "distinct-state scanning only (0 / 1 / >1 distinct lexemes, one remembered lexeme, null count, rows inspected); chunked Arrow traversal; conflict short-circuits; no all-values collection.",
+    "unknown_law": "UNIT_UNVERIFIED never carries a lexeme and never auto-promotes from row bytes; ROW_NATIVE declares only the durable location of per-row/per-level native units.",
+    "variability_law": "STATIC_VERIFIED requires state=VERIFIED_NATIVE + lexeme; UNIT_UNVERIFIED requires state=UNIT_UNVERIFIED + no lexeme; ROW_NATIVE requires state=UNIT_UNVERIFIED + no lexeme and marks a durable per-row/per-level location; absent variability preserves the I16R1 pair semantics exactly.",
+    "verification_model": "I16R2's vocabulary adds no conversion, no canonical unit, no effective_at, no Bloc-5 normalization: WHERE native unit truth lives is preserved (Bloc 4); per-row interpretation remains Bloc 5."
+  },
+  "t0b_representation_audit": {
+    "arrow_descriptor_capability": "_arrow_type_descriptor/_rebuild_arrow_type in storage/projection_schema.py are lossless for list, large_list, struct, map (verified in this tree) and fail closed on dictionary/union.",
+    "physical_binding": "write_projection binds each row's exact key set to the registered provider-native Arrow schema, builds an explicit Arrow table, re-reads the staged Parquet and requires exact schema equality; the artifact commit re-verifies physical bytes + schema + T0 constants.",
+    "production_registration_audit": {
+      "production_projection_schema_constructions": 0,
+      "registered_schemas_carrying_source_unit_evidence": 0,
+      "search": "src/**/*.py exhaustive grep for ProjectionSchemaDefinition( and ProjectionSchemaRegistry registrations: only the definition itself and the registry infrastructure exist; every construction site is under tests/.",
+      "verdict": "CAPABILITY_PROVEN_POPULATION_ZERO"
+    },
+    "unit_shape_classes": [
+      "static scalar (trade quantity_unit, book metric metric_unit, OI native_unit)",
+      "optional/unverified (liquidation quantity_unit, nullable)",
+      "row/nested (book snapshot PriceLevel.quantity_unit)",
+      "no unit-bearing fields (funding, basis, positioning)"
+    ]
+  }
+}
