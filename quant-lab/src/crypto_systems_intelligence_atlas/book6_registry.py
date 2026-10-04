@@ -190,8 +190,58 @@ class Book6MeasurementRegistry:
             chain.append(successors[0])
         return tuple(chain)
 
-    # -- authority-bearing resolution ---------------------------------------
+    # -- registered lineage facts (structural; never authority) -------------
+    #
+    # GAP-7 ratified SUPERSESSION_CURRENTNESS_SOURCE as REGISTERED_LINEAGE
+    # TERMINALITY. The accessors below report lineage FACTS. The authority
+    # verdict is reached only in ``resolve_current``, which consults them at
+    # ratified resolver steps 2 and 3.
+    #
+    # ObservationStatus is deliberately absent from every one of them: status is
+    # not authority (B-STRICT), and lineage is derived from registered
+    # supersession edges alone.
+    #
+    # Scope is PER_RECORD (BOOK6-GAP7-SUCCESSOR-CURRENTNESS-v0.1): each predicate
+    # describes the record it is asked about and never the rest of its connected
+    # component. A branched predecessor invalidates itself; it does not condemn
+    # its successors.
 
+    def direct_successors(self, measurement_id: str) -> tuple[MeasurementObservation, ...]:
+        """Observations that supersede ``measurement_id`` directly.
+
+        Deterministic in registration order, matching ``registered_refs``. That
+        order is presentational only: every predicate below is a function of the
+        COUNT, so no caller may depend on which successor appears first.
+        """
+
+        self.registered_measurement(measurement_id)  # refuses an unknown id
+        return tuple(
+            self._measurements[mid]
+            for mid in self._measurement_order
+            if self._measurements[mid].supersedes_measurement_id == measurement_id
+        )
+
+    def lineage_is_valid(self, measurement_id: str) -> bool:
+        """Whether this record's own lineage is valid: at most one successor.
+
+        More than one direct successor is a branched lineage (TERM-4). This is a
+        fact about the record itself. It says nothing about any other record, and
+        it never invalidates the successors.
+        """
+
+        return len(self.direct_successors(measurement_id)) <= 1
+
+    def is_terminal(self, measurement_id: str) -> bool:
+        """Terminality: no registered observation supersedes this one.
+
+        A fact about this record's own successor set. Terminality is never
+        regained once lost, because a superseding record is never removed --
+        SUPERSEDED_PREDECESSOR_NEVER_RESURRECTS, and TERM-5.
+        """
+
+        return not self.direct_successors(measurement_id)
+
+    # -- authority-bearing resolution ---------------------------------------
     def resolve_current(self, measurement_id: str) -> MeasurementObservation:
         """Resolve a measurement's CURRENT authority against live Book 2 state.
 

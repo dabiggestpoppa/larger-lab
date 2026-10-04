@@ -86,9 +86,19 @@ R3_FAMILIES: Final[tuple[str, ...]] = (
     "R3.PRESERVED_SEALS",
 )
 
+#: The Book 6 GAP-7 amendment families -- registered lineage terminality as the
+#: supersession source of currentness, and the seals that must survive it.
+#: Rung 1 only: these trace the lineage FACTS. The authority verdict arrives at
+#: rung 2 and is traced there.
+R4_FAMILIES: Final[tuple[str, ...]] = (
+    "R4.LINEAGE_TERMINALITY",
+    "R4.PRESERVED_SEALS",
+)
+
 #: Every family the matrix must cover.
 ALL_FAMILIES: Final[tuple[str, ...]] = (
-    VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES + R2_FAMILIES + R3_FAMILIES
+    VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES + R2_FAMILIES
+    + R3_FAMILIES + R4_FAMILIES
 )
 
 #: ``(row_id, family, claim, test_file, test_name)``. Every row must resolve.
@@ -2137,6 +2147,84 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "the R2 comparison content seal and corpus row authority survive R3",
         "test_book6_hardening_r3.py",
         "test_r3_phase17_r2_seals_survive_at_the_state_boundary",
+    ),
+    # -- R4 GAP-7 registered lineage terminality -----------------------------
+    (
+        "R4.LT.01",
+        "R4.LINEAGE_TERMINALITY",
+        "a lone registered measurement is terminal with an empty successor set",
+        "test_book6_hardening_r4_lineage.py",
+        "test_lone_measurement_is_terminal",
+    ),
+    (
+        "R4.LT.02",
+        "R4.LINEAGE_TERMINALITY",
+        "a superseded measurement is non-terminal while its successor is terminal",
+        "test_book6_hardening_r4_lineage.py",
+        "test_superseded_measurement_is_not_terminal",
+    ),
+    (
+        "R4.LT.03",
+        "R4.LINEAGE_TERMINALITY",
+        "in A <- B <- C only C is terminal (TERM-3)",
+        "test_book6_hardening_r4_lineage.py",
+        "test_three_link_chain_terminality",
+    ),
+    (
+        "R4.LT.04",
+        "R4.LINEAGE_TERMINALITY",
+        "a branched lineage A <- B and A <- C is invalid on A (TERM-4)",
+        "test_book6_hardening_r4_lineage.py",
+        "test_branched_lineage_is_invalid",
+    ),
+    (
+        "R4.LT.05",
+        "R4.LINEAGE_TERMINALITY",
+        "fail-closed scope is PER_RECORD: the successors of a branch stay valid and terminal (TERM-6)",
+        "test_book6_hardening_r4_lineage.py",
+        "test_successors_of_a_branch_are_unaffected",
+    ),
+    (
+        "R4.LT.06",
+        "R4.LINEAGE_TERMINALITY",
+        "direct successors are deterministic in registration order",
+        "test_book6_hardening_r4_lineage.py",
+        "test_direct_successors_are_deterministic_in_registration_order",
+    ),
+    (
+        "R4.LT.07",
+        "R4.LINEAGE_TERMINALITY",
+        "an unknown measurement is refused by every lineage accessor, never reported empty",
+        "test_book6_hardening_r4_lineage.py",
+        "test_unknown_measurement_is_refused_not_reported_empty",
+    ),
+    (
+        "R4.PS.01",
+        "R4.PRESERVED_SEALS",
+        "registration still accepts a second successor; no registration policy was invented",
+        "test_book6_hardening_r4_lineage.py",
+        "test_second_successor_registration_is_still_accepted",
+    ),
+    (
+        "R4.PS.02",
+        "R4.PRESERVED_SEALS",
+        "measurement_history still refuses a branched chain, unchanged",
+        "test_book6_hardening_r4_lineage.py",
+        "test_measurement_history_still_refuses_branching",
+    ),
+    (
+        "R4.PS.03",
+        "R4.PRESERVED_SEALS",
+        "all four status assignments leave the lineage facts identical (B-STRICT)",
+        "test_book6_hardening_r4_lineage.py",
+        "test_status_permutation_does_not_change_lineage_facts",
+    ),
+    (
+        "R4.PS.04",
+        "R4.PRESERVED_SEALS",
+        "the deferred status-validator incoherence still refuses SUPERSEDED on a root, recorded not patched",
+        "test_book6_hardening_r4_lineage.py",
+        "test_superseded_status_on_a_root_is_refused_by_the_record_validator",
     ),
 )
 
