@@ -3397,3 +3397,57 @@ interval; any one-day convention; any exclusion of `INSTANTANEOUS`; any
 `observed_at` or caller-order ordering; any window-class coercion; any
 aggregation invention; any reopening of GAP-1..GAP-5; any reversal of
 `BOOK6-COMPARE-SUBSTRATE-v0.2`.
+
+---
+
+# GAP-7 RATIFIED — LEDGER UPDATE
+
+**Date:** 2026-10-03
+**Decision id:** `BOOK6-GAP7-v0.3`
+**Ratification record:** `CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_RATIFICATION_RECORD_v0.1.md`
+**Precondition:** `CSIA_BOOK_6_GAP7_PRE_RATIFICATION_REVIEW_v0.3.md` = `15 / 15 PASS`
+
+```text
+GAP_7 = CLOSED / RATIFIED
+
+GAP_7_RESOLUTION = 7A-KERNEL
+STATUS           = B-STRICT
+NV_POLICY        = NV-B / EVIDENCE_REQUIRED_MISSINGNESS
+
+SOURCELESS_MISSINGNESS_CONSTRUCTIBILITY  = ACCEPTED
+SOURCELESS_MISSINGNESS_CURRENT_AUTHORITY = FALSE
+
+CITED_NV_REVALIDATION       = REQUIRED
+METHODOLOGY_NV_REVALIDATION  = REQUIRED
+
+NO_RESURRECTION = TRUE
+MULTIPLE_SUCCESSOR_LINEAGE = FAIL_CLOSED
+
+OBSERVATION_STATUS_IS_CURRENTNESS_AUTHORITY = FALSE
+STATUS_ONLY_CHANGES_CURRENTNESS            = FALSE
+COMPARISON_LOCAL_CURRENTNESS               = PROHIBITED
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+
+GAP_6 = 6E DESIGN VALID / RATIFICATION STILL PENDING
+
+TEST_SPEC_v0.3_CASES = 39   (19 carried + 3 status + 5 terminality
+                            + 10 NV-B + 2 structural); 0 implemented
+
+NV_B_IS_A_NEW_POLICY_CHOICE = TRUE
+NV_B_IS_PRE_EXISTING_ACCEPTED_DOCTRINE = FALSE
+
+NEXT = POST-GAP7 GAP-6 READINESS REVIEW
+```
+
+**Not authorized and not performed:** GAP-6 ratification; any implementation;
+any source or test change; any status validator repair; any source-less current
+authority; any predecessor resurrection; any comparison-local currentness; any
+deletion of historical non-value-bearing records; any reopening of GAP-1..GAP-5;
+any Choir work.
+
+**Implementation remains a separate, later decision.** The eventual Book 6
+implementation authorization must cover **both** the GAP-7 kernel currentness
+hardening **and** the comparison/change amendment, including GAP-6 if ratified.

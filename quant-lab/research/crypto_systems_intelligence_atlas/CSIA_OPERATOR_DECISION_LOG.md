@@ -2675,3 +2675,138 @@ NEXT = operator selects NV policy from DECISION_PACKET_v0.3:
        Then GAP-7 ratification becomes possible; GAP-6 follows separately.
        Implementation of the 7A-KERNEL repair remains a LATER, separate decision.
 ```
+
+---
+
+# CSIA — GAP-7 RATIFICATION (NV-B)
+
+**Date:** 2026-10-03
+**Authorization:** `BOOK 6 CURRENTNESS GOVERNANCE ONLY`
+**Decision id:** `BOOK6-GAP7-v0.3`
+**Nature of this entry:** formal operator RATIFICATION of GAP-7.
+
+```text
+STARTING_HEAD_PLANNING = 8b5bf1e5a8c5f55b2bdcff4471971be4fc4f429c
+STARTING_HEAD_IMPL     = 5f94c3f40cea4441470c57671f51454da7377361
+ACCEPTED_BOOK_6_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc (ancestor, 1 behind)
+BASELINE_SUITE         = 2162 passed (independently re-measured this round)
+IMPL_DRIFT             = 0 files
+```
+
+## The decision
+
+```text
+operator_selection = RATIFY_7A_KERNEL_WITH_STATUS_B_STRICT_AND_NV_B
+status             = RATIFIED / CLOSED
+scope              = BOOK 6 CURRENTNESS GOVERNANCE ONLY
+
+GAP_7            = CLOSED / RATIFIED
+GAP_7_RESOLUTION = 7A-KERNEL
+STATUS           = B-STRICT
+NV_POLICY        = NV-B / EVIDENCE_REQUIRED_MISSINGNESS
+```
+
+## Ratified doctrine
+
+```text
+SINGLE_MEANING_OF_CURRENT                = TRUE
+COMPARISON_LOCAL_CURRENTNESS             = PROHIBITED
+OBSERVATION_STATUS_IS_CURRENTNESS_AUTHORITY = FALSE
+STATUS_ONLY_CHANGES_CURRENTNESS          = FALSE
+SUPERSESSION_CURRENTNESS_SOURCE          = REGISTERED_LINEAGE_TERMINALITY
+SUPERSEDED_PREDECESSOR_NEVER_RESURRECTS  = TRUE
+MULTIPLE_SUCCESSOR_LINEAGE               = FAIL_CLOSED
+```
+
+## NV-B — exact ratified semantics
+
+```text
+SOURCELESS_MISSINGNESS_CONSTRUCTIBILITY  = ACCEPTED
+SOURCELESS_MISSINGNESS_REGISTRATION      = ACCEPTED
+SOURCELESS_MISSINGNESS_QUERYABILITY      = ACCEPTED
+SOURCELESS_MISSINGNESS_CURRENT_AUTHORITY = FALSE
+
+CURRENT = TERMINAL
+     AND STRUCTURALLY_VALID
+     AND METHODOLOGY_CURRENT
+     AND HAS_SOURCE_CLAIMS
+     AND ALL_SOURCE_CLAIMS_CURRENT
+
+ObservationStatus is NOT a conjunct.
+```
+
+Applies uniformly to all eight non-value-bearing `MissingnessState` members:
+`NOT_APPLICABLE`, `NOT_SUPPORTED`, `NOT_AVAILABLE`, `NOT_COLLECTED`,
+`SOURCE_UNAVAILABLE`, `STALE`, `PARTIAL_COVERAGE`, `UNKNOWN`. **No
+state-specific authority split is ratified.**
+
+```text
+UNCITED_STRUCTURAL_ASSERTION_IS_CURRENT_AUTHORITY = FALSE
+VALUE_PERMISSION_PARTITION != AUTHORITY_PARTITION
+NO HISTORICAL RECORD DELETED OR INVALIDATED = TRUE
+```
+
+## Provenance — the binding statement
+
+```text
+NV_B_IS_A_NEW_POLICY_CHOICE                  = TRUE
+NV_B_IS_PRE_EXISTING_ACCEPTED_DOCTRINE       = FALSE
+DEFECTIVE_BEHAVIOR_IS_NORMATIVE_EVIDENCE      = FALSE
+ACCEPTED_CONSTRUCTION_BEHAVIOR
+    != ACCEPTED_CURRENT_AUTHORITY_DOCTRINE
+```
+
+**NV-B is a NEW POLICY choice, not a recovered accepted rule.** The v0.1 §6.2
+claim *"No new policy is invented. NV-A is the already-ratified behaviour"*
+remains **withdrawn and false**. No accepted source settles the
+non-value-bearing authority question. The operator selected NV-B as a policy
+judgment; it is recorded as new policy and is never to be cited as
+pre-existing accepted doctrine.
+
+## Artifacts created this round (docs only)
+
+```text
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_CLARIFICATION_v0.3.md
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_TEST_SPEC_v0.3.md
+CSIA_BOOK_6_GAP7_PRE_RATIFICATION_REVIEW_v0.3.md
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_RATIFICATION_RECORD_v0.1.md
+CSIA_OPERATOR_DECISION_LOG.md   (this entry)
+CSIA_PLANNING_PROGRESS.md       (ledger append)
+```
+
+Pre-ratification review v0.3 = `15 / 15 PASS`, `BLOCKING = 0`. Its two
+policy-answered questions (Q8, Q12) are recorded as operator selections, not
+as measurements.
+
+## Unchanged by this entry
+
+```text
+BOOK_6                          = FROZEN_ACCEPTED
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+BOOK_6_ACCEPTANCE_COMMIT        = 5f94c3f40cea4441470c57671f51454da7377361
+GAP_1..GAP_5                    = CLOSED / RATIFIED
+GAP_6                           = 6E DESIGN VALID / RATIFICATION STILL PENDING
+CHOIR_PLAN_PRESERVED            = TRUE
+UNTRACKED_PRIOR_TOOLING         = 6 files, PRESENT, UNCOMMITTED, UNDELETED,
+                                  md5 verified unchanged
+```
+
+## Not authorized and not performed
+
+GAP-6 ratification; any implementation; any source edit; any test code; any
+status rename, deletion, reinterpretation or validator repair; any status-based
+currentness; any source-less current authority; any predecessor resurrection;
+any comparison-local currentness; any deletion or invalidation of historical
+non-value-bearing records; any invented per-state authority table; any reopening
+of GAP-1..GAP-5; any Choir work; any force-push, rebase, amend or history
+rewrite.
+
+```text
+NEXT = POST-GAP7 GAP-6 READINESS REVIEW
+       (CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_READINESS_REVIEW_v0.2.md)
+
+GAP-7 ratification is COMPLETE. Implementation of the 7A-KERNEL repair remains a
+SEPARATE, LATER decision and is NOT authorized. The eventual Book 6
+implementation authorization must cover BOTH the GAP-7 kernel currentness
+hardening AND the comparison/change amendment, including GAP-6 if ratified.
+```
