@@ -3999,3 +3999,101 @@ CSIA_OPERATOR_DECISION_LOG.md
 any edit to v0.4 or any ratified record; any status-validator edit; any revision
 of B-STRICT; any GAP reopening; any branch or worktree creation; any mutation
 of the frozen accepted Book 6 worktree; Book 7 or Choir work.
+
+---
+
+# BOOK 6 IMPLEMENTATION CONTRACT — ALL RUNGS GREEN (LEDGER UPDATE)
+
+**Recorded:** 2026-10-04
+**Planning HEAD at time of writing:** `aec9ac49`
+
+## The last evidence gap is closed
+
+The traceability matrix v0.1 reported ten GREEN and one AMBER. The amber was
+Rung 6: its 6E falsification cases existed only as draft. They are now
+ratified, and the matrix has been re-run against the ratified corpus.
+
+```text
+RUNGS_MAPPED       = 11
+GREEN_RUNGS        = 11
+AMBER_RUNGS        =  0
+RED_RUNGS          =  0
+KNOWN_EVIDENCE_GAPS = 0
+
+ALL_IMPLEMENTATION_RUNGS_HAVE_RATIFIED_FALSIFICATION = TRUE
+```
+
+```text
+RUNG_TRACEABILITY_v0.1 = SUPERSEDED / RUNG 6 AMBER
+RUNG_TRACEABILITY_v0.2 = 11 GREEN / 0 AMBER / 0 RED
+```
+
+## Authorization review re-run
+
+```text
+AUTH_REVIEW_v0.2 = SUPERSEDED BY v0.3 ONLY BECAUSE TEST EVIDENCE GAP CLOSED
+AUTH_REVIEW_v0.3 = PASS 12 / 12
+
+CRITERION_CHANGED_VALUE        = 0
+CRITERION_EVIDENCE_STRENGTHENED = 2
+CANONICAL_CRITERIA_COUNT      = 12   (UNCHANGED)
+```
+
+The evidence statement `ALL_IMPLEMENTATION_RUNGS_HAVE_RATIFIED_FALSIFICATION`
+is recorded **as evidence** for criteria 7 and 8, not as a thirteenth
+criterion. The canonical twelve are not widened by an audit.
+
+## What this round was actually about
+
+The round was opened by an external review of the test contract, not by the
+matrix. TIME-11 in spec v0.4 made `ObservationStatus` authority-bearing and
+inverted the ratified lexical tie-break. It was a **wrong test** — it specified
+the inverse of B-STRICT while wearing the costume of a ratified gate.
+
+```text
+MECHANICAL_CHECKS_THAT_WOULD_HAVE_CAUGHT_IT = 0
+DOCTRINE_COMPARISON_CAUGHT_IT               = 1
+```
+
+That asymmetry is the finding worth carrying forward. The corpus's mechanical
+consistency checks were all green on a spec that contradicted ratified
+doctrine. Only reading the test against the record caught it.
+
+## Standing state
+
+```text
+TIME_v0.4 = SUPERSEDED / TIME-11 STATUS CONTRADICTION
+TIME_v0.5 = RATIFIED
+TIME_11    = LINEAGE / TERMINALITY BASED
+
+BOOK_6_DESIGN_COMPLETE          = TRUE
+BOOK_6_IMPLEMENTED              = FALSE
+BOOK_6_IMPLEMENTATION_AUTHORITY  = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY  = FALSE
+LIVE_ACQUISITION_AUTHORITY       = FALSE
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.2.md
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.3.md
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PACKET_v0.3.md
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Next operator action — one question
+
+```text
+Read   CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.3.md
+Select BOOK6-IMPL-CONSOLIDATED-v0.3 = AUTHORIZE_OFFLINE_IMPLEMENTATION | HOLD
+```
+
+```text
+DECISIONS_OUTSTANDING = 1
+```
+
+**Not authorized and not performed:** implementation; any source or test code;
+any test executed; any edit to a ratified record or to any superseded artifact;
+any status-validator edit; any GAP reopening; any branch or worktree creation;
+any mutation of the frozen accepted Book 6 worktree; Book 7 or Choir work.
