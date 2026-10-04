@@ -3557,3 +3557,90 @@ CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PREVIEW_v0.1.md  PREVIEW
 **Not authorized and not performed:** GAP-6 ratification; any implementation;
 any branch or worktree creation; any mutation of the frozen accepted Book 6
 worktree; any source or test change; Book 7 or Choir work.
+
+---
+
+# GAP-6 RATIFIED — LEDGER UPDATE
+
+**Date:** 2026-10-04
+**Decision id:** `BOOK6-GAP6-v0.2`
+**Operator selection:** `RATIFY_GAP6_6E_WINDOW_CLASS_AWARE_ORDERING_KEYS`
+
+## New standing state
+
+```text
+GAP_1..GAP_5 = CLOSED / RATIFIED
+GAP_6        = CLOSED / RATIFIED
+GAP_6_RESOLUTION = 6E WINDOW_CLASS_AWARE_ORDERING_KEYS
+GAP_7        = CLOSED / RATIFIED
+GAP_7_RESOLUTION = 7A-KERNEL + B-STRICT + NV-B
+
+COMPARISON_REPLAY = 20 CHECKS / CURRENT
+BOOK_6_COMPARISON_DESIGN = COMPLETE
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+
+NEXT = CONSOLIDATED BOOK 6 IMPLEMENTATION AUTHORIZATION REVIEW
+```
+
+## GAP-6 was the last open comparison/change gap
+
+```text
+COMPARISON_CHANGE_GAPS_OPEN = 0
+BOOK_6_DESIGN_COMPLETE      = TRUE
+BOOK_6_DESIGN_COMPLETE_MEANS_IMPLEMENTED = FALSE
+```
+
+The distinction is the whole point: the *design* is complete and closed; the
+*code* is absent and remains unauthorized. Nothing about this ratification moves
+accepted source.
+
+```text
+COMPARISON_CHANGE_IMPLEMENTED = FALSE
+COMPARISON_RULE_IN_SOURCE     = FALSE
+CHANGE_OBSERVATION_IN_SOURCE  = FALSE
+ORDERING_KEY_IN_SOURCE        = FALSE
+```
+
+## Replay precedence settled (additive, non-retroactive)
+
+```text
+COMPARISON_REPLAY_CANONICAL_COUNT = 20
+CANONICAL_SOURCE = BOOK6-COMPARE-SUBSTRATE-v0.2 section 14
+
+HISTORICAL_v0_4_REPLAY_CHECK_COUNT = 19
+HISTORICAL_19_CHECK_REPLAY_IS_CURRENT = FALSE
+STATUS = HISTORICAL / SUPERSEDED FOR IMPLEMENTATION
+
+RETROACTIVE_REWRITE         = FALSE
+HISTORICAL_RECORD_PRESERVED = TRUE
+```
+
+The 19-check list remains in the v0.4 record, unedited. The substrate
+ratification prospectively supersedes it **for implementation purposes only**.
+No historical claim is altered.
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_RATIFICATION_RECORD_v0.1.md      RATIFIED
+CSIA_BOOK_6_COMPARISON_CHANGE_REPLAY_PRECEDENCE_ERRATUM_v0.1.md    RATIFIED
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_RATIFICATION_PACKET_v0.2.md      (decision source)
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_READINESS_REVIEW_v0.3.md         PASS 12/12
+```
+
+## Next operator action
+
+```text
+1. Review CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1.md
+   covering GAP-7 hardening + comparison/change GAP-1..5 + ratified 6E +
+   the canonical 20-check replay, scored against the twelve criteria.
+2. If and only if 12 / 12 TRUE, decide the consolidated authorization packet:
+      AUTHORIZE_OFFLINE_IMPLEMENTATION  |  HOLD
+```
+
+**Not authorized and not performed:** implementation; any source or test change;
+any branch or worktree creation; any mutation of the frozen accepted Book 6
+worktree; any edit to any ratified record; Book 7 or Choir work.

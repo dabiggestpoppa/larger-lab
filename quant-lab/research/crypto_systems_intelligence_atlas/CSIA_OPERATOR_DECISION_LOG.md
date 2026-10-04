@@ -2887,3 +2887,170 @@ CHOIR_PLAN_PRESERVED            = TRUE
 GAP-7 reopening; any amendment of `5ac1e0b14`; any force-push, rebase or
 history rewrite; any implementation; any source or test change; GAP-6
 ratification; any Book 7 or Choir work.
+
+---
+
+# CSIA — GAP-6 RATIFIED — 6E WINDOW CLASS AWARE ORDERING KEYS
+
+**Date:** 2026-10-04
+**Decision id:** `BOOK6-GAP6-v0.2`
+**Operator selection:** `RATIFY_GAP6_6E_WINDOW_CLASS_AWARE_ORDERING_KEYS`
+**Status:** `RATIFIED / CLOSED`
+**Scope:** `BOOK 6 COMPARISON TEMPORAL ORDERING DOCTRINE ONLY`
+**Implementation authority:** `FALSE`
+
+## Precondition verified before the decision
+
+```text
+GAP6_READINESS_v0.3 = PASS (12 / 12)
+REVIEW_TYPE         = PRE_IMPLEMENTATION_IMPLEMENTABILITY
+POLICY_GAP          = 0
+IMPLEMENTABLE_FROM_RATIFIED_CONTRACT   = 16
+DEPENDENCY_REQUIRES_GAP7_IMPLEMENTATION =  4  (N, O, P, Q)
+6E_DESIGN           = FULLY_SPECIFIED
+GAP7_DEPENDENCY     = RATIFIED / FULLY_SPECIFIED
+```
+
+## Ratified content
+
+```text
+GAP_6            = CLOSED / RATIFIED
+GAP_6_RESOLUTION = 6E WINDOW_CLASS_AWARE_ORDERING_KEYS
+```
+
+Effective-key semantics (derived, selector-local, discarded after selection):
+
+```text
+interval WindowClass members:  effective_start = window_start
+                                effective_end   = window_end
+INSTANTANEOUS:                 effective_start = valid_time
+                                effective_end   = valid_time
+
+ORDERING_KEYS_ARE_DERIVED = TRUE
+OBSERVATION_MUTATION      = FALSE
+STORED_BACK_ONTO_RECORD   = FALSE
+NEW_TEMPORAL_CONTRACT     = NONE
+PROJECTION_TOTAL_OVER_CLOSED_ENUM = TRUE
+UNRECOGNISED_WINDOW_CLASS = FAIL_CLOSED_ERROR
+```
+
+Ordering:
+
+```text
+PRIOR CONDITION: candidate.effective_end < comparison.effective_start   (strict)
+1. greatest effective_end(candidate)
+2. if tied: greatest effective_start(candidate)
+3. if still tied: stable lexical measurement_ref      (FINAL tie-break ONLY)
+
+CALLER_ORDER_AFFECTS_BASELINE    = FALSE
+OBSERVED_AT_USED_FOR_ORDERING    = FALSE
+INGESTION_TIME_USED_FOR_ORDERING = FALSE
+RANDOM_SELECTION                 = FALSE
+LEXICAL_IS_FINAL_TIEBREAK_ONLY   = TRUE
+```
+
+WindowClass boundary:
+
+```text
+WINDOW_CLASS_CONVERSION            = FALSE
+INSTANTANEOUS_TO_INTERVAL_COERCION = FALSE
+INTERVAL_TO_INSTANTANEOUS_COERCION = FALSE
+SAME_METRIC_DEFINITION_BINDING_SUPPLIES_COMPATIBLE_WINDOW_CLASS = TRUE
+MIXED_OR_WRONG_DEFINITION_RECORDS_ARE_INELIGIBLE_BEFORE_ORDERING = TRUE
+```
+
+Eligibility-before-ordering:
+
+```text
+ELIGIBILITY_PRECEDES_ORDERING = TRUE
+A_HISTORICAL_PREDECESSOR_NEVER_REACHES_TIEBREAK = TRUE
+A_SOURCELESS_NON_VALUE_BEARING_RECORD_UNDER_NV_B_NEVER_REACHES_ORDERING = TRUE
+```
+
+Aggregation boundary:
+
+```text
+SELECTOR_AGGREGATES = FALSE
+MetricDefinition.aggregation OWNS_AGGREGATION = TRUE
+aggregation == NONE AND a window would require inventing aggregation
+    -> HOLD THAT RUNTIME CASE AND SURFACE
+SILENT_AGGREGATION       = FORBIDDEN
+THIS_IS_A_DESIGN_GAP     = FALSE
+```
+
+Unchanged by this decision:
+
+```text
+NEW_PUBLIC_AUTHORITY_BEARING_CONTRACT_CLASSES = 2   (ComparisonRule, ChangeObservation)
+HIDDEN_THIRD_CONTRACT = NONE
+CONTRACT_COUNT_CHANGED_BY_GAP6 = FALSE
+EXECUTABLE_BASELINE_SELECTOR_COUNT = 1  (PRIOR_COMPARABLE_WINDOW)
+COMPARISON_REPLAY_CHECK_COUNT = 20  (unchanged by GAP-6)
+D6M_ITEMS_CLOSED_BY_GAP_6 = 0
+BOOK_6_CLASS_C_STATE_BENCHMARK_RUNTIME = UNRATIFIED / UNIMPLEMENTED
+```
+
+## Companion provision — comparison replay precedence
+
+In the same decision the operator directed that the one remaining replay
+ambiguity between two ratified records be resolved additively, without any
+retroactive rewrite.
+
+```text
+ORIGINAL_AMENDMENT_RATIFICATION = BOOK6-COMPARE-AMEND-v0.4
+ORIGINAL_REPLAY_COUNT           = 19
+ORIGINAL_CHECKS_4_6             = PHANTOM BENCHMARK METHODOLOGY CHECKS
+
+LATER_SUBSTRATE_RATIFICATION    = BOOK6-COMPARE-SUBSTRATE-v0.2
+CURRENT_REPLAY_COUNT            = 20
+CURRENT_CHECKS_4_6              = BASELINE SELECTOR / CANDIDATE / DETERMINISTIC RESOLUTION
+CURRENT_CHECK_19                = TEMPORAL COMPARABILITY RESOLUTION
+CURRENT_CHECK_20                = DETERMINISTIC CHANGE RECOMPUTATION
+
+BOOK6-COMPARE-SUBSTRATE-v0.2 PROSPECTIVELY SUPERSEDES
+the v0.4 replay list FOR IMPLEMENTATION PURPOSES
+
+COMPARISON_REPLAY_CANONICAL_COUNT = 20
+HISTORICAL_19_CHECK_REPLAY_IS_CURRENT = FALSE
+SUBSTRATE_20_CHECK_REPLAY_IS_CURRENT  = TRUE
+
+RETROACTIVE_REWRITE         = FALSE
+HISTORICAL_RECORD_PRESERVED = TRUE
+IMPLEMENTATION_CANONICAL_REPLAY = 20
+NO_IMPLEMENTATION_AGENT_MAY_USE_THE_19_CHECK_LIST = TRUE
+```
+
+The 19-check list is recorded as **HISTORICAL / SUPERSEDED FOR IMPLEMENTATION**.
+It is not retracted, not edited, and not claimed to have ever contained 20
+checks. It did not.
+
+## Artifacts created this round (docs only)
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_RATIFICATION_RECORD_v0.1.md
+CSIA_BOOK_6_COMPARISON_CHANGE_REPLAY_PRECEDENCE_ERRATUM_v0.1.md
+CSIA_OPERATOR_DECISION_LOG.md          (this entry)
+CSIA_PLANNING_PROGRESS.md              (ledger entry)
+```
+
+## Unchanged by this entry
+
+```text
+GAP_1..GAP_5 = CLOSED / RATIFIED
+GAP_6        = RATIFIED / CLOSED
+GAP_7        = RATIFIED / CLOSED
+BOOK_6       = FROZEN_ACCEPTED
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+BOOK_6_ACCEPTANCE_COMMIT        = 5f94c3f40cea4441470c57671f51454da7377361
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+CHOIR_PLAN_PRESERVED            = TRUE
+```
+
+## Not authorized and not performed
+
+Implementation; any source or test change; any branch or worktree creation; any
+mutation of the frozen accepted Book 6 worktree; any edit to the v0.4 record or
+any other ratified record; any retroactive rewrite or force-push; GAP-7 or
+GAP-1..5 reopening; Book 7 work; Choir work.
