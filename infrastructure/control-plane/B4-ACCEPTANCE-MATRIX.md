@@ -1367,3 +1367,93 @@ $0, capital authority none. SonarCloud and Kilo remain the only external checks
 and neither is a GitHub-required check, which is **not** merge authorization.
 **`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
 
+## X9 - LOSSLESS, VERSION-NORMALIZED SOURCE AUTHORITY
+
+Mission `B4-CXR7U9R48X9`. Corrects five X8 claims (see the full record,
+`B4-EVIDENCE-RECORD.md` section 17); X8's exact-site and occurrence authority
+stand as valid historical evidence.
+
+**The X8 blind spot, demonstrated before repair at `663f46b61`.** X8 kept the
+owner digest stable across 3.11/3.12 by DROPPING `type_params` as "merely
+interpreter metadata" and by emitting fields in the interpreter's `_fields`
+order. Both halves were defects. PEP 695 type parameters create a lexical
+scope visible inside the generic body, so `def f[os](): os.stat(path)` resolves
+`os` to the type parameter -- and the measured probes showed the digest
+unchanged (`dbb47ffe4249a39e...`), the binding walker reporting no `os`
+binding, the manifest and occurrence count unchanged, and the site still
+granted as `PROVEN_READ_ONLY_OR_PURE`; `hashlib`, `RecordSnapshot` and
+`_transitions_dir` shadows were granted the same way. Swapping two entries of
+`FunctionDef._fields` -- same values, same source -- moved the digest
+`c649a4c9df70b303...` -> `4953c178717f43fe...`, and an unknown `Call` field was
+silently ignored (digest identical for two different values while `ast.dump`
+moved). Every reproduction had a negative control.
+
+**The repair (R1).** The canonical serializer reads a frozen schema that
+INCLUDES `type_params` (and `bound`), with the `_INTERPRETER_FIELD_ADDITIONS`
+exception set removed entirely; emits fields in sorted-name order, never in
+`_fields` order; normalises a MISSING `type_params` to `[]` so a non-generic
+definition has one canonical value on 3.11 and 3.12 while a real non-empty
+parameter is serialised like any other content; RAISES
+`_UnreviewedAstFieldError` naming the node type and field when the interpreter
+carries a field outside the schema; and encodes as structured JSON with tagged
+scalars rather than undelimited fragments. All 35 digests were regenerated; the
+206-entry manifest is byte-identical to X8 (11,292 bytes), because its keys
+never used the serializer. Stated boundary: validated on CPython 3.11 and 3.12
+-- no arbitrary future-version independence is claimed.
+
+**The repair (R2).** `type-param` is part of the binding vocabulary; the walker
+reports every type-parameter name on `FunctionDef`, `AsyncFunctionDef` and
+`ClassDef`; and a classifier-level refusal computed from the measured binding
+inventory -- deliberately INDEPENDENT of the owner digest -- refuses any call
+whose callee or receiver is shadowed, naming the binding form and the shadowed
+name. `def f[os](): os.stat(...)` and the `hashlib`/constructor/internal
+variants are refused; with the exact-site gate neutralised the binding rule
+alone still refuses; a harmless `[T]` still moves the digest and withdraws
+every grant (a review decision). REAL PEP 695 syntax controls (N.G x4, N.H,
+N.I) are gated to 3.12+ and executed by b1 on 3.12.14; the 3.11 suite runs the
+exact synthetic shape instead and COMPARES it against the real parser on the
+runner, rather than assuming equivalence.
+
+**Measurements, unchanged from the X8 baseline** (the repair changed what the
+digest and walker can see, not what is authorized): 35 closure functions; 312
+reachable call sites; 206 manifest entries; 35 owner digests; 312/312 unique
+site identities; 0 missing, 0 surplus, 0 count-drift; **182 / 123 / 7 / 0**
+READ_ONLY / INTERNAL / MUTATION / UNKNOWN; 2 reachable mutation channels
+(`open`, `os.open`), all observing; 33 globally instrumented channels; 182/182
+READ_ONLY rows carrying a reason.
+
+**Validation.** Discrimination: **34 mutations / 98 pairs / 41 controls / 0
+vacuous / 0 skipped / 0 invalid**, with eight non-biting pairs reported
+individually alongside the mutation that discriminates each. Local
+R48R3+R48R4: **159 node IDs, 159 unique, 0 duplicates**; 150 passed, 9 skipped
+(3 platform-conditional + 6 real-PEP695 gated, which b1 executes). Module also
+runs 111 passed / 9 skipped in a SIMULATED 3.12 world on 3.11. R40 **34 passed
+/ 1 skipped**. Ruff `All checks passed!` on the changed file (13 pre-existing
+findings elsewhere, identical in count to baseline). `py_compile` OK; `git
+diff --check` clean; module pure LF.
+
+**Authoritative runs at the implementation head**
+`e42b2b4e8fb0e88eaea3d165ad5bd998b7f299ef` (tree
+`aadba62553d0691e5a3ab08128d9ea2912d8e1d0`): b1 `37241959812`, B1-I1R
+`37241962667`, b2 `37241959938`, b3 `37241959950`, b4 `37241959726` -- all
+`success`. No superseded head failed on this mission. The b1 artifact was read
+from its own files, not inferred from workflow colour: `tested_commit`
+`e42b2b4e8...`, `tested_tree` `aadba625...`; JUnit **758 collected / 758
+executed / 0 failed / 0 errors / 0 skipped**, 758 unique node IDs with **0
+duplicates**; 15 `L.*` + 6 `M.*` + 15 `N.*` all present and executed (including
+the six real PEP 695 controls on the runner's own parser); independent gate
+**75 / 75 checks ok** including "manifest hashes and sizes match final files";
+cleanup `{"cleanup": "ok", "disposable_removed": true}`; artifact fingerprint
+`Python 3.12.14`; cloud mutations 0, cost ZERO.
+
+**Scope: one test module and two Markdown files. `scripts/pg-recovery.py` is
+byte-identical across X9 (blob `6e322784beeed6c749fed0c9a0a1c67740b687ce`) --
+no production change**, because no independently demonstrated production defect
+required repair. No SonarCloud or Kilo suppression, exclusion, waiver or
+relabelling; no `NOSONAR`; no test deletion. No merge, no force push, no
+amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. Accounting: cloud mutations 0,
+broker mutations 0, capital mutations 0, execution mutations 0, recurring cost
+$0, capital authority none. **`MERGE_AUTHORIZED = false`.** PR #4 remains
+**open and unmerged**.
+

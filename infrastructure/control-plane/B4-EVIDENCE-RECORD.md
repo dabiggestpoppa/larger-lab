@@ -5122,3 +5122,235 @@ required it. Accounting: cloud mutations 0, broker mutations 0, capital
 mutations 0, execution mutations 0, recurring cost $0, capital authority none.
 No PR merge; `origin/main` untouched at
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`.
+## 17. X9 -- LOSSLESS, VERSION-NORMALIZED SOURCE AUTHORITY
+
+Mission `B4-CXR7U9R48X9`. Branch `oce-program-build`, PR #4. This section is a
+narrow post-X8 proof repair and it CORRECTS five X8 claims that do not hold as
+written (17.8). X8 itself remains valid historical evidence for what it
+actually proved: exact-site occurrence enforcement, duplicate-call refusal,
+ordinary assignment rebinding and module/constructor shadowing refusal, the
+3.11-versus-3.12 failure discovery, and zero-skip authoritative execution. Its
+CI was not fake -- its tests were real, executed, and the recorded failures
+were real property failures; what was incomplete was the proof boundary this
+section repairs.
+
+### 17.1 The X8 blind spot, demonstrated before repair
+
+Reproduced against the SHIPPED X8 implementation at `663f46b61`, from
+executable probes with negative controls rather than from reading the source.
+Real PEP 695 syntax does not parse on the local 3.11.9, so the field was
+presented in the exact shape CPython 3.12 sets on `FunctionDef._fields` (the
+3.12 runner additionally parses the real syntax; see 17.6/17.7).
+
+| # | reproduction | measured result |
+|---|---|---|
+| A | `def f[os](): os.stat(path)` -- owner digest with `type_params=[os]` | **unchanged**: `dbb47ffe4249a39e...`; the reviewed digest still matched |
+| B | binding inventory for `os` | **not reported**: no binding for `os` before or after |
+| C | manifest and occurrence count | **unchanged**: key present, reviewed count 1, observed count 1 |
+| D | classifier verdict for `os.stat` | **granted**: `PROVEN_READ_ONLY_OR_PURE` with `reason=reviewed dotted module call`, identical before and after |
+| E | reviewed constructor `RecordSnapshot`, module-level internal `_transitions_dir` | **both granted**: `reviewed pure constructor` / `INTERNAL_CALL`, digests unchanged |
+| F | swap `FunctionDef._fields[0:2]`, same values, same source | **digest moved**: `c649a4c9df70b303...` -> `4953c178717f43fe...`, field VALUES asserted identical (negative control) |
+| G | unknown meaning-bearing `Call` field `default_value`, two different values | **silently ignored**: digest identical for both while `ast.dump` moved (negative control); the M.A enumeration catches it only because a test enumerates |
+
+So the X8 owner-context proof consumed two things it did not control: which
+fields exist (`type_params` discarded) and in which order they sit
+(interpreter-provided `_fields`). PEP 695 type parameters create a lexical
+scope visible inside the generic body, so `def f[os](): os.stat(path)` resolves
+`os` to the TYPE PARAMETER while every string-matching rule kept matching and
+neither the digest nor the binding walker could see it.
+
+### 17.2 The corrected serialization law
+
+`_STABLE_AST_FIELDS` is now the canonical schema, and the exception set
+`_INTERPRETER_FIELD_ADDITIONS` is GONE -- there is no exclusion a future field
+can hide behind. `type_params` and `bound` are part of it. The serializer:
+
+1. **closes the field SET**: a field not in the schema raises
+   `_UnreviewedAstFieldError` naming the node type and the field, so an
+   interpreter-added field is RED until an operator reviews it, never silently
+   invisible;
+2. **fixes the field ORDER**: fields are emitted in sorted-name order, never in
+   `node._fields` order, so interpreter ordering cannot move the digest (F);
+3. **normalises the VALUE, not the field**: an interpreter whose nodes lack
+   `type_params` (3.11) synthesises `[]` and an interpreter that carries it
+   natively (3.12+) yields `[]` for a non-generic definition, so a non-generic
+   definition has ONE canonical form on both; a real non-empty parameter is
+   serialised like any other meaning-bearing content;
+4. **encodes structurally**: JSON with tagged scalars (`{"str": ...}`,
+   `{"bytes": ...}`, `{"none": true}`, ...), not undelimited concatenation, so
+   distinct trees cannot collide by juxtaposition;
+5. **keeps coordinates out**: line and column numbers are never emitted.
+
+All 35 frozen digests were regenerated; the exact-site manifest is untouched --
+verified byte for byte (11,292 bytes identical to X8), because its keys come
+from `_normalized_call_expression`, which never used the serializer. Stated
+boundary, exactly: **validated on CPython 3.11 and 3.12**. No arbitrary
+future-version independence is claimed; a new field or AST kind is a review
+decision, which is the point.
+
+### 17.3 Type-parameter binding authority
+
+`type-param` is part of the binding-form vocabulary, and the walker reports
+every type-parameter name on `FunctionDef`, `AsyncFunctionDef` and `ClassDef`
+(reading both the 3.12 `identifier` shape and the later expression shape). A
+classifier-level refusal computed from the measured binding inventory --
+deliberately INDEPENDENT of the owner digest -- refuses any call whose callee
+or receiver is shadowed, naming the binding form `type-param` and the shadowed
+name. The four required shapes were proven twice each: against the real engine
+source with the synthetic 3.12 shape (N.B), and through REAL PEP 695 syntax on
+the 3.12 runner (N.G, N.H). N.B additionally neutralises the exact-site gate
+and shows the binding rule ALONE still refuses, so the refusal is not a digest
+side effect. N.C proves the review-decision direction: a harmless parameter
+(`[T]`) moves the digest and withdraws every grant in the owner, while neither
+the shadow rule nor any string-matching rule has anything to say.
+
+### 17.4 Required proofs
+
+Each is an executable control. `M` are the serialization-law obligations, `N`
+the type-parameter authority obligations, `L` the preserved X8 obligations.
+
+| # | obligation | control |
+|---|---|---|
+| 1 | non-empty `type_params` changes the digest | M.B, N.C |
+| 2 | missing 3.11 `type_params` == 3.12 empty list | M.D, M.F, N.I |
+| 3 | `def f[os](): os.stat(...)` is refused | N.B, N.G, N.H |
+| 4 | a type parameter shadowing `hashlib` is refused | N.B, N.G, N.H |
+| 5 | a type parameter shadowing a reviewed constructor is refused | N.B, N.G, N.H |
+| 6 | a type parameter shadowing a module-level internal name is refused | N.B, N.G, N.H |
+| 7 | a harmless type parameter still withdraws authority (review decision) | N.C, M.B |
+| 8 | reordering `_fields` does not change the digest | N.D |
+| 9 | an unknown AST field fails closed with node type and field name | N.E, M.E |
+| 10 | removing `id`, `name`, `body`, `args`, `func`, `value`, `type_params` from the schema reddens controls | M.E (naming each), plus harness mutations |
+| 11 | line shifts stay digest-neutral | M.C |
+| 12 | column/indentation shifts stay digest-neutral | M.C |
+| 13 | statement reordering stays digest-sensitive | M.B |
+| 14 | receiver rebinding, module shadowing, duplication, addition stay sensitive | M.B, L.B-L.H |
+| 15 | the unchanged shipped engine still validates | N.F, L.I, L.J, L.O |
+| 16 | the manifest stays exact in both directions | L.J (206 entries, 0 missing, 0 surplus) |
+| 17 | mutation-observer coverage stays complete and non-vacuous | N.F, L.L, H.* |
+| 18 | every new control has a weakened implementation that fails it | X9 discrimination harness (17.6) |
+| 19 | the harness fails on a skipped, invalid or no-op mutation | harness fails on SKIP/no-op; measured 0 |
+
+### 17.5 Measurements
+
+Measured, not asserted. All totals are unchanged from the pre-X9 baseline, so
+the repair changed WHAT the digest and walker can see, not what is authorized.
+
+| quantity | value |
+|---|---|
+| closure functions | 35 |
+| reachable call sites | 312 |
+| exact-site manifest entries | 206 (byte-identical to X8) |
+| reviewed owner digests | 35 (all regenerated) |
+| site identities / unique | 312 / 312 |
+| duplicate site identities (count > 1) | 54 (recorded, not errors) |
+| missing / surplus manifest entries | 0 / 0 |
+| occurrence-count drift | 0 |
+| READ_ONLY / INTERNAL / MUTATION / UNKNOWN | 182 / 123 / 7 / 0 |
+| reachable mutation channels | 2 (`open`, `os.open`), all observing |
+| globally instrumented channels | 33 |
+| READ_ONLY rows carrying a reason | 182 / 182 |
+
+### 17.6 Validation
+
+* Reproductions A-G: executable, each with a negative control (17.1).
+* Discrimination harness (`x9_discrimination.py`): **34 mutations / 98 pairs /
+  41 controls / 0 vacuous / 0 skipped / 0 invalid**, `X9_DISCRIMINATION=PASS`.
+  Eight pairs are recorded as NOT biting, each with the mutation that does
+  discriminate it -- ordering, reported rather than hidden. The harness fails
+  on SKIPPED mutations, invalid (non-importing) mutants and no-op edits.
+* Local `R48R3 + R48R4` on 3.11.9: **159 node IDs collected, 159 unique, 0
+  duplicates**; 150 passed, 9 skipped (3 platform-conditional; 6 real-PEP695
+  controls that the 3.12 runner executes -- see 17.7).
+* The focused module alone: 120 collected, 111 passed, 9 skipped; the same
+  module also runs **111 passed / 9 skipped in a SIMULATED 3.12 world on
+  3.11** (patching `_fields` on the three classes before collection).
+* R40 state matrix: **34 passed, 1 skipped**.
+* Ruff on the touched file: `All checks passed!` (13 pre-existing findings
+  elsewhere in the tree, identical in count to the X8 baseline; untouched).
+* `py_compile` OK; `git diff --check` clean; the module is pure LF (0 CR).
+* Identity: X8 -> X9 is one test module, +915/-182; R1 is +378/-182 and R2 is
+  +537/-0. `scripts/pg-recovery.py` is **byte-identical** across X9 (blob
+  `6e322784beeed6c749fed0c9a0a1c67740b687ce` at both ends).
+
+### 17.7 Authoritative runs
+
+Implementation head
+`e42b2b4e8fb0e88eaea3d165ad5bd998b7f299ef`, tree
+`aadba62553d0691e5a3ab08128d9ea2912d8e1d0`, ladder
+`663f46b61` -> `c873b66b5` (X9R1) -> `e42b2b4e8` (X9R2):
+
+| workflow | run | conclusion |
+|---|---|---|
+| b1-local-ground-validation | 37241959812 | success |
+| B1-I1R Validation | 37241962667 | success |
+| b2-control-plane-validation | 37241959938 | success |
+| b3-worker-fabric-validation | 37241959950 | success |
+| b4-config-spine-validation | 37241959726 | success |
+
+No superseded head failed on this mission; the R1 intermediate was not pushed
+separately, so the only run head is the implementation head above.
+
+**b1 artifact verification for the implementation head**, read from the
+artifact files rather than inferred from workflow colour:
+
+* `tested_commit` = `e42b2b4e8fb0e88eaea3d165ad5bd998b7f299ef`;
+  `tested_tree` = `aadba62553d0691e5a3ab08128d9ea2912d8e1d0`.
+* JUnit: **758 collected / 758 executed / 0 failed / 0 errors / 0 skipped**;
+  758 unique full node IDs, **0 duplicates**.
+* X9 nodes: 15 `L.*` + 6 `M.*` + 15 `N.*` all present, none skipped. The 15
+  `N.*` nodes include the six REAL PEP 695 syntax controls (N.G x4, N.H, N.I),
+  executed on the runner's own parser.
+* Independent gate: **75 / 75 checks ok**, including "manifest hashes and sizes
+  match final files". Cleanup:
+  `{"cleanup": "ok", "disposable_removed": true}`.
+* The artifact's own environment fingerprint reports `Python 3.12.14`; cloud
+  mutations 0, cloud cost state ZERO.
+
+### 17.8 Corrections to the X8 record
+
+X8's manifest/occurrence authority and its interpreter discovery stand. The
+following X8 statements do NOT hold as written and are corrected here. This is
+an append-only correction: section 16 is preserved exactly as written, as the
+record of what was believed and measured at that time.
+
+* **"`type_params` is merely interpreter metadata."** Superseded. It is PEP
+  695 syntax: a real lexical scope over the generic definition's body.
+* **"It cannot change what a NAME in the owner means."** Superseded and
+  falsified by execution (17.1 A-E): `def f[os](): os.stat(path)` re-binds the
+  name the classifier matches as a module head, and the site was still granted.
+* **"Ignoring interpreter-added fields provides lossless source authority."**
+  Superseded. Discarding a meaning-bearing field is a LOSS of sensitivity, not
+  losslessness. Lossless now means representing the field and normalising the
+  VALUE (`[]` for a non-generic definition on either interpreter).
+* **"The serializer is interpreter-independent by construction" while
+  consuming interpreter-provided field order.** Superseded. The order came
+  from `ast.iter_fields`, so permuting `_fields` with identical values moved
+  the digest (17.1 F). The order is now controlled by the proof.
+* **"The owner digest changes on every relevant semantic edit."** True only
+  for the edits the frozen vocabulary could see. It was false for a PEP 695
+  type parameter, and the sentence is therefore corrected rather than
+  repeated; with `type_params` in the schema the claim is made true, and its
+  boundary (3.11/3.12, fail-closed on anything unreviewed) is now stated
+  instead of implied.
+
+Preserved as valid X8 history, not rewritten: the exact-site occurrence
+enforcement and its 206-entry manifest; duplicate-call refusal; ordinary
+assignment rebinding refusal; ordinary module/constructor/internal shadowing
+refusal through the owner digest; the discovery that `ast.dump` made the
+baseline interpreter-dependent and that the local digest equalled the runner's
+REVIEWED value; and the zero-skip authoritative execution that made the
+failure visible at all. The Sonar temporal-union correction is retained
+unchanged.
+
+### 17.9 Boundaries and authority
+
+No production recovery behaviour changed: `scripts/pg-recovery.py` is
+byte-identical, and no independently demonstrated production defect required
+it. Accounting: cloud mutations 0, broker mutations 0, capital mutations 0,
+execution mutations 0, recurring cost $0, capital authority none. No PR merge;
+`origin/main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. SonarCloud and Kilo are not
+suppressed, excluded, waived, downgraded or relabelled, and neither being a
+GitHub-required check is **not** merge authorization.
+**`MERGE_AUTHORIZED = false`.**
