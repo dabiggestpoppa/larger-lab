@@ -1,0 +1,241 @@
+{
+  "artifact": "unit_claim_truth_matrix",
+  "cases": [
+    {
+      "case_id": "static_mismatch_all_rows",
+      "conflict_class": "MISMATCH",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "SOL",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 1,
+      "durable_projection_created": false,
+      "field_path": [
+        "quantity_unit"
+      ],
+      "null_count": 0,
+      "pre_repair_ref": "BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json#red_reproduction.red_1_static_mismatch (COMMIT_SUCCEEDED, handoff exposed VERIFIED_NATIVE/SOL)",
+      "rows_inspected": 1
+    },
+    {
+      "case_id": "static_mixed_rows",
+      "conflict_class": "MIXED",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "SOL",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 2,
+      "durable_projection_created": false,
+      "field_path": [
+        "quantity_unit"
+      ],
+      "null_count": 0,
+      "pre_repair_ref": "BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json#red_reproduction.red_2_mixed_row_units (COMMIT_SUCCEEDED, static claim silently collapsed)",
+      "rows_inspected": 2
+    },
+    {
+      "case_id": "static_all_null",
+      "conflict_class": "ALL_NULL",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "SOL",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 0,
+      "durable_projection_created": false,
+      "field_path": [
+        "quantity_unit"
+      ],
+      "null_count": 1,
+      "rows_inspected": 1
+    },
+    {
+      "case_id": "static_partial_null_matching",
+      "committed_values": [
+        null,
+        "SOL"
+      ],
+      "current_measured": "COMMIT_SUCCEEDED",
+      "durable_projection_created": true,
+      "handoff_evidence": [
+        {
+          "field_path": [
+            "quantity_unit"
+          ],
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE",
+          "variability": null
+        }
+      ]
+    },
+    {
+      "case_id": "static_partial_null_conflict",
+      "conflict_class": "MISMATCH",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "SOL",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 1,
+      "durable_projection_created": false,
+      "field_path": [
+        "quantity_unit"
+      ],
+      "null_count": 1,
+      "rows_inspected": 2
+    },
+    {
+      "case_id": "static_matching_binding",
+      "committed_values": [
+        "SOL",
+        "SOL"
+      ],
+      "current_measured": "COMMIT_SUCCEEDED",
+      "durable_projection_created": true,
+      "handoff_evidence": [
+        {
+          "field_path": [
+            "quantity_unit"
+          ],
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE",
+          "variability": null
+        }
+      ]
+    },
+    {
+      "case_id": "unknown_rows_carry_lexeme",
+      "committed_values": [
+        "SOL"
+      ],
+      "current_measured": "COMMIT_SUCCEEDED",
+      "durable_projection_created": true,
+      "handoff_evidence": [
+        {
+          "field_path": [
+            "quantity_unit"
+          ],
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED",
+          "variability": null
+        }
+      ]
+    },
+    {
+      "case_id": "row_native_scalar_varying",
+      "committed_values": [
+        "SOL",
+        "BTC"
+      ],
+      "current_measured": "COMMIT_SUCCEEDED",
+      "durable_projection_created": true,
+      "handoff_evidence": [
+        {
+          "field_path": [
+            "quantity_unit"
+          ],
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED",
+          "variability": "ROW_NATIVE"
+        }
+      ]
+    },
+    {
+      "case_id": "nested_static_mixed_levels",
+      "conflict_class": "MIXED",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "BTC",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 2,
+      "durable_projection_created": false,
+      "field_path": [
+        "bids",
+        "item",
+        "quantity_unit"
+      ],
+      "null_count": 0,
+      "rows_inspected": 1
+    },
+    {
+      "case_id": "nested_row_native_levels",
+      "current_measured": "COMMIT_SUCCEEDED",
+      "durable_projection_created": true,
+      "handoff_evidence": [
+        {
+          "field_path": [
+            "asks",
+            "item",
+            "quantity_unit"
+          ],
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED",
+          "variability": "ROW_NATIVE"
+        },
+        {
+          "field_path": [
+            "bids",
+            "item",
+            "quantity_unit"
+          ],
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED",
+          "variability": "ROW_NATIVE"
+        }
+      ]
+    },
+    {
+      "case_id": "real_trade_static_mismatch",
+      "conflict_class": "MISMATCH",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "ETH",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 1,
+      "durable_projection_created": false,
+      "field_path": [
+        "quantity_unit"
+      ],
+      "fixture": "trade_valid.json",
+      "null_count": 0,
+      "rows_inspected": 1
+    },
+    {
+      "case_id": "real_liquidation_all_null",
+      "conflict_class": "ALL_NULL",
+      "conflict_type": "ProjectionUnitEvidenceConflict",
+      "current_measured": "COMMIT_REFUSED",
+      "declared_lexeme": "USDT",
+      "declared_state": "VERIFIED_NATIVE",
+      "distinct_lexeme_count": 0,
+      "durable_projection_created": false,
+      "field_path": [
+        "quantity_unit"
+      ],
+      "fixture": "liquidation_interval_aggregate.json",
+      "null_count": 1,
+      "rows_inspected": 1
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I16R2C",
+  "current_head": "bccbffe02f55199b8cf884932c1719d97cb74247",
+  "gate_id": "G4-13",
+  "law": "VERIFIED_NATIVE means ONLY: the declared provider-native lexeme is proven invariant across the committed projection evidence governed by the declaration, for the declared field or structural path. Mismatch, mixed distinct lexemes, and an all-null location are typed refusals before durable publication; a claim is never silently downgraded.",
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "summary": {
+    "all_null_refusals": 2,
+    "cases_total": 12,
+    "committed": 5,
+    "durable_projection_created_after_any_refusal": false,
+    "mismatch_refusals": 3,
+    "mixed_refusals": 2,
+    "nested_shape_proven": true,
+    "no_silent_downgrade": true,
+    "refused": 7,
+    "repaired_head": "bccbffe02f55199b8cf884932c1719d97cb74247",
+    "row_native_location_only": true,
+    "unknown_preserved": true
+  }
+}

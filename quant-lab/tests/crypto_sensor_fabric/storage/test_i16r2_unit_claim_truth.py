@@ -47,6 +47,7 @@ if SRC not in sys.path:
 from _sibling_import import load_sibling  # noqa: E402
 
 from crypto_sensor_fabric.storage import (  # noqa: E402
+    ProjectionSchemaDefinition,
     ProjectionUnitEvidenceConflict,
     SourceUnitState,
 )
@@ -70,11 +71,19 @@ SOL_ROW = {"price": 1.0, "qty": 1.0, "quantity_unit": "SOL"}
 BTC_ROW = {"price": 1.0, "qty": 1.0, "quantity_unit": "BTC"}
 
 
-def _stack(tmp_path: Path, *, schema_id: str, declarations, schema=None):
+def _stack(
+    tmp_path: Path, *, schema_id: str, declarations, schema=None, contract=None
+):
     lake = Lake(tmp_path / "lake")
-    _support._register_definition(
-        lake, schema_id=schema_id, declarations=declarations, schema=schema
+    definition = ProjectionSchemaDefinition(
+        schema_id,
+        "1.0.0",
+        schema if schema is not None else _support.R1_NATIVE_SCHEMA,
+        source_unit_evidence=declarations,
+        source_unit_contract=contract,
     )
+    lake.schemas.register(definition)
+    lake.schema_definition = definition
     return lake
 
 

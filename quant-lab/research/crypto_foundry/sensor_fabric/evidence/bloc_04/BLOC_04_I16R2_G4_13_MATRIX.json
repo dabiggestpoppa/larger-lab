@@ -1,0 +1,167 @@
+{
+  "artifact": "g4_13_unit_readiness_remeasurement",
+  "checkpoint": "SENSOR-B4-I16R2C",
+  "condition_11_basis": "real supported unit evidence is reachable through public contracts for every audited unit-shape class (registration + commit + handoff + public consumer), proven over supported fixtures offline",
+  "current_head": "bccbffe02f55199b8cf884932c1719d97cb74247",
+  "dimensions": [
+    {
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_g4_13_positive.py::TestEmitG4_13Matrix"
+      ],
+      "dimension": "SOURCE",
+      "result": "PASS",
+      "witness": {
+        "native_instrument": "BTC-USDT-PERP",
+        "parser_version": "1.0.0",
+        "projection_schema_id": "i16r2.real.g4-dims",
+        "projection_schema_version": "1.0.0",
+        "provider": "FIXTURE_PROVIDER_A",
+        "sensor_family": "MECHANICAL_TRADE",
+        "source_granularity": "1m",
+        "venue": "FIXTURE_VENUE_A"
+      }
+    },
+    {
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_g4_13_positive.py::TestEmitG4_13Matrix"
+      ],
+      "dimension": "TIME",
+      "result": "PASS",
+      "witness": {
+        "actual_end_field_publicly_available": true,
+        "actual_end_fixture_value_present": false,
+        "actual_start_field_publicly_available": true,
+        "actual_start_fixture_value_present": false,
+        "ingested_at": "2026-01-15T12:00:00+00:00",
+        "logical_time_range_end": "2026-01-15T23:59:00+00:00",
+        "logical_time_range_start": "2026-01-15T00:00:00+00:00",
+        "manifest_date_basis": "UNKNOWN",
+        "requested_end": "2026-01-15T23:59:00+00:00",
+        "requested_start": "2026-01-15T00:00:00+00:00",
+        "response_observed_at": "2026-01-15T12:00:00+00:00"
+      }
+    },
+    {
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_unit_claim_truth.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r2_unit_location.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r2_real_provider_units.py"
+      ],
+      "dimension": "UNIT",
+      "result": "PASS",
+      "sub_checks": {
+        "all_null_refusal": {
+          "result": "PASS",
+          "witness": "static_all_null + real_liquidation_all_null"
+        },
+        "claim_truth": {
+          "result": "PASS",
+          "witness": "static_matching_binding: every committed non-null value equals the declared lexeme; pre-repair counterexamples now refuse"
+        },
+        "mixed_row_refusal": {
+          "result": "PASS",
+          "witness": "static_mixed_rows + nested_static_mixed_levels refused"
+        },
+        "real_schema_population": {
+          "conflated_with_capability": false,
+          "finding": "no production code registers a ProjectionSchemaDefinition in this repository (exhaustive src search); registered schemas carrying source_unit_evidence = 0.  The registration path is validated by construction over supported-family fixtures (offline), so capability is proven and population is reported as zero.",
+          "result": "CAPABILITY_PROVEN_POPULATION_ZERO"
+        },
+        "row_nested_shape": {
+          "result": "PASS",
+          "witness": "nested structural paths resolve against the registered Arrow schema; nested_static_mixed_levels refuses; nested_row_native_levels exposes per-level locations"
+        },
+        "static_mismatch_refusal": {
+          "result": "PASS",
+          "witness": "static_mismatch_all_rows + real_trade_static_mismatch"
+        },
+        "unknown_preservation": {
+          "result": "PASS",
+          "witness": "unknown_rows_carry_lexeme commits with UNIT_UNVERIFIED and a null lexeme; no auto-promotion from row bytes"
+        }
+      },
+      "truth_matrix_ref": "BLOC_04_I16R2_UNIT_CLAIM_TRUTH_MATRIX.json",
+      "witness": "claim truth, refusal classes, nested/row-native shape and unknown preservation measured through the real commit path"
+    },
+    {
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_g4_13_positive.py::TestEmitG4_13Matrix"
+      ],
+      "dimension": "LINEAGE",
+      "result": "PASS",
+      "witness": {
+        "acquisition_blob_matches": true,
+        "acquisition_resolved": true,
+        "blob_metadata_resolved": true,
+        "filesystem_knowledge_used": false,
+        "manifest_resolved": true,
+        "projection_artifact_resolved": true,
+        "projection_schema_matches_batch": true
+      }
+    },
+    {
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_real_provider_units.py::TestConsumerContract::test_evidence_view_is_path_independent"
+      ],
+      "dimension": "PATH_INDEPENDENCE",
+      "result": "PASS",
+      "witness": {
+        "absolute_path_present_in_view": false,
+        "identical_public_view": true,
+        "roots_are_unrelated": true,
+        "view": {
+          "canonical_unit_decisions": 0,
+          "contract_state": "UNIT_EVIDENCE_DECLARED",
+          "entries": [
+            {
+              "classification": "STATIC_VERIFIED",
+              "field_path": [
+                "quantity_unit"
+              ],
+              "native_unit_lexeme": "BTC",
+              "state": "VERIFIED_NATIVE",
+              "variability": null
+            }
+          ],
+          "guessed_values": [],
+          "historical_contract_absent": false,
+          "no_unit_bearing_fields": false,
+          "row_native_locations": [],
+          "static_verified": [
+            {
+              "classification": "STATIC_VERIFIED",
+              "field_path": [
+                "quantity_unit"
+              ],
+              "native_unit_lexeme": "BTC",
+              "state": "VERIFIED_NATIVE",
+              "variability": null
+            }
+          ],
+          "unverified": []
+        }
+      }
+    },
+    {
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_real_provider_units.py::TestConsumerContract::test_probe_uses_only_public_contracts_and_no_filesystem"
+      ],
+      "dimension": "NEGATIVE_IMPORT",
+      "result": "PASS",
+      "witness": {
+        "absolute_root_literals": 0,
+        "filesystem_traversal_calls": 0,
+        "imports_outside_public_storage_and_typing": [],
+        "private_attribute_accesses": []
+      }
+    }
+  ],
+  "frozen_definition": "PASS when RawNormalizationBatch exposes sufficient source/timestamp/unit/lineage evidence for PIT normalization without filesystem/path assumptions (bloc_04/06_ACCEPTANCE_TESTS_AND_STAGED_IMPLEMENTATION_COMMITS.md §G4-13)",
+  "gate_id": "G4-13",
+  "overall": "PASS",
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}
