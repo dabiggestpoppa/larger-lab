@@ -1,0 +1,128 @@
+{
+  "authority_trace": {
+    "durable_authority": "ProjectionSchemaDefinition registered in the T0B projection schema registry; declarations are covered by the schema fingerprint and validated on every registry reload",
+    "forbidden_sources_used": [],
+    "handoff_path": "Bloc5Handoff.to_batch resolves the batch's projection_schema_id@version and copies the durable source_unit_evidence verbatim",
+    "independent_probe_check": "the consumer re-resolves the schema from the registry and compares (resolved_schema_declaration_matches_batch)"
+  },
+  "cases": [
+    {
+      "canonical_unit_decisions": 0,
+      "case": "known_native_unit",
+      "declared_entries": [
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE"
+        }
+      ],
+      "durable_schema_declaration_matches_batch": true,
+      "guessed_values": [],
+      "probe_entries": [
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE"
+        }
+      ],
+      "probe_reachable": true,
+      "registry_match": true,
+      "schema_id": "i16r1.units.known"
+    },
+    {
+      "canonical_unit_decisions": 0,
+      "case": "unit_unverified",
+      "declared_entries": [
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED"
+        }
+      ],
+      "durable_schema_declaration_matches_batch": true,
+      "guessed_values": [],
+      "probe_entries": [
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED"
+        }
+      ],
+      "probe_reachable": true,
+      "registry_match": true,
+      "schema_id": "i16r1.units.unknown"
+    },
+    {
+      "canonical_unit_decisions": 0,
+      "case": "multiple_unit_bearing_fields",
+      "declared_entries": [
+        {
+          "field_name": "metric_unit",
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED"
+        },
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE"
+        }
+      ],
+      "durable_schema_declaration_matches_batch": true,
+      "guessed_values": [],
+      "probe_entries": [
+        {
+          "field_name": "metric_unit",
+          "native_unit_lexeme": null,
+          "state": "UNIT_UNVERIFIED"
+        },
+        {
+          "field_name": "quantity_unit",
+          "native_unit_lexeme": "SOL",
+          "state": "VERIFIED_NATIVE"
+        }
+      ],
+      "probe_reachable": true,
+      "registry_match": true,
+      "schema_id": "i16r1.units.multi"
+    },
+    {
+      "canonical_unit_decisions": 0,
+      "case": "declared_no_unit_fields",
+      "declared_entries": [],
+      "durable_schema_declaration_matches_batch": true,
+      "guessed_values": [],
+      "probe_entries": [],
+      "probe_reachable": true,
+      "registry_match": true,
+      "schema_id": "i16r1.units.undeclared"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I16R1C",
+  "current_head": "ed7137f12345c7d15d55ea1e6f5332234497714d",
+  "dimension_results": {
+    "LINEAGE": "PASS",
+    "NEGATIVE_IMPORT": "PASS",
+    "PATH_INDEPENDENCE": "PASS",
+    "SOURCE": "PASS",
+    "TIME": "PASS",
+    "UNIT": "PASS"
+  },
+  "gate_id": "G4-13",
+  "historical_context": {
+    "i16_gap_id": "I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP",
+    "i16_negative_artifact": "BLOC_04_I16_BLOC4_READINESS.json",
+    "i16_negative_preserved": true,
+    "repair_commits": [
+      "SENSOR-B4-I16R1A (audit + RED contract tests)",
+      "SENSOR-B4-I16R1B (durable contract + handoff wiring)"
+    ]
+  },
+  "matrix": "unit_handoff",
+  "measured_case_count": 4,
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "result": "PASS",
+  "schema": "sensor_fabric_evidence_matrix_v1"
+}

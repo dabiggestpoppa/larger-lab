@@ -139,7 +139,13 @@ def _register_definition(
 
 
 def _commit_projection(lake, *, projection_id: str = "proj-r1", rows):
-    sha = lake.seed_blob()
+    # The raw source payload carries a unit-looking string on purpose: R1
+    # proves that unit EVIDENCE comes from the durable schema contract, not
+    # from a byte search (the no-guess proof).
+    sha = lake.seed_blob(
+        b'{"rows":[{"price":1.0,"qty":1.0,"quantity_unit":"SOL"}],'
+        b'"ts":1700000000}'
+    )
     lake.seed_acquisition(sha, "acq-r1")
     lake.projection_service.commit_projection(
         rows=rows,

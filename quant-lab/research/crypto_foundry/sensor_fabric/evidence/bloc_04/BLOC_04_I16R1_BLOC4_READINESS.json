@@ -1,0 +1,111 @@
+{
+  "bloc_5_consumer_module": "i16r1_bloc5_consumer_probe.py",
+  "checkpoint": "SENSOR-B4-I16R1C",
+  "current_head": "ed7137f12345c7d15d55ea1e6f5332234497714d",
+  "dimension_reachability": {
+    "LINEAGE": true,
+    "NEGATIVE_IMPORT": true,
+    "PATH_INDEPENDENCE": true,
+    "SOURCE": true,
+    "TIME": true,
+    "UNIT": true
+  },
+  "dimensions_missing": [],
+  "frozen_definition": "PASS when RawNormalizationBatch exposes sufficient SOURCE / TIMESTAMP / UNIT / LINEAGE evidence for PIT normalization WITHOUT filesystem/path assumptions",
+  "gap_status": {
+    "closed_by": "SENSOR-B4-I16R1B",
+    "gap_id": "I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP",
+    "status": "CLOSED"
+  },
+  "gate_id": "G4-13",
+  "lineage_proof": {
+    "chain": "batch -> acquisition -> blob -> projection -> revision",
+    "path_parsing_used": false,
+    "private_map_used": false,
+    "reachable_via": "public repositories only"
+  },
+  "measured_case_count": 10,
+  "negative_import_check": {
+    "absolute_root_references": 0,
+    "consumer_imports_only_public_storage": true,
+    "filesystem_traversal_calls": 0,
+    "private_api_accesses": 0
+  },
+  "path_independence": {
+    "absolute_path_in_view": false,
+    "consumer_logic_unchanged": true,
+    "evidence_views_identical": true,
+    "two_distinct_roots_compared": true
+  },
+  "platform": {
+    "os": "nt",
+    "python": "3.11.9"
+  },
+  "production_authority": "storage.models.SourceUnitEvidence + storage.projection_schema.ProjectionSchemaDefinition source_unit_evidence + storage.replay.Bloc5Handoff.to_batch + storage.query.RawEvidenceQueryService (public contract surface only)",
+  "result": "PASS",
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "supersedes": "BLOC_04_I16_BLOC4_READINESS.json (historical negative measurement, preserved unchanged)",
+  "timestamp_proof": {
+    "actual_end": {
+      "field_publicly_available": true,
+      "fixture_value_present": false,
+      "wording_correction": "FIELD_PUBLICLY_AVAILABLE=true; FIXTURE_VALUE_PRESENT=false (I16R1 §18)"
+    },
+    "actual_start": {
+      "field_publicly_available": true,
+      "fixture_value_present": false,
+      "wording_correction": "FIELD_PUBLICLY_AVAILABLE=true; FIXTURE_VALUE_PRESENT=false (I16R1 §18)"
+    },
+    "canonical_pit_semantics_added": false,
+    "preserved_facts": [
+      "actual_end_field_publicly_available",
+      "actual_end_fixture_value_present",
+      "actual_start_field_publicly_available",
+      "actual_start_fixture_value_present",
+      "ingested_at",
+      "logical_time_range_end",
+      "logical_time_range_start",
+      "request_started_at",
+      "requested_end",
+      "requested_start",
+      "response_observed_at"
+    ],
+    "reachable_via": "RawNormalizationBatch logical range + AcquisitionRecord + PartitionManifest.date_basis",
+    "structurally_absent_facts": [
+      "provider_time_raw",
+      "provider_time_parsed",
+      "provider_time_unit_assumption",
+      "provider_publication_time"
+    ]
+  },
+  "unit_proof": {
+    "known_case": {
+      "lexeme_available": true,
+      "native_unit_lexeme": "SOL",
+      "state": "VERIFIED_NATIVE"
+    },
+    "multi_field_case": {
+      "entry_count": 2,
+      "unverified_fields": [
+        "metric_unit"
+      ],
+      "verified_fields": [
+        "quantity_unit"
+      ]
+    },
+    "public_export_proof": [
+      "SourceUnitState",
+      "SourceUnitEvidence",
+      "RawNormalizationBatch.source_unit_evidence"
+    ],
+    "raw_bytes_contain_unit_string": true,
+    "raw_bytes_count_as_proof": false,
+    "reachable": true,
+    "row_content_count_as_proof": false,
+    "unknown_case": {
+      "guessed_values": [],
+      "native_unit_lexeme": null,
+      "state": "UNIT_UNVERIFIED"
+    }
+  }
+}
