@@ -4482,71 +4482,155 @@ def test_m_c_the_digest_ignores_coordinates_and_indentation():
         "this control discriminates nothing")
 
 
-def test_m_d_an_interpreter_added_field_cannot_move_the_digest():
-    """M.D The exact defect, reproduced and refused.
+def _present_type_params(node, value):
+    """Make `type_params` present the way THIS interpreter would carry it.
 
-    The simulation patches `_fields`, because that is the MECHANISM: CPython
-    3.12 appended `type_params` to the class's `_fields`, and `ast.dump`
-    iterates `_fields`. An earlier draft of this control attached a bare
-    attribute instead, observed that `ast.dump` was unchanged, and would have
-    certified the fix while reproducing nothing at all.
+    On 3.12 and later the field is NATIVE, and the defect is observable
+    directly. On 3.11 it has to be simulated by appending it to the class's
+    `_fields`, which is the MECHANISM: `ast.dump` iterates `_fields`, and
+    appending the name is exactly what 3.12 did.
+
+    The first version of M.D demanded `type_params` be ABSENT, so it passed on
+    the interpreter that had the defect and FAILED on the interpreter that did
+    not -- it asserted the wrong shape of the world and reddened the very
+    runner it was written to defend. Returns `(saved_fields, synthetic)`.
+    """
+    original = ast.FunctionDef._fields
+    synthetic = "type_params" not in original
+    prior = (hasattr(node, "type_params"),
+             getattr(node, "type_params", None))
+    if synthetic:
+        ast.FunctionDef._fields = original + ("type_params",)
+    node.type_params = value
+    return (original, synthetic, prior)
+
+
+def _restore_type_params(node, saved):
+    """Undo `_present_type_params` exactly, native case included.
+
+    Returning the class to its own `_fields` is not enough where the field is
+    NATIVE: the test's value would stay on the shared node. The prior attribute
+    state is restored too, so no control can observe another's residue.
+    """
+    original, synthetic, (had, prior) = saved
+    ast.FunctionDef._fields = original
+    if synthetic or not had:
+        if hasattr(node, "type_params"):
+            del node.type_params
+    else:
+        node.type_params = prior
+
+
+def test_m_d_an_interpreter_added_field_cannot_move_the_digest():
+    """M.D The exact defect, reproduced and refused, on ANY interpreter.
+
+    `ast.dump` -- the implementation this replaced -- must move when the field
+    changes, or the control reproduces nothing; and the shipped digest must
+    not. Both halves hold whether the running interpreter carries the field
+    natively or has to be made to carry it.
     """
     funcs, _closure = _authority_closure(ast.parse(_engine_source()))
     node = funcs["_acquire_recovery_authority"]
-    original = ast.FunctionDef._fields
-    assert "type_params" not in original, (
-        "this interpreter already carries the 3.12 field, so the simulation "
-        "is unnecessary and this control would be vacuous")
-    saved = _owner_ast_digest(node)
-    saved_dump = ast.dump(node, annotate_fields=True, include_attributes=False)
+    clean = _owner_ast_digest(node)          # no type_params at all
+    param = ast.Name(id="T", ctx=ast.Load())
+    saved = _present_type_params(node, [])
     try:
-        ast.FunctionDef._fields = original + ("type_params",)
-        node.type_params = []
-        moved = _owner_ast_digest(node)
-        moved_dump = ast.dump(node, annotate_fields=True,
+        empty_digest = _owner_ast_digest(node)
+        empty_dump = ast.dump(node, annotate_fields=True,
                               include_attributes=False)
+        node.type_params = [param]
+        filled_digest = _owner_ast_digest(node)
+        filled_dump = ast.dump(node, annotate_fields=True,
+                               include_attributes=False)
     finally:
-        ast.FunctionDef._fields = original
-        del node.type_params
-    # Negative control: the simulation is faithful, so the proof means
-    # something. `ast.dump` -- the implementation this replaced -- DOES move.
-    assert moved_dump != saved_dump, (
-        "patching `_fields` did not change `ast.dump`, so this control does "
-        "not reproduce the defect it claims to")
-    # The obligation: the shipped digest does NOT move.
-    assert moved == saved, (
+        _restore_type_params(node, saved)
+    # Negative control: the mechanism is live, so the second assertion means
+    # something rather than being satisfied by a dead simulation.
+    assert filled_dump != empty_dump, (
+        "changing the version field did not change `ast.dump`, so this "
+        "control does not reproduce the defect it claims to")
+    # The obligation: the reviewed digest cannot be moved that way.
+    assert filled_digest == empty_digest, (
         "an interpreter-added AST field moved the reviewed digest, so the "
         "baseline is a function of the interpreter again")
-    # And the simulation left nothing behind.
-    assert _owner_ast_digest(node) == saved, "the control leaked a mutation"
+    # And nothing leaked into the tree the other controls share.
+    assert _owner_ast_digest(node) == clean, "the control leaked a mutation"
 
 
 def test_m_e_the_vocabulary_is_what_makes_that_immunity_real(monkeypatch):
-    """M.E Admitting the version field reddens M.D -- the guards are load-bearing.
+    """M.E The immunity M.D reports comes from the vocabulary, not by accident.
 
-    M.D shows the digest ignores `type_params`. On its own that is equally
+    M.D shows the digest ignores `type_params`; on its own that is equally
     consistent with the digest ignoring EVERYTHING, which is why M.B exists.
-    This control closes the loop the other way: make the vocabulary READ the
-    version field and the digest moves again, so the immunity M.D reports is
-    produced by `_STABLE_AST_FIELDS` and not by accident.
+    This control closes the loop the other way, and in BOTH directions, on
+    whichever interpreter is running: with the shipped vocabulary an edit to
+    the version field is invisible, and with the field admitted the SAME edit
+    moves the digest. That difference is the whole proof.
     """
     funcs, _closure = _authority_closure(ast.parse(_engine_source()))
     node = funcs["_acquire_recovery_authority"]
-    original = ast.FunctionDef._fields
-    saved_dump = ast.dump(node, annotate_fields=True, include_attributes=False)
+    param = ast.Name(id="T", ctx=ast.Load())
+
+    def digest_before_and_after_the_edit():
+        saved = _present_type_params(node, [param])
+        try:
+            before = _owner_ast_digest(node)
+            node.type_params = []
+            after = _owner_ast_digest(node)
+        finally:
+            _restore_type_params(node, saved)
+        return before, after
+
+    blind_before, blind_after = digest_before_and_after_the_edit()
+    assert blind_before == blind_after, (
+        "the SHIPPED vocabulary read the version field, so the digest is "
+        "interpreter-dependent again and M.D proves nothing")
+
     monkeypatch.setattr(sys.modules[__name__], "_STABLE_AST_FIELDS",
                         _STABLE_AST_FIELDS | {"type_params"})
-    saved = _owner_ast_digest(node)
+    loud_before, loud_after = digest_before_and_after_the_edit()
+    assert loud_before != loud_after, (
+        "admitting the version field to the vocabulary did NOT move the "
+        "digest, so the vocabulary is not what protects it and M.D's immunity "
+        "comes from somewhere the proof does not name")
+
+
+def test_m_f_the_frozen_digests_validate_under_the_3_12_ast_shape():
+    """M.F The frozen literals must hold on the interpreter b1 actually uses.
+
+    Every frozen digest was GENERATED on 3.11.9. b1 runs 3.12.14. A literal
+    that validates only where it was made is not evidence, and this module has
+    already been red once for exactly that reason.
+
+    So this control puts the running interpreter into the 3.12 shape -- where
+    `type_params` is present on FunctionDef, AsyncFunctionDef and ClassDef --
+    and then re-runs the comparison that FAILED on the runner: every frozen
+    owner digest, and the whole closed-world audit, against the shipped
+    engine.
+
+    Stated boundary, because it matters: this faithfully reproduces the one
+    documented 3.12 AST change that caused the failure. It cannot prove there
+    are no OTHER 3.12 AST differences, and it does not claim to. The authority
+    for that is the b1 run on 3.12 itself.
+    """
+    saved_fields = [(cls, cls._fields) for cls in
+                    (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)]
     try:
-        ast.FunctionDef._fields = original + ("type_params",)
-        node.type_params = []
-        moved = _owner_ast_digest(node)
-        moved_dump = ast.dump(node, annotate_fields=True,
-                              include_attributes=False)
+        for cls, fields in saved_fields:
+            cls._fields = fields + ("type_params",)
+        source = _engine_source()
+        tree = ast.parse(source)
+        funcs, closure = _authority_closure(tree)
+        mismatched = sorted(
+            owner for owner in closure
+            if _owner_ast_digest(funcs[owner])
+            != REVIEWED_OWNER_DIGESTS.get(owner))
+        assert not mismatched, (
+            "frozen digests are interpreter-dependent; these owners moved "
+            "under the 3.12 AST shape: " + repr(mismatched))
+        _assert_closed_world(source, label="engine under the 3.12 AST shape")
     finally:
-        ast.FunctionDef._fields = original
-        del node.type_params
-    assert moved_dump != saved_dump, "the simulation is not faithful here"
-    assert moved != saved, (
-        "reading the version field did NOT move the digest, so M.D's immunity "
-        "is not produced by the vocabulary and M.D proves nothing")
+        for cls, fields in saved_fields:
+            cls._fields = fields
+    # The simulation left nothing behind: the real 3.11 shape still validates.
+    _assert_closed_world(_engine_source())
