@@ -3054,3 +3054,96 @@ Implementation; any source or test change; any branch or worktree creation; any
 mutation of the frozen accepted Book 6 worktree; any edit to the v0.4 record or
 any other ratified record; any retroactive rewrite or force-push; GAP-7 or
 GAP-1..5 reopening; Book 7 work; Choir work.
+
+---
+
+# CSIA — SENSOR REGRESSION BASELINE PINNED
+
+**Date:** 2026-10-04
+**Decision id:** none. Operator-directed measurement; ratifies no policy.
+**Status:** `PINNED — VERIFIED MEASUREMENT`
+**Implementation authority:** `FALSE`
+
+## The pin
+
+```text
+PINNED_TO     = 5f94c3f40cea4441470c57671f51454da7377361
+PINNED_BRANCH = agent/crypto-systems-intelligence-atlas-book6-build
+COMMAND       = python -m pytest tests/crypto_sensor_fabric -q   (from quant-lab/)
+
+SENSOR_COLLECTED = 2343
+SENSOR_PASSED    = 2325
+SENSOR_FAILED    =   14
+SENSOR_SKIPPED   =    4
+SENSOR_XFAILED   =    0
+OBSERVED_DURATION = 197.56s
+MATCHES_RECORDED_BASELINE = TRUE
+```
+
+## Two corrections recorded
+
+```text
+CORRECTION_1  the 14 are FAILURES, not xfails
+              corpus wording: "2325 PASS / 14 FAIL / 4 SKIPPED; the 14 are the
+              known canonical set". An xfail reading would have produced a
+              freeze gate that CANNOT fail, because an xfail is absorbed by a
+              green run and 14 unexpected failures would still satisfy it.
+
+CORRECTION_2  the baseline is a CSIA-LINEAGE measurement, not a sensor-branch one
+              CSIA lineage (both planning and book6-build) collects 2343
+              sensor branch a4ee26379 collects 2850
+              sensor branch e8d1384d9 (tip)  collects 3353
+```
+
+The framing correction is the substantive one. Pinning to a sensor-programme
+commit, as the request proposed, would have bound a CSIA freeze gate to a commit
+the CSIA freeze never referenced, and would have silently replaced 2343 with
+3353.
+
+## Freeze is now verifiable, not asserted
+
+```text
+SENSOR_TESTS_TREE_FILES  = 215
+SENSOR_TESTS_TREE_SHA256 = a3a99657117c0238a0f635c19dde8a7f8e5ab3575c8bac6b334fa3e7254b0fd5
+SENSOR_SRC_TREE_FILES    = 112
+SENSOR_SRC_TREE_SHA256   = b16a148e5ac05ca148bf6bd60af4be6ff72b1fbc95e118dafdbcf7f24c6b2081
+
+IDENTICAL_ON_BOTH_CSIA_LINEAGES = TRUE   (215/215 files, 0 differ, CRLF-normalised)
+SENSOR_FREEZE_VERIFIABLE_WITHOUT_RUNNING_TESTS = TRUE   (~1s fast path)
+CRLF_NORMALISATION_MANDATORY = TRUE   (raw diff reports every file as differing;
+                                      0 files actually differ once normalised)
+```
+
+The 14 canonical failures are named individually in the pin artifact, so the
+gate is "exactly these 14 fail; no others", not merely "14 fail".
+
+## Effect on the consolidated review
+
+Criterion 12 `SENSOR_FREEZE_PRESERVABLE` was the only criterion resting on an
+unverified figure. It now rests on a reproduced measurement and a named commit.
+**No criterion changed value: the review remains 12 / 12 TRUE.** One criterion
+gained evidence.
+
+```text
+CRITERIA_TOTAL = 12 / 12 TRUE   (unchanged)
+CRITERION_12_EVIDENCE_STATUS = WAS_ASSERTED -> NOW_VERIFIED
+```
+
+## Unchanged by this entry
+
+```text
+GAP_1..GAP_7 = CLOSED / RATIFIED
+BOOK_6       = FROZEN_ACCEPTED
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+BOOK_6_ACCEPTANCE_COMMIT        = 5f94c3f40cea4441470c57671f51454da7377361
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Not authorized and not performed
+
+Implementation; any source or test change; any branch or worktree creation; any
+mutation of the frozen accepted Book 6 worktree (read-only suite run only, 0
+drift); any sensor source change; any ratified record edit; GAP reopening;
+Book 7 or Choir work.

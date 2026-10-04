@@ -3644,3 +3644,70 @@ CSIA_BOOK_6_COMPARISON_CHANGE_GAP6_READINESS_REVIEW_v0.3.md         PASS 12/12
 **Not authorized and not performed:** implementation; any source or test change;
 any branch or worktree creation; any mutation of the frozen accepted Book 6
 worktree; any edit to any ratified record; Book 7 or Choir work.
+
+---
+
+# SENSOR BASELINE PINNED — LEDGER UPDATE
+
+**Date:** 2026-10-04
+**Decision id:** none. Operator-directed measurement.
+
+## Standing state change
+
+```text
+SENSOR_REGRESSION_BASELINE_PINNED      = TRUE
+SENSOR_REGRESSION_BASELINE_PINNED_TO   = 5f94c3f40cea4441470c57671f51454da7377361
+SENSOR_REGRESSION_BASELINE_CANONICAL   = 2325 passed / 14 failed / 4 skipped
+SENSOR_BASELINE_IS_A_CSIA_LINEAGE_MEASUREMENT = TRUE
+SENSOR_BASELINE_REPIN_REQUIRED         = FALSE
+```
+
+## What the last open soft spot in the ledger was, and is now
+
+Before this session the consolidated authorization review carried exactly one
+criterion resting on an unverified, operator-supplied figure — criterion 12,
+the sensor freeze. It is now measured, pinned, and machine-verifiable.
+
+```text
+CRITERION_12 = SENSOR_FREEZE_PRESERVABLE = TRUE
+CRITERION_12_EVIDENCE = WAS_ASSERTED -> NOW_REPRODUCED_EXACTLY
+REVIEW_SCORE = 12 / 12 TRUE  (unchanged; no criterion flipped)
+UNVERIFIED_FIGURES_REMAINING_IN_THE_REVIEW = 0
+```
+
+## Freeze verification is now cheap
+
+```text
+SENSOR_TESTS_TREE_SHA256 = a3a99657117c0238a0f635c19dde8a7f8e5ab3575c8bac6b334fa3e7254b0fd5  (215 files)
+SENSOR_SRC_TREE_SHA256   = b16a148e5ac05ca148bf6bd60af4be6ff72b1fbc95e118dafdbcf7f24c6b2081  (112 files)
+IDENTICAL_ON_BOTH_CSIA_LINEAGES = TRUE
+SENSOR_FREEZE_CHECK_COST = ~1s (vs ~200s for the full suite)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_SENSOR_REGRESSION_BASELINE_PIN_v0.1.md          PINNED
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1.md   (section 7.2 corrected)
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PACKET_v0.1.md   (section 7 corrected)
+CSIA_OPERATOR_DECISION_LOG.md                             (this entry)
+```
+
+## Next operator action — UNCHANGED
+
+```text
+1. Read   CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1.md
+2. Select exactly one:
+     BOOK6-IMPL-CONSOLIDATED-v0.1 = AUTHORIZE_OFFLINE_IMPLEMENTATION
+                                   | HOLD
+```
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**Not authorized and not performed:** implementation; any source or test change;
+any branch or worktree creation; any mutation of the frozen accepted Book 6
+worktree; any sensor source change; Book 7 or Choir work.
