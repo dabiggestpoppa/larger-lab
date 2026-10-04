@@ -22,6 +22,7 @@ methodology identity against it.
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Final
 
 from .book6_coverage_rules import CoverageRuleRegistry
@@ -33,12 +34,48 @@ from .book6_methodology import (
 from .book6_normalization import NormalizationRule
 from .book6_predicates import PredicateRegistry
 from .book6_provenance import Book6Provenance, Book6ProvenanceError
-from .book6_records import MeasurementObservation, validate_against_definition
+from .book6_records import (
+    MeasurementObservation,
+    MeasurementRecordError,
+    validate_against_definition,
+)
 from .book6_states import StateRule, StateRuleRegistry
 
 
 class Book6RegistryError(ValueError):
     """A Book 6 registry operation is invalid."""
+
+
+class CurrentnessRefusal(str, Enum):
+    """Why ``resolve_current`` refused, in ratified resolver order.
+
+    The vocabulary is closed. Review v0.4 lists exactly these seven authority
+    refusals plus REGISTRATION; no entry reads ``ObservationStatus``, and no
+    entry names a registration policy -- GAP-7 governs none.
+    """
+
+    NOT_REGISTERED = "NOT_REGISTERED"
+    LINEAGE_INVALID = "LINEAGE_INVALID"
+    NOT_TERMINAL = "NOT_TERMINAL"
+    DEFINITION_UNKNOWN = "DEFINITION_UNKNOWN"
+    STRUCTURE = "STRUCTURE"
+    METHODOLOGY_CURRENT = "METHODOLOGY_CURRENT"
+    SOURCE_CLAIMS_ABSENT = "SOURCE_CLAIMS_ABSENT"
+    SOURCE_CLAIMS_STALE = "SOURCE_CLAIMS_STALE"
+
+
+class Book6CurrentnessError(Book6RegistryError):
+    """A measurement has no current authoritative measurement.
+
+    Subclasses :class:`Book6RegistryError` so every existing caller that catches
+    the general registry error keeps working, while the new ``reason`` attribute
+    lets the ratified test contract assert WHICH gate refused rather than merely
+    that something did.
+    """
+
+    def __init__(self, reason: CurrentnessRefusal, message: str) -> None:
+        super().__init__(message)
+        self.reason = reason
 
 
 class Book6MeasurementRegistry:
@@ -245,24 +282,108 @@ class Book6MeasurementRegistry:
     def resolve_current(self, measurement_id: str) -> MeasurementObservation:
         """Resolve a measurement's CURRENT authority against live Book 2 state.
 
+        Executed in the ratified resolver order (clarification v0.3 §8). Every
+        step runs for every record. There is no authority-bearing early return,
+        and no special bypass for non-value-bearing observations:
+
+            1  registered lookup
+            2  lineage validity
+            3  terminality
+            4  definition lookup
+            5  structural validation
+            6  methodology authority
+            7  require source_claim_refs != ()
+            8  resolve every cited Book 2 claim as current
+            9  return record
+
+        The previous early return for non-value-bearing observations is GONE. It
+        let a source-less missingness record reach step 9 by skipping steps 2-8
+        entirely, which is exactly what NV-B forbids.
+
         Fails closed when any cited Book 2 claim is unknown, non-current, or has
         detached evidence. The record itself is never mutated or removed — a
-        decayed measurement remains registered history.
+        decayed measurement remains registered history, and a refused one is
+        refused again identically for as long as the cause persists.
         """
 
-        observation = self.registered_measurement(measurement_id)
-        if not observation.is_value_bearing:
-            return observation
-        self.require_methodology(observation.methodology_identity)
+        # 1. registered lookup
+        try:
+            observation = self.registered_measurement(measurement_id)
+        except Book6RegistryError as exc:
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.NOT_REGISTERED, str(exc)
+            ) from exc
+
+        # 2. lineage validity -- a branched lineage may never resolve current.
+        #    Scope is PER_RECORD: only THIS record's own successor set is judged,
+        #    so B and C in a branched family are unaffected (TERM-6).
+        if not self.lineage_is_valid(measurement_id):
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.LINEAGE_INVALID,
+                f"measurement {measurement_id} has a branched lineage; "
+                f"supersession must be linear for current authority",
+            )
+
+        # 3. terminality -- superseded means not current, permanently (TERM-5).
+        if not self.is_terminal(measurement_id):
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.NOT_TERMINAL,
+                f"measurement {measurement_id} has been superseded and is not "
+                f"terminal; a superseded predecessor never resurrects",
+            )
+
+        # 4. definition lookup
+        definition = self._definitions.get(observation.metric_definition_ref)
+        if definition is None:
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.DEFINITION_UNKNOWN,
+                f"measurement {measurement_id} cites unregistered metric "
+                f"definition {observation.metric_definition_ref}",
+            )
+
+        # 5. structural validation, re-resolved against the live definition
+        try:
+            validate_against_definition(observation, definition)
+        except MeasurementRecordError as exc:
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.STRUCTURE,
+                f"measurement {measurement_id} fails structural validation: {exc}",
+            ) from exc
+
+        # 6. methodology authority
+        try:
+            self.require_methodology(observation.methodology_identity)
+        except Book6RegistryError as exc:
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.METHODOLOGY_CURRENT,
+                f"measurement {measurement_id} methodology "
+                f"{observation.methodology_identity!r} is not current: {exc}",
+            ) from exc
+
+        # 7. NV-B: source-less records are constructible, registrable and
+        #    queryable as history, but never current-authoritative. This holds
+        #    for ALL missingness states, with no per-state split (NV-C not
+        #    adopted).
+        if not observation.source_claim_refs:
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.SOURCE_CLAIMS_ABSENT,
+                f"measurement {measurement_id} cites no Book 2 source claim; "
+                f"NV-B forbids current authority without cited evidence",
+            )
+
+        # 8. live Book 2 revalidation of every cited claim
         try:
             self._provenance.resolve_source_claim_refs(
                 observation.source_claim_refs, require_current=True
             )
         except Book6ProvenanceError as exc:
-            raise Book6RegistryError(
+            raise Book6CurrentnessError(
+                CurrentnessRefusal.SOURCE_CLAIMS_STALE,
                 f"measurement {measurement_id} has no current Book 2 authority: "
-                f"{exc}"
+                f"{exc}",
             ) from exc
+
+        # 9. return record
         return observation
 
     def is_authoritative_now(self, measurement_id: str) -> bool:

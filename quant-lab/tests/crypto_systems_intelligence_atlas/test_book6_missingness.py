@@ -13,6 +13,10 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 from crypto_systems_intelligence_atlas.book6_core import Book6EngineError
+from crypto_systems_intelligence_atlas.book6_registry import (
+    Book6CurrentnessError,
+    CurrentnessRefusal,
+)
 from crypto_systems_intelligence_atlas.book6_definitions import (
     CoverageObservation,
     CoverageSufficiencyRule,
@@ -109,6 +113,14 @@ def test_value_forbidden_states_exclude_both_value_states() -> None:
 
 
 def test_engine_refuses_to_read_a_value_out_of_an_absence() -> None:
+    """Absence is not zero, at the value-read gate.
+
+    The record here CITES a Book 2 claim on purpose. That lets it clear the NV-B
+    currentness gate (step 7) and reach the absence read, which is the gate this
+    test is about. The source-less variant is a different gate and is asserted
+    separately below.
+    """
+
     engine, _, _, _ = build_engine(CLAIM)
     register_definition(engine, definition("m:supply"))
     register_measurement(engine, 
@@ -117,12 +129,42 @@ def test_engine_refuses_to_read_a_value_out_of_an_absence() -> None:
             "m:supply",
             value=None,
             missingness=MissingnessState.NOT_COLLECTED,
-            claim_refs=(),
+            claim_refs=(CLAIM,),
             unit=None,
         )
     )
     with pytest.raises(Book6EngineError, match="absence is not zero"):
         engine.current_value("obs:na")
+
+
+def test_source_less_missingness_is_not_current_under_nv_b() -> None:
+    """NV-B: source-less records are history, never current authority.
+
+    Before the GAP-7 amendment this record reached the consumer through the
+    non-value-bearing early bypass. It is now refused at resolver step 7, before
+    any consumer can read it, and the record stays registered and queryable.
+    """
+
+    engine, _, _, _ = build_engine(CLAIM)
+    register_definition(engine, definition("m:supply"))
+    register_measurement(engine,
+        windowed_observation(
+            "obs:sourceless",
+            "m:supply",
+            value=None,
+            missingness=MissingnessState.NOT_COLLECTED,
+            claim_refs=(),
+            unit=None,
+        )
+    )
+    assert engine.registry.is_authoritative_now("obs:sourceless") is False
+    with pytest.raises(Book6CurrentnessError) as excinfo:
+        engine.registry.resolve_current("obs:sourceless")
+    assert excinfo.value.reason is CurrentnessRefusal.SOURCE_CLAIMS_ABSENT
+    # still history
+    assert engine.registry.registered_measurement("obs:sourceless").measurement_id == (
+        "obs:sourceless"
+    )
 
 
 # -- denominator doctrine (Phase 8) ----------------------------------------

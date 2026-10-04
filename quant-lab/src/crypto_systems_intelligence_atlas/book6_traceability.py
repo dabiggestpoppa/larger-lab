@@ -92,6 +92,7 @@ R3_FAMILIES: Final[tuple[str, ...]] = (
 #: rung 2 and is traced there.
 R4_FAMILIES: Final[tuple[str, ...]] = (
     "R4.LINEAGE_TERMINALITY",
+    "R4.RESOLVER_ORDER",
     "R4.PRESERVED_SEALS",
 )
 
@@ -2225,6 +2226,104 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "the deferred status-validator incoherence still refuses SUPERSEDED on a root, recorded not patched",
         "test_book6_hardening_r4_lineage.py",
         "test_superseded_status_on_a_root_is_refused_by_the_record_validator",
+    ),
+    (
+        "R4.RO.01",
+        "R4.RESOLVER_ORDER",
+        "a terminal, sourced, valid record resolves current",
+        "test_book6_hardening_r4_resolver.py",
+        "test_terminal_record_resolves",
+    ),
+    (
+        "R4.RO.02",
+        "R4.RESOLVER_ORDER",
+        "a superseded record is refused at the terminality gate (TERM-2)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_superseded_record_is_refused_at_terminality",
+    ),
+    (
+        "R4.RO.03",
+        "R4.RESOLVER_ORDER",
+        "a superseded predecessor never resurrects when its successor decays (TERM-5)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_superseded_predecessor_never_resurrects",
+    ),
+    (
+        "R4.RO.04",
+        "R4.RESOLVER_ORDER",
+        "a branched lineage is refused at the lineage gate (TERM-4)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_branched_record_is_refused_at_lineage",
+    ),
+    (
+        "R4.RO.05",
+        "R4.RESOLVER_ORDER",
+        "the successors of a branch still resolve current; fail-closed scope is PER_RECORD (TERM-6)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_branch_successors_still_resolve_current",
+    ),
+    (
+        "R4.RO.06",
+        "R4.RESOLVER_ORDER",
+        "a refused record stays registered and queryable history",
+        "test_book6_hardening_r4_resolver.py",
+        "test_refused_record_remains_registered_history",
+    ),
+    (
+        "R4.RO.07",
+        "R4.RESOLVER_ORDER",
+        "every non-value-bearing state without sources is not current; one rule, no per-state split (NV-8)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_every_non_value_state_without_sources_is_not_current",
+    ),
+    (
+        "R4.RO.08",
+        "R4.RESOLVER_ORDER",
+        "a sourced absence clears NV-B and is refused later, at the absence read",
+        "test_book6_hardening_r4_resolver.py",
+        "test_non_value_state_with_sources_is_not_current_for_a_different_reason",
+    ),
+    (
+        "R4.RO.09",
+        "R4.RESOLVER_ORDER",
+        "an unknown measurement refuses at resolver step 1",
+        "test_book6_hardening_r4_resolver.py",
+        "test_unknown_measurement_refuses_at_step_one",
+    ),
+    (
+        "R4.RO.10",
+        "R4.RESOLVER_ORDER",
+        "the refusal vocabulary is closed, reads no status, and names no registration policy",
+        "test_book6_hardening_r4_resolver.py",
+        "test_refusal_vocabulary_is_closed_and_status_free",
+    ),
+    (
+        "R4.PS.05",
+        "R4.PRESERVED_SEALS",
+        "status alone never changes the verdict (CURR-S1)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_status_alone_does_not_change_the_verdict",
+    ),
+    (
+        "R4.PS.06",
+        "R4.PRESERVED_SEALS",
+        "a SUPERSEDED-status non-terminal record is refused at terminality, not status (CURR-S2)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_superseded_status_record_is_refused_at_terminality_not_status",
+    ),
+    (
+        "R4.PS.07",
+        "R4.PRESERVED_SEALS",
+        "a SUPERSEDED-status record with a decayed claim is refused at revalidation, not status (CURR-S3)",
+        "test_book6_hardening_r4_resolver.py",
+        "test_stale_claim_refusal_is_not_a_status_refusal",
+    ),
+    (
+        "R4.PS.08",
+        "R4.PRESERVED_SEALS",
+        "is_authoritative_now inherits the central resolver with no separate edit",
+        "test_book6_hardening_r4_resolver.py",
+        "test_is_authoritative_now_inherits_the_resolver",
     ),
 )
 
