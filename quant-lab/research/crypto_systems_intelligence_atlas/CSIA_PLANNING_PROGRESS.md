@@ -3939,3 +3939,63 @@ LIVE_ACQUISITION_AUTHORITY      = FALSE
 any edit to the status validator or any accepted test; any remedy selection;
 any revision of B-STRICT; any GAP reopening; any branch or worktree creation;
 any mutation of the frozen accepted Book 6 worktree; Book 7 or Choir work.
+
+---
+
+# TIME FALSIFICATION CONTRACT RATIFIED — LEDGER UPDATE
+
+**Date:** 2026-10-04
+**Decision id:** `BOOK6-GAP6-TIME-TESTS-v0.1`
+
+```text
+TIME_v0.4 = SUPERSEDED / TIME-11 STATUS CONTRADICTION
+TIME_v0.5 = RATIFIED
+TIME_11    = LINEAGE / TERMINALITY BASED
+TIME_CASES = 15   BLOCKED = 0
+
+TEST_SPEC_v0.3 = 237 RATIFIED CARRIED CASES
+TEST_SPEC_v0.5 = 252 TOTAL RATIFIED CASES
+
+B_STRICT                = UNCHANGED / RATIFIED
+B_STRICT_STRENGTHENED_BY_TEST = TRUE
+RATIFIED_DOCTRINE_CHANGED      = FALSE
+GAP_6_REOPENED                 = FALSE
+GAP_7_REOPENED                 = FALSE
+```
+
+## Consequence for implementation traceability
+
+```text
+RATIFIED 6E DOCTRINE            = TRUE
+RATIFIED 6E FALSIFICATION CASES = 15
+DRAFT_ONLY 6E CASES             = 0
+RUNG_6                         = GREEN
+KNOWN_EVIDENCE_GAPS            = 0   (pending matrix v0.2)
+```
+
+The last known evidence gap in the Book 6 implementation contract is closed.
+Every implementation rung now has ratified falsification.
+
+## Standing state
+
+```text
+BOOK_6_DESIGN_COMPLETE   = TRUE
+BOOK_6_IMPLEMENTED       = FALSE
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_TIME_TEST_RATIFICATION_RECORD_v0.1.md  RATIFIED
+CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_TEST_SPEC_v0.5.md        RATIFIED
+CSIA_BOOK_6_COMPARISON_CHANGE_TIME_TEST_PRE_RATIFICATION_REVIEW_v0.1.md  PASS 10/10
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+**Not authorized and not performed:** implementation; any source or test change;
+any edit to v0.4 or any ratified record; any status-validator edit; any revision
+of B-STRICT; any GAP reopening; any branch or worktree creation; any mutation
+of the frozen accepted Book 6 worktree; Book 7 or Choir work.

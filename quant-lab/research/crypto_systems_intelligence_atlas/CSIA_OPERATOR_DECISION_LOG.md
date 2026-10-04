@@ -3478,3 +3478,113 @@ Implementation; any source or test change; any edit to the status validator or
 any accepted test; any remedy selection; any revision of B-STRICT; any GAP
 reopening; any branch or worktree creation; any mutation of the frozen Book 6
 worktree; Book 7 or Choir work.
+
+---
+
+# CSIA — TIME-1..TIME-15 RATIFIED AS THE 6E FALSIFICATION CONTRACT
+
+**Date:** 2026-10-04
+**Decision id:** `BOOK6-GAP6-TIME-TESTS-v0.1`
+**Operator selection:**
+`RATIFY_TIME_1_THROUGH_TIME_15_AS_GAP6_FALSIFICATION_CONTRACT`
+**Status:** `RATIFIED`
+**Ratifies doctrine:** `FALSE` — a test contract only
+**Implementation authority:** `FALSE`
+
+## Preconditions verified before the decision
+
+```text
+TIME_CASES_CONSISTENT = 15 / 15
+CONTRADICTS_RATIFIED_DOCTRINE = 0
+PRE_RATIFICATION_v0.1 = PASS (10 / 10)
+BLOCKED = 0
+DOCTRINE_CHANGED_BY_v0.5 = FALSE
+```
+
+## Ratified
+
+```text
+TEST_SPEC_v0.3 = 237 RATIFIED CARRIED CASES  (unchanged)
+TEST_SPEC_v0.5 = 252 TOTAL RATIFIED CASES
+TIME_CASES      = 15 RATIFIED
+
+TIME_11 = LINEAGE / TERMINALITY BASED
+RATIFIED_6E_DOCTRINE            = TRUE  (BOOK6-GAP6-v0.2)
+RATIFIED_6E_FALSIFICATION_CASES = 15
+DRAFT_ONLY_6E_CASES             =  0
+RUNG_6                         = GREEN
+```
+
+## TIME-11, corrected meaning
+
+```text
+A historical candidate is excluded by TERMINALITY, not by status.
+
+A: same metric, same valid_time as B, HAS A REGISTERED SUCCESSOR
+   -> TERMINAL = FALSE, given the lexically greater measurement_ref
+B: same everything else, no registered successor -> TERMINAL = TRUE
+
+A filtered during ELIGIBILITY, before ordering computes anything
+REFUSAL_REASON_A = TERMINALITY
+STATUS_REFUSAL   = FALSE
+the lexical tie-break NEVER sees A
+selection        = B
+```
+
+with the status permutation required to hold in all four combinations
+(`STATUS_CHANGES_TIME11_OUTCOME = FALSE`). Case 1 is load-bearing: A reads
+OBSERVED and is still excluded.
+
+## Superseded
+
+```text
+TIME_v0.4 = SUPERSEDED / TIME-11 STATUS CONTRADICTION
+```
+
+TIME-11 v0.4 contradicted ratified doctrine **twice**: it made
+`ObservationStatus` the deciding gate, and it inverted the ratified ordering by
+demanding the OBSERVED record win "for ANY lexical relationship". v0.4 is not
+edited; its 14 sound cases are carried verbatim into v0.5.
+
+## B-STRICT
+
+```text
+OBSERVATION_STATUS_IS_CURRENTNESS_AUTHORITY = FALSE   (unchanged)
+STATUS_ONLY_CHANGES_CURRENTNESS             = FALSE   (unchanged)
+SUPERSESSION_CURRENTNESS_SOURCE             = REGISTERED_LINEAGE_TERMINALITY
+
+B_STRICT_PRESERVED   = TRUE
+B_STRICT_REVISED     = FALSE
+B_STRICT_STRENGTHENED_BY_THIS_RATIFICATION = TRUE   (by test, not by wording)
+```
+
+## Standing state
+
+```text
+GAP_1..GAP_7 = CLOSED / RATIFIED
+RATIFIED_DOCTRINE_CHANGED = FALSE
+GAP_6_REOPENED = FALSE
+GAP_7_REOPENED = FALSE
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Residual, recorded not blocking
+
+```text
+TERMINALITY_SPECIFICITY_PROVEN_BY_TIME_11_ALONE = FALSE
+```
+
+TIME-11 proves status is never consulted and that ordering never sees a
+non-terminal candidate. It does not prove the implementation reasons about
+terminality specifically rather than a correlated property. A `TIME-16` with
+the non-terminal candidate lexically smaller would close that.
+
+## Not authorized and not performed
+
+Implementation; any source or test change; any edit to v0.4 or to any ratified
+record; any status-validator edit; any revision of B-STRICT; any GAP reopening;
+any branch or worktree creation; any mutation of the frozen Book 6 worktree;
+Book 7 or Choir work.
