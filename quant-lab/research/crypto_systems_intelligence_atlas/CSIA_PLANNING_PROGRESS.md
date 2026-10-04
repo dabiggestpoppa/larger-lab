@@ -4283,3 +4283,93 @@ The build law is unchanged. It is simply better founded.
 executed, no branch created, no worktree created, no GAP reopened, no prior
 ratified artifact edited, no registration-policy change. The frozen accepted
 Book 6 worktree remains at `5f94c3f40c` with 0 drift.
+
+---
+
+# TIME-11.1 FIXTURE REPAIRED — BUILD UNBLOCKED (LEDGER UPDATE)
+
+**Recorded:** 2026-10-04
+**Binding decision:** `BOOK6-GAP6-TIME-FIXTURE-v0.1`
+**Planning HEAD at time of writing:** `1bd05a1d9`
+**Implementation branch HEAD at time of writing:** `ca9d381d4` (rungs 1-2)
+
+## The round that produced this
+
+The authorized implementation ran rungs 1 and 2 cleanly and then stopped at
+rung 6. The ratified `TIME-11.1` was **unbuildable**: two of its four status
+permutations were refused by the accepted lifecycle validator, because the
+fixture made `A` a root record and `SUPERSEDED` requires an outgoing edge.
+
+That is not a GAP-7 defect and not an implementation error. It is the deferred
+lifecycle incoherence, met from a direction nobody had tested it from before.
+
+## The repair
+
+```text
+Z <- A <- S
+Y <- B
+      (no record supersedes B)
+```
+
+Both `A` and `B` now carry an outgoing supersession edge, so either may legally
+take either status. `A` stays non-terminal because `S` supersedes it — never
+because a status exists.
+
+```text
+PRE_RAT = 12 / 12 PASS
+ALL FOUR PERMUTATIONS = CONSTRUCTIBLE AND REGISTERED
+STATUS_VALIDATOR_EDIT  = FALSE
+LIFECYCLE_REMEDY_SELECTED = NONE
+DOCTRINE_CHANGED       = FALSE
+```
+
+## Spec succession
+
+```text
+TIME_SPEC_v0.5 = SUPERSEDED PROSPECTIVELY / TIME-11.1 FIXTURE ONLY
+TIME_SPEC_v0.6 = RATIFIED
+CASES_CARRIED = 252 ; CASES_CHANGED = 0 ; TIME_CASES = 15
+```
+
+## GAP-7 case count restated
+
+```text
+PRIOR_CASES         = 39
+TERM_6              =  1
+RATIFIED_GAP7_CASES = 40
+CARR-1..19  CURR-S1..3  TERM-1..6  NV-1..10  STRUCT-1..2
+```
+
+## Standing state
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED             = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_IMPLEMENTATION_TEST_SPEC_v0.6.md        RATIFIED
+CSIA_BOOK_6_COMPARISON_CHANGE_TIME_FIXTURE_PRE_RATIFICATION_REVIEW_v0.1.md  12/12
+CSIA_BOOK_6_COMPARISON_CHANGE_TIME_FIXTURE_RATIFICATION_RECORD_v0.1.md      RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Continuation baseline for the resumed build
+
+```text
+B6        = 1429      (was 1341 before rung 1)
+FULL CSIA = 2250 passed / 0 failed
+Sensor    = 2325 passed / 14 canonical failed / 4 skipped / 0 xfailed
+ruff      = PASS
+mypy      = PASS
+B1..B5, R1..R3 = unchanged
+```
+
+**Not done in this round:** no source written; no implementation test written;
+no test executed; no status-validator edit; no lifecycle remedy; no registration
+policy; no branch or worktree created; no GAP reopened; the frozen accepted
+Book 6 worktree untouched at `5f94c3f40c` with 0 drift.

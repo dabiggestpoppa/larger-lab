@@ -3938,3 +3938,97 @@ any test executed; any edit to a ratified record, to test spec v0.3, to review
 v0.4 or to packet v0.4; any registration-policy change; any status-validator
 edit; any GAP reopening; any branch or worktree creation; any mutation of the
 frozen accepted Book 6 worktree; Book 7 or Choir work.
+
+---
+
+# TIME-11.1 FIXTURE REPAIRED AND RATIFIED AS CONSTRUCTIBLE
+
+**Recorded:** 2026-10-04
+**Binding decision:** `BOOK6-GAP6-TIME-FIXTURE-v0.1`
+**Operator selection:** `REPAIR TIME-11.1 FIXTURE ONLY`, then
+`RATIFY_CONSTRUCTIBLE_TIME11_STATUS_PERMUTATION_FIXTURE`
+
+## What the implementation found
+
+Implementation reached rung 6 and hit a wall. The ratified `TIME-11.1` could
+not be built: two of its four status permutations were unconstructible.
+
+```text
+case 1   A=OBSERVED    B=OBSERVED    -> CONSTRUCTIBLE
+case 2   A=SUPERSEDED  B=OBSERVED    -> REFUSED
+case 3   A=OBSERVED    B=SUPERSEDED  -> CONSTRUCTIBLE
+case 4   A=SUPERSEDED  B=SUPERSEDED  -> REFUSED
+
+REFUSAL = "a SUPERSEDED observation must name the observation it superseded"
+```
+
+`A` was a root record. The accepted lifecycle validator requires any record
+carrying `status = SUPERSEDED` to declare an outgoing supersession edge, and a
+root has none.
+
+## The decision
+
+Repair the **fixture**, not the validator. The validator is untouched, no
+lifecycle remedy is selected, and the case is not weakened.
+
+```text
+STATUS_VALIDATOR_EDIT     = FALSE
+LIFECYCLE_REMEDY_SELECTED = NONE
+DEFERRED_LIFECYCLE_RECORD = UNCHANGED
+TIME_11_WEAKENED          = FALSE
+PERMUTATION_DROPPED       = FALSE
+DOCTRINE_CHANGED          = FALSE
+```
+
+## The ratified fixture
+
+```text
+Z <- A <- S
+Y <- B
+      (no record supersedes B)
+
+A.supersedes = Z ; S.supersedes = A ; B.supersedes = Y
+A_TERMINAL = FALSE (S supersedes A)
+B_TERMINAL = TRUE  (no successor)
+Z, Y, S = SUPPORT RECORDS ONLY, NEVER CANDIDATES
+```
+
+Both `A` and `B` now declare an outgoing edge, so either may legally carry
+either status. All four permutations construct and register.
+
+```text
+PRE_RAT = 12 / 12 PASS
+TIME_SPEC_v0.5 = SUPERSEDED PROSPECTIVELY FOR THE TIME-11.1 FIXTURE ONLY
+TIME_SPEC_v0.6 = RATIFIED
+CASES_CARRIED  = 252 ; CASES_CHANGED = 0
+```
+
+## GAP-7 case count, restated
+
+`BOOK6-GAP7-SUCCESSOR-CURRENTNESS-v0.1` added `TERM-6`, so the implemented
+GAP-7 contract is 40 cases:
+
+```text
+PRIOR_CASES = 39 ; TERM_6 = 1 ; RATIFIED_GAP7_CASES = 40
+CARR-1..19  CURR-S1..3  TERM-1..6  NV-1..10  STRUCT-1..2
+```
+
+## Standing state
+
+```text
+GAP_1..GAP_7 = CLOSED / RATIFIED
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY,
+                                         unchanged by this record)
+BOOK_6_IMPLEMENTED             = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+The build was blocked on one unbuildable case; it is now buildable. The
+authorization was never suspended and is not re-issued.
+
+**Not authorized and not performed:** any status-validator edit; any lifecycle
+remedy; any `ObservationStatus` change; any registration-policy change; any
+status authority; any edit to test spec v0.5 or to any ratified record; any GAP
+reopening; any implementation; any branch or worktree creation; any mutation of
+the frozen accepted Book 6 worktree; Book 7 or Choir work.
