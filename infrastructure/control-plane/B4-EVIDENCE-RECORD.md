@@ -4858,3 +4858,267 @@ Kilo suppression, exclusion, waiver or relabelling; no `NOSONAR`; no test
 deletion. No R49, no Book 5, no Atlas Program Block 4. No merge, no force
 push, no amend, squash, rebase or reset; `main` untouched at
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`.
+## 16. X8 -- EXACT CALL-SITE AND BINDING AUTHORITY
+
+Mission `B4-CXR7U9R48X8`. Branch `oce-program-build`, PR #4. Supersedes the X7
+and X7X authority claims recorded in sections 13, 14 and 15; those sections are
+preserved unchanged as valid historical evidence for what they actually
+proved, and what they did not.
+
+### 16.1 The X7 gap, demonstrated before repair
+
+X7 replaced bare method-name authorization with a global syntactic-pair
+allowlist. `_classify_call` tested `expr in REVIEWED_RECEIVER_METHODS` and
+returned READ_ONLY; `owner` was recorded in the result but did not participate
+in authorization. So an approved PAIR was a global capability. Reproduced
+against the shipped classifier at `df19763a3`, each control preserving
+entry-point reachability, asserting the source changed, asserting the injected
+site existed exactly once, and carrying a negative control:
+
+| scenario | at `df19763a3` |
+|---|---|
+| A: `roots.append(payload)` injected into a DIFFERENT reachable owner | admitted |
+| B: `roots.append` duplicated inside its own owner | admitted |
+| C: `roots = attacker` before `roots.append` | admitted |
+| D: `os = attacker` before `os.stat(path)` | admitted |
+| E: a reviewed constructor shadowed before being called | admitted |
+| F: a new unapproved spelling (control) | refused |
+
+A, B, C, D and E were admitted as `PROVEN_READ_ONLY_OR_PURE` or
+`PROVEN_INTERNAL`. This is the X6 failure family one level up: X6 bought
+authority from a method's ATTRIBUTE, X7 bought it from a receiver's SPELLING.
+
+### 16.2 The authority model
+
+Two independently load-bearing rules, both frozen literals measured from the
+shipped engine and never recomputed from the source under audit:
+
+* `EXACT_SITE_MANIFEST` -- 206 entries keyed by `(owner function, normalized
+  call expression)` with the exact reviewed occurrence count. A new call, or a
+  DUPLICATE of an approved one, changes the count and fails closed.
+* `REVIEWED_OWNER_DIGESTS` -- 35 owner digests. A rebinding, a shadowing
+  assignment, an added or duplicated call or a reordering changes the digest
+  and withdraws EVERY grant in that owner.
+
+`_site_authority` gates every authority grant, so no grant by-passes it. Both
+rules are needed: the owner digest alone cannot refuse a duplicate, and the
+manifest alone cannot refuse a rebinding that adds no call.
+
+Stated boundary, unchanged from X8's own record and NOT widened here: this is
+exact-site and exact-owner-context binding. It is NOT semantic type resolution.
+It proves the site is the reviewed one in the reviewed owner and that the owner
+has not been edited. It does not prove that `record` holds a dict.
+
+### 16.3 The finding: the baseline was correct and CI was red anyway
+
+Commit `72d88af6c` (X8R1+R2) was green locally and b1 came back **33 failed,
+704 passed** on Linux. The failure text was unambiguous: the runner reported
+**313** `UNKNOWN_OR_DYNAMIC` sites, and every owner carried
+
+    source context changed: reviewed digest <X>..., observed <Y>...
+
+with 35 of 35 owners mismatched. Measured root cause, from the run rather than
+from inference:
+
+* b1 runs **CPython 3.12.14**; the development machine runs **3.11.9**.
+* `_owner_ast_digest` used `ast.dump`, whose output is not interpreter-stable:
+  3.12 appended `type_params` to `FunctionDef._fields`.
+* Every CI-reported coordinate existed locally at the IDENTICAL line:col and
+  the IDENTICAL spelled expression -- 24 distinct CI sites, **0 absent
+  locally** -- so the PARSE agreed on both interpreters and only the
+  serialisation differed.
+* The local digest for `_acquire_recovery_authority` was
+  `6e90f2548fe4ad35...`, which is exactly the value the runner reported as
+  REVIEWED. The runner's OBSERVED value differed. The frozen literal was the
+  correct one.
+
+So the reviewed baseline had a second, hidden input: the interpreter. A frozen
+artifact whose value depends on WHERE the proof runs is not a reviewed
+baseline, and the failure was not a false alarm -- it was the proof correctly
+refusing a baseline it could not trust. `313` is the full site count of the
+weakened source b1 audited (312 pristine plus the injected site), consistent
+with the gate withdrawing every grant.
+
+**Repair (`c90482159`).** Serialise through a FROZEN VOCABULARY of field names
+rather than `node._fields`. A field this interpreter does not know is never
+read; a field a future interpreter adds cannot leak in. The cost is stated in
+the source rather than hidden: a later addition becomes invisible to the
+digest, which is a real loss of sensitivity, so M.A fails if the interpreter
+drops any field that is not a named version addition and M.E proves the
+immunity is produced by the vocabulary and not by the digest ignoring
+everything.
+
+The reviewed manifest was NOT touched: its keys come from
+`_normalized_call_expression`, which never used `ast.dump`. Verified byte for
+byte, not assumed -- the working copy tripped an earlier reformat, which was
+backed out so the diff is 35 digest lines plus the serializer only.
+
+### 16.4 Two further defects found while proving 16.3, both ours
+
+1. **The vocabulary omitted `id`.** Every identifier in an owner was therefore
+   invisible to its digest, so a rename or a rebound receiver could not
+   withdraw anything -- the exact sensitivity X8 exists to provide, absent, and
+   invisible to reading it. Found by an executable probe, not by review. M.A
+   now ENUMERATES the fields of the real closure and fails on any dropped name
+   that is not a documented version addition, because reading had already
+   failed once.
+
+2. **The discrimination harness treated a SKIPPED mutation as a PASS.**
+   `digest-includes-coordinates` anchored on the old `ast.dump` body; when the
+   serializer replaced that body the anchor vanished, the harness printed SKIP,
+   and still reported `X8_DISCRIMINATION=PASS` -- silently vacating L.I, the
+   one control only that mutation reddened. A skipped mutation is a LOST
+   guarantee. The harness now fails on SKIP and lists them.
+
+### 16.5 The repair's own control asserted the wrong shape of the world
+
+`c90482159` was pushed and b1 came back **1 failed, 741 passed on 3.12**. The
+digest repair WORKED: all 35 frozen digests, the manifest, the exact-site gate
+and all 26 X8 claims validated on the interpreter that had falsified them. The
+single failure was M.D, which asserted `type_params` was ABSENT from
+`FunctionDef._fields`. True on 3.11, false on 3.12 -- so the control passed on
+the interpreter that HAD the defect and failed on the one that did not. It
+asserted an interpreter's shape and called it a proof about the interpreter.
+
+**Repair (`47db26def`).** M.D and M.E present the field the way THIS
+interpreter carries it: natively where 3.12+ already has it, by appending it to
+`_fields` where it does not -- which is the mechanism `ast.dump` actually
+depends on. The restore is exact in both directions; returning the class's
+`_fields` is not enough where the field is native, because the test's own value
+would remain on the shared node. M.F is new and is the control whose absence
+allowed this: it puts the running interpreter into the 3.12 shape and re-runs
+the exact comparison that failed on the runner.
+
+M.F's stated boundary: it reproduces the ONE documented 3.12 AST change that
+caused the failure and does not claim there are no others. The authority for
+that is b1 on 3.12 itself.
+
+### 16.6 Required proofs
+
+Each is an executable control; `L` are the X8 section-4 obligations and `M` are
+the interpreter-independence obligations. Discrimination evidence for every one
+is in 16.8.
+
+| # | obligation | control |
+|---|---|---|
+| 1 | a known pair in a different owner fails closed | L.A |
+| 2 | a duplicate known pair in the same owner fails closed | L.B |
+| 3 | rebinding `roots` before `roots.append` fails closed | L.C |
+| 4 | rebinding `record` before `record.get` fails closed | L.D |
+| 5 | shadowing `os` before `os.stat` fails closed | L.E |
+| 6 | shadowing `hashlib` before a reviewed hash call fails closed | L.F |
+| 7 | shadowing a reviewed constructor fails closed | L.G |
+| 8 | shadowing a module-level internal name fails closed | L.H |
+| 9 | the unchanged shipped source remains green | L.I |
+| 10 | every reviewed site appears exactly once in the manifest | L.J |
+| 11 | no manifest entry lacks a real source site | L.J |
+| 12 | no site is authorized by pair spelling alone | L.K, L.M |
+| 13 | mutation-channel coverage is unchanged and non-vacuous | L.L |
+| 14 | removing the exact-site/binding guard reddens the controls | L.M, and 16.8 |
+| 15 | diagnostics name owner, expression, coordinate, rule, both identities | L.N |
+| 16 | totals are measured and stable | L.O |
+| -- | vocabulary drops no meaning-bearing field | M.A |
+| -- | digest moves on every required condition | M.B |
+| -- | digest ignores coordinates and indentation | M.C |
+| -- | an interpreter-added field cannot move the digest | M.D |
+| -- | the vocabulary is what makes that immunity real | M.E |
+| -- | frozen digests validate under the 3.12 AST shape | M.F |
+
+### 16.7 Measurements
+
+Measured, not asserted. All values are unchanged from the pre-X8 baseline,
+so the two new refusal conditions are never tripped by the real engine.
+
+| quantity | value |
+|---|---|
+| closure functions | 35 |
+| reachable call sites | 312 |
+| exact-site manifest entries | 206 |
+| reviewed owner digests | 35 |
+| site identities / unique | 312 / 312 |
+| duplicate site identities (count > 1) | 54 (recorded, not errors) |
+| missing manifest entries | 0 |
+| surplus manifest entries | 0 |
+| occurrence-count drift | 0 |
+| binding/provenance mismatches | 0 |
+| READ_ONLY / INTERNAL / MUTATION / UNKNOWN | 182 / 123 / 7 / 0 |
+| reachable mutation channels | 2 (`open`, `os.open`) |
+| channels whose sites observe | all |
+| globally instrumented channels | 33 |
+| READ_ONLY rows carrying a reason | 182 / 182 |
+
+### 16.8 Validation
+
+* Discrimination harness: **26 mutations / 69 pairs / 34 controls / 0 vacuous
+  / 0 skipped / 0 invalid**, `X8_DISCRIMINATION=PASS`. Six pairs are recorded
+  as NOT biting, each with the mutation that does discriminate it -- ordering,
+  reported rather than hidden.
+* Local `R48R3 + R48R4`: 144 node IDs collected, 144 unique, 0 duplicates;
+  141 passed, 3 skipped (symlink/FIFO/mode, platform-conditional).
+* R40 state matrix: 34 passed, 1 skipped.
+* Ruff on the touched file: `All checks passed!` (13 pre-existing findings
+  elsewhere, identical to baseline, untouched).
+* `py_compile` OK; `git diff --check` clean.
+* The whole module also runs 101 passed / 3 skipped in a SIMULATED 3.12 world
+  on 3.11, and M.D passes under both shapes with no residue on the shared node.
+
+**Authoritative runs, implementation head `47db26deff995034d89402964fcea28bf72562fd`:**
+
+| workflow | run | conclusion |
+|---|---|---|
+| b1-local-ground-validation | 37236129355 | success |
+| B1-I1R Validation | 37236132862 | success |
+| b2-control-plane-validation | 37236129394 | success |
+| b3-worker-fabric-validation | 37236129340 | success |
+| b4-config-spine-validation | 37236129357 | success |
+
+Superseded head `c90482159` (the intermediate that exposed 16.5): b1
+`37235001825` failure, the other four success. Recorded, not hidden.
+
+**b1 artifact verification for the implementation head**, read from the
+artifact files rather than inferred from workflow colour:
+
+* `tested_commit` = `47db26deff995034d89402964fcea28bf72562fd`;
+  `tested_tree` = `3ba01f5977e4e0d94c3abe8609bfcbf07a8b48b3`.
+* JUnit: **743 collected / 743 executed / 0 failed / 0 errors / 0 skipped**;
+  743 unique full node IDs, **0 duplicates**.
+* X8 nodes: 15 `L.*` + 6 `M.*` = 21, all present, none skipped.
+* Independent gate: **75 / 75 checks ok**. Cleanup:
+  `{"cleanup": "ok", "disposable_removed": true}`.
+* The artifact's own environment fingerprint reports `Python 3.12.14`.
+
+### 16.9 Corrections to X7's recorded claims
+
+X7 remains valid historical evidence for what it proved: bare method names were
+removed from `READ_ONLY_REGISTRY`, a global blanket admission rule was deleted,
+class methods no longer entered the internal namespace, and four reproduced
+escapes were closed. The following claims in sections 13 and 14 do NOT hold as
+written and are corrected here.
+
+* **X7 bound methods to normalized receiver SPELLINGS, not exact call sites or
+  receiver bindings.** It blocked arbitrary NEW spellings but still allowed
+  approved spellings to be reused or rebound without a new review decision.
+* Superseded: "a pair that appears anywhere else is refused". X7 refused a pair
+  whose spelling was not reviewed. Refusing a KNOWN pair in a different owner
+  is an X8 property, proven by L.A, and was untrue at `df19763a3`.
+* Superseded: the policy is safe "at this site". X7 recorded an owner and a
+  coordinate; it did not bind grant to either. Site binding is X8.
+* Superseded: receiver spelling constitutes receiver binding. X7X bound the
+  method to the receiver NAME as spelled in the source and never bound that
+  name to a value, which is why comprehension, walrus, tuple-unpack, lambda,
+  `for`, `with` and augmented targets could forge it.
+* Superseded: J.L proves individual call-site authorization. J.L proves every
+  reachable site is classified EXACTLY ONCE and carries a reason. It does not
+  prove any site was individually reviewed, nor that a grant is unique to one
+  site. That distinction is the whole of X8.
+* Retained unchanged: the Sonar temporal-union correction. A union across
+  analyses remains historical observation, never a current active-issue census.
+
+### 16.10 Boundaries and authority
+
+`pg-recovery.py` is **byte-identical** across X8. No production recovery
+behaviour changed, because no independently demonstrated production defect
+required it. Accounting: cloud mutations 0, broker mutations 0, capital
+mutations 0, execution mutations 0, recurring cost $0, capital authority none.
+No PR merge; `origin/main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`.

@@ -1241,3 +1241,129 @@ no force push, no amend/squash/rebase/reset; `main` untouched at
 and Kilo outcomes recorded in the operator handoff - neither is a
 GitHub-required check, which is **not** merge authorization.
 **`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
+## X8 - EXACT CALL-SITE AND BINDING AUTHORITY
+
+Mission `B4-CXR7U9R48X8`. Supersedes the X7 and X7X authority rows; those
+entries stand as valid historical evidence for what they actually proved.
+Full record: `B4-EVIDENCE-RECORD.md` section 16.
+
+**The gap, demonstrated before repair at `df19763a3`.** X7's replacement for
+bare method names was a GLOBAL syntactic-pair allowlist: `_classify_call`
+tested the normalized expression against `REVIEWED_RECEIVER_METHODS` and
+`owner` never participated in authorization. So an approved PAIR was a global
+capability. Five scenarios were admitted, each with entry-point reachability
+preserved and a negative control: a known pair injected into a different
+reachable owner; a duplicate inside its own owner; `roots = attacker` before
+`roots.append`; `os = attacker` before `os.stat`; and a shadowed reviewed
+constructor. A sixth control, a genuinely new spelling, was refused - so the
+harness observed real change rather than a blanket refusal. This is the X6
+failure family one level up: X6 bought authority from a method's attribute, X7
+from a receiver's spelling.
+
+**The repair.** Authority is bound to the exact reviewed source site AND to
+the source context that gives the receiver its meaning, through two frozen,
+independently load-bearing registries measured from the shipped engine:
+`EXACT_SITE_MANIFEST` (206 `(owner, expression)` entries with exact occurrence
+counts) and `REVIEWED_OWNER_DIGESTS` (35 owner digests). `_site_authority`
+gates every grant, so no grant by-passes it. Both rules are needed: the digest
+cannot refuse a duplicate, and the manifest cannot refuse a rebinding that adds
+no call. Coordinates remain diagnostic only.
+
+Stated boundary, NOT widened: this is exact-site and exact-owner-context
+binding, **not** semantic type resolution. It proves the site is the reviewed
+one in the reviewed owner and that the owner has not been edited. It does not
+prove that `record` holds a dict.
+
+**The finding that mattered most: the baseline was correct and CI was red
+anyway.** Head `72d88af6c` was green locally; b1 returned **33 failed, 704
+passed** on Linux, reporting 313 `UNKNOWN_OR_DYNAMIC` sites with **35 of 35**
+owner digests mismatched. Measured root cause: b1 runs **CPython 3.12.14**, the
+development machine **3.11.9**, and `_owner_ast_digest` used `ast.dump`, which
+is not interpreter-stable - 3.12 appended `type_params` to
+`FunctionDef._fields`. All 24 distinct CI-reported site coordinates existed
+locally at the IDENTICAL line:col and spelling (0 absent locally), so the parse
+agreed and only the serialisation differed; and the local digest equalled
+precisely the value the runner reported as REVIEWED. The reviewed baseline had
+a second, hidden input: the interpreter. `c90482159` replaced `ast.dump` with a
+serialisation over a FROZEN VOCABULARY of field names, so a field this
+interpreter does not know is never read and a field a future interpreter adds
+cannot leak in. The reviewed manifest was **not** touched - verified byte for
+byte, because its keys never used `ast.dump`.
+
+**Two further defects found while proving that, both ours.** The vocabulary
+omitted `id`, so every identifier in an owner was invisible to its digest and a
+rename or a rebound receiver could not withdraw anything - the exact
+sensitivity X8 exists to provide. M.A now ENUMERATES the real closure's fields
+instead of trusting a read-through. And the discrimination harness treated a
+SKIPPED mutation as a PASS: when the serializer replaced the `ast.dump` body
+that `digest-includes-coordinates` anchored on, the anchor vanished, the
+harness printed SKIP and still reported `PASS`, silently vacating L.I. The
+harness now fails on SKIP.
+
+**And the repair's own control asserted the wrong shape of the world.**
+`c90482159` came back **1 failed, 741 passed on 3.12**: the digest repair
+worked - every frozen digest, the manifest, the exact-site gate and all 26 X8
+claims validated on the interpreter that had falsified them - and the single
+failure was M.D, which asserted `type_params` was ABSENT from
+`FunctionDef._fields`. True on 3.11, false on 3.12, so it passed on the
+interpreter that had the defect and failed on the one that did not. `47db26def`
+makes M.D and M.E present the field the way THIS interpreter carries it, with
+an exact restore in both directions, and adds M.F: the control whose absence
+allowed it, which puts the running interpreter into the 3.12 shape and re-runs
+the exact comparison that failed on the runner. M.F's stated limit is that it
+reproduces the one documented 3.12 AST change that caused the failure and does
+not claim there are no others; the authority for that is b1 on 3.12 itself.
+
+**Superseded X7 claims** (corrected in the record, X7 history not rewritten):
+X7 bound methods to normalized receiver SPELLINGS, not exact call sites or
+receiver bindings; it blocked arbitrary NEW spellings while still allowing
+approved spellings to be reused or rebound without a new review decision.
+"A pair that appears anywhere else is refused", the policy being safe "at this
+site", receiver spelling constituting receiver binding, and J.L proving
+individual call-site authorization are all superseded - J.L proves every site
+is classified exactly once with a reason, which is not the same claim. The
+Sonar temporal-union correction is retained unchanged: a union across analyses
+remains historical observation, never a current active-issue census.
+
+**Measurements, unchanged from the pre-X8 baseline** (so the two new refusal
+conditions are never tripped by the real engine): 35 closure functions; 312
+reachable call sites; 206 manifest entries; 35 owner digests; 312/312 unique
+site identities; 0 missing, 0 surplus, 0 count-drift, 0 provenance mismatches;
+**182 / 123 / 7 / 0** READ_ONLY / INTERNAL / MUTATION / UNKNOWN; 2 reachable
+mutation channels (`open`, `os.open`), all observing; 33 globally instrumented
+channels; 182/182 READ_ONLY rows carrying a reason.
+
+**Validation at `47db26deff995034d89402964fcea28bf72562fd`.** Discrimination:
+**26 mutations / 69 pairs / 34 controls / 0 vacuous / 0 skipped / 0 invalid**,
+with six non-biting pairs reported individually alongside the mutation that
+does discriminate each. Local R48R3+R48R4: **144 node IDs, 144 unique, 0
+duplicates**; 141 passed, 3 skipped (platform-conditional). R40 **34 passed /
+1 skipped**. Ruff `All checks passed!` on the changed file (13 pre-existing
+findings elsewhere, identical to baseline). `py_compile` OK; `git diff
+--check` clean. The whole module also runs 101 passed / 3 skipped in a
+SIMULATED 3.12 world on 3.11.
+
+**Authoritative runs at the implementation head:** b1 `37236129355`, B1-I1R
+`37236132862`, b2 `37236129394`, b3 `37236129340`, b4 `37236129357` - all
+`success`. Superseded head `c90482159`: b1 `37235001825` **failure**, the other
+four success; recorded rather than hidden. The b1 artifact for the
+implementation head was read from its own files, not inferred from workflow
+colour: `tested_commit` `47db26deff995034d89402964fcea28bf72562fd`, `tested_tree`
+`3ba01f5977e4e0d94c3abe8609bfcbf07a8b48b3`; JUnit **743 collected / 743
+executed / 0 failed / 0 errors / 0 skipped**, 743 unique node IDs with **0
+duplicates**; 15 `L.*` plus 6 `M.*` X8 nodes all present and executed;
+independent gate **75 / 75 checks ok**; cleanup `{"cleanup": "ok",
+"disposable_removed": true}`; the artifact's own fingerprint reports
+`Python 3.12.14`.
+
+**Scope: one test module and two Markdown files. `scripts/pg-recovery.py` is
+byte-identical - no production change**, because no independently demonstrated
+production defect required repair. No SonarCloud or Kilo suppression,
+exclusion, waiver or relabelling; no `NOSONAR`; no test deletion. No merge, no
+force push, no amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. Accounting: cloud mutations 0,
+broker mutations 0, capital mutations 0, execution mutations 0, recurring cost
+$0, capital authority none. SonarCloud and Kilo remain the only external checks
+and neither is a GitHub-required check, which is **not** merge authorization.
+**`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
+
