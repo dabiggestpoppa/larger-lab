@@ -2810,3 +2810,80 @@ SEPARATE, LATER decision and is NOT authorized. The eventual Book 6
 implementation authorization must cover BOTH the GAP-7 kernel currentness
 hardening AND the comparison/change amendment, including GAP-6 if ratified.
 ```
+
+---
+
+# CSIA — GAP-7 RATIFICATION EVIDENCE ANCHOR REPAIR
+
+**Date:** 2026-10-03
+**Authorization:** `GAP-7 EVIDENCE-ANCHOR REPAIR` ONLY
+**Decision id:** none. This entry records **no** operator decision.
+**Nature of this entry:** provenance/anchoring correction. GAP-7 is **not**
+reopened.
+
+## The defect
+
+An external review found that the GAP-7 ratification record committed at
+`5ac1e0b14` cites three evidence artifacts that were **untracked in git** at
+that commit:
+
+```text
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_CLARIFICATION_v0.3.md
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_TEST_SPEC_v0.3.md
+CSIA_BOOK_6_GAP7_PRE_RATIFICATION_REVIEW_v0.3.md
+```
+
+Verified by direct index inspection at `5ac1e0b14`. The decision was recorded
+correctly; the evidence it rests on had no commit to point at.
+
+```text
+GAP7_RATIFICATION_DECISION = STANDS
+GAP7_EVIDENCE_PACKAGE_GIT_ANCHORED_AT_RATIFICATION = FALSE
+```
+
+## The repair
+
+```text
+GAP7_RATIFICATION                        = STANDS
+GAP7_ORIGINAL_DECISION_COMMIT            = 5ac1e0b14ab9ca8981ef017e75b963c2bb6c44f6
+GAP7_EVIDENCE_PACKAGE_ANCHOR             = 7488010608102bf5d7217c8f473eb8e088a44144
+EVIDENCE_ANCHOR_ERRATUM                  = v0.1
+NO_RETROACTIVE_CONTENT_CHANGE            = TRUE
+
+RATIFIED_DOCTRINE_CHANGED      = FALSE
+RATIFIED_TEST_CONTRACT_CHANGED = FALSE
+RATIFIED_PRE_RAT_RESULT_CHANGED = FALSE
+
+GAP_7 = RATIFIED / CLOSED
+GAP_7_RESOLUTION = 7A-KERNEL + B-STRICT + NV-B
+TEST_SPEC_v0.3_CASES = 39
+PRE_RAT_v0.3 = 15 / 15 PASS
+```
+
+The three artifacts were committed with content **identical to what was cited
+at ratification time**. `5ac1e0b14` was not rewritten, amended, or rebase.
+No claim is made that the evidence was historically committed there.
+
+**Erratum artifact:**
+`CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_RATIFICATION_ANCHOR_ERRATUM_v0.1.md`
+
+## Unchanged by this entry
+
+```text
+GAP_1..GAP_5 = CLOSED / RATIFIED
+GAP_6        = 6E DESIGN VALID / RATIFICATION NOT TAKEN UP
+GAP_7        = RATIFIED / CLOSED
+BOOK_6       = FROZEN_ACCEPTED
+BOOK_6_ACCEPTED_IMPLEMENTATION_ANCHOR = 3919fb8052e216e94034a753fb258d338c5fa0dc
+BOOK_6_ACCEPTANCE_COMMIT        = 5f94c3f40cea4441470c57671f51454da7377361
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+CHOIR_PLAN_PRESERVED            = TRUE
+```
+
+## Not authorized and not performed
+
+GAP-7 reopening; any amendment of `5ac1e0b14`; any force-push, rebase or
+history rewrite; any implementation; any source or test change; GAP-6
+ratification; any Book 7 or Choir work.

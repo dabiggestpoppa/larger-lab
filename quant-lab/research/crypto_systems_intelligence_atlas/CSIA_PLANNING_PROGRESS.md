@@ -3451,3 +3451,41 @@ any Choir work.
 **Implementation remains a separate, later decision.** The eventual Book 6
 implementation authorization must cover **both** the GAP-7 kernel currentness
 hardening **and** the comparison/change amendment, including GAP-6 if ratified.
+
+---
+
+# GAP-7 EVIDENCE ANCHOR REPAIRED — LEDGER UPDATE
+
+**Date:** 2026-10-03
+**Erratum:** `CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_RATIFICATION_ANCHOR_ERRATUM_v0.1.md`
+**Decision id:** none — provenance correction, GAP-7 not reopened.
+
+```text
+GAP7_RATIFICATION                        = STANDS
+GAP7_ORIGINAL_DECISION_COMMIT            = 5ac1e0b14ab9ca8981ef017e75b963c2bb6c44f6
+GAP7_EVIDENCE_PACKAGE_ANCHOR             = 7488010608102bf5d7217c8f473eb8e088a44144
+EVIDENCE_ANCHOR_ERRATUM                  = v0.1
+NO_RETROACTIVE_CONTENT_CHANGE            = TRUE
+
+GAP_7              = CLOSED / RATIFIED
+GAP_7_RESOLUTION   = 7A-KERNEL + B-STRICT + NV-B
+TEST_SPEC_v0.3_CASES = 39
+PRE_RAT_v0.3       = 15 / 15 PASS
+
+RATIFIED_DOCTRINE_CHANGED      = FALSE
+RATIFIED_TEST_CONTRACT_CHANGED = FALSE
+RATIFIED_PRE_RAT_RESULT_CHANGED = FALSE
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+
+GAP_6 = 6E DESIGN VALID / RATIFICATION NOT TAKEN UP
+```
+
+**Lesson recorded.** A ratification record that cites artifacts must not be
+committed before those artifacts are anchored. Evidence and decision land in the
+same commit, or the decision is anchored to a commit that cannot be checked.
+
+**Not authorized and not performed:** any amendment of `5ac1e0b14`; any history
+rewrite; any implementation; any source or test change; GAP-6 ratification.
