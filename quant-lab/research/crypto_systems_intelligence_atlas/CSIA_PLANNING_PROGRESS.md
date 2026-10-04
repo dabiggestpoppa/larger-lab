@@ -3771,3 +3771,88 @@ LIVE_ACQUISITION_AUTHORITY      = FALSE
 any branch or worktree creation; any mutation of the frozen accepted Book 6
 worktree; any edit to a ratified record or committed spec; any re-scoring of the
 consolidated review; Book 7 or Choir work.
+
+---
+
+# B-STRICT RECONCILED — LEDGER UPDATE
+
+**Date:** 2026-10-04
+**Decision id:** none (audit); proposed `BOOK6-IMPL-CONSOLIDATED-v0.2`
+
+## Standing state change
+
+```text
+AUTH_REVIEW_v0.1 = SUPERSEDED / INTERNAL GAP7 STATUS CONTRADICTION
+AUTH_REVIEW_v0.2 = PASS (12 / 12 TRUE)
+PACKET_v0.1      = SUPERSEDED / INHERITED THE CONTRADICTION
+PACKET_v0.2      = AWAITING_OPERATOR_DECISION
+
+B_STRICT                 = UNCHANGED / RATIFIED   (BOOK6-GAP7-v0.3)
+STATUS_VALIDATOR_CLEANUP = DEFERRED / NON-AUTHORITY
+BOOK6_BASELINE_COUNTS    = VERIFIED               (B1-B6, R1-R3, 0 divergences)
+SENSOR_BASELINE          = PINNED / 2325 PASS / 14 FAIL / 4 SKIP
+
+CRITERION_3 = TRUE in both v0.1 and v0.2
+              the BASIS changed: v0.1's TRUE was unsupported because D3
+              contradicted ratified B-STRICT; v0.2's TRUE is sound.
+CRITERION_VALUE_CHANGES = 0
+```
+
+## The corrected GAP-7 contract
+
+```text
+D1  remove the non-value-bearing early authority bypass  (AUTHORITY-RELEVANT)
+D2  lineage / terminality enforced at the registry       (AUTHORITY-RELEVANT)
+D3  NO STATUS VALIDATOR AUTHORITY CHANGE                 (EXPLICIT NON-ACTION)
+D4  all 8 resolve_current consumers inherit the fix      (AUTHORITY-RELEVANT)
+
+STATUS_VALIDATOR_EDIT_REQUIRED   = FALSE
+CURRENTNESS_RESOLVER_USES_STATUS = FALSE
+RENAME_OBSERVATION_STATUS        = FORBIDDEN
+DELETE_OBSERVATION_STATUS        = FORBIDDEN
+```
+
+## Why the tempting repair is refused
+
+The `SUPERSEDED` validator is genuinely incoherent: it pairs the status with the
+**outgoing** edge while "superseded" names the **incoming** one. It is not on any
+authority path, so it changes no verdict. Making it refuse authority would fix a
+bookkeeping inconsistency by corrupting the currentness law and would break
+`CURR-S1`.
+
+```text
+STATUS_VALIDATOR_SEMANTIC_INCOHERENCE = KNOWN / HISTORICAL / NON-AUTHORITY-BEARING
+OUT_OF_SCOPE_LIFECYCLE_CLEANUP        = TRUE
+```
+
+## Not a blocker
+
+```text
+BOOK6_TREE_FINGERPRINT_REQUIRED_FOR_AUTHORIZATION = FALSE
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.2.md  PASS 12/12
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PACKET_v0.2.md  AWAITING
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Next operator action — two independent questions
+
+```text
+1. BOOK6-IMPL-CONSOLIDATED-v0.2 = AUTHORIZE_OFFLINE_IMPLEMENTATION | HOLD
+2. RATIFY TIME-1..TIME-15 as the 6E falsification contract        | PROCEED
+```
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**Not authorized and not performed:** implementation; any source or test change;
+any branch or worktree creation; any mutation of the frozen accepted Book 6
+worktree; any status-validator edit; any rename or deletion of
+`ObservationStatus`; any edit to review v0.1 or packet v0.1; Book 7 or Choir work.

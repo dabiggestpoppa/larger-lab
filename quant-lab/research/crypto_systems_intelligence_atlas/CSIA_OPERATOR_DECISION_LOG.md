@@ -3248,3 +3248,129 @@ Implementation; any source or test change; any branch or worktree creation; any
 mutation of the frozen accepted Book 6 worktree; any edit to a ratified record
 or a committed spec; any re-scoring of the consolidated review; GAP reopening;
 Book 7 or Choir work.
+
+---
+
+# CSIA — B-STRICT RECONCILED IN BOOK 6 IMPLEMENTATION AUTHORIZATION
+
+**Date:** 2026-10-04
+**Decision id:** none (audit); proposed `BOOK6-IMPL-CONSOLIDATED-v0.2`
+**Status:** `AUDIT_FINDING` + `AWAITING_OPERATOR_DECISION`
+**Implementation authority:** `FALSE`
+
+## The defect found by external review
+
+The committed review v0.1 carried an internal contradiction:
+
+```text
+STATEMENT A  section 1.1 (lines 71-72) and row A8 (line 86)
+    ObservationStatus IS NOT A CONJUNCT
+    STATUS_ONLY_CHANGES_CURRENTNESS = FALSE
+    correct, and consistent with ratified B-STRICT
+
+STATEMENT B  section 1.3 delta D3 (lines 115-117)
+    "Required: correct the polarity so SUPERSEDED cannot read as CURRENT"
+    would make ObservationStatus authority-bearing
+
+AUTH_REVIEW_v0.1_INTERNAL_CONTRADICTION = TRUE
+```
+
+The two cannot both govern implementation.
+
+## The ratified precedence, verified at source
+
+`CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_RATIFICATION_RECORD_v0.1.md`
+(`RATIFIED`, `BOOK6-GAP7-v0.3`), §2 lines 53-56 and §3 line 83:
+
+```text
+OBSERVATION_STATUS_IS_CURRENTNESS_AUTHORITY = FALSE
+STATUS_ONLY_CHANGES_CURRENTNESS             = FALSE
+SUPERSESSION_CURRENTNESS_SOURCE             = REGISTERED_LINEAGE_TERMINALITY
+ObservationStatus is NOT a conjunct.
+
+AUTHORITY_FOLLOWS_LINEAGE_NOT_STATUS = TRUE
+D3_AS_IMPLEMENTATION_REQUIREMENT     = INVALID
+```
+
+## What the validator actually does (verified read-only)
+
+Read at `book6_records.py:202-215`, `_check_supersession_discipline` performs
+three construction-time bookkeeping checks: a `SUPERSEDED` record must name what
+it superseded; a superseding record must declare a restatement reason; a record
+may not supersede itself. It reads no lineage, no methodology, no source claims,
+and never returns a currency verdict.
+
+```text
+THE_VALIDATOR_DECIDES_CURRENTNESS = FALSE
+D3_PREMISE "INVERTED RELATIVE TO TERMINALITY LAW" = FALSE
+```
+
+The real incoherence is narrower: the status is paired with the **outgoing**
+edge while "superseded" names the **incoming** one (`measurement_history` at
+`book6_registry.py:172-191` walks forward via
+`obs.supersedes_measurement_id == chain[-1].measurement_id`).
+
+```text
+STATUS_VALIDATOR_SEMANTIC_INCOHERENCE  = KNOWN
+HISTORICAL                             = TRUE
+AUTHORITY_BEARING                      = FALSE
+REQUIRED_FOR_GAP7_CURRENTNESS_FIX      = FALSE
+REQUIRED_FOR_COMPARISON_IMPLEMENTATION = FALSE
+OUT_OF_SCOPE_LIFECYCLE_CLEANUP         = TRUE
+
+STATUS_VALIDATOR_EDIT_REQUIRED   = FALSE
+CURRENTNESS_RESOLVER_USES_STATUS = FALSE
+```
+
+Refusing the tempting repair is correct: making `SUPERSEDED` refuse authority
+would introduce a status-to-currency mapping the ratified record forbids, and
+would break `CURR-S1`.
+
+## Corrected GAP-7 implementation deltas
+
+```text
+D1  book6_registry.py:195-216  remove the non-value-bearing early bypass
+D2  book6_registry.py:172-191  lineage validity / terminality enforced at the
+                               registry, so branching fails closed on WRITE
+D3  book6_records.py:202-215   NO STATUS VALIDATOR AUTHORITY CHANGE
+D4  8 call sites               inherit the central fix; no consumer workaround
+```
+
+## Standing state
+
+```text
+AUTH_REVIEW_v0.1 = SUPERSEDED / STATUS CONTRADICTION
+AUTH_REVIEW_v0.2 = PASS (12 / 12 TRUE)
+PACKET_v0.1      = SUPERSEDED / INHERITED THE CONTRADICTION
+PACKET_v0.2      = AWAITING_OPERATOR_DECISION
+
+B_STRICT                = UNCHANGED / RATIFIED (BOOK6-GAP7-v0.3)
+STATUS_VALIDATOR_CLEANUP = DEFERRED / NON-AUTHORITY
+BOOK6_BASELINE_COUNTS    = VERIFIED (B1-B6, R1-R3, 0 divergences)
+SENSOR_BASELINE          = PINNED / 2325 PASS / 14 FAIL / 4 SKIP
+
+CRITERION_3_CHANGED_VALUE = 0
+CRITERION_3_CHANGED_BASIS = 1  (TRUE is now sound rather than unsupported)
+
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Explicitly NOT raised as a blocker
+
+```text
+BOOK6_TREE_FINGERPRINT_REQUIRED_FOR_AUTHORIZATION = FALSE
+```
+
+B1-B6 and R1-R3 were independently re-measured per-file at `5f94c3f40c`. A
+baseline manifest is optional hardening for RUNG 11 and must change no
+governance semantics.
+
+## Not authorized and not performed
+
+Implementation; any source or test change; any branch or worktree creation; any
+mutation of the frozen accepted Book 6 worktree; any edit to the status
+validator; any rename or deletion of `ObservationStatus`; any reinterpretation
+of historical records; any edit to review v0.1 or packet v0.1; any GAP reopening;
+any Book 7 or Choir work.
