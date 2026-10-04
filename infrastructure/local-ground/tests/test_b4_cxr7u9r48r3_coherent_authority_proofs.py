@@ -19,6 +19,7 @@ that the attack was impossible.
 import ast
 import builtins
 import dataclasses
+import hashlib
 import json
 import os
 import sys
@@ -1499,6 +1500,362 @@ ALL_BINDING_FORMS = frozenset({
 })
 
 
+# X8: EXACT CALL-SITE AND BINDING AUTHORITY.
+#
+# The X7 and X7X rules both authorize a REVIEWED SPELLING. X7 authorized a
+# (receiver, method) pair anywhere; X7X narrowed that to a
+# (owner, receiver, method) triple plus reviewed binding forms. Neither binds
+# the review to the INDIVIDUAL SOURCE SITE, so all of these are still admitted:
+#
+#     roots.append(payload)          # a SECOND call in the owner that owns it
+#     roots = attacker; roots.append(payload)   # receiver rebound by an
+#                                               # already-reviewed form
+#     os = attacker; os.stat(path)   # the module NAME is shadowed
+#     hashlib = attacker; hashlib.sha256(b"x")
+#     RecordSnapshot = attacker; RecordSnapshot(record)
+#     _transitions_dir = attacker; _transitions_dir()
+#
+# The last four are the substantive ones: EVERY spelling-based rule in this
+# file matches identifier strings, so assigning to a name defeats it. A name
+# that has been reassigned is not the thing the review was about, and no
+# amount of string comparison can tell.
+#
+# So authority is bound to the exact site AND to the source context that gives
+# the receiver its meaning:
+#
+#   * EXACT_SITE_MANIFEST records, per (owner function, normalized call
+#     expression), the exact number of times that call occurs in the reviewed
+#     source. A new call, or a DUPLICATE of an approved one, changes the count.
+#   * REVIEWED_OWNER_DIGESTS records a coordinate-independent digest of each
+#     owning function's AST. Any change to the owner -- a rebinding, a
+#     shadowing assignment, an added or duplicated call, a reordering --
+#     changes the digest and withdraws every grant in that owner.
+#
+# The digest deliberately uses `include_attributes=False`, so it is stable
+# under line and column shifts and cannot be satisfied by re-indenting, while
+# still changing under every semantic edit. Coordinates REMAIN DIAGNOSTIC
+# ONLY. The digest is intentionally coarse and fail-closed: it does not model
+# what each name holds, it refuses when anything in the owner changed.
+#
+# Both registries are FROZEN literals measured from the shipped engine. An
+# audited source is judged against them, never against itself.
+#
+# Stated boundary: this is NOT semantic type resolution. It is exact-site and
+# exact-owner-context binding. It does not prove that `record` holds a dict --
+# it proves that the site is the reviewed one in the reviewed owner and that
+# the owner has not been edited. Stated rather than implied.
+EXACT_SITE_MANIFEST = {
+    ("_acquire_recovery_authority", "OPERATION_ID_RE.match"): 1,
+    ("_acquire_recovery_authority", "RecordSnapshot"): 1,
+    ("_acquire_recovery_authority", "RecoveryAuthoritySnapshot"): 1,
+    ("_acquire_recovery_authority", "_ExecutionAuthorityConflict"): 2,
+    ("_acquire_recovery_authority", "_assert_one_directory_generation"): 1,
+    ("_acquire_recovery_authority", "_assert_record_identity"): 1,
+    ("_acquire_recovery_authority", "_deep_freeze"): 1,
+    ("_acquire_recovery_authority", "_derive_claim_coordinate"): 1,
+    ("_acquire_recovery_authority", "_derive_record_coordinate_name"): 1,
+    ("_acquire_recovery_authority", "_open_governed_directory"): 1,
+    ("_acquire_recovery_authority", "_read_record_snapshot_admitted"): 1,
+    ("_acquire_recovery_authority", "_read_selector_snapshot_admitted"): 1,
+    ("_acquire_recovery_authority", "_receipt_digest"): 3,
+    ("_acquire_recovery_authority", "admitted_record.get"): 1,
+    ("_acquire_recovery_authority", "isinstance"): 2,
+    ("_acquire_recovery_authority", "os.close"): 1,
+    ("_acquire_recovery_authority", "os.path.join"): 1,
+    ("_admit_record_descriptor", "_assert_record_authority_names"): 1,
+    ("_admit_record_descriptor", "_record_conflict"): 7,
+    ("_admit_record_descriptor", "bool"): 2,
+    ("_admit_record_descriptor", "getattr"): 2,
+    ("_admit_record_descriptor", "os.fstat"): 2,
+    ("_admit_record_descriptor", "os.path.basename"): 1,
+    ("_admit_record_descriptor", "os.stat"): 1,
+    ("_admit_record_descriptor", "stat.S_IMODE"): 1,
+    ("_admit_record_descriptor", "stat.S_ISREG"): 1,
+    ("_admit_selector_descriptor", "_assert_selector_authority_names"): 1,
+    ("_admit_selector_descriptor", "_selector_conflict"): 7,
+    ("_admit_selector_descriptor", "bool"): 2,
+    ("_admit_selector_descriptor", "getattr"): 2,
+    ("_admit_selector_descriptor", "os.fstat"): 2,
+    ("_admit_selector_descriptor", "os.stat"): 1,
+    ("_admit_selector_descriptor", "stat.S_IMODE"): 1,
+    ("_admit_selector_descriptor", "stat.S_ISREG"): 1,
+    ("_approved_roots", "os.environ.get"): 1,
+    ("_approved_roots", "os.environ.get(...).split"): 1,
+    ("_approved_roots", "os.path.dirname"): 2,
+    ("_approved_roots", "os.path.isdir"): 1,
+    ("_approved_roots", "os.path.join"): 1,
+    ("_approved_roots", "os.path.realpath"): 2,
+    ("_approved_roots", "part.strip"): 1,
+    ("_approved_roots", "roots.append"): 1,
+    ("_assert_one_directory_generation", "_record_conflict"): 7,
+    ("_assert_one_directory_generation", "bool"): 1,
+    ("_assert_one_directory_generation", "getattr"): 1,
+    ("_assert_one_directory_generation", "os.fstat"): 1,
+    ("_assert_one_directory_generation", "os.stat"): 1,
+    ("_assert_one_directory_generation", "stat.S_ISDIR"): 1,
+    ("_assert_record_authority_names", "_record_conflict"): 4,
+    ("_assert_record_authority_names", "census.append"): 2,
+    ("_assert_record_authority_names", "len"): 2,
+    ("_assert_record_authority_names", "name.startswith"): 1,
+    ("_assert_record_authority_names", "os.listdir"): 1,
+    ("_assert_record_authority_names", "os.stat"): 1,
+    ("_assert_record_authority_names", "stat.S_IMODE"): 1,
+    ("_assert_record_authority_names", "stat.S_ISREG"): 1,
+    ("_assert_record_identity", "_record_conflict"): 3,
+    ("_assert_record_identity", "isinstance"): 1,
+    ("_assert_record_identity", "record.get"): 2,
+    ("_assert_selector_authority_names", "_claim_temp_prefix"): 1,
+    ("_assert_selector_authority_names", "_selector_conflict"): 5,
+    ("_assert_selector_authority_names", "census.append"): 1,
+    ("_assert_selector_authority_names", "entry.stat"): 1,
+    ("_assert_selector_authority_names", "len"): 2,
+    ("_assert_selector_authority_names", "name.endswith"): 1,
+    ("_assert_selector_authority_names", "name.startswith"): 1,
+    ("_assert_selector_authority_names", "os.scandir"): 1,
+    ("_assert_selector_authority_names", "stat.S_IMODE"): 1,
+    ("_assert_selector_authority_names", "stat.S_ISREG"): 1,
+    ("_bound_operation", "OPERATION_ID_RE.match"): 1,
+    ("_bound_operation", "RuntimeError"): 4,
+    ("_bound_operation", "_load_transition_record"): 1,
+    ("_bound_operation", "_receipt_digest"): 1,
+    ("_bound_operation", "isinstance"): 1,
+    ("_bound_operation", "promote.get"): 2,
+    ("_bound_operation", "record.get"): 3,
+    ("_claim_state", "_classify_claim_content"): 1,
+    ("_claim_state", "_read_selector_snapshot"): 1,
+    ("_classify_claim_content", "any"): 1,
+    ("_classify_claim_content", "claim.get"): 4,
+    ("_classify_claim_content", "isinstance"): 2,
+    ("_classify_claim_content", "len"): 1,
+    ("_classify_claim_coordinate", "_selector_conflict"): 4,
+    ("_classify_claim_coordinate", "bool"): 1,
+    ("_classify_claim_coordinate", "getattr"): 1,
+    ("_classify_claim_coordinate", "os.stat"): 1,
+    ("_classify_claim_coordinate", "stat.S_IMODE"): 1,
+    ("_classify_claim_coordinate", "stat.S_ISREG"): 1,
+    ("_classify_record_coordinate", "_record_conflict"): 4,
+    ("_classify_record_coordinate", "bool"): 1,
+    ("_classify_record_coordinate", "getattr"): 1,
+    ("_classify_record_coordinate", "os.stat"): 1,
+    ("_classify_record_coordinate", "stat.S_IMODE"): 1,
+    ("_classify_record_coordinate", "stat.S_ISREG"): 1,
+    ("_classify_record_for_shell", "OPERATION_ID_RE.match"): 1,
+    ("_classify_record_for_shell", "_STATE_DISPATCH.get"): 1,
+    ("_classify_record_for_shell", "_acquire_recovery_authority"): 1,
+    ("_classify_record_for_shell", "_claim_state"): 1,
+    ("_classify_record_for_shell", "handler"): 1,
+    ("_classify_record_for_shell", "isinstance"): 2,
+    ("_classify_record_for_shell", "record.get"): 3,
+    ("_classify_rollback_for_shell", "_bound_operation"): 1,
+    ("_classify_rollback_for_shell", "_classify_record_for_shell"): 1,
+    ("_classify_rollback_for_shell", "_load_receipt"): 1,
+    ("_classify_rollback_for_shell", "isinstance"): 1,
+    ("_classify_rollback_for_shell", "promote.get"): 4,
+    ("_deep_freeze", "_FrozenDict"): 1,
+    ("_deep_freeze", "_deep_freeze"): 3,
+    ("_deep_freeze", "frozenset"): 1,
+    ("_deep_freeze", "isinstance"): 3,
+    ("_deep_freeze", "tuple"): 1,
+    ("_deep_freeze", "value.items"): 1,
+    ("_derive_claim_coordinate", "OPERATION_ID_RE.match"): 1,
+    ("_derive_claim_coordinate", "_ExecutionAuthorityConflict"): 1,
+    ("_derive_claim_coordinate", "_transitions_dir"): 1,
+    ("_derive_claim_coordinate", "isinstance"): 1,
+    ("_derive_record_coordinate_name", "OPERATION_ID_RE.match"): 1,
+    ("_derive_record_coordinate_name", "_record_conflict"): 3,
+    ("_derive_record_coordinate_name", "isinstance"): 1,
+    ("_derive_record_coordinate_name", "os.path.basename"): 1,
+    ("_load_receipt", "_validated_open_path"): 1,
+    ("_load_receipt", "json.load"): 1,
+    ("_load_receipt", "open"): 1,
+    ("_load_transition_record", "RuntimeError"): 1,
+    ("_load_transition_record", "_transitions_dir"): 1,
+    ("_load_transition_record", "json.load"): 1,
+    ("_load_transition_record", "open"): 1,
+    ("_load_transition_record", "os.path.isfile"): 1,
+    ("_load_transition_record", "os.path.join"): 1,
+    ("_open_claim_descriptor", "_selector_conflict"): 2,
+    ("_open_claim_descriptor", "os.open"): 2,
+    ("_open_governed_directory", "_ExecutionAuthorityConflict"): 6,
+    ("_open_governed_directory", "getattr"): 1,
+    ("_open_governed_directory", "os.close"): 2,
+    ("_open_governed_directory", "os.fstat"): 1,
+    ("_open_governed_directory", "os.open"): 1,
+    ("_open_governed_directory", "os.stat"): 1,
+    ("_open_governed_directory", "stat.S_ISDIR"): 2,
+    ("_read_admitted_claim", "_selector_conflict"): 5,
+    ("_read_admitted_claim", "bytes.join"): 1,
+    ("_read_admitted_claim", "bytes.join(...).decode"): 1,
+    ("_read_admitted_claim", "chunks.append"): 1,
+    ("_read_admitted_claim", "json.loads"): 1,
+    ("_read_admitted_claim", "len"): 1,
+    ("_read_admitted_claim", "os.fstat"): 2,
+    ("_read_admitted_claim", "os.read"): 1,
+    ("_read_admitted_record", "_record_conflict"): 5,
+    ("_read_admitted_record", "bytes.join"): 1,
+    ("_read_admitted_record", "chunks.append"): 1,
+    ("_read_admitted_record", "json.loads"): 1,
+    ("_read_admitted_record", "len"): 1,
+    ("_read_admitted_record", "os.fstat"): 2,
+    ("_read_admitted_record", "os.read"): 1,
+    ("_read_admitted_record", "raw.decode"): 1,
+    ("_read_record_snapshot_admitted", "RecordSnapshot"): 2,
+    ("_read_record_snapshot_admitted", "_admit_record_descriptor"): 1,
+    ("_read_record_snapshot_admitted", "_classify_record_coordinate"): 1,
+    ("_read_record_snapshot_admitted", "_deep_freeze"): 1,
+    ("_read_record_snapshot_admitted", "_read_admitted_record"): 1,
+    ("_read_record_snapshot_admitted", "_receipt_digest"): 1,
+    ("_read_record_snapshot_admitted", "_record_conflict"): 4,
+    ("_read_record_snapshot_admitted", "hashlib.sha256"): 1,
+    ("_read_record_snapshot_admitted", "hashlib.sha256(...).hexdigest"): 1,
+    ("_read_record_snapshot_admitted", "isinstance"): 1,
+    ("_read_record_snapshot_admitted", "os.close"): 2,
+    ("_read_record_snapshot_admitted", "os.open"): 2,
+    ("_read_record_snapshot_admitted", "os.path.join"): 1,
+    ("_read_record_snapshot_admitted", "os.stat"): 1,
+    ("_read_record_snapshot_admitted", "stat.S_IMODE"): 1,
+    ("_read_selector_snapshot", "_derive_claim_coordinate"): 1,
+    ("_read_selector_snapshot", "_open_governed_directory"): 1,
+    ("_read_selector_snapshot", "_read_selector_snapshot_admitted"): 1,
+    ("_read_selector_snapshot", "os.close"): 1,
+    ("_read_selector_snapshot_admitted", "SelectorSnapshot"): 2,
+    ("_read_selector_snapshot_admitted", "_admit_selector_descriptor"): 1,
+    ("_read_selector_snapshot_admitted", "_classify_claim_coordinate"): 1,
+    ("_read_selector_snapshot_admitted", "_deep_freeze"): 1,
+    ("_read_selector_snapshot_admitted", "_open_claim_descriptor"): 1,
+    ("_read_selector_snapshot_admitted", "_read_admitted_claim"): 1,
+    ("_read_selector_snapshot_admitted", "_selector_conflict"): 2,
+    ("_read_selector_snapshot_admitted", "os.close"): 2,
+    ("_read_selector_snapshot_admitted", "os.path.join"): 1,
+    ("_read_selector_snapshot_admitted", "os.stat"): 1,
+    ("_read_selector_snapshot_admitted", "stat.S_IMODE"): 1,
+    ("_receipt_digest", "_thaw"): 1,
+    ("_receipt_digest", "canonical.encode"): 1,
+    ("_receipt_digest", "hashlib.sha256"): 1,
+    ("_receipt_digest", "hashlib.sha256(...).hexdigest"): 1,
+    ("_receipt_digest", "json.dumps"): 1,
+    ("_record_conflict", "_selector_conflict"): 1,
+    ("_recovery_state_dir", "os.path.dirname"): 2,
+    ("_recovery_state_dir", "os.path.join"): 1,
+    ("_recovery_state_dir", "os.path.realpath"): 1,
+    ("_selector_conflict", "_ExecutionAuthorityConflict"): 1,
+    ("_thaw", "_thaw"): 3,
+    ("_thaw", "isinstance"): 3,
+    ("_thaw", "sorted"): 1,
+    ("_thaw", "value.items"): 1,
+    ("_transitions_dir", "_recovery_state_dir"): 1,
+    ("_transitions_dir", "os.path.join"): 1,
+    ("_validated_open_path", "RuntimeError"): 3,
+    ("_validated_open_path", "_approved_roots"): 1,
+    ("_validated_open_path", "os.path.abspath"): 1,
+    ("_validated_open_path", "os.path.commonpath"): 1,
+    ("_validated_open_path", "os.path.isfile"): 1,
+    ("_validated_open_path", "os.path.realpath"): 1,
+}
+
+REVIEWED_OWNER_DIGESTS = {
+    "_acquire_recovery_authority": "6e90f2548fe4ad353f8af63b3680398f918fb84c9dd24b2431c715331ab112fb",
+    "_admit_record_descriptor": "fb4e99fea8002019dabe2832afa0236986a13d65767838694e900cbf9844023e",
+    "_admit_selector_descriptor": "113cd5eadc91c435444d555f6b7aac57043100816373e88108e992a6ce084c8b",
+    "_approved_roots": "9054ac48685e91440b18602a9e872e40dad449c4c30cf2b77ab18c0a57c833ff",
+    "_assert_one_directory_generation": "b040a2fb4411eca733722ddf5234938e31dc16dcc5b0ff280254b8af5fbc9b59",
+    "_assert_record_authority_names": "1658b1134b6be61e808d69550cbc8d852ba2d25cfc2326c361383b4298f7a841",
+    "_assert_record_identity": "c79ae13e85ddc62d64a483b003df58eb17e627fca5f2cdd3beb8ee2c462a1f06",
+    "_assert_selector_authority_names": "3aee57e5574beb6b1828bf0a0a2c0f1f29536bbff60f4625ccaad3eed8de48af",
+    "_bound_operation": "8cc3a300c95e6af2b892c2609eb14abee1cb55ccdac546185784d1cbe44acd42",
+    "_claim_state": "6f9c8b122b80820d3dfb5da4f8b92beaba68e0d2a86d283b6b97eb2c18ed34b9",
+    "_claim_temp_prefix": "eee817c6a81b589262f2e2e82eb751c5af718d3c72639eb230cb787fc2305cdb",
+    "_classify_claim_content": "582e865cb0a45d74aa6c9ec668c9822c0fd06d6fc0f85db97e4d8e70b0530639",
+    "_classify_claim_coordinate": "561bb63fae4d22c19d9f0614a3828cdc10f0f6d5e048cbaaa732f49f772be381",
+    "_classify_record_coordinate": "707fcde7fb7ed49f28aef746cef8a1c2650706669f99ba5f91965ef2c2579a3b",
+    "_classify_record_for_shell": "87fae53b1f3f8238f3b73e2c9a99ee7f24d86b7db139b018032f60da5c5ae85f",
+    "_classify_rollback_for_shell": "c69097a8fbb79314a0fad59d17fcf9232797a46709cd7f037b62b93448cbe3f2",
+    "_deep_freeze": "d8905b2215cd2c021b0d281f442acec1549e4d3323fd8fc826241193ff3fa619",
+    "_derive_claim_coordinate": "c67d8f3f49f6849984c3476533087670500ff5c124a0dae443cd9941d6f02b08",
+    "_derive_record_coordinate_name": "ba7b48d83e8e1a6454d502cbaab229c6e6093aa3a883465f25a4cbaf584ab8d9",
+    "_load_receipt": "7a3a146bde711d8acbdc36cd2104d36f01ac82ea15487c07ef184d0b5bd5e759",
+    "_load_transition_record": "4bde580c2e3765a038343d4bedad95d47ccaba415a40df1e036e54e36f6f7ffd",
+    "_open_claim_descriptor": "edd5a83f1bec9714293257bd8745d8ad8203bd1ed6bbad78cec351ae54e5e847",
+    "_open_governed_directory": "35900b55cf47fb6e78a4cc805f5d3b7263ca12685f01a46b8d23d58544f6833e",
+    "_read_admitted_claim": "e018b8f917feea992ad1d8c9ad25bcf643f31e217d21c5ce5149d76b2c9aa752",
+    "_read_admitted_record": "ee8da960dafe219acafe7723d8f8c381a46df9ad66c32f136259e4f8d2c49b1c",
+    "_read_record_snapshot_admitted": "38961ec849f2155e21f239d4736f4cb44a15587e1459b4dab17687cecdd3ac0f",
+    "_read_selector_snapshot": "88ca2e52e5ec51236108664b03fd9fe1e35b26fb80270649205dd02859cbf4e6",
+    "_read_selector_snapshot_admitted": "4078f272d81d25e0270dd368536467d800b017187746939f006eb09f19a6c864",
+    "_receipt_digest": "24aed40c1a6fd44cd2ddb3c535d99eff2d23536ea961c1cd7998304c247b0fc8",
+    "_record_conflict": "6190a0cd2752d36e6f172ddc334ed8b3b3bb5d4cb075385dad92caa7c0b87d1c",
+    "_recovery_state_dir": "4ccea432012075da29f00fae07153be4e3b49436bdf55ef67996c8f0e3ce4aab",
+    "_selector_conflict": "85054cb34f77d34d2abc837d0667e23add2bdaf4dd8a0fb439c91565f671fc6c",
+    "_thaw": "f1ca67f2b87f3177585a6ec3e4792aab3e446b4765b888ac4ff90e37d3aa6bfb",
+    "_transitions_dir": "74f342aa6ebcd42912085d68e268d4035f0079afaecc4b4635e0a94d94ddcb2e",
+    "_validated_open_path": "dc70eb27c0c6f3aeb568603914354c79ecb5c486d2908feee5d93ed348d994e0",
+}
+
+
+def _owner_ast_digest(node):
+    """Coordinate-independent digest of an owning function's AST.
+
+    `include_attributes=False` drops line and column numbers, so re-indenting
+    or shifting the file does not change the digest. Anything that could
+    change what a name MEANS inside the owner does.
+    """
+    dumped = ast.dump(node, annotate_fields=True, include_attributes=False)
+    return hashlib.sha256(dumped.encode("utf-8")).hexdigest()
+
+
+def _audit_context(tree):
+    """Everything the classifier needs about the source UNDER AUDIT.
+
+    Rebuilt on every audit, so a monkeypatched registry is picked up and a
+    weakened source reports its own counts and digests -- which is what lets
+    them be compared against the frozen reviewed baseline.
+    """
+    funcs, closure = _authority_closure(tree)
+    counts = {}
+    for owner in closure:
+        for call in ast.walk(funcs[owner]):
+            if not isinstance(call, ast.Call):
+                continue
+            key = (owner, _normalized_call_expression(call))
+            counts[key] = counts.get(key, 0) + 1
+    return {
+        "definitions": _engine_definitions(tree),
+        "bindings": _receiver_binding_forms(funcs, closure),
+        "digests": {o: _owner_ast_digest(funcs[o]) for o in closure},
+        "counts": counts,
+        "funcs": funcs,
+        "closure": closure,
+    }
+
+
+def _site_authority(owner, expr, context):
+    """None when this exact site is reviewed; else the refusal reason.
+
+    Three independent ways to fail, each naming the identity it compared, so
+    an operator can tell "this call was never reviewed" from "this owner was
+    edited" without re-deriving the classifier.
+    """
+    key = (owner, expr)
+    expected = EXACT_SITE_MANIFEST.get(key)
+    if expected is None:
+        return (f"exact source site {key!r} is not in EXACT_SITE_MANIFEST, "
+                f"so this {expr!r} call has no review decision of its own")
+    observed = context["counts"].get(key, 0)
+    if observed != expected:
+        return (f"exact source site {key!r} occurs {observed} time(s) in the "
+                f"source under audit but {expected} time(s) in the reviewed "
+                f"manifest; a duplicate does not inherit the review")
+    want = REVIEWED_OWNER_DIGESTS.get(owner)
+    if want is None:
+        return f"owner {owner!r} has no reviewed source digest"
+    have = context["digests"].get(owner)
+    if have != want:
+        return (f"owner {owner!r} source context changed: reviewed digest "
+                f"{want[:16]}..., observed {have[:16]}... -- a rebinding, "
+                f"shadowing or edit withdraws every grant in this owner")
+    return None
+
+
 def _note_arg_names(args, form, note):
     """Record every name a signature binds under `form`."""
     for arg in (list(args.posonlyargs) + list(args.args)
@@ -1680,7 +2037,7 @@ QUALIFIED_MODULES = frozenset({
 })
 
 
-def _classify_call(owner, call, engine_definitions, receiver_bindings):
+def _classify_call(owner, call, context):
     """Assign exactly one classification to a single reachable call site.
 
     Matching order matters and is deliberate:
@@ -1706,26 +2063,48 @@ def _classify_call(owner, call, engine_definitions, receiver_bindings):
     FORMS that name is allowed to take, so a reviewed receiver name rebound by
     a walrus, comprehension target, tuple unpack, lambda parameter or with
     target no longer inherits the review.
+
+    X8: steps 2-6 no longer GRANT authority on their own. Every grant is routed
+    through `_grant`, which additionally requires the exact source site to
+    appear in `EXACT_SITE_MANIFEST` with the reviewed occurrence count and the
+    owning function to carry the reviewed AST digest. A rule can therefore
+    RECOGNIZE a call and still refuse it: recognition is not authority.
     """
     callee = _qualified_callee(call)
     expr = _normalized_call_expression(call)
     col = getattr(call, "col_offset", 0)
+    engine_definitions = context["definitions"]
+    receiver_bindings = context["bindings"].get(owner, {})
 
     def _ret(classification, reason="", observer=None):
         return _ClassifiedCall(owner, call.lineno, callee, classification,
                                observer, col=col, expression=expr,
                                reason=reason)
 
+    def _grant(classification, reason, observer=None):
+        """Authorize ONE exact source site. X8: recognition is not authority.
+
+        Every path that would grant authority passes through here, so no rule
+        can admit a call by itself. The mutation path is deliberately included:
+        `os.open` earns its observer mapping from the SPELLING `os.open`, and
+        a shadowed `os` is not the real module, so the runtime tripwire would
+        never see a write issued through it.
+        """
+        denied = _site_authority(owner, expr, context)
+        if denied is not None:
+            return _ret(CLASS_UNKNOWN, denied)
+        return _ret(classification, reason, observer)
+
     if callee is None:
         return _ret(CLASS_UNKNOWN, "no renderable callee (dynamic call)")
     observer = _observer_for(callee)
     if observer is not None:
-        return _ret(CLASS_MUTATION, "maps to a tripwire observer", observer)
+        return _grant(CLASS_MUTATION, "maps to a tripwire observer", observer)
     # X7 rule F: a reviewed constructor must be decidable on its own reviewed
     # merits. Previously engine_definitions was consulted first, so every name
     # in PURE_CONSTRUCTORS was unreachable and the policy was dead.
     if callee in PURE_CONSTRUCTORS:
-        return _ret(CLASS_READ_ONLY, "reviewed pure constructor")
+        return _grant(CLASS_READ_ONLY, "reviewed pure constructor")
     head, _, attr = callee.rpartition(".")
     # X7: the receiver/method vs bare-name discriminator is the AST SHAPE, not
     # the rendered spelling. `hashlib.sha256(x).hexdigest()` renders as the
@@ -1735,25 +2114,29 @@ def _classify_call(owner, call, engine_definitions, receiver_bindings):
     if head in QUALIFIED_MODULES:
         # Known module: only the full dotted spelling may be admitted, so a
         # new module call cannot be absorbed by a bare-name registry entry.
+        # X8: a module HEAD is matched by string, so a shadowed `os` reaches
+        # this branch; `_grant` is what refuses it.
         if callee in READ_ONLY_REGISTRY:
-            return _ret(CLASS_READ_ONLY, "reviewed dotted module call")
+            return _grant(CLASS_READ_ONLY, "reviewed dotted module call")
         return _ret(CLASS_UNKNOWN,
                     f"module call {callee!r} is not in READ_ONLY_REGISTRY")
     if not is_method:
         # X7 rule E: the dispatch-table seam stays explicit and separately
         # proven by I.G.
         if callee in REVIEWED_DISPATCH_LOCALS:
-            return _ret(CLASS_INTERNAL,
-                        "engine dispatch table (proven by I.G)",
-                        "engine dispatch table (proven by I.G)")
+            return _grant(CLASS_INTERNAL,
+                          "engine dispatch table (proven by I.G)",
+                          "engine dispatch table (proven by I.G)")
         # X7 rule D: only genuine MODULE-LEVEL engine functions and classes may
         # take INTERNAL_CALL from a bare name. Nested defs and class methods are
         # deliberately absent from engine_definitions, so `commit()` cannot be
         # mistaken for an engine function.
+        # X8: this is a bare-name match too, so it is exactly as shadowable as
+        # the module case; `_grant` is what refuses it.
         if callee in engine_definitions:
-            return _ret(CLASS_INTERNAL, "module-level engine definition")
+            return _grant(CLASS_INTERNAL, "module-level engine definition")
         if callee in READ_ONLY_REGISTRY:
-            return _ret(CLASS_READ_ONLY, "reviewed bare builtin")
+            return _grant(CLASS_READ_ONLY, "reviewed bare builtin")
         return _ret(CLASS_UNKNOWN,
                     f"bare name {callee!r} is neither a module-level engine "
                     f"definition nor a reviewed builtin")
@@ -1761,12 +2144,13 @@ def _classify_call(owner, call, engine_definitions, receiver_bindings):
     receiver = call.func.value
     if _is_literal_receiver(receiver):
         if expr in LITERAL_RECEIVER_METHODS:
-            return _ret(CLASS_READ_ONLY, "literal receiver cannot be rebound")
+            return _grant(CLASS_READ_ONLY,
+                          "literal receiver cannot be rebound")
         return _ret(CLASS_UNKNOWN,
                     f"literal-receiver call {expr!r} is not reviewed")
     if isinstance(receiver, ast.Call):
         if expr in REVIEWED_EXPRESSION_RECEIVERS:
-            return _ret(CLASS_READ_ONLY, "reviewed expression receiver")
+            return _grant(CLASS_READ_ONLY, "reviewed expression receiver")
         return _ret(CLASS_UNKNOWN,
                     f"expression receiver {expr!r} is not in "
                     f"REVIEWED_EXPRESSION_RECEIVERS")
@@ -1791,9 +2175,9 @@ def _classify_call(owner, call, engine_definitions, receiver_bindings):
                         f"(owner, receiver, method) "
                         f"{(owner, recv, meth)!r} is not in "
                         f"REVIEWED_RECEIVER_SITES")
-        return _ret(CLASS_READ_ONLY,
-                    "reviewed (owner, receiver, method) triple, receiver "
-                    "bound only by reviewed forms")
+        return _grant(CLASS_READ_ONLY,
+                      "reviewed (owner, receiver, method) triple, receiver "
+                      "bound only by reviewed forms")
     return _ret(CLASS_UNKNOWN,
                 f"(receiver, method) pair {expr!r} is not in "
                 f"REVIEWED_RECEIVER_METHODS")
@@ -1849,16 +2233,14 @@ def _engine_definitions(tree):
 def _audit_source(source):
     """Classify every reachable call site. Returns (closure, sites)."""
     tree = ast.parse(source)
-    funcs, closure = _authority_closure(tree)
-    engine_definitions = _engine_definitions(tree)
-    receiver_bindings = _receiver_binding_forms(funcs, closure)
+    context = _audit_context(tree)
+    funcs, closure = context["funcs"], context["closure"]
     sites = []
     for owner in sorted(closure):
         calls = [c for c in ast.walk(funcs[owner]) if isinstance(c, ast.Call)]
         for call in sorted(calls,
                            key=lambda c: (c.lineno, _qualified_callee(c) or "")):
-            sites.append(_classify_call(owner, call, engine_definitions,
-                                        receiver_bindings.get(owner, {})))
+            sites.append(_classify_call(owner, call, context))
     return closure, sites
 
 
@@ -2213,6 +2595,13 @@ def test_i_g_the_dispatch_local_admission_is_proven_executably():
     authority closure, so its body is audited by the same closed-world check.
 
     It also pins the reverse: a name NOT in the reviewed set stays unknown.
+
+    X8 strengthens the reverse direction. The direct probe used to assert that
+    a bare `handler(record)` in an UNRELATED owner took INTERNAL_CALL on the
+    strength of its spelling. It no longer does: the dispatch admission is now
+    bound to the exact reviewed site in the engine, so the same spelling
+    outside that site is refused. The real site is still asserted internal, in
+    the loop above, so this narrows the admission rather than deleting it.
     """
     dispatch = pgrec._STATE_DISPATCH
     assert isinstance(dispatch, dict) and dispatch, "no state dispatch table"
@@ -2249,12 +2638,16 @@ def test_i_g_the_dispatch_local_admission_is_proven_executably():
 
     # A bare name outside the reviewed set stays unknown -- the admission is
     # not a blanket allowance for bare locals.
+    probe_context = {"definitions": set(), "bindings": {}, "digests": {},
+                     "counts": {}, "funcs": {}, "closure": set()}
     assert _classify_call(
         "_probe", ast.parse("handler(record)").body[0].value,
-        set(), {}).classification == CLASS_INTERNAL
+        probe_context).classification == CLASS_UNKNOWN, (
+        "X8: a dispatch-local name that is NOT an exact reviewed site must "
+        "not take INTERNAL_CALL from its spelling alone")
     assert _classify_call(
         "_probe", ast.parse("rogue(value)").body[0].value,
-        set(), {}).classification == CLASS_UNKNOWN
+        probe_context).classification == CLASS_UNKNOWN
 
 
 def test_i_f_the_four_quantities_are_reported_separately():
@@ -3064,29 +3457,46 @@ def test_k_j_the_reviewed_binding_forms_are_measured_not_invented():
 def test_k_k_dropping_the_binding_form_rule_reopens_the_hole(monkeypatch):
     """K.K The binding-form rule is load-bearing, not decorative.
 
-    Same shape as J.J: allow every form the engine uses and the forging
-    injections -- each injected into an owner that DID review the triple, so
-    owner-scoping cannot mask the result -- must become ADMITTED again. Then
-    restore the registry and the proof must go green.
+    Same shape as J.J: loosen the form registry and the forging injections --
+    each injected into an owner that DID review the triple, so owner-scoping
+    cannot mask the result -- must become ADMITTED again. Then restore the
+    registry and the proof must go green.
+
+    X8 NOTE. Loosening the form registry alone is no longer sufficient to
+    re-open the hole, because the exact-site gate refuses these injections on
+    its own. That is not this control going vacuous -- it is a SECOND rule
+    covering the same ground. So the exact-site gate is neutralized for the
+    duration, which is what isolates the form rule and keeps this control
+    discriminating. K.X (section L) proves the reverse isolation.
     """
-    saved = dict(REVIEWED_RECEIVER_BINDINGS)
-    every_form = ALL_BINDING_FORMS
-    loosened = {name: frozenset(every_form) for name in saved}
-    assert loosened["record"] != saved["record"], (
+    saved_bindings = dict(REVIEWED_RECEIVER_BINDINGS)
+    saved_gate = _site_authority
+    loosened = {name: frozenset(ALL_BINDING_FORMS) for name in saved_bindings}
+    assert loosened["record"] != saved_bindings["record"], (
         "the loosening is a no-op; this control would be vacuous")
     monkeypatch.setattr(
         sys.modules[__name__], "REVIEWED_RECEIVER_BINDINGS", loosened)
+    monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                        lambda *a, **k: None)
     try:
+        reopened = []
         for label, owner, injected, expr, rule in _BINDING_FORGERIES:
             if rule != "form":
                 continue  # caught by owner-scoping, not by the form rule
             refusals = _refusals(_inject_into_reachable(injected, into=owner))
-            assert expr not in refusals, (
-                f"loosening the binding-form rule did NOT re-open the hole "
-                f"for {label!r}; the rule is not load-bearing")
+            if expr not in refusals:
+                reopened.append(label)
+        assert sorted(reopened) == sorted(
+            label for label, _, _, _, rule in _BINDING_FORGERIES
+            if rule == "form"), (
+            f"loosening the binding-form rule did NOT re-open every form-rule "
+            f"forgery; still refused: "
+            f"{sorted(set(label for label, _, _, _, r in _BINDING_FORGERIES if r == 'form') - set(reopened))}")
     finally:
         monkeypatch.setattr(sys.modules[__name__],
-                            "REVIEWED_RECEIVER_BINDINGS", saved)
+                            "REVIEWED_RECEIVER_BINDINGS", saved_bindings)
+        monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                            saved_gate)
     _assert_closed_world(_engine_source())
 
 
@@ -3116,27 +3526,29 @@ def test_k_l_dropping_the_site_rule_reopens_cross_function_forging(
     _assert_closed_world(_engine_source())
 
 
-def test_k_m_the_unclosed_value_provenance_residual_is_recorded():
-    """K.M What is STILL admitted, stated and executable.
+def test_k_m_the_x7x_value_provenance_residual_is_now_closed(monkeypatch):
+    """K.M X7X recorded an OPEN residual here. X8 CLOSES it.
 
-    X7X refuses a reviewed receiver name bound by a form the review does not
-    cover. What it CANNOT do is follow the VALUE: a receiver rebound by a form
-    the review DOES cover, inside a function that DID review that pair, is
-    still admitted. Two instances, both demonstrated here:
+    X7X refused a reviewed receiver name bound by a form the review does not
+    cover. It could not follow the VALUE, so a receiver rebound by a form the
+    review DOES cover, inside a function that DID review that pair, was still
+    admitted:
 
       * `record = externals[0]; record.get('x')` in `_classify_record_for_shell`
         -- `assign` is a reviewed form for `record` there;
       * `for entry in attacker: entry.stat()` in
-        `_assert_selector_authority_names` -- `for` is a reviewed form for
-        `entry` there, so a SECOND for-binding adds no new form.
+        `_assert_selector_authority_names` -- `for` is already a reviewed form
+        for `entry` there, so a second for-binding added no NEW form.
 
-    The classifier has no value flow and cannot tell the second from the real
-    loop four lines above it. This is the same convention `_engine_definitions`
-    follows: a boundary that is not crossed is RECORDED, not asserted away.
+    K.M previously ASSERTED these were still open, and instructed that if one
+    ever closed the evidence must be rewritten rather than the control deleted.
+    One has closed, so this control is rewritten -- not removed -- and it keeps
+    the same job: it fails if the boundary ever moves again in either
+    direction.
 
-    The assertions below are that each residual is still OPEN and that nothing
-    ELSE is open. If one ever closes, this control fails and the evidence must
-    be rewritten before the claim is retired -- not the test deleted.
+    The closure is attributed, not just observed: neutralizing the exact-site
+    gate must make both injections ADMITTED again, which proves X8 is what
+    closed them and that the X7X rules alone never could.
     """
     residuals = (
         ("assign in a reviewed owner",
@@ -3149,22 +3561,33 @@ def test_k_m_the_unclosed_value_provenance_residual_is_recorded():
     for label, injected, owner, expr in residuals:
         weakened = _inject_into_reachable(injected, into=owner)
         refusals = _refusals(weakened)
-        assert expr not in refusals, (
-            f"the value-provenance residual {label!r} is now CLOSED. That is "
-            "an improvement, but the evidence claiming it is open must be "
-            f"rewritten first; refused instead: {sorted(refusals)}")
-        _assert_closed_world(weakened)
+        assert expr in refusals, (
+            f"the X7X value-provenance residual {label!r} is OPEN again, so "
+            f"the X8 exact-site gate is not holding it closed; refused: "
+            f"{sorted(refusals)}")
+        reason = refusals[expr].reason
+        assert "source context changed" in reason or "manifest" in reason, (
+            f"{label}: the residual is refused, but not by the X8 exact-site "
+            f"rule, so the attribution is wrong: {reason}")
+        with pytest.raises(AssertionError):
+            _assert_closed_world(weakened)
 
-    # And every OTHER forging shape is genuinely closed, so the residual is a
-    # named, enumerated case rather than a vague disclaimer.
-    still_open = []
-    for label, owner, injected, expr, _rule in _BINDING_FORGERIES:
-        if _refusals(_inject_into_reachable(injected, into=owner)).get(
-                expr) is None:
-            still_open.append(label)
-    assert still_open == [], (
-        f"these forging shapes are still open, so the residual is not the "
-        f"enumerated set above: {still_open!r}")
+    # Attribution, and the negative control section 2 requires: with the new
+    # gate neutralized, the SAME injections are admitted, so they were open at
+    # X7X and X8 is the thing that closed them.
+    saved_gate = _site_authority
+    monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                        lambda *a, **k: None)
+    try:
+        for label, injected, owner, expr in residuals:
+            refusals = _refusals(_inject_into_reachable(injected, into=owner))
+            assert expr not in refusals, (
+                f"{label} is refused even with the X8 gate neutralized, so "
+                f"this control no longer demonstrates what it claims")
+    finally:
+        monkeypatch.setattr(sys.modules[__name__], "_site_authority",
+                            saved_gate)
+    _assert_closed_world(_engine_source())
 
 
 def test_k_n_a_refusal_names_the_owner_expression_form_and_coordinate():
