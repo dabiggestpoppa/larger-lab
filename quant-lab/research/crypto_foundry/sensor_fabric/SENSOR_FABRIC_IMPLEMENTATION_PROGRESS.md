@@ -4165,3 +4165,137 @@ through G4-12.
   earned. Its absence is not an affirmative finding that no volume ceiling
   exists.
 - No self-ratification. I17 NOT started. STOP.
+## 149 — SENSOR-B4-I16R1 G4-13 SOURCE-UNIT HANDOFF CONTRACT REPAIR + FINAL GOVERNANCE CORRECTION
+
+**Checkpoint:** SENSOR-B4-I16R1 G4-13 SOURCE-UNIT HANDOFF CONTRACT REPAIR + FINAL GOVERNANCE CORRECTION
+**Start head (mandatory):** `618de97827a22b2514caa4178d5cffa4ea76d1b7`
+**Branch:** `agent/crypto-sensor-fabric-build`
+**Production diff:** ADDITIVE ONLY — `storage/enums.py`, `storage/models.py`,
+`storage/projection_schema.py`, `storage/replay.py`, `storage/__init__.py`.
+No historical contract was rewritten; historical descriptors and batches load
+unchanged.
+**Authorized scope:** I16R1 ONLY — respected. I17 NOT started.
+
+### Governance (I16 history preserved; verdict field corrected, not rewritten)
+
+```
+PASS_SENSOR_B4_I16_FINAL_ACCEPTANCE_EVIDENCE_SEALED   = OPERATOR_HOLD
+PASS_SENSOR_B4_I16R1_G4_13_UNIT_HANDOFF_REPAIR_SEALED = PENDING_OPERATOR_REVIEW
+
+BLOC_04_FINAL_VERDICT = PASS_BLOC_04_IMPLEMENTED
+
+all_G4_gates
+  G4-01 EXACT_EVIDENCE        = PASS
+  G4-02 ATOMIC_DURABILITY     = PASS
+  G4-03 IMMUTABILITY          = PASS
+  G4-04 REVISION              = PASS
+  G4-05 MANIFEST              = PASS
+  G4-06 LINEAGE               = PASS
+  G4-07 MISSINGNESS           = PASS
+  G4-08 STORAGE_PRESSURE      = PASS
+  G4-09 CATALOG_REBUILD       = PASS
+  G4-10 OPERATIONAL_METADATA  = PASS_WITH_STATED_ENVIRONMENT_LIMITATION
+  G4-11 EXPORT_RESTORE        = PASS
+  G4-12 BLOC3_HANDOFF         = PASS
+  G4-13 BLOC5_READINESS       = PASS
+
+all_G4_gates overall = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+
+next_checkpoint_authorized = FALSE
+recommended_next           = OPERATOR REVIEW OF I16 -> I16R1 FINAL BLOC 4 CHAIN
+
+I17+     = UNAUTHORIZED
+research = FROZEN
+```
+
+### Governance correction (§2) — append-only
+
+```
+gap_id                          = I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP
+blocking_reason                 = G4-13 UNIT evidence not publicly reachable
+historical_I16_final_verdict_field
+                                = NONCANONICAL / SUPERSEDED_BY_I16R1_CORRECTION
+```
+
+The frozen final-verdict vocabulary was never changed; the I16 field outside
+it is preserved as history in ledger section 148 and in
+`BLOC_04_I16_FINAL_ACCEPTANCE_EVIDENCE.md`, and superseded by this correction.
+
+### The repair and the proof
+
+I16 measured G4-13 UNIT as not publicly reachable. I16R1A audited all eight
+frozen sensor families before touching any model
+(`BLOC_04_I16R1_UNIT_SEMANTIC_AUDIT.json`) and proved a single scalar
+`native_unit` is not semantically sufficient: book snapshots carry a unit per
+price level, and funding / basis / positioning carry no unit field at all.
+
+I16R1B then added the smallest additive durable contract: `SourceUnitState`
+(`VERIFIED_NATIVE` / `UNIT_UNVERIFIED`) and `SourceUnitEvidence`
+(`field_name`, `native_unit_lexeme`, `state`) as public storage vocabulary; an
+additive `source_unit_evidence` declaration on the durable
+`ProjectionSchemaDefinition` that participates in the schema fingerprint and
+is validated on every registry reload; and `Bloc5Handoff.to_batch` copying the
+durable declarations verbatim into
+`RawNormalizationBatch.source_unit_evidence`. Unknown units fail closed as
+`UNIT_UNVERIFIED` and are never guessed from provider names, instruments,
+fixture maps, Bloc 5 rules, row content or raw bytes.
+
+I16R1C remeasured G4-13 through a new narrow Bloc 5 consumer probe that
+imports only public `crypto_sensor_fabric.storage` contracts: SOURCE, TIME,
+UNIT (known + unknown + multi-field), LINEAGE, PATH_INDEPENDENCE and
+NEGATIVE_IMPORT all PASS (`BLOC_04_I16R1_G4_13_UNIT_HANDOFF_MATRIX.json`,
+`BLOC_04_I16R1_BLOC4_READINESS.json`). The old I16 negative test is
+preserved as a write-free checkpoint-fossil validator and every I16 artifact
+is byte-identical.
+
+### §18 timestamp wording correction
+
+`actual_start` / `actual_end`:
+`FIELD_PUBLICLY_AVAILABLE = true` / `FIXTURE_VALUE_PRESENT = false`. They are
+public typed `AcquisitionRecord` fields; the standard fixture simply left
+their values unset. They were never structurally unavailable. No production
+change was made or needed.
+
+### Volume classification (§23)
+
+`PASS_BLOC_04_IMPLEMENTED` — no accepted scale ceiling affects supported use.
+The 10,000-row actual manifest scan, 1 GiB-equivalent streaming hash, 64
+MiB-equivalent T0A streaming write, content dedupe, DuckDB many-projection
+rebuild, revision-chain scale, query result bounds and the export ceilings are
+configurable operational guardrails with accepted priority behavior (G4-08:
+T0A auto-delete count = 0), not an unsupported ceiling.
+
+### Regression (§26)
+
+| Phase | Passed | Failed | Skipped |
+|-------|--------|--------|---------|
+| Focused I16R1 + all current G4 suites | 131 | 0 | 0 |
+| All-G4 rerun (G4-01..G4-12 suites) | 71 | 0 | 0 |
+| Full storage | 1963 | 0 | 13 |
+| Full project | 3342 | 0 | 14 |
+
+Full storage is exactly +41 against the I16 baseline of 1922 with the same 13
+skips: 60 R1 tests were added (audit 6, contract 29, positive 18) and the
+19-test I16 current-tree readiness file became a 7-test write-free fossil
+validator (+41 = 6 + 29 + 18 + 7 − 19).
+
+### Static / security (§28) and external CI (§30)
+
+Ruff clean on all changed scope; compileall OK; mypy 0 errors in changed
+production files (the same 10 pre-existing `providers/**` findings as the
+I15R2 baseline); the accepted I15 repository secret scan runs clean over
+source, tests and evidence. `external_ci = NONE_OBSERVED` at the start head
+(0 statuses, 0 check-runs, 0 runs). Local pytest is not described as CI.
+
+### Evidence custody (§32/§27)
+
+Historical evidence diff after all runs: ZERO for every `BLOC_04_I16_*`
+artifact and every older measured matrix; the single authorized republish is
+`BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` per §40 (one line:
+`python_files_scanned` 1001 → 1005 because I16R1 added four tracked Python
+files). I16R1 produced only `BLOC_04_I16R1_*` evidence.
+
+### Notes
+
+- No self-ratification. I16R1 seal is PENDING_OPERATOR_REVIEW. I17 NOT
+  started. Research FROZEN.

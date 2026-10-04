@@ -1,0 +1,75 @@
+{
+  "schema": "sensor_fabric_evidence_matrix_v1",
+  "checkpoint": "SENSOR-B4-I16R1D",
+  "current_head": "b9221f749db95fd7544095d5a87b6b7396e4bd08",
+  "start_head": "618de97827a22b2514caa4178d5cffa4ea76d1b7",
+  "branch": "agent/crypto-sensor-fabric-build",
+  "focused_battery": {
+    "files": {
+      "test_i16_g4_core.py": 40,
+      "test_i16_g4_evidence.py": 31,
+      "test_i16_g4_13_readiness.py (checkpoint fossil)": 7,
+      "test_i16r1_unit_semantic_audit.py": 6,
+      "test_i16r1_unit_contract.py": 29,
+      "test_i16r1_g4_13_positive.py": 18
+    },
+    "passed": 131,
+    "failed": 0,
+    "skipped": 0
+  },
+  "all_g4_rerun": {
+    "description": "G4-01..G4-12 suites rerun at the repaired head after I16R1B",
+    "passed": 71,
+    "failed": 0,
+    "seconds": 28.16
+  },
+  "full_storage": {
+    "passed": 1963,
+    "failed": 0,
+    "skipped": 13,
+    "seconds": 1047.32,
+    "delta_vs_i16": 41,
+    "delta_composition": "new R1 audit 6 + contract 29 + positive 18 + fossil 7 - removed I16 current-tree readiness 19"
+  },
+  "full_project": {
+    "passed": 3342,
+    "failed": 0,
+    "skipped": 14,
+    "seconds": 1145.97,
+    "delta_vs_i16": 41
+  },
+  "static_checks": {
+    "ruff": "clean on all changed production and test scope; 'ruff check src tests' reports exactly the 2 pre-existing findings in test_i08_evidence.py (lines 33 and 786, from I08C 00898d666, not touched by I16R1), i.e. the accepted baseline is unchanged",
+    "compileall": "OK (storage package)",
+    "mypy": {
+      "changed_production_errors": 0,
+      "pre_existing_errors": 10,
+      "pre_existing_scope": "providers/** and probes/** (same set as the I15R2 baseline)"
+    },
+    "secret_scan": "clean — accepted I15 repository secret scanner (source + tests + evidence) ran within the passing suites"
+  },
+  "external_ci": {
+    "status": "NONE_OBSERVED",
+    "statuses": 0,
+    "check_runs": 0,
+    "runs": 0,
+    "head_checked": "618de97827a22b2514caa4178d5cffa4ea76d1b7",
+    "note": "local pytest is not described as CI"
+  },
+  "i11r2_audit": {
+    "republished": true,
+    "authority": "I16R1 §29/§40 — new tracked Python acceptance files",
+    "change": "python_files_scanned 1001 -> 1005 (one line)",
+    "byte_stable": true,
+    "no_update_rerun": "passes"
+  },
+  "historical_evidence_custody": {
+    "i16_artifacts_rewritten": 0,
+    "older_matrices_diff": "ZERO after §32 restoration of suite-dirtied files",
+    "evidence_dir_files_hashed": 235,
+    "only_authorized_republish": "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json"
+  },
+  "red_phase": {
+    "i16r1a_state": "contract tests failed to collect with ImportError on SourceUnitEvidence — the RED evidence for the contract tests; I16R1B turned them green"
+  }
+}
