@@ -35,7 +35,7 @@ import hashlib
 import json
 import re
 from pathlib import Path
-from typing import Any
+from typing import Any, Iterable
 
 import pyarrow as pa
 
@@ -44,6 +44,7 @@ from .json_catalog import (
     JsonCatalogCorrupt,
     DurableJsonCatalog,
 )
+from .models import SourceUnitEvidence
 
 
 _SEMVER_RE = re.compile(r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$")
@@ -384,7 +385,10 @@ def _field_descriptor(field: pa.Field) -> dict[str, Any]:
     }
 
 
-def compute_schema_fingerprint(schema: pa.Schema) -> str:
+def compute_schema_fingerprint(
+    schema: pa.Schema,
+    source_unit_evidence: Iterable[SourceUnitEvidence] | None = None,
+) -> str:
     """Deterministic structural fingerprint of an Arrow schema.
 
     Covers, in order: every provider-native field (name, Arrow logical type,
@@ -392,15 +396,28 @@ def compute_schema_fingerprint(schema: pa.Schema) -> str:
     (name + Arrow type + nullable per column — I05R1 §34/§35, so a
     ``_t0_row_ordinal`` int64→string change alters the fingerprint).
 
+    I16R1 ADDITIVE extension: when the definition declares durable
+    source-unit evidence, the canonical declaration list (sorted by field
+    name) is part of the fingerprinted contract too, so a changed unit
+    declaration is a changed schema contract.  When NO declaration exists
+    the fingerprint is byte-identical to the pre-I16R1 formula — historical
+    descriptors keep verifying under their historical contract.
+
     Returns full 64-char lowercase SHA-256 hex.  The fingerprint answers:
     WHAT EXACT FIELD STRUCTURE WAS REGISTERED?  It is separate from
     schema_key (WHICH REGISTERED SCHEMA ID/VERSION?).
     """
     fields_desc = [_field_descriptor(field) for field in schema]
-    descriptor = {
+    descriptor: dict[str, Any] = {
         "fields": fields_desc,
         "t0_metadata_schema": t0_metadata_descriptor(),
     }
+    evidence = tuple(source_unit_evidence or ())
+    if evidence:
+        descriptor["source_unit_evidence"] = [
+            e.to_descriptor()
+            for e in sorted(evidence, key=lambda e: e.field_name)
+        ]
     canonical = json.dumps(
         descriptor, sort_keys=True, ensure_ascii=False, separators=(",", ":")
     ).encode("utf-8")
@@ -448,6 +465,7 @@ class ProjectionSchemaDefinition:
         projection_schema_id: str,
         projection_schema_version: str,
         provider_native_schema: pa.Schema,
+        source_unit_evidence: Iterable[SourceUnitEvidence] | None = None,
     ) -> None:
         _validate_nonempty_string(projection_schema_id, "projection_schema_id")
         validate_semver(projection_schema_version)
@@ -467,13 +485,45 @@ class ProjectionSchemaDefinition:
                     "not survive a lossless descriptor round trip; fail closed"
                 )
 
+        # I16R1: durable source-unit declarations.  Each declaration must
+        # name a REAL provider-native field of THIS schema (fail closed on
+        # contradictions) and appear at most once (no silent dedupe).
+        native_names = {field.name for field in provider_native_schema}
+        evidence_list: list[SourceUnitEvidence] = []
+        seen_fields: set[str] = set()
+        for entry in source_unit_evidence or ():
+            evidence = (
+                entry
+                if isinstance(entry, SourceUnitEvidence)
+                else SourceUnitEvidence.from_descriptor(entry)
+            )
+            if evidence.field_name not in native_names:
+                raise ValueError(
+                    f"source-unit evidence names field "
+                    f"{evidence.field_name!r}, which is not a provider-native "
+                    "field of this schema; fail closed"
+                )
+            if evidence.field_name in seen_fields:
+                raise ValueError(
+                    "duplicate source-unit evidence for field "
+                    f"{evidence.field_name!r}; conflicting declarations "
+                    "fail closed (no silent dedupe)"
+                )
+            seen_fields.add(evidence.field_name)
+            evidence_list.append(evidence)
+
         self.projection_schema_id = projection_schema_id
         self.projection_schema_version = projection_schema_version
         self.provider_native_schema = provider_native_schema
+        self.source_unit_evidence: tuple[SourceUnitEvidence, ...] = tuple(
+            sorted(evidence_list, key=lambda e: e.field_name)
+        )
         self.schema_key = compute_schema_key(
             projection_schema_id, projection_schema_version
         )
-        self.schema_fingerprint = compute_schema_fingerprint(provider_native_schema)
+        self.schema_fingerprint = compute_schema_fingerprint(
+            provider_native_schema, self.source_unit_evidence
+        )
 
     @property
     def schema_identity(self) -> str:
@@ -498,9 +548,14 @@ class ProjectionSchemaDefinition:
         )
 
     def to_descriptor(self) -> dict[str, Any]:
-        """Language-neutral JSON-serializable descriptor for persistence."""
+        """Language-neutral JSON-serializable descriptor for persistence.
+
+        I16R1: ``source_unit_evidence`` appears only when the definition
+        declares at least one source-unit field; a definition with no
+        declaration serializes exactly as it did before I16R1.
+        """
         fields = [_field_descriptor(field) for field in self.provider_native_schema]
-        return {
+        descriptor = {
             "schema_identity": self.schema_identity,
             "projection_schema_id": self.projection_schema_id,
             "projection_schema_version": self.projection_schema_version,
@@ -509,6 +564,11 @@ class ProjectionSchemaDefinition:
             "provider_native_fields": fields,
             "t0_metadata_schema": t0_metadata_descriptor(),
         }
+        if self.source_unit_evidence:
+            descriptor["source_unit_evidence"] = [
+                e.to_descriptor() for e in self.source_unit_evidence
+            ]
+        return descriptor
 
     @classmethod
     def from_descriptor(
@@ -528,7 +588,18 @@ class ProjectionSchemaDefinition:
             for fd in fields_desc
         ]
         schema = pa.schema(pa_fields)
-        definition = cls(schema_id, schema_version, schema)
+        # I16R1 additive source-unit declarations.  A historical descriptor
+        # without the key loads under its historical contract: absence means
+        # UNKNOWN HISTORICAL CONTRACT, never VERIFIED_NATIVE.
+        raw_units = descriptor.get("source_unit_evidence")
+        unit_evidence = (
+            [SourceUnitEvidence.from_descriptor(entry) for entry in raw_units]
+            if raw_units is not None
+            else None
+        )
+        definition = cls(
+            schema_id, schema_version, schema, source_unit_evidence=unit_evidence
+        )
         # Fingerprint integrity (I05R1 §38).
         if definition.schema_fingerprint != descriptor["schema_fingerprint"]:
             raise ValueError(

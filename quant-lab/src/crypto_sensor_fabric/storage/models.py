@@ -26,8 +26,9 @@ from __future__ import annotations
 import json
 import re
 from datetime import datetime
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from ..contracts.base import normalize_utc_datetimes
 from ..contracts.enums import SensorFamily
@@ -45,6 +46,7 @@ from .enums import (
     ProjectionState,
     RevisionPolicy,
     RevisionState,
+    SourceUnitState,
     StorageEncoding,
     StorageJobStatus,
     StorageObjectType,
@@ -755,11 +757,89 @@ class RawEvidenceResult(StorageModelBase):
         return self
 
 
+class SourceUnitEvidence(StorageModelBase):
+    """Durable provider-native source-unit evidence for ONE field (I16R1).
+
+    Additive repair of the measured Bloc 4 -> Bloc 5 unit handoff gap
+    (I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP).  Bloc 4 preserves:
+
+    - the provider-native unit lexeme VERBATIM when the durable
+      projection-schema contract explicitly pins it
+      (``state=VERIFIED_NATIVE``), or
+    - an explicit ``UNIT_UNVERIFIED`` state when it does not — never a
+      guessed unit (frozen unknown law §6).
+
+    No canonicalization exists here: no canonical unit, no base/quote/USD
+    conversion, no contract multiplier, no effective_at.  The evidence is a
+    ``(field_name, native_unit_lexeme, state)`` triple; it deliberately
+    lives in a LIST on the batch because the accepted sensor vocabulary is
+    multi-field (e.g. a trade's quantity unit and a book metric's measurement
+    unit; book snapshots carry a unit per price level) and several families
+    (funding / basis / positioning) carry no unit field at all.
+    """
+
+    field_name: str = Field(min_length=1)
+    native_unit_lexeme: str | None = None
+    state: SourceUnitState
+
+    @model_validator(mode="after")
+    def _validate_field_identity(self) -> SourceUnitEvidence:
+        if not self.field_name.strip():
+            raise ValueError("field_name must be a non-blank provider-native field")
+        if self.field_name.startswith("_t0_"):
+            raise ValueError(
+                "field_name must not use the reserved _t0_ namespace; "
+                "source-unit evidence names provider-native fields only"
+            )
+        return self
+
+    @model_validator(mode="after")
+    def _validate_state_lexeme_consistency(self) -> SourceUnitEvidence:
+        if self.state is SourceUnitState.VERIFIED_NATIVE:
+            if (
+                self.native_unit_lexeme is None
+                or not self.native_unit_lexeme.strip()
+            ):
+                raise ValueError(
+                    "VERIFIED_NATIVE requires a non-blank native_unit_lexeme; "
+                    "a verified unit without a lexeme is a contradiction"
+                )
+        elif self.native_unit_lexeme is not None:
+            raise ValueError(
+                "UNIT_UNVERIFIED must not carry a native_unit_lexeme; "
+                "unknown must never be guessed"
+            )
+        return self
+
+    def to_descriptor(self) -> dict[str, Any]:
+        """Language-neutral JSON-serializable descriptor (deterministic)."""
+        return {
+            "field_name": self.field_name,
+            "native_unit_lexeme": self.native_unit_lexeme,
+            "state": self.state.value,
+        }
+
+    @classmethod
+    def from_descriptor(cls, descriptor: dict[str, Any]) -> SourceUnitEvidence:
+        """Reconstruct with full self-validation (fail closed on drift)."""
+        return cls(
+            field_name=descriptor["field_name"],
+            native_unit_lexeme=descriptor.get("native_unit_lexeme"),
+            state=descriptor["state"],
+        )
+
+
 class RawNormalizationBatch(StorageModelBase):
     """Future Bloc 5 handoff object (F19/F21).  NO normalization here.
 
     No canonical_asset_id / canonical_notional / effective_at / normalized_*
     fields: those belong to Bloc 5.
+
+    ``source_unit_evidence`` (I16R1) is the ADDITIVE durable source-unit
+    handoff: one entry per unit-bearing provider-native field, copied
+    verbatim from the registered projection-schema contract by
+    ``Bloc5Handoff.to_batch``.  An EMPTY list is the historical contract
+    (nothing declared) and never means VERIFIED_NATIVE.
     """
 
     batch_id: str = Field(min_length=1)
@@ -782,6 +862,7 @@ class RawNormalizationBatch(StorageModelBase):
     known_gap_intervals: list[str] = Field(default_factory=list)
     source_granularity: Granularity | None = None
     history_boundary: str | None = None
+    source_unit_evidence: list[SourceUnitEvidence] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def _normalize_timestamps(self) -> RawNormalizationBatch:
@@ -804,6 +885,25 @@ class RawNormalizationBatch(StorageModelBase):
         # all T0 source evidence (I01R1 §9).
         _validate_unique_sha256_list(self.source_blob_refs, "source_blob_refs")
         return self
+
+    @field_validator("source_unit_evidence")
+    @classmethod
+    def _validate_source_unit_evidence(
+        cls, value: list[SourceUnitEvidence]
+    ) -> list[SourceUnitEvidence]:
+        # I16R1 §16/§17: one entry per field, no silent dedupe, and a
+        # canonical (field_name-sorted) order so equal semantics serialize
+        # byte-identically regardless of construction order.
+        seen: set[str] = set()
+        for evidence in value:
+            if evidence.field_name in seen:
+                raise ValueError(
+                    "duplicate source-unit evidence for field "
+                    f"{evidence.field_name!r}; conflicting/duplicate unit "
+                    "evidence fails closed (no silent dedupe)"
+                )
+            seen.add(evidence.field_name)
+        return sorted(value, key=lambda e: e.field_name)
 
 
 # ---------------------------------------------------------------------------

@@ -409,10 +409,26 @@ class Bloc5Handoff:
     Bloc 5.  Every native identity field, lineage ref, gap interval and
     timestamp fact the model carries is preserved verbatim from the source
     result and its acquisitions.
+
+    I16R1: when a ``schema_registry`` is wired, ``to_batch`` resolves the
+    batch's ``projection_schema_id`` / ``projection_schema_version`` against
+    the DURABLE projection-schema registry and copies the registered
+    source-unit declarations verbatim into
+    ``RawNormalizationBatch.source_unit_evidence`` — the unit evidence is
+    never inferred from provider names, instrument strings, fixture maps or
+    raw bytes.  Without a registry the batch keeps the historical contract
+    (no unit evidence), which means UNKNOWN HISTORICAL CONTRACT and never
+    VERIFIED_NATIVE.
     """
 
-    def __init__(self, *, batch_id_factory: Any) -> None:
+    def __init__(
+        self,
+        *,
+        batch_id_factory: Any,
+        schema_registry: Any | None = None,
+    ) -> None:
         self._batch_id_factory = batch_id_factory
+        self._schema_registry = schema_registry
 
     def to_batch(
         self,
@@ -440,6 +456,23 @@ class Bloc5Handoff:
                 "a normalization batch must carry ONE parser version; got "
                 f"{sorted(parser_versions)}"
             )
+        # I16R1 §8/§11: source-unit evidence comes from the DURABLE schema
+        # contract and nowhere else.  A wired registry that cannot resolve
+        # the schema the projections claim is a real inconsistency: fail
+        # closed rather than silently dropping unit evidence.
+        source_unit_evidence: list[Any] = []
+        if self._schema_registry is not None:
+            try:
+                definition = self._schema_registry.resolve_by_id(
+                    schema_id, schema_version
+                )
+            except Exception as exc:  # noqa: BLE001 - typed re-wrap
+                raise ProjectionSchemaUnsupported(
+                    "source-unit evidence requires the durable projection "
+                    f"schema {schema_id!r}@{schema_version!r} to be "
+                    f"registered: {exc}"
+                ) from exc
+            source_unit_evidence = list(definition.source_unit_evidence)
         known_gaps: list[str] = []
         if result.coverage_state.value in ("PARTIAL", "KNOWN_GAP"):
             known_gaps.append(f"coverage_state={result.coverage_state.value}")
@@ -469,6 +502,7 @@ class Bloc5Handoff:
             known_gap_intervals=known_gaps,
             source_granularity=result.source_granularity,
             history_boundary=history_boundary,
+            source_unit_evidence=source_unit_evidence,
         )
 
 

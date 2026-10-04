@@ -246,3 +246,24 @@ class ChecksumAlgorithm(_StrEnum):
     SHA256 = "SHA256"
     MD5 = "MD5"
     CRC32 = "CRC32"
+
+
+class SourceUnitState(_StrEnum):
+    """Source-unit evidence state — ADDITIVE I16R1 repair vocabulary.
+
+    Not part of the original freeze manifest: this pair was operator-directed
+    by SENSOR-B4-I16R1 §7 to close the measured Bloc 4 -> Bloc 5 source-unit
+    handoff contract gap (I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP).
+
+    ``VERIFIED_NATIVE`` asserts that the durable projection-schema contract
+    explicitly pins the provider-native unit lexeme for a unit-bearing field.
+    ``UNIT_UNVERIFIED`` is the frozen unknown law (§6): the T0 source unit is
+    not pinned by durable evidence and MUST NOT be guessed.
+
+    Bloc 4 never decides canonical units, conversions, notional or
+    effective_at; those remain Bloc 5.  This vocabulary only preserves what
+    T0 durably knows — or marks that it does not know.
+    """
+
+    VERIFIED_NATIVE = "VERIFIED_NATIVE"
+    UNIT_UNVERIFIED = "UNIT_UNVERIFIED"
