@@ -4312,3 +4312,334 @@ was changed. No R49, no Book 5, no Atlas Program Block 4.
 cloud mutations = 0 - broker mutations = 0 - capital mutations = 0 -
 execution mutations = 0 - recurring cost = $0 - `capital.authority =
 none`. API read calls: 1232, all authenticated, **0 writes**.
+
+## 13. B4-CXR7U9R48X7 - receiver-bound call-site authority
+
+**This section supersedes §11's account of X6. It does not rewrite or
+delete it.** X6's contribution stands: it replaced allowlist discovery
+with a fail-closed classifier. X7 records what that classifier still got
+wrong.
+
+### 13.1 X6 was closed-world in SPELLING only
+
+X6 made **unknown spellings** fail closed. It did **not** prove the
+**receiver** of a known method name. The classifier ended with:
+
+```
+    # Receiver is a local value, not a module: review the method name.
+    if attr and attr in READ_ONLY_REGISTRY:
+        return PROVEN_READ_ONLY_OR_PURE
+```
+
+so read-only authority was bought with an ATTRIBUTE NAME ALONE. Because
+`_qualified_callee` renders a method on a call expression down to its
+bare attribute, four escapes followed:
+
+| Written in the engine | Rendered as | X6 classified it | What it can actually be |
+|---|---|---|---|
+| `Path(src).replace(dst)` | `replace` | `PROVEN_READ_ONLY_OR_PURE` | **a filesystem rename** - `str.replace` authority inherited by `Path.replace` |
+| `external.update(payload)` | `external.update` | `PROVEN_READ_ONLY_OR_PURE` | any object's `.update`, not only an in-memory dict |
+| `sink.append(payload)` | `sink.append` | `PROVEN_READ_ONLY_OR_PURE` | any object's `.append` |
+| `Factory().commit()` | `commit` | `INTERNAL_CALL` | **an engine class method** - `_engine_definitions` walked the whole tree, so `commit`, `activate`, `acquire`, `_refuse`, `__enter__` had all entered the generic internal namespace |
+
+**Reproduced end-to-end before any repair.** All four were injected into
+the reachable `_load_transition_record` with every entry-point name
+preserved. `_assert_closed_world` **PASSED**, with **0 unknowns** over
+318 classified sites. `record.replace` / `external.update` /
+`sink.append` / `commit()` / `RecordSnapshot().replace` were all
+admitted as reviewed. A filesystem rename was invisible to a proof that
+claimed closed-world coverage. Scratch only; nothing was committed.
+
+### 13.2 The policy is now receiver-bound
+
+Measured first, then written: the 35-function closure contains **47**
+reachable calls with a non-module receiver, resolving to **17** distinct
+`(receiver, method)` pairs and **6** non-`Name` receivers. The policy
+admits exactly that measured set and nothing else.
+
+| Rule | Implementation |
+|---|---|
+| **A** module calls use complete dotted names | `QUALIFIED_MODULES` (`os`, `os.path`, `os.environ`, `tempfile`, `shutil`, `stat`, `json`, `hashlib`, `io`, `subprocess`, `sys`, `fcntl`, `msvcrt`, `pathlib`); only the full spelling may match |
+| **B** named receiver methods only as reviewed PAIRS | `REVIEWED_RECEIVER_METHODS` - 16 measured pairs (`record.get`, `promote.get`, `claim.get`, `admitted_record.get`, `_STATE_DISPATCH.get`, `census.append`, `chunks.append`, `roots.append`, `name.startswith`, `name.endswith`, `part.strip`, `value.items`, `canonical.encode`, `raw.decode`, `entry.stat`, `OPERATION_ID_RE.match`) |
+| **C** expression receivers fail closed | `REVIEWED_EXPRESSION_RECEIVERS` - 3 measured shapes only (`os.environ.get(...).split`, `bytes.join(...).decode`, `hashlib.sha256(...).hexdigest`). `Path(x).replace(y)` is refused |
+| **D** INTERNAL from a bare name only for module-level engine definitions | `_engine_definitions` now reads `tree.body`, dropping 12 nested/method names. **Measured: narrowing breaks no reachable call site** |
+| **E** `_STATE_DISPATCH` stays an explicit seam | `_STATE_DISPATCH.get` is a reviewed pair; bare dispatch locals stay under `REVIEWED_DISPATCH_LOCALS`, still proven executably by I.G |
+| **F** `PURE_CONSTRUCTORS` is no longer dead | consulted **before** `engine_definitions`, so the three reviewed constructors classify on their reviewed merits |
+
+**Every bare method name was removed from `READ_ONLY_REGISTRY`.** That is
+the structural fix: no receiver can inherit reviewed authority from a
+method name, because no method name is in the registry at all.
+
+Literal receivers (`b"".join(...)`) are admitted on a separate rule: a
+literal cannot be rebound, so it cannot denote a filesystem object. The
+normalizer renders a literal as its TYPE, so every `bytes` literal
+shares one reviewed entry.
+
+### 13.3 Refusals now carry a diagnosable reason
+
+Every classified site records a normalized expression and an admission
+reason, and a refusal names all four required elements:
+
+```
+_load_transition_record:847:4 record.replace UNKNOWN_OR_DYNAMIC observer=-
+  reason=(receiver, method) pair 'record.replace' is not in REVIEWED_RECEIVER_METHODS
+```
+
+Owning function, normalized call expression, source coordinate, reason.
+
+### 13.4 Thirteen controls, and what each is FOR
+
+| Control | Establishes |
+|---|---|
+| `J.A` | `Path(src).replace(dst)` is refused and cannot inherit `str.replace` authority; also asserts the spelling collapse that made it exploitable |
+| `J.B` | `external.update(payload)` is refused |
+| `J.C` | `sink.append(payload)` is refused |
+| `J.D` | `Factory().commit()` is not an engine function; no nested/method name is in the internal namespace |
+| `J.E` | real reviewed dictionary `.get` calls remain admitted |
+| `J.F` | real reviewed list `.append` calls remain admitted |
+| `J.G` | reviewed string methods admitted only at their reviewed receivers (`record.startswith` is refused) |
+| `J.H` | `entry.stat` admitted at its receiver; `other.stat` refused |
+| `J.I` | reachable `os.open` still maps to an observer AND the observer fires on a LIVE tripwire |
+| `J.J` | removing the `os.open` observer makes the proof RED, and restoring it makes it green again |
+| `J.K` | the X6 `Path.write_text` unknown-call control remains red - tightening did not blind the older proof |
+| `J.L` | every reachable call site classified exactly once; identities distinct; every READ_ONLY site carries a reason |
+| `J.M` | the reviewed-constructor policy is reachable and not dead text |
+
+**Discrimination was measured, not asserted.** Nine mutations of the
+classifier were applied and the matching controls re-run: **15**
+mutation/control pairs, **0 vacuous controls**. One pair is reported
+honestly: restoring the blanket bare-name rule does **not** make `J.A`
+fail, because `Path(...).replace` has a call-expression receiver and the
+expression-receiver guard fires first. That is correct rule ordering, and
+`J.A` is discriminated by disabling the expression-receiver rule instead.
+Recording it avoids claiming a stronger discrimination than was shown.
+
+### 13.5 Classification totals on the real source at `ac49bb75`
+
+| Measure | X6 (`ab34dada`) | X7 (`ac49bb75`) |
+|---|---|---|
+| closure functions | 35 | **35** |
+| reachable call sites | 312 | **312** |
+| distinct identities / ambiguous | 312 / 0 | **312 / 0** |
+| `PROVEN_READ_ONLY_OR_PURE` | 176 | **182** |
+| `INTERNAL_CALL` | 129 | **123** |
+| `INSTRUMENTED_MUTATION_CHANNEL` | 7 | **7** |
+| `UNKNOWN_OR_DYNAMIC` | 0 | **0** |
+| reachable mutation channels | 2 (`open`, `os.open`) | **2, unchanged** |
+
+The `INTERNAL_CALL` decrease and `READ_ONLY` increase are the intended
+effect of rules D and F, not a coverage loss: six names left the internal
+namespace or moved to a more precise reviewed reason, and the reachable
+mutation surface is byte-identical.
+
+### 13.6 Stated boundary of the receiver-bound policy
+
+This proves that every reachable call site in the intra-module closure
+is classified, that ambiguous receivers fail closed, and that every
+reachable mutation channel maps to a tested observer. It does **not**
+prove: anything about modules the closure does not enter; that a
+reviewed receiver is safe *in general* rather than *at this site*; that a
+**class body** is walked by the closure - a reviewed constructor is
+admitted as a pure construction, and calls inside its `__init__` are
+outside the closure unless reachability pulls them in. That limit is
+recorded rather than asserted away, and `J.M` proves the constructor
+policy is live rather than decorative.
+
+### 13.7 Node accounting and validation
+
+| Measure | Value |
+|---|---|
+| R48R3 nodes | **70** (57 + 13 new J controls) |
+| R48R4 nodes | **39** (unchanged) |
+| R48 pair | **109** |
+| duplicate full node IDs (`classname::name`) | **0** |
+| b1 JUnit | **708 collected, 708 executed, 708 passed, 0 failed, 0 errors, 0 skipped** |
+| independent gate | `PASS`, `AUTHORITATIVE_CI`, **75/75 checks ok** |
+| cleanup | `{"cleanup": "ok", "disposable_removed": true}` |
+| tested commit / tree | `ac49bb7523b1e61752fb6311fe3c6114dd78f890` / `b0df77a4e77343faa230ff704d9f4ec15010f8c8` |
+| source clean before and after | yes (`dirty_pre 0`, `dirty_post 0`) |
+| all 13 `J.*` controls executed on Linux | **yes** |
+
+708 is arithmetic against the X6 head, not an assumption: **695 + 13 =
+708**. Local: **106 passed, 3 skipped** on the R48R3+R48R4 selection; R40
+**34 passed, 1 skipped**; Ruff **All checks passed**; `py_compile` clean;
+`git diff --check` clean.
+
+All five authoritative workflows **success** on the implementation head
+`ac49bb7523b1e61752fb6311fe3c6114dd78f890`:
+
+| Workflow | Run ID |
+|---|---|
+| `b1-local-ground-validation` | `37217880283` |
+| `b2-control-plane-validation` | `37217880288` |
+| `b3-worker-fabric-validation` | `37217880287` |
+| `b4-config-spine-validation` | `37217880284` |
+| `B1-I1R Validation` | `37217883110` |
+
+### 13.8 No production change
+
+`pg-recovery.py` is **untouched**. Commit `ac49bb75` changes **1 file**, the
+test module: **0 files under `scripts/`**. No production repair was
+authorized or made, because the closed-world audit exposed no production
+defect: all 312 reachable call sites classify with 0 unknowns, and the
+7 reachable mutation sites are unchanged from X6.
+
+---
+
+## 14. B4-CXR7U9R48X7 - correcting §12's temporal-union claim
+
+**This section supersedes the §12 current-state claims. §12 is not
+deleted or rewritten.** §12's *measurements* are sound and are preserved
+below. Its *inference* from a union across analyses to a current active
+issue set was not sound, and is withdrawn.
+
+### 14.1 What was measured, and what was wrongly concluded
+
+Preserved as measured:
+
+| Measure | Value |
+|---|---|
+| commits walked | **882** |
+| SonarCloud analyses located | **170** |
+| analyses carrying annotations | **132** |
+| non-empty slices sitting exactly on 50 | **132 / 132** |
+| page 2 empty on every slice | **yes** |
+| distinct issue keys **ever** observed | **1,599** |
+| HTTP requests / failures | 1232 / **0** |
+| SonarCloud credential present | **no** |
+| `annotation_level` is an issue-type proxy | **no** - refuted |
+
+Withdrawn. A union across analyses can contain issues still active, issues
+fixed after an earlier analysis, issues moved or replaced, and issues
+from earlier heads inside the selected epoch - and it can equally **miss**
+active issues that SonarCloud never published in any 50-annotation slice.
+So the union is not a census, not a lower bound and not an upper bound:
+
+| §12 statement | Status |
+|---|---|
+| "current epoch (converged) = ~324" | **withdrawn.** ~324 is the number of **distinct issue keys observed across the selected recent analysis window** - an observational count, not a current active set |
+| "the count is measured; only type is credential-gated" | **withdrawn.** Current **membership, count, status AND type** are all credential-gated |
+| "current window contains 108 failure / 213 warning" | **restated.** That window contained 108 failure-level and 213 warning-level **annotations observed across analyses**. They are not asserted to be currently active |
+| "271 of 321 are suppressed from the newest analysis" | **restated.** 271 union keys are **absent from the newest published slice**. Absence does **not** distinguish *resolved* from *capped / never published* |
+| "slice-across-analyses turns the sample into a census" | **withdrawn.** It converts a sample into a broader observational union, which is a different and weaker thing |
+| the residual 15 as confirmed current issues | **withdrawn.** They are **named candidates** found in the window. None is asserted currently active without independent current-source proof |
+
+### 14.2 The truthful statements
+
+- The newest published slice contains **exactly 50 annotations**.
+- The selected recent-window union contains **approximately 324 distinct
+  issue keys observed**.
+- **271** of those union keys are **absent from the newest published
+  slice**.
+- That absence does **not** distinguish a resolved issue from one that
+  was capped out or never published.
+- **Current active issue membership, count, status and type are
+  inaccessible without authorized SonarCloud issue access.**
+
+```
+CURRENT_ACTIVE_SONAR_SET = INACCESSIBLE_WITHOUT_AUTHORIZED_CREDENTIALS
+```
+
+No active count is fabricated. **Do not** read `~324` as an upper bound:
+the cap guarantees the union can also be missing live issues.
+
+### 14.3 Credential search - presence only, never values
+
+| Location | Result |
+|---|---|
+| `SONAR_TOKEN`, `SONARQUBE_TOKEN`, `SONAR_API_TOKEN`, `SONAR_HOST`, `SONAR_ORGANIZATION`, `SONAR_PROJECT_KEY`, `SONAR_ANALYSIS_TOKEN` | **all absent** |
+| operator `KEYS.md` | 0 SonarCloud entries |
+| workspace `.env` (25 variables) | 0 SonarCloud entries |
+| `SONARCLOUD-OPERATOR-RUNBOOK.md` | holds a literal `<paste>` placeholder, not a credential |
+
+No token value was printed, written to disk, committed, placed in a URL,
+or emitted to any log. The private-API query in
+`SONARCLOUD-OPERATOR-RUNBOOK.md` - bound to
+`componentKeys=dabiggestpoppa_larger-lab`, `pullRequest=4`,
+`issueStatuses=OPEN,CONFIRMED`, `sinceLeakPeriod=true`, paginated to the
+API-reported total - is the exact procedure that would close this, and
+it requires that credential.
+
+### 14.4 What the red ratings DO prove, and what they do not
+
+Supported:
+
+- **Reliability Rating on New Code = C** implies the applicable current
+  code period contains **at least one BUG** contributing to it.
+- **Security Rating on New Code = D** implies it contains **at least one
+  VULNERABILITY** contributing to it.
+
+**Not** inferred, and not inferable from this feed:
+
+- which annotations correspond to those issues;
+- that any security-named annotation is a vulnerability;
+- that the eight historical `pg-recovery.py` path-handling candidates are
+  currently active;
+- that historical line numbers still identify current sinks.
+
+**Security Hotspots do not automatically establish Security Rating
+defects.** A hotspot is reviewed; only a VULNERABILITY enters the rating.
+
+### 14.5 Source-audit boundary for the historical candidates
+
+Candidates that MAY be reviewed - `pg-recovery.py` path handling, docker
+command-argument handling, independent-gate paths, worker runtime
+directory, worker supervisor state loading, schema regex validation,
+`asyncio.CancelledError` handling - are **candidates**, not defects.
+
+A separate current-source audit of the `pg-recovery.py` findings was
+performed and is recorded here because it is the only adjudication
+performed so far:
+
+- **The two findings live in the NEWEST published slice are both false
+  positives.** `_load_receipt` validates inline via
+  `_validated_open_path`; `sha256_file` has exactly one caller, which
+  passes a path admitted by `_validated_open_path` on the preceding
+  line. `_validated_open_path` enforces no-symlink-indirection, approved-
+  root containment and regular-file, in that order.
+- **That audit also found three `os.path.join(_transitions_dir(), ...)`
+  constructions with no local validation** - `_transition_record_path`,
+  `_coordinate_path`, and the execution-authority `metadata_path` -
+  against a hardened sibling `_derive_record_coordinate_name` that
+  matches `OPERATION_ID_RE` and asserts a bare basename.
+- **They are not currently reachable with an unvalidated id:** every
+  traced entry validates upstream via `_execution_receipt_binding`,
+  `_validated_promote_receipt`, `_bound_operation` or
+  `_acquire_recovery_authority`. This is a fail-open-under-refactor
+  gap, not a demonstrated vulnerability.
+- **No production change was made**, because no defect was demonstrated
+  independently of the historical union. Recording the gap for operator
+  scheduling is the correct outcome, not repairing it speculatively.
+
+Honest limit on the audit method: the first automated pass reported six
+unguarded call edges, but that pass treated a path as validated once any
+guard was entered without tracking which value the guard covered. Each
+edge was therefore resolved by hand. The residual confidence is "no
+traced path is unguarded", **not** "no path exists".
+
+### 14.6 External and merge truth at `ac49bb75`
+
+| Item | Value |
+|---|---|
+| SonarCloud Code Analysis | `111482427284` `completed`/`failure` |
+| Kilo Code Review | `111482021226` - see the operator handoff for the terminal state at this head |
+| five `validate` checks | all `success` |
+| PR #4 | `OPEN`, `mergedAt = null`, `MERGEABLE`, `UNSTABLE`, `reviewDecision = ""` |
+| classic protection on `main` | none ("Branch not protected") |
+| repository rulesets | `[]` |
+| reviews on PR #4 | 0 |
+
+**Neither external failure is weakened, suppressed, excluded, waived or
+relabelled, and neither is claimed green.** Both remain OCE policy
+blockers. They are **not GitHub-required checks** - but GitHub's
+mechanical ability to merge is **not** merge authorization.
+**`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
+
+### 14.7 Accounting
+
+cloud mutations = 0 - broker mutations = 0 - capital mutations = 0 -
+execution mutations = 0 - recurring cost = $0 - `capital.authority =
+none`. SonarCloud API calls: read-only, unauthenticated, and **no token
+was used, printed or stored**. No `NOSONAR`, no exclusion, no quality-
+profile, rating, threshold or coverage change, no test deletion, no LFS
+migration. No R49, no Book 5, no Atlas Program Block 4.

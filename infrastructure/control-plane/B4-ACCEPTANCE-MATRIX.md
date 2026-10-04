@@ -1031,3 +1031,141 @@ Read-only. No `NOSONAR`, no exclusion, no quality-profile change, no
 workflow edit. SonarCloud `111270669563` and Kilo both remain
 `completed`/`failure` and neither is claimed green.
 **`MERGE_AUTHORIZED = false`.**
+
+## B4-CXR7U9R48X7 - receiver-bound authority (supersedes X6's closed-world row)
+
+X6's row is **kept and corrected**. X6 replaced allowlist discovery with a
+fail-closed classifier; what remained was closed-world in **spelling**
+only.
+
+| X6 property | X7 status |
+|---|---|
+| unknown spellings fail closed | **holds** - retained and proven by I.A and J.K |
+| ambiguous KNOWN method names fail closed | **was false.** Admission used the bare attribute name, so `Path(src).replace(dst)` - a **filesystem rename** - was admitted as the reviewed string operation `replace`; `external.update` / `sink.append` inherited dict/list authority; `Factory().commit()` classified `INTERNAL_CALL` because class methods had been harvested into the internal namespace |
+
+**Reproduced end-to-end before repair:** all four injected into a
+reachable function with every anchor name preserved;
+`_assert_closed_world` **PASSED with 0 unknowns** over 318 sites.
+
+| Rule | Implementation |
+|---|---|
+| A module calls | complete dotted names only (`QUALIFIED_MODULES`, now including `os.environ`) |
+| B receiver methods | 16 measured `(receiver, method)` pairs in `REVIEWED_RECEIVER_METHODS` |
+| C expression receivers | 3 measured shapes only; `Path(x).replace(y)` refused |
+| D INTERNAL from a bare name | module-level definitions only; 12 nested/method names dropped; **measured to break no reachable site** |
+| E `_STATE_DISPATCH` | explicit dispatch seam, still proven by I.G |
+| F `PURE_CONSTRUCTORS` | consulted before engine definitions; no longer dead |
+
+**Every bare method name was removed from `READ_ONLY_REGISTRY`**, so no
+receiver can inherit reviewed authority from a method name at all.
+
+| Control | Establishes |
+|---|---|
+| `J.A` | `Path(src).replace(dst)` refused; cannot inherit `str.replace` authority |
+| `J.B` | `external.update(...)` refused |
+| `J.C` | `sink.append(...)` refused |
+| `J.D` | `Factory().commit()` not an engine function; internal namespace is module-level only |
+| `J.E` | reviewed dictionary `.get` calls still admitted |
+| `J.F` | reviewed list `.append` calls still admitted |
+| `J.G` | reviewed string methods only at reviewed receivers |
+| `J.H` | `entry.stat` admitted; `other.stat` refused |
+| `J.I` | reachable `os.open` maps to an observer **and fires on a live tripwire** |
+| `J.J` | removing that observer makes the proof red; restoring it makes it green |
+| `J.K` | the X6 `Path.write_text` control stays red |
+| `J.L` | every reachable call site classified exactly once; identities distinct |
+| `J.M` | the reviewed-constructor policy is reachable, not dead |
+
+**Discrimination measured:** 9 classifier mutations, **15**
+mutation/control pairs, **0 vacuous controls**. One pair is recorded
+honestly as unaffected - restoring the blanket rule does not make `J.A`
+fail, because the expression-receiver guard fires first; `J.A` is
+discriminated by disabling that guard instead.
+
+| Measure | X6 | X7 |
+|---|---|---|
+| closure functions | 35 | **35** |
+| reachable call sites | 312 | **312** |
+| distinct identities / ambiguous | 312 / 0 | **312 / 0** |
+| READ_ONLY / INTERNAL / MUTATION / UNKNOWN | 176 / 129 / 7 / 0 | **182 / 123 / 7 / 0** |
+| reachable mutation channels | 2 | **2, unchanged** |
+| R48R3 / R48R4 / pair | 57 / 39 / 96 | **70 / 39 / 109** |
+| duplicate full node IDs | 0 | **0** |
+| b1 JUnit | 695 / 0 / 0 / 0 | **708 / 0 / 0 / 0** |
+
+All five workflows **success** on `ac49bb7523b1e61752fb6311fe3c6114dd78f890`:
+b1 `37217880283`, b2 `37217880288`, b3 `37217880287`, b4 `37217880284`,
+B1-I1R `37217883110`. Gate `PASS`, 75/75 checks ok, cleanup `ok`, all 13
+`J.*` controls executed on Linux.
+
+**No production change.** `pg-recovery.py` untouched; `ac49bb75` changes 1
+file with **0 files under `scripts/`**.
+
+---
+
+## B4-CXR7U9R48X7 - SonarCloud temporal-union correction (supersedes §12)
+
+§12 is **kept and corrected**. Its measurements stand; its inference from
+a union across analyses to a **current active** issue set is withdrawn.
+
+| §12 claim | X7 status |
+|---|---|
+| "current epoch (converged) = ~324" | **withdrawn** - ~324 is *distinct issue keys observed across the selected recent analysis window*, an observational count |
+| "the count is measured; only type is credential-gated" | **withdrawn** - current **membership, count, status and type** are all credential-gated |
+| "current window contains 108 failure / 213 warning" | **restated** - those are annotations **observed across analyses**, not asserted currently active |
+| "271 of 321 suppressed from the newest analysis" | **restated** - 271 union keys are absent from the newest published slice; absence does not distinguish *resolved* from *capped / never published* |
+| "slice-across-analyses turns the sample into a census" | **withdrawn** |
+| the residual 15 as confirmed current issues | **withdrawn** - named candidates, none asserted active without current-source proof |
+
+**Preserved measurements:** 882 commits walked; 170 analyses located; 132
+non-empty slices; **all 132 exactly 50**; page 2 empty on every slice;
+**1,599** distinct keys ever observed; direct-HTTPS harvester refusing
+failed fetches (1232 requests, 0 failures); no token present; and
+`annotation_level` **is not** an issue-type proxy (refuted: the `failure`
+level contains 17 `"[[ instead of ["` and ~45 `Cognitive Complexity`
+rules that are code smells).
+
+**Truthful replacements:** newest published slice = exactly **50**
+annotations; recent-window observed union = ~**324** distinct keys;
+**271** union keys absent from the newest published slice; absence does
+not distinguish resolved from capped/not-published.
+
+```
+CURRENT_ACTIVE_SONAR_SET = INACCESSIBLE_WITHOUT_AUTHORIZED_CREDENTIALS
+```
+
+**Credential search - presence only, never values:** all seven `SONAR_*`
+variables absent; operator `KEYS.md` has 0 Sonar entries; workspace `.env`
+has 0 Sonar entries; the operator runbook holds a literal `<paste>`
+placeholder. No token was printed, written, committed, placed in a URL or
+logged. **No active count is fabricated.**
+
+**What the red ratings prove:** Reliability = C implies **>= 1 BUG** in the
+applicable current code period; Security = D implies **>= 1 VULNERABILITY**.
+**Not inferred:** which annotations they are; that any security-named
+annotation is a vulnerability; that the eight historical `pg-recovery.py`
+candidates are currently active; that historical line numbers still
+identify current sinks. **Security Hotspots do not automatically establish
+Security Rating defects.**
+
+**Current-source audit of the two live `pg-recovery.py` findings: both are
+FALSE POSITIVES.** `_load_receipt` validates inline; `sha256_file`'s only
+caller passes a path admitted by `_validated_open_path` (no-symlink,
+approved-root containment, regular file, in that order). The same audit
+found three **unguarded** `os.path.join(_transitions_dir(), ...)`
+constructions (`_transition_record_path`, `_coordinate_path`, the
+authority `metadata_path`) against a hardened sibling
+`_derive_record_coordinate_name` - **not currently reachable** with an
+unvalidated id, because every traced entry validates upstream. A
+fail-open-under-refactor gap, **not a demonstrated defect**; **no
+production change made**. Method limit recorded: the first automated
+pass over-reported six unguarded edges and each was resolved by hand, so
+the confidence is "no traced path is unguarded", not "no path exists".
+
+**External truth at `ac49bb75`:** SonarCloud `111482427284`
+`completed`/`failure`; Kilo `111482021226` (terminal state in the operator
+handoff); five `validate` all `success`; PR #4 `OPEN`, unmerged,
+`MERGEABLE`, `UNSTABLE`, 0 reviews; `main` unprotected; rulesets `[]`.
+Neither external check is weakened, suppressed, excluded, waived or
+relabelled, neither is claimed green, and neither is a GitHub-required
+check - which is **not** merge authorization. **`MERGE_AUTHORIZED =
+false`.**
