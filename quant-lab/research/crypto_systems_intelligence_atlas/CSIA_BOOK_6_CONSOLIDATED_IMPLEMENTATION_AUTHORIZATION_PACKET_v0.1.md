@@ -279,3 +279,44 @@ RATIFIED_GAP_REOPENED           = FALSE
 BOOK_7_WORKED_ON                = FALSE
 CHOIR_TOUCHED                   = FALSE   (md5 8ddc60567c0e758564168f583cc2df48 unchanged)
 ```
+
+---
+
+# 11. Addendum — a second operator choice (appended)
+
+Appended 2026-10-04 after the rung traceability matrix. **This packet now
+carries two questions, not one.** The implementation-authorization question is
+unchanged; a second, smaller ratification question has been surfaced.
+
+```text
+QUESTION 1  (original)  AUTHORIZE_OFFLINE_IMPLEMENTATION  |  HOLD
+QUESTION 2  (new)       RATIFY TIME-1..TIME-15 as the 6E falsification
+                         contract  |  PROCEED WITHOUT IT
+```
+
+Question 2 exists because GAP-6's doctrine was ratified this session while its
+falsification cases were not. The ratified 237-case test contract contains
+zero occurrences of `INSTANTANEOUS`, `WindowClass`, `effective_start` or
+`effective_end`; the 15 cases that would falsify 6E live in test spec v0.4,
+which is `DRAFT_PENDING_OPERATOR_RATIFICATION`.
+
+```text
+QUESTION_2_OPTIONS =
+    RATIFY  -> test spec v0.4 ratified at 252 cases; Rung 6 AMBER -> GREEN;
+               one ratification, no design change, no source change
+    PROCEED -> 6E implements with zero ratified tests able to falsify it
+               NOT RECOMMENDED: repeats the phantom-check pattern this corpus
+               already rejected in checks 4-6
+```
+
+The two questions are independent. `HOLD` on question 1 leaves question 2
+open; ratifying on question 2 changes no implementation authority.
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE   (unchanged by either answer)
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+Evidence:
+`CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.1.md` §4 FINDING-1.

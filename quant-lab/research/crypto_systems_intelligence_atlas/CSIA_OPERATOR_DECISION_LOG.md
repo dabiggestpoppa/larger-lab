@@ -3147,3 +3147,104 @@ Implementation; any source or test change; any branch or worktree creation; any
 mutation of the frozen accepted Book 6 worktree (read-only suite run only, 0
 drift); any sensor source change; any ratified record edit; GAP reopening;
 Book 7 or Choir work.
+
+---
+
+# CSIA — IMPLEMENTATION RUNG TRACEABILITY MATRIX
+
+**Date:** 2026-10-04
+**Decision id:** none. This artifact records **no** operator decision.
+**Status:** `AUDIT_FINDING`
+**Implementation authority:** `FALSE`
+
+## What was done
+
+All eleven implementation rungs were mapped to the ratified artifact that
+binds them and the test cases that can falsify them, with ratification status
+distinguished at every cell.
+
+```text
+RUNGS_MAPPED      = 11
+ARTIFACTS_CITED   = 16
+ARTIFACTS_MISSING =  0
+CITATIONS_RESOLVED_PROGRAMMATICALLY = TRUE
+GREEN_RUNGS = 10
+AMBER_RUNGS =  1   (RUNG 6)
+RED_RUNGS   =  0
+```
+
+## FINDING-1 — MATERIAL
+
+GAP-6 doctrine was ratified this session. Its falsification cases were not.
+
+```text
+6E DOCTRINE               = RATIFIED  (BOOK6-GAP6-v0.2)
+6E FALSIFICATION CASES    = 0 ratified, 15 draft  (TIME-1..TIME-15)
+
+In the RATIFIED 237-case test contract (test spec v0.3):
+  INSTANTANEOUS   0 occurrences
+  WindowClass     0 occurrences
+  effective_start 0 occurrences
+  effective_end   0 occurrences
+  6E              0 occurrences
+```
+
+The ratified v0.3 predates the 6E clarification, so it could not have covered
+it. An implementer working strictly from ratified contracts would build the
+baseline-selection projection with **no ratified test capable of falsifying it**
+— not TIME-6 (same instant is not prior), TIME-9 (forged interval rejected),
+TIME-11 (superseded filtered before the tie-break), TIME-13/TIME-14 (no
+zero-width interval, no one-day convention).
+
+```text
+THIS REPEATS THE PHANTOM PATTERN: a check that cannot fail.
+RUNG_6_MAY_PROCEED_ON_RATIFIED_CONTRACTS_ALONE = FALSE
+```
+
+**The review was NOT re-scored.** 12 / 12 stands. Criterion 5 and criterion 7
+both remain TRUE on their own terms. What is recorded is a *known evidence gap*
+at one rung, which is a different statement from a lower score.
+
+Remedy, operator decision not taken here: ratify `TIME-1..TIME-15`, which makes
+test spec v0.4 the ratified contract at 252 cases and moves Rung 6 AMBER ->
+GREEN. One ratification. No design change, no source change, no rework.
+
+## FINDING-2 — COSMETIC
+
+The GAP-7 test spec v0.3 states its case count five times. Four say 39; line 60
+says 38. The line-226 arithmetic sums to 39 and the GAP-7 ratification record
+says 39, so **39 is correct** and line 60 is a stale sentence. Recorded, not
+repaired, under the corpus rule that committed ratified material is corrected
+by additive errata rather than edited in place.
+
+## FINDING-3 — STRUCTURAL
+
+Three families of document carry `DRAFT_PENDING_OPERATOR_RATIFICATION` headers
+while being adopted by a ratification record: the GAP-7 test spec v0.3 (adopted
+at 39 cases), the comparison test spec v0.3 (adopted as THE implementation test
+contract at 237), and grammar v0.6/v0.7 (cited as verified). Nothing is
+under-ratified; a reader checking only headers would conclude the opposite.
+
+```text
+MISRATIFIED_ARTIFACTS = 0
+HEADER_IS_AUTHORITATIVE = FALSE
+A DRAFT A RECORD ADOPTS IS ADOPTED; A DRAFT NOBODY ADOPTS IS NOT.
+```
+
+## Unchanged by this entry
+
+```text
+GAP_1..GAP_7 = CLOSED / RATIFIED
+BOOK_6       = FROZEN_ACCEPTED
+CONSOLIDATED_REVIEW_SCORE = 12 / 12 TRUE   (unchanged)
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Not authorized and not performed
+
+Implementation; any source or test change; any branch or worktree creation; any
+mutation of the frozen accepted Book 6 worktree; any edit to a ratified record
+or a committed spec; any re-scoring of the consolidated review; GAP reopening;
+Book 7 or Choir work.

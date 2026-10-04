@@ -3711,3 +3711,63 @@ LIVE_ACQUISITION_AUTHORITY      = FALSE
 **Not authorized and not performed:** implementation; any source or test change;
 any branch or worktree creation; any mutation of the frozen accepted Book 6
 worktree; any sensor source change; Book 7 or Choir work.
+
+---
+
+# RUNG TRACEABILITY MATRIX — LEDGER UPDATE
+
+**Date:** 2026-10-04
+**Decision id:** none.
+
+```text
+RUNGS_MAPPED = 11   GREEN = 10   AMBER = 1 (RUNG 6)   RED = 0
+CITATIONS_RESOLVED = 100%   (16 artifacts, 0 missing)
+FINDINGS = 3   (1 material, 1 cosmetic, 1 structural)
+```
+
+## Standing state change
+
+```text
+BOOK_6_IMPLEMENTATION_CONTRACT_TRACED = 10 OF 11 FULLY, 1 OF 11 DOCTRINE-ONLY
+CONSOLIDATED_REVIEW_SCORE              = 12 / 12 TRUE   (unchanged)
+KNOWN_EVIDENCE_GAPS                   = 1   (RUNG 6 falsifiability)
+```
+
+## The one gap
+
+```text
+6E doctrine         = RATIFIED   (BOOK6-GAP6-v0.2)
+6E falsification    = 0 ratified / 15 draft   (TIME-1..TIME-15, spec v0.4)
+RATIFIED_237_CONTAIN_INSTANTANEOUS_OR_WINDOWCLASS = FALSE  (0 occurrences each)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.1.md      AUDIT_FINDING
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_REVIEW_v0.1.md  (addendum 12)
+CSIA_BOOK_6_CONSOLIDATED_IMPLEMENTATION_AUTHORIZATION_PACKET_v0.1.md  (addendum 11)
+CSIA_OPERATOR_DECISION_LOG.md
+```
+
+## Next operator action — now TWO questions
+
+```text
+1. BOOK6-IMPL-CONSOLIDATED-v0.1 = AUTHORIZE_OFFLINE_IMPLEMENTATION | HOLD
+2. RATIFY TIME-1..TIME-15 as the 6E falsification contract        | PROCEED
+   (ratifying makes test spec v0.4 ratified at 252 cases and moves
+    RUNG 6 AMBER -> GREEN; one ratification, no design or source change)
+```
+
+The two are independent. Neither answer grants implementation authority.
+
+```text
+BOOK_6_IMPLEMENTATION_AUTHORITY = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**Not authorized and not performed:** implementation; any source or test change;
+any branch or worktree creation; any mutation of the frozen accepted Book 6
+worktree; any edit to a ratified record or committed spec; any re-scoring of the
+consolidated review; Book 7 or Choir work.

@@ -598,3 +598,51 @@ WORKTREE_CREATED             = FALSE
 FROZEN_WORKTREE_TOUCHED       = FALSE
 RATIFIED_RECORD_EDITED       = FALSE
 ```
+
+---
+
+# 12. Addendum — rung traceability finding (appended, score unchanged)
+
+Appended 2026-10-04 after
+`CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.1.md` mapped all
+eleven rungs to their ratified constraints.
+
+**The score does not change. 12 / 12 stands.** What changes is that one
+criterion now carries a *known evidence gap*, which is a different statement
+from a lower score and is recorded as such.
+
+```text
+FINDING-1  RUNG 6 (BaselineSelectorSpec + 6E) is DOCTRINE-ONLY
+           6E doctrine is RATIFIED at BOOK6-GAP6-v0.2
+           6E falsification cases are NOT ratified: 0 of 15
+           the ratified 237-case contract contains
+             INSTANTANEOUS   0 occurrences
+             WindowClass     0 occurrences
+             effective_start 0 occurrences
+             effective_end   0 occurrences
+           TIME-1..TIME-15 exist in test spec v0.4, DRAFT
+```
+
+Criterion 5 `GAP6_ORDERING_CONTRACT_COMPLETE` remains **TRUE**: the doctrine is
+fully specified and no coder must choose policy. Criterion 7
+`TEST_CONTRACT_COMPLETE` remains **TRUE** on its own terms: the ratified 237
+are complete and `BLOCKED = 0` — they are simply silent on 6E.
+
+```text
+CRITERIA_5 = TRUE   (unchanged; doctrine unaffected)
+CRITERIA_7 = TRUE   (unchanged; ratified 237 complete, silent on 6E)
+KNOWN_EVIDENCE_GAPS = 1   (RUNG 6 falsifiability)
+AMBER_RUNGS = 1 of 11
+```
+
+The remedy is one ratification and nothing else: ratify `TIME-1..TIME-15`,
+which makes test spec v0.4 the ratified contract at 252 cases and moves Rung 6
+from AMBER to GREEN. No design change, no source change, no rework.
+
+```text
+RUNG_6_MAY_PROCEED_ON_RATIFIED_CONTRACTS_ALONE = FALSE
+```
+
+See
+`CSIA_BOOK_6_IMPLEMENTATION_RUNG_TRACEABILITY_MATRIX_v0.1.md` §4 for the full
+finding and §5 for its citation verification.
