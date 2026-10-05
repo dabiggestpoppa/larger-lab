@@ -1,0 +1,658 @@
+{
+  "artifact": "BLOC_05_I01_BASE_MODEL_MATRIX",
+  "checkpoint": "SENSOR-B5-I01",
+  "title": "Bloc 5 normalization base models and T1 base envelope -- measured field matrix",
+  "branch": "agent/crypto-sensor-fabric-build",
+  "generated_by": "mechanical introspection of the shipped pydantic models",
+  "convention": {
+    "model_base": "pydantic BaseModel with model_config extra='forbid'",
+    "convention_rationale": "Matches the accepted storage convention (StorageModelBase). The repository's models are validated mutable pydantic objects, so the base layer matches them rather than introducing frozen dataclasses; determinism is delivered by canonical serialization plus the canonical quality-flag ordering the envelope enforces.",
+    "collections": "tuples, never lists, so an envelope cannot be mutated after construction",
+    "enums": "inherited str Enum with value == member name",
+    "identifiers": "Annotated[str, StringConstraints(min_length=1, pattern=r'\\S')] + reject-blank + reject-padding",
+    "datetimes": "Optional[datetime], timezone-aware, UTC-normalized by the accepted coerce_utc rule",
+    "numeric": "Decimal for every provider-native value (no rounding, no invented precision)",
+    "determinism": "canonical_json_bytes: UTF-8, sort_keys, compact separators, enum string values"
+  },
+  "vocabularies": [
+    {
+      "enum": "NormalizationStatus",
+      "members": 8,
+      "source": "bloc_05/03 §15"
+    },
+    {
+      "enum": "MissingnessReason",
+      "members": 13,
+      "source": "bloc_05/05 §12"
+    },
+    {
+      "enum": "NormalizationQualityFlag",
+      "members": 36,
+      "source": "union of bloc_05/05 §11 + bloc_05/01 §14 + bloc_05/02 §16"
+    },
+    {
+      "enum": "QualityDimensionState",
+      "members": 6,
+      "source": "bloc_05/05 §10"
+    },
+    {
+      "enum": "LineageState",
+      "members": 3,
+      "source": "bloc_05/05 §11 + §23 invariant 7"
+    },
+    {
+      "enum": "QuarantineReason",
+      "members": 7,
+      "source": "bloc_05/05 §20"
+    },
+    {
+      "enum": "PayoffType",
+      "members": 5,
+      "source": "bloc_05/01 §3"
+    },
+    {
+      "enum": "IntervalTimeConvention",
+      "members": 4,
+      "source": "bloc_05/02 §7"
+    },
+    {
+      "enum": "AvailabilityBasis",
+      "members": 8,
+      "source": "bloc_05/02 §5"
+    },
+    {
+      "enum": "TimestampPrecision",
+      "members": 6,
+      "source": "bloc_05/02 §8"
+    }
+  ],
+  "frozen_correspondences": [
+    {
+      "name": "BLOCKED_STATUS_MISSINGNESS_REASON",
+      "kind": "MappingProxyType",
+      "entries": {
+        "BLOCKED_IDENTITY": "IDENTITY_BLOCKED",
+        "BLOCKED_TIME": "TIME_BLOCKED",
+        "BLOCKED_SEMANTICS": "SEMANTICS_BLOCKED",
+        "BLOCKED_CONVERSION": "CONVERSION_BLOCKED"
+      },
+      "why": "bloc_05/03 §15 spells a blocked cause BLOCKED_IDENTITY while bloc_05/05 §12 spells the same concept IDENTITY_BLOCKED. Both are kept exactly as frozen and related by frozen read-only data, so neither vocabulary is renamed to match the other."
+    },
+    {
+      "name": "BLOCKING_QUALITY_FLAGS",
+      "kind": "frozenset",
+      "members": [
+        "IDENTITY_AMBIGUOUS",
+        "IDENTITY_TERMS_UNVERIFIED",
+        "LINEAGE_BROKEN",
+        "REFERENCE_PRICE_UNAVAILABLE",
+        "SEMANTICS_UNVERIFIED",
+        "STABLECOIN_CONVERSION_UNAVAILABLE",
+        "TIME_MARKET_AVAILABILITY_UNKNOWN",
+        "TIME_SEMANTICS_UNVERIFIED",
+        "UNIT_CONVERSION_BLOCKED"
+      ],
+      "why": "Each member has an explicit frozen fail-closed citation. Label-only flags (archive reconstruction, dedupe candidates, unit-native-only) are deliberately excluded."
+    }
+  ],
+  "validated_opaque_types": [
+    {
+      "type": "OpaqueIdentifier",
+      "algorithm": "NONE (type only)",
+      "deferred_to": "",
+      "why": "validated non-blank, unpadded string for provider/venue/instrument/ref fields"
+    },
+    {
+      "type": "T1RecordId",
+      "algorithm": "NONE (type only)",
+      "deferred_to": "SENSOR-B5-I16",
+      "why": "directive §18: the deterministic T1 identity algorithm is B5-I16; the envelope field is therefore Optional and no ID is ever generated"
+    },
+    {
+      "type": "ContractInstanceId",
+      "algorithm": "NONE (type only)",
+      "deferred_to": "SENSOR-B5-I02",
+      "why": "opaque id only; the registry and resolver are B5-I02/I03, and there is no UNKNOWN_CONTRACT or other placeholder value"
+    },
+    {
+      "type": "T1GenerationId",
+      "algorithm": "NONE (type only)",
+      "deferred_to": "SENSOR-B5-I18",
+      "why": "directive §19: no generation writer, manifest, atomic publication or checksum"
+    },
+    {
+      "type": "RegistryVersion",
+      "algorithm": "NONE (type only)",
+      "deferred_to": "SENSOR-B5-I02/I04/I05/I09",
+      "why": "naming a version is not resolving it; no registry exists at B5-I01"
+    }
+  ],
+  "models": [
+    {
+      "model": "ObservationTimeEnvelope",
+      "public": true,
+      "module": "crypto_sensor_fabric.normalization.models",
+      "extra": "forbid",
+      "field_count": 15,
+      "required_field_count": 0,
+      "fields": [
+        {
+          "name": "source_event_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "interval_start_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "interval_end_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "effective_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "published_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "market_available_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "observed_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "ingested_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "normalized_at",
+          "annotation": "datetime.datetime | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "interval_closed",
+          "annotation": "bool | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "interval_time_convention",
+          "annotation": "crypto_sensor_fabric.normalization.enums.IntervalTimeConvention | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "availability_basis",
+          "annotation": "crypto_sensor_fabric.normalization.enums.AvailabilityBasis | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "source_precision",
+          "annotation": "crypto_sensor_fabric.normalization.enums.TimestampPrecision | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "clock_skew_ms",
+          "annotation": "decimal.Decimal | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "clock_skew_methodology_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        }
+      ],
+      "validation_laws": [
+        "naive datetimes refused; every present clock normalized to UTC (bloc_5/02 §18 inv.1)",
+        "interval_end_at >= interval_start_at (the only universally valid ordering)",
+        "interval bounds require an explicit interval_time_convention (bloc_05/02 §7)",
+        "interval bounds require an explicit interval_closed; None is not a declaration",
+        "market_available_at requires an availability_basis",
+        "market_available_at refused with availability_basis=UNKNOWN (bloc_05/02 §5)",
+        "no ordering assumed between distinct clocks (bloc_05/02 §6 published_at < effective_at stays representable)"
+      ],
+      "note": "All nine frozen canonical clocks are distinct Optional fields. None is derived at B5-I01, so none is required: a forced value would be fabrication. This container carries NO field that fills one clock from another."
+    },
+    {
+      "model": "NativeQuantity",
+      "public": true,
+      "module": "crypto_sensor_fabric.normalization.models",
+      "extra": "forbid",
+      "field_count": 4,
+      "required_field_count": 2,
+      "fields": [
+        {
+          "name": "native_field_name",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "native_value",
+          "annotation": "<class 'decimal.Decimal'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "native_unit_evidence",
+          "annotation": "crypto_sensor_fabric.storage.models.SourceUnitEvidence | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "source_unit_contract",
+          "annotation": "crypto_sensor_fabric.storage.enums.SourceUnitContract | None",
+          "required": false,
+          "default": "None"
+        }
+      ],
+      "validation_laws": [
+        "native_field_name must not be blank",
+        "source_unit_contract=UNIT_EVIDENCE_DECLARED requires native_unit_evidence",
+        "source_unit_contract=NO_UNIT_FIELDS forbids native_unit_evidence",
+        "both absent stays HISTORICAL_UNIT_CONTRACT_ABSENT, a third distinct state (bloc_04/I17 §4.7)",
+        "unit truth carried by the accepted Bloc 4 SourceUnitEvidence object, not re-implemented"
+      ],
+      "note": "There is NO normalized_value / canonical_value / notional / USD field on this model at all, so native truth cannot be overwritten by a canonical value: the separation is structural. Dimensionless families (funding, basis, positioning) carry a value with no unit evidence and an explicit NO_UNIT_FIELDS declaration."
+    },
+    {
+      "model": "T1Quality",
+      "public": true,
+      "module": "crypto_sensor_fabric.normalization.models",
+      "extra": "forbid",
+      "field_count": 8,
+      "required_field_count": 8,
+      "fields": [
+        {
+          "name": "identity_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "time_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "semantic_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "unit_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "lineage_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "source_integrity_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "coverage_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "replay_quality",
+          "annotation": "<enum 'QualityDimensionState'>",
+          "required": true,
+          "default": null
+        }
+      ],
+      "validation_laws": [
+        "all eight frozen dimensions required; none has a default"
+      ],
+      "note": "A defaulted quality dimension is a claim. 'Not determined' must be declared as UNKNOWN rather than defaulting to something healthy. No aggregate score exists: Bloc 6 may read these components but must not overwrite them (bloc_05/07 §6)."
+    },
+    {
+      "model": "T1LineageRef",
+      "public": true,
+      "module": "crypto_sensor_fabric.normalization.models",
+      "extra": "forbid",
+      "field_count": 8,
+      "required_field_count": 5,
+      "fields": [
+        {
+          "name": "raw_projection_refs",
+          "annotation": "tuple[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)], ...]",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "acquisition_refs",
+          "annotation": "tuple[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)], ...]",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "evidence_blob_hashes",
+          "annotation": "tuple[str, ...]",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "identity_evidence_refs",
+          "annotation": "tuple[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)], ...]",
+          "required": false,
+          "default": "()"
+        },
+        {
+          "name": "semantic_evidence_refs",
+          "annotation": "tuple[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)], ...]",
+          "required": false,
+          "default": "()"
+        },
+        {
+          "name": "conversion_lineage_refs",
+          "annotation": "tuple[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)], ...]",
+          "required": false,
+          "default": "()"
+        },
+        {
+          "name": "code_version",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "config_version",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        }
+      ],
+      "validation_laws": [
+        "raw_projection_refs, acquisition_refs and evidence_blob_hashes must all be non-empty (bloc_05/05 §2/F25)",
+        "every evidence_blob_hashes member must be a SHA-256 hex digest (format only; no hashing here)",
+        "blob digests and every reference list must be duplicate-free"
+      ],
+      "note": "Durable identifiers and digests only. No filesystem path, catalog layout, DuckDB location or absolute root (bloc_04/I17 §12/§13). identity_evidence_refs / semantic_evidence_refs / conversion_lineage_refs are empty-by-default slots for evidence that does not exist yet."
+    },
+    {
+      "model": "T1VersionContext",
+      "public": true,
+      "module": "crypto_sensor_fabric.normalization.models",
+      "extra": "forbid",
+      "field_count": 5,
+      "required_field_count": 0,
+      "fields": [
+        {
+          "name": "identity_registry_version",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "contract_terms_version",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "semantic_registry_version",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "methodology_registry_version",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "time_semantics_version",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        }
+      ],
+      "validation_laws": [
+        "NORMALIZED / PARTIALLY_NORMALIZED require identity_registry_version, contract_terms_version, semantic_registry_version and methodology_registry_version",
+        "time_semantics_version is a slot, not an I01 requirement (no time semantics exist yet)"
+      ],
+      "note": "bloc_05/01 §15: every T1 row records the identity registry and contract-terms versions. bloc_05/06 §3: registry/methodology versions are required where derived fields exist. A row with no canonical claim carries none, because there is nothing to attribute."
+    },
+    {
+      "model": "T1BaseEnvelope",
+      "public": true,
+      "module": "crypto_sensor_fabric.normalization.models",
+      "extra": "forbid",
+      "field_count": 27,
+      "required_field_count": 15,
+      "fields": [
+        {
+          "name": "t1_record_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "sensor_family",
+          "annotation": "<enum 'SensorFamily'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "provider",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "venue",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "native_instrument",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "provider_instrument_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "source_granularity",
+          "annotation": "crypto_sensor_fabric.probes.enums.Granularity | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "native_event_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "native_sequence_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "contract_instance_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "normalization_generation",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "source_revision_id",
+          "annotation": "<class 'str'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "supersedes_t1_record_id",
+          "annotation": "typing.Optional[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)]]",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "source_revision_state",
+          "annotation": "<enum 'RevisionState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "source_coverage_state",
+          "annotation": "<enum 'CoverageState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "time",
+          "annotation": "<class 'crypto_sensor_fabric.normalization.models.ObservationTimeEnvelope'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "native_values",
+          "annotation": "tuple[crypto_sensor_fabric.normalization.models.NativeQuantity, ...]",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "normalization_status",
+          "annotation": "<enum 'NormalizationStatus'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "missingness_reason",
+          "annotation": "crypto_sensor_fabric.normalization.enums.MissingnessReason | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "lineage_state",
+          "annotation": "<enum 'LineageState'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "lineage",
+          "annotation": "<class 'crypto_sensor_fabric.normalization.models.T1LineageRef'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "quality",
+          "annotation": "<class 'crypto_sensor_fabric.normalization.models.T1Quality'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "quality_flags",
+          "annotation": "tuple[crypto_sensor_fabric.normalization.enums.NormalizationQualityFlag, ...]",
+          "required": false,
+          "default": "()"
+        },
+        {
+          "name": "versions",
+          "annotation": "<class 'crypto_sensor_fabric.normalization.models.T1VersionContext'>",
+          "required": true,
+          "default": null
+        },
+        {
+          "name": "quarantine_reason",
+          "annotation": "crypto_sensor_fabric.normalization.enums.QuarantineReason | None",
+          "required": false,
+          "default": "None"
+        },
+        {
+          "name": "quarantine_evidence_refs",
+          "annotation": "tuple[typing.Annotated[str, StringConstraints(strip_whitespace=None, to_upper=None, to_lower=None, strict=None, min_length=1, max_length=None, pattern='\\\\S', ascii_only=None), AfterValidator(func=<function _reject_blank at 0x000002652C70AF20>), AfterValidator(func=<function _require_unpadded at 0x000002652C70AB60>)], ...]",
+          "required": false,
+          "default": "()"
+        },
+        {
+          "name": "quarantine_remediation",
+          "annotation": "str | None",
+          "required": false,
+          "default": "None"
+        }
+      ],
+      "validation_laws": [
+        "quality_flags must be in canonical NormalizationQualityFlag declaration order, duplicate-free",
+        "lineage_state must agree with exactly one matching lineage flag",
+        "NORMALIZED / PARTIALLY_NORMALIZED require contract_instance_id (bloc_05/01 §2.5, F3)",
+        "each BLOCKED_* status requires exactly its own typed missingness cause",
+        "QUARANTINED requires missingness_reason=QUARANTINED",
+        "NORMALIZED must not carry a missingness reason",
+        "QUARANTINED requires quarantine_reason, non-empty quarantine_evidence_refs and a non-blank quarantine_remediation (bloc_05/05 §20)",
+        "quarantine metadata refused on a non-quarantined row",
+        "NORMALIZED / PARTIALLY_NORMALIZED require at least one native value (bloc_05/07 F12)",
+        "NORMALIZED / PARTIALLY_NORMALIZED require the four registry/methodology versions",
+        "no BLOCKING_QUALITY_FLAGS member may accompany a canonical status",
+        "LINEAGE_BROKEN is blocking regardless of the claimed status (bloc_05/05 §11)",
+        "quarantine_evidence_refs must be duplicate-free",
+        "identity_quality=VERIFIED requires contract_instance_id",
+        "lineage_quality VERIFIED/ACCEPTABLE_WITH_FLAGS contradicts lineage_state=LINEAGE_BROKEN",
+        "unit_quality=VERIFIED contradicts UNIT_CONVERSION_BLOCKED or STABLECOIN_CONVERSION_UNAVAILABLE",
+        "time_quality=VERIFIED contradicts an unverified/unknown time flag or an absent/UNKNOWN availability basis",
+        "semantic_quality=VERIFIED contradicts SEMANTICS_UNVERIFIED",
+        "extra fields refused (extra='forbid')"
+      ],
+      "note": "Deliberately named T1BaseEnvelope, not the frozen T1ObservationEnvelope: the frozen envelope also carries economic_contract_id, canonical_asset_id, normalization_methodology_id/_version and replay_eligibility, owned by B5-I02/I09/I06. The full name stays unexported until the composite is complete so nothing can mistake this base layer for the finished contract. Fields that cannot yet be truthfully populated are Optional, and t1_record_id is absent by default because no deterministic identity exists at B5-I01."
+    }
+  ],
+  "explicit_absences": {
+    "no_canonical_numeric_field": "no normalized_value, canonical_value, notional, base_quantity, usd or usd_equivalent field exists on any B5-I01 model",
+    "no_stablecoin_equivalence": "no field name contains 'usd' or 'fiat'; no default implies 1:1",
+    "no_collapsed_source_field": "no source/source_id/source_venue/provider_venue field re-merges provider and venue",
+    "no_missing_boolean": "no *_missing / has_* / missing field; absence is always a typed MissingnessReason",
+    "no_generated_identity": "no wall-clock read, no hash, no uuid, no ID derivation in model construction",
+    "no_replay_eligibility": "belongs to B5-I06; nothing claims a replay verdict at B5-I01",
+    "no_canonical_asset_or_economic_contract": "belongs to B5-I02; the base envelope fabricates no economic grouping"
+  }
+}

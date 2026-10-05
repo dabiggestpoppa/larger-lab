@@ -1,0 +1,251 @@
+{
+  "artifact": "BLOC_05_I01_SCOPE_AUDIT",
+  "checkpoint": "SENSOR-B5-I01",
+  "title": "Measured scope audit: what B5-I01 added and what it provably did not",
+  "branch": "agent/crypto-sensor-fabric-build",
+  "start_head": "ae152d010f3cd8c472c6dc0593a0e94f779cb079",
+  "generated_by": "mechanical introspection; every value below is measured, not asserted",
+  "production_files": [
+    {
+      "path": "src/crypto_sensor_fabric/normalization/__init__.py",
+      "lines": 93,
+      "sha256": "d10ce9f36864bcc1d14f35bbbb1e29a9437819b01d5eb3d00a3a711e808863cb"
+    },
+    {
+      "path": "src/crypto_sensor_fabric/normalization/enums.py",
+      "lines": 395,
+      "sha256": "070c6e9bfd3062fd2242b2c9ab5302b42db8063d63c0a932a0602dcaf2c79cb4"
+    },
+    {
+      "path": "src/crypto_sensor_fabric/normalization/models.py",
+      "lines": 840,
+      "sha256": "718738e1d19dea0341335db1322fc5c2042dc92c9e70820336ed235ce6bdbd0a"
+    }
+  ],
+  "test_files": [
+    {
+      "path": "tests/crypto_sensor_fabric/normalization/test_b5_i01_enums.py",
+      "lines": 599,
+      "sha256": "d389e5589060167faf47f932db76a4f17a54bcd7ecbd88c3357b155c54266b52"
+    },
+    {
+      "path": "tests/crypto_sensor_fabric/normalization/test_b5_i01_models.py",
+      "lines": 1097,
+      "sha256": "b2423e899719f4756151c7198769fcb62c65270d1263c3e2210bea6920580f50"
+    },
+    {
+      "path": "tests/crypto_sensor_fabric/normalization/test_b5_i01_public_api.py",
+      "lines": 270,
+      "sha256": "49f9d8b8f7546ab7502756efdf53129065e4c99d6d734b37dca8ccc22f64ed48"
+    },
+    {
+      "path": "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+      "lines": 405,
+      "sha256": "fe3e04d5b4b66f02b2612108bae72980fcec07397e26cf7be819d844a9a1a23e"
+    }
+  ],
+  "public_api": [
+    "AvailabilityBasis",
+    "BLOCKED_STATUS_MISSINGNESS_REASON",
+    "BLOCKING_QUALITY_FLAGS",
+    "ContractInstanceId",
+    "IntervalTimeConvention",
+    "LineageState",
+    "MissingnessReason",
+    "NativeQuantity",
+    "NormalizationQualityFlag",
+    "NormalizationStatus",
+    "ObservationTimeEnvelope",
+    "OpaqueIdentifier",
+    "PayoffType",
+    "QualityDimensionState",
+    "QuarantineReason",
+    "RegistryVersion",
+    "T1BaseEnvelope",
+    "T1GenerationId",
+    "T1LineageRef",
+    "T1Quality",
+    "T1RecordId",
+    "T1VersionContext",
+    "TimestampPrecision",
+    "canonical_json_bytes"
+  ],
+  "public_api_count": 24,
+  "modules_module_all": [
+    "AvailabilityBasis",
+    "BLOCKED_STATUS_MISSINGNESS_REASON",
+    "BLOCKING_QUALITY_FLAGS",
+    "IntervalTimeConvention",
+    "LineageState",
+    "MissingnessReason",
+    "NormalizationQualityFlag",
+    "NormalizationStatus",
+    "PayoffType",
+    "QualityDimensionState",
+    "QuarantineReason",
+    "TimestampPrecision"
+  ],
+  "models_module_all": [
+    "ContractInstanceId",
+    "NativeQuantity",
+    "NormalizationModelBase",
+    "ObservationTimeEnvelope",
+    "OpaqueIdentifier",
+    "RegistryVersion",
+    "T1BaseEnvelope",
+    "T1GenerationId",
+    "T1LineageRef",
+    "T1Quality",
+    "T1RecordId",
+    "T1VersionContext",
+    "canonical_json_bytes"
+  ],
+  "private_symbols_present_but_unexported": [
+    "_FLAG_ORDER",
+    "_StrEnum"
+  ],
+  "imports_in_production_source": [
+    ".contracts.base",
+    ".contracts.enums",
+    ".enums",
+    ".models",
+    ".probes.enums",
+    ".storage",
+    "__future__",
+    "datetime",
+    "decimal",
+    "enum",
+    "json",
+    "pydantic",
+    "re",
+    "types",
+    "typing"
+  ],
+  "upstream_bloc4_types_consumed": [
+    "crypto_sensor_fabric.contracts.enums.SensorFamily",
+    "crypto_sensor_fabric.contracts.base.normalize_utc_datetimes",
+    "crypto_sensor_fabric.probes.enums.Granularity",
+    "crypto_sensor_fabric.storage.CoverageState",
+    "crypto_sensor_fabric.storage.RevisionState",
+    "crypto_sensor_fabric.storage.SourceUnitContract",
+    "crypto_sensor_fabric.storage.SourceUnitEvidence"
+  ],
+  "upstream_types_duplicated": [],
+  "private_bloc4_symbols_imported": [],
+  "forbidden_modules_present": [],
+  "forbidden_modules_checked": [
+    "registry.py",
+    "resolver.py",
+    "terms.py",
+    "conversion.py",
+    "aliases.py",
+    "lifecycle.py",
+    "universe.py",
+    "availability.py",
+    "intervals.py",
+    "revision_policy.py",
+    "replay_gate.py",
+    "semantics_registry.py",
+    "methodologies.py",
+    "comparability.py",
+    "writer.py",
+    "query.py",
+    "generations.py",
+    "manifests.py",
+    "trades.py",
+    "liquidations.py",
+    "open_interest.py",
+    "funding.py",
+    "books.py",
+    "book_metrics.py",
+    "positioning.py",
+    "basis.py",
+    "provider_side_maps.py"
+  ],
+  "forbidden_subpackages_present": [],
+  "network_imports": [],
+  "filesystem_or_backend_imports": [],
+  "hashing_or_id_generation_imports": [],
+  "network_calls": 0,
+  "network_proof": "No requests/httpx/aiohttp/urllib/socket/http/websockets/ccxt import appears in any production source file, and importing the package with socket.socket and socket.create_connection monkeypatched to raise succeeds. Test layer: tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py::test_importing_the_package_makes_no_connection.",
+  "bloc4_dependency_firewall": {
+    "imports_allowed": [
+      ".contracts.base",
+      ".contracts.enums",
+      ".probes.enums",
+      ".storage"
+    ],
+    "private_modules_imported": [],
+    "path_or_catalog_knowledge_in_source": [],
+    "duckdb_dependency": false,
+    "note": "Only accepted PUBLIC Bloc 4 contract types are imported. No storage backend, no provider adapter, no path, catalog or DuckDB knowledge. The SHA-256 format rule is duplicated locally rather than imported, because storage.checksums is deliberately outside the accepted public surface."
+  },
+  "type_scope_split": {
+    "implemented_rows": 24,
+    "deferred_rows": 37,
+    "deferred_types": [
+      "CanonicalAsset",
+      "Venue",
+      "VenueInstrument",
+      "EconomicContract",
+      "ContractInstance",
+      "ContractTermsSnapshot",
+      "InstrumentAlias",
+      "AliasType",
+      "InstrumentLifecycleState",
+      "IdentityResolutionStatus",
+      "IdentityResolution",
+      "UniverseMembership",
+      "VenueScope",
+      "AvailabilityConfidence",
+      "TimeSemantics",
+      "AvailabilityResolution",
+      "ReplayEligibility",
+      "T1RevisionStatus",
+      "T1RevisionChain",
+      "Bloc5RevisionPolicy",
+      "DedupeStrength",
+      "DuplicateOutcomeClass",
+      "CanonicalQuantity",
+      "ConversionRateObservation",
+      "ReferencePriceType",
+      "SemanticConfidence",
+      "ProviderSemanticMapping",
+      "NormalizationMethodology",
+      "FieldLineage",
+      "ConversionLineage",
+      "T1Lineage",
+      "T1Generation",
+      "T1PartitionManifest",
+      "SensorBlockingSemanticError",
+      "SensorNormalizerProtocol",
+      "T1Writer",
+      "CanonicalT1Query"
+    ],
+    "deferred_types_implemented": []
+  },
+  "measured_vocabulary_gaps_recorded_not_invented": [
+    {
+      "type": "AvailabilityConfidence",
+      "why": "bloc_05/02 §5 names the field but never freezes its vocabulary",
+      "deferred_to": "SENSOR-B5-I06"
+    },
+    {
+      "type": "VenueScope",
+      "why": "bloc_05/01 §13 names only MULTI_VENUE_AGGREGATE and says 'such as'",
+      "deferred_to": "SENSOR-B5-I02"
+    }
+  ],
+  "bloc_05_blocking_gates": {
+    "IDENTITY_GATE": "NOT_YET_EARNED",
+    "TIME_GATE": "NOT_YET_EARNED",
+    "SEMANTIC_GATE": "NOT_YET_EARNED",
+    "UNIT_GATE": "NOT_YET_EARNED",
+    "LINEAGE_GATE": "NOT_YET_EARNED",
+    "DUPLICATE_REVISION_GATE": "NOT_YET_EARNED",
+    "REPLAY_SAFETY_GATE": "NOT_YET_EARNED",
+    "GOLDEN_T0_T1_GATE": "NOT_YET_EARNED",
+    "note": "B5-I01 builds vocabulary and the base container only. No gate is earned and none is claimed. Vocabulary is not a gate."
+  },
+  "head_at_generation": "83b2076b67bdb433cef7aa2ec5e4de7762af4fd1"
+}
