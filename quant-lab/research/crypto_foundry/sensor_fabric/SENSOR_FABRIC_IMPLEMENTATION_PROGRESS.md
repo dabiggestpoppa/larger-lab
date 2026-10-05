@@ -4464,3 +4464,192 @@ research = FROZEN
 
 No self-ratification. The seal decision remains the operator's. No production
 change was made to produce the packet. I17 NOT started. STOP.
+## 152 — SENSOR-B4-I16R2-RATIFY: FINAL BLOC 4 OPERATOR ACCEPTANCE, I17 HANDOFF AUTHORIZED
+
+**Mandate:** SENSOR-B4-I16R2-RATIFY — final Bloc 4 operator acceptance of the
+complete I16 -> I16R1 -> I16R2 chain, plus I17 BLOC 5 handoff authorization
+DOCUMENTATION ONLY
+**Branch:** agent/crypto-sensor-fabric-build
+**Mandatory start HEAD:** `2cf6f1c9fe1e20e55594b179ede57d7f36e1e30f`
+**Actual ratification start HEAD:** `aa29933156fa78716089d05adc530934e246bea7`
+**origin/main (untouched):** `7c7816f382947bbc8a1f2154435fc436f2428fa8`
+**Production diff:** ZERO
+**Authorized scope:** FINAL RATIFICATION OF I16 -> I16R1 -> I16R2 ONLY.
+I17 NOT implemented in this run. I18+ UNAUTHORIZED. Research FROZEN.
+
+### Start-gate deviation (operator-adjudicated)
+
+Every start-gate item matched the directive exactly except HEAD, which was one
+commit ahead: `aa2993315`, the operator review packet produced in the
+preceding operator-accepted task and pushed before this mandate was issued. It
+contains 2 files (new review packet MD +300, ledger +24), **0 production source
+files**, no seal change and no checkpoint advanced; `2cf6f1c9f` is a strict
+ancestor of it, so the ratified chain is a superset of the mandated chain. The
+operator was shown this and decided to **ratify from `aa2993315` with the
+deviation recorded**. Reaching `2cf6f1c9f` exactly would have required a reset,
+rebase or force push — all forbidden. No reset, rebase, amend, squash or force
+push was performed.
+
+### Ratification battery at the ratification start head
+
+Focused (I16R2 + I16R1 + all-G4 + I15 hardening/scale/TOCTOU + I14 handoff +
+I13 export/restore, 24 files) = **390 passed / 4 skipped / 0 failed** (533 s).
+**Full storage on the FINAL TREE after I11R2 regeneration = 2019 passed /
+13 skipped / 0 failed** (1253 s) — the direct final-tree measurement the
+operator required; the earlier `2018 + 1 expected staleness failure` figure was
+pre-regeneration. **Full project = 3398 passed / 14 skipped / 0 failed**
+(1228 s). ZERO deterministic failures. Ruff: exactly 2 pre-existing findings in
+the untouched `test_i08_evidence.py` (lines 33, 786); **changed scope
+`src/crypto_sensor_fabric/storage` = All checks passed**. compileall OK. mypy:
+10 pre-existing errors in 6 files (probes/planner.py:79; providers/rest.py:91,
+93,96; okx/probe.py:34; kraken/probe.py:49; gate/probe.py:45,279,298;
+deribit/probe.py:33), **0 in changed scope**. Secret scan 4 passed, matrix
+13/13 rows ok. I11R2 binding audit no-update run 4 passed, **byte-stable at
+1011 scanned files**, `unexpected_hits = {}`, **NOT republished**. External CI
+= **NONE_OBSERVED** (0 check-runs, 0 statuses, 0 runs on this branch).
+Historical evidence custody: **0** `BLOC_04_I16_*` / `I16R1_*` / `I16R2_*`
+artifacts modified; the 11 suite-dirtied historical evidence JSONs were
+inspected and RESTORED before diff and before commit.
+
+### Ratified facts
+
+Strict linear ancestry: all 11 operator-named SHAs plus 2 further chain
+commits (I16A, I16B) are ancestors of the ratification start HEAD; 13 commits
+in range, 0 merges, first-parent == full, 0 squash/amend/revert/fixup subjects.
+Production source changed in exactly two chain commits — I16R1B (5 files) and
+I16R2B (6 files). Historical chronology preserved: **I16 correctly found and
+preserved a G4-13 unit handoff failure** (I16D sealed BLOCKED); **I16R1 added
+the public source-unit handoff capability but was later found to contain a
+static-claim truth gap**; **I16R2 closed the static-claim truth gap and the
+unit-location gap and re-earned every G4 gate.** Earlier checkpoints are NOT
+rewritten as though they had always passed.
+
+Both RED counterexamples remain immutable historical counterexamples
+(pre-repair `COMMIT_SUCCEEDED` with the handoff falsely exposing
+`VERIFIED_NATIVE/SOL`; and the mixed-row claim silently collapsed). Post-repair
+both are `COMMIT_REFUSED:ProjectionUnitEvidenceConflict`, with all-null also
+refused and partial-null-with-matching-values accepted under the accepted null
+law; refusal occurs BEFORE durable publication and is never a silent
+downgrade. Validation is bounded and O(1) (`_UnitClaimScan`, six scalar
+`__slots__`, one remembered lexeme, null count, rows inspected, chunked walk,
+conflict short-circuit; no value accumulation, no unbounded lexeme set, no
+whole-projection materialization introduced for unit validation). The unit
+location contract distinguishes `STATIC_VERIFIED` / `ROW_NATIVE` /
+`UNIT_UNVERIFIED`, and `NO_UNIT_FIELDS` / `UNIT_EVIDENCE_DECLARED` /
+historical absence, with no empty-list ambiguity. Nested book-snapshot paths
+such as `("bids", "item", "quantity_unit")` resolve list and struct steps
+explicitly against the registered Arrow schema, require a string terminal,
+refuse the reserved `_t0_` namespace, fail closed on unresolvable paths, and
+serialize deterministically as a JSON list with no dotted-string ambiguity.
+`Bloc5Handoff` stays metadata-only: it copies declarations verbatim and never
+scans rows, normalizes units, converts base/quote, computes notional, assigns a
+canonical asset or assigns `effective_at`. `UNIT_UNVERIFIED` never carries a
+lexeme and is never auto-promoted from row content, provider name, symbol or raw
+bytes. `ROW_NATIVE` marks a durable location and fabricates no batch-level
+static unit; Bloc 4 still performs no canonical normalization. Historical
+descriptors without I16R1/R2 unit metadata keep verifying under the historical
+fingerprint law and never become `NO_UNIT_FIELDS` or `VERIFIED_NATIVE`.
+
+G4-13: overall PASS. **Precision note recorded, not smoothed over** — the
+committed dimension table has 6 rows (`SOURCE`, `TIME`, `UNIT`, `LINEAGE`,
+`PATH_INDEPENDENCE`, `NEGATIVE_IMPORT`); `TRUTH_BINDING` is recorded as the
+G4-13 gate-row `truth_binding` object (committed 5 / refused 7, MISMATCH 3,
+MIXED 2, ALL_NULL 2, `silent_downgrade false`, PASS) and as
+`summary.g4_13_truth_binding = PASS`. All seven named dimensions PASS; no
+dimension inferred.
+
+All 13 G4 gates PASS with current-head proofs (`all_thirteen_measured = true`,
+`any_pass_without_current_measured_proof = false`), G4-10 carrying its stated
+**no-live-DSN** environment limitation (no `SENSOR_FABRIC_POSTGRES_DSN` or
+`DATABASE_URL` in this environment; the decision rests on the current-head
+contract test plus accepted I11 live evidence). All **11 blocking conditions
+NOT PRESENT, 0 PRESENT** (`previously_present_ids = [11]`), `bloc_4_completion_blocked
+= false`; condition 11 ("Bloc 5 needs provider-specific filesystem knowledge")
+is NOT PRESENT because source/unit/time/lineage are public typed handoff
+evidence. The stale I16R1 row-11 prose note remains in its artifact, whose
+authoritative machine fields already said `measured = NOT PRESENT` and
+`summary.present = 0`; the contradiction was corrected append-only in
+`BLOC_04_I16R2_EVIDENCE_CONSISTENCY_CORRECTION.md` and history was NOT rewritten.
+
+**Production schema population is ZERO and is recorded as a known limitation,
+not as a G4-13 failure:**
+`BLOC_04_UNIT_CONTRACT_CAPABILITY = PROVEN`,
+`PRODUCTION_SCHEMA_POPULATION = ZERO_AT_BLOC4_BOUNDARY` (0 production
+`ProjectionSchemaDefinition` constructions, 0 registered schemas carrying
+`source_unit_evidence`, exhaustive `src` search; verdict
+`CAPABILITY_PROVEN_POPULATION_ZERO`). The frozen G4-13 contract asks about the
+public handoff surface (capability), which Bloc 4 supplies. No claim is made
+that real provider production schemas are already registered. The
+"real-provider offline" proofs mean supported-family committed fixtures driven
+through registration -> commit -> unit truth validation -> handoff -> public
+consumer, with **network_calls = 0** and no live provider execution.
+
+### Governance
+
+**Vocabulary decision, recorded explicitly.** The operator's preferred label
+`OPERATOR_ACCEPTED_AS_SUPERSEDED_STAGE` is **not** established vocabulary in
+this repository — the historical chain seals use `OPERATOR_ACCEPTED` (I11, I12,
+I13, I14, I15). Per the directive's own fallback, explicit status/prose fields
+are used here instead of inventing a misleading PASS state, and **no PASS state
+was created for the historical I16 block.**
+
+```
+SENSOR-B4-I16R2-RATIFY
+
+I16_HISTORICAL_G4_13_BLOCK_STATUS =
+    OPERATOR_ACKNOWLEDGED_AS_CORRECTLY_MEASURED_HISTORICAL_BLOCK
+    / SUPERSEDED_BY_I16R1_THEN_I16R2
+    (NOT accepted as a passing stage; NOT relabeled)
+
+PASS_SENSOR_B4_I16_FINAL_ACCEPTANCE_EVIDENCE_SEALED =
+    HISTORICAL_BLOCK_SUPERSEDED
+    (the I16D evidence packet keeps its published BLOCKED verdict unchanged)
+
+PASS_SENSOR_B4_I16R1_G4_13_UNIT_HANDOFF_REPAIR_SEALED =
+    ACCEPTED_AS_SUPERSEDED_STAGE_ONLY
+    (public source-unit handoff capability accepted; its static-claim truth gap
+     accepted as a real weakness that I16R2 closed)
+
+PASS_SENSOR_B4_I16R2_UNIT_AUTHORITY_TRUTH_SEALED = OPERATOR_ACCEPTED
+
+BLOC_04_FINAL_VERDICT   = PASS_BLOC_04_IMPLEMENTED
+BLOC_04_IMPLEMENTATION  = OPERATOR_ACCEPTED
+all_G4_gates            = OPERATOR_ACCEPTED_PASS
+
+next_checkpoint_authorized = TRUE
+next_checkpoint            = SENSOR-B4-I17 BLOC 5 HANDOFF
+authorized_scope           = I17 ONLY
+I18+                       = UNAUTHORIZED
+research                   = FROZEN
+recommended_next           = SENSOR-B4-I17 IMPLEMENTATION
+```
+
+No data-volume suffix: the accepted volume classification is unchanged
+(configurable operational guardrails with accepted priority behavior, not an
+unsupported supported-use ceiling).
+
+### I17 frozen scope and firewall
+
+I17 is a HANDOFF/DOCUMENTATION checkpoint: *"Document stable public
+interfaces, schema versions, known limitations, and normalization-ready
+evidence contract."* **I17 DOES NOT AUTHORIZE** Bloc 5 normalization
+implementation, provider redesign, live network work, canonical asset logic,
+unit conversions, `effective_at` logic, research restart, or storage
+architecture redesign.
+
+Carry-forward items (documentation items for I17, **not** Bloc 4 blockers):
+**A** `PRODUCTION_SCHEMA_POPULATION = ZERO_AT_BLOC4_BOUNDARY`; **B** G4-10's
+no-live-DSN limitation, supported by accepted prior I11 live evidence plus the
+current contract proof; **C** POSIX runtime TOCTOU structurally verified but
+`POSIX_RUNTIME_TOCTOU = NOT_MEASURED_ON_THIS_HOST` on the Windows I15 host (no
+POSIX runtime evidence fabricated); **D** historical contracts without unit
+metadata remain distinguishable; **E** Bloc 5 owns canonical units, base/quote
+transformations, notional normalization, canonical asset identity, and
+`effective_at` / PIT semantic decisions.
+
+Ratification artifact:
+`research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I16_CHAIN_OPERATOR_RATIFICATION.md`
+
+No production defect was found requiring a source change, so no repair
+checkpoint is issued. **I17 NOT started in this run.** Research FROZEN. STOP
+after ratification.
