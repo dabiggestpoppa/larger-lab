@@ -214,7 +214,8 @@ def _first_refusal(
     if candidate.window_class is not comparison.window_class:
         return BaselineRefusal.WINDOW_INCOMPATIBLE
 
-    # 9. strictly precedes. The comparison is `<=`, never `<`.
+    # 9. strictly precedes. The precedence relation is strict `<`, never `<=`;
+    #    a candidate sharing the comparison's own start instant is ineligible.
     if not effective_end(candidate) < effective_start(comparison):
         return BaselineRefusal.NOT_STRICTLY_PRIOR
 

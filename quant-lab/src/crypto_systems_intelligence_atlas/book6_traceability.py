@@ -124,6 +124,9 @@ CMP_FAMILIES: Final[tuple[str, ...]] = (
     "CMP.RULE_AUTHORITY",
     "CMP.BASELINE_ORDERING",
     "CMP.BASELINE_ELIGIBILITY",
+    "CMP.COVERAGE_APPLICABILITY",
+    "CMP.COVERAGE_AUTHORITY",
+    "CMP.TEMPORAL_COMPARABILITY",
 )
 
 #: Every family the matrix must cover.
@@ -3043,6 +3046,141 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "persist onto a record and no new temporal contract field exists",
         "test_book6_comparison_selector.py",
         "test_no_new_temporal_contract_field_exists",
+    ),
+    (
+        "CMP.COVAPP.51",
+        "CMP.COVERAGE_APPLICABILITY",
+        "GAP-3 3C: an exact-metric, current, ratified, in-scope rule yields "
+        "coverage applicability REQUIRED",
+        "test_book6_comparison_coverage.py",
+        "test_exact_metric_current_ratified_rule_yields_required",
+    ),
+    (
+        "CMP.COVAPP.52",
+        "CMP.COVERAGE_APPLICABILITY",
+        "3C: no coverage rule yields UNRESOLVED with "
+        "NO_UPSTREAM_DETERMINATION_EXISTS",
+        "test_book6_comparison_coverage.py",
+        "test_no_coverage_rule_yields_unresolved_not_not_applicable",
+    ),
+    (
+        "CMP.COVAPP.53",
+        "CMP.COVERAGE_APPLICABILITY",
+        "ABSENCE_OF_COVERAGE_RULE != NOT_APPLICABLE: a rule nobody wrote is a "
+        "gap in the basis, never a negative determination",
+        "test_book6_comparison_coverage.py",
+        "test_absence_never_implies_not_applicable",
+    ),
+    (
+        "CMP.COVAUTH.54",
+        "CMP.COVERAGE_AUTHORITY",
+        "a stale or superseded coverage rule does not authorize a comparison; "
+        "authority decays on revision",
+        "test_book6_comparison_coverage.py",
+        "test_stale_rule_does_not_authorize_comparison",
+    ),
+    (
+        "CMP.COVAUTH.55",
+        "CMP.COVERAGE_AUTHORITY",
+        "a wrong-metric coverage rule cannot authorize, and check 15 reports "
+        "the scope fault independently of ratification",
+        "test_book6_comparison_coverage.py",
+        "test_check_15_reports_a_scope_mismatch_independently_of_14",
+    ),
+    (
+        "CMP.COVAUTH.56",
+        "CMP.COVERAGE_AUTHORITY",
+        "check 16 is deterministic across runs and refuses to claim a verdict "
+        "it cannot establish",
+        "test_book6_comparison_coverage.py",
+        "test_check_16_is_deterministic",
+    ),
+    (
+        "CMP.COVSEP.57",
+        "CMP.COVERAGE_AUTHORITY",
+        "checks 12 through 16 are each independently falsifiable; one may fail "
+        "while its neighbours hold",
+        "test_book6_comparison_coverage.py",
+        "test_each_coverage_check_is_individually_falsifiable",
+    ),
+    (
+        "CMP.BIAS.58",
+        "CMP.COVERAGE_APPLICABILITY",
+        "COVERAGE_SELECTS_BASELINE is FALSE, enforced structurally: the "
+        "coverage module never imports or calls the selector",
+        "test_book6_comparison_coverage.py",
+        "test_coverage_module_does_not_import_the_selector",
+    ),
+    (
+        "CMP.BIAS.59",
+        "CMP.COVERAGE_APPLICABILITY",
+        "the selected baseline is byte-identical before and after coverage "
+        "evaluation, across every coverage verdict",
+        "test_book6_comparison_coverage.py",
+        "test_coverage_cannot_cause_reselection_or_reordering",
+    ),
+    (
+        "CMP.TCMP.60",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "GAP-4 4D: every applicable structural and coverage gate passing "
+        "derives COMPARABLE",
+        "test_book6_comparison_coverage.py",
+        "test_comparable_path",
+    ),
+    (
+        "CMP.TCMP.61",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "an explicit ratified determination that coverage is INSUFFICIENT is a "
+        "DECISION and derives NOT_COMPARABLE, not UNRESOLVED",
+        "test_book6_comparison_coverage.py",
+        "test_not_comparable_path_requires_an_explicit_determination",
+    ),
+    (
+        "CMP.TCMP.62",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "no upstream determination derives UNRESOLVED",
+        "test_book6_comparison_coverage.py",
+        "test_unresolved_path_when_no_upstream_determination_exists",
+    ),
+    (
+        "CMP.TCMP.63",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "UNRESOLVED is never collapsed into NOT_COMPARABLE: absence of basis is "
+        "not a structural failure",
+        "test_book6_comparison_coverage.py",
+        "test_unresolved_is_never_not_comparable",
+    ),
+    (
+        "CMP.TCMP.64",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "an explicit structural failure outranks an unresolved basis, and both "
+        "are reported rather than merged",
+        "test_book6_comparison_coverage.py",
+        "test_an_explicit_structural_failure_outranks_an_unresolved_basis",
+    ),
+    (
+        "CMP.CHECK19.65",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "check 19 is separate from the coverage block and can fail while every "
+        "coverage check passes",
+        "test_book6_comparison_coverage.py",
+        "test_check_19_can_fail_while_every_coverage_check_passes",
+    ),
+    (
+        "CMP.AUTHORITY.66",
+        "CMP.COVERAGE_AUTHORITY",
+        "no second coverage registry, no comparison-local coverage authority, "
+        "and no benchmark authority is introduced",
+        "test_book6_comparison_coverage.py",
+        "test_no_second_coverage_authority_or_benchmark_is_introduced",
+    ),
+    (
+        "CMP.AUTHORITY.67",
+        "CMP.CONTRACT_SCOPE",
+        "G-8 still holds: Rung 7 declares no new authority-bearing contract "
+        "class and re-declares no accepted type",
+        "test_book6_comparison_coverage.py",
+        "test_no_third_comparison_authority_bearing_contract_is_introduced",
     ),
 )
 
