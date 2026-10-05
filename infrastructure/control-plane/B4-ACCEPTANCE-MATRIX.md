@@ -1530,3 +1530,59 @@ performed by the operator through the repository-scoped GitHub UI.
 - Accounting: cloud mutations 0, broker mutations 0, capital mutations 0,
   execution mutations 0, recurring cost $0, `capital.authority = none`.
   **`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
+
+## B4-FINAL-GOVERNANCE (confirmed) -- section 18.3 removal claim falsified and superseded
+
+Section 18 above recorded the governance correction. This row supersedes its
+removal-timing claim and stands as the operative position. Nothing is deleted or
+rewritten.
+
+### Falsified claim, recorded
+
+Section 18.3 asserted that removal "was completed by the operator through the
+repository-scoped GitHub UI". Post-push verification on section 18's own
+evidence head `4867c78f597ef684f042e9c0201f2e9f2c31a246` **falsified** it: `kilo-code-bot` created
+check-run `111781705620` and `sonarqubecloud` created `111782766280`, both after
+the removal action. An early poll appeared to show SonarCloud gone; that was
+analysis latency, not removal. **Neither removal had taken effect.** Removal was
+re-applied, and its verification is empirical rather than API-based because
+installation enumeration remains refused (`/user/installations` **403**,
+`/repos/.../installation` **401**).
+
+| Statement | Status |
+|---|---|
+| SonarCloud ever passed | **NO** -- Quality Gate failed on every analysis observed |
+| Kilo ever reviewed this repository | **NO** -- checkout failed (HTTP 429), never began |
+| Historical failures | **remain historical and accurate**; check runs preserved, not deleted |
+| Reason for removal | **never operator-authorized OCE dependency** -- not any result |
+| Required by branch protection | **NO** -- `main` protection HTTP 404 |
+| Required by repository rulesets | **NO** -- rulesets `[]` |
+| Removal is a pass / remediation / suppression / false-positive disposition | **NO** -- it is a governance act only |
+| Authoritative Book 4 gate | **the five OCE-owned workflows** plus their evidence artifacts |
+| Operator account / credential / budget / lifecycle authority | **none**, for either service |
+| Repo Actions secrets | **0** |
+
+### Unaffected
+
+- `CURRENT_ACTIVE_SONAR_SET = INACCESSIBLE_WITHOUT_AUTHORIZED_CREDENTIALS` is
+  still accurate; no active count is fabricated.
+- Section 12's measurements and section 14's temporal-union correction stand; the
+  union remains an observational count, **not** the active issue set.
+- The narrow deduction (Reliability C implies >=1 BUG; Security D implies >=1
+  VULNERABILITY) is unchanged, and **no further inference is drawn** now that
+  the source is gone.
+- Section 14.5's three `os.path.join` constructions remain an open
+  fail-open-under-refactor gap, **not** closed by this removal.
+- No `NOSONAR`, exclusion, waiver, severity/profile/rating/threshold/gate
+  change, coverage manipulation, or test deletion.
+
+### Method
+
+Verifying a GitHub App removal from this account is necessarily empirical: push
+a commit after removal and observe whether either app creates a check run, and
+only judge absence after the producer's asynchronous latency has elapsed.
+
+No merge, no force push, no amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. Accounting: cloud mutations 0, broker mutations 0, capital
+mutations 0, execution mutations 0, recurring cost $0, `capital.authority =
+none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.

@@ -5473,3 +5473,106 @@ No PR merge; `origin/main` untouched at
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`. No amend, squash, rebase, reset, or force-push. No Book
 5, no R49 or X10, no Atlas Program Block 4. This commit is documentation and
 evidence only.
+## 19. GOVERNANCE CORRECTION CONFIRMED, AND THE SECTION 18 REMOVAL CLAIM FALSIFIED
+
+Section 18 recorded the governance correction. **This section supersedes one
+specific claim in section 18.3. Nothing is deleted or rewritten: section 18
+stands byte-for-byte as the record of what was believed when it was written,
+and this section is the record of what verification then proved.**
+
+### 19.1 What section 18.3 claimed, and what verification showed
+
+Section 18.3 stated that removal *"was therefore completed by the operator
+through the repository-scoped GitHub UI"*. That sentence was **falsified** by
+post-push verification performed on section 18's own evidence head
+`4867c78f597ef684f042e9c0201f2e9f2c31a246`:
+
+| Check run | App | State at verification |
+|---|---|---|
+| `111781705620` | `kilo-code-bot` | `in_progress` |
+| `111782766280` | `sonarqubecloud` | `completed` / `failure` |
+
+Both unauthorized applications created **fresh** check runs on a commit pushed
+after the removal action. An earlier reading of the poll showed SonarCloud
+absent in the first two rounds; that was **analysis latency, not removal** -
+SonarCloud appeared at round three and completed normally. **The correct
+conclusion was that neither removal had taken effect.** Recording the correction
+of that intermediate misreading matters: absence in an early poll is not
+evidence of removal when the producer is asynchronous.
+
+Removal was then re-applied. GitHub still refuses installation inspection to
+this account - `GET /user/installations` returns **403** and
+`GET /repos/{owner}/{repo}/installation` returns **401** - so removal authority
+cannot be enumerated or altered by API from here at all.
+
+### 19.2 The governance statements, confirmed
+
+These are unchanged by the timing correction above and are the operative
+governance position:
+
+1. **SonarCloud and Kilo were never operator-authorized Book 4 dependencies.**
+   No operator requested, authorized, configured, or created an account for
+   either service.
+2. **No operator account, credentials, budget, acceptance requirement, or
+   lifecycle authority was ever established** for either. The repository's
+   GitHub Actions secret count is **0**.
+3. **Neither service was required by GitHub branch protection or by any
+   repository ruleset.** Protection on `main` returns HTTP 404 "Branch not
+   protected"; repository rulesets including parents are `[]`.
+4. **Neither service ever passed.** SonarCloud's Quality Gate failed on every
+   analysis observed, and Kilo never completed a review of this repository at
+   all. No pass is claimed, implied, or retroactively created by their removal.
+5. **Their historical failures remain historical.** SonarCloud Code Analysis
+   `111555287875` (Reliability on New Code C, Security on New Code D) and Kilo
+   Code Review `111554878664` (clone failed, HTTP 429) remain accurate
+   observations of the state on the commits where they were produced. Their
+   check runs were **not deleted, falsified, or erased**, and neither service
+   is described as green, waived, remediated, suppressed, or adjudicated as a
+   false positive.
+6. **Both were removed because they were never operator-authorized OCE
+   dependencies**, not because of any result they produced. Removal is a
+   governance act, not a quality disposition.
+7. **The five OCE-owned workflows constitute the authoritative Book 4 gate**,
+   together with their evidence artifacts bound to the tested commit and tree.
+   Attachment is not authorization: an unapproved third-party service cannot
+   acquire governance authority merely by installing a check.
+8. **Any future external scanner or reviewer must, before becoming
+   authoritative, have** explicit operator authorization, documented ownership,
+   operator-managed credentials, explicit cost authority, a declared data
+   boundary, explicit failure semantics, and a documented removal procedure.
+
+### 19.3 What is unaffected by the governance correction
+
+- Sections 12 and 14 remain valid. The recent-window union is still **not** the
+  active issue set, and `CURRENT_ACTIVE_SONAR_SET =
+  INACCESSIBLE_WITHOUT_AUTHORIZED_CREDENTIALS` remains accurate. No active count
+  is fabricated.
+- The narrow deduction is unchanged: Reliability on New Code = C implies at
+  least one BUG in the applicable code period; Security on New Code = D implies
+  at least one VULNERABILITY. **No further inference is drawn now that the
+  source is gone** - the removal does not identify, confirm, retire, or excuse
+  any specific finding.
+- Section 14.5's three unvalidated `os.path.join` constructions remain an open
+  fail-open-under-refactor gap. That gap is unrelated to these external services
+  and is **not** closed by their removal.
+- No `NOSONAR`, exclusion, waiver, severity change, quality-profile change,
+  rating change, threshold change, gate change, coverage manipulation, or test
+  deletion was performed at any point.
+
+### 19.4 Method note on verifying a removal
+
+A GitHub App removal is not directly observable through the REST API available
+to this account. The only sound verification is **empirical**: push a commit
+after removal and observe whether either application creates a check run. A
+single sample is weak evidence because producers are asynchronous, so a check is
+made only after the producer's characteristic latency has elapsed. Absence seen
+too early is not absence, and section 18.3 is the recorded instance of that
+mistake.
+
+### 19.5 Accounting
+
+cloud mutations 0, broker mutations 0, capital mutations 0, execution mutations
+0, recurring cost $0, `capital.authority = none`. No PR merge; `origin/main`
+untouched at `7c7816f382947bbc8a1f2154435fc436f2428fa8`. No amend, squash, rebase, reset, or force-push.
+No Book 5, no R49 or X10, no Atlas Program Block 4. This commit is documentation
+and evidence only.
