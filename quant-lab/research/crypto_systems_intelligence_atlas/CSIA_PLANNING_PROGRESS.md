@@ -4479,3 +4479,77 @@ no new currentness policy; no case renumbering; no history deletion; no edit to
 test spec v0.3 or any prior ratification; no edit to the Rung 1–3 commits; no
 rebase; no mutation of the frozen accepted Book 6 worktree at `5f94c3f40c`; Book
 7 or Choir work.
+
+---
+
+## Grammar v0.7 status gate — erratum
+
+`CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.7_STATUS_GATE_ERRATUM_v0.1.md` —
+`RATIFIED` (erratum) — 2026-10-05
+
+Grammar v0.7 §1.5 line 179 states `eligible requires: observation.status is
+ObservationStatus.OBSERVED`. That sentence is stray, non-governing errant draft
+text.
+
+```text
+RATIFIED_ELIGIBILITY_CONDITIONS (v0.6 §2.3) = 11
+OBSERVATION_STATUS_OCCURRENCES_IN_v0.6       = 0
+SUBSTRATE_RATIFIED_AS_WRITTEN                = TRUE
+v0.7 SECTIONS_CHANGED                        = 1  (§2.4 ordering only)
+v0.7 GAP_6_ELIGIBILITY_CHANGES               = 0
+
+V07_STATUS_SENTENCE_IS_INTERNALLY_INCONSISTENT_WITH_V07_CHANGE_SCOPE = TRUE
+GRAMMAR_v0.7_STATUS_SENTENCE = STRAY / NON-GOVERNING / INCONSISTENT DRAFT TEXT
+```
+
+It conflicts with v0.7's own declared change scope, with `BOOK6-GAP7-v0.3`
+B-STRICT, and with ratified `TIME-11`. It has no implementation authority.
+
+```text
+BASELINE_RECORD_AUTHORITY_GATE = GAP7 CURRENTNESS
+OBSERVATION_STATUS_GATE       = NOT GOVERNING
+ELIGIBILITY_PRECEDES_ORDERING = TRUE   (BOOK6-GAP6-v0.2)
+
+DOCTRINE_CHANGED           = FALSE
+IMPLEMENTATION_CHANGED     = FALSE
+RUNG6_REWORK_REQUIRED      = FALSE
+RUNG_6                     = VALID / NO REWORK
+GAP_5 / GAP_6 / GAP_7 REOPENED = FALSE
+```
+
+The stray sentence is preserved in grammar v0.7 as history; a ratified or
+superseded artifact is not edited in place. The erratum is the record that
+discharges it.
+
+**Correction recorded:** the Rung 6 implementation report characterised the v0.7
+status sentence as a doctrinal precedence conflict requiring a ruling. That was
+wrong — the ratified eligibility list never contained a status gate, so there
+was nothing to supersede. The Rung 6 implementation gates on injected GAP-7
+currentness and never reads `ObservationStatus`, which is correct under the
+ratified authority chain.
+
+## Standing state
+
+```text
+GRAMMAR_v0.7_STATUS_GATE = NON-GOVERNING ERRANT TEXT
+RUNG_6                   = VALID / NO REWORK
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED             = FALSE  (Rung 7 pending)
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.7_STATUS_GATE_ERRATUM_v0.1.md  RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md                                          appended
+CSIA_PLANNING_PROGRESS.md                                              appended
+```
+
+**Not done in this round:** no source written or edited; no test written or
+edited; no edit to grammar v0.6 or v0.7; no edit to any ratified record; no GAP
+reopening; no new policy selection; no rebase; no mutation of the frozen
+accepted Book 6 worktree; Book 7 or Choir work.
+
+**Next:** Rung 7 — coverage and temporal comparability.

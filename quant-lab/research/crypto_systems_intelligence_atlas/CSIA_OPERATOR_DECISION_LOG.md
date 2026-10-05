@@ -4129,3 +4129,88 @@ any new currentness policy; any case renumbering; any history deletion; any edit
 to test spec v0.3 or to any prior ratification; any edit to the Rung 1–3
 commits; any rebase; any mutation of the frozen accepted Book 6 worktree; Book 7
 or Choir work.
+
+---
+
+## Grammar v0.7 status gate — errant draft text, recorded
+
+`CSIA_BOOK_6_COMPARISON_CHANGE_GRAMMAR_v0.7_STATUS_GATE_ERRATUM_v0.1.md` —
+`RATIFIED` (erratum) — 2026-10-05
+
+No new decision id: an erratum records a fact about an artifact and selects no
+policy.
+
+### What was found
+
+Grammar v0.7 §1.5 (line 179) contains:
+
+```text
+Record-state gate, over accepted fields only:
+eligible requires: observation.status is ObservationStatus.OBSERVED
+```
+
+It is **stray, non-governing, errant draft text** — not superseded law.
+
+### The four facts
+
+1. **v0.6 §2.3 was ratified with eleven conditions and no status gate.**
+   `ObservationStatus` occurs **zero times** in the whole of grammar v0.6.
+2. **`BOOK6-COMPARE-SUBSTRATE-v0.2` ratified v0.6 as written** — "No edit was
+   made to any of the six artifacts ratified here."
+3. **v0.7 declares `SECTIONS_CHANGED = 1`**, that one section being §2.4
+   ordering. Its §2.1 annotation adds
+   `GAP_6_ELIGIBILITY_CHANGES = 0`. §2.3 eligibility is "carried unchanged".
+4. **The sentence sits inside the replaced §2.4 block**, yet states a §2.3
+   change the document says it did not make — and it conflicts with B-STRICT
+   (`OBSERVATION_STATUS_IS_CURRENTNESS_AUTHORITY = FALSE`) and with ratified
+   `TIME-11` (`REFUSAL_REASON_A = TERMINALITY`, `STATUS_REFUSAL = FALSE`).
+
+```text
+V07_STATUS_SENTENCE_IS_INTERNALLY_INCONSISTENT_WITH_V07_CHANGE_SCOPE = TRUE
+GRAMMAR_v0.7_STATUS_SENTENCE = STRAY / NON-GOVERNING / INCONSISTENT DRAFT TEXT
+STATUS_GATE_GOVERNING        = FALSE
+CURRENTNESS_GATE_GOVERNING   = TRUE
+```
+
+### Governing gate
+
+```text
+BASELINE_RECORD_AUTHORITY_GATE   = GAP7 CURRENTNESS
+ELIGIBILITY_PRECEDES_ORDERING     = TRUE   (BOOK6-GAP6-v0.2)
+ORDERING_SEES_INELIGIBLE_RECORDS = FALSE
+A historical predecessor NEVER reaches the lexical tie-break
+```
+
+### Not claimed
+
+```text
+"ratified status eligibility was superseded"   NOT SAID — nothing was ratified
+"the operator rejected a status gate"           NOT SAID — no choice was made
+GAP_5 / GAP_6 / GAP_7 REOPENED                  = FALSE
+DOCTRINE_CHANGED                                = FALSE
+IMPLEMENTATION_CHANGED                          = FALSE
+RUNG6_REWORK_REQUIRED                           = FALSE
+GRAMMAR_v0.7_EDITED                             = FALSE   (stray text is history)
+```
+
+### Correction to the implementation report
+
+The Rung 6 report framed this as a doctrinal precedence conflict requiring a
+ruling between grammar v0.7 and B-STRICT. That framing was wrong. There is
+nothing to supersede: the ratified eligibility list never contained a status
+gate, so the sentence is errant text inside a document that declares it
+replaced its one changed section. The implementation was correct as written.
+
+### Standing state
+
+```text
+GRAMMAR_v0.7_STATUS_GATE = NON-GOVERNING ERRANT TEXT
+RUNG_6                   = VALID / NO REWORK
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED             = FALSE  (Rung 7 pending)
+```
+
+**Not authorized and not performed:** any source edit; any test edit; any edit
+to grammar v0.6 or v0.7; any edit to any ratified record; any GAP reopening;
+any new policy selection; any rebase; any mutation of the frozen accepted Book
+6 worktree; Book 7 or Choir work.
