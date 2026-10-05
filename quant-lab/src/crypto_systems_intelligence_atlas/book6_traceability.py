@@ -120,6 +120,8 @@ CMP_FAMILIES: Final[tuple[str, ...]] = (
     "CMP.TEMPORAL_COMPARABILITY",
     "CMP.POLICY_FIREWALL",
     "CMP.DISPLAY_SEPARATION",
+    "CMP.FINGERPRINT",
+    "CMP.RULE_AUTHORITY",
 )
 
 #: Every family the matrix must cover.
@@ -2810,6 +2812,93 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "score, rank, grade, or recommendation field can be attached",
         "test_book6_comparison_contracts.py",
         "test_model_copy_cannot_smuggle_a_field",
+    ),
+    (
+        "CMP.FP.22",
+        "CMP.FINGERPRINT",
+        "equal rule content yields an equal digest, and unordered requirement "
+        "tuples are order-insensitive so a cosmetic reordering is not a change",
+        "test_book6_comparison_registry.py",
+        "test_unordered_fields_are_order_insensitive",
+    ),
+    (
+        "CMP.FP.23",
+        "CMP.DISPLAY_SEPARATION",
+        "display_metadata is outside the fingerprint: re-rendering a rule does "
+        "not invalidate its live authority",
+        "test_book6_comparison_registry.py",
+        "test_display_metadata_is_outside_the_fingerprint",
+    ),
+    (
+        "CMP.FP.24",
+        "CMP.BASELINE_SELECTOR",
+        "grammar v0.6 §2.7: the baseline selector's semantic content is folded "
+        "into the rule digest, so swapping the selector changes the rule",
+        "test_book6_comparison_registry.py",
+        "test_selector_content_is_inside_the_rule_fingerprint",
+    ),
+    (
+        "CMP.FP.25",
+        "CMP.FINGERPRINT",
+        "the canonical field lists match the ratified specification, with the "
+        "presentation-only fields excluded by construction",
+        "test_book6_comparison_registry.py",
+        "test_canonical_field_lists_match_the_specification",
+    ),
+    (
+        "CMP.AUTH.26",
+        "CMP.RULE_AUTHORITY",
+        "D6M-3 = A: the canonical bootstrap ratified count is zero and there is "
+        "no bulk or delegated ratification",
+        "test_book6_comparison_registry.py",
+        "test_bootstrap_ratified_count_is_zero",
+    ),
+    (
+        "CMP.AUTH.27",
+        "CMP.RULE_AUTHORITY",
+        "REGISTERED THEN != AUTHORITATIVE NOW: registration alone refuses",
+        "test_book6_comparison_registry.py",
+        "test_registered_is_not_authoritative",
+    ),
+    (
+        "CMP.AUTH.28",
+        "CMP.RULE_AUTHORITY",
+        "authority decays on supersession: a new version is a new decision and "
+        "never inherits the prior one",
+        "test_book6_comparison_registry.py",
+        "test_decision_does_not_inherit_across_versions",
+    ),
+    (
+        "CMP.AUTH.29",
+        "CMP.RULE_AUTHORITY",
+        "the R2-D1 content seal: a tampered in-memory rule stops authorizing "
+        "even though it still resolves structurally",
+        "test_book6_comparison_registry.py",
+        "test_content_drift_invalidates_a_still_registered_rule",
+    ),
+    (
+        "CMP.AUTH.30",
+        "CMP.RULE_AUTHORITY",
+        "invalidation removes authority immediately while the record stays "
+        "queryable as history",
+        "test_book6_comparison_registry.py",
+        "test_invalidation_removes_authority_but_keeps_history",
+    ),
+    (
+        "CMP.AUTH.31",
+        "CMP.RULE_AUTHORITY",
+        "an unknown rule identity refuses; there is no fuzzy or aliasing "
+        "resolution anywhere in the registry",
+        "test_book6_comparison_registry.py",
+        "test_unknown_rule_refuses",
+    ),
+    (
+        "CMP.PHANTOM.32",
+        "CMP.POLICY_FIREWALL",
+        "G-10: the phantom benchmark registry and fingerprint namespace does "
+        "not come back under any name",
+        "test_book6_comparison_registry.py",
+        "test_no_benchmark_registry_was_introduced",
     ),
 )
 
