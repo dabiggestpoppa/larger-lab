@@ -1,0 +1,169 @@
+{
+  "artifact": "i17_schema_version_matrix",
+  "checkpoint": "SENSOR-B4-I17",
+  "generated_for": "SENSOR-B4-I17 BLOC 5 HANDOFF - schema identity, versioning and compatibility freeze",
+  "historical_descriptor_compatibility": {
+    "carry_forward_id": "known limitation item D from the I16R2 ratification",
+    "distinguishable_states": [
+      "NO_UNIT_FIELDS (explicit marker present, empty list)",
+      "UNIT_EVIDENCE_DECLARED (explicit marker present, non-empty list)",
+      "HISTORICAL_UNIT_CONTRACT_ABSENT (no marker and no declaration - the third, distinct state)"
+    ],
+    "law": "Pre-I16R1 descriptors carry no unit metadata. They remain VALID historical contracts and continue to verify against their historical fingerprints.",
+    "prohibited_retroactive_reads": [
+      "an absent contract marker MUST NOT be read as NO_UNIT_FIELDS",
+      "an absent declaration list MUST NOT be read as VERIFIED_NATIVE",
+      "an absent marker with an empty list MUST NOT be read as UNIT_EVIDENCE_DECLARED"
+    ]
+  },
+  "identity_mechanisms": {
+    "compatibility_matrix_exists": false,
+    "compatibility_matrix_law": "This repository enforces semver FORM and identity uniqueness ONLY. It defines NO major/minor/patch compatibility semantics, no additive/backward/forward guarantees and no deprecation policy. Bloc 5 must not infer any of these from the version numbers and must not invent them; if a downstream policy is needed it must be authored and ratified separately.",
+    "projection_schema_id": {
+      "answers": "WHICH logical schema",
+      "law": "Nonempty stable logical name. Paired with projection_schema_version it forms schema_identity.",
+      "type": "str"
+    },
+    "projection_schema_version": {
+      "answers": "WHICH declared revision of that schema",
+      "law": "Strict semver MAJOR.MINOR.PATCH, validated by validate_semver(): no prerelease, no leading zeros. Anything else raises ValueError.",
+      "type": "str"
+    },
+    "schema_fingerprint": {
+      "answers": "WHAT EXACT FIELD STRUCTURE WAS REGISTERED",
+      "formula": "SHA-256 over canonical JSON of: every provider-native field (name, Arrow logical type, nullable), the full ordered _t0_* metadata schema (name, type, nullable), the canonical source_unit_evidence list sorted by resolved_field_path, and the source_unit_contract marker when declared",
+      "law": "Structure only. Separate question from schema_key; neither substitutes for the other.",
+      "type": "str"
+    },
+    "schema_key": {
+      "answers": "WHICH registered schema id/version",
+      "formula": "SHA-256(UTF-8('<projection_schema_id>@<projection_schema_version>')), full 64-char lowercase hex, never truncated",
+      "law": "Identity only. Registry self-consistency is validated on load: a stored key must hash from the stored id and version.",
+      "type": "str"
+    }
+  },
+  "method": "Read from the frozen implementation at the start head: projection_schema.compute_schema_key, projection_schema.compute_schema_fingerprint, projection_schema.validate_semver, ProjectionSchemaDefinition construction, ProjectionSchemaRegistry.register/resolve/resolve_by_id, export.PACK_SCHEMA_VERSION, and the pydantic model_fields of each public handoff model. No versioning policy is invented here; only enforced behavior is recorded.",
+  "registry_semantics": {
+    "conflict": "ProjectionSchemaConflict(schema_id, schema_version) is raised when the same schema_id + schema_version already exists with a DIFFERENT fingerprint. It is a ValueError subclass.",
+    "consequence_for_bloc5": "A changed schema structure under an unchanged id+version is REJECTED, not silently accepted. To change structure, register a NEW projection_schema_version.",
+    "corruption": "ProjectionSchemaCatalogCorrupt (RuntimeError) when a committed registry fragment is corrupt; the registry fails closed.",
+    "not_found": "ProjectionSchemaNotFound (KeyError subclass) for an unregistered schema_key or id+version.",
+    "register": "Idempotent for an exact duplicate (same id+version, same fingerprint). Returns the registered ProjectionSchemaDefinition.",
+    "resolution": "resolve(schema_key) or resolve_by_id(schema_id, schema_version). has(schema_key) and list_keys() are public."
+  },
+  "reserved_and_validated_namespaces": {
+    "laws": [
+      "A provider-native schema field beginning with _t0_ is rejected with ReservedProjectionColumn; the T0B layer injects those columns.",
+      "SourceUnitEvidence.field_name beginning with _t0_ is rejected.",
+      "Every component of SourceUnitEvidence.field_path beginning with _t0_ is rejected."
+    ],
+    "reserved_prefix": "_t0_",
+    "structural_path_law": "A unit path is a tuple, never a dotted string. Component 0 must be a top-level provider-native field; a component under list/large_list must equal the Arrow list value-field name; a component under struct must name a struct child field; any other intermediate type is not traversable; the terminal must be a string field. Every violation fails closed with a typed ValueError."
+  },
+  "schema": "sensor_fabric_schema_version_matrix_v1",
+  "schema_compatibility_table": [
+    {
+      "compatibility_behavior": "Pydantic model; additive fields are the only sanctioned change. No batch-level schema version field exists.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "Carries the projection schema identity; the row-level meaning of raw_rows_or_reader is defined by that registered schema.",
+      "public_fields": 22,
+      "schema": "RawNormalizationBatch",
+      "version_fields": [
+        "projection_schema_id",
+        "projection_schema_version"
+      ]
+    },
+    {
+      "compatibility_behavior": "Additive only. Changing any field changes the owner fingerprint and therefore requires a new projection_schema_version.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "Versioned indirectly through the owning ProjectionSchemaDefinition fingerprint.",
+      "public_fields": 5,
+      "schema": "SourceUnitEvidence",
+      "version_fields": []
+    },
+    {
+      "compatibility_behavior": "Same id+version with a different fingerprint is a hard conflict; no compatibility matrix.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "schema_key for identity, schema_fingerprint for structure; both derived deterministically.",
+      "public_fields": 6,
+      "schema": "ProjectionSchemaDefinition",
+      "version_fields": [
+        "projection_schema_id",
+        "projection_schema_version",
+        "schema_key",
+        "schema_fingerprint"
+      ]
+    },
+    {
+      "compatibility_behavior": "A projection whose declared schema version does not match the artifact is rejected at read/export time.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "projection_sha256 is the durable artifact digest; state is a typed ProjectionState.",
+      "public_fields": 13,
+      "schema": "RawProjectionArtifact",
+      "version_fields": [
+        "projection_schema_id",
+        "projection_schema_version",
+        "parser_version"
+      ]
+    },
+    {
+      "compatibility_behavior": "Append-only acquisition facts; resume tokens are opaque.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "request_fingerprint identifies the request; adapter_version/capability_version identify the producing adapter contract.",
+      "public_fields": 31,
+      "schema": "AcquisitionRecord",
+      "version_fields": [
+        "adapter_version",
+        "adapter_capability_version",
+        "request_fingerprint"
+      ]
+    },
+    {
+      "compatibility_behavior": "A pointer never precedes its durable manifest; versions are reported as versions, not as separate current manifests.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "partition_manifest_id plus a per-partition monotonically advancing manifest_version; supersedes_manifest_id chains revisions.",
+      "public_fields": 22,
+      "schema": "PartitionManifest",
+      "version_fields": [
+        "manifest_version",
+        "supersedes_manifest_id"
+      ]
+    },
+    {
+      "compatibility_behavior": "UNKNOWN_REVISION is an honest state and never resolves to latest by default (query default policy is ERROR_ON_AMBIGUITY).",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "source_revision_key plus revision_number plus blob_sha256; revision_state names what the revision means.",
+      "public_fields": 7,
+      "schema": "SourceRevision (revision identity)",
+      "version_fields": [
+        "revision_number",
+        "revision_state"
+      ]
+    },
+    {
+      "compatibility_behavior": "Verification and restore require exact equality with the supported pack version; any other value raises PackUnsupportedVersion. There is no cross-version migration.",
+      "frozen_at_bloc4": true,
+      "identity_mechanism": "PACK_SCHEMA_VERSION is the constant \"1\"; manifest_sha256 and pack_root_sha256 bind the pack.",
+      "public_fields": 14,
+      "schema": "Export evidence pack",
+      "version_fields": [
+        "pack_schema_version"
+      ]
+    }
+  ],
+  "start_head": "fb813728f32d6e518ed9911470388aec24c1e83e",
+  "unit_declaration_versioning": {
+    "current_behavior_exact": "Changing any fingerprinted input changes schema_fingerprint. Re-registering the SAME projection_schema_id + projection_schema_version with the changed declaration therefore raises ProjectionSchemaConflict. The only accepted way to ship a changed unit declaration alongside the old one is a NEW projection_schema_version (or a new projection_schema_id).",
+    "fingerprinted_inputs": [
+      "SourceUnitEvidence.field_name",
+      "SourceUnitEvidence.field_path (structural tuple; absent means the scalar path (field_name,))",
+      "SourceUnitEvidence.state (VERIFIED_NATIVE | UNIT_UNVERIFIED)",
+      "SourceUnitEvidence.variability (STATIC_VERIFIED | ROW_NATIVE | UNIT_UNVERIFIED | absent)",
+      "SourceUnitEvidence.native_unit_lexeme (str | None)",
+      "ProjectionSchemaDefinition.source_unit_contract (NO_UNIT_FIELDS | UNIT_EVIDENCE_DECLARED, when declared)"
+    ],
+    "historical_stability": "When NO declaration exists at all, the fingerprint formula omits both the source_unit_evidence list and the source_unit_contract key, so the resulting digest is byte-identical to the pre-I16R1 formula and historical descriptors keep verifying under their historical contract.",
+    "rule": "source-unit declarations participate in the schema fingerprint.",
+    "what_bloc5_must_not_do": "Do not assume a changed unit declaration is a compatible change; do not silently re-register an existing id+version; do not treat an unchanged version string as proof of an unchanged unit contract - compare fingerprints."
+  }
+}

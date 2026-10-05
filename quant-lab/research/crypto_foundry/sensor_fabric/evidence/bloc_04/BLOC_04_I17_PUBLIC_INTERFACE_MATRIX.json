@@ -1,0 +1,705 @@
+{
+  "artifact": "i17_public_interface_matrix",
+  "checkpoint": "SENSOR-B4-I17",
+  "entries": [
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Declarative only; 17 public fields; revision_policy defaults to ERROR_ON_AMBIGUITY so ambiguity never resolves silently.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "No field implies a filesystem location; empty list means unconstrained, not 'none exist'.",
+      "import_path": "crypto_sensor_fabric.storage.RawEvidenceQuery",
+      "purpose": "Declarative selector for durable raw evidence: providers, venues, sensor_families, native_instruments, source_granularities, logical_start/logical_end, acquired_before, observed_before, integrity_minimum, coverage_states, revision_policy, include_t0a/include_t0b, projection_schema_ids, limit, exact_revision_number.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawEvidenceQuery",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Path-independent; returns typed absences rather than empty frames.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Never derive blob or manifest paths from it; no absolute root is exposed.",
+      "import_path": "crypto_sensor_fabric.storage.RawEvidenceQueryService",
+      "purpose": "Executes a RawEvidenceQuery against durable evidence and returns a QueryOutcome. Public methods: execute(query) -> QueryOutcome, refresh() -> None.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawEvidenceQueryService",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Missingness is explicit: no_matching_evidence=True is a typed absence, never a zero row count.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "An empty results tuple with no_matching_evidence=False must not be read as data.",
+      "import_path": "crypto_sensor_fabric.storage.QueryOutcome",
+      "purpose": "Result envelope of a query: results (tuple[RawEvidenceResult, ...]), no_matching_evidence (bool), reason (str | None).",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "QueryOutcome",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "References, not paths; integrity_state and coverage_state are always present typed states.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "quality_flags absence is not proof of provider completeness.",
+      "import_path": "crypto_sensor_fabric.storage.RawEvidenceResult",
+      "purpose": "Per-match durable evidence identity: provider, venue, sensor_family, native_instrument, source_granularity, logical_time_start/end, coverage_state, integrity_state, acquisition_ids, blob_refs, projection_refs, revision_state, quality_flags, lineage_refs.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawEvidenceResult",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "NORMALIZATION-READY EVIDENCE, never normalized science data; contains no canonical unit, no notional, no effective_at.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Must not be treated as a DataFrame of tidy series; row-level meaning is described by the declared schema, not by the batch.",
+      "import_path": "crypto_sensor_fabric.storage.RawNormalizationBatch",
+      "purpose": "The handoff batch: 22 public fields carrying source identity, time evidence, unit evidence, lineage, coverage, integrity and revision truth.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawNormalizationBatch",
+      "version_field": "projection_schema_id + projection_schema_version (carried, not interpreted)"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Copies durable source_unit_evidence and source_unit_contract verbatim from the registered schema definition; establishes no row truth of its own.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "It never scans projection rows, never normalizes, never converts base/quote, never assigns a canonical asset or effective_at.",
+      "import_path": "crypto_sensor_fabric.storage.Bloc5Handoff",
+      "purpose": "Metadata-only handoff constructor. to_batch(result, projections, acquisitions, parser_version, raw_rows_or_reader) -> RawNormalizationBatch.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "Bloc5Handoff",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "state=VERIFIED_NATIVE is truth-bound at T0B commit time, not a bare declaration.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "An absent field_path means the scalar path (field_name,); it does not mean nested or absent.",
+      "import_path": "crypto_sensor_fabric.storage.SourceUnitEvidence",
+      "purpose": "One declared provider-native unit location: field_name, native_unit_lexeme, state, field_path, variability. Public method: to_descriptor().",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "SourceUnitEvidence",
+      "version_field": "participates in the schema fingerprint"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "VERIFIED_NATIVE always carries a non-blank lexeme (model-enforced).",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "UNIT_UNVERIFIED never means unitless.",
+      "import_path": "crypto_sensor_fabric.storage.SourceUnitState",
+      "purpose": "Frozen pair: VERIFIED_NATIVE, UNIT_UNVERIFIED.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "SourceUnitState",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Absent variability preserves the I16R1 state/lexeme pair semantics exactly.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Variability is not a substitute for state; read both.",
+      "import_path": "crypto_sensor_fabric.storage.SourceUnitVariability",
+      "purpose": "How declared evidence behaves across rows: STATIC_VERIFIED, ROW_NATIVE, UNIT_UNVERIFIED.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "SourceUnitVariability",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Marker plus list is unambiguous; absence is a third, distinct state.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "An empty list with no marker is NOT NO_UNIT_FIELDS.",
+      "import_path": "crypto_sensor_fabric.storage.SourceUnitContract",
+      "purpose": "Explicit unit-contract marker: NO_UNIT_FIELDS, UNIT_EVIDENCE_DECLARED.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "SourceUnitContract",
+      "version_field": "participates in the schema fingerprint when declared"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Provider-native fields may not use the reserved _t0_ namespace; unit paths are validated against the Arrow schema.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "schema_key answers WHICH id/version; schema_fingerprint answers WHAT STRUCTURE. They are different questions and neither replaces the other.",
+      "import_path": "crypto_sensor_fabric.storage.ProjectionSchemaDefinition",
+      "purpose": "Frozen registered provider-native schema contract: projection_schema_id, projection_schema_version (strict semver MAJOR.MINOR.PATCH), provider_native_schema, source_unit_evidence, source_unit_contract, schema_key, schema_fingerprint. Public method: to_descriptor().",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "ProjectionSchemaDefinition",
+      "version_field": "projection_schema_id + projection_schema_version + schema_fingerprint"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "register() is idempotent for exact duplicates and raises ProjectionSchemaConflict for the same id+version with a different fingerprint.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "There is no compatibility matrix; do not infer semver compatibility from the version numbers.",
+      "import_path": "crypto_sensor_fabric.storage.ProjectionSchemaRegistry",
+      "purpose": "Durable schema registry. Public methods: register(definition), resolve(schema_key), resolve_by_id(schema_id, schema_version), has(schema_key), list_keys().",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "ProjectionSchemaRegistry",
+      "version_field": "schema_key = SHA-256('<id>@<version>')"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Deterministic and stable across processes.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "It carries no structural information whatsoever.",
+      "import_path": "crypto_sensor_fabric.storage.compute_schema_key",
+      "purpose": "Deterministic registry key = SHA-256(UTF-8('<schema_id>@<schema_version>')), full 64-char hex, never truncated.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "compute_schema_key",
+      "version_field": "identity function of id+version"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "When no unit declaration exists the fingerprint is byte-identical to the pre-I16R1 formula, so historical descriptors keep verifying.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "A changed unit declaration IS a changed schema contract.",
+      "import_path": "crypto_sensor_fabric.storage.compute_schema_fingerprint",
+      "purpose": "Deterministic structural fingerprint (SHA-256) over provider-native fields, the full ordered _t0_* metadata schema, the canonical sorted source_unit_evidence list, and the source_unit_contract marker when declared.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "compute_schema_fingerprint",
+      "version_field": "content-derived"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Type-driven, deterministic, no dotted-string ambiguity.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Do not hand-build path strings; use tuples.",
+      "import_path": "crypto_sensor_fabric.storage.resolve_unit_field_path",
+      "purpose": "Resolves a structural source-unit path tuple against the registered Arrow schema into ordered traversal steps; fails closed on empty paths, unknown roots, wrong list value-field names, non-struct children, untraversable intermediates and non-string terminals.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "resolve_unit_field_path",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "date_basis is an explicit enum, never an assumption.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "partition_key is a logical key, not a directory path.",
+      "import_path": "crypto_sensor_fabric.storage.PartitionManifest",
+      "purpose": "Durable partition durability record: 22 fields including partition_manifest_id, partition_key, manifest_version, date_basis, logical_date_start/end, blob_refs, projection_refs, coverage_state, integrity_state, row_count, min_time, max_time, gap_count, revision_count, created_at, supersedes_manifest_id.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "PartitionManifest",
+      "version_field": "manifest_version (per-partition counter)"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Commit-before-pointer ordering is enforced; a pointer never precedes its durable manifest.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Do not bypass the repository to read manifest fragments directly.",
+      "import_path": "crypto_sensor_fabric.storage.PartitionManifestRepository",
+      "purpose": "Durable manifest authority. Public methods: append_partition_manifest(manifest, expected_current, fault_hooks), get_current_manifest, get_manifest, list_manifest_versions, list_all_current_manifests, list_orphan_manifest_fragments, read_current_pointer.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "PartitionManifestRepository",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "actual_start/actual_end are nullable and nullable means unknown, not epoch.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "endpoint_host/endpoint_path are acquisition facts, not storage locations.",
+      "import_path": "crypto_sensor_fabric.storage.AcquisitionRecord",
+      "purpose": "31-field acquisition fact record: identity, request fingerprint, adapter versions, requested/actual bounds, request_started_at, response_observed_at, ingested_at, source_locator, blob_sha256, schema_state, evidence_ref, provider checksum fields, resume tokens, quality_flags, failure_ref.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "AcquisitionRecord",
+      "version_field": "adapter_version + adapter_capability_version"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Usability and H3 proof are explicit public queries, not caller heuristics.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "A matching acquisition is not automatically a usable one.",
+      "import_path": "crypto_sensor_fabric.storage.AcquisitionRepository",
+      "purpose": "Durable acquisition authority. Public methods include append_acquisition, get_acquisition, list_acquisitions_for_blob, find_matching_acquisitions, find_usable_matching_acquisitions, has_earned_h3_proof, is_usable_manifest_provenance and static is_usable_manifest_provenance(record).",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "AcquisitionRepository",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "projection_sha256 is the durable artifact digest; state is a typed ProjectionState.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "projection_uri is an opaque descriptor; do not parse it as a path. min/max_provider_time are nullable artifact bounds, not a provider-time contract.",
+      "import_path": "crypto_sensor_fabric.storage.RawProjectionArtifact",
+      "purpose": "The public projection record (this is the symbol Bloc 5 uses; there is NO symbol named ProjectionArtifact in the package). 13 fields including projection_id, source_blob_sha256, projection_schema_id, projection_schema_version, parser_version, row_count, min_provider_time, max_provider_time, partition_key, projection_uri, projection_sha256, quality_flags, state.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawProjectionArtifact",
+      "version_field": "projection_schema_id + projection_schema_version + parser_version"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Row access is possible but row INTERPRETATION is not supplied and not authorized by Bloc 4.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Never construct projection storage paths yourself.",
+      "import_path": "crypto_sensor_fabric.storage.RawProjectionReader",
+      "purpose": "Public projection access. Methods: get_artifact(projection_id), open_projection_bytes(projection_id), projection_metadata(projection_id), resolve_lineage(projection_id), set_acquisition_repository(repo).",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawProjectionReader",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Every committed projection row range is traceable to a source blob and acquisition.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Nullable row bounds mean the edge is batch-level, not that lineage is missing.",
+      "import_path": "crypto_sensor_fabric.storage.ProjectionLineage",
+      "purpose": "Projection lineage edge: lineage_manifest_id, projection_id, source_blob_sha256, source_acquisition_id, source_row_start, source_row_end, source_order.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "ProjectionLineage",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Lineage validity is a public check, not an internal assumption.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": null,
+      "import_path": "crypto_sensor_fabric.storage.ProjectionLineageResolver",
+      "purpose": "Public lineage resolver with validate_projection_ref(projection_id, manifest).",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "ProjectionLineageResolver",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "revision_state distinguishes STABLE, IDENTICAL_REFETCH, SOURCE_MUTATION, PROVIDER_DECLARED_REVISION and UNKNOWN_REVISION.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "UNKNOWN_REVISION is not permission to assume the latest.",
+      "import_path": "crypto_sensor_fabric.storage.SourceRevision",
+      "purpose": "Revision observation record: source_revision_key, revision_number, blob_sha256, first_seen_at, last_seen_at, revision_reason, revision_state.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "SourceRevision",
+      "version_field": "revision_number"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Resolution is explicit and returns explicit indices.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Do not select a revision silently; see the RevisionPolicy table in the handoff contract.",
+      "import_path": "crypto_sensor_fabric.storage.RevisionResolver",
+      "purpose": "The PUBLIC revision-resolution interface: key_for(acquisition) -> str and resolve(source_revision_key=..., query=...) -> list[int]. This is how Bloc 5 resolves revisions; SourceRevisionRegistry and RevisionSourceIdentityV1 are NOT exported and are not needed.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RevisionResolver",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "The default fails closed on ambiguity.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Never switch to LATEST_SEEN without recording the decision as part of the PIT policy.",
+      "import_path": "crypto_sensor_fabric.storage.RevisionPolicy",
+      "purpose": "Query-level revision policy: ERROR_ON_AMBIGUITY (default), ALL, FIRST_SEEN, LATEST_SEEN, EXACT_REVISION, PROVIDER_DECLARED_CANONICAL.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RevisionPolicy",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": null,
+      "exported_by_storage": true,
+      "forbidden_assumptions": "SOURCE_MUTATION must never be silently normalized away.",
+      "import_path": "crypto_sensor_fabric.storage.RevisionState",
+      "purpose": "STABLE, IDENTICAL_REFETCH, SOURCE_MUTATION, PROVIDER_DECLARED_REVISION, UNKNOWN_REVISION.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RevisionState",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Absence is always a named state; NONE never becomes numeric zero.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "EMPTY_CONFIRMED is not an error and NOT_ATTEMPTED is not empty.",
+      "import_path": "crypto_sensor_fabric.storage.CoverageState",
+      "purpose": "Missingness vocabulary: COMPLETE_SOURCE_BOUNDARY, PARTIAL, KNOWN_GAP, EMPTY_CONFIRMED, NOT_ATTEMPTED, FAILED, ACCESS_BLOCKED, HISTORY_UNAVAILABLE, QUARANTINED, REVISION_CONFLICT.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "CoverageState",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Integrity can be filtered at query time with integrity_minimum.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "PROVIDER_HASH_VERIFIED is stronger than LOCAL_HASH_VERIFIED, not equivalent.",
+      "import_path": "crypto_sensor_fabric.storage.IntegrityState",
+      "purpose": "UNVERIFIED, LOCAL_HASH_VERIFIED, PROVIDER_HASH_VERIFIED, QUARANTINED_INTEGRITY_FAILURE, MISSING_BLOB, PROJECTION_INVALID.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "IntegrityState",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "UNKNOWN is an explicit, honest state.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Do not silently coerce UNKNOWN into EVENT_TIME.",
+      "import_path": "crypto_sensor_fabric.storage.DateBasis",
+      "purpose": "EVENT_TIME, PROVIDER_FILE_DATE, SNAPSHOT_TIME, UNKNOWN.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "DateBasis",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Invalid projections are named, not silently dropped.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "SUPERSEDED is not INVALID.",
+      "import_path": "crypto_sensor_fabric.storage.ProjectionState",
+      "purpose": "VALID, SUPERSEDED, INVALID_PARSER, INVALID_SOURCE, INVALID_LINEAGE.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "ProjectionState",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "CHECKPOINT_ADVANCED exists only after MANIFEST_COMMITTED.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Do not read PROJECTION_COMMITTED as evidence that a manifest is durable.",
+      "import_path": "crypto_sensor_fabric.storage.StorageJobStatus",
+      "purpose": "Upstream causality vocabulary: PLANNED, ACQUIRING, RAW_STAGED, RAW_COMMITTED, PROJECTION_PENDING, PROJECTION_COMMITTED, MANIFEST_COMMITTED, CHECKPOINT_ADVANCED, COMPLETE, FAILED_RETRYABLE, FAILED_TERMINAL, QUARANTINED.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "StorageJobStatus",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "advance_checkpoint requires a durable acquisition and an optional manifest reference.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Job state is operational metadata, not evidence authority.",
+      "import_path": "crypto_sensor_fabric.storage.DurableJobStateRepository",
+      "purpose": "Durable job state authority. Public methods: create_job, get_job, has_job, list_job_ids, list_transitions, advance_status, advance_checkpoint.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "DurableJobStateRepository",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "verify() is the public T0A integrity check.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Never construct a blob path from a digest yourself.",
+      "import_path": "crypto_sensor_fabric.storage.RawArtifactReader",
+      "purpose": "Public T0A blob access: open_bytes, stream_bytes, metadata, metadata_all, verify.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawArtifactReader",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Content-addressed; immutable once committed.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "BLOB_KEY_PREFIX is an implementation detail; do not construct keys.",
+      "import_path": "crypto_sensor_fabric.storage.LocalBlobStore",
+      "purpose": "Public blob authority: put, put_bytes, open_blob, blob_exists, verify_blob.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "LocalBlobStore",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Physical verification is queryable, not assumed.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "has_verified_physical() is local verification unless the record says provider-verified.",
+      "import_path": "crypto_sensor_fabric.storage.BlobMetadataRepository",
+      "purpose": "Public blob metadata authority: append_metadata, get_blob_metadata, get_blob_metadata_exact, has_verified_physical, list_all_blob_metadata.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "BlobMetadataRepository",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Ordering is explicit (ACQUISITION_ORDER default, PROVIDER_EVENT_TIME, SOURCE_ORDER).",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Ordering is a caller decision and must be recorded, not inherited.",
+      "import_path": "crypto_sensor_fabric.storage.RawReplayCursor",
+      "purpose": "Deterministic replay: replay(query, order_by), acquisitions_for(result), ordered_acquisitions(result, order_by).",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "RawReplayCursor",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": null,
+      "exported_by_storage": true,
+      "forbidden_assumptions": "ACQUISITION_ORDER is ingestion order, not event-time order.",
+      "import_path": "crypto_sensor_fabric.storage.ReplayOrder",
+      "purpose": "ACQUISITION_ORDER, PROVIDER_EVENT_TIME, SOURCE_ORDER.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "ReplayOrder",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Packs are self-contained and verifiable.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "A pack is not a database backup and not a normalized dataset.",
+      "import_path": "crypto_sensor_fabric.storage.EvidencePackExporter",
+      "purpose": "export_query(query, destination) -> ExportReceipt: portable evidence pack.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "EvidencePackExporter",
+      "version_field": "export schema version carried in ExportManifest"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Verification precedes restore.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": null,
+      "import_path": "crypto_sensor_fabric.storage.EvidencePackVerifier",
+      "purpose": "verify_pack(pack_root) -> PackVerificationReport.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "EvidencePackVerifier",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Destination must be unrelated and empty; identity, hash, query, revision and lineage parity are preserved.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Restoring into a non-empty root raises RestoreDestinationNotEmpty; do not work around it.",
+      "import_path": "crypto_sensor_fabric.storage.EvidencePackRestorer",
+      "purpose": "restore_pack(pack_root, destination, source_revision_keys=None) -> Path into a NEW empty root.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "EvidencePackRestorer",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative for OPERATIONAL METADATA ONLY; never for bulk raw evidence",
+      "downstream_guarantees": "Every table is reconstructible from durable sources; the database is a cache of metadata, not its owner.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Losing Postgres loses no evidence. G4-10 final acceptance carried a no-live-DSN limitation; no new live run is claimed.",
+      "import_path": "crypto_sensor_fabric.storage.PostgresMetadataRepository",
+      "purpose": "Operational metadata/state store only. Methods: install_schema, validate_installed_schema, introspect_schema, upsert_operational_state, set_quota_state, set_backup_state, record_integrity_check, refresh_reconstructible_metadata, canonical_rows, drop_schema.",
+      "stability": "STABLE_WITH_DOCUMENTED_LIMITATION",
+      "symbol": "PostgresMetadataRepository",
+      "version_field": "SCHEMA_VERSION"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Table shapes are declared, not inferred.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Do not write tables outside TABLE_SCHEMAS.",
+      "import_path": "crypto_sensor_fabric.storage.TABLE_SCHEMAS",
+      "purpose": "Sole table-shape authority for the operational metadata store.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "TABLE_SCHEMAS",
+      "version_field": "SCHEMA_VERSION"
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Reconstruction is the proof of non-authority.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": null,
+      "import_path": "crypto_sensor_fabric.storage.reconstruct_snapshot",
+      "purpose": "Rebuilds operational metadata from durable sources, proving the DB is disposable.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "reconstruct_snapshot",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Credentials never enter evidence or logs.",
+      "exported_by_storage": true,
+      "forbidden_assumptions": "Never log a raw DSN even in a local debugging path.",
+      "import_path": "crypto_sensor_fabric.storage.redact_dsn",
+      "purpose": "Secret-safe DSN rendering for logs and evidence.",
+      "stability": "STABLE_FOR_BLOC5",
+      "symbol": "redact_dsn",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Public, importable, stable vocabulary.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "NOT re-exported by crypto_sensor_fabric.storage; import from crypto_sensor_fabric.contracts.enums.",
+      "import_path": "crypto_sensor_fabric.contracts.enums.SensorFamily",
+      "purpose": "Family vocabulary used by RawEvidenceResult, RawEvidenceQuery, RawNormalizationBatch, AcquisitionRecord and PartitionManifest.",
+      "stability": "STABLE_WITH_DOCUMENTED_LIMITATION",
+      "symbol": "SensorFamily",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Public, importable, stable vocabulary.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "NOT re-exported by crypto_sensor_fabric.storage. Import from crypto_sensor_fabric.probes.enums. This is a base enum module only: it does NOT pull in any provider adapter, network client or provider-specific code.",
+      "import_path": "crypto_sensor_fabric.probes.enums.Granularity",
+      "purpose": "Source granularity used by source_granularity on results/batches/manifests and source_granularities on queries.",
+      "stability": "STABLE_WITH_DOCUMENTED_LIMITATION",
+      "symbol": "Granularity",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Base shared enums only.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "NOT re-exported by crypto_sensor_fabric.storage. Import from providers.base.enums. Do NOT import any concrete provider adapter package.",
+      "import_path": "crypto_sensor_fabric.providers.base.enums",
+      "purpose": "Acquisition quality flags and provider schema state carried on results, batches and acquisition records.",
+      "stability": "STABLE_WITH_DOCUMENTED_LIMITATION",
+      "symbol": "QualityFlagAcquisition / SchemaState",
+      "version_field": null
+    },
+    {
+      "authoritative": "authoritative",
+      "downstream_guarantees": "Typed, opaque values.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "NOT re-exported by crypto_sensor_fabric.storage; treat as opaque and never introspect them for provider behavior.",
+      "import_path": "crypto_sensor_fabric.providers.base.models",
+      "purpose": "Typed adapter evidence references and resume tokens carried on AcquisitionRecord.",
+      "stability": "STABLE_WITH_DOCUMENTED_LIMITATION",
+      "symbol": "AdapterEvidenceRef / ResumeToken",
+      "version_field": null
+    },
+    {
+      "authoritative": "NOT an authority - deliberately not public",
+      "downstream_guarantees": "None for Bloc 5: it is not part of the handoff surface.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "Bloc 5 must not treat DuckDB as evidence authority and must not depend on these symbols; it is intentionally unreachable through the public package.",
+      "import_path": "crypto_sensor_fabric.storage.duckdb_catalog (module exists; symbols NOT exported)",
+      "purpose": "Disposable discovery/query acceleration over committed projections.",
+      "stability": "INTERNAL_NOT_PUBLIC",
+      "symbol": "rebuild_duckdb_catalog / ReadOnlyDuckDBCatalog",
+      "version_field": null
+    },
+    {
+      "authoritative": "upstream concern, not a Bloc 5 surface",
+      "downstream_guarantees": "None required; upstream causality is observable through the exported StorageJobStatus vocabulary and DurableJobStateRepository.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "Do not import it; Bloc 5 receives only already-accepted durable evidence.",
+      "import_path": "crypto_sensor_fabric.storage.integration (module exists; symbol NOT exported)",
+      "purpose": "Upstream Bloc 3 -> Bloc 4 persistence handoff.",
+      "stability": "INTERNAL_NOT_PUBLIC",
+      "symbol": "Bloc3StorageHandoff",
+      "version_field": null
+    },
+    {
+      "authoritative": "internal",
+      "downstream_guarantees": "None needed: the public revision surface is RevisionResolver + RevisionPolicy + RevisionState + SourceRevision + RawEvidenceResult.revision_state.",
+      "exported_by_storage": false,
+      "forbidden_assumptions": "Do not import them. This is NOT a public-contract gap: no Bloc 5 behaviour requires a private symbol.",
+      "import_path": "crypto_sensor_fabric.storage.revisions (symbols NOT exported)",
+      "purpose": "Internal revision registry and identity value type.",
+      "stability": "INTERNAL_NOT_PUBLIC",
+      "symbol": "SourceRevisionRegistry / RevisionSourceIdentityV1",
+      "version_field": null
+    }
+  ],
+  "generated_for": "SENSOR-B4-I17 BLOC 5 HANDOFF - stable public interface inventory for crypto_sensor_fabric.storage",
+  "method": "Machine introspection of the installed package: crypto_sensor_fabric.storage.__all__ was enumerated and every operator-named symbol was resolved by getattr, checked for presence and for membership in __all__. Model field sets were read from pydantic model_fields. No symbol is documented that did not resolve, and no resolved symbol is omitted from its stability class.",
+  "operator_named_symbol_check": [
+    {
+      "exported": true,
+      "requested": "RawEvidenceQuery",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "RawEvidenceQueryService",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "RawEvidenceResult",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "RawNormalizationBatch",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "Bloc5Handoff",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "SourceUnitEvidence",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "SourceUnitState",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "SourceUnitVariability",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "SourceUnitContract",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "ProjectionSchemaDefinition",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "ProjectionSchemaRegistry",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "PartitionManifest",
+      "resolved": true
+    },
+    {
+      "exported": true,
+      "requested": "AcquisitionRecord",
+      "resolved": true
+    },
+    {
+      "correction": "No such symbol exists. The public projection record is RawProjectionArtifact, which IS exported. Documented under that real name; no aspirational API is documented as existing.",
+      "exported": false,
+      "requested": "ProjectionArtifact",
+      "resolved": false
+    },
+    {
+      "correction": "Not re-exported by crypto_sensor_fabric.storage. Import from crypto_sensor_fabric.probes.enums. Recorded as STABLE_WITH_DOCUMENTED_LIMITATION.",
+      "exported": false,
+      "requested": "Granularity",
+      "resolved": false
+    },
+    {
+      "correction": "Resolved to the public surface RevisionResolver (key_for, resolve) + RevisionPolicy + RevisionState + SourceRevision. No private symbol is required.",
+      "exported": true,
+      "requested": "revision-resolution public interfaces",
+      "resolved": true
+    },
+    {
+      "correction": "CoverageState (10 members).",
+      "exported": true,
+      "requested": "coverage/missingness enums",
+      "resolved": true
+    },
+    {
+      "correction": "IntegrityState (6 members) + IntegrityCheck.",
+      "exported": true,
+      "requested": "integrity enums",
+      "resolved": true
+    }
+  ],
+  "package_export_surface": {
+    "exported_symbol_count": 200,
+    "has_dunder_all": true,
+    "import_rule": "A symbol is PUBLIC for Bloc 5 if and only if it appears in crypto_sensor_fabric.storage.__all__ and is importable from crypto_sensor_fabric.storage.",
+    "module": "crypto_sensor_fabric.storage",
+    "non_reexported_sibling_enums_note": "Public storage model annotations reference four enum/model families that live in sibling public packages and are NOT re-exported by crypto_sensor_fabric.storage. They are recorded in this matrix with their real import paths under stability STABLE_WITH_DOCUMENTED_LIMITATION."
+  },
+  "public_contract_gap_assessment": {
+    "conclusion": "Every behaviour a Bloc 5 implementation needs is reachable through crypto_sensor_fabric.storage public names. No required behaviour depends on a private (underscore) symbol. Two documented non-re-exports (Granularity, SensorFamily) live in PUBLIC sibling packages and are recorded with their real import paths; the DuckDB catalog and Bloc3StorageHandoff are deliberately non-public and are not needed by Bloc 5. No private API is blessed.",
+    "deferred_to_operator": [],
+    "non_public_but_needed": [],
+    "stop_condition_triggered": false
+  },
+  "schema": "sensor_fabric_public_interface_matrix_v1",
+  "stability_summary": {
+    "HISTORICAL_COMPAT_ONLY": 0,
+    "INTERNAL_NOT_PUBLIC": 3,
+    "STABLE_FOR_BLOC5": 44,
+    "STABLE_WITH_DOCUMENTED_LIMITATION": 5,
+    "entries_total": 52
+  },
+  "stability_vocabulary": {
+    "HISTORICAL_COMPAT_ONLY": "Loadable and verifiable only for backward compatibility; must not be used to author new downstream data.",
+    "INTERNAL_NOT_PUBLIC": "Not in __all__. Must not be used by Bloc 5 and must not be documented as stable.",
+    "STABLE_FOR_BLOC5": "Exported by crypto_sensor_fabric.storage.__all__, exercised by accepted current-head tests, and part of the frozen Bloc 4 acceptance surface.",
+    "STABLE_WITH_DOCUMENTED_LIMITATION": "Reachable and importable, but carries a recorded limitation, a sibling-package import path, or is an operational accelerator rather than an authority."
+  },
+  "start_head": "fb813728f32d6e518ed9911470388aec24c1e83e"
+}
