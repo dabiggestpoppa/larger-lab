@@ -122,6 +122,8 @@ CMP_FAMILIES: Final[tuple[str, ...]] = (
     "CMP.DISPLAY_SEPARATION",
     "CMP.FINGERPRINT",
     "CMP.RULE_AUTHORITY",
+    "CMP.BASELINE_ORDERING",
+    "CMP.BASELINE_ELIGIBILITY",
 )
 
 #: Every family the matrix must cover.
@@ -2899,6 +2901,148 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "not come back under any name",
         "test_book6_comparison_registry.py",
         "test_no_benchmark_registry_was_introduced",
+    ),
+    (
+        "CMP.TIME1.33",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-1 / G-16: an instantaneous candidate carries no interval, stays "
+        "eligible, and its record is never mutated by key derivation",
+        "test_book6_comparison_selector.py",
+        "test_time_1_instantaneous_candidate_carries_no_interval_and_is_eligible",
+    ),
+    (
+        "CMP.TIME9.34",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-9: forging an interval on an instantaneous record is rejected by "
+        "the accepted model, so the selector never sees it",
+        "test_book6_comparison_selector.py",
+        "test_forging_an_interval_on_instantaneous_is_rejected_at_the_record",
+    ),
+    (
+        "CMP.TIME2.35",
+        "CMP.BASELINE_ORDERING",
+        "TIME-2: with t1 < t2 < t3 < t4 the selector resolves t3",
+        "test_book6_comparison_selector.py",
+        "test_time_2_latest_prior_instant_is_selected",
+    ),
+    (
+        "CMP.TIME3.36",
+        "CMP.BASELINE_ORDERING",
+        "TIME-3: caller order never affects the selected baseline",
+        "test_book6_comparison_selector.py",
+        "test_time_3_caller_order_does_not_affect_the_baseline",
+    ),
+    (
+        "CMP.TIME4.37",
+        "CMP.BASELINE_ORDERING",
+        "TIME-4: observed_at is never read anywhere in the ordering path, "
+        "verified against the executable source with docstrings stripped",
+        "test_book6_comparison_selector.py",
+        "test_time_4_observed_at_is_never_read",
+    ),
+    (
+        "CMP.TIME5.38",
+        "CMP.BASELINE_ORDERING",
+        "TIME-5: an exact instant tie resolves to the greater lexical ref, so "
+        "the tie-break fires when it should",
+        "test_book6_comparison_selector.py",
+        "test_time_5_same_instant_tie_resolves_to_the_greater_ref",
+    ),
+    (
+        "CMP.TIME6.39",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-6: strict precedence means the same instant is NOT prior, so one "
+        "instant may never serve as both baseline and comparison",
+        "test_book6_comparison_selector.py",
+        "test_time_6_same_instant_is_not_prior",
+    ),
+    (
+        "CMP.TIME7.40",
+        "CMP.BASELINE_ORDERING",
+        "TIME-7 / GAP-6 §1.4: for interval windows the projection is the "
+        "identity, so interval ordering is unchanged by the effective keys",
+        "test_book6_comparison_selector.py",
+        "test_time_7_interval_ordering_matches_the_effective_key_rule",
+    ),
+    (
+        "CMP.TIME8.41",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-8: mixed temporal shapes are rejected before any ordering is "
+        "computed, and nothing is coerced in either direction",
+        "test_book6_comparison_selector.py",
+        "test_time_8_mixed_temporal_shapes_are_rejected_without_ordering",
+    ),
+    (
+        "CMP.TIME10.42",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-10: an interval record missing its bounds is rejected at the "
+        "record, not defaulted by the selector",
+        "test_book6_comparison_selector.py",
+        "test_time_10_interval_without_bounds_is_rejected",
+    ),
+    (
+        "CMP.TIME11.43",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-11 / G-19: a non-terminal predecessor that would win the "
+        "lexical tie-break is filtered during eligibility, never during ordering",
+        "test_book6_comparison_selector.py",
+        "test_time_11_non_terminal_predecessor_is_filtered_before_ordering",
+    ),
+    (
+        "CMP.BSTRICT.44",
+        "CMP.BASELINE_ELIGIBILITY",
+        "B-STRICT: the candidate record-state gate is currentness authority "
+        "and never status, in either direction",
+        "test_book6_comparison_selector.py",
+        "test_time_11_refusal_is_terminality_not_status",
+    ),
+    (
+        "CMP.TIME11.45",
+        "CMP.BASELINE_ELIGIBILITY",
+        "TIME-11.1: across all four status permutations the selection is "
+        "unchanged, so status decides nothing",
+        "test_book6_comparison_selector.py",
+        "test_time_11_1_status_permutation_gives_one_outcome",
+    ),
+    (
+        "CMP.BIAS.46",
+        "CMP.BASELINE_ELIGIBILITY",
+        "the selection-bias firewall: coverage is never a selection input, so "
+        "the authorization gate cannot choose which observation is the baseline",
+        "test_book6_comparison_selector.py",
+        "test_coverage_is_not_a_selection_input",
+    ),
+    (
+        "CMP.AGG.47",
+        "CMP.BASELINE_ORDERING",
+        "§2.6: the selector selects exactly one observation and never "
+        "aggregates; aggregation belongs to the metric definition",
+        "test_book6_comparison_selector.py",
+        "test_selector_selects_exactly_one_and_never_aggregates",
+    ),
+    (
+        "CMP.UNAVAIL.48",
+        "CMP.BASELINE_ORDERING",
+        "§2.5: no eligible prior baseline is a first-class outcome with no "
+        "silent fallback",
+        "test_book6_comparison_selector.py",
+        "test_no_eligible_baseline_is_a_first_class_outcome",
+    ),
+    (
+        "CMP.NAMED.49",
+        "CMP.BASELINE_ELIGIBILITY",
+        "AGGREGATE_ONLY is rejected: every exclusion names the requirement "
+        "that refused it, so a failing check can be diagnosed",
+        "test_book6_comparison_selector.py",
+        "test_every_exclusion_is_named_not_aggregated",
+    ),
+    (
+        "CMP.DERIVED.50",
+        "CMP.BASELINE_ORDERING",
+        "G-17: effective ordering keys are derived and discarded; they never "
+        "persist onto a record and no new temporal contract field exists",
+        "test_book6_comparison_selector.py",
+        "test_no_new_temporal_contract_field_exists",
     ),
 )
 
