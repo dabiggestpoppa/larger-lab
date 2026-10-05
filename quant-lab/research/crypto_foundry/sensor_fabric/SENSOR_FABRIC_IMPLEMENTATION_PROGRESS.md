@@ -4821,3 +4821,175 @@ research                                = FROZEN
 I17 is **not** self-ratified. No contract gap requiring a source change was
 found, so no repair checkpoint is issued. **Bloc 5 normalization NOT started.**
 Research FROZEN. STOP.
+
+## 154 — SENSOR-B4-I17-RATIFY: BLOC 4 -> BLOC 5 HANDOFF ACCEPTED, B5-I01 AUTHORIZED
+
+**Mandate:** SENSOR-B4-I17-RATIFY — accept the final Bloc 4 -> Bloc 5 handoff and
+authorize SENSOR-B5-I01 ONLY
+**Branch:** agent/crypto-sensor-fabric-build
+**Mandatory start HEAD:** `ab75d6738e1004b20ed8738439c2bac3ccc1d85b`
+**origin/main (untouched):** `7c7816f382947bbc8a1f2154435fc436f2428fa8`
+**Production diff:** ZERO
+**Authorized scope:** I17 RATIFICATION ONLY. **B5-I01 NOT implemented in this
+run.** B5-I02+ UNAUTHORIZED. Bloc 6 UNAUTHORIZED. Research FROZEN.
+
+I17 is the final Bloc 4 -> Bloc 5 handoff/documentation checkpoint. It is NOT
+Bloc 5 implementation and is not relabelled as such.
+
+### Start gate
+
+Every item matched the directive exactly: branch, HEAD == `ab75d6738`, origin
+build == local HEAD, `origin/main` == `7c7816f38`, and all eleven governance
+values (`PASS_SENSOR_B4_I17_BLOC5_HANDOFF_SEALED = PENDING_OPERATOR_REVIEW`,
+`BLOC_04_TO_BLOC_5_HANDOFF_CONTRACT = DOCUMENTED`,
+`NORMALIZATION_READY_EVIDENCE = TRUE`,
+`BLOC_05_NORMALIZATION_IMPLEMENTED = FALSE`,
+`BLOC_04_FINAL_VERDICT = PASS_BLOC_04_IMPLEMENTED`,
+`BLOC_04_IMPLEMENTATION = OPERATOR_ACCEPTED`, `next_checkpoint_authorized =
+FALSE`, `recommended_next = OPERATOR REVIEW OF SENSOR-B4-I17 HANDOFF`, `I18+ =
+UNAUTHORIZED`, `research = FROZEN`). No deviation; no STOP condition triggered.
+
+### Ancestry and zero-production-diff law
+
+All five operator-named SHAs verified as ancestors: `fb813728f` (Bloc 4
+ratification / I17 authorization), `e6b3bc7fd` (I17A), `68d2908d5` (I17B),
+`b2d5ba4ab` (I17C), `ab75d6738` (I17D). 4 commits in range, **0 merges**,
+first-parent == full, **0** `squash|amend|revert|fixup` subjects. No rebase, no
+amend, no squash, no force push. I17 changed exactly **8 files** (1 ledger + 7
+handoff/evidence documents): `src/` **0**, `tests/` **0**, config/provider/
+normalization **0**.
+
+### Ratified I17 content (all counts recomputed from source, not from prose)
+
+A read-only recomputation script re-derived every asserted figure from the tree
+and the committed artifacts: **36 checks / 36 passed / 0 failed**, plus the
+doc-to-code consistency check **PASS** (45 documented-public entries resolve and
+are exported, 7 documented-non-public entries are genuinely absent, 18
+section-4 checklist rows consistent).
+
+`crypto_sensor_fabric.storage.__all__` = **200**; documented interface entries =
+**52**; stability counts **44 STABLE_FOR_BLOC5 / 5 STABLE_WITH_DOCUMENTED_LIMITATION
+/ 0 HISTORICAL_COMPAT_ONLY / 3 INTERNAL_NOT_PUBLIC**. `RawNormalizationBatch` =
+**22** public fields grouped SOURCE_IDENTITY / TIME / UNIT / LINEAGE /
+COVERAGE-QUALITY / INTEGRITY-REVISION / DESCRIPTOR_ONLY, with
+`NORMALIZATION_READY_EVIDENCE = TRUE` while the batch remains **not** normalized
+science data. `RawEvidenceQuery` = **17** fields. `CoverageState` = **10**
+members, `RevisionPolicy` = **6** members with documented default
+**`ERROR_ON_AMBIGUITY`** (no silent latest selection).
+
+**Corrected symbol truth, ratified as-is:** `ProjectionArtifact` **DOES NOT
+EXIST** — the real exported symbol is **`RawProjectionArtifact`**; `Granularity`
+is **NOT** exported by `crypto_sensor_fabric.storage` (real path
+`crypto_sensor_fabric.probes.enums`); `SensorFamily` is **NOT** exported either
+(real path `crypto_sensor_fabric.contracts.enums`). **No alias was added** to
+make the earlier wording resolve.
+
+**Private API firewall:** `rebuild_duckdb_catalog`, `ReadOnlyDuckDBCatalog`,
+`Bloc3StorageHandoff`, `SourceRevisionRegistry` and `RevisionSourceIdentityV1`
+are all absent from the public surface, and no documented entry is a private `_`
+API. Revision resolution stays public through `RevisionResolver` +
+`RevisionPolicy`. **No private interface is ratified as stable.**
+
+Unit handoff truth ratified: three non-collapsed vocabularies plus the distinct
+`HISTORICAL_UNIT_CONTRACT_ABSENT` third state; `VERIFIED_NATIVE` is **truth-bound
+at the T0B commit boundary**, refusals precede durable publication, no silent
+downgrade, and Bloc 5 may rely on the proof but may **not** reinterpret it as a
+canonical unit without its own normalization logic; `ROW_NATIVE` identifies
+*location* via structural tuple paths and fabricates no batch lexeme; the flat
+book-snapshot representation remains **NOT PROVEN**; all eight frozen families
+documented at their I16R2-final shapes; `BLOC_04_UNIT_CONTRACT_CAPABILITY =
+PROVEN` with `PRODUCTION_SCHEMA_POPULATION = ZERO_AT_BLOC4_BOUNDARY` accepted and
+carried into Bloc 5, with **no offline fixture converted into a
+production-population claim**.
+
+Schema/version truth ratified as-is: `schema_key` identifies `id@version`,
+`schema_fingerprint` identifies structural content, strict semver **form** is
+enforced, and **no automatic major/minor/patch compatibility matrix exists**
+because the source does not implement one.
+
+Ownership **8 Bloc 4 / 10 Bloc 5, overlap 0, unassigned 0**. Prohibitions
+**24 declared = 24 listed**. Known limitations **14, with 0 open Bloc 4
+blockers**. DuckDB is disposable acceleration and not a stable public contract;
+Postgres is operational metadata/state only, and the **no-live-DSN** G4-10
+limitation is carried with **no new live DB claim**. Export/restore restores into
+an unrelated empty root with hash/identity/query/revision/lineage parity and no
+original-root dependency. Bloc 3 -> Bloc 4 causality holds: a resume checkpoint
+never precedes manifest durability.
+
+### Executed example
+
+Documentation/proof only, stopping **before** normalization, `network_calls = 0`,
+explainable entirely through accepted public contracts: trade
+`STATIC_VERIFIED`; book snapshot nested `ROW_NATIVE`; funding `NO_UNIT_FIELDS`;
+static unit mismatch `ProjectionUnitEvidenceConflict` with **no durable
+projection created**.
+
+### Windows thread warning — classified, not fixed
+
+The I17 full-storage run emitted a load-only
+`PytestUnhandledThreadExceptionWarning` (Windows temp-directory teardown race in
+a reader thread). The test passed, the file passes 4/4 isolated, `src/` is
+byte-identical to the I17 start head, and both suites completed with 0 failures.
+**Classification: KNOWN TEST-ENVIRONMENT DEBT, NOT an I17 source regression.**
+It did **not** reappear in this ratification's full-storage run, and it was not
+fixed here (no repair under ratification).
+
+### Final verification
+
+Focused (public interface/import, schema-version/fingerprint, Bloc5Handoff,
+G4-13, I16R2 unit truth + location, revision/query/missingness) = **244 passed /
+0 failed** (205 s). **Full storage = 2019 passed / 13 skipped / 0 failed**
+(1481 s). **Full project = 3398 passed / 14 skipped / 0 failed** (1355 s).
+**Zero deterministic failures.** Ruff: 2 pre-existing findings in untouched
+`test_i08_evidence.py`; `src/crypto_sensor_fabric/storage` **All checks passed**;
+**no new I17 findings**. mypy: 10 pre-existing errors in 6 files under
+`probes/`/`providers/`, **no new I17 findings**. compileall OK. Secret scan 4
+passed. I11R2 audit **not republished** — no-update run 4 passed, byte-stable at
+**1011** scanned files, `unexpected_hits = {}`. `external_ci = NONE_OBSERVED`
+(0 check-runs, 0 statuses, 0 runs on this branch). Historical custody: **zero**
+published artifacts modified during this ratification; all suite-dirtied
+informational matrices RESTORED before commit.
+
+### Authorization boundary into Bloc 5
+
+`bloc_05/07_BLOC_05_FREEZE_MANIFEST.md` already carries `PASS_BLOC_05_PLAN_FROZEN`
+and the frozen 23-stage sequence; **Bloc 5 was NOT redesigned here**.
+**B5-I01 = normalization enums, base normalization models, T1 envelope** only. It
+does NOT authorize asset/venue registries, contract identity resolver, PIT alias
+resolver, linear/inverse conversion, timestamp registry, unit conversion, sensor
+normalizers, T1 writer, canonical query, golden fixtures or live network — those
+belong to the later frozen stages. Frozen Bloc 5 blocking gates carried forward
+**RECORD ONLY, none claimed passed by I17**: `IDENTITY_GATE`, `TIME_GATE`,
+`SEMANTIC_GATE`, `UNIT_GATE`, `LINEAGE_GATE`, `DUPLICATE_REVISION_GATE`,
+`REPLAY_SAFETY_GATE`, `GOLDEN_T0_T1_GATE`. **I17 establishes input readiness
+only.**
+
+Ratification artifact:
+`research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I17_OPERATOR_RATIFICATION.md`
+
+### Governance
+
+```
+SENSOR-B4-I17-RATIFY
+
+PASS_SENSOR_B4_I17_BLOC5_HANDOFF_SEALED = OPERATOR_ACCEPTED
+BLOC_04_TO_BLOC_5_HANDOFF_CONTRACT      = OPERATOR_ACCEPTED
+NORMALIZATION_READY_EVIDENCE            = TRUE
+BLOC_05_NORMALIZATION_IMPLEMENTED       = FALSE
+PRODUCTION_SCHEMA_POPULATION            = ZERO_AT_BLOC4_BOUNDARY
+BLOC_04_FINAL_VERDICT                   = PASS_BLOC_04_IMPLEMENTED
+BLOC_04_IMPLEMENTATION                  = OPERATOR_ACCEPTED
+
+next_checkpoint_authorized = TRUE
+next_checkpoint            = SENSOR-B5-I01 NORMALIZATION ENUMS / BASE MODELS / T1 ENVELOPE
+authorized_scope           = B5-I01 ONLY
+B5-I02+                    = UNAUTHORIZED
+Bloc 6                     = UNAUTHORIZED
+research                   = FROZEN
+recommended_next           = SENSOR-B5-I01 IMPLEMENTATION
+```
+
+Bloc 4 is closed and accepted; the Bloc 4 -> Bloc 5 handoff contract is
+operator-accepted and frozen. **Bloc 5 normalization remains unimplemented and
+B5-I01 was NOT started in this run.** No production defect was found requiring a
+source change, so no repair checkpoint is issued. Research FROZEN. STOP.
