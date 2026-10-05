@@ -5354,3 +5354,122 @@ execution mutations 0, recurring cost $0, capital authority none. No PR merge;
 suppressed, excluded, waived, downgraded or relabelled, and neither being a
 GitHub-required check is **not** merge authorization.
 **`MERGE_AUTHORIZED = false`.**
+## 18. GOVERNANCE CORRECTION -- UNAUTHORIZED EXTERNAL CHECKS REMOVED FROM THE CLOSURE GATE
+
+**This section supersedes every earlier statement that treated SonarCloud Code
+Analysis or Kilo Code Review as a Book 4 closure gate. No earlier section is
+deleted, reworded or rewritten; every prior line stands byte-for-byte as
+historical record.**
+
+### 18.1 The correction, as eight statements of record
+
+1. **SonarCloud and Kilo were never operator-authorized Book 4 dependencies.**
+   The operator did not request, authorize, configure, or create accounts for
+   either service.
+2. **No operator account, credentials, budget, acceptance requirement, or
+   lifecycle authority was ever established** for either service. No SonarCloud
+   credential exists in any environment, on disk, or in the repository; the
+   repository's GitHub Actions secret count is **0**.
+3. **Neither service was required by GitHub branch protection or by repository
+   rulesets.** Protection on `main` returns HTTP 404 "Branch not protected";
+   repository rulesets including parents are `[]`.
+4. **Their previous failures remain accurate historical observations.** The
+   SonarCloud Quality Gate failures and the Kilo clone/429 failures recorded on
+   prior commits stand exactly as written and are not restated.
+5. **Removal is NOT a pass, a remediation, a suppression, or a false-positive
+   disposition.** Neither service was made to pass. No finding was fixed,
+   waived, excluded, downgraded, or relabelled. No `NOSONAR` was added, and no
+   quality profile, severity, threshold, gate, or coverage setting was altered.
+6. **The services are removed from the present Book 4 closure gate because an
+   unapproved third-party service cannot acquire governance authority merely by
+   installing a check.** Attachment is not authorization.
+7. **The authoritative Book 4 gate is the five OCE-owned workflows and their
+   evidence artifacts**, bound to the tested commit and tree.
+8. **Any future external scanner or reviewer must, before it can become
+   authoritative, have:** explicit operator authorization; documented ownership;
+   operator-managed credentials; explicit cost authority; a declared data
+   boundary; explicit failure semantics; and a documented removal procedure.
+
+### 18.2 How each check was attached, and why removal was structural
+
+Every integration surface was enumerated before anything was changed:
+
+| Surface | Finding at removal time |
+|---|---|
+| Tracked Sonar/Kilo configuration files | **0** |
+| `.github/workflows/` referencing either service | **0** (six OCE workflows only) |
+| Repository webhooks | **0** |
+| Repository rulesets (including parents) | `[]` |
+| `main` branch protection | none -- HTTP 404 |
+| Repository owner type | **User** (`dabiggestpoppa`), not an Organization |
+
+Both services attached **solely as GitHub App installations** that post check
+runs:
+
+| App | Slug | App ID | App owner |
+|---|---|---|---|
+| SonarQubeCloud | `sonarqubecloud` | `12526` | SonarSource |
+| Kilo Code Bot | `kilo-code-bot` | `2193792` | Kilo-Org |
+
+No repository artifact existed to delete. The installation itself was the whole
+of the grant of access, which is precisely why removing it removes all of their
+authority over this repository at once.
+
+### 18.3 Removal, and the API boundary that forced manual action
+
+GitHub exposes installation listing and removal **only** to App-scoped tokens.
+With repository `admin` and a token carrying `admin:org`, every user-token route
+was refused:
+
+| Endpoint | Result |
+|---|---|
+| `GET /user/installations` | **403** "You must authenticate with an access token authorized to a GitHub App in order to list installations" |
+| `GET /repos/{owner}/{repo}/installation` | **401** "A JSON web token could not be decoded" |
+| `GET /orgs/dabiggestpoppa/installations` | **404** (owner is a User, not an Organization) |
+| `GET /repos/{owner}/{repo}/installations`, `/integrations`, `/apps`, `/actions/permissions/apps` | **404** |
+
+Removal was therefore completed by the operator through the **repository-scoped**
+GitHub UI: each application's repository access was set to "Only select
+repositories" and `larger-lab` was unchecked. No account-wide uninstall was
+performed, so **no other repository on the account was affected**, and no
+unrelated installation was deleted.
+
+### 18.4 What removal does and does not change in this record
+
+- **Sections 12 and 14 remain fully valid and are not withdrawn.** Their
+  measurements stand: 882 commits walked, 170 SonarCloud analyses located, 132
+  analyses carrying annotations, every non-empty slice exactly 50, page 2 empty
+  on every slice, 1,599 distinct issue keys ever observed, 1,232 requests with
+  0 failures, no credential present, and `annotation_level` refuted as an
+  issue-type proxy.
+- `CURRENT_ACTIVE_SONAR_SET = INACCESSIBLE_WITHOUT_AUTHORIZED_CREDENTIALS`
+  **remains the accurate statement.** Removing the integration does not make the
+  active set known; it ends an unauthorized collection attempt. No active count
+  is fabricated, before or after.
+- The narrow supported deduction is unchanged: Reliability Rating on New Code = C
+  implies the applicable code period contains at least one BUG; Security Rating
+  on New Code = D implies at least one VULNERABILITY. No further inference is
+  drawn now that the source is gone, and none was drawn before.
+- The historical candidate audit in 14.5 stands unchanged, including the three
+  `os.path.join` constructions recorded as a fail-open-under-refactor gap rather
+  than a demonstrated vulnerability. **That gap is unrelated to these external
+  services and remains open for operator scheduling.**
+- **Historical check runs remain attached and were not deleted, falsified, or
+  erased.** SonarCloud Code Analysis `111555287875` and Kilo Code Review
+  `111554878664` on `5c85e4733` are preserved history.
+
+### 18.5 The precise boundary of the removal claim
+
+Removal is **not** claimed as a SonarCloud pass, a Kilo review, remediation of
+any finding, a false-positive disposition, a waiver, or evidence that either
+service ever approved this work. It is claimed only as: **this repository no
+longer grants either service access.**
+
+### 18.6 Accounting
+
+cloud mutations 0, broker mutations 0, capital mutations 0, execution mutations
+0, recurring cost $0, `capital.authority = none`. Removal was repository-scoped.
+No PR merge; `origin/main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. No amend, squash, rebase, reset, or force-push. No Book
+5, no R49 or X10, no Atlas Program Block 4. This commit is documentation and
+evidence only.

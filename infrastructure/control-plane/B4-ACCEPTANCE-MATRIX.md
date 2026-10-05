@@ -1457,3 +1457,76 @@ broker mutations 0, capital mutations 0, execution mutations 0, recurring cost
 $0, capital authority none. **`MERGE_AUTHORIZED = false`.** PR #4 remains
 **open and unmerged**.
 
+
+## B4-FINAL-GOVERNANCE -- unauthorized external checks removed from the closure gate
+
+Supersedes every earlier acceptance row that treated **SonarCloud Code Analysis**
+or **Kilo Code Review** as a Book 4 closure gate. It does **not** withdraw the
+X7/X7X temporal-union correction: those rows remain valid, and the union is
+still explicitly *not* the active issue set.
+
+| Item | Value |
+|---|---|
+| Operator authorization for SonarCloud | **never granted** |
+| Operator authorization for Kilo | **never granted** |
+| Operator account created for either | **none** |
+| Operator-managed credential for either | **none** (repo Actions secrets = 0) |
+| Budget / cost authority established | **none**; recurring cost stayed $0 |
+| Acceptance requirement established | **none** |
+| Lifecycle authority established | **none** |
+| Required by branch protection | **no** -- `main` protection HTTP 404 |
+| Required by repository rulesets | **no** -- rulesets `[]` |
+| Attachment mechanism | **GitHub App installation only** |
+| SonarQubeCloud identity | slug `sonarqubecloud`, app id `12526`, owner SonarSource |
+| Kilo Code Bot identity | slug `kilo-code-bot`, app id `2193792`, owner Kilo-Org |
+| Tracked repo config for either | **0** files, **0** workflow references |
+| Repository webhooks | **0** |
+| Removal scope | **this repository only** -- account-wide uninstall NOT used |
+| Other repositories affected | **none** |
+| Historical check runs deleted | **none** -- `111555287875` and `111554878664` preserved |
+
+### Governance statements
+
+1. Neither service was ever an operator-authorized Book 4 dependency.
+2. No operator account, credentials, budget, acceptance requirement, or
+   lifecycle authority was established for either.
+3. Neither was required by branch protection or repository rulesets.
+4. Their prior failures remain accurate historical observations.
+5. Removal is **not** a pass, remediation, suppression, or false-positive
+   disposition; nothing was made green and no finding was waived.
+6. They are removed from the closure gate because an unapproved third-party
+   service cannot acquire governance authority merely by installing a check.
+7. The authoritative Book 4 gate is the **five OCE-owned workflows** plus their
+   evidence artifacts, bound to the tested commit and tree.
+8. Any future external scanner or reviewer requires explicit operator
+   authorization, documented ownership, operator-managed credentials, cost
+   authority, a declared data boundary, explicit failure semantics, and a
+   documented removal procedure before it can become authoritative.
+
+### API boundary of the removal
+
+GitHub permits installation management only to App-scoped tokens. With repository
+`admin` and a token carrying `admin:org`: `GET /user/installations` returned
+**403** "You must authenticate with an access token authorized to a GitHub App in
+order to list installations"; `GET /repos/.../installation` returned **401** "A
+JSON web token could not be decoded"; `GET /orgs/dabiggestpoppa/installations`
+returned **404** because the owner is a User, not an Organization; and the
+repository-scoped `/installations`, `/integrations`, `/apps`, and
+`/actions/permissions/apps` routes all returned **404**. Removal was therefore
+performed by the operator through the repository-scoped GitHub UI.
+
+### Unchanged by this correction
+
+- `CURRENT_ACTIVE_SONAR_SET = INACCESSIBLE_WITHOUT_AUTHORIZED_CREDENTIALS` is
+  still accurate; no active count is fabricated.
+- Section 12's measurements stand; the union remains an observational count, not
+  a current active set.
+- Section 14.5's three `os.path.join` constructions remain an open
+  fail-open-under-refactor gap, unrelated to these services.
+- No `NOSONAR`, no exclusion, no waiver, no relabelling, no test deletion, no
+  coverage manipulation, no profile/rating/threshold/gate change.
+- No merge, no force push, no amend/squash/rebase/reset; `main` untouched at
+  `7c7816f382947bbc8a1f2154435fc436f2428fa8`.
+- Accounting: cloud mutations 0, broker mutations 0, capital mutations 0,
+  execution mutations 0, recurring cost $0, `capital.authority = none`.
+  **`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
