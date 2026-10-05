@@ -1,0 +1,328 @@
+{
+  "checkpoint": "SENSOR-B4-I16R2D",
+  "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+  "evidence_first_rule": "No row is PASS on the strength of an older checkpoint. Each row records accepted implementation/evidence ancestry, current production authority, a CURRENT-HEAD acceptance proof that was executed, the current result, and the historical supporting checkpoint. Old evidence is supporting history only.",
+  "frozen_verdict": "PASS_BLOC_04_IMPLEMENTED",
+  "generated_for": "SENSOR-B4-I16R2 SOURCE-UNIT CLAIM TRUTH + UNIT-LOCATION CONTRACT REPAIR + FINAL GOVERNANCE CORRECTION",
+  "production_diff": "ADDITIVE ONLY (enums.py, models.py, projection_schema.py, projections.py, replay.py, storage/__init__.py); historical descriptors and batches remain loadable unchanged",
+  "rows": [
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG401ExactEvidence"
+      ],
+      "frozen_definition": "PASS when arbitrary source bytes can be stored/retrieved exactly with verified source SHA256.",
+      "gate_id": "G4-01",
+      "historical_evidence_refs": [
+        "BLOC_04_I02_OBJECT_KEYS.json",
+        "BLOC_04_I03_STORED_IDENTITY.json"
+      ],
+      "known_limitations": "None material. Eight awkward source classes were exercised (empty, single NUL, embedded NUL text, non-UTF8 latin-1, invalid UTF-8 sequence, all 256 byte values, high-bit pseudo-random, JSON-like binary) plus a ZSTD transparency case.",
+      "measured_case_count": 11,
+      "production_authority": "storage.blob_store.LocalBlobStore.put_bytes/open_blob; storage.paths.blob_object_key",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG402AtomicDurability"
+      ],
+      "frozen_definition": "PASS when the crash matrix produces no cursor skip or half-valid final object.",
+      "gate_id": "G4-02",
+      "historical_evidence_refs": [
+        "BLOC_04_I03_ATOMIC_ORDER.json",
+        "BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+        "BLOC_04_I08R1_CRASH_TRUTH_MATRIX.json",
+        "BLOC_04_I14_HANDOFF_MATRIX.json"
+      ],
+      "known_limitations": "Fault injection is deterministic in-process; it cannot simulate power-loss below the filesystem level, only the code's own ordering guarantees.",
+      "measured_case_count": 13,
+      "production_authority": "storage.atomic.publish_no_replace with FaultPoint/RaiseFaultHook; storage.manifests.PartitionManifestRepository.append_partition_manifest with PointerFaultPoint P1..P5",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG403Immutability"
+      ],
+      "frozen_definition": "PASS when committed T0A cannot be overwritten through public storage APIs.",
+      "gate_id": "G4-03",
+      "historical_evidence_refs": [
+        "BLOC_04_I03_ATOMIC_ORDER.json",
+        "BLOC_04_I04_CATALOG_SCHEMAS.json",
+        "BLOC_04_I15_CORRUPTION_MATRIX.json",
+        "BLOC_04_I15R1_TOCTOU_MATRIX.json"
+      ],
+      "known_limitations": "The hardlink mutation proof is skipped on filesystems without hardlink support (Windows volumes without the privilege); it did not skip in this run.",
+      "measured_case_count": 6,
+      "production_authority": "storage.atomic no-replace publish; LocalBlobStore._verify_existing raising ExistingBlobIntegrityConflict",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG404Revision"
+      ],
+      "frozen_definition": "PASS when the same source key with different bytes creates an explicit revision and preserves both versions.",
+      "gate_id": "G4-04",
+      "historical_evidence_refs": [
+        "BLOC_04_I06_REVISION_MATRIX.json",
+        "BLOC_04_I06R1_EVIDENCE.json",
+        "BLOC_04_I12R1_QUERY_EVIDENCE.json"
+      ],
+      "known_limitations": "SourceRevisionRegistry and RevisionSourceIdentityV1 are not exported in the package __all__; downstream consumers read revision state through RawEvidenceResult.revision_state. This is recorded, not a gate failure.",
+      "measured_case_count": 6,
+      "production_authority": "storage.revisions.SourceRevisionRegistry + RevisionSourceIdentityV1",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG405Manifest"
+      ],
+      "frozen_definition": "PASS when all current manifests reference existing valid objects and historical versions remain available.",
+      "gate_id": "G4-05",
+      "historical_evidence_refs": [
+        "BLOC_04_I04_CATALOG_SCHEMAS.json",
+        "BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+        "BLOC_04_I04R1_POINTER_SCHEMA.json",
+        "BLOC_04_I15_MANIFEST_SCAN_MATRIX.json"
+      ],
+      "known_limitations": "None material.",
+      "measured_case_count": 6,
+      "production_authority": "storage.manifests.PartitionManifestRepository (append_partition_manifest / get_manifest / list_manifest_versions / get_current_manifest)",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_core.py::TestG406Lineage"
+      ],
+      "frozen_definition": "PASS when every T0B projection resolves completely to T0A blob/acquisition evidence.",
+      "gate_id": "G4-06",
+      "historical_evidence_refs": [
+        "BLOC_04_I05_PROJECTION_MATRIX.json",
+        "BLOC_04_I05R1_SCHEMA_REGISTRY.json",
+        "BLOC_04_I12R2_FAIL_SAFE_MATRIX.json"
+      ],
+      "known_limitations": "None material.",
+      "measured_case_count": 6,
+      "production_authority": "storage.projections.T0BProjectionService.commit_projection; storage.projection_lineage.ProjectionLineageRepository; storage.projection_resolver.ProjectionLineageResolver",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG407Missingness"
+      ],
+      "frozen_definition": "PASS when no acquisition, no data, failure and history unavailable are distinguishable and NONE become numeric zero.",
+      "gate_id": "G4-07",
+      "historical_evidence_refs": [
+        "BLOC_04_I12_QUERY_MATRIX.json",
+        "BLOC_04_I12R2_FAIL_SAFE_MATRIX.json",
+        "BLOC_04_I09R1_ADMISSION_RETENTION.json"
+      ],
+      "known_limitations": "A provider failure page is exercised as a typed refusal with zero mutation rather than as a persisted FAILED manifest; the FAILED coverage state exists in the vocabulary but the handoff refuses the contradictory batch instead of committing a failure record. This is fail-closed behaviour, recorded rather than hidden.",
+      "measured_case_count": 5,
+      "production_authority": "storage.enums.CoverageState (9 members); storage.query.RawEvidenceQueryService.execute with typed NoMatchingEvidence; integration.Bloc3StorageHandoff._persist_empty_valid",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG408StoragePressure"
+      ],
+      "frozen_definition": "PASS when optional high-volume writes pause before critical P0 sensor evidence and no raw auto-deletion occurs.",
+      "gate_id": "G4-08",
+      "historical_evidence_refs": [
+        "BLOC_04_I09_QUOTA_SIMULATION.json",
+        "BLOC_04_I09R1_QUOTA_AUTHORITY.json",
+        "BLOC_04_I09R1_ADMISSION_RETENTION.json"
+      ],
+      "known_limitations": "Measured against a synthetic 100 GiB capacity with a 256 MiB floor so the PRESSURE policy is exercised independently of the hard-floor policy; the hard floor is measured separately and blocks P0 as well.",
+      "measured_case_count": 17,
+      "production_authority": "storage.quota.classify_storage + decide_storage_write (side-effect-free)",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG409CatalogRebuild"
+      ],
+      "frozen_definition": "PASS when DuckDB discovery is reconstructed from manifest/projection files on an empty catalog.",
+      "gate_id": "G4-09",
+      "historical_evidence_refs": [
+        "BLOC_04_I10_DUCKDB_REBUILD.json",
+        "BLOC_04_I10R1_SCHEMA_CONTRACT.json",
+        "BLOC_04_I10R2_RELATIONS.json",
+        "BLOC_04_I13R3_ROOT_LAW.json"
+      ],
+      "known_limitations": "The corrupt-durable-source case corrupts a JSON catalog fragment. A truncated binary payload with a valid catalog would be caught by the integrity layer rather than the catalog reader; that path is covered by the accepted I15 corruption matrix as supporting evidence.",
+      "measured_case_count": 4,
+      "production_authority": "storage.duckdb_catalog.rebuild_duckdb_catalog + ReadOnlyDuckDBCatalog",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG410OperationalMetadata"
+      ],
+      "frozen_definition": "PASS when PostgreSQL contains metadata/state only and raw payload tables are absent.",
+      "gate_id": "G4-10",
+      "historical_evidence_refs": [
+        "BLOC_04_I11_POSTGRES_METADATA.json",
+        "BLOC_04_I11_POSTGRES_EVIDENCE.json",
+        "BLOC_04_I11R1_POSTGRES_INTEGRATION.json",
+        "BLOC_04_I11R2_BINDING_AUDIT.json"
+      ],
+      "known_limitations": "NO LIVE POSTGRES EXECUTION WAS PERFORMED OR CLAIMED. No DSN was available in this environment (SENSOR_FABRIC_POSTGRES_DSN and DATABASE_URL are both unset). The decision rests on the current-head schema and runtime contract test plus the accepted I11 live evidence. This limitation is recorded in the artifact itself and is not papered over.",
+      "measured_case_count": 6,
+      "production_authority": "storage.postgres_metadata.TABLE_SCHEMAS (sole table-shape authority) + reconstruct_snapshot + PostgresMetadataRepository",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG411ExportRestore"
+      ],
+      "frozen_definition": "PASS when the fixture evidence pack restores into an empty root and hashes/query results match.",
+      "gate_id": "G4-11",
+      "historical_evidence_refs": [
+        "BLOC_04_I13_EXPORT_RESTORE.json",
+        "BLOC_04_I13R1_PACK_MANIFEST.json",
+        "BLOC_04_I13R2_DISK_CONSTRAINTS.json",
+        "BLOC_04_I13R3_ROOT_LAW.json"
+      ],
+      "known_limitations": "The pack is small by construction; the accepted I13 resource-limit matrices cover the bounded-size refusal path as supporting evidence.",
+      "measured_case_count": 4,
+      "production_authority": "storage.export.EvidencePackExporter.export_query, EvidencePackVerifier.verify_pack, EvidencePackRestorer.restore_pack",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_evidence.py::TestG412Bloc3Handoff"
+      ],
+      "frozen_definition": "PASS when adapter output persists and the resume checkpoint advances ONLY AFTER durable manifest commit.",
+      "gate_id": "G4-12",
+      "historical_evidence_refs": [
+        "BLOC_04_I14_HANDOFF_MATRIX.json",
+        "BLOC_04_I14R1_EMPTY_VALID.json",
+        "BLOC_04_I12R1_QUERY_EVIDENCE.json"
+      ],
+      "known_limitations": "Measured on a 3-page sequence over ONE partition, so the durable manifests are 3 versions of that partition (v1, v2, v3) with a single current pointer. That is the correct shape for a paginated job and is reported as versions rather than as three distinct current manifests.",
+      "measured_case_count": 9,
+      "production_authority": "storage.integration.Bloc3StorageHandoff.persist_batch + storage.jobs.DurableJobStateRepository.advance_checkpoint",
+      "result": "PASS"
+    },
+    {
+      "blocking_reason_if_any": null,
+      "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+      "current_test_refs": [
+        "tests/crypto_sensor_fabric/storage/test_i16r2_g4_13_positive.py::TestEmitG4_13Matrix",
+        "tests/crypto_sensor_fabric/storage/test_i16r2_unit_claim_truth.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r2_unit_integrity.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r2_unit_location.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r2_real_provider_units.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r1_g4_13_positive.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r1_unit_contract.py",
+        "tests/crypto_sensor_fabric/storage/test_i16r1_unit_semantic_audit.py",
+        "tests/crypto_sensor_fabric/storage/i16r2_bloc5_consumer_probe.py",
+        "tests/crypto_sensor_fabric/storage/i16r1_bloc5_consumer_probe.py",
+        "tests/crypto_sensor_fabric/storage/test_i16_g4_13_readiness.py (checkpoint-fossil validator, write-free)"
+      ],
+      "fossil_validations": 7,
+      "frozen_definition": "PASS when RawNormalizationBatch exposes sufficient SOURCE, TIMESTAMP, UNIT and LINEAGE evidence for PIT normalization WITHOUT filesystem/path assumptions.",
+      "gap_status": "CLOSED_BY_I16R1B; TRUTH_BOUND_AND_LOCATION_COMPLETE_BY_I16R2B",
+      "gate_id": "G4-13",
+      "historical_evidence_refs": [
+        "BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json",
+        "BLOC_04_I16R2_UNIT_CLAIM_TRUTH_MATRIX.json",
+        "BLOC_04_I16R2_G4_13_MATRIX.json",
+        "BLOC_04_I16R2_EVIDENCE_CONSISTENCY_CORRECTION.md",
+        "BLOC_04_I16R1_UNIT_SEMANTIC_AUDIT.json",
+        "BLOC_04_I16R1_G4_13_UNIT_HANDOFF_MATRIX.json",
+        "BLOC_04_I16R1_BLOC4_READINESS.json",
+        "BLOC_04_I16_BLOC4_READINESS.json (historical negative, preserved)"
+      ],
+      "i16_gap_id": "I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP",
+      "known_limitations": "Population: no production code registers a ProjectionSchemaDefinition in this repository (exhaustive source search); capability is proven and population = 0, recorded explicitly. Static claims are truth-bound at the T0B commit boundary (I16R2B): VERIFIED_NATIVE requires an explicit pinned lexeme proven invariant across every committed non-null value for the declared field or structural path (absent path = (field_name,)); mismatch, mixed distinct lexemes and all-null are typed refusals, never silent downgrades. ROW_NATIVE marks a durable per-row/per-level location without a lexeme; nested structural paths (list element step named by the Arrow list value-field; struct steps by child field names) are now expressible and validated against the registered Arrow schema. Historical descriptors without the new fields keep the I16R1 pair semantics exactly. provider_time_raw/parsed/unit_assumption/publication_time remain structurally absent from the public acquisition contract (recorded, not repaired).",
+      "measured_case_breakdown": {
+        "checkpoint_fossil_validations": 7,
+        "i16r1_g4_13_positive": 18,
+        "i16r2_g4_13_positive": 3,
+        "i16r2_real_provider_units": 18,
+        "i16r2_unit_claim_truth": 9,
+        "i16r2_unit_integrity": 4,
+        "i16r2_unit_location": 22
+      },
+      "measured_case_count": 74,
+      "production_authority": "storage.models.SourceUnitEvidence + SourceUnitState + SourceUnitVariability + SourceUnitContract (public export); storage.projection_schema.ProjectionSchemaDefinition source_unit_evidence/source_unit_contract declaration covered by the schema fingerprint, resolve_unit_field_path validated on registry reload; storage.projections.ProjectionUnitEvidenceConflict at the T0B commit boundary; storage.replay.Bloc5Handoff.to_batch copies the durable declarations verbatim; storage.query.RawEvidenceQueryService + public repositories for SOURCE/TIME/LINEAGE",
+      "remeasurement": {
+        "LINEAGE": "PASS",
+        "NEGATIVE_IMPORT": "PASS",
+        "PATH_INDEPENDENCE": "PASS",
+        "SOURCE": "PASS",
+        "TIME": "PASS",
+        "UNIT": "PASS"
+      },
+      "result": "PASS",
+      "truth_binding": {
+        "committed_cases": 5,
+        "durable_projection_created_after_any_refusal": false,
+        "matrix": "BLOC_04_I16R2_UNIT_CLAIM_TRUTH_MATRIX.json",
+        "refusals_by_class": {
+          "ALL_NULL": 2,
+          "MISMATCH": 3,
+          "MIXED": 2
+        },
+        "refused_cases": 7,
+        "result": "PASS",
+        "silent_downgrade": false
+      }
+    }
+  ],
+  "schema": "sensor_fabric_g4_gate_matrix_v1",
+  "start_head": "e8d1384d98771c39cb119e2cae0ff93296be02ec",
+  "summary": {
+    "all_thirteen_measured": true,
+    "any_pass_without_current_measured_proof": false,
+    "fail": 0,
+    "failing_gates": [],
+    "g4_13_gap_id": "I16_G4_13_UNIT_HANDOFF_CONTRACT_GAP",
+    "g4_13_gap_status": "CLOSED_BY_I16R1B; TRUTH_BOUND_AND_LOCATION_COMPLETE_BY_I16R2B",
+    "g4_13_previous_result": "FAIL",
+    "g4_13_result": "PASS",
+    "g4_13_truth_binding": "PASS",
+    "gates": 13,
+    "pass": 12,
+    "pass_with_stated_limitation": 1
+  },
+  "volume_classification": {
+    "reason": "No accepted scale ceiling affects supported use. The measured 10k manifest scan, streaming hash/write, dedupe, DuckDB rebuild, revision chain, query bounds and export ceilings are CONFIGURABLE OPERATIONAL GUARDRAILS with accepted priority behavior (G4-08: T0A auto-delete count = 0; CRITICAL blocks optional P1-P3 before P0 and P0 proceeds with WARN per accepted policy), not an unsupported volume ceiling. No actual supported-use ceiling was found, so PASS_BLOC_04_IMPLEMENTED rather than PASS_BLOC_04_IMPLEMENTED_WITH_DATA_VOLUME_LIMITS.",
+    "reviewed": {
+      "chunking": "hash/write chunk size is configuration, not a fixed assumption; independent fixtures at 64 KiB and 2 MiB",
+      "dedupe": "identical re-put REUSED_EXISTING with streaming verification; neither source held in memory",
+      "duckdb_scale": "many-projection rebuild OK; 150 projections rebuilt in 3.61 s (duckdb_many_projection_scale)",
+      "export_limits": "configured ceilings: max_objects 1,000,000; max_total_bytes 1 TiB; max_object_bytes 8 GiB; max_manifest_bytes 64 MiB (export_ceilings_configured)",
+      "large_t0a_write": "64 MiB-equivalent T0A streaming write, exact SHA identity, peak 555.9 KB (large_t0a_streaming_write)",
+      "query_resource_limits": "query result bound is an explicit configurable limit field; bounded and unlimited paths both measured",
+      "revision_scale": "revision_chain_scale OK",
+      "streaming_hash": "1 GiB-equivalent hash bounded by chunk size, peak 1.05 MB (BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json gib_streaming_hash)",
+      "ten_k_manifest_scan": "10,000 ACTUAL PartitionManifest rows scanned with production reader code: rows_scanned == rows_created, invalid_rows = 0, duplicates = 0, deterministic order, peak memory 56.2 MB (BLOC_04_I15_MANIFEST_SCAN_MATRIX.json)"
+    },
+    "verdict": "PASS_BLOC_04_IMPLEMENTED"
+  }
+}

@@ -4299,3 +4299,144 @@ files). I16R1 produced only `BLOC_04_I16R1_*` evidence.
 
 - No self-ratification. I16R1 seal is PENDING_OPERATOR_REVIEW. I17 NOT
   started. Research FROZEN.
+## 150 — SENSOR-B4-I16R2 SOURCE-UNIT CLAIM TRUTH + UNIT-LOCATION CONTRACT REPAIR + FINAL GOVERNANCE CORRECTION
+
+**Checkpoint:** SENSOR-B4-I16R2 SOURCE-UNIT CLAIM TRUTH + UNIT-LOCATION CONTRACT REPAIR + FINAL GOVERNANCE CORRECTION
+**Start head (mandatory):** `e8d1384d98771c39cb119e2cae0ff93296be02ec`
+**Branch:** `agent/crypto-sensor-fabric-build`
+**Production diff:** ADDITIVE ONLY — `storage/enums.py`, `storage/models.py`,
+`storage/projection_schema.py`, `storage/projections.py`, `storage/replay.py`,
+`storage/__init__.py`. No historical contract was rewritten; historical
+descriptors and batches load unchanged.
+**Authorized scope:** I16R2 ONLY — respected. I17 NOT started.
+
+### Governance (I16 / I16R1 history preserved; append-only)
+
+```
+PASS_SENSOR_B4_I16_FINAL_ACCEPTANCE_EVIDENCE_SEALED           = OPERATOR_HOLD
+PASS_SENSOR_B4_I16R1_G4_13_UNIT_HANDOFF_REPAIR_SEALED         = OPERATOR_HOLD
+PASS_SENSOR_B4_I16R2_UNIT_AUTHORITY_TRUTH_SEALED              = PENDING_OPERATOR_REVIEW
+
+BLOC_04_FINAL_VERDICT = PASS_BLOC_04_IMPLEMENTED
+
+all_G4_gates
+  G4-01 EXACT_EVIDENCE        = PASS
+  G4-02 ATOMIC_DURABILITY     = PASS
+  G4-03 IMMUTABILITY          = PASS
+  G4-04 REVISION              = PASS
+  G4-05 MANIFEST              = PASS
+  G4-06 LINEAGE               = PASS
+  G4-07 MISSINGNESS           = PASS
+  G4-08 STORAGE_PRESSURE      = PASS
+  G4-09 CATALOG_REBUILD       = PASS
+  G4-10 OPERATIONAL_METADATA  = PASS_WITH_STATED_ENVIRONMENT_LIMITATION
+  G4-11 EXPORT_RESTORE        = PASS
+  G4-12 BLOC3_HANDOFF         = PASS
+  G4-13 BLOC5_READINESS       = PASS
+
+all_G4_gates overall = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+
+next_checkpoint_authorized = FALSE
+recommended_next           = OPERATOR REVIEW OF COMPLETE I16 -> I16R1 -> I16R2 FINAL BLOC 4 CHAIN
+
+I17+     = UNAUTHORIZED
+research = FROZEN
+```
+
+### The findings I16R2 repaired
+
+1. **Static claim truth gap (RED reproduced).** The I16R1 contract let a
+durable `ProjectionSchemaDefinition` declare `VERIFIED_NATIVE("SOL")` for
+`quantity_unit` while every committed projection row said `BTC`, and
+`Bloc5Handoff.to_batch` exposed the declared claim to Bloc 5. The RED probe
+(`.bu_tmp/i16r2_red_probe.py`) reproduced both counterexamples against the
+real T0B commit path: RED-1 all-BTC rows with a SOL declaration ->
+COMMIT_SUCCEEDED; RED-2 mixed SOL/BTC rows -> COMMIT_SUCCEEDED with the
+static claim silently collapsed. Recorded in
+`BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json#red_reproduction`.
+
+2. **Unit-location contract gap.** The I16R1 contract could express only a
+top-level field name pair (`field_name` + lexeme/state); book snapshots
+carry a unit per price level (`bids[]/asks[].quantity_unit`), which is not
+expressible as a scalar. Recorded in
+`BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json`.
+
+3. **Stale row-11 note.** `BLOC_04_I16R1_BLOCKING_CONDITION_AUDIT.json` row 11
+carried note prose ("This is the ONLY frozen blocking condition that
+remains...") that contradicted the artifact's own machine fields
+(`measured = NOT PRESENT`, `summary.present = 0`,
+`bloc_4_completion_blocked = false`). The note is corrected append-only in
+`BLOC_04_I16R2_EVIDENCE_CONSISTENCY_CORRECTION.md`; the frozen artifact is
+preserved byte-for-byte.
+
+4. **Population conflation.** No production code registers a
+`ProjectionSchemaDefinition`; I16R1 proved contract capability, not current
+population. I16R2 measures and reports this explicitly:
+`CAPABILITY_PROVEN_POPULATION_ZERO`.
+
+### The repair and the proof (I16R2A -> I16R2B -> I16R2C)
+
+I16R2B added the smallest additive contract that makes a static claim
+truth-bound and a row-varying/nested unit location expressible:
+`SourceUnitVariability` / `SourceUnitContract` enums;
+`SourceUnitEvidence.field_path` (deterministic structural path tuple),
+`.variability` and `.resolved_field_path` with validators;
+`resolve_unit_field_path` resolving a path against the registered Arrow
+schema (list element step = Arrow list value-field name, struct steps =
+child names, terminal string field, no `_t0_` component);
+`RawNormalizationBatch.source_unit_contract`; the T0B commit-boundary scan
+(`write_projection` step "2b") that proves a `VERIFIED_NATIVE` lexeme against
+every committed non-null value and raises the typed
+`ProjectionUnitEvidenceConflict` (MISMATCH / MIXED / ALL_NULL) before durable
+publication; and `Bloc5Handoff.to_batch` copying the durable declarations
+verbatim. The scan is bounded O(1) memory (distinct-state short-circuit,
+never collects all values).
+
+I16R2C remeasured G4-13 through the real registration + commit + handoff +
+public-consumer path over supported offline fixtures
+(`BLOC_04_I16R2_G4_13_MATRIX.json`, overall PASS) and emitted the 12-case
+claim-truth matrix (`BLOC_04_I16R2_UNIT_CLAIM_TRUTH_MATRIX.json`: 7 typed
+refusals - mismatch 3, mixed 2, all-null 2 - with no durable projection
+created after any refusal, and 5 commits including partial-null matching,
+unknown preservation and row-native/nested locations). The book-snapshot
+physical shape resolves as ROW_LEVEL_NESTED (flat alternative NOT PROVEN).
+
+### Regression (§26)
+
+| Phase | Passed | Failed | Skipped |
+|-------|--------|--------|---------|
+| Focused I16R2 + current G4 suites | 187 | 0 | 0 |
+| All-G4 rerun (G4-01..G4-12 suites) | 71 | 0 | 0 |
+| Full storage | 2018 | 1 (expected I11R2 staleness, closed by §40 republish) | 13 |
+| Full project | 3398 | 0 | 14 |
+
+Full storage is exactly +56 against the I16R1 baseline of 1963 with the same
+13 skips: claim 9 + integrity 4 + location 22 + real-provider 18 + R2 positive
+3. The single failure was the §40-mandated I11R2 staleness from six new
+tracked Python files (1005 -> 1011); the audit was mechanically regenerated
+and verified byte-stable (no-update rerun 4 passed), and the subsequent
+full-project run at the repaired tree reports zero failures.
+
+### Static / security (§28) and external CI (§30)
+
+Ruff clean on all changed scope (the only findings are the 2 accepted
+pre-existing ones in `test_i08_evidence.py`); compileall OK; mypy 0 errors in
+changed production files (the same 10 pre-existing `providers/**` findings as
+the I15R2/I16/I16R1 baseline); the accepted I15 repository secret scan runs
+clean. `external_ci = NONE_OBSERVED` for this branch (0 workflow runs on
+`agent/crypto-sensor-fabric-build`; 0 check-runs and 0 statuses at the last
+pushed build head `e8d1384d9`). Other programs' workflows in this repository
+never targeted this branch. Local pytest is not described as CI.
+
+### Evidence custody (§32/§27)
+
+All `BLOC_04_I16_*` and `BLOC_04_I16R1_*` artifacts are byte-identical to the
+start head; I16R2 produced only new `BLOC_04_I16R2*` evidence plus the single
+authorized §40 republish `BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json`
+(one line). The eleven historical matrices dirtied by suite runs were restored
+to committed bytes; I16R2 rewrote no historical artifact.
+
+### Notes
+
+- No self-ratification. The I16R2 seal is PENDING_OPERATOR_REVIEW. I17 NOT
+  started. Research FROZEN. STOP.

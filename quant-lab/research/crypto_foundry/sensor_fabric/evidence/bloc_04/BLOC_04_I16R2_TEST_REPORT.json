@@ -1,0 +1,108 @@
+{
+  "all_g4_rerun": {
+    "description": "G4-01..G4-12 suites (core + evidence) rerun at the repaired head; measured inside the focused battery run at the same head",
+    "failed": 0,
+    "passed": 71,
+    "skipped": 0
+  },
+  "branch": "agent/crypto-sensor-fabric-build",
+  "checkpoint": "SENSOR-B4-I16R2D",
+  "current_head": "23fb1147ba58473feee91045571695dfb9a48dd6",
+  "external_ci": {
+    "method": "gh 2.92.0: 'gh run list -R dabiggestpoppa/larger-lab --branch agent/crypto-sensor-fabric-build' returned 0 runs; check-runs = 0 and statuses = 0 at the last pushed build head e8d1384d9; the current head 23fb1147b is not yet pushed (GitHub: 'No commit found for SHA')",
+    "note": "The repository runs external validation workflows for other programs/branches; none ever targeted this branch. Local pytest is NOT described as CI.",
+    "value": "NONE_OBSERVED"
+  },
+  "focused_battery": {
+    "delta_vs_i16r1": "+56 tests (claim 9 + integrity 4 + location 22 + real-provider 18 + R2 positive 3)",
+    "failed": 0,
+    "files": {
+      "test_i16_g4_13_readiness.py (checkpoint fossil)": 7,
+      "test_i16_g4_core.py": 40,
+      "test_i16_g4_evidence.py": 31,
+      "test_i16r1_g4_13_positive.py": 18,
+      "test_i16r1_unit_contract.py": 29,
+      "test_i16r1_unit_semantic_audit.py": 6,
+      "test_i16r2_g4_13_positive.py": 3,
+      "test_i16r2_real_provider_units.py": 18,
+      "test_i16r2_unit_claim_truth.py": 9,
+      "test_i16r2_unit_integrity.py": 4,
+      "test_i16r2_unit_location.py": 22
+    },
+    "passed": 187,
+    "seconds": 52.79,
+    "skipped": 0
+  },
+  "full_project": {
+    "delta_vs_i16r1": "+56 tests",
+    "failed": 0,
+    "note": "run at the repaired tree after the §40 republish; includes every storage test",
+    "passed": 3398,
+    "seconds": 1342.26,
+    "skipped": 14
+  },
+  "full_storage": {
+    "delta_vs_i16r1": "+56 tests",
+    "failed": 1,
+    "failure_classification": "expected procedural staleness, closed by the authorized §40 republish",
+    "failure_note": "The single failure was the I11R2 governance binding audit (staleness), caused solely by the six new tracked Python files: python_files_scanned 1005 -> 1011 (diff at index 4427). It was mechanically regenerated per §40, verified byte-stable on a no-update rerun (4 passed), and is green in the subsequent full-project run at the same tree.",
+    "final_state_note": "Every storage test is green at the repaired tree: the full-project run below includes all 2019 storage tests with zero failures.",
+    "passed": 2018,
+    "seconds": 1245.0,
+    "skipped": 13,
+    "total_tests": 2019
+  },
+  "generated_for": "SENSOR-B4-I16R2 FINAL BLOC 4 ACCEPTANCE - CLAIM TRUTH + UNIT LOCATION CONTRACT",
+  "historical_evidence_custody": {
+    "authorized_republish": "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json (one line: python_files_scanned 1005 -> 1011)",
+    "final_historical_evidence_diff": "ZERO for every artifact measured before I16R2: all BLOC_04_I16_* and BLOC_04_I16R1_* artifacts are byte-identical to the start head e8d1384d9; the only non-additive change in the evidence directory is the authorized §40 republish",
+    "i16_artifacts_rewritten": 0,
+    "i16r1_artifacts_rewritten": 0,
+    "suite_dirt_restored_to_committed_bytes": [
+      "BLOC_04_I03R1_ATOMIC_ORDER.json",
+      "BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+      "BLOC_04_I04R1_POINTER_SCHEMA.json",
+      "BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+      "BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+      "BLOC_04_I04_CATALOG_SCHEMAS.json",
+      "BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+      "BLOC_04_I15R1_TOCTOU_MATRIX.json",
+      "BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+      "BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json",
+      "BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+    ]
+  },
+  "i11r2_audit": {
+    "authority": "§40 - six new tracked I16R2 Python acceptance files",
+    "byte_stable": true,
+    "change": "python_files_scanned 1005 -> 1011 (one line)",
+    "no_update_rerun": "passes (4 passed)",
+    "republished": true
+  },
+  "platform": {
+    "os": "nt (Windows, Git Bash)",
+    "python": "3.11.9"
+  },
+  "production_diff": {
+    "files_changed_under_src": 6,
+    "note": "enums.py, models.py, projection_schema.py, projections.py, replay.py, storage/__init__.py - additive only; no historical contract was rewritten",
+    "value": "ADDITIVE_ONLY"
+  },
+  "red_phase": {
+    "post_repair": "probe re-run at 23fb1147b: both cases COMMIT_REFUSED:ProjectionUnitEvidenceConflict; committed projection rows null; the handoff exposes nothing",
+    "pre_repair": "recorded in BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json#red_reproduction: RED-1 COMMIT_SUCCEEDED while the committed rows said BTC (handoff exposed VERIFIED_NATIVE/SOL); RED-2 mixed SOL/BTC COMMIT_SUCCEEDED with the static claim silently collapsed",
+    "probe": ".bu_tmp/i16r2_red_probe.py (throwaway outside the worktree; drives the accepted storage stack exactly as the I16R1 tests do)"
+  },
+  "schema": "sensor_fabric_test_report_v1",
+  "start_head": "e8d1384d98771c39cb119e2cae0ff93296be02ec",
+  "static_checks": {
+    "compileall": "OK (storage package)",
+    "mypy": {
+      "changed_production_errors": 0,
+      "pre_existing_errors": 10,
+      "pre_existing_scope": "providers/** and probes/**; identical to the accepted I15R2 / I16 / I16R1 baseline"
+    },
+    "ruff": "exactly the 2 pre-existing findings in test_i08_evidence.py (lines 33 and 786; from I08C 00898d666) = the unchanged accepted baseline; 0 findings in all I16R2 scope",
+    "secret_scan": "clean - the accepted I15 repository secret scanner (source + tests + evidence) runs within the passing suites"
+  }
+}
