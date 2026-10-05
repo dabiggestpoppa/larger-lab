@@ -4653,3 +4653,171 @@ Ratification artifact:
 No production defect was found requiring a source change, so no repair
 checkpoint is issued. **I17 NOT started in this run.** Research FROZEN. STOP
 after ratification.
+
+## 153 — SENSOR-B4-I17 FINAL BLOC 4 -> BLOC 5 HANDOFF (DOCUMENTATION FREEZE)
+
+**Mandate:** SENSOR-B4-I17 — document stable public interfaces, schema versions,
+known limitations and the normalization-ready evidence contract
+**Branch:** agent/crypto-sensor-fabric-build
+**Start head:** `fb813728f32d6e518ed9911470388aec24c1e83e`
+**origin/main (untouched):** `7c7816f382947bbc8a1f2154435fc436f2428fa8`
+**Production source diff:** ZERO (verified: `src/` is byte-identical to the start head)
+**Authorized scope:** I17 ONLY. Bloc 5 normalization implementation
+UNAUTHORIZED. I18+ UNAUTHORIZED. Research FROZEN.
+
+I17 is a DOCUMENTATION / CONTRACT FREEZE. It implemented no canonical unit, no
+base/quote conversion, no contract multiplier, no USD notional, no canonical
+asset identity, no `effective_at`/`observed_at`, no PIT transformation logic, no
+provider redesign, no live network logic, no research restart and no storage
+architecture redesign.
+
+### Artifacts (7 new, +1995 lines, all documentation)
+
+* `BLOC_04_I17_PUBLIC_INTERFACE_MATRIX.json` — 52 entries; 44 `STABLE_FOR_BLOC5`,
+  5 `STABLE_WITH_DOCUMENTED_LIMITATION`, 0 `HISTORICAL_COMPAT_ONLY`, 3
+  `INTERNAL_NOT_PUBLIC` (counts recomputed mechanically from the entries, never
+  hand-written).
+* `BLOC_04_I17_SCHEMA_VERSION_MATRIX.json` — identity vs fingerprint, semver
+  validation, registry conflict law, unit-declaration versioning, historical
+  descriptor compatibility, 8-row schema compatibility table.
+* `BLOC_04_I17_BLOC5_HANDOFF_CONTRACT.md` — the normative contract.
+* `BLOC_04_I17_KNOWN_LIMITATIONS.json` — 14 limitations, 0 open Bloc 4 blockers.
+* `BLOC_04_I17_NORMALIZATION_OWNERSHIP.json` — ownership split, overlap 0,
+  unassigned 0.
+* `BLOC_04_I17_DOWNSTREAM_PROHIBITIONS.json` — 24 hard prohibitions (listed 24 =
+  declared 24, verified).
+* `BLOC_04_I17_HANDOFF_EXAMPLE.md` — the executed end-to-end example.
+
+### Public-interface truth (§3/§4/§40)
+
+`crypto_sensor_fabric.storage.__all__` = **200** exported symbols. Every
+operator-named symbol was resolved by machine introspection. Two corrections
+were required and are recorded rather than papered over:
+
+* **`ProjectionArtifact` does not exist.** The public projection record is
+  **`RawProjectionArtifact`**, which IS exported. No aspirational API is
+  documented as existing.
+* **`Granularity` is not re-exported by `storage`.** It lives in
+  `crypto_sensor_fabric.probes.enums` — a base enum module with no provider
+  adapter and no network. Likewise `SensorFamily`
+  (`crypto_sensor_fabric.contracts.enums`) and
+  `QualityFlagAcquisition` / `SchemaState` / `AdapterEvidenceRef` / `ResumeToken`
+  (`providers.base.*`) are public but not re-exported; each is recorded with its
+  real import path.
+
+**Public-contract gap assessment: `stop_condition_triggered = false`.** The
+"revision-resolution public interfaces" requirement resolves to the public
+surface `RevisionResolver.key_for/resolve` + `RevisionPolicy` + `RevisionState` +
+`SourceRevision` + `RawEvidenceResult.revision_state`.
+`SourceRevisionRegistry` and `RevisionSourceIdentityV1` are internal and are NOT
+needed by Bloc 5, so no private API is blessed. `rebuild_duckdb_catalog` /
+`ReadOnlyDuckDBCatalog` and `Bloc3StorageHandoff` are deliberately non-public and
+are likewise not required.
+
+**Doc-to-code consistency check: PASS** (0 failures). 45 documented-public
+entries all resolve and are exported; 7 documented-non-public entries are
+genuinely absent from `__all__`; 18 section-4 checklist rows consistent; the
+three unit vocabularies still have exactly their frozen members. The check ran
+untracked from `.bu_tmp/` so I17 added no Python file at all.
+
+### Ratified laws frozen for Bloc 5
+
+`RawNormalizationBatch` = 22 public fields classified as SOURCE_IDENTITY,
+TIME_EVIDENCE, UNIT_EVIDENCE, LINEAGE, COVERAGE/QUALITY, INTEGRITY/REVISION and
+DESCRIPTOR_ONLY; it is **NORMALIZATION-READY EVIDENCE, NOT normalized science
+data**. Source identity (provider, venue, sensor_family, native_instrument,
+source_granularity, schema id/version, parser_version) is evidence and must never
+be turned into a storage path. Preserved time facts (`logical_time_range_*`,
+`requested_*`, `actual_*`, `request_started_at`, `response_observed_at`,
+`ingested_at`, `date_basis`) are separated from Bloc 5 canonical decisions
+(`effective_at`, canonical observed time, provider-time interpretation, PIT
+semantics), and **I17 introduced none of them**. `provider_time_raw`,
+`provider_time_parsed`, `provider_time_unit_assumption` and
+`provider_publication_time` were re-measured as **structurally absent** from every
+public handoff model; only nullable `min_provider_time`/`max_provider_time` exist
+on `RawProjectionArtifact`.
+
+Unit contract: `SourceUnitState` (VERIFIED_NATIVE | UNIT_UNVERIFIED),
+`SourceUnitVariability` (STATIC_VERIFIED | ROW_NATIVE | UNIT_UNVERIFIED) and
+`SourceUnitContract` (NO_UNIT_FIELDS | UNIT_EVIDENCE_DECLARED) are three
+independent vocabularies and are not blurred; absent marker +
+`HISTORICAL_UNIT_CONTRACT_ABSENT` is a third, distinct state. `VERIFIED_NATIVE`
+is truth-bound at T0B commit time (mismatch / mixed / all-null refuse before
+durable publication; no silent downgrade), so Bloc 5 may rely on the proof.
+`ROW_NATIVE` declares *where* native unit truth lives as a structural tuple path
+and fabricates no batch lexeme. `UNIT_UNVERIFIED` is an explicit unknown and
+never licenses a guess. The eight-family unit matrix is frozen, with book
+snapshot = `ROW_LEVEL_NESTED_SUPPORT_REQUIRED` and the flat alternative NOT
+PROVEN.
+
+`BLOC_04_UNIT_CONTRACT_CAPABILITY = PROVEN` and
+`PRODUCTION_SCHEMA_POPULATION = ZERO_AT_BLOC4_BOUNDARY` (0 production
+`ProjectionSchemaDefinition` constructions, 0 registered schemas carrying
+`source_unit_evidence`) are carried prominently and **not hidden**; offline
+supported-family fixtures are **not** converted into a production-population
+claim (`network_calls = 0`).
+
+Lineage, revision, missingness, integrity, query, path-independence, DuckDB,
+Postgres, export/restore, Bloc 3 causality, security and resource laws are all
+frozen (see the contract). DuckDB is disposable acceleration and is not public;
+Postgres is operational metadata only and fully reconstructible, and the G4-10
+no-live-DSN limitation is carried without claiming any new live run; evidence
+packs restore into a new empty root with identity/hash/query/revision/lineage
+parity; a checkpoint never precedes its durable manifest commit. `NONE` never
+becomes numeric zero. **POSIX runtime TOCTOU remains
+`NOT_MEASURED_ON_THIS_HOST`** — structurally verified only, no runtime evidence
+fabricated. All measured ceilings are configurable operational guardrails, which
+is why the Bloc 4 verdict carries no data-volume suffix.
+
+### Validation
+
+Focused (public authority + I05R1 fingerprint law + I12 query/replay +
+I16R1 contract + I16R1/R2 G4-13 + all-G4 + readiness fossil) = **244 passed /
+0 failed** (150 s). **Full storage = 2019 passed / 13 skipped / 0 failed**
+(1240 s). **Full project = 3398 passed / 14 skipped / 0 failed** (1119 s).
+One load-only warning appeared during the full storage run
+(`test_manifest_concurrency.py::test_readers_never_observe_partial_pointer`,
+`PytestUnhandledThreadExceptionWarning`, a Windows temp-dir teardown race in a
+reader thread raising `CurrentPointerCorrupt`); the test **passed**, the file
+passes 4/4 in isolation at both the I17 head and the start head, and I17 changed
+no source — it is the already-recorded Windows test-environment debt, recorded
+here rather than hidden. Ruff: exactly 2 pre-existing findings in untouched
+`test_i08_evidence.py`; `src/crypto_sensor_fabric/storage` **All checks
+passed**. mypy: 10 pre-existing errors in 6 files, **0** in changed scope.
+compileall OK. Secret scan 4 passed. I11R2 audit **not republished**: no-update
+run 4 passed, byte-stable at **1011** scanned files, `unexpected_hits = {}`.
+`external_ci = NONE_OBSERVED` (0 check-runs, 0 statuses, 0 runs on this branch).
+Historical evidence custody: the suite-dirtied historical JSONs were inspected
+and RESTORED before diff and before commit; **no I01..I16R2 artifact and no
+ratification artifact was modified.**
+
+### Handoff contract status
+
+```
+BLOC_04_TO_BLOC_05_HANDOFF_CONTRACT = DOCUMENTED
+NORMALIZATION_READY_EVIDENCE        = TRUE
+BLOC_05_NORMALIZATION_IMPLEMENTED   = FALSE
+PRODUCTION_SCHEMA_POPULATION        = ZERO_AT_BLOC4_BOUNDARY
+```
+
+### Governance
+
+```
+SENSOR-B4-I17
+
+PASS_SENSOR_B4_I17_BLOC5_HANDOFF_SEALED = PENDING_OPERATOR_REVIEW
+BLOC_04_TO_BLOC_05_HANDOFF_CONTRACT     = DOCUMENTED
+NORMALIZATION_READY_EVIDENCE            = TRUE
+BLOC_05_NORMALIZATION_IMPLEMENTED       = FALSE
+PRODUCTION_SCHEMA_POPULATION            = ZERO_AT_BLOC4_BOUNDARY
+BLOC_04_FINAL_VERDICT                   = PASS_BLOC_04_IMPLEMENTED
+BLOC_04_IMPLEMENTATION                  = OPERATOR_ACCEPTED
+next_checkpoint_authorized              = FALSE
+recommended_next                        = OPERATOR REVIEW OF SENSOR-B4-I17 HANDOFF
+I18+                                    = UNAUTHORIZED
+research                                = FROZEN
+```
+
+I17 is **not** self-ratified. No contract gap requiring a source change was
+found, so no repair checkpoint is issued. **Bloc 5 normalization NOT started.**
+Research FROZEN. STOP.
