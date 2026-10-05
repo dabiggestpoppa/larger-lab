@@ -1,0 +1,137 @@
+{
+  "artifact": "i17_normalization_ownership",
+  "bloc_4_owns": [
+    {
+      "capability": "Exact raw evidence",
+      "does_not_mean": "It does not mean the raw payload is interpretable as science data",
+      "means": "T0A bytes are content-addressed, immutable and verifiable through RawArtifactReader.verify"
+    },
+    {
+      "capability": "Acquisition facts",
+      "does_not_mean": "It does not mean those bounds are canonical event times",
+      "means": "requested/actual bounds, request_started_at, response_observed_at, ingested_at, adapter versions, request fingerprint are recorded exactly as observed"
+    },
+    {
+      "capability": "Public projections",
+      "does_not_mean": "It does not mean the projection is normalized",
+      "means": "Registered provider-native Arrow schemas committed with exact schema equality and a durable projection_sha256"
+    },
+    {
+      "capability": "Source-unit evidence",
+      "does_not_mean": "It does not mean Bloc 4 chose a canonical unit",
+      "means": "VERIFIED_NATIVE lexemes are truth-bound at T0B commit; ROW_NATIVE locations are declared as structural paths"
+    },
+    {
+      "capability": "Lineage",
+      "does_not_mean": "It does not mean downstream outputs automatically preserve it",
+      "means": "projection -> acquisition -> blob -> revision -> manifest -> T0A bytes is resolvable through public interfaces"
+    },
+    {
+      "capability": "Revision truth",
+      "does_not_mean": "It does not mean Bloc 5's PIT revision policy has been chosen",
+      "means": "RevisionState is recorded and ambiguity fails closed via ERROR_ON_AMBIGUITY"
+    },
+    {
+      "capability": "Missingness and coverage truth",
+      "does_not_mean": "It does not mean absence may be filled with zeros",
+      "means": "Every absence is a named CoverageState / QueryOutcome.no_matching_evidence / known_gap_intervals value"
+    },
+    {
+      "capability": "Integrity",
+      "does_not_mean": "It does not mean downstream correctness is guaranteed",
+      "means": "T0A hash verification, projection/schema binding, unit-claim validation, lineage validity and revision identity are public and enforceable"
+    }
+  ],
+  "bloc_5_owns": [
+    {
+      "bloc4_provides": "provider, venue, native_instrument as evidence",
+      "capability": "Canonical asset identity",
+      "decision_owned": true,
+      "means": "Deciding that FIXTURE_PROVIDER_A/BTC-USDT-PERP and another venue's instrument are the same asset"
+    },
+    {
+      "bloc4_provides": "the verified native lexeme or an explicit ROW_NATIVE location",
+      "capability": "Canonical units",
+      "decision_owned": true,
+      "means": "Deciding that CONTRACTS multiply by a contract size and that BTC means a base-asset quantity"
+    },
+    {
+      "bloc4_provides": "the declared unit location only",
+      "capability": "Quantity conversion",
+      "decision_owned": true,
+      "means": "Converting native quantities into a canonical measure"
+    },
+    {
+      "bloc4_provides": "nothing; notional is deliberately absent from the batch",
+      "capability": "Notional normalization",
+      "decision_owned": true,
+      "means": "Producing a USD (or any chosen) notional, including FX policy"
+    },
+    {
+      "bloc4_provides": "native_instrument and sensor_family as evidence",
+      "capability": "Base/quote interpretation",
+      "decision_owned": true,
+      "means": "Deciding which leg is base and which is quote for a given family"
+    },
+    {
+      "bloc4_provides": "logical ranges, requested/actual bounds, date_basis - all as preserved facts",
+      "capability": "effective_at",
+      "decision_owned": true,
+      "means": "The canonical time at which a fact is treated as effective"
+    },
+    {
+      "bloc4_provides": "provider-time facts are STRUCTURALLY ABSENT; only acquisition and logical evidence exists",
+      "capability": "Canonical PIT timestamps",
+      "decision_owned": true,
+      "means": "Resolving provider-time ambiguity and defining as-of semantics"
+    },
+    {
+      "bloc4_provides": "raw evidence plus lineage",
+      "capability": "Normalized science features",
+      "decision_owned": true,
+      "means": "Any derived series, resampling, or feature construction"
+    },
+    {
+      "bloc4_provides": "per-source evidence with explicit boundaries",
+      "capability": "Cross-provider semantic reconciliation",
+      "decision_owned": true,
+      "means": "Deciding whether two providers' series are comparable"
+    },
+    {
+      "bloc4_provides": "RevisionPolicy with ERROR_ON_AMBIGUITY as the safe default",
+      "capability": "Revision resolution policy for PIT",
+      "decision_owned": true,
+      "means": "Choosing FIRST_SEEN / LATEST_SEEN / EXACT_REVISION / ALL and recording it"
+    }
+  ],
+  "checkpoint": "SENSOR-B4-I17",
+  "generated_for": "SENSOR-B4-I17 BLOC 5 HANDOFF - frozen normalization ownership split",
+  "non_negotiable_boundary": "Bloc 4 never performs normalization. It never converts units, never computes notional, never assigns a canonical asset, and never assigns effective_at. If a future change requires Bloc 4 to do any of these, that change is out of contract and requires a separately authorized checkpoint.",
+  "overlap_count": 0,
+  "rule": "No capability is claimed by both blocs and no capability is claimed by neither. Where an answer could belong to either, it is listed under the bloc that must MAKE the decision and is marked decision_owned.",
+  "schema": "sensor_fabric_normalization_ownership_v1",
+  "shared_decision_points": [
+    {
+      "ambiguous": false,
+      "point": "Choosing the revision policy",
+      "resolution": "Default is ERROR_ON_AMBIGUITY (Bloc 4 enforces the fail-closed default); Bloc 5 must change it deliberately and record it."
+    },
+    {
+      "ambiguous": false,
+      "point": "Query result ordering",
+      "resolution": "Bloc 4 exposes the options (ReplayOrder); Bloc 5 selects and records one. Default ACQUISITION_ORDER is ingestion order, not event-time order."
+    },
+    {
+      "ambiguous": false,
+      "point": "Integrity threshold",
+      "resolution": "Bloc 4 provides IntegrityState and integrity_minimum; Bloc 5 chooses its minimum for a given pass."
+    }
+  ],
+  "start_head": "fb813728f32d6e518ed9911470388aec24c1e83e",
+  "status": {
+    "BLOC_04_TO_BLOC_05_HANDOFF_CONTRACT": "DOCUMENTED",
+    "BLOC_05_NORMALIZATION_IMPLEMENTED": false,
+    "NORMALIZATION_READY_EVIDENCE": true
+  },
+  "unassigned_count": 0
+}

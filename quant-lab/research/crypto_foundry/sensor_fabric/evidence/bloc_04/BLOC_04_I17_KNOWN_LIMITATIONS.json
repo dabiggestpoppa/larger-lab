@@ -1,0 +1,146 @@
+{
+  "artifact": "i17_known_limitations",
+  "blocker_status": {
+    "basis": "BLOC_04_FINAL_VERDICT = PASS_BLOC_04_IMPLEMENTED, BLOC_04_IMPLEMENTATION = OPERATOR_ACCEPTED, all 11 frozen blocking conditions NOT PRESENT (BLOC_04_I16R2_BLOCKING_CONDITION_AUDIT.json), all 13 G4 gates PASS with current-head proofs.",
+    "bloc_4_blockers_open": 0
+  },
+  "checkpoint": "SENSOR-B4-I17",
+  "documentation_items": 8,
+  "generated_for": "SENSOR-B4-I17 BLOC 5 HANDOFF - known limitations carried forward from the accepted Bloc 4 chain",
+  "informational": 4,
+  "limitations": [
+    {
+      "bloc5_action": "Do not assume any production schema exists. Register a schema explicitly before relying on one; a missing schema is ProjectionSchemaNotFound.",
+      "carried_from": "I16R2 ratification carry-forward item A",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "BLOC_04_I16R2_REAL_UNIT_PROJECTION_AUDIT.json#t0b_representation_audit.production_registration_audit",
+      "id": "A",
+      "measured_fact": "0 production ProjectionSchemaDefinition constructions and 0 registered schemas carrying source_unit_evidence (exhaustive src/**/*.py search); verdict CAPABILITY_PROVEN_POPULATION_ZERO.",
+      "title": "Production schema population is zero at the Bloc 4 boundary",
+      "why_not_a_gate_failure": "The frozen G4-13 wording binds the public handoff surface (capability), not a registration census. Capability is proven."
+    },
+    {
+      "bloc5_action": "Treat the operational metadata store as reconstructible and unproven-live in this environment. I17 makes NO new live database claim.",
+      "carried_from": "I16R2 ratification carry-forward item B",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "BLOC_04_I16R2_G4_GATE_MATRIX.json#rows[G4-13].known_limitations (G4-10 row) and the G4-10 row itself",
+      "id": "B",
+      "measured_fact": "No live Postgres execution was performed or claimed at the I16R2 head; SENSOR_FABRIC_POSTGRES_DSN and DATABASE_URL were both unset. The gate rested on the current-head schema and runtime contract test plus accepted prior I11 live evidence.",
+      "title": "G4-10 acceptance carried a no-live-DSN environment limitation"
+    },
+    {
+      "bloc5_action": "Do not cite POSIX runtime TOCTOU evidence on this platform. No POSIX runtime evidence is fabricated by I17.",
+      "carried_from": "I16R2 ratification carry-forward item C",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "I15 hardening chain evidence (ledger sections 146-147)",
+      "id": "C",
+      "measured_fact": "POSIX_STRUCTURAL_PATH = VERIFIED (O_DIRECTORY / O_NOFOLLOW per component, dst_dir_fd to os.link). POSIX_RUNTIME_TOCTOU = NOT_MEASURED_ON_THIS_HOST. The accepted I15 measurements were taken on a Windows host.",
+      "title": "POSIX runtime TOCTOU structurally verified but not runtime-measured on this host"
+    },
+    {
+      "bloc5_action": "Never collapse the three states. An absent marker is never an explicit declaration.",
+      "carried_from": "I16R2 ratification carry-forward item D",
+      "classification": "INFORMATIONAL",
+      "evidence": "BLOC_04_I17_SCHEMA_VERSION_MATRIX.json#historical_descriptor_compatibility",
+      "id": "D",
+      "measured_fact": "A descriptor with no source_unit_contract marker and no declarations is HISTORICAL_UNIT_CONTRACT_ABSENT - distinct from NO_UNIT_FIELDS and from UNIT_EVIDENCE_DECLARED. Its schema fingerprint stays byte-identical to the pre-I16R1 formula.",
+      "title": "Historical contracts without unit metadata remain distinguishable"
+    },
+    {
+      "bloc5_action": "Own and record every one of these decisions. See BLOC_04_I17_DOWNSTREAM_PROHIBITIONS.json.",
+      "carried_from": "I16R2 ratification carry-forward item E",
+      "classification": "OWNERSHIP_STATEMENT",
+      "evidence": "BLOC_04_I17_NORMALIZATION_OWNERSHIP.json",
+      "id": "E",
+      "measured_fact": "Bloc 4 supplies no canonical unit, no notional, no canonical asset, no base/quote interpretation, no effective_at and no canonical PIT timestamps.",
+      "title": "Canonicalization is entirely Bloc 5-owned"
+    },
+    {
+      "bloc5_action": "Work from the available acquisition and logical evidence and label any derived time as derived. Never imply these fields exist.",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "BLOC_04_I17_BLOC5_HANDOFF_CONTRACT.md section 3",
+      "id": "F",
+      "measured_at": "I17 start head",
+      "measured_fact": "provider_time_raw, provider_time_parsed, provider_time_unit_assumption and provider_publication_time are absent from every public handoff model (RawNormalizationBatch, RawEvidenceResult, RawEvidenceQuery, AcquisitionRecord, PartitionManifest, RawProjectionArtifact, SourceRevision). Only nullable min_provider_time / max_provider_time exist on RawProjectionArtifact.",
+      "title": "Provider-time facts are structurally absent from the public handoff"
+    },
+    {
+      "bloc5_action": "Do not infer compatibility from version numbers. If a downstream compatibility policy is needed, author and ratify it separately.",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "BLOC_04_I17_SCHEMA_VERSION_MATRIX.json#identity_mechanisms",
+      "id": "G",
+      "measured_at": "I17 start head",
+      "measured_fact": "The registry enforces strict semver FORM (MAJOR.MINOR.PATCH, no prerelease, no leading zeros) and identity uniqueness (same id+version with a different fingerprint raises ProjectionSchemaConflict). It defines no major/minor/patch compatibility semantics and no deprecation policy.",
+      "title": "No semver compatibility matrix exists"
+    },
+    {
+      "bloc5_action": "Import them from their real public paths. Granularity comes from probes.enums (a base enum module only - no provider adapter, no network). Do NOT import any concrete provider adapter package.",
+      "classification": "STABLE_WITH_DOCUMENTED_LIMITATION",
+      "evidence": "BLOC_04_I17_PUBLIC_INTERFACE_MATRIX.json#operator_named_symbol_check",
+      "id": "H",
+      "measured_at": "I17 start head",
+      "measured_fact": "SensorFamily (crypto_sensor_fabric.contracts.enums), Granularity (crypto_sensor_fabric.probes.enums), QualityFlagAcquisition/SchemaState (crypto_sensor_fabric.providers.base.enums) and AdapterEvidenceRef/ResumeToken (crypto_sensor_fabric.providers.base.models) appear in public storage model annotations but are absent from crypto_sensor_fabric.storage.__all__.",
+      "title": "Four public enums are not re-exported by crypto_sensor_fabric.storage"
+    },
+    {
+      "bloc5_action": "Treat DuckDB as disposable acceleration only. It can never be evidence authority and must not be depended on.",
+      "classification": "INFORMATIONAL",
+      "evidence": "BLOC_04_I17_PUBLIC_INTERFACE_MATRIX.json (INTERNAL_NOT_PUBLIC entry)",
+      "id": "I",
+      "measured_at": "I17 start head",
+      "measured_fact": "rebuild_duckdb_catalog and ReadOnlyDuckDBCatalog exist in storage.duckdb_catalog but are absent from __all__.",
+      "title": "DuckDB catalog is deliberately not public"
+    },
+    {
+      "bloc5_action": "Use RevisionResolver and RevisionPolicy. Do not import the internal symbols.",
+      "classification": "INFORMATIONAL",
+      "evidence": "BLOC_04_I17_PUBLIC_INTERFACE_MATRIX.json#public_contract_gap_assessment",
+      "id": "J",
+      "measured_at": "I17 start head",
+      "measured_fact": "SourceRevisionRegistry and RevisionSourceIdentityV1 are not exported by crypto_sensor_fabric.storage. This is NOT a public-contract gap: the public revision surface is RevisionResolver (key_for, resolve) + RevisionPolicy + RevisionState + SourceRevision + RawEvidenceResult.revision_state.",
+      "title": "Internal revision symbols are not exported"
+    },
+    {
+      "bloc5_action": "When order matters, request it explicitly and record which order was used. ACQUISITION_ORDER is not event-time order.",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "BLOC_04_I17_BLOC5_HANDOFF_CONTRACT.md section 11",
+      "id": "K",
+      "measured_at": "I17 start head",
+      "measured_fact": "RawEvidenceQueryService.execute returns a tuple of results without a documented ordering guarantee. Explicit ordering is available only through RawReplayCursor.replay(query, order_by=...) with ReplayOrder ACQUISITION_ORDER (default, an ingestion order), PROVIDER_EVENT_TIME or SOURCE_ORDER.",
+      "title": "Query result ordering is not a guaranteed contract"
+    },
+    {
+      "bloc5_action": "Pin the pack version you produce and re-export rather than assuming migration.",
+      "classification": "DOCUMENTATION_ITEM",
+      "evidence": "crypto_sensor_fabric.storage.export.PACK_SCHEMA_VERSION",
+      "id": "L",
+      "measured_at": "I17 start head",
+      "measured_fact": "PACK_SCHEMA_VERSION is the constant \"1\"; verification and restore require exact equality and raise PackUnsupportedVersion otherwise.",
+      "title": "No cross-version export pack migration"
+    },
+    {
+      "bloc5_action": "Design the downstream consumption strategy accordingly rather than assuming resumable paging.",
+      "classification": "INFORMATIONAL",
+      "evidence": "RawEvidenceQuery field set (17 fields)",
+      "id": "M",
+      "measured_at": "I17 start head",
+      "measured_fact": "RawEvidenceQuery.limit is a bound; there is no cursor/continuation API on the public query surface.",
+      "title": "No cursor pagination"
+    },
+    {
+      "bloc5_action": "Never parse them as paths or identifiers.",
+      "classification": "PROHIBITION",
+      "evidence": "BLOC_04_I17_BLOC5_HANDOFF_CONTRACT.md sections 1 and 12",
+      "id": "N",
+      "measured_at": "I17 start head",
+      "measured_fact": "Both are opaque strings. Their meaning is defined by the registered projection schema, not by string parsing.",
+      "title": "projection_uri and raw_rows_or_reader are opaque descriptors"
+    }
+  ],
+  "limitations_total": 14,
+  "ownership_statements": 1,
+  "prohibitions": 1,
+  "rule": "Every limitation below is stated as measured fact with its evidence provenance. Nothing is softened, nothing is omitted, and no limitation is reclassified as a Bloc 4 blocker unless the accepted evidence says so.",
+  "schema": "sensor_fabric_known_limitations_v1",
+  "start_head": "fb813728f32d6e518ed9911470388aec24c1e83e"
+}
