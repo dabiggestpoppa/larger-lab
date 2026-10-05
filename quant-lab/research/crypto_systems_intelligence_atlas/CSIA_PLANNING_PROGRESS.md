@@ -4730,3 +4730,52 @@ authority-bearing class; no Class C; no Book 7; no live acquisition.
 
 **Next:** operator answers §7, then the append-only Rung 7 measurement-binding
 repair on `53ac5ea28`.
+
+---
+
+## Coverage measurement binding — operator ruling
+
+`BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1` — `RATIFIED` — 2026-10-05
+
+**Operator selection:** `BIND_COVERAGE_TO_THE_COMPARISON_MEASUREMENT`
+
+Closes the erratum's §7. The corpus was silent; the operator ruled rather than
+letting the implementation pick.
+
+```text
+COVERAGE_EVIDENCE_ATTACHES_TO              = THE COMPARISON MEASUREMENT
+BASELINE_MEASUREMENT_COVERAGE_AUTHORIZES   = FALSE  (out of scope by selection)
+REQUIRE_DISTINCT_COVERAGE_EVIDENCE_FOR_BOTH = NOT SELECTED
+ERRATUM_S7_OPEN                            = FALSE
+
+COVERAGE_REPLAY_GRANULARITY = ONE MEASUREMENT PER REPLAY
+AGGREGATE_COVERAGE_VERDICT  = NOT DEFINED / NOT INTRODUCED
+```
+
+The plural/singleton tension is answered by granularity, not aggregation: N
+comparison measurements replay N times, each against its own observation. The
+`comparison_measurement_ref` parameter is required with no default, so omission
+is structurally impossible and self-inference is prohibited.
+
+### Standing state
+
+```text
+RUNG_7_MEASUREMENT_BINDING_REPAIR = UNBLOCKED
+IMPLEMENTATION_SOURCE_EDITED      = FALSE (repair not yet written)
+TEST_CODE_EDITED                  = FALSE
+IMPLEMENTATION_HEAD              = 53ac5ea28e4b82eedf924f631ada13c56b1cffe6
+BOOK_6_IMPLEMENTATION_AUTHORITY   = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_COVERAGE_MEASUREMENT_BINDING_RATIFICATION_RECORD_v0.1.md  RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md                                                   appended
+CSIA_PLANNING_PROGRESS.md                                                       appended
+```
+
+The erratum is not edited; its §7 is discharged by this record and the OPEN text
+stays as history.
+
+**Next:** append-only Rung 7 measurement-binding repair on `53ac5ea28`.

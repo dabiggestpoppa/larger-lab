@@ -4424,3 +4424,49 @@ or baseline side; any new field on `ChangeObservation`; any new coverage
 observation schema; any new aggregation semantics; any new coverage registry;
 any new authority-bearing class; any implementation source or test written or
 edited; any edit to `53ac5ea2`; any rebase; any Book 7 or live acquisition.
+
+---
+
+## Coverage measurement binding — operator ruling
+
+`BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1` — `RATIFIED` — 2026-10-05
+
+**Operator selection:** `BIND_COVERAGE_TO_THE_COMPARISON_MEASUREMENT`
+
+Closes §7 of `CSIA_BOOK_6_COMPARISON_COVERAGE_MEASUREMENT_BINDING_ERRATUM_v0.1.md`,
+which was held open because fourteen governing artifacts were audited and none
+bound the singleton `coverage_observation_ref` to either side of the comparison.
+The operator ruled; the implementation did not guess.
+
+```text
+COVERAGE_EVIDENCE_ATTACHES_TO                  = THE COMPARISON MEASUREMENT
+COMPARISON_MEASUREMENT_COVERAGE_AUTHORIZES     = TRUE
+BASELINE_MEASUREMENT_COVERAGE_AUTHORIZES       = FALSE  (out of scope by selection)
+REQUIRE_DISTINCT_COVERAGE_EVIDENCE_FOR_BOTH    = NOT SELECTED
+ERRATUM_S7_OPEN                                = FALSE
+
+COVERAGE_REPLAY_GRANULARITY      = ONE MEASUREMENT PER REPLAY
+AGGREGATE_COVERAGE_VERDICT       = NOT DEFINED   (and NOT introduced)
+NEW AGGREGATION SEMANTICS        = NONE
+```
+
+`comparison_measurement_refs` is plural and the selected binding names one
+measurement. That tension is resolved by keeping the replay per-measurement and
+defining no aggregate: N comparison measurements are replayed N times, each
+against its own coverage observation. How N verdicts populate the single record
+field is untouched and left to a later amendment.
+
+The parameter carries no default and no optional path, so omission is
+structurally impossible and inference from the rule, metric, convention or the
+observation itself is prohibited.
+
+```text
+IMPLEMENTATION_AUTHORIZED = TRUE  (offline amendment scope only)
+RUNG_7_MEASUREMENT_BINDING_REPAIR = UNBLOCKED
+```
+
+**Not authorized and not performed:** any binding of baseline coverage; any new
+field on `ChangeObservation`; any aggregate coverage verdict; any new coverage
+observation schema; any new aggregation semantics; any new coverage registry; any
+new authority-bearing class; any edit to the erratum or to any ratified record;
+any edit to `53ac5ea2`; any rebase; any Book 7 or live acquisition.
