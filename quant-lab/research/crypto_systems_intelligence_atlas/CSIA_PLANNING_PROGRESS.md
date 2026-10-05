@@ -4553,3 +4553,85 @@ reopening; no new policy selection; no rebase; no mutation of the frozen
 accepted Book 6 worktree; Book 7 or Choir work.
 
 **Next:** Rung 7 — coverage and temporal comparability.
+
+---
+
+## Coverage replay binding — ratified
+
+`BOOK6-COVERAGE-REPLAY-BINDING-v0.1` — `RATIFIED` — 2026-10-05
+
+**Operator selection:** `RATIFY_NAMED_COVERAGE_RULE_AND_OBSERVATION_REPLAY`
+
+Binds deterministic coverage replay to the **named** `ComparisonRule`
+`coverage_sufficiency_rule_ref` and an **actual** `CoverageObservation`. Resolves
+how already-ratified fields participate; adds no field, class, registry or
+authority.
+
+### Findings at the Rung 7 candidate 92b954e5
+
+```text
+CALLER_CALLBACK_CAN_ASSERT_COVERAGE_VERDICT = TRUE
+CALLER_CALLBACK_IS_AUTHORITY_SAFE           = FALSE
+LEXICAL_COVERAGE_RULE_SELECTION            = UNRATIFIED IMPLEMENTATION INVENTION
+RATIFIED_ANSWER_TO_BOTH                    = ALREADY EXISTED IN THE CORPUS
+```
+
+### Substrate verified
+
+```text
+CoverageObservation   : observed_fraction in [0.0, 1.0], sufficiency_rule_ref
+CoverageSufficiencyRule: required_fraction in [0.0, 1.0], scope_metric_id
+Authority owner       : CoverageRuleRegistry (registration != ratification)
+NUMERIC_COVERAGE_IS_NOT_SUFFICIENCY = TRUE   (number is the rule's input)
+required_fraction     : DECLARED BUT APPLIED NOWHERE before this repair
+```
+
+### Binding
+
+```text
+CHECK12_SELECTS_COVERAGE_RULE = FALSE
+RULE_BINDING_SOURCE           = ComparisonRule.coverage_sufficiency_rule_ref
+CHECK_13  named ref present when REQUIRED
+CHECK_14  named rule re-resolved through CoverageRuleRegistry
+CHECK_15  named rule scoped to the exact compared metric
+CHECK_16  actual observation; observed_fraction vs required_fraction
+
+CALLER_SUPPLIED_COVERAGE_VERDICT  = PROHIBITED
+CALLER_SUPPLIED_COVERAGE_CALLBACK = PROHIBITED
+MULTIPLE_RULES_REQUIRE_LEXICAL_SELECTION = FALSE
+NAMED_RULE_BINDING_CONTROLS               = TRUE
+
+CHECK16_SUCCEEDED_WITH_INSUFFICIENT -> NOT_COMPARABLE
+CHECK16_FAILED                     -> UNRESOLVED
+```
+
+### Pre-ratification
+
+```text
+REVIEW = 12 / 12 PASS, BLOCKING = 0
+```
+
+### Standing state
+
+```text
+DOCTRINE_CHANGED          = FALSE
+AUTHORITY_CLASS_ADDED     = FALSE
+RUNG7_REPAIR_REQUIRED     = TRUE
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+RUNG_7 = REPAIR PENDING (append-only repair on 92b954e5; history preserved)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_COVERAGE_REPLAY_BINDING_CLARIFICATION_v0.1.md  RATIFIED
+CSIA_BOOK_6_COMPARISON_COVERAGE_REPLAY_BINDING_REVIEW_v0.1.md        12 / 12
+CSIA_OPERATOR_DECISION_LOG.md                                          appended
+CSIA_PLANNING_PROGRESS.md                                              appended
+```
+
+**Not done in this round:** no implementation source written or edited; no
+test written or edited; no accepted source edited; no edit to `92b954e5`; no
+rebase; no new aggregation semantics; no new registry authority; no new
+schema; no new authority-bearing class; no Class C; no Book 7; no live
+acquisition.

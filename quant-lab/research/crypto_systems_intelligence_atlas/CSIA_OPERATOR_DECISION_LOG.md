@@ -4214,3 +4214,113 @@ BOOK_6_IMPLEMENTED             = FALSE  (Rung 7 pending)
 to grammar v0.6 or v0.7; any edit to any ratified record; any GAP reopening;
 any new policy selection; any rebase; any mutation of the frozen accepted Book
 6 worktree; Book 7 or Choir work.
+
+---
+
+## Coverage replay binding — named rule and actual observation
+
+`BOOK6-COVERAGE-REPLAY-BINDING-v0.1` — `RATIFIED` — 2026-10-05
+
+**Operator selection:** `RATIFY_NAMED_COVERAGE_RULE_AND_OBSERVATION_REPLAY`
+
+Precondition: `..._COVERAGE_REPLAY_BINDING_REVIEW_v0.1.md` = `12 / 12 PASS`,
+`BLOCKING = 0`.
+
+This resolves how **already-existing** fields participate in deterministic
+replay. It adds no field, no class, no registry and no authority.
+
+### Two defects in the Rung 7 candidate at 92b954e5
+
+**A — caller-supplied verdict was authority.** `coverage_verdict_of:
+Callable[[str, str], CoverageVerdict]` fed check 16 directly.
+
+```text
+CALLER_CALLBACK_CAN_ASSERT_COVERAGE_VERDICT = TRUE
+CALLER_CALLBACK_IS_AUTHORITY_SAFE           = FALSE
+```
+
+A callback returning `SUFFICIENT` produced a passing check 16 with **no**
+CoverageObservation evaluated, **no** `observed_fraction` read and **no**
+`required_fraction` read. Two callbacks over identical state produced
+`SUFFICIENT` and `INSUFFICIENT`. That is a self-declared verdict, which the
+ratified corpus forbids.
+
+**B — lexical rule selection was an invention.** Two separately-ratified
+exact-metric rules resolved to `sorted(authorizing)[0]`. A corpus-wide search
+found **zero** rules preferring a lexically smallest coverage rule id.
+
+```text
+LEXICAL_COVERAGE_RULE_SELECTION = UNRATIFIED IMPLEMENTATION INVENTION
+```
+
+It also defeated the field's ratified purpose: amendment plan v0.3 already
+declares `coverage_sufficiency_rule_ref` *"a CITATION that must agree with the
+derived status"*.
+
+### The binding
+
+```text
+CHECK_12  Does ANY current ratified exact-metric rule exist? YES -> REQUIRED,
+          NO -> UNRESOLVED / NO_UPSTREAM_DETERMINATION_EXISTS
+CHECK12_SELECTS_COVERAGE_RULE = FALSE
+
+CHECK_13  ComparisonRule.coverage_sufficiency_rule_ref present when REQUIRED
+          RULE_BINDING_SOURCE = ComparisonRule.coverage_sufficiency_rule_ref
+          NO REGISTRY_ORDER_TIE_BREAK
+
+CHECK_14  the NAMED rule re-resolved through CoverageRuleRegistry:
+          registered + live ratification + current version
+
+CHECK_15  the NAMED rule's scope_metric_id == the exact compared metric
+
+CHECK_16  an ACTUAL CoverageObservation, never a caller verdict:
+          its sufficiency_rule_ref must equal the named rule;
+          then observed_fraction >= required_fraction -> SUFFICIENT
+                                  observed_fraction <  required_fraction -> INSUFFICIENT
+```
+
+```text
+CALLER_SUPPLIED_COVERAGE_VERDICT  = PROHIBITED
+CALLER_SUPPLIED_COVERAGE_CALLBACK = PROHIBITED
+NUMERIC_COVERAGE_IS_NOT_SUFFICIENCY = TRUE   (a number is the rule's input,
+                                              never its own verdict)
+```
+
+### Multiple current rules
+
+```text
+MULTIPLE_RULES_REQUIRE_LEXICAL_SELECTION = FALSE
+MULTIPLE_RULES_INVALID                   = FALSE
+NAMED_RULE_BINDING_CONTROLS               = TRUE
+```
+
+Two ratified rules disagreeing about sufficiency is a substantive difference,
+resolved by which one the operator bound into the `ComparisonRule` — and that
+binding is inside the ratified rule fingerprint.
+
+### The distinction that must not collapse
+
+```text
+CHECK16_SUCCEEDED_WITH_INSUFFICIENT -> NOT_COMPARABLE
+CHECK16_FAILED                     -> UNRESOLVED
+```
+
+A replay check succeeds when it faithfully recomputes the rule's verdict.
+Conflating "recomputed INSUFFICIENT" with "check failed" would reintroduce the
+GAP-4 collapse.
+
+### Standing state
+
+```text
+DOCTRINE_CHANGED          = FALSE
+AUTHORITY_CLASS_ADDED     = FALSE
+RUNG7_REPAIR_REQUIRED     = TRUE
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+RUNG_7                    = REPAIR REQUIRED (append-only; 92b954e5 preserved)
+```
+
+**Not authorized and not performed:** any new aggregation semantics; any new
+`CoverageRuleRegistry` authority; any rule-selection policy beyond the explicit
+`ComparisonRule` binding; any new coverage observation schema; any new
+authority-bearing class; any Class C work; any edit to accepted source; any
+edit to `92b954e5`; any rebase; any Book 7 or live acquisition.
