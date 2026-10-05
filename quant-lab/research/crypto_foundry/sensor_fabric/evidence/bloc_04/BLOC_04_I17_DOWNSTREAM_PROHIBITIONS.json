@@ -1,0 +1,144 @@
+{
+  "artifact": "i17_downstream_prohibitions",
+  "checkpoint": "SENSOR-B4-I17",
+  "generated_for": "SENSOR-B4-I17 BLOC 5 HANDOFF - hard downstream prohibition registry",
+  "infer_from_absence": [
+    {
+      "correct_alternative": "Keep the declared state and location; treat the quantity as unit-UNKNOWN and do not emit a canonical unit.",
+      "inference": "A unit is absent, therefore the quantity is unitless.",
+      "why_forbidden": "UNIT_UNVERIFIED means no VERIFIED static native-unit evidence exists. It says nothing about whether the quantity has a unit. Liquidation fixtures are a live example: quantity_unit is null and an all-null static claim is REFUSED rather than treated as unitless."
+    },
+    {
+      "correct_alternative": "Carry the CoverageState and known_gap_intervals through to the output and represent absence as absence.",
+      "inference": "No rows / no results, therefore the value is zero.",
+      "why_forbidden": "Absence is a named state: QueryOutcome.no_matching_evidence, CoverageState.EMPTY_CONFIRMED / NOT_ATTEMPTED / HISTORY_UNAVAILABLE / KNOWN_GAP. NONE never becomes numeric zero."
+    },
+    {
+      "correct_alternative": "Check the coverage/integrity/failure fields before treating data as successfully acquired.",
+      "inference": "An AcquisitionRecord exists, therefore the acquisition succeeded.",
+      "why_forbidden": "Acquisition records exist for failures too; failure_ref, http_status_or_source_status and CoverageState.FAILED / ACCESS_BLOCKED carry that truth."
+    },
+    {
+      "correct_alternative": "Read CoverageState and the gap fields; state the boundary you actually have.",
+      "inference": "Data exists for the requested window, therefore the history is complete.",
+      "why_forbidden": "Completeness is bounded and declared: COMPLETE_SOURCE_BOUNDARY vs PARTIAL vs KNOWN_GAP, plus gap_count, known_gap_intervals and history_boundary."
+    },
+    {
+      "correct_alternative": "Compute effective_at in Bloc 5, record the derivation, and label it as derived rather than provider-asserted.",
+      "inference": "logical_time_range_* plus ingested_at are the canonical event timestamps.",
+      "why_forbidden": "Bloc 4 preserves acquisition and logical facts; it does not decide canonical time. provider_time_raw / provider_time_parsed / provider_time_unit_assumption / provider_publication_time are STRUCTURALLY ABSENT."
+    },
+    {
+      "correct_alternative": "Use it as evidence and build canonical asset identity explicitly in Bloc 5.",
+      "inference": "native_instrument identifies the asset.",
+      "why_forbidden": "It is a provider-native string. Cross-venue asset identity is a canonicalization decision."
+    },
+    {
+      "correct_alternative": "Treat completeness as unknown unless a coverage state states it.",
+      "inference": "quality_flags is empty, therefore the provider returned complete data.",
+      "why_forbidden": "An empty list is an absence of flags, not an assertion of completeness. provider completeness is exactly the kind of claim that must be proven."
+    },
+    {
+      "correct_alternative": "Distinguish all three states and never merge them.",
+      "inference": "An absent source_unit_contract marker means NO_UNIT_FIELDS.",
+      "why_forbidden": "That state is HISTORICAL_UNIT_CONTRACT_ABSENT - a third, distinct state meaning the descriptor predates the unit contract."
+    },
+    {
+      "correct_alternative": "Compare schema_fingerprints and treat any structural difference as a different contract.",
+      "inference": "A schema_id@version combination looks compatible, therefore it is compatible.",
+      "why_forbidden": "The registry enforces semver FORM and identity uniqueness only. There is no compatibility matrix."
+    }
+  ],
+  "never_choose_silently": [
+    {
+      "correct_alternative": "Select RevisionPolicy and ReplayOrder explicitly and record the choice with the output.",
+      "inference": "Relying on a default revision or ordering without recording it.",
+      "why_forbidden": "ERROR_ON_AMBIGUITY is the safe default precisely so that ambiguity never resolves silently; ACQUISITION_ORDER is ingestion order, not event-time order."
+    },
+    {
+      "correct_alternative": "Restore into a new empty root.",
+      "inference": "Restoring an evidence pack over an existing non-empty root to make it work.",
+      "why_forbidden": "RestoreDestinationNotEmpty is a safety refusal, not an obstacle to bypass."
+    },
+    {
+      "correct_alternative": "Pin the pack version and re-export when it changes.",
+      "inference": "Assuming an unsupported export pack version can be migrated.",
+      "why_forbidden": "PACK_SCHEMA_VERSION must match exactly or PackUnsupportedVersion is raised."
+    },
+    {
+      "correct_alternative": "Resolve explicitly with a RevisionPolicy, or fail closed.",
+      "inference": "Treating RevisionState.UNKNOWN_REVISION as 'latest'.",
+      "why_forbidden": "It is an honest unknown state."
+    },
+    {
+      "correct_alternative": "Propagate revision_state and resolve the mutation deliberately.",
+      "inference": "Normalizing away RevisionState.SOURCE_MUTATION.",
+      "why_forbidden": "Source mutation is evidence about the upstream source and must survive into the normalized record."
+    }
+  ],
+  "never_guess_units": [
+    {
+      "correct_alternative": "Use only declared evidence.",
+      "inference": "Deriving a unit from the provider name.",
+      "why_forbidden": "No such heuristic exists in Bloc 4 and none is authorized."
+    },
+    {
+      "correct_alternative": "Use the declared native_unit_lexeme or ROW_NATIVE location.",
+      "inference": "Deriving a unit by parsing the instrument symbol.",
+      "why_forbidden": "Symbols are provider-native and ambiguous across venues."
+    },
+    {
+      "correct_alternative": "Propagate the explicit unknown.",
+      "inference": "Deriving a unit by scanning raw row bytes when the declaration says UNIT_UNVERIFIED.",
+      "why_forbidden": "The unknown_rows_carry_lexeme case exists precisely to prove this does not happen: rows carrying 'SOL' still surface a null lexeme."
+    }
+  ],
+  "never_parse_or_infer_from_names": [
+    {
+      "correct_alternative": "Resolve the projection through RawProjectionReader by projection_id.",
+      "inference": "Parsing projection_uri or raw_rows_or_reader to recover a path or identity.",
+      "why_forbidden": "Both are opaque descriptors whose meaning is defined by the registered schema."
+    },
+    {
+      "correct_alternative": "Use the public repositories. If metadata is not publicly reachable, that is a contract gap to report, not a filename to parse.",
+      "inference": "Reconstructing metadata from blob/manifest/catalog filenames or directory layout.",
+      "why_forbidden": "Path independence is a frozen G4-13 property; layout is an implementation detail and not a contract."
+    },
+    {
+      "correct_alternative": "Use tuple paths and resolve_unit_field_path.",
+      "inference": "Building a dotted unit path string such as 'bids.item.quantity_unit'.",
+      "why_forbidden": "Paths are structural tuples precisely to avoid dotted-string ambiguity."
+    },
+    {
+      "correct_alternative": "Name provider-native fields outside that namespace.",
+      "inference": "Using the reserved _t0_ namespace in a unit field name or path.",
+      "why_forbidden": "It is reserved and rejected on both the schema and the evidence side."
+    }
+  ],
+  "never_treat_accelerators_as_authority": [
+    {
+      "correct_alternative": "Use RawEvidenceQueryService / RawProjectionReader.",
+      "inference": "Querying DuckDB directly as the evidence source.",
+      "why_forbidden": "It is disposable acceleration and is deliberately not exported from the public package."
+    },
+    {
+      "correct_alternative": "Use reconstruct_snapshot to prove non-authority; read evidence from the durable layer.",
+      "inference": "Treating Postgres rows as the record of raw evidence.",
+      "why_forbidden": "Postgres holds operational metadata/state only and is fully reconstructible from durable sources."
+    },
+    {
+      "correct_alternative": "Carry the IntegrityState value unchanged and filter with integrity_minimum.",
+      "inference": "Collapsing PROVIDER_HASH_VERIFIED and LOCAL_HASH_VERIFIED into one 'verified'.",
+      "why_forbidden": "They are different guarantees."
+    }
+  ],
+  "prohibitions_total": 24,
+  "rule": "These are HARD prohibitions. Each entry names the inference that must never be made, the exact reason it is unsafe, and the supported alternative. Violating any of these breaks the evidence contract, not merely a style rule.",
+  "schema": "sensor_fabric_downstream_prohibitions_v1",
+  "start_head": "fb813728f32d6e518ed9911470388aec24c1e83e",
+  "status": {
+    "bloc5_must_not_relax": true,
+    "enforcement": "Advisory contract for Bloc 5. Violations are contract breaks and should be reported, not worked around.",
+    "registry_frozen_at": "SENSOR-B4-I17"
+  }
+}
