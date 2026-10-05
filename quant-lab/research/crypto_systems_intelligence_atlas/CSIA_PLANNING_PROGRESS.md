@@ -4373,3 +4373,109 @@ B1..B5, R1..R3 = unchanged
 no test executed; no status-validator edit; no lifecycle remedy; no registration
 policy; no branch or worktree created; no GAP reopened; the frozen accepted
 Book 6 worktree untouched at `5f94c3f40c` with 0 drift.
+
+---
+
+## GAP-7 test-contract precedence resolved — corpus cleanup
+
+`BOOK6-GAP7-TEST-PRECEDENCE-v0.1` — `RATIFIED` — 2026-10-05
+
+The carried GAP-7 case set held two requirements for one scenario with opposite
+outcomes. `CARR-21` (from test spec v0.2 §5) demanded `A`, `B` and `C` **all**
+refuse. `TERM-6` demands `A` refuses while `B` and `C` resolve on their own
+conjuncts. Both were readable from the ratified corpus.
+
+```text
+v0.2 WAS RATIFIED IN ITS OWN RIGHT     = FALSE   (it was DRAFT)
+CARR_21_ENTERED_THE_RATIFIED_CONTRACT = TRUE
+ENTRANCE_MECHANISM                    = TRANSITIVE_CARRIAGE
+LATER_RATIFICATION_CONTROLS           = TRUE
+POLICY_DECISION_OUTSTANDING           = FALSE
+CORPUS_PRECEDENCE_CLEANUP_REQUIRED    = TRUE
+```
+
+This was a corpus-precedence defect. Not a source-code defect, and not a new
+policy question — `PER_RECORD` had already been selected at
+`BOOK6-GAP7-SUCCESSOR-CURRENTNESS-v0.1`. One row simply had not been updated.
+
+## Canonical GAP-7 contract
+
+```text
+GAP7_CURRENT_TEST_CONTRACT = v0.4
+GAP7_CANONICAL_CASES      = 40
+
+CARR-1..19 (19)  CURR-S1..3 (3)  TERM-1..6 (6)  NV-1..10 (10)  STRUCT-1..2 (2)
+
+STALE_CARR21 = SUPERSEDED   (requirement-level)
+TERM6        = CANONICAL
+TERM_4_AND_TERM_6 = BOTH RETAINED   (paired negatives, not duplicates)
+```
+
+The count stays **40**. `CARR-21` was never a ratified case-id — only `CARR-1`
+and `CARR-19` ever appear individually, both as range endpoints — so the stale
+outcome was carried as *content* inside the lossy `CARR-1..CARR-19` relabeling.
+The supersession retires a requirement, not a row. A 39 would require inventing a
+mapping the corpus never recorded.
+
+## Pre-ratification and ratification
+
+```text
+PRECEDENCE REVIEW      = 10 / 10 PASS, BLOCKING = 0
+PRECEDENCE RATIFICATION = BOOK6-GAP7-TEST-PRECEDENCE-v0.1
+OPERATOR SELECTION      = RATIFY_TERM6_PER_RECORD_AS_CANONICAL_AND_SUPERSEDE_COMPONENT_WIDE_CARR21
+```
+
+## Rung 3 reconciliation — no rework
+
+Verified behaviourally at `f705007e`, not inferred from test names:
+
+```text
+resolve_current(A) = REFUSE (LINEAGE_INVALID)
+resolve_current(B) = B        resolve_current(C) = C
+is_authoritative_now A/B/C   = False / True / True
+NO_COMPONENT_WIDE_REFUSAL    = TRUE
+
+RUNG_3_REWORK_REQUIRED = FALSE
+RUNG_3_IMPLEMENTATION  = ALREADY COMPLIANT
+```
+
+The implementation never asserted the component-wide outcome. Its `TERM-6` note
+recording that `CARR-21` is superseded remains correct and is left in place.
+
+## Traceability
+
+```text
+GAP7_CURRENT_TEST_CONTRACT = v0.4
+STALE_CARR21               = SUPERSEDED
+TERM6                      = CANONICAL
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_GAP7_MEASUREMENT_CURRENTNESS_TEST_SPEC_v0.4.md                    DRAFT -> ratified
+CSIA_BOOK_6_GAP7_TEST_CONTRACT_PRECEDENCE_REVIEW_v0.1.md                      10 / 10 PASS
+CSIA_BOOK_6_GAP7_TEST_CONTRACT_PRECEDENCE_RATIFICATION_RECORD_v0.1.md         RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md                                                  appended
+CSIA_PLANNING_PROGRESS.md                                                      appended
+```
+
+## Standing state
+
+```text
+DOCTRINE_CHANGED             = FALSE
+IMPLEMENTATION_SCOPE_CHANGED = FALSE
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED             = FALSE
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**Next:** Rung 4 — comparison types and contracts.
+
+**Not done in this round:** no source written; no implementation test written or
+edited; no status-validator edit; no lifecycle remedy; no registration policy;
+no new currentness policy; no case renumbering; no history deletion; no edit to
+test spec v0.3 or any prior ratification; no edit to the Rung 1–3 commits; no
+rebase; no mutation of the frozen accepted Book 6 worktree at `5f94c3f40c`; Book
+7 or Choir work.

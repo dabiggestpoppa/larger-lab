@@ -4032,3 +4032,100 @@ remedy; any `ObservationStatus` change; any registration-policy change; any
 status authority; any edit to test spec v0.5 or to any ratified record; any GAP
 reopening; any implementation; any branch or worktree creation; any mutation of
 the frozen accepted Book 6 worktree; Book 7 or Choir work.
+
+---
+
+## GAP-7 test-contract precedence: CARR-21 superseded by TERM-6
+
+`BOOK6-GAP7-TEST-PRECEDENCE-v0.1` — `RATIFIED` — 2026-10-05
+
+**Operator selection:**
+`RATIFY_TERM6_PER_RECORD_AS_CANONICAL_AND_SUPERSEDE_COMPONENT_WIDE_CARR21`
+
+### The contradiction
+
+The carried GAP-7 case set contained two requirements for the same scenario
+(`A <- B`, `A <- C`) with opposite outcomes:
+
+```text
+CARR-21  (from test spec v0.2 §5, CURR-21)  A, B AND C ALL REFUSE
+TERM-6   (successor record §5)               A refuses; B and C resolve
+```
+
+Both could be read out of the ratified corpus. No implementation satisfies both.
+
+### How CARR-21 got in
+
+```text
+v0.2 WAS RATIFIED IN ITS OWN RIGHT        = FALSE   (it was DRAFT)
+CARR_21_ENTERED_THE_RATIFIED_CONTRACT    = TRUE
+ENTRANCE_MECHANISM                       = TRANSITIVE_CARRIAGE
+```
+
+v0.3 declared 19 cases "carried unchanged"; `BOOK6-GAP7-v0.3` ratified that set
+at `CASES = 39`. Adopting a set unchanged adopts every member's outcome.
+
+### Why the later one controls
+
+```text
+CARRIED_FROM_DRAFT       = LOWER PRECEDENCE
+EXPLICITLY_ADOPTED_LATER = CONTROLS
+LATER_RATIFICATION_CONTROLS = TRUE
+```
+
+### Decision
+
+```text
+CARR_21_COMPONENT_WIDE = HISTORICAL / SUPERSEDED
+TERM_6_PER_RECORD      = CURRENT / RATIFIED
+
+SUCCESSOR_CURRENTNESS_SCOPE = PER_RECORD
+COMPONENT_WIDE_FAIL_CLOSED  = NOT ADOPTED
+
+DOCTRINE_CHANGED             = FALSE
+IMPLEMENTATION_SCOPE_CHANGED = FALSE
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (offline amendment scope only)
+```
+
+`TERM-4` and `TERM-6` are both retained — paired negatives pinning the scope
+from opposite sides, not duplicates.
+
+### Provenance preserved
+
+The old row is recorded as what it said and retired on one point only. It is
+not deleted, not renumbered, and not re-described as having meant `PER_RECORD`.
+It was never false; it is no longer current.
+
+### Two labelling defects recorded, neither blocking
+
+1. `CARR-21` is **not a ratified case-id**. Only `CARR-1` and `CARR-19` ever
+   appear individually, both as range endpoints. The stale outcome was carried
+   as *content* inside the lossy `CARR-1..CARR-19` relabeling. The supersession
+   is therefore requirement-level, and the canonical case count stays **40**.
+2. v0.3's gloss *"(CURR-1..15 less CURR-7, plus CURR-16..23 less CURR-24)"*
+   enumerates 22 labels against a declared 19. The operative figure is 19 and
+   reconciles against the ratified total; the gloss is non-governing shorthand.
+
+### Standing state
+
+```text
+GAP7_CURRENT_TEST_CONTRACT = v0.4
+STALE_CARR21               = SUPERSEDED
+TERM6                      = CANONICAL
+
+RUNG_3_REWORK_REQUIRED = FALSE
+RUNG_3_IMPLEMENTATION  = ALREADY COMPLIANT   (verified at f705007e)
+
+GAP_1..GAP_7 = CLOSED / RATIFIED
+BOOK_6_IMPLEMENTATION_AUTHORITY = TRUE   (OFFLINE AMENDMENT SCOPE ONLY)
+BOOK_6_IMPLEMENTED             = FALSE  (Rung 4 pending)
+BOOK_7_IMPLEMENTATION_AUTHORITY = FALSE
+LIVE_ACQUISITION_AUTHORITY      = FALSE
+```
+
+**Not authorized and not performed:** any source edit; any implementation test
+edit; any status-validator edit; any lifecycle remedy; any registration policy;
+any new currentness policy; any case renumbering; any history deletion; any edit
+to test spec v0.3 or to any prior ratification; any edit to the Rung 1–3
+commits; any rebase; any mutation of the frozen accepted Book 6 worktree; Book 7
+or Choir work.
