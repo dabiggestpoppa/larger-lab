@@ -3064,6 +3064,38 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "test_no_coverage_rule_yields_unresolved_not_not_applicable",
     ),
     (
+        "CMP.COVSEL.52A",
+        "CMP.COVERAGE_APPLICABILITY",
+        "CHECK12_SELECTS_COVERAGE_RULE is FALSE: applicability exposes no "
+        "authoritative rule ref, so registry order cannot become authority",
+        "test_book6_comparison_coverage.py",
+        "test_applicability_selects_no_rule",
+    ),
+    (
+        "CMP.COVSEL.52B",
+        "CMP.COVERAGE_AUTHORITY",
+        "LEXICAL_COVERAGE_RULE_SELECTION is corrected: two current exact-metric "
+        "rules invoke no lexical winner and both are reported as candidates",
+        "test_book6_comparison_coverage.py",
+        "test_two_current_rules_do_not_invoke_a_lexical_winner",
+    ),
+    (
+        "CMP.COVSEL.52C",
+        "CMP.COVERAGE_AUTHORITY",
+        "NAMED_RULE_BINDING_CONTROLS: the same observation replayed under each "
+        "of two ratified rules follows the bound rule, not the identifier",
+        "test_book6_comparison_coverage.py",
+        "test_comparison_rule_may_name_either_currently_authorized_rule",
+    ),
+    (
+        "CMP.COVSEL.52D",
+        "CMP.COVERAGE_AUTHORITY",
+        "no rule substitution: the named rule is replayed and the other is "
+        "never silently consulted",
+        "test_book6_comparison_coverage.py",
+        "test_named_rule_is_never_silently_replaced",
+    ),
+    (
         "CMP.COVAPP.53",
         "CMP.COVERAGE_APPLICABILITY",
         "ABSENCE_OF_COVERAGE_RULE != NOT_APPLICABLE: a rule nobody wrote is a "
@@ -3077,7 +3109,7 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "a stale or superseded coverage rule does not authorize a comparison; "
         "authority decays on revision",
         "test_book6_comparison_coverage.py",
-        "test_stale_rule_does_not_authorize_comparison",
+        "test_check_14_fails_for_a_stale_named_rule",
     ),
     (
         "CMP.COVAUTH.55",
@@ -3085,7 +3117,7 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "a wrong-metric coverage rule cannot authorize, and check 15 reports "
         "the scope fault independently of ratification",
         "test_book6_comparison_coverage.py",
-        "test_check_15_reports_a_scope_mismatch_independently_of_14",
+        "test_check_15_fails_for_a_wrong_metric_named_rule",
     ),
     (
         "CMP.COVAUTH.56",
@@ -3094,6 +3126,54 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "it cannot establish",
         "test_book6_comparison_coverage.py",
         "test_check_16_is_deterministic",
+    ),
+    (
+        "CMP.COVCB.56A",
+        "CMP.COVERAGE_AUTHORITY",
+        "CALLER_SUPPLIED_COVERAGE_CALLBACK is prohibited: the replay signature "
+        "carries no callable and no verdict parameter at all",
+        "test_book6_comparison_coverage.py",
+        "test_no_callable_or_verdict_parameter_exists_on_the_replay_path",
+    ),
+    (
+        "CMP.COVCB.56B",
+        "CMP.COVERAGE_AUTHORITY",
+        "CALLER_SUPPLIED_COVERAGE_VERDICT is prohibited: the defect A "
+        "reproducer is now a permanent regression test and cannot be re-entered",
+        "test_book6_comparison_coverage.py",
+        "test_caller_cannot_inject_a_sufficient_verdict",
+    ),
+    (
+        "CMP.COV16.56C",
+        "CMP.COVERAGE_AUTHORITY",
+        "check 16 replays an ACTUAL CoverageObservation: observed_fraction "
+        "above required_fraction derives SUFFICIENT deterministically",
+        "test_book6_comparison_coverage.py",
+        "test_actual_fraction_above_required_is_sufficient",
+    ),
+    (
+        "CMP.COV16.56D",
+        "CMP.COVERAGE_AUTHORITY",
+        "check 16 replays an ACTUAL CoverageObservation: observed_fraction "
+        "below required_fraction derives INSUFFICIENT deterministically",
+        "test_book6_comparison_coverage.py",
+        "test_actual_fraction_below_required_is_insufficient",
+    ),
+    (
+        "CMP.COV16.56E",
+        "CMP.COVERAGE_AUTHORITY",
+        "a missing required CoverageObservation fails check 16 and reports no "
+        "verdict rather than inferring one",
+        "test_book6_comparison_coverage.py",
+        "test_missing_required_observation_fails_check_16",
+    ),
+    (
+        "CMP.COV16.56F",
+        "CMP.COVERAGE_AUTHORITY",
+        "an observation naming a different sufficiency rule fails check 16; "
+        "no rule substitution is permitted",
+        "test_book6_comparison_coverage.py",
+        "test_observation_naming_the_wrong_rule_fails_check_16",
     ),
     (
         "CMP.COVSEP.57",
@@ -3117,7 +3197,7 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "the selected baseline is byte-identical before and after coverage "
         "evaluation, across every coverage verdict",
         "test_book6_comparison_coverage.py",
-        "test_coverage_cannot_cause_reselection_or_reordering",
+        "test_baseline_selection_is_unchanged_by_coverage",
     ),
     (
         "CMP.TCMP.60",
@@ -3133,7 +3213,23 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "an explicit ratified determination that coverage is INSUFFICIENT is a "
         "DECISION and derives NOT_COMPARABLE, not UNRESOLVED",
         "test_book6_comparison_coverage.py",
-        "test_not_comparable_path_requires_an_explicit_determination",
+        "test_recomputed_insufficient_is_check_success_then_not_comparable",
+    ),
+    (
+        "CMP.TCMP.61A",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "CHECK16_SUCCEEDED_WITH_INSUFFICIENT and CHECK16_FAILED are different "
+        "outcomes, NOT_COMPARABLE and UNRESOLVED respectively",
+        "test_book6_comparison_coverage.py",
+        "test_the_two_are_not_the_same_outcome",
+    ),
+    (
+        "CMP.TCMP.61B",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "a check 16 that could not run is an absence of basis and derives "
+        "UNRESOLVED, never NOT_COMPARABLE",
+        "test_book6_comparison_coverage.py",
+        "test_failed_check_16_is_unresolved_not_not_comparable",
     ),
     (
         "CMP.TCMP.62",
@@ -3148,7 +3244,7 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "UNRESOLVED is never collapsed into NOT_COMPARABLE: absence of basis is "
         "not a structural failure",
         "test_book6_comparison_coverage.py",
-        "test_unresolved_is_never_not_comparable",
+        "test_missing_required_observation_fails_check_16",
     ),
     (
         "CMP.TCMP.64",
@@ -3172,7 +3268,7 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "no second coverage registry, no comparison-local coverage authority, "
         "and no benchmark authority is introduced",
         "test_book6_comparison_coverage.py",
-        "test_no_second_coverage_authority_or_benchmark_is_introduced",
+        "test_no_second_coverage_registry_or_benchmark_is_introduced",
     ),
     (
         "CMP.AUTHORITY.67",
@@ -3180,7 +3276,23 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "G-8 still holds: Rung 7 declares no new authority-bearing contract "
         "class and re-declares no accepted type",
         "test_book6_comparison_coverage.py",
-        "test_no_third_comparison_authority_bearing_contract_is_introduced",
+        "test_no_new_authority_bearing_class_is_introduced",
+    ),
+    (
+        "CMP.THRESH.68",
+        "CMP.COVERAGE_AUTHORITY",
+        "NO NUMERIC COVERAGE THRESHOLD ON THIS OBJECT is preserved: the "
+        "threshold lives on the ratified coverage rule, never on ComparisonRule",
+        "test_book6_comparison_coverage.py",
+        "test_no_threshold_was_added_to_the_comparison_rule",
+    ),
+    (
+        "CMP.NOAGG.69",
+        "CMP.COVERAGE_AUTHORITY",
+        "check 16 introduces no aggregation, tolerance, epsilon or rounding; "
+        "it compares one stored scalar against one ratified threshold",
+        "test_book6_comparison_coverage.py",
+        "test_rung_7_adds_no_aggregation_or_tolerance_field",
     ),
 )
 

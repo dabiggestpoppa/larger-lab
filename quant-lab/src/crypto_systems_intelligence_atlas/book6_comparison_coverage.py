@@ -20,8 +20,29 @@ observation was chosen, only whether the comparison may proceed.
 accepted ``CoverageRuleRegistry`` — the same registry that seals
 ``DATA_COMPLETE`` for the state vector. This module adds no registry, no
 ratification mechanism, no comparison-local coverage authority, and no benchmark
-authority. ``CoverageSufficiencyRule`` is not re-declared here; the accepted
-type is imported and used as-is.
+authority. ``CoverageSufficiencyRule`` and ``CoverageObservation`` are not
+re-declared here; the accepted types are imported and used as-is.
+
+**No caller-supplied verdict.** There is deliberately no callable parameter on
+the replay path. Check 16 recomputes its verdict from an actual
+``CoverageObservation``'s ``observed_fraction`` against the named rule's
+``required_fraction`` — two fields of accepted frozen models, both constrained
+to ``[0, 1]``, compared with no epsilon, no tolerance and no rounding. A
+caller-supplied ``CoverageVerdict`` would be a self-declared coverage claim,
+which is precisely what the accepted corpus forbids.
+
+**No lexical rule selection.** Check 12 answers one question — does *any*
+current, ratified, exact-metric rule exist — and selects nothing. Which rule
+governs is the operator's choice, recorded as
+``ComparisonRule.coverage_sufficiency_rule_ref`` and sealed inside the rule's
+own ratified fingerprint. Registry ordering is not a source of authority.
+
+**Check 16 succeeds by recomputing, whatever it recomputes.** An
+``INSUFFICIENT`` verdict is a *successful* replay of a ratified rule that found
+coverage insufficient; check 19 maps that explicit determination to
+``NOT_COMPARABLE``. Check 16 *fails* only when the replay could not be
+performed — no observation, or one naming a different rule — which is an absence
+of basis and maps to ``UNRESOLVED``. Merging those two is the GAP-4 collapse.
 
 **GAP-3 / 3C, stated exactly.** For the exact metric being compared:
 
@@ -56,7 +77,7 @@ coverage check fails (and the reverse), and neither is derivable from the other.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Final, Sequence
+from typing import Final, Sequence
 
 from .book6_comparison_contracts import (
     CoverageObservationState,
@@ -65,6 +86,7 @@ from .book6_comparison_contracts import (
     TemporalComparabilityStatus,
 )
 from .book6_coverage_rules import CoverageRuleError, CoverageRuleRegistry
+from .book6_definitions import CoverageObservation
 
 
 class ComparisonCoverageError(ValueError):
@@ -105,11 +127,17 @@ class ReplayCheck:
 
 @dataclass(frozen=True)
 class CoverageApplicability:
-    """The GAP-3 / 3C answer for one exact metric."""
+    """The GAP-3 / 3C answer for one exact metric.
+
+    ``candidate_rule_refs`` is DIAGNOSTIC ONLY. It exists so a failure can say
+    which rules were considered, and it is deliberately never consulted to
+    pick one: check 12 answers a yes/no existence question and the authoritative
+    binding is the ``ComparisonRule``'s own citation.
+    """
 
     requirement_status: CoverageRequirementStatus
     source_ref: str | None
-    coverage_rule_ref: str | None
+    candidate_rule_refs: tuple[str, ...] = ()
     reasons: tuple[str, ...] = ()
 
 
@@ -141,36 +169,43 @@ class ComparabilityVerdict:
 def resolve_coverage_applicability(
     *, registry: CoverageRuleRegistry, metric_id: str
 ) -> CoverageApplicability:
-    """GAP-3 / 3C: is coverage required for this exact metric, and on whose word?
+    """GAP-3 / 3C: is coverage required for this exact metric?
 
-    ``REQUIRED`` requires a rule that is registered, carries a live ratification
-    for its CURRENT version, and is scoped to this exact metric — all three
-    checked live through the accepted registry, never through a local mirror.
+    ``REQUIRED`` requires SOME rule that is registered, carries a live
+    ratification for its CURRENT version, and is scoped to this exact metric —
+    all three checked live through the accepted registry, never through a
+    local mirror.
+
+    This function deliberately selects no rule. It answers one question. Which
+    ratified rule this comparison is bound to is a property of the
+    operator-ratified ``ComparisonRule``, not of registry ordering; the earlier
+    ``sorted(...)[0]`` tie-break was an unratified invention with no basis in
+    any ratification. Candidate refs are returned for diagnostics only.
 
     Anything else is ``UNRESOLVED`` with ``NO_UPSTREAM_DETERMINATION_EXISTS``.
     It is deliberately never ``NOT_APPLICABLE``: see the module docstring.
     """
 
     candidates = registry.rules_for_metric(metric_id)
-    authorizing = [
-        rule.rule_id
-        for rule in candidates
-        if registry.is_sufficient(metric_id=metric_id, rule_ref=rule.rule_id)
-    ]
+    authorizing = tuple(
+        sorted(
+            rule.rule_id
+            for rule in candidates
+            if registry.is_sufficient(metric_id=metric_id, rule_ref=rule.rule_id)
+        )
+    )
     if not authorizing:
         return CoverageApplicability(
             requirement_status=CoverageRequirementStatus.UNRESOLVED,
             source_ref=None,
-            coverage_rule_ref=None,
+            candidate_rule_refs=(),
             reasons=(NO_UPSTREAM_DETERMINATION_EXISTS,),
         )
-    # Deterministic: id-ordered, so the chosen rule never depends on
-    # registration order or dict iteration.
-    chosen = sorted(authorizing)[0]
+    # source_ref records THAT a determination exists, not WHICH rule governs.
     return CoverageApplicability(
         requirement_status=CoverageRequirementStatus.REQUIRED,
-        source_ref=f"coverage-rule:{chosen}",
-        coverage_rule_ref=chosen,
+        source_ref=f"exact-metric:{metric_id}:{len(authorizing)}",
+        candidate_rule_refs=authorizing,
         reasons=(),
     )
 
@@ -180,39 +215,36 @@ def replay_coverage_checks(
     registry: CoverageRuleRegistry,
     metric_id: str,
     named_rule_ref: str | None,
-    observation_state: CoverageObservationState,
-    observation_ref: str | None,
-    coverage_verdict_of: Callable[[str, str], CoverageVerdict],
+    coverage_observation: CoverageObservation | None,
 ) -> CoverageAuthorization:
     """Replay canonical checks 12–16, each independently.
 
-    ``named_rule_ref`` is what the ``ComparisonRule`` names. It is the input to
-    check 13, and it never silently substitutes for the derived applicability in
-    check 12 — a mismatch between the two is itself a failure, because a rule
-    that asserts a coverage ref the applicability derivation does not support is
-    making a claim the corpus has not established.
+    ``named_rule_ref`` is ``ComparisonRule.coverage_sufficiency_rule_ref`` — the
+    citation the operator bound into the ratified rule. It is the authoritative
+    binding and no registry ordering may substitute for it.
 
-    ``coverage_verdict_of`` stands for the ratified rule's deterministic verdict
-    for a comparison. It is injected rather than computed because the accepted
-    substrate has no coverage-fraction reader, and inventing one here would be
-    new aggregation semantics. Returning ``UNKNOWN`` is the honest answer when
-    no determination exists — and ``UNKNOWN`` routes to ``UNRESOLVED``, not to
-    ``NOT_COMPARABLE``.
+    ``coverage_observation`` is an actual accepted ``CoverageObservation``. There
+    is deliberately **no** callable parameter: a caller-supplied verdict would
+    be a self-declared coverage claim, which the corpus forbids. Check 16
+    recomputes the verdict from two ratified-bounded numbers — the
+    observation's ``observed_fraction`` against the named rule's
+    ``required_fraction`` — with no epsilon, tolerance or caller input.
+
+    Check 16 succeeds when it faithfully recomputes the rule's verdict,
+    *whatever* that verdict is. A recomputed ``INSUFFICIENT`` is a successful
+    replay; a check 16 that could not run at all is a failure and means an
+    absence of basis. The distinction is load-bearing and is what keeps
+    ``NOT_COMPARABLE`` distinct from ``UNRESOLVED`` downstream.
     """
 
     applicability = resolve_coverage_applicability(
         registry=registry, metric_id=metric_id
     )
     required = applicability.requirement_status is CoverageRequirementStatus.REQUIRED
-    # The rule the ComparisonRule NAMES is the subject of checks 13-15. The
-    # derived applicability is a separate input, and check 13 is where the two
-    # are reconciled. Preferring the derived ref here would make checks 14 and
-    # 15 unfalsifiable: no naming mistake could ever reach them.
-    effective_ref = named_rule_ref or applicability.coverage_rule_ref
 
     checks: list[ReplayCheck] = []
 
-    # 12 — coverage applicability resolution
+    # 12 — applicability only. It selects no rule.
     checks.append(
         ReplayCheck(
             12,
@@ -225,23 +257,25 @@ def replay_coverage_checks(
         )
     )
 
-    # 13 — coverage-sufficiency rule ref, required exactly when REQUIRED, and
-    #      required to agree with the derived applicability when it is.
+    # 13 — the operator's citation must be present when coverage is REQUIRED.
     if not required:
         ref_ok = True
-        ref_reason = f"coverage is not REQUIRED for {metric_id}, so no rule ref is needed"
-    elif effective_ref is None:
-        ref_ok = False
-        ref_reason = f"coverage is REQUIRED for {metric_id} but no rule ref was named"
-    elif applicability.coverage_rule_ref != effective_ref:
+        ref_reason = (
+            f"coverage is not REQUIRED for {metric_id}, so no rule ref is needed"
+        )
+    elif named_rule_ref is None:
         ref_ok = False
         ref_reason = (
-            f"named rule ref {effective_ref} disagrees with the derived "
-            f"applicability ref {applicability.coverage_rule_ref}"
+            f"coverage is REQUIRED for {metric_id} but the ComparisonRule "
+            f"names no coverage_sufficiency_rule_ref"
         )
     else:
         ref_ok = True
-        ref_reason = f"coverage rule ref {effective_ref} is bound"
+        ref_reason = (
+            f"ComparisonRule binds coverage_sufficiency_rule_ref "
+            f"{named_rule_ref}; check 12 considered "
+            f"{list(applicability.candidate_rule_refs)}"
+        )
     checks.append(
         ReplayCheck(
             13, "coverage sufficiency rule ref present where REQUIRED",
@@ -249,28 +283,29 @@ def replay_coverage_checks(
         )
     )
 
-    # 14 — ratification and currency. Supersession revokes the ledger entry, so
-    #      a stale version reports here and NOT as a scope problem.
-    if effective_ref is None:
+    # 14 — the NAMED rule's ratification and currency, live through the
+    #      accepted registry. Supersession revokes, so a stale version lands
+    #      here and not as a scope problem.
+    if named_rule_ref is None:
         ratified_ok = True
         ratification_reason = "no coverage rule ref is bound, so there is nothing to ratify"
     else:
         try:
-            registry.registered_rule(effective_ref)
+            registry.registered_rule(named_rule_ref)
         except CoverageRuleError as exc:
             ratified_ok, ratification_reason = False, str(exc)
         else:
-            decision = registry.ratification_of(effective_ref)
+            decision = registry.ratification_of(named_rule_ref)
             if decision is None:
                 ratified_ok = False
                 ratification_reason = (
-                    f"{effective_ref} carries no live ratification for its "
+                    f"{named_rule_ref} carries no live ratification for its "
                     f"current version; authority decays on supersession"
                 )
             else:
                 ratified_ok = True
                 ratification_reason = (
-                    f"{effective_ref} carries a live ratification by "
+                    f"{named_rule_ref} carries a live ratification by "
                     f"{decision.operator} for version {decision.version}"
                 )
     checks.append(
@@ -280,30 +315,31 @@ def replay_coverage_checks(
         )
     )
 
-    # 15 — scope match against the exact metric, judged independently of 14 so
-    #      a wrong-metric rule is reported as a scope fault, not a ratification
-    #      fault.
-    if effective_ref is None:
+    # 15 — the NAMED rule's scope, judged independently of 14 so a
+    #      wrong-metric rule reports as a scope fault and not a ratification
+    #      fault. No alternative rule may silently replace it.
+    if named_rule_ref is None:
         scope_ok = True
         scope_reason = "no coverage rule ref is bound, so there is no scope to match"
     else:
         try:
-            rule = registry.registered_rule(effective_ref)
+            named_rule = registry.registered_rule(named_rule_ref)
         except CoverageRuleError as exc:
             scope_ok, scope_reason = False, str(exc)
         else:
-            scope_ok = rule.scope_metric_id == metric_id
+            scope_ok = named_rule.scope_metric_id == metric_id
             scope_reason = (
-                f"{effective_ref} is scoped to {metric_id}"
+                f"{named_rule_ref} is scoped to {metric_id}"
                 if scope_ok
-                else f"{effective_ref} is scoped to {rule.scope_metric_id}, "
+                else f"{named_rule_ref} is scoped to {named_rule.scope_metric_id}, "
                      f"not {metric_id}"
             )
     checks.append(
         ReplayCheck(15, "coverage scope match", scope_ok, scope_reason)
     )
 
-    # 16 — deterministic coverage verdict
+    # 16 — deterministic recomputation from an ACTUAL observation under the
+    #      NAMED rule. No caller input of any kind.
     if not required:
         verdict, verdict_ok, verdict_reason = (
             CoverageVerdict.UNKNOWN,
@@ -316,19 +352,38 @@ def replay_coverage_checks(
             False,
             "coverage authority could not be established, so no verdict is claimed",
         )
-    elif observation_state is CoverageObservationState.UNAVAILABLE:
+    elif coverage_observation is None:
         verdict, verdict_ok, verdict_reason = (
             CoverageVerdict.UNKNOWN,
             False,
-            "the coverage observation required by the rule is unavailable",
+            f"coverage is REQUIRED under {named_rule_ref} but no applicable "
+            f"CoverageObservation exists for this comparison",
+        )
+    elif coverage_observation.sufficiency_rule_ref != named_rule_ref:
+        verdict, verdict_ok, verdict_reason = (
+            CoverageVerdict.UNKNOWN,
+            False,
+            f"CoverageObservation names "
+            f"{coverage_observation.sufficiency_rule_ref}, not the bound rule "
+            f"{named_rule_ref}; no rule substitution is permitted",
         )
     else:
-        verdict = coverage_verdict_of(effective_ref or "", metric_id)
+        # The deterministic comparison. Both operands are accepted frozen
+        # fields constrained to [0, 1]. No epsilon, no tolerance, no rounding:
+        # the number is the RULE'S INPUT, never its own verdict.
+        assert named_rule_ref is not None  # narrowed by check 13 above
+        named_rule = registry.registered_rule(named_rule_ref)
+        verdict = (
+            CoverageVerdict.SUFFICIENT
+            if coverage_observation.observed_fraction >= named_rule.required_fraction
+            else CoverageVerdict.INSUFFICIENT
+        )
         verdict_ok = True
-        verdict_reason = f"{effective_ref} determined coverage {verdict.value}"
-        if verdict is CoverageVerdict.UNKNOWN:
-            verdict_ok = False
-            verdict_reason = f"{effective_ref} produced no coverage determination"
+        verdict_reason = (
+            f"{named_rule_ref} requires {named_rule.required_fraction} and "
+            f"observation {coverage_observation.measurement_id} observed "
+            f"{coverage_observation.observed_fraction} -> {verdict.value}"
+        )
 
     checks.append(
         ReplayCheck(16, "deterministic coverage verdict", verdict_ok, verdict_reason)
@@ -337,14 +392,21 @@ def replay_coverage_checks(
     resolved_state = (
         CoverageObservationState.NOT_APPLICABLE
         if not required
-        else observation_state
+        else (
+            CoverageObservationState.PRESENT
+            if coverage_observation is not None
+            else CoverageObservationState.UNAVAILABLE
+        )
     )
     return CoverageAuthorization(
         applicability=applicability,
         observation_state=resolved_state,
-        observation_ref=observation_ref
-        if resolved_state is CoverageObservationState.PRESENT
-        else None,
+        observation_ref=(
+            coverage_observation.measurement_id
+            if resolved_state is CoverageObservationState.PRESENT
+            and coverage_observation is not None
+            else None
+        ),
         verdict=verdict,
         checks=tuple(checks),
     )
