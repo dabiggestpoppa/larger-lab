@@ -1,0 +1,555 @@
+{
+  "artifact": "BLOC_05_I01_TYPE_SCOPE_MATRIX",
+  "checkpoint": "SENSOR-B5-I01",
+  "title": "Normalization enums / base models / T1 envelope — type scope inventory",
+  "branch": "agent/crypto-sensor-fabric-build",
+  "start_head": "ae152d010f3cd8c472c6dc0593a0e94f779cb079",
+  "scope": "B5-I01 ONLY. Derives the minimum enum/model set required by the frozen Bloc 5 plan before any code is written, and separates it (A) from types that belong to later frozen checkpoints (B). No registry, resolver, conversion, sensor-normalizer, T1 storage or query behaviour is authorized.",
+  "plan_authority": [
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/01_PIT_IDENTITY_AND_LIFECYCLE_ARCHITECTURE.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/02_TIMESTAMP_REVISION_AND_AVAILABILITY_TRUTH.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/03_COMMON_UNIT_AND_SEMANTIC_NORMALIZATION_CONTRACTS.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/04_SENSOR_SPECIFIC_NORMALIZATION_RULES.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/05_T1_LINEAGE_DUPLICATES_QUALITY_AND_STORAGE.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/06_ACCEPTANCE_TESTS_AND_STAGED_IMPLEMENTATION_COMMITS.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/bloc_05/07_BLOC_05_FREEZE_MANIFEST.md"
+  ],
+  "handoff_authority": [
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I17_BLOC5_HANDOFF_CONTRACT.md",
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I17_NORMALIZATION_OWNERSHIP.json",
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I17_DOWNSTREAM_PROHIBITIONS.json"
+  ],
+  "split_rule": "A type belongs to I01 only when the base T1 envelope cannot carry the frozen Bloc 5 contract without it. A type whose meaning only becomes decidable once a registry, resolver, conversion, provider semantics or storage layer exists is deferred to the frozen stage that owns it. No type is invented beyond the frozen documents.",
+  "reuse_rule": "Accepted Bloc 4 / Bloc 1 public types are consumed, never re-declared: SensorFamily (contracts.enums), Granularity (probes.enums), CoverageState / RevisionState / SourceUnitState / SourceUnitVariability / SourceUnitContract / SourceUnitEvidence (storage, public __all__).",
+  "columns": [
+    "type_name",
+    "kind",
+    "source_plan_section",
+    "needed_for_I01",
+    "deferred_checkpoint",
+    "reason"
+  ],
+  "rows": [
+    {
+      "type_name": "PayoffType",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/01 §3 (LINEAR, INVERSE, QUANTO, SPOT, UNKNOWN); bloc_05/07 F5",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Frozen payoff vocabulary explicitly required by the B5-I01 directive §6. It is implemented as a vocabulary only; it carries NO envelope field, because payoff_type is a ContractInstance attribute (bloc_05/01 §2.5) owned by B5-I02. Distinct from the pre-existing Bloc 1 ContractType (LINEAR/INVERSE/QUANTO/OTHER): ContractType omits SPOT and UNKNOWN, so collapsing them would lose the frozen fail-closed UNKNOWN payoff state."
+    },
+    {
+      "type_name": "NormalizationStatus",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/03 §15 (NORMALIZED, PARTIALLY_NORMALIZED, NATIVE_ONLY, BLOCKED_IDENTITY, BLOCKED_TIME, BLOCKED_SEMANTICS, BLOCKED_CONVERSION, QUARANTINED); bloc_05/07 F3",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The row-level fail-closed status vocabulary. Carries the blocking classes that the base envelope must be able to state without resolving anything."
+    },
+    {
+      "type_name": "MissingnessReason",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §12 (13 members); bloc_05/03 §14; bloc_05/07 F13",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Typed normalization-specific missingness. Never a bool, never a numeric zero. Note the frozen spelling is INVERTED relative to the status classes: doc 03 §15 uses BLOCKED_IDENTITY, doc 05 §12 uses IDENTITY_BLOCKED. Both are implemented in their own homes and related by BLOCKED_STATUS_MISSINGNESS_REASON; they are deliberately NOT collapsed."
+    },
+    {
+      "type_name": "NormalizationQualityFlag",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §11 (canonical T1 flags) UNION bloc_05/01 §14 (identity flags) UNION bloc_05/02 §16 (time flags); bloc_05/07 F27",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Union of every generic, row-level flag vocabulary frozen across the three Bloc 5 documents = 36 members (doc 01 §14: 10 identity; doc 02 §16: 10 time; doc 05 §11: 5 semantics/units + 5 event/dedupe + 3 books + 3 lineage, whose 4 identity and 4 time members are strict subsets of docs 01/02). Doc 05 §11 is explicitly a MINIMUM list; keeping the doc 01 / doc 02 supersets preserves frozen distinctions instead of discarding them. Declaration order is canonical (doc 05 §11 order, then the additive doc 01 §14 and doc 02 §16 members) so serialization is order-deterministic."
+    },
+    {
+      "type_name": "QualityDimensionState",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §10 (VERIFIED, ACCEPTABLE_WITH_FLAGS, PARTIAL, UNKNOWN, BLOCKED, QUARANTINED); bloc_05/07 §6",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The frozen per-dimension quality states required by the eight frozen T1Quality dimensions. The directive §9 lists four of the six; the frozen document supersets them with ACCEPTABLE_WITH_FLAGS and UNKNOWN, and UNKNOWN is the lawful 'not yet determined' state, so the frozen six are implemented and the four are preserved as a subset. No aggregate score is invented (that is Bloc 6)."
+    },
+    {
+      "type_name": "LineageState",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §11 (lineage flag group) and §23 invariant 7; bloc_05/07 §6",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The envelope must state lineage completeness. The same three frozen names appear as a flag group in doc 05 §11, so LineageState is the state enum and the matching flag is kept as a member of NormalizationQualityFlag; the model requires the two to agree so the meanings can never drift."
+    },
+    {
+      "type_name": "QuarantineReason",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §20 (schema failure, identity ambiguity, lineage break, impossible units, invalid side mapping, book sequence corruption, source revision conflict)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Reasoned quarantine is a base-envelope law (directive §24); without a typed reason vocabulary the model could not reject an unreasoned QUARANTINED row. Quarantine STORAGE remains B5-I18."
+    },
+    {
+      "type_name": "IntervalTimeConvention",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §7 (LEFT_CLOSED_RIGHT_OPEN, LEFT_OPEN_RIGHT_CLOSED, PROVIDER_NATIVE_UNKNOWN, POINT_SAMPLE)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Interval bounds without a declared boundary convention are exactly the ambiguity doc 02 §7 forbids. It is a pure vocabulary; the interval semantics REGISTRY is B5-I05."
+    },
+    {
+      "type_name": "AvailabilityBasis",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §5 (8 members incl. UNKNOWN, SYSTEM_ONLY_OBSERVED)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "market_available_at without a basis is unverifiable, so the base time container must be able to label it. Pure vocabulary; the conservative derivation function is B5-I06."
+    },
+    {
+      "type_name": "TimestampPrecision",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §8 (SECOND, MILLISECOND, MICROSECOND, NANOSECOND, DATE_ONLY, UNKNOWN)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Doc 02 invariant 5 requires source precision to be preserved, and directive §21 forbids inferred timestamps; without the precision vocabulary a row cannot state what precision it actually has."
+    },
+    {
+      "type_name": "BLOCKED_STATUS_MISSINGNESS_REASON",
+      "kind": "data",
+      "source_plan_section": "bloc_05/03 §15 + bloc_05/05 §12",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Read-only frozen correspondence between a blocked normalization status and its typed missingness cause. Data, not behaviour: it makes the doc 03 / doc 05 spelling inversion auditable and lets validation require a typed cause instead of a generic bool."
+    },
+    {
+      "type_name": "BLOCKING_QUALITY_FLAGS",
+      "kind": "data",
+      "source_plan_section": "bloc_05/06 §1 G9, bloc_05/05 §11, bloc_05/01 §9, bloc_05/02 §5, bloc_05/03 §8/§13",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Read-only frozen set of flags each of which a frozen document ties to a failed gate. It lets the envelope refuse NORMALIZED alongside a blocking flag. Deliberately minimal: only flags with an explicit fail-closed citation are members."
+    },
+    {
+      "type_name": "OpaqueIdentifier",
+      "kind": "type",
+      "source_plan_section": "bloc_05/01 §15, bloc_05/03 §2, bloc_05/05 §13",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Validated non-blank, unpadded opaque string. Used for provider/venue/instrument/version/ref fields so no identifier can be blank or whitespace-padded."
+    },
+    {
+      "type_name": "T1RecordId",
+      "kind": "type",
+      "source_plan_section": "bloc_05/05 §4 (deterministic T1 record identity)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "TYPE ONLY per directive §18. No hashing, no identity-key derivation, no generation of any kind. The deterministic algorithm is B5-I16, so the envelope field is Optional: at I01 no row may claim an assigned T1 identity."
+    },
+    {
+      "type_name": "ContractInstanceId",
+      "kind": "type",
+      "source_plan_section": "bloc_05/01 §2.5 ('Every T1 observation must resolve to a contract_instance_id or fail closed')",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Opaque validated identifier only. The ContractInstance registry and resolver are B5-I02/I03. Optional at I01 while the status is unresolved, blocked or native-only; no UNKNOWN_CONTRACT or synthetic placeholder value exists."
+    },
+    {
+      "type_name": "T1GenerationId",
+      "kind": "type",
+      "source_plan_section": "bloc_05/05 §13 (T1Generation.generation_id)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "TYPE ONLY per directive §19. No generation writer, manifest, atomic publication or checksum logic. The T1Generation model is B5-I18."
+    },
+    {
+      "type_name": "RegistryVersion",
+      "kind": "type",
+      "source_plan_section": "bloc_05/01 §15, bloc_05/03 §2, bloc_05/05 §13, bloc_05/06 §3",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Opaque validated version reference for the identity / contract-terms / semantic / methodology / time-semantics registries. The registries themselves are NOT implemented; the envelope can only name a version, never resolve one."
+    },
+    {
+      "type_name": "ObservationTimeEnvelope",
+      "kind": "model",
+      "source_plan_section": "bloc_05/02 §2/§3/§7/§8/§9; bloc_05/07 F8, F9, F10",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Preserves all nine frozen canonical timestamp coordinates plus the interval convention, availability basis, precision and clock-skew fields. Derives nothing, orders nothing except the universally valid interval_start <= interval_end, and rejects naive datetimes."
+    },
+    {
+      "type_name": "NativeQuantity",
+      "kind": "model",
+      "source_plan_section": "bloc_05/03 §1/§5; bloc_05/07 F12; BLOC_04_I17_HANDOFF §4.1-§4.7",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Carries one provider-native quantity as a Decimal (exact provider precision, doc 03 §3.1/§3.3) with NO normalized/canonical counterpart field at all. The source-unit truth is carried by the accepted Bloc 4 public SourceUnitEvidence object plus the SourceUnitContract marker, which preserves the three-state unit contract (NO_UNIT_FIELDS vs UNIT_EVIDENCE_DECLARED vs HISTORICAL_UNIT_CONTRACT_ABSENT) instead of re-implementing or collapsing it."
+    },
+    {
+      "type_name": "T1Quality",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §10; bloc_05/07 §6",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The eight frozen quality dimensions, all explicitly declared (no defaults), so no dimension can be silently assumed healthy. No aggregate or score: Bloc 6 owns that."
+    },
+    {
+      "type_name": "T1LineageRef",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §3 + bloc_05/05 §2 chain; bloc_05/07 F25; BLOC_04_I17_HANDOFF §7",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The base-envelope slice of the frozen T1 lineage chain: T1 -> T0B raw projection refs -> acquisition refs -> T0A EvidenceBlob SHA256, all three required and non-empty, plus code/config version. It names durable IDs only and never a filesystem path, catalog layout or DuckDB location (BLOC_04_I17_HANDOFF §12/§13)."
+    },
+    {
+      "type_name": "T1VersionContext",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §15, bloc_05/03 §2, bloc_05/05 §13, bloc_05/06 §3",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The five frozen registry/methodology version references the envelope must be able to name. Required for a NORMALIZED row (doc 06 §3: 'methodology/registry versions required where derived fields exist') and absent-by-construction otherwise. No registry is resolved at I01."
+    },
+    {
+      "type_name": "T1BaseEnvelope",
+      "kind": "model",
+      "source_plan_section": "bloc_05/03 §2 (T1ObservationEnvelope); bloc_05/07 F1, F3, F7, F12, F13, F25",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "The minimum generic T1 observation envelope, deliberately named T1BaseEnvelope rather than the frozen T1ObservationEnvelope: the frozen envelope also carries economic_contract_id, canonical_asset_id, normalization_methodology_id/_version and replay_eligibility, which belong to B5-I02/I06/I09/I19. Exporting the frozen full-envelope name at I01 would let a consumer mistake the base layer for the frozen contract, so the full name is deliberately NOT exported until the composite is complete."
+    },
+    {
+      "type_name": "canonical_json_bytes",
+      "kind": "helper",
+      "source_plan_section": "repo convention: quant-lab/src/crypto_sensor_fabric/storage/models.py (SENSOR-B4-I01 §37)",
+      "needed_for_I01": true,
+      "deferred_checkpoint": "",
+      "reason": "Deterministic serialization for the base layer. storage.canonical_json_bytes is NOT part of the accepted 200-symbol public handoff surface, so it is deliberately not imported; the normalization layer provides its own identical rule rather than reaching past the public surface."
+    },
+
+    {
+      "type_name": "CanonicalAsset",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §2.1; bloc_05/07 §2",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "Asset identity registry object. Not resolvable and not registrable at I01."
+    },
+    {
+      "type_name": "Venue",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §2.2",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "Venue registry object. I01 requires venue to be a non-blank separate field, not a registered venue."
+    },
+    {
+      "type_name": "VenueInstrument",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §2.3",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "Provider/venue-native instrument registry object; carries first_seen_at/last_seen_at that only the registry may populate."
+    },
+    {
+      "type_name": "EconomicContract",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §2.4",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "Stable economic grouping owned by the identity registry; the base envelope must not fabricate an economic grouping."
+    },
+    {
+      "type_name": "ContractInstance",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §2.5",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "Lifecycle-valid contract terms. I01 carries only the opaque ContractInstanceId; the object itself requires a terms registry (B5-I04) and PIT resolver (B5-I03)."
+    },
+    {
+      "type_name": "ContractTermsSnapshot",
+      "kind": "model",
+      "source_plan_section": "bloc_05/07 §2",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I04",
+      "reason": "Terms snapshot needs contract_terms_version content that does not exist until the terms registry."
+    },
+    {
+      "type_name": "InstrumentAlias",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §8",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I03",
+      "reason": "Alias registry object; alias resolution is B5-I03."
+    },
+    {
+      "type_name": "AliasType",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/01 §8",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I03",
+      "reason": "Only consumed by the alias registry/resolver."
+    },
+    {
+      "type_name": "InstrumentLifecycleState",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/01 §6; bloc_05/07 F4",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I03",
+      "reason": "Directive §6 permits lifecycle state vocabulary ONLY if the base envelope needs it. The base envelope has no lifecycle field, so it does not. PRE_LISTING/DELISTED semantics are enforced later at resolution time; at I01 the equivalent absence facts are already carried as typed MissingnessReason values."
+    },
+    {
+      "type_name": "IdentityResolutionStatus",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/01 §9",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I03",
+      "reason": "Result vocabulary of the PIT resolver; nothing resolves at I01."
+    },
+    {
+      "type_name": "IdentityResolution",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §9",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I03",
+      "reason": "Resolver return type; would be resolver behaviour at I01 (directive §1, §41)."
+    },
+    {
+      "type_name": "UniverseMembership",
+      "kind": "model",
+      "source_plan_section": "bloc_05/01 §11",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "Derived registry object; not a base-envelope concern."
+    },
+    {
+      "type_name": "VenueScope",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/01 §13 (only MULTI_VENUE_AGGREGATE is named; 'carries a scope such as')",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I02",
+      "reason": "NOT FROZEN: the document names one member and says 'such as'. Choosing the remaining members would be an operator decision frozen by this checkpoint (directive §41 stop condition). Recorded here as a measured vocabulary gap. I01 mitigates the underlying law differently: venue is a required non-blank field with no default and no aggregator shorthand, so no multi-venue aggregate can be assigned a fabricated single venue."
+    },
+    {
+      "type_name": "AvailabilityConfidence",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §5 (field named; vocabulary never given)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I06",
+      "reason": "NOT FROZEN: bloc_05/02 §5 requires an availability_confidence field but never defines its vocabulary. Inventing members would be an operator decision. I01 omits the field entirely rather than shipping an invented vocabulary."
+    },
+    {
+      "type_name": "TimeSemantics",
+      "kind": "model",
+      "source_plan_section": "bloc_05/02 §17; bloc_05/07 §3",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I05",
+      "reason": "Provider time-semantics registry object."
+    },
+    {
+      "type_name": "AvailabilityResolution",
+      "kind": "model",
+      "source_plan_section": "bloc_05/02 §6; bloc_05/07 §3",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I06",
+      "reason": "Output of derive_market_available_at, which is explicitly deferred (directive §7: no timestamp inference, no PIT availability logic)."
+    },
+    {
+      "type_name": "ReplayEligibility",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §15; bloc_05/07 §3",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I06",
+      "reason": "Eligibility is decided from market availability and revision mode, neither of which exists at I01. The doc 06 §3 impossible combination 'replay_eligibility=ELIGIBLE with market_available_at unknown' therefore becomes a testable N0 law at B5-I06, not at I01."
+    },
+    {
+      "type_name": "T1RevisionStatus",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §10 (ORIGINAL, PROVIDER_CORRECTED, SOURCE_MUTATION_REPARSED, NORMALIZATION_REBUILD, IDENTITY_REBUILD, SEMANTIC_REINTERPRETATION)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I17",
+      "reason": "T1 revision-chain status. The base envelope instead carries the reused Bloc 4 RevisionState (source-revision truth) plus source_revision_id; inventing a parallel source-revision vocabulary would violate directive §17. T1 chain status belongs to the duplicate/revision engine."
+    },
+    {
+      "type_name": "T1RevisionChain",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §9",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I17",
+      "reason": "Revision-chain object; requires the revision engine. The base envelope keeps only the frozen supersedes_t1_record_id placeholder and the REVISION_PRESENT / PIT_REVISION_UNCERTAIN flags."
+    },
+    {
+      "type_name": "Bloc5RevisionPolicy",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/02 §11 + bloc_05/07 F11 (AS_KNOWN_THEN, LATEST_VERIFIED, FIRST_SEEN, EXACT_REVISION, ALL_REVISIONS, ERROR_ON_AMBIGUITY)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I07",
+      "reason": "MUST NOT reuse the accepted Bloc 4 storage RevisionPolicy: Bloc 4's ERROR_ON_AMBIGUITY/FIRST_SEEN/LATEST_SEEN/EXACT_REVISION/ALL/PROVIDER_DECLARED_CANONICAL is a raw-evidence QUERY policy, while bloc_05/02 §11 is a research/replay policy that additionally contains AS_KNOWN_THEN and LATEST_VERIFIED. Overlapping member names with different meanings must stay separate vocabularies, so a distinct type is introduced at B5-I07, not at I01."
+    },
+    {
+      "type_name": "DedupeStrength",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §6; bloc_05/07 §7",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I17",
+      "reason": "Per sensor/provider mapping dedupe strength; part of the duplicate engine."
+    },
+    {
+      "type_name": "DuplicateOutcomeClass",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/05 §5; bloc_05/07 §7",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I17",
+      "reason": "Duplicate taxonomy; part of the duplicate engine. The base layer only carries DUPLICATE_CONFIRMED / DUPLICATE_CANDIDATE / NO_SAFE_DEDUPE_KEY flags."
+    },
+    {
+      "type_name": "CanonicalQuantity",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/03 §4 (CONTRACTS, BASE_ASSET, QUOTE_ASSET, SETTLEMENT_ASSET, USD, USDT, USDC, OTHER_QUOTE, PERCENT, RATE_PER_INTERVAL, BPS, PRICE, COUNT)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I08",
+      "reason": "Canonical unit vocabulary belongs to the unit/numeric/stablecoin conversion checkpoint. I01 deliberately ships NO canonical unit vocabulary and NO canonical unit field at all, which is the strongest possible native/canonical separation."
+    },
+    {
+      "type_name": "ConversionRateObservation",
+      "kind": "model",
+      "source_plan_section": "bloc_05/03 §9; bloc_05/07 §4",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I08",
+      "reason": "PIT-safe USD equivalent evidence; conversion is out of scope (directive §1, §14)."
+    },
+    {
+      "type_name": "ReferencePriceType",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/03 §8 (PROVIDER_MARK, PROVIDER_INDEX, TRADE_PRICE, MID_PRICE, INTERVAL_CLOSE)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I04",
+      "reason": "Only meaningful for price-dependent inverse conversion, which is B5-I04. At I01 the envelope carries only the REFERENCE_PRICE_UNAVAILABLE flag."
+    },
+    {
+      "type_name": "SemanticConfidence",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/03 §13",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I09",
+      "reason": "Provider semantic-mapping confidence; part of the semantic registry."
+    },
+    {
+      "type_name": "ProviderSemanticMapping",
+      "kind": "model",
+      "source_plan_section": "bloc_05/03 §11/§12; bloc_05/07 §4",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I09",
+      "reason": "Provider field mapping object; provider-specific behavior is out of scope (directive §1, §32, §41). The accepted Bloc 1 SemanticEquivalence enum is reused rather than duplicated."
+    },
+    {
+      "type_name": "NormalizationMethodology",
+      "kind": "model",
+      "source_plan_section": "bloc_05/03 §16; bloc_05/07 §4",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I09",
+      "reason": "Methodology registry object. I01 carries methodology_registry_version as an opaque reference only and never resolves one."
+    },
+    {
+      "type_name": "FieldLineage",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §3",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I16",
+      "reason": "Per-field derivation lineage; meaningless while no canonical field exists, since I01 ships no normalized value."
+    },
+    {
+      "type_name": "ConversionLineage",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §2; bloc_05/07 §4",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I16",
+      "reason": "Auxiliary-conversion lineage; no conversion exists at I01. The envelope keeps conversion_lineage_refs as an opaque, empty-by-default slot."
+    },
+    {
+      "type_name": "T1Lineage",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §3",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I16",
+      "reason": "The frozen full lineage object binds t1_record_id + normalization_generation + FieldLineage wiring, which requires the deterministic identity key of B5-I16. I01 ships the ref-only component T1LineageRef and deliberately does not export the frozen full name."
+    },
+    {
+      "type_name": "T1Generation",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §13",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I18",
+      "reason": "Directive §19 forbids a generation writer/manifest at I01. I01 ships only the opaque T1GenerationId."
+    },
+    {
+      "type_name": "T1PartitionManifest",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §17",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I18",
+      "reason": "T1 storage manifest; T1 storage is out of scope (directive §1)."
+    },
+    {
+      "type_name": "SensorBlockingSemanticError",
+      "kind": "enum",
+      "source_plan_section": "bloc_05/04 §16 (AGGRESSOR_SIDE_UNVERIFIED, LIQUIDATION_POSITION_SIDE_UNVERIFIED, OI_UNIT_UNVERIFIED, FUNDING_INTERVAL_UNVERIFIED, POSITIONING_POPULATION_UNVERIFIED, BASIS_REFERENCE_UNVERIFIED)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I10..SENSOR-B5-I15",
+      "reason": "Sensor-family-specific blocking semantic errors. Adding them to the generic base flag enum would be premature sensor normalization. BOOK_SEQUENCE_GAP is already a generic member of NormalizationQualityFlag because bloc_05/05 §11 freezes it there."
+    },
+    {
+      "type_name": "SensorNormalizerProtocol",
+      "kind": "model",
+      "source_plan_section": "bloc_05/04 §15; bloc_05/07 §5",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I10..SENSOR-B5-I15",
+      "reason": "Sensor normalizers are explicitly out of scope (directive §1, §32)."
+    },
+    {
+      "type_name": "T1Writer",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §16 (atomic T1 publication)",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I18",
+      "reason": "T1 storage writer; explicitly out of scope (directive §1, §32)."
+    },
+    {
+      "type_name": "CanonicalT1Query",
+      "kind": "model",
+      "source_plan_section": "bloc_05/05 §18/§19; bloc_05/07 F30",
+      "needed_for_I01": false,
+      "deferred_checkpoint": "SENSOR-B5-I19",
+      "reason": "Canonical T1 query/replay filters; explicitly out of scope (directive §1, §32)."
+    }
+  ],
+  "summary": {
+    "rows_total": 61,
+    "needed_for_I01_true": 24,
+    "needed_for_I01_false": 37,
+    "implemented_enums": 10,
+    "implemented_flag_members": 36,
+    "implemented_data_constants": 2,
+    "implemented_validated_types": 5,
+    "implemented_models": 6,
+    "implemented_helpers": 1,
+    "reused_bloc4_public_types": [
+      "crypto_sensor_fabric.contracts.enums.SensorFamily",
+      "crypto_sensor_fabric.probes.enums.Granularity",
+      "crypto_sensor_fabric.storage.CoverageState",
+      "crypto_sensor_fabric.storage.RevisionState",
+      "crypto_sensor_fabric.storage.SourceUnitContract",
+      "crypto_sensor_fabric.storage.SourceUnitEvidence"
+    ],
+    "duplicated_upstream_types": "NONE",
+    "private_bloc4_symbols_imported": "NONE"
+  },
+  "bloc_05_blocking_gates": {
+    "note": "Recorded as NOT_YET_EARNED. B5-I01 builds vocabulary and the base container only; no gate is earned and none is claimed.",
+    "IDENTITY_GATE": "NOT_YET_EARNED",
+    "TIME_GATE": "NOT_YET_EARNED",
+    "SEMANTIC_GATE": "NOT_YET_EARNED",
+    "UNIT_GATE": "NOT_YET_EARNED",
+    "LINEAGE_GATE": "NOT_YET_EARNED",
+    "DUPLICATE_REVISION_GATE": "NOT_YET_EARNED",
+    "REPLAY_SAFETY_GATE": "NOT_YET_EARNED",
+    "GOLDEN_T0_T1_GATE": "NOT_YET_EARNED"
+  }
+}
