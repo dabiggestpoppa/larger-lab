@@ -107,10 +107,25 @@ GAP7_FAMILIES: Final[tuple[str, ...]] = (
     "GAP7.ACCOUNTING",
 )
 
+#: The Book 6 comparison / change amendment families, added at Rung 4 for the
+#: two new authority-bearing contract classes. One family per ratified clause so
+#: that a defect in the contract shape cannot hide behind a broader row.
+CMP_FAMILIES: Final[tuple[str, ...]] = (
+    "CMP.CONTRACT_SCOPE",
+    "CMP.BASELINE_SELECTOR",
+    "CMP.NUMERIC_DOMAIN",
+    "CMP.SINGLE_MEANING",
+    "CMP.SUPERSESSION",
+    "CMP.COVERAGE",
+    "CMP.TEMPORAL_COMPARABILITY",
+    "CMP.POLICY_FIREWALL",
+    "CMP.DISPLAY_SEPARATION",
+)
+
 #: Every family the matrix must cover.
 ALL_FAMILIES: Final[tuple[str, ...]] = (
     VALIDATION_FAMILIES + STRUCTURAL_FAMILIES + R1_FAMILIES + R2_FAMILIES
-    + R3_FAMILIES + R4_FAMILIES + GAP7_FAMILIES
+    + R3_FAMILIES + R4_FAMILIES + GAP7_FAMILIES + CMP_FAMILIES
 )
 
 #: ``(row_id, family, claim, test_file, test_name)``. Every row must resolve.
@@ -2623,6 +2638,178 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "the ratified GAP-7 case THE is discharged",
         "test_book6_hardening_r4_gap7_contract.py",
         "test_the_forty_ratified_cases_are_all_named_in_this_file",
+    ),
+    # -- Rung 4: comparison / change contracts ------------------------------
+    (
+        "CMP.SCOPE.01",
+        "CMP.CONTRACT_SCOPE",
+        "G-8: exactly two public authority-bearing contract classes exist and "
+        "there is no hidden third contract",
+        "test_book6_comparison_contracts.py",
+        "test_exactly_two_authority_bearing_classes",
+    ),
+    (
+        "CMP.SCOPE.02",
+        "CMP.CONTRACT_SCOPE",
+        "GAP-5 5E: BaselineSelectorSpec is nested rule content, with no "
+        "registry, ratification ledger, lifecycle, or authority of its own",
+        "test_book6_comparison_contracts.py",
+        "test_baseline_selector_spec_is_not_authority_bearing",
+    ),
+    (
+        "CMP.GAP5.03",
+        "CMP.BASELINE_SELECTOR",
+        "grammar v0.6 §2.2.3: reserved selector names are refused at "
+        "construction and carry no placeholder behaviour",
+        "test_book6_comparison_contracts.py",
+        "test_reserved_selector_kinds_are_rejected",
+    ),
+    (
+        "CMP.GAP5.04",
+        "CMP.BASELINE_SELECTOR",
+        "EXECUTABLE_BASELINE_SELECTOR_COUNT == 1 and the reserved set is "
+        "disjoint from it",
+        "test_book6_comparison_contracts.py",
+        "test_only_one_selector_is_executable",
+    ),
+    (
+        "CMP.GAP5.05",
+        "CMP.BASELINE_SELECTOR",
+        "grammar v0.6 §2.2.4: the ordering policy is single-valued and admits "
+        "no caller, observed_at, ingestion, random, or insertion order",
+        "test_book6_comparison_contracts.py",
+        "test_ordering_policy_is_single_valued",
+    ),
+    (
+        "CMP.GAP1.06",
+        "CMP.NUMERIC_DOMAIN",
+        "GAP-1 1A-STRICT: the delta operator set is closed and no free-form "
+        "formula or expression language exists",
+        "test_book6_comparison_contracts.py",
+        "test_delta_formula_basis_is_not_a_free_string",
+    ),
+    (
+        "CMP.GAP1.07",
+        "CMP.NUMERIC_DOMAIN",
+        "GAP-1: non-finite stored deltas are refused rather than carried as a "
+        "sentinel that could read as a result",
+        "test_book6_comparison_contracts.py",
+        "test_non_finite_deltas_are_refused",
+    ),
+    (
+        "CMP.GAP1.08",
+        "CMP.NUMERIC_DOMAIN",
+        "plan v0.4 §5: NO_CHANGE means exact canonical equality and there is no "
+        "epsilon, tolerance, materiality, or significance field through which a "
+        "threshold could be expressed",
+        "test_book6_comparison_contracts.py",
+        "test_no_change_requires_exact_canonical_equality",
+    ),
+    (
+        "CMP.AC17.09",
+        "CMP.SINGLE_MEANING",
+        "AC-17: an absent delta is NOT_COMPUTABLE or UNDEFINED and is never "
+        "spelled as 0",
+        "test_book6_comparison_contracts.py",
+        "test_absent_delta_is_never_zero",
+    ),
+    (
+        "CMP.R5.10",
+        "CMP.SUPERSESSION",
+        "R-5: supersedes_ref absence means first version only, and a later "
+        "version may not be silently unlinked",
+        "test_book6_comparison_contracts.py",
+        "test_later_version_must_declare_supersession",
+    ),
+    (
+        "CMP.R2.11",
+        "CMP.COVERAGE",
+        "R-2: coverage_applicability_source_ref absence means "
+        "NO_UPSTREAM_DETERMINATION_EXISTS only, and is required when a "
+        "determination is asserted",
+        "test_book6_comparison_contracts.py",
+        "test_coverage_source_ref_required_when_a_determination_is_asserted",
+    ),
+    (
+        "CMP.R3.12",
+        "CMP.COVERAGE",
+        "R-3: the coverage observation state and its ref are one fact; silence "
+        "about known coverage is INVALID",
+        "test_book6_comparison_contracts.py",
+        "test_coverage_observation_ref_iff_present",
+    ),
+    (
+        "CMP.AC17.13",
+        "CMP.SINGLE_MEANING",
+        "AC-17: NOT_APPLICABLE is a real closed-enum member and is never used "
+        "as an absence encoding",
+        "test_book6_comparison_contracts.py",
+        "test_not_applicable_is_a_real_state_not_an_absence",
+    ),
+    (
+        "CMP.GAP4.14",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "GAP-4 4D: TemporalComparabilityStatus is a closed three-member "
+        "domain, distinct from CorpusVerdict, ComparabilityClass, StateName, "
+        "and ClaimState",
+        "test_book6_comparison_contracts.py",
+        "test_temporal_comparability_status_is_closed_three",
+    ),
+    (
+        "CMP.GAP4.15",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "grammar v0.5 §3.4: UNRESOLVED is never mapped to NOT_COMPARABLE, "
+        "because absence of basis is not a structural failure",
+        "test_book6_comparison_contracts.py",
+        "test_unresolved_never_maps_to_not_comparable",
+    ),
+    (
+        "CMP.GAP4.16",
+        "CMP.TEMPORAL_COMPARABILITY",
+        "GAP-4 closes the v0.4 defect: a NOT_COMPARABLE or UNRESOLVED status "
+        "must name the gate that produced it",
+        "test_book6_comparison_contracts.py",
+        "test_a_decision_status_requires_a_producer",
+    ),
+    (
+        "CMP.AC17.17",
+        "CMP.SINGLE_MEANING",
+        "selected_baseline_measurement_ref is absent exactly when no "
+        "comparison reached arithmetic, and present exactly when it did",
+        "test_book6_comparison_contracts.py",
+        "test_selected_baseline_presence_tracks_resolution",
+    ),
+    (
+        "CMP.POLICY.18",
+        "CMP.POLICY_FIREWALL",
+        "plan v0.4 §0: the four deleted policy surfaces do not exist and cannot "
+        "be re-added as fields",
+        "test_book6_comparison_contracts.py",
+        "test_removed_policy_fields_do_not_exist",
+    ),
+    (
+        "CMP.PHANTOM.19",
+        "CMP.POLICY_FIREWALL",
+        "boundary v0.4: the phantom benchmark field is absent from both "
+        "authority classes",
+        "test_book6_comparison_contracts.py",
+        "test_phantom_benchmark_field_does_not_exist",
+    ),
+    (
+        "CMP.DISPLAY.20",
+        "CMP.DISPLAY_SEPARATION",
+        "plan v0.4 §0 repair 5: display precision is presentation-only, held "
+        "in its own field and outside every derivation",
+        "test_book6_comparison_contracts.py",
+        "test_display_metadata_is_presentation_only",
+    ),
+    (
+        "CMP.FIREWALL.21",
+        "FIREWALL.ANTI_SCORE",
+        "the anti-score firewall reaches the constructor and model_copy: no "
+        "score, rank, grade, or recommendation field can be attached",
+        "test_book6_comparison_contracts.py",
+        "test_model_copy_cannot_smuggle_a_field",
     ),
 )
 
