@@ -5576,3 +5576,35 @@ cloud mutations 0, broker mutations 0, capital mutations 0, execution mutations
 untouched at `7c7816f382947bbc8a1f2154435fc436f2428fa8`. No amend, squash, rebase, reset, or force-push.
 No Book 5, no R49 or X10, no Atlas Program Block 4. This commit is documentation
 and evidence only.
+## 20. X1 CLAIM-FREE VERIFICATION MARKER
+
+This section was committed **before any detachment verdict was reached**. It
+records no outcome, asserts no status, and licenses no closure.
+
+- The operator reports that repository access was removed for SonarQubeCloud
+  (app `12526`) and Kilo Code Bot (app `2193792`).
+- **Removal is not verified.** No API-visible evidence of the removal exists
+  from this account. Installation enumeration is refused from here
+  (`/user/installations` **403**, `/repos/dabiggestpoppa/larger-lab/installation`
+  **401**), so removal cannot be read, only triggered.
+- This commit exists **solely** to generate an observable post-removal push
+  event. A final evidence commit cannot witness its own push; the marker and
+  the verdict are therefore separate commits by construction.
+- **No closure, no passing-gate, and no verified-removal claim is made here.**
+  Five green OCE-owned workflow runs, a passing test tally, and an absence of
+  external checks are all outcomes still to be measured, not facts asserted.
+
+Marker scope: this file and `B4-ACCEPTANCE-MATRIX.md`, documentation only. No
+production code, test, workflow, trigger, registry, configuration, rule, or
+protection setting was touched. Sections 1 through 19 are preserved
+byte-for-byte, including the falsified removal claim of section 18.3 and its
+falsification in section 19.1.
+
+Predecessor: `d0e4b30bd68d96edfd8b68d570a761af1d5c3aa6`.
+
+Accounting: cloud mutations 0, broker mutations 0, capital mutations 0,
+execution mutations 0, recurring cost $0, `capital.authority = none`. No merge;
+`origin/main` untouched at `7c7816f382947bbc8a1f2154435fc436f2428fa8`. No amend,
+squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas Program
+Block 4. PR #4 remains **open and unmerged**.
+

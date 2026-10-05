@@ -1586,3 +1586,23 @@ No merge, no force push, no amend/squash/rebase/reset; `main` untouched at
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`. Accounting: cloud mutations 0, broker mutations 0, capital
 mutations 0, execution mutations 0, recurring cost $0, `capital.authority =
 none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.
+### X1 verification marker (claim-free)
+
+Committed before any detachment verdict was reached. It records no outcome.
+
+| Statement | Status |
+|---|---|
+| Operator reports access removed (app `12526`, app `2193792`) | **reported, unverified** |
+| Removal proven at commit time | **NO** -- unreadable from this account (`/user/installations` **403**, `/repos/.../installation` **401**) |
+| Sole purpose of this commit | **an observable post-removal push event** |
+| Closure / passing-gate / verified-removal claim | **NONE** -- outcome not yet measured |
+| Sections 18 and 19 | **preserved byte-for-byte**, including the falsified 18.3 removal claim |
+| Marker scope | documentation only -- this file and `B4-EVIDENCE-RECORD.md` |
+
+Predecessor `d0e4b30bd68d96edfd8b68d570a761af1d5c3aa6`. Accounting unchanged:
+cloud mutations 0, broker mutations 0, capital mutations 0, execution mutations
+0, recurring cost $0, `capital.authority = none`. No merge, no force push, no
+amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. **`MERGE_AUTHORIZED = false`.**
+PR #4 remains **open and unmerged**.
+
