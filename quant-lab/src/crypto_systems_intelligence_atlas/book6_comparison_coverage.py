@@ -37,6 +37,39 @@ governs is the operator's choice, recorded as
 ``ComparisonRule.coverage_sufficiency_rule_ref`` and sealed inside the rule's
 own ratified fingerprint. Registry ordering is not a source of authority.
 
+**Coverage evidence is bound to one exact measurement.** The accepted substrate
+already carries the binding: ``CoverageObservation.measurement_id`` is a
+required field, ``register_coverage`` keys the store by it, and ``coverage_of``
+reads by it, so no accepted path can return measurement B's coverage when asked
+for measurement A's. Check 16 performs that binding rather than assuming it, and
+it performs it **before** reading ``observed_fraction``:
+
+    coverage_observation.measurement_id == comparison_measurement_ref
+
+A rule match, a live ratification and an exact metric scope say nothing about
+which observation was measured, so passing checks 14 and 15 with another
+measurement's observation is not evidence for this comparison at all:
+
+    CROSS_MEASUREMENT_COVERAGE_SUBSTITUTION = PROHIBITED
+    RULE_MATCH_ALONE_IS_NOT_ENOUGH          = TRUE
+
+The expected identity arrives as a required parameter and is never inferred from
+the rule, the metric, a caller convention, the registry, or the observation
+itself — inferring it from the observation would satisfy the check with the very
+substitution the check exists to catch.
+
+**A wrong-measurement observation yields no verdict at all.** It is not a
+recomputed ``INSUFFICIENT`` and not a finding; it is an absence of basis:
+
+    CHECK 16 = FAIL, COVERAGE_VERDICT = UNKNOWN, COMPARABILITY = UNRESOLVED
+
+Per ``BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1``
+(``BIND_COVERAGE_TO_THE_COMPARISON_MEASUREMENT``), the evidence attaches to the
+comparison measurement. ``comparison_measurement_refs`` on the record is a
+plural set, so this module replays **one measurement per call** and defines no
+aggregate verdict — N comparison measurements are N replays, each against its own
+observation. No aggregation semantics are introduced here.
+
 **Check 16 succeeds by recomputing, whatever it recomputes.** An
 ``INSUFFICIENT`` verdict is a *successful* replay of a ratified rule that found
 coverage insufficient; check 19 maps that explicit determination to
@@ -105,6 +138,19 @@ COVERAGE_CHECK_NUMBERS: Final[tuple[int, ...]] = (12, 13, 14, 15, 16)
 #: block: it must stay independently falsifiable from all five.
 TEMPORAL_COMPARABILITY_CHECK: Final[int] = 19
 
+#: Check 16's failure reason when the observation belongs to another measurement.
+#: A named constant because it is a law the tests assert on verbatim, not a
+#: message string that may drift.
+COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT: Final[str] = (
+    "coverage observation belongs to another measurement"
+)
+
+#: ...and when the caller supplied no expected identity to bind against. Kept
+#: distinct: omitting the expectation is not the same fault as contradicting it.
+COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED: Final[str] = (
+    "coverage is REQUIRED but no expected measurement identity was supplied"
+)
+
 
 @dataclass(frozen=True)
 class ReplayCheck:
@@ -143,7 +189,12 @@ class CoverageApplicability:
 
 @dataclass(frozen=True)
 class CoverageAuthorization:
-    """Checks 12–16 for one comparison, plus the fields they determine."""
+    """Checks 12–16 for one comparison, plus the fields they determine.
+
+    ``observation_state`` answers *was an observation supplied* (grammar §3.1
+    R-3), not *was it accepted*. A rejected observation is still PRESENT on the
+    record; check 16 is where acceptance is decided, so the two never collapse.
+    """
 
     applicability: CoverageApplicability
     observation_state: CoverageObservationState
@@ -215,6 +266,7 @@ def replay_coverage_checks(
     registry: CoverageRuleRegistry,
     metric_id: str,
     named_rule_ref: str | None,
+    comparison_measurement_ref: str,
     coverage_observation: CoverageObservation | None,
 ) -> CoverageAuthorization:
     """Replay canonical checks 12–16, each independently.
@@ -222,6 +274,13 @@ def replay_coverage_checks(
     ``named_rule_ref`` is ``ComparisonRule.coverage_sufficiency_rule_ref`` — the
     citation the operator bound into the ratified rule. It is the authoritative
     binding and no registry ordering may substitute for it.
+
+    ``comparison_measurement_ref`` is the exact identity of the measurement whose
+    coverage is being replayed. It is a **required** parameter with no default
+    and no optional path: the expected identity is never inferred from the rule
+    id, the metric id, a caller convention, registry ordering, or the observation
+    itself, because the last of those would satisfy the check with the very
+    substitution it exists to reject.
 
     ``coverage_observation`` is an actual accepted ``CoverageObservation``. There
     is deliberately **no** callable parameter: a caller-supplied verdict would
@@ -235,6 +294,10 @@ def replay_coverage_checks(
     replay; a check 16 that could not run at all is a failure and means an
     absence of basis. The distinction is load-bearing and is what keeps
     ``NOT_COMPARABLE`` distinct from ``UNRESOLVED`` downstream.
+
+    The same distinction governs the measurement binding. An observation that
+    belongs to another measurement does not recompute ``INSUFFICIENT`` — it
+    fails, and a failure is an absence of basis.
     """
 
     applicability = resolve_coverage_applicability(
@@ -339,7 +402,8 @@ def replay_coverage_checks(
     )
 
     # 16 — deterministic recomputation from an ACTUAL observation under the
-    #      NAMED rule. No caller input of any kind.
+    #      NAMED rule, bound to the EXACT measurement under comparison.
+    #      No caller input of any kind beyond the required identities.
     if not required:
         verdict, verdict_ok, verdict_reason = (
             CoverageVerdict.UNKNOWN,
@@ -367,6 +431,28 @@ def replay_coverage_checks(
             f"{coverage_observation.sufficiency_rule_ref}, not the bound rule "
             f"{named_rule_ref}; no rule substitution is permitted",
         )
+    elif comparison_measurement_ref is None:
+        # Unreachable through the typed signature; guarded because a Python
+        # caller can still pass None and a silently unbound replay would be the
+        # exact defect this branch exists to close.
+        verdict, verdict_ok, verdict_reason = (
+            CoverageVerdict.UNKNOWN,
+            False,
+            COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED,
+        )
+    elif coverage_observation.measurement_id != comparison_measurement_ref:
+        # The binding, and it comes BEFORE observed_fraction is read: another
+        # measurement's fraction says nothing about this one, however good it
+        # looks or however well it matches the rule.
+        verdict, verdict_ok, verdict_reason = (
+            CoverageVerdict.UNKNOWN,
+            False,
+            f"{COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT}: the "
+            f"observation is attached to {coverage_observation.measurement_id}, "
+            f"but coverage is being replayed for "
+            f"{comparison_measurement_ref}; no measurement substitution is "
+            f"permitted",
+        )
     else:
         # The deterministic comparison. Both operands are accepted frozen
         # fields constrained to [0, 1]. No epsilon, no tolerance, no rounding:
@@ -381,7 +467,8 @@ def replay_coverage_checks(
         verdict_ok = True
         verdict_reason = (
             f"{named_rule_ref} requires {named_rule.required_fraction} and "
-            f"observation {coverage_observation.measurement_id} observed "
+            f"observation {coverage_observation.measurement_id} is bound to "
+            f"{comparison_measurement_ref} and observed "
             f"{coverage_observation.observed_fraction} -> {verdict.value}"
         )
 
@@ -522,6 +609,8 @@ def derive_temporal_comparability(
 
 __all__ = [
     "COVERAGE_CHECK_NUMBERS",
+    "COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED",
+    "COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT",
     "NO_UPSTREAM_DETERMINATION_EXISTS",
     "TEMPORAL_COMPARABILITY_CHECK",
     "ComparabilityVerdict",

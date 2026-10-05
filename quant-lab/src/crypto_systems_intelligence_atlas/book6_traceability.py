@@ -3294,6 +3294,79 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "test_book6_comparison_coverage.py",
         "test_rung_7_adds_no_aggregation_or_tolerance_field",
     ),
+    (
+        "CMP.BINDING.70",
+        "CMP.COVERAGE_AUTHORITY",
+        "COVERAGE_OBSERVATION_MEASUREMENT_BINDING: an observation attached to "
+        "another measurement cannot authorize this comparison, whatever its "
+        "rule, scope or fraction",
+        "test_book6_comparison_coverage.py",
+        "test_no_coverage_substitution_from_another_measurement",
+    ),
+    (
+        "CMP.BINDING.71",
+        "CMP.COVERAGE_AUTHORITY",
+        "RULE_MATCH_ALONE_IS_NOT_ENOUGH: same rule, same metric and a passing "
+        "fraction still fail when only the measurement_id differs",
+        "test_book6_comparison_coverage.py",
+        "test_same_rule_same_metric_wrong_measurement_fails",
+    ),
+    (
+        "CMP.BINDING.72",
+        "CMP.COVERAGE_AUTHORITY",
+        "a wrong-measurement observation yields no verdict at all: check 16 "
+        "fails, the verdict is UNKNOWN and it is never INSUFFICIENT",
+        "test_book6_comparison_coverage.py",
+        "test_wrong_measurement_cannot_produce_insufficient",
+    ),
+    (
+        "CMP.BINDING.73",
+        "CMP.COVERAGE_AUTHORITY",
+        "a wrong-measurement observation is an evidence-binding failure, so "
+        "temporal comparability is UNRESOLVED and never NOT_COMPARABLE",
+        "test_book6_comparison_coverage.py",
+        "test_wrong_measurement_yields_temporal_comparability_unresolved",
+    ),
+    (
+        "CMP.BINDING.74",
+        "CMP.COVERAGE_AUTHORITY",
+        "the measurement binding is independently falsifiable from checks 14 "
+        "and 15, and correcting one fault never cures another",
+        "test_book6_comparison_coverage.py",
+        "test_measurement_binding_is_independently_falsifiable_from_14_and_15",
+    ),
+    (
+        "CMP.BINDING.75",
+        "CMP.COVERAGE_AUTHORITY",
+        "no caller may omit the expected measurement identity: the parameter "
+        "carries no default and a deliberate None fails closed",
+        "test_book6_comparison_coverage.py",
+        "test_no_caller_may_omit_the_expected_measurement_identity",
+    ),
+    (
+        "CMP.BINDING.76",
+        "CMP.COVERAGE_AUTHORITY",
+        "metric identity and measurement identity are distinct questions: a "
+        "rule scoped to the metric says nothing about which observation it covers",
+        "test_book6_comparison_coverage.py",
+        "test_metric_identity_and_measurement_identity_are_distinct",
+    ),
+    (
+        "CMP.BINDING.77",
+        "CMP.COVERAGE_AUTHORITY",
+        "the expected identity is never derived from the observation, the rule "
+        "or the registry, and no second notion of identity is introduced",
+        "test_book6_comparison_coverage.py",
+        "test_the_binding_is_not_derived_from_the_observation_or_the_rule",
+    ),
+    (
+        "CMP.BINDING.78",
+        "CMP.COVERAGE_AUTHORITY",
+        "the operator's named rule still decides among several current rules; "
+        "the measurement binding neither selects nor overrides it",
+        "test_book6_comparison_coverage.py",
+        "test_multiple_rule_named_binding_is_unchanged_by_the_measurement_binding",
+    ),
 )
 
 
