@@ -5608,3 +5608,169 @@ execution mutations 0, recurring cost $0, `capital.authority = none`. No merge;
 squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas Program
 Block 4. PR #4 remains **open and unmerged**.
 
+## 21. X1 OUTCOME: FOURTH FALSIFICATION, AND WHERE THE REMOVAL MUST ACTUALLY HAPPEN
+
+This section records an observation and a procedure. It asserts **no removal**,
+**no closure**, and **no passing gate**. It was written after the decisive
+condition of the X1 census failed, and it supersedes nothing above it.
+
+### 21.1 What was pushed and what answered
+
+The X1V claim-free marker `6875ca4d6bd8a7ce538228abb67c8b2a09df8da1` was
+pushed to `oce-program-build` with no force at **2026-10-05T21:10:44Z** (server
+range `d0e4b30bd..6875ca4d6`). The marker contained no status claim by design.
+
+Both applications answered it.
+
+| App | App ID | Check run | Check suite | Created / started | Latency after push |
+|---|---|---|---|---|---|
+| SonarQubeCloud | **12526** | `111979956611` - `completed/failure` | `101236508229` | suite `21:10:43Z`, run started `21:11:00Z`, completed `21:14:20Z` | **~16 s** |
+| Kilo Code Bot | **2193792** | `111978689389` - `in_progress` at `21:27:11Z` | `101236507928` | suite `21:10:43Z`, run started `21:10:46Z` | **~2 s** |
+
+Both check runs are bound to pull request #4 at head
+`6875ca4d6bd8a7ce538228abb67c8b2a09df8da1`. **Repository access for both
+applications is active.**
+
+Kilo's check run was still `in_progress` **16 minutes 25 seconds** after it
+started, at the time of reading. It had not abandoned the repository; it was
+working in it.
+
+### 21.2 The fourth occurrence, not the first
+
+| Commit | Pushed | SonarQubeCloud | Kilo Code Bot |
+|---|---|---|---|
+| `4867c78f597ef684f042e9c0201f2e9f2c31a246` | `2026-10-05T13:2x` | check run `111782766280` | check run `111781705620` |
+| `d0e4b30bd68d96edfd8b68d570a761af1d5c3aa6` | `2026-10-05T13:33:28Z` | `111789723846` (+24 s) | `111788730730` (+19 s) |
+| `6875ca4d6bd8a7ce538228abb67c8b2a09df8da1` | `2026-10-05T21:10:44Z` | `111979956611` (+16 s) | `111978689389` (+2 s) |
+
+Three marker-grade pushes, three reappearances. The claimed removals did not
+take effect on any of them. The observed latency is **shrinking**, not
+stabilising, which is inconsistent with a binding that is being wound down.
+
+### 21.3 What this falsifies
+
+Every statement in this record asserting that repository access had been
+removed - section 18.3 ("removal was completed by the operator") and section
+19's "Removal was then re-applied" - is falsified again, by direct observation
+on a commit that claimed nothing. Section 19.1 already recorded the first
+falsification; this section records the fourth failed attempt.
+
+The operator statement that access was removed while signed in as
+`dabiggestpoppa` remains **unverified and now contradicted four times**. It is
+recorded here as a statement, never as a finding.
+
+### 21.4 Three more attached applications, previously uncatalogued
+
+The check-suite census on `6875ca4d` shows the boundary problem is wider than
+the two applications under discussion. All five non-Actions applications
+answered the same push:
+
+| App | App ID | Check suite | Created | Terminal state observed |
+|---|---|---|---|---|
+| Vercel | `8329` | `101236507544` | `21:10:43Z` | `queued` |
+| Railway App | `73253` | `101236508678` | `21:10:43Z` | `queued` |
+| Freebuff Web | `1734312` | `101236509025` | `21:10:44Z` | `queued` |
+
+These are recorded, not adjudicated. Removing SonarQubeCloud and Kilo Code Bot
+would not, by itself, return this repository to an OCE-owned check boundary.
+
+### 21.5 Why repository-level removal does not detach a GitHub App
+
+A GitHub App reaches a repository only through an **installation**. An
+installation is an object on an **account** (a user or an organization), not a
+property of a repository, and it carries its own **Repository access**
+selection. There is no per-repository installation to revoke. Three
+consequences follow, and together they explain every failure above:
+
+1. If the installation is set to **All repositories**, the app covers every
+   repository on that account and there is nothing to remove one repository at
+   a time. The only lever is narrowing the installation's own selection.
+2. If the installation is **Only select repositories**, `larger-lab` must be
+   deselected **on the installation**, and the change must be saved. Removing
+   an app from a repository's app list, or from the third party's own project
+   dashboard, does not necessarily change the installation's selection.
+3. The third-party service can hold its own OAuth or project binding and
+   request or reinstate access independently of what the operator just clicked.
+
+The repository owner here is a **User** account, `dabiggestpoppa`, created
+2023-07-11, with **zero organization memberships** (`GET /users/dabiggestpoppa/orgs`
+returns `[]`). Any organization installation serving this repository therefore
+belongs to an organization that this account cannot see, list, or edit. Local
+identity is also unproven: the machine's Git identity is
+`Quant Lab <quant@lab.local>` and the collaborator account `wifik` holds **read**
+only - neither is the owner account.
+
+### 21.6 The correct install-location procedure
+
+Perform every step; do not infer completion of a step from having attempted it.
+
+1. **Prove the acting identity.** Sign in to GitHub as `dabiggestpoppa` and
+   confirm it from the account menu. Do not proceed from a session whose
+   identity has not been displayed.
+2. **Enumerate installations at the account.** Open
+   `https://github.com/settings/installations` and list **every** installation
+   for `sonarqubecloud` (app `12526`) and `kilo-code-bot` (app `2193792`).
+   Record how many there are; more than one is the likely root cause.
+3. **Narrow the installation, then save.** On each installation set **Repository
+   access** to **Only select repositories**, deselect `larger-lab`, and save.
+   "All repositories" must be narrowed. A repository-level app list is not this
+   control.
+4. **Also detach at the third party.** In SonarQube Cloud, open the
+   organization and project management and remove the GitHub binding for this
+   project; in Kilo Code, disconnect the GitHub connection in its settings.
+5. **Disable SonarCloud Automatic Analysis** for this project, so the service
+   cannot request an analysis on push by its own path after the GitHub binding
+   is gone.
+6. **Check organization installations separately.** Because `dabiggestpoppa` has
+   no org membership, an org-owned installation can only be found and changed
+   by an org admin or by GitHub Support. Absence from step 2 is **not** absence
+   of an installation.
+7. **Verify empirically**, using 21.7. API enumeration cannot confirm this from
+   the OCE account: `/user/installations` returns **403** and
+   `/repos/dabiggestpoppa/larger-lab/installation` returns **401**.
+
+### 21.7 The verification rule, stated so it cannot be satisfied by accident
+
+- Wait **at least five full minutes** after any change. Observed push-to-check
+  latency is 2 s, 16 s, 19 s and 24 s; the worst observed is 24 s, so a
+  five-minute window is more than twelve times the worst case.
+- Require **zero check runs and zero check suites** from app `12526` **and**
+  from app `2193792` on the exact pushed SHA. Check suites count as well as
+  check runs: on `6875ca4d` both applications created a suite within a second
+  of the push.
+- Require **three consecutive** pushes with zero app checks before any removal
+  is accepted as verified. One clean sample is one clean sample.
+- Absence seen before the producer's latency has elapsed is **not** absence.
+  Section 18.3 remains the recorded instance of that error.
+- If either application appears, the disposition is
+  `BLOCKED_B4_EXTERNAL_APP_REMOVAL` with the app ID, check-run ID, check-suite
+  ID, SHA, creation timestamp and latency. Do not create a verdict commit.
+
+### 21.8 What this section does not claim
+
+- It does **not** claim access was removed. It does **not** claim access
+  remains. It claims only what was observed on one commit at one time.
+- It grants no closure, no passing gate, and no change to the Book 4 gate,
+  which remains the five OCE-owned workflows plus their bound evidence
+  artifacts.
+- The five OCE-owned workflow runs completed `success` on the marker SHA -
+  `37374252494` (b1), `37374252505` (b3), `37374252512` (b4 config spine),
+  `37374252537` (b2), `37374260699` (B1-I1R). That is a statement about
+  OCE-owned gates only. It classifies neither external application and
+  compensates for neither.
+- No external result was waived, suppressed, relabelled, deleted, or
+  fabricated. Historical SonarQubeCloud and Kilo runs on `4867c78f`,
+  `d0e4b30b` and `6875ca4d` remain accurate evidence of failure and are
+  preserved untouched.
+- No `NOSONAR`, exclusion, suppression, quality-profile, rating, threshold, or
+  coverage change was made to make any check disappear.
+
+### 21.9 Accounting
+
+cloud mutations 0, broker mutations 0, capital mutations 0, execution
+mutations 0, recurring cost $0, `capital.authority = none`. No merge. No amend,
+squash, rebase, reset, or force-push. `origin/main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. No Book 5, no R49 or X10, no Atlas
+Program Block 4. PR #4 remains **open and unmerged**; its body was not modified
+by this run. This commit is documentation only.
+

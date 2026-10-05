@@ -1606,3 +1606,57 @@ amend/squash/rebase/reset; `main` untouched at
 `7c7816f382947bbc8a1f2154435fc436f2428fa8`. **`MERGE_AUTHORIZED = false`.**
 PR #4 remains **open and unmerged**.
 
+### X1 outcome - fourth falsification, and where removal must actually happen
+
+The claim-free marker `6875ca4d6bd8a7ce538228abb67c8b2a09df8da1` was pushed at
+`2026-10-05T21:10:44Z`. Both applications answered it.
+
+| Application | App ID | Check run | Check suite | Latency after push |
+|---|---|---|---|---|
+| SonarQubeCloud | `12526` | `111979956611` `completed/failure` | `101236508229` | ~16 s |
+| Kilo Code Bot | `2193792` | `111978689389` `in_progress` at +16m25s | `101236507928` | ~2 s |
+
+Repository access for both applications is **active**. This is the third
+marker-grade push and the third reappearance, after `4867c78f` and `d0e4b30b`.
+
+| Statement | Status |
+|---|---|
+| Operator reports access removed | **reported, unverified, contradicted four times** |
+| Any claimed removal in sections 18 or 19 | **falsified again** by observation on a commit that claimed nothing |
+| Repository access is active | **YES** - both apps produced runs on `6875ca4d` |
+| Removal claimed by this section | **NO** - only the observation is recorded |
+| Closure or passing gate granted here | **NONE** |
+| Removal is a pass / remediation / suppression | **NO** - a governance act only |
+| Authoritative Book 4 gate | **unchanged** - the five OCE-owned workflows plus their bound artifacts |
+| Sonar / Kilo classified as passing | **NO** - they are outside the OCE gate and remain failed |
+| Five OCE workflow runs on `6875ca4d` | `37374252494`, `37374252505`, `37374252512`, `37374252537`, `37374260699` - all `success` |
+| External result waived / suppressed / relabelled / fabricated | **NO** |
+| Historical external runs | **preserved untouched** as accurate evidence of failure |
+
+**Three further applications are attached and also answered the push**: Vercel
+app `8329` (suite `101236507544`), Railway App `73253` (`101236508678`), and
+Freebuff Web `1734312` (`101236509025`), all created `2026-10-05T21:10:43-44Z`.
+Recorded, not adjudicated. Removing Sonar and Kilo alone would not restore an
+OCE-owned check boundary.
+
+**Root cause to act on.** A GitHub App reaches a repository only through an
+*installation*, which lives on an **account**, not on a repository, and carries
+its own **Repository access** selection. There is no per-repository
+installation to revoke. Narrow the installation to **Only select repositories**,
+deselect `larger-lab`, and **save**; also detach at SonarQube Cloud and Kilo
+Code; disable SonarCloud **Automatic Analysis**; and check organization
+installations, which `dabiggestpoppa` cannot see (zero org memberships, and
+`/user/installations` is refused **403**, `/repos/.../installation` **401**).
+Full procedure in evidence-record section 21.6.
+
+**Verification rule.** At least five full minutes after any change (worst
+observed latency 24 s), then **zero** check runs **and** check suites from app
+`12526` and app `2193792`, across **three consecutive** pushes, before any
+removal is accepted as verified. One clean sample is one clean sample.
+
+No merge, no force push, no amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. Accounting: cloud mutations 0, broker
+mutations 0, capital mutations 0, execution mutations 0, recurring cost $0,
+`capital.authority = none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains **open
+and unmerged**.
+
