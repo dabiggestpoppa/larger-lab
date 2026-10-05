@@ -5774,3 +5774,64 @@ squash, rebase, reset, or force-push. `origin/main` untouched at
 Program Block 4. PR #4 remains **open and unmerged**; its body was not modified
 by this run. This commit is documentation only.
 
+## 22. X1V2 SECOND CLAIM-FREE VERIFICATION MARKER
+
+Committed **before any uninstall verdict was reached**. It records no outcome,
+asserts no status, and licenses no closure. Sections 1 through 21 are
+preserved byte-for-byte.
+
+This commit states, and nothing beyond it:
+
+- The operator reports that **SonarQubeCloud (app `12526`)** and **Kilo Code Bot
+  (app `2193792`)** were **uninstalled** from the repository-owner account
+  `dabiggestpoppa`, at `https://github.com/settings/installations`, after
+  confirming their installation pages listed no other repository the operator
+  cares about.
+- **Uninstall status remains unverified.** Installation enumeration is still
+  unreadable from this account (`/user/installations` **403**,
+  `/repos/dabiggestpoppa/larger-lab/installation` **401**), so an uninstall
+  cannot be read. It can only be triggered and observed.
+- This commit exists **solely** to create a new observable push event. A
+  verdict commit cannot witness its own push, which is not a hypothesis: it is
+  demonstrated below.
+- **No governance closure and no verified-removal claim is made here.** Five
+  green OCE-owned workflow runs, a passing test tally, and the absence of
+  external checks are outcomes still to be measured, not facts asserted.
+
+**Vercel (app `8329`), Railway (app `73253`), and Freebuff Web (app
+`1734312`) are outside this mission.** Their presence is inventory information
+only. They were not altered, disabled, uninstalled, or characterised as
+unauthorised, and their appearance in any census neither passes nor fails the
+Sonar/Kilo gate.
+
+### 22.1 Why a second marker was necessary - observed, not asserted
+
+The previous evidence commit `81cc3a05326218620dfa352728b507568933f65c`, which
+claimed nothing about removal, was itself answered:
+
+| Application | App ID | Check run | Per-app group | Started | Latency |
+|---|---|---|---|---|---|
+| Kilo Code Bot | `2193792` | `111985408596` - `in_progress` | `101241895052` | `21:29:11Z` | **~2 s** |
+| SonarQubeCloud | `12526` | `111986347145` - `completed/failure` | `101241895457` | `21:29:23Z` | **~14 s** |
+
+Kilo's check run was still `in_progress` at `2026-10-05T22:08:10Z`, **38
+minutes 59 seconds** after it started. Vercel, Railway and Freebuff also
+created per-app groups at `21:29:08Z`; those three are recorded as
+out-of-scope inventory.
+
+This is the concrete demonstration of section 19.4 and section 21.7: a commit
+that asserts detachment cannot be the evidence for its own detachment, because
+it must be pushed first and answered second. Hence this second marker, separate
+from the eventual correction by construction.
+
+Predecessor: `81cc3a05326218620dfa352728b507568933f65c`. Marker scope:
+this file and `B4-ACCEPTANCE-MATRIX.md`, documentation only. No production
+code, test, workflow, trigger, registry, configuration, rule, or protection
+setting was touched.
+
+Accounting: cloud mutations 0, broker mutations 0, capital mutations 0,
+execution mutations 0, recurring cost $0, `capital.authority = none`. No merge;
+`origin/main` untouched at `7c7816f382947bbc8a1f2154435fc436f2428fa8`. No amend,
+squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas Program
+Block 4. PR #4 remains **open and unmerged**.
+

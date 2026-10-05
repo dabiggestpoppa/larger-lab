@@ -1660,3 +1660,31 @@ mutations 0, capital mutations 0, execution mutations 0, recurring cost $0,
 `capital.authority = none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains **open
 and unmerged**.
 
+### X1V2 second verification marker (claim-free)
+
+Committed before any uninstall verdict was reached. It records no outcome.
+
+| Statement | Status |
+|---|---|
+| Operator reports Sonar `12526` and Kilo `2193792` uninstalled from `dabiggestpoppa` | **reported, unverified** |
+| Uninstall readable from this account | **NO** -- `/user/installations` **403**, `/repos/.../installation` **401** |
+| Sole purpose of this commit | **a new observable push event** |
+| Governance closure or verified-removal claim | **NONE** -- outcome not yet measured |
+| Vercel `8329`, Railway `73253`, Freebuff `1734312` | **OUT OF SCOPE** -- inventory only; not altered, not characterised |
+| Sections 1 through 21 | **preserved byte-for-byte** |
+
+**Why a second marker was necessary, observed.** The prior evidence commit
+`81cc3a05326218620dfa352728b507568933f65c`, which claimed nothing, was itself
+answered: Kilo check-run `111985408596` at ~2 s (still `in_progress`
+38 m 59 s later, at `22:08:10Z`), SonarQubeCloud check-run `111986347145`
+`completed/failure` at ~14 s. A commit that asserts detachment cannot evidence
+its own detachment, so the marker and the correction are separate commits.
+
+Predecessor `81cc3a05326218620dfa352728b507568933f65c`. Marker scope: this file
+and `B4-EVIDENCE-RECORD.md`, documentation only. No merge, no force push, no
+amend/squash/rebase/reset; `main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`. Accounting: cloud mutations 0, broker
+mutations 0, capital mutations 0, execution mutations 0, recurring cost $0,
+`capital.authority = none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains **open
+and unmerged**.
+
