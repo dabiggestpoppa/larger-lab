@@ -4324,3 +4324,103 @@ RUNG_7                    = REPAIR REQUIRED (append-only; 92b954e5 preserved)
 `ComparisonRule` binding; any new coverage observation schema; any new
 authority-bearing class; any Class C work; any edit to accepted source; any
 edit to `92b954e5`; any rebase; any Book 7 or live acquisition.
+
+---
+
+## Coverage measurement binding — ratified; which measurement, held open
+
+`CSIA_BOOK_6_COMPARISON_COVERAGE_MEASUREMENT_BINDING_ERRATUM_v0.1.md` —
+`RATIFIED` (§1–§6), `OPEN` (§7) — 2026-10-05
+
+**Decision id:** none for §1–§6. `BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1`
+reserved for §7 and **not issued**.
+**Operator selection:** none made or implied.
+
+Third Rung 7 coverage defect, found at the Rung 7 repair
+`53ac5ea28e4b82eedf924f631ada13c56b1cffe6`. Clarification v0.1 §4 validation 4
+requires that the observation "applies to the comparison input"; check 16 never
+performed that validation.
+
+### The accepted substrate already binds coverage to a measurement
+
+```text
+CoverageObservation.measurement_id : str = Field(min_length=1)   REQUIRED
+register_coverage -> self._coverage[coverage.measurement_id]
+coverage_of(measurement_id)       -> self._coverage.get(measurement_id)
+
+COVERAGE_OBSERVATION_IS_MEASUREMENT_BOUND = TRUE
+ONE_COVERAGE_OBSERVATION_PER_MEASUREMENT  = TRUE
+CROSS_MEASUREMENT_COVERAGE_LOOKUP_PATH    = NONE
+```
+
+### Reproducer
+
+Measurement `A` as the comparison input; `CoverageObservation` belonging to
+measurement `B`; same named rule, correct scope, valid fraction.
+
+```text
+check 16 PASS  -> SUFFICIENT
+temporal comparability -> COMPARABLE
+observation_ref -> meas:unrelated-other-subject   (B's id, written into the record)
+
+CROSS_MEASUREMENT_COVERAGE_SUBSTITUTION = TRUE
+SAME_METRIC_WRONG_MEASUREMENT           = ACCEPTED (defect)
+replay_coverage_checks carries an expected measurement identity = FALSE
+```
+
+The identity was not merely unchecked — it was **inexpressible**. There was no
+parameter in which the comparison input could be named.
+
+### Classification
+
+```text
+DOCTRINE_CHANGED              = FALSE
+NEW_FIELD                     = FALSE
+NEW_AUTHORITY_CLASS           = FALSE
+NEW_COVERAGE_POLICY           = FALSE
+IMPLEMENTATION_BINDING_DEFECT = TRUE
+```
+
+### Ratified binding
+
+```text
+COVERAGE_EVIDENCE_BINDING               = EXACT_MEASUREMENT_IDENTITY
+CROSS_MEASUREMENT_COVERAGE_SUBSTITUTION = PROHIBITED
+RULE_MATCH_ALONE_IS_NOT_ENOUGH          = TRUE
+SAME_METRIC_WRONG_MEASUREMENT           = REFUSED
+
+ON MISMATCH: CHECK_16 = FAIL, VERDICT = UNKNOWN, COMPARABILITY = UNRESOLVED
+WRONG_MEASUREMENT_IS_NOT_A_FINDING      = TRUE   (never NOT_COMPARABLE)
+```
+
+Inferring the expected identity from the observation itself is prohibited — it
+would satisfy the binding with the very thing the binding exists to test.
+
+### Held: which measurement the singular `coverage_observation_ref` covers
+
+Fourteen governing artifacts audited. None binds the singleton
+`ChangeObservation.coverage_observation_ref` to either side of the comparison.
+
+```text
+DOCTRINE_BINDS_COVERAGE_TO_COMPARISON_MEASUREMENT = NOT ESTABLISHED
+DOCTRINE_BINDS_COVERAGE_TO_BASELINE_MEASUREMENT   = NOT ESTABLISHED
+DOCTRINE_REQUIRES_BOTH                            = NOT ESTABLISHED
+DOCTRINE_IS_SILENT_ON_THE_QUESTION                = TRUE
+```
+
+The single affirmative phrase — "the comparison input", clarification `:197` —
+occurs once in the corpus, is not a defined term, and does not survive contact
+with `comparison_measurement_refs`, which is **plural** (`min_length=1` on a
+tuple) while the coverage ref is a singleton. Checks 10 and 11 use the generic
+term "input measurement" for **all** inputs, baseline included.
+
+```text
+IMPLEMENTATION_AUTHORIZED_WHILE_§7_IS_OPEN = FALSE
+RUNG_7_MEASUREMENT_BINDING_REPAIR = HELD PENDING §7
+```
+
+**Not authorized and not performed:** any binding of coverage to a comparison
+or baseline side; any new field on `ChangeObservation`; any new coverage
+observation schema; any new aggregation semantics; any new coverage registry;
+any new authority-bearing class; any implementation source or test written or
+edited; any edit to `53ac5ea2`; any rebase; any Book 7 or live acquisition.

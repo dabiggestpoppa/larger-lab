@@ -4635,3 +4635,98 @@ test written or edited; no accepted source edited; no edit to `92b954e5`; no
 rebase; no new aggregation semantics; no new registry authority; no new
 schema; no new authority-bearing class; no Class C; no Book 7; no live
 acquisition.
+
+---
+
+## Coverage measurement binding — ratified; which measurement, held open
+
+`CSIA_BOOK_6_COMPARISON_COVERAGE_MEASUREMENT_BINDING_ERRATUM_v0.1.md` —
+`RATIFIED` (§1–§6), `OPEN` (§7) — 2026-10-05
+
+**Decision id:** none for §1–§6. `BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1`
+reserved for §7, not issued.
+
+Third Rung 7 coverage defect, at the Rung 7 repair `53ac5ea28`.
+
+### Substrate evidence
+
+```text
+CoverageObservation.measurement_id REQUIRED (book6_definitions.py:204)
+register_coverage keyed by it (book6_registry.py:152-157)
+coverage_of looks up by it (book6_registry.py:398-399)
+MeasurementObservation.coverage_observation_id (book6_records.py:125)
+
+COVERAGE_OBSERVATION_IS_MEASUREMENT_BOUND = TRUE
+CROSS_MEASUREMENT_COVERAGE_LOOKUP_PATH    = NONE
+```
+
+### Reproduced at 53ac5ea2
+
+```text
+comparison input = meas:comparison-input
+observation      = meas:unrelated-other-subject (same rule, in scope, 0.97/0.90)
+
+check 16 PASS -> SUFFICIENT ; comparability COMPARABLE
+observation_ref = meas:unrelated-other-subject
+
+CROSS_MEASUREMENT_COVERAGE_SUBSTITUTION = TRUE
+SAME_METRIC_WRONG_MEASUREMENT           = ACCEPTED (defect)
+replay API carries an expected measurement identity = FALSE
+```
+
+Classification: `IMPLEMENTATION_BINDING_DEFECT = TRUE`; doctrine, fields,
+authority classes and coverage policy all unchanged.
+
+### Ratified binding
+
+```text
+COVERAGE_EVIDENCE_BINDING               = EXACT_MEASUREMENT_IDENTITY
+CROSS_MEASUREMENT_COVERAGE_SUBSTITUTION = PROHIBITED
+RULE_MATCH_ALONE_IS_NOT_ENOUGH          = TRUE
+ON MISMATCH: CHECK_16 FAIL / VERDICT UNKNOWN / COMPARABILITY UNRESOLVED
+NO INFERENCE FROM RULE, METRIC, CONVENTION, OBSERVATION OR ORDERING
+```
+
+### Audit outcome — §7 open
+
+Fourteen artifacts audited for which measurement the singleton
+`coverage_observation_ref` covers. None settles it.
+
+```text
+DOCTRINE_BINDS_COVERAGE_TO_COMPARISON_MEASUREMENT = NOT ESTABLISHED
+DOCTRINE_BINDS_COVERAGE_TO_BASELINE_MEASUREMENT   = NOT ESTABLISHED
+DOCTRINE_REQUIRES_BOTH                            = NOT ESTABLISHED
+```
+
+Decisive obstacle: `comparison_measurement_refs` is plural, the coverage ref is
+a singleton, and no ratified artifact says which member the coverage covers. The
+one affirmative phrase, "the comparison input", occurs once in the corpus and is
+not a defined term.
+
+### Standing state
+
+```text
+RUNG_7                        = REPAIR REQUIRED (third defect)
+RUNG_7_MEASUREMENT_BINDING_REPAIR = HELD PENDING OPERATOR DECISION
+IMPLEMENTATION_SOURCE_EDITED   = FALSE
+TEST_CODE_EDITED               = FALSE
+IMPLEMENTATION_HEAD           = 53ac5ea28e4b82eedf924f631ada13c56b1cffe6 (unchanged)
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_COVERAGE_MEASUREMENT_BINDING_ERRATUM_v0.1.md  RATIFIED / OPEN
+CSIA_OPERATOR_DECISION_LOG.md                                         appended
+CSIA_PLANNING_PROGRESS.md                                             appended
+```
+
+**Not done in this round:** no implementation source written or edited; no test
+written or edited; no accepted source edited; no binding of coverage to a
+comparison or baseline side invented; no field added to `ChangeObservation`; no
+edit to `53ac5ea2`; no rebase; no new schema; no new registry authority; no new
+authority-bearing class; no Class C; no Book 7; no live acquisition.
+
+**Next:** operator answers §7, then the append-only Rung 7 measurement-binding
+repair on `53ac5ea28`.
