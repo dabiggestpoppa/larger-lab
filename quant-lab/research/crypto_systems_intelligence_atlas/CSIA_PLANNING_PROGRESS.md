@@ -4779,3 +4779,60 @@ The erratum is not edited; its §7 is discharged by this record and the OPEN tex
 stays as history.
 
 **Next:** append-only Rung 7 measurement-binding repair on `53ac5ea28`.
+---
+
+## 2026-10-06 - Operand cardinality ratified (BOOK6-COMPARISON-OPERAND-CARDINALITY-v0.1)
+
+**Record:** `CSIA_BOOK_6_COMPARISON_CHANGE_OPERAND_CARDINALITY_RATIFICATION_RECORD_v0.1.md` - RATIFIED
+**Operator selection:** `RATIFY_ONE_COMPARISON_MEASUREMENT_PER_CHANGEOBSERVATION`
+
+The operator ruled that one authoritative ChangeObservation describes ONE
+comparison MeasurementObservation against ONE selected baseline
+MeasurementObservation. This closes the plurality question the measurement
+binding record left open at its section 3: N comparison measurements are not
+aggregated, not reduced, and not selected among - N > 1 is not authorized for
+authoritative production.
+
+```text
+AUTHORITATIVE_COMPARISON_MEASUREMENT_CARDINALITY = EXACTLY_ONE
+AUTHORITATIVE_SELECTED_BASELINE_CARDINALITY      = EXACTLY_ONE
+DELTA_OPERAND_COUNT                              = TWO
+BASELINE_CANDIDATE_REF_CARDINALITY               = 1_OR_MORE
+SELECTED_BASELINE_REF_COUNT_AT_ARITHMETIC        = EXACTLY_ONE
+MULTI_COMPARISON_CHANGEOBSERVATION               = NOT AUTHORIZED
+REFUSAL_REASON                                   = MULTI_COMPARISON_MEASUREMENT_SET_NOT_AUTHORIZED
+MULTI_COMPARISON_ARITHMETIC                      = NOT IMPLEMENTED
+MULTI_COMPARISON_COVERAGE_AGGREGATION            = NOT IMPLEMENTED
+NEW AGGREGATION SEMANTICS                        = NONE
+NEW AUTHORITY CLASS                              = NONE
+```
+
+Schema discipline: comparison_measurement_refs REMAINS tuple[str, ...] with
+min_length=1. The restriction is executable-cardinality imposed by the
+authoritative runtime, not a schema rewrite. The tuple shape is preserved for
+schema continuity, historical compatibility, and future successor governance.
+No pick-first/pick-last/sort/average/sum/time/coverage/caller-order selection
+exists or may be invented: no comparison-side selector exists.
+
+### Standing state
+
+```text
+RUNG_8_CHANGE_ARITHMETIC        = UNBLOCKED
+IMPLEMENTATION_SOURCE_EDITED    = FALSE (repair not yet written)
+TEST_CODE_EDITED                = FALSE
+IMPLEMENTATION_HEAD             = b9ef5c7b028f7c007ef7c4d7c0f3433c62ef383e
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COMPARISON_CHANGE_OPERAND_CARDINALITY_RATIFICATION_RECORD_v0.1.md  RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md                                                 appended
+CSIA_PLANNING_PROGRESS.md                                                     appended
+```
+
+No ratified record was edited. No schema was rewritten.
+
+**Next:** append-only Rung 8 cardinality firewall + deterministic change
+arithmetic on `b9ef5c7b028f`.

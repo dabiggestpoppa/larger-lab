@@ -4470,3 +4470,52 @@ field on `ChangeObservation`; any aggregate coverage verdict; any new coverage
 observation schema; any new aggregation semantics; any new coverage registry; any
 new authority-bearing class; any edit to the erratum or to any ratified record;
 any edit to `53ac5ea2`; any rebase; any Book 7 or live acquisition.
+
+---
+
+## 2026-10-06 — BOOK6-COMPARISON-OPERAND-CARDINALITY-v0.1
+
+**Record:** `CSIA_BOOK_6_COMPARISON_CHANGE_OPERAND_CARDINALITY_RATIFICATION_RECORD_v0.1.md`
+**Status:** `RATIFIED`
+**Operator selection:** `RATIFY_ONE_COMPARISON_MEASUREMENT_PER_CHANGEOBSERVATION`
+
+Closes the plurality question the measurement-binding ratification record §3
+left open: how N replayed comparison-measurement coverage verdicts populate the
+singular `ChangeObservation` coverage fields. The operator ruled that an
+authoritative `ChangeObservation` describes ONE comparison
+`MeasurementObservation` against ONE selected baseline; N is neither reduced nor
+aggregated nor selected among, because N > 1 is not authorized for authoritative
+production at all.
+
+```text
+ONE_CHANGEOBSERVATION_ONE_COMPARISON_MEASUREMENT      = TRUE
+AUTHORITATIVE_COMPARISON_MEASUREMENT_CARDINALITY      = EXACTLY_ONE
+AUTHORITATIVE_SELECTED_BASELINE_CARDINALITY           = EXACTLY_ONE
+DELTA_OPERAND_COUNT                                   = TWO
+BASELINE_CANDIDATE_REF_CARDINALITY                    = 1_OR_MORE (selector input unchanged)
+MULTI_COMPARISON_CHANGEOBSERVATION                    = NOT AUTHORIZED
+REFUSAL_REASON                                        = MULTI_COMPARISON_MEASUREMENT_SET_NOT_AUTHORIZED
+MULTI_COMPARISON_ARITHMETIC                           = NOT IMPLEMENTED
+MULTI_COMPARISON_COVERAGE_AGGREGATION                 = NOT IMPLEMENTED
+NEW AGGREGATION SEMANTICS                             = NONE
+NEW AUTHORITY CLASS                                   = NONE
+```
+
+`comparison_measurement_refs` stays `tuple[str, ...]` with `min_length=1` — the
+restriction is executable-cardinality at the authoritative derivation layer, not
+a schema rewrite. The tuple is preserved for schema continuity, historical
+compatibility, and future successor governance. No first/last/sort/average/sum/
+time/coverage/caller-order selection exists or may be invented: there is no
+comparison-side selector.
+
+```text
+IMPLEMENTATION_AUTHORIZED   = TRUE  (offline amendment scope only)
+RUNG_8_CHANGE_ARITHMETIC    = UNBLOCKED
+```
+
+**Not authorized and not performed:** any change to the
+`comparison_measurement_refs` schema shape; any baseline-candidate cardinality
+constraint; any amendment to the Rung 6 selector; any change to coverage replay
+granularity; any new field on `ChangeObservation`; any aggregation, selection,
+tie-break, or reduction over comparison measurements; any new authority-bearing
+class; any edit to a ratified record; any rebase; any Book 7 or live acquisition.
