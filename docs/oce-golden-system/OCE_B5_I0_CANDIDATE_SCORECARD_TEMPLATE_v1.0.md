@@ -3,7 +3,7 @@
 
 **Document ID:** OCE-B5-I0-SCORECARD-001
 **Version:** 1.0
-**Status:** BLANK TEMPLATE — READY_FOR_OPERATOR_REVIEW
+**Status:** BLANK TEMPLATE — OPERATOR_RATIFIED — FROZEN (remains blank)
 **Governing protocol:** `OCE_B5_I0_SELECTION_PROTOCOL_v1.0.md` (OCE-B5-I0-PROTOCOL-001 v1.0)
 **Used at:** B5-I1 (candidate comparison), only after the protocol is ratified/frozen
 **Build authorization:** None

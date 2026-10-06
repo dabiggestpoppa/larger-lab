@@ -3,7 +3,7 @@
 
 **Document ID:** OCE-B5-I0-RISK-REGISTER-001
 **Version:** 1.0
-**Status:** READY_FOR_OPERATOR_REVIEW — FROZEN BEFORE ANY CANDIDATE IS SCORED
+**Status:** OPERATOR_RATIFIED — FROZEN
 **Governing protocol:** `OCE_B5_I0_SELECTION_PROTOCOL_v1.0.md` (§6, §7.4)
 **Stage scope:** `AUTHORIZED_STAGE=B5-I0` only
 **Build authorization:** None. Documentation only.

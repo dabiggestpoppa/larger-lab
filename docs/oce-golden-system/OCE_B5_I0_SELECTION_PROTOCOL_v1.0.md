@@ -3,7 +3,7 @@
 
 **Document ID:** OCE-B5-I0-PROTOCOL-001
 **Version:** 1.0
-**Status:** READY_FOR_OPERATOR_REVIEW — FROZEN BEFORE ANY CANDIDATE IS SCORED
+**Status:** OPERATOR_RATIFIED — FROZEN
 **Authorized stage:** `AUTHORIZED_STAGE=B5-I0` (exclusive)
 **Parent authorities:** OCE Constitution 1.1; Amendment A-002; Master Program Atlas 1.0; Full Program Build Roadmap 1.0; Block 00/01/02/03/04/05 plans; Full Planning Index 1.0; final Book 4 evidence and acceptance records (immutable historical evidence)
 **Build authorization:** None. Documentation only.
@@ -238,10 +238,10 @@ The blank scorecard for B5-I1 is `OCE_B5_I0_CANDIDATE_SCORECARD_TEMPLATE_v1.0.md
 | Field | Value |
 |---|---|
 | Protocol version | 1.0 |
-| Frozen on | (date of operator ratification) |
+| Frozen on | 2026-10-06 |
 | Ratified by | Operator |
 | Status before ratification | READY_FOR_OPERATOR_REVIEW |
-| Status after ratification | FROZEN — scoring may begin at B5-I1 |
+| Status after ratification | OPERATOR_RATIFIED — FROZEN — selection rules frozen exactly as approved; scoring may begin at B5-I1 only under a fresh `AUTHORIZED_STAGE=B5-I1` |
 | Amendments applied | none |
 
 ## 11. Prohibitions of this stage

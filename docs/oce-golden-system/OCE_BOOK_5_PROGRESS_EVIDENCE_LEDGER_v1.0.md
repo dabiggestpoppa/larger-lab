@@ -14,8 +14,8 @@
 
 | Increment | Scope (per Block 5 plan §7) | Status | Gate / evidence |
 |---|---|---|---|
-| **B5-I0** | Freeze candidate criteria, risk ceiling and evaluation protocol | **READY_FOR_OPERATOR_REVIEW** | This ledger's §2 evidence set; selection process frozen before any scoring |
-| B5-I1 | C1 compare/select/freeze application → operator-approved Product Charter | **LOCKED** | Requires operator ratification of B5-I0 + fresh authorization |
+| **B5-I0** | Freeze candidate criteria, risk ceiling and evaluation protocol | **OPERATOR_ACCEPTED** | Operator-ratified 2026-10-06 (protocol §10); this ledger's §2 evidence set; selection process frozen before any scoring |
+| B5-I1 | C1 compare/select/freeze application → operator-approved Product Charter | **LOCKED** | Requires a fresh `AUTHORIZED_STAGE=B5-I1` (B5-I0 ratified 2026-10-06) |
 | B5-I2 | C2 outcome/domain/interfaces | **LOCKED** | Requires B5-I1 complete |
 | B5-I3 | C2 failures/acceptance and construction plan | **LOCKED** | Requires B5-I2 complete |
 | B5-I4 | C3 deterministic kernel and first vertical slice | **LOCKED** | Requires B5-I3 complete |
@@ -31,12 +31,12 @@
 
 | # | Artifact | Document ID | Status | Role |
 |---|---|---|---|---|
-| 1 | Selection protocol (criteria, exact weights, freeze + amendment rules) | OCE-B5-I0-PROTOCOL-001 | READY_FOR_OPERATOR_REVIEW | Frozen selection process |
-| 2 | Blank candidate scorecard template | OCE-B5-I0-SCORECARD-001 | READY_FOR_OPERATOR_REVIEW (BLANK) | B5-I1 instrument; no winner/score/selection |
-| 3 | Risk ceiling and disqualifier register | OCE-B5-I0-RISK-REGISTER-001 | READY_FOR_OPERATOR_REVIEW | 14 mandatory disqualifiers, frozen |
-| 4 | Evaluation and independent-review procedure | OCE-B5-I0-EVAL-PROC-001 | READY_FOR_OPERATOR_REVIEW | Blind dual scoring, dissent, COI controls |
-| 5 | Book 5 progress/evidence ledger (this file) | OCE-BOOK5-LEDGER-001 | ACTIVE | B5-I0 READY_FOR_OPERATOR_REVIEW; B5-I1–I9 LOCKED |
-| 6 | B5-I0 acceptance matrix | OCE-B5-I0-ACCEPTANCE-MATRIX-001 | READY_FOR_OPERATOR_REVIEW | Requirement → artifact-section proof |
+| 1 | Selection protocol (criteria, exact weights, freeze + amendment rules) | OCE-B5-I0-PROTOCOL-001 | OPERATOR_RATIFIED — FROZEN | Frozen selection process |
+| 2 | Blank candidate scorecard template | OCE-B5-I0-SCORECARD-001 | OPERATOR_RATIFIED — FROZEN (BLANK) | B5-I1 instrument; no winner/score/selection |
+| 3 | Risk ceiling and disqualifier register | OCE-B5-I0-RISK-REGISTER-001 | OPERATOR_RATIFIED — FROZEN | 14 mandatory disqualifiers, frozen |
+| 4 | Evaluation and independent-review procedure | OCE-B5-I0-EVAL-PROC-001 | OPERATOR_RATIFIED — FROZEN | Blind dual scoring, dissent, COI controls |
+| 5 | Book 5 progress/evidence ledger (this file) | OCE-BOOK5-LEDGER-001 | ACTIVE | B5-I0 OPERATOR_ACCEPTED; B5-I1–I9 LOCKED |
+| 6 | B5-I0 acceptance matrix | OCE-B5-I0-ACCEPTANCE-MATRIX-001 | PASS — OPERATOR_RATIFIED | Requirement → artifact-section proof |
 
 ## 3. Stage integrity attestations (B5-I0)
 
@@ -62,10 +62,11 @@
 
 | Date | Event | Actor | Record |
 |---|---|---|---|
-| 2026-10-06 | Reality lock from merged `main` (`3bde6cb2c…`, PR #4 merge commit, parents `7c7816f38…`/`0e486f15c…`); branch `oce-book-5-build` created from exact merged `main` | Agent under `AUTHORIZED_STAGE=B5-I0` | B5-I0 acceptance matrix §Reality lock |
+| 2026-10-06 | Reality lock from merged `main` (`3bde6cb2c…`, PR #4 merge commit, parents `7c7816f38…`/`0e486f15c…`); branch `oce-book-5-build` created from exact merged `main` | Agent under `AUTHORIZED_STAGE=B5-I0` | B5-I0 acceptance matrix §G (G10) |
 | 2026-10-06 | Required reading of 12 authorities completed; OCE Block 5 vs Sensor Fabric `bloc_05` distinction recorded | Agent | Protocol §2 |
 | 2026-10-06 | Six B5-I0 artifacts authored, documentation-only, one commit | Agent | This ledger §2 |
 | (pending) | Operator review of B5-I0 | **Operator** | Status decision on this ledger |
+| 2026-10-06 | Operator ratification of B5-I0 at commit `bcbeacf88bd8d55e4bef1396c0ac50b3fc1b6334`: protocol accepted and frozen with no amendments; evidence map repaired (acceptance-matrix heading → `all ten candidate criteria`, E3 `L §11` → `L §3`); B5-I0 → OPERATOR_ACCEPTED; B5-I1–I9 remain LOCKED; normal merge of PR #8 authorized (`MERGE_AUTHORIZED=true` for PR #8 only) | **Operator** | `AUTHORIZED_STAGE=B5-I0-RATIFICATION`; protocol §10; this ledger §1 |
 
 ## 5. Downstream contract (what B5-I1 may rely on, only after ratification)
 
@@ -73,4 +74,4 @@ If the operator ratifies B5-I0, B5-I1 may rely exclusively on: the frozen protoc
 
 ## 6. Accounting
 
-Documentation only, one commit, no force push. Cloud mutations 0; broker mutations 0; capital mutations 0; execution mutations 0; recurring cost `$0`; `capital.authority = none`. `main` unchanged. `oce-program-build` unchanged. No merge, amend, squash, rebase, reset, or force-push.
+Documentation only; two append-only commits on `oce-book-5-build` (`B5-I0: freeze reference-application selection protocol`, `B5-I0-RATIFY: accept frozen selection protocol and repair evidence map`), no force push. Cloud mutations 0; broker mutations 0; capital mutations 0; execution mutations 0; recurring cost `$0`; `capital.authority = none`. `main` untouched by direct push; `oce-program-build` unchanged. PR #8 normal two-parent merge authorized by the operator (`MERGE_AUTHORIZED=true` for PR #8 only); no amend, squash, rebase, reset, or force-push.

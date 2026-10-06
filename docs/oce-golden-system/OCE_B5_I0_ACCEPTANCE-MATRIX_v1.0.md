@@ -3,7 +3,7 @@
 
 **Document ID:** OCE-B5-I0-ACCEPTANCE-MATRIX-001
 **Version:** 1.0
-**Status:** READY_FOR_OPERATOR_REVIEW
+**Status:** PASS — OPERATOR_RATIFIED (2026-10-06)
 **Scope:** Proves every B5-I0 requirement (per the operator's B5-I0 authorization) is represented in an exact artifact section.
 **Build authorization:** None. Documentation only.
 
@@ -17,7 +17,7 @@ Artifact keys:
 
 ---
 
-## A. Candidate criteria (all eleven requirement themes)
+## A. Representation of all ten candidate criteria
 
 | # | Requirement | Represented at | Status |
 |---|---|---|---|
@@ -89,7 +89,7 @@ Artifact keys:
 |---|---|---|---|
 | E1 | Deployment topology = local-only | P §3, L §3 | REPRESENTED |
 | E2 | External hosting authority = none | P §3, R §3 D10, L §3 | REPRESENTED |
-| E3 | `oce/frontend` internally owned, untouched during B5-I0 | P §3, L §3, L §11 (validation) | REPRESENTED |
+| E3 | `oce/frontend` internally owned, untouched during B5-I0 | P §3, L §3 | REPRESENTED |
 | E4 | SonarCloud/Kilo/Vercel/Railway outside governance boundary | P §3, R §5, L §3 | REPRESENTED |
 | E5 | Freebuff outside scope, untouched | P §3, R §5, L §3 | REPRESENTED |
 | E6 | Cloud/broker/capital/execution mutations = 0 | P §12, R §7, E §10, L §3/L §6 | REPRESENTED |
@@ -105,7 +105,7 @@ Artifact keys:
 | F2 | Blank candidate scorecard | S | PRESENT |
 | F3 | Risk-ceiling and disqualifier register | R | PRESENT |
 | F4 | Evaluation and independent-review procedure | E | PRESENT |
-| F5 | Book 5 progress/evidence ledger: B5-I0 = READY_FOR_OPERATOR_REVIEW; B5-I1–I9 = LOCKED | L §1 | PRESENT |
+| F5 | Book 5 progress/evidence ledger: B5-I0 = OPERATOR_ACCEPTED (operator-ratified 2026-10-06); B5-I1–I9 = LOCKED | L §1 | PRESENT |
 | F6 | Acceptance matrix proving each B5-I0 requirement represented | M (this file) | PRESENT |
 | F7 | No B5 work appended to closed Book 4 evidence records | L §3; git evidence (files changed list excludes B4-*) | REPRESENTED |
 
@@ -135,4 +135,4 @@ Artifact keys:
 
 ---
 
-**Conclusion:** all B5-I0 requirements map to exact artifact sections in the six-document set. Status: `READY_FOR_OPERATOR_REVIEW`.
+**Conclusion:** all B5-I0 requirements map to exact artifact sections in the six-document set. Status: `PASS` — operator-ratified 2026-10-06; selection rules frozen exactly as approved, amendments none.
