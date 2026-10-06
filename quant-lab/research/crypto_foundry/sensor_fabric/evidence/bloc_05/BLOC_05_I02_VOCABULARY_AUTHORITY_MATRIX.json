@@ -1,0 +1,174 @@
+{
+  "artifact": "BLOC_05_I02_VOCABULARY_AUTHORITY_MATRIX",
+  "checkpoint": "SENSOR-B5-I02",
+  "created": "2026-10-06",
+  "authority": [
+    "bloc_05/01_PIT_IDENTITY_AND_LIFECYCLE_ARCHITECTURE.md (§2 identity layers, §3 payoff types, §12 stablecoin, §13 provider/venue/aggregator, §6 lifecycle)",
+    "bloc_05/03_COMMON_UNIT_AND_SEMANTIC_NORMALIZATION_CONTRACTS.md (§6 contract multiplier normalization)",
+    "bloc_05/06_ACCEPTANCE_TESTS_AND_STAGED_IMPLEMENTATION_COMMITS.md (§18 tree, §19 staged commits)",
+    "bloc_05/07_BLOC_05_FREEZE_MANIFEST.md (§2 frozen core identity objects, F1-F7)",
+    "BLOC_05_I01_OPERATOR_RATIFICATION.md (§15 authorization boundary, §38 VenueScope firewall)"
+  ],
+  "method": "mechanical grep audit over all bloc_05/*.md for every audited field name and any candidate vocabulary; a vocabulary counts as frozen only if the plan names exact member values for the field itself. Field-name mentions with no member list are recorded as NOT FROZEN.",
+  "summary": {
+    "audited_fields": 10,
+    "frozen_vocabularies_reused": 1,
+    "under_specified_opaque_tokens": 8,
+    "not_required_deferred": 1,
+    "identity_enums_module_created": false,
+    "enums_module_reason": "No fully frozen I02-owned vocabulary exists. payoff_type is already frozen and ratified as normalization.enums.PayoffType (B5-I01) and is reused, not redefined. Every other audited field has a field name but no member list in the frozen plans, so directive §4/§37 requires the smallest faithful representation - a validated opaque semantic token - instead of a speculative enum."
+  },
+  "rows": [
+    {
+      "field_name": "payoff_type",
+      "owning_model": "EconomicContract, ContractInstance",
+      "semantic_type": "frozen enum",
+      "frozen_vocabulary_exists": true,
+      "exact_frozen_values": ["LINEAR", "INVERSE", "QUANTO", "SPOT", "UNKNOWN"],
+      "existing_reusable_type": "crypto_sensor_fabric.normalization.enums.PayoffType (B5-I01, operator-ratified, identical members from bloc_05/01 §3)",
+      "opaque_value_sufficient": false,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "",
+      "evidence": "bloc_05/01 §3 'Initial canonical values'; directive §5 orders reuse. UNKNOWN remains fail-closed evidence state.",
+      "decision": "REUSE PayoffType; never redefine; no conversion formulas at I02."
+    },
+    {
+      "field_name": "asset_type",
+      "owning_model": "CanonicalAsset",
+      "semantic_type": "opaque semantic token",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_DECISION_IF_CLOSED_ENUM_WANTED",
+      "evidence": "bloc_05/01 §2.1 names the field; the only asset lists in the plan (§2.1 BTC/ETH/SOL/USDT/USDC/USD) are asset EXAMPLES, not asset_type values. Grep over bloc_05/*.md finds no member list.",
+      "decision": "SemanticToken (validated opaque, non-blank, unpadded, verbatim). No speculative enum (directive §4)."
+    },
+    {
+      "field_name": "instrument_type",
+      "owning_model": "VenueInstrument, EconomicContract",
+      "semantic_type": "opaque semantic token",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_DECISION_IF_CLOSED_ENUM_WANTED",
+      "evidence": "bloc_05/01 §2.3/§2.4 name the field; no member list exists anywhere in bloc_05.",
+      "decision": "SemanticToken. Preserves the value verbatim without claiming a closed vocabulary."
+    },
+    {
+      "field_name": "perpetual_or_delivery",
+      "owning_model": "EconomicContract",
+      "semantic_type": "opaque semantic token",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_DECISION_IF_CLOSED_ENUM_WANTED",
+      "evidence": "bloc_05/01 §2.4 names the field. §7 mentions 'delivery series rollover' as a terms-change event, not a vocabulary.",
+      "decision": "SemanticToken."
+    },
+    {
+      "field_name": "VenueScope",
+      "owning_model": "(none in B5-I02)",
+      "semantic_type": "not required",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": ["MULTI_VENUE_AGGREGATE (named only as an example, 'a scope such as')"],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": false,
+      "operator_decision_required": true,
+      "deferred_checkpoint": "SENSOR-B5-I03_OR_LATER",
+      "evidence": "bloc_05/01 §13. None of the five authorized I02 models (01 §2.1-§2.5 field lists) carries a venue_scope field. Directive §36 asks whether I02 requires it.",
+      "decision": "VENUESCOPE_DECISION = NOT_REQUIRED_DEFERRED. The five identity models and registries are implementable without it; inventing members would violate the I01 ratification §38 firewall. Revisit only if a later authorized checkpoint carries the field."
+    },
+    {
+      "field_name": "chain_or_issuer_context",
+      "owning_model": "CanonicalAsset",
+      "semantic_type": "opaque semantic token (optional)",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_DECISION_IF_CLOSED_ENUM_WANTED",
+      "evidence": "bloc_05/01 §2.1 names the field optional; no values given.",
+      "decision": "Optional SemanticToken."
+    },
+    {
+      "field_name": "index_family",
+      "owning_model": "EconomicContract",
+      "semantic_type": "opaque semantic token (optional)",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_DECISION_IF_CLOSED_ENUM_WANTED",
+      "evidence": "bloc_05/01 §2.4 names the field optional; no values given.",
+      "decision": "Optional SemanticToken."
+    },
+    {
+      "field_name": "multiplier_unit",
+      "owning_model": "ContractInstance",
+      "semantic_type": "opaque semantic token",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "SENSOR-B5-I08",
+      "evidence": "bloc_05/01 §2.5 names the field. bloc_05/03 §6 says the terms registry SUPPLIES multiplier_unit for conversion but defines no unit vocabulary; the common-unit framework (including unit vocabularies) is SENSOR-B5-I08 per bloc_05/06 §19.",
+      "decision": "SemanticToken now; unit vocabulary ownership is B5-I08."
+    },
+    {
+      "field_name": "price_unit",
+      "owning_model": "ContractInstance",
+      "semantic_type": "opaque semantic token",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "SENSOR-B5-I08",
+      "evidence": "bloc_05/01 §2.5 names the field; no unit vocabulary exists in bloc_05; units belong to bloc_05/03 (B5-I08).",
+      "decision": "SemanticToken now; deferred to B5-I08."
+    },
+    {
+      "field_name": "quantity_unit",
+      "owning_model": "ContractInstance",
+      "semantic_type": "opaque semantic token",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "SENSOR-B5-I08",
+      "evidence": "bloc_05/01 §2.5 names the field; no unit vocabulary exists in bloc_05; units belong to bloc_05/03 (B5-I08).",
+      "decision": "SemanticToken now; deferred to B5-I08."
+    }
+  ],
+  "related_frozen_vocabularies_deliberately_not_implemented": [
+    {
+      "vocabulary": "lifecycle states (PRE_LISTING, ACTIVE, SUSPENDED, DELISTING_ANNOUNCED, DELISTED, RELISTED_NEW_INSTANCE, UNKNOWN)",
+      "source": "bloc_05/01 §6",
+      "reason": "The values are frozen, but none of the five I02 models carries a lifecycle_state field (01 §2.5), and lifecycle state machinery/resolver is SENSOR-B5-I03 (directive §24). Implementing the enum now would be unused forward vocabulary. Audited and deferred."
+    },
+    {
+      "vocabulary": "identity resolution statuses (RESOLVED_EXACT, RESOLVED_ALIAS, RESOLVED_WITH_WARNING, AMBIGUOUS, NOT_YET_LISTED, DELISTED, UNKNOWN_SYMBOL, TERMS_UNVERIFIED, PIT_KNOWLEDGE_BLOCKED)",
+      "source": "bloc_05/01 §9",
+      "reason": "PIT resolver result vocabulary; the resolver is SENSOR-B5-I03 (directive §26 firewall)."
+    }
+  ],
+  "stablecoin_identity_rule": {
+    "source": "bloc_05/01 §12; directive §7",
+    "rule": "USD, USDT and USDC are independently representable canonical assets. No USDT->USD or USDC->USD mapping logic may exist. Stablecoin-denominated notional is not silently equal to USD notional. No fiat classification may be derived from symbol text."
+  },
+  "opaque_token_definition": {
+    "type_name": "SemanticToken",
+    "law": "non-blank, no leading/trailing whitespace, otherwise uninterpreted and preserved verbatim",
+    "rationale": "The smallest faithful representation that preserves the value without claiming a closed vocabulary (directive §4/§37). A closed enum for any of these fields would be an operator decision, recorded as such."
+  }
+}
