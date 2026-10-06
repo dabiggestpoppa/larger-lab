@@ -13,11 +13,11 @@ One ``ChangeObservation`` describes ONE comparison ``MeasurementObservation``
 against ONE selected baseline ``MeasurementObservation``. There is no
 comparison-side selector, no tie-break, no reducer, and no aggregation, because
 there is nothing for one to operate on: the engine receives exactly one
-comparison observation or it refuses. ``comparison_measurement_refs`` is not a
-parameter at all — the engine stamps it from the one observation it received —
-so a caller cannot assert a plural comparison set, and no code path exists that
-could pick first, pick last, sort lexically, average, sum, select by time,
-select by coverage, or select by caller order.
+comparison measurement ref or it refuses. ``comparison_measurement_refs`` is not
+a parameter at all — the engine stamps it from the one ref it received — so a
+caller cannot assert a plural comparison set, and no code path exists that could
+pick first, pick last, sort lexically, average, sum, select by time, select by
+coverage, or select by caller order.
 
 The refusal is enforced at **this** derivation layer, not as a schema rewrite.
 ``ChangeObservation.comparison_measurement_refs`` keeps its ratified
@@ -29,28 +29,48 @@ authorize. This module is the only authoritative production path for change
 arithmetic, so the executable-cardinality restriction lives here, where it
 gates exactly the records this amendment produces.
 
-**Caller authority.** ``derive_change_observation`` has no parameter that could
-carry a caller-authored ``absolute_delta``, ``relative_delta``, or
-``change_kind`` — not an ignored one, none at all. The engine derives all
-three from the stored operand values, and the selected baseline identity it
-writes is the Rung 6 selector's already-resolved result.
+**Caller authority — sealed by the Rung 8 authority sealing erratum v0.1.**
+``derive_change_observation`` has no parameter that could carry a
+caller-authored ``absolute_delta``, ``relative_delta``, ``change_kind``, or —
+per grammar v0.6 §3.2 — a ``selected_baseline_ref``, a
+``baseline_selector_result``, or a ``baseline_is_valid`` flag:
 
-**The engine consumes, never recomputes, Rung 7.** Coverage and comparability
-arrive as an already-derived :class:`ComparabilityVerdict` — check 19's own
-result, sealed by the rung that owns it. Replaying coverage here would create a
-second, parallel coverage authority and could disagree with the verdict the
-corpus already recorded. The engine reads the replayed checks out of the frozen
-verdict and refuses to *assert* a comparability it was not handed: a caller
-cannot write ``COMPARABLE`` into the record while passing a verdict that says
-otherwise, because the record's ``comparability_status`` **is** the verdict's
-status field.
+    CALLER MAY provide:      candidate baseline refs (for offline resolution)
+    CALLER MAY NOT provide:  selected_baseline_ref
+                             baseline_selector_result
+                             baseline_is_valid
+
+The caller supplies the comparison measurement **ref** (an identity, not an
+object — a mutated copy has nothing to mutate) and the candidate baseline refs.
+Everything else is derived: the engine resolves the canonical comparison through
+the GAP-7 registry, structurally loads every candidate ref through the same
+registry, and invokes the **one** ratified Rung 6 selector
+(:func:`select_baseline`) itself with the ratified inputs. No second selector
+implementation exists; ``SELECTOR_IMPLEMENTATIONS = 1``. A candidate ref that
+does not resolve fails closed — no silent removal from the candidate set, no
+substitution. The selector's result is the only baseline that can become an
+operand, it must be a member of the supplied candidate set, and coverage never
+influences it (the selector does not read ``coverage_observation_id``).
+
+**The engine consumes, never recomputes, Rung 7 — and never parses prose.**
+Coverage and comparability arrive as an already-derived
+:class:`ComparabilityVerdict` — check 19's own result, sealed by the rung that
+owns it. The verdict now carries its structured :class:`CoverageAuthorization`
+(the applicability, observation state, observation ref and verdict Rung 7
+already derived), and the engine reads **only** those structured fields. A
+sealed verdict without its structured result cannot drive arithmetic: there is
+deliberately no fallback that reconstructs the facts from check-reason text,
+because ``ReplayCheck.reason`` is diagnostic prose, not a canonical authority
+field. Changing reason wording changes nothing; the reasons remain present for
+check-by-check falsifiability, and are never canonical.
 
 Under Rung 7's own law, ``COMPARABLE`` is reachable only when the sealed
 coverage replay recomputed ``SUFFICIENT`` under a live, ratified, in-scope rule
 (anything less maps to ``UNRESOLVED`` or ``NOT_COMPARABLE``). The engine
-enforces that equivalence instead of trusting it: a ``COMPARABLE`` verdict
-whose check 16 did not recompute ``SUFFICIENT`` is refused, and the record's
-coverage fields are the sealed replay's answer, never a recomputation.
+enforces that equivalence on the **structured** verdict instead of trusting it:
+a ``COMPARABLE`` verdict whose sealed coverage verdict is not ``SUFFICIENT`` is
+refused, and the record's coverage fields are the sealed authorization's
+answer, never a recomputation.
 
 **Stored binary64 arithmetic, exactly as ratified.** ``absolute_delta`` is one
 IEEE-754 subtraction of stored values, ``relative_delta`` one division. No
@@ -76,53 +96,74 @@ them from being *derived* at all, which is earlier and cheaper than refusal at
 construction.)
 
 **Currentness is re-resolved live, on both operands.** Registration is not
-authority. At derivation time the engine resolves each operand through the
-accepted :class:`Book6MeasurementRegistry` resolver — the GAP-7 currentness
-authority — and refuses anything that is not current *now*. It checks the
-comparison observation too, not only the baseline: a comparison whose lineage
-has been superseded is exactly as dead as a superseded baseline, and Rung 6's
-candidate-side check is not this check. The comparison rule's own authority is
-re-checked live through :class:`ComparisonRuleRegistry` at the same moment.
+authority. The engine resolves the comparison operand through the accepted
+:class:`Book6MeasurementRegistry` resolver — the GAP-7 currentness authority —
+before anything else, and refuses anything that is not current *now*. The
+selected baseline is resolved through the same resolver, and the selector's
+own eligibility gate applies the same authority to every candidate before any
+ordering runs. The comparison rule's own authority is re-checked live through
+:class:`ComparisonRuleRegistry` at the moment of use.
 
-**Structural identity is re-checked here, fail closed.** Same metric
-definition and same exact unit — no conversion — between the two resolved
-operands. A unitless operand is not an arithmetic value this engine may
-compare. These gates raise rather than downgrade: a record they would produce
-has no honest arithmetic to carry.
+**Structural identity is re-checked here, fail closed, against the RULE.** The
+binding is three-way, not pairwise: the canonical comparison's metric
+definition, the selected baseline's metric definition, and the governing
+``ComparisonRule``'s ``metric_definition_ref`` must all be the same exact ref,
+and the two operands must carry the same exact unit — no conversion. (The
+rule's declared metric-definition semantic fingerprint is sealed content; its
+replay against a recomputation from the registered ``MetricDefinition`` is
+reserved as Rung 9 check 17, because no canonical fingerprint helper exists in
+executable form yet and inventing one is out of authority.) These gates raise
+rather than downgrade: a record they would produce has no honest arithmetic to
+carry.
 
 **Refusals the sealed verdict already decided become records.** When the
 sealed Rung 7 verdict is ``NOT_COMPARABLE`` or ``UNRESOLVED``, no arithmetic
-runs and no baseline resolution is asserted: the engine writes the refusal
-record carrying the verdict's own decision, its own producing checks as
-refusal reasons, and ``selected_baseline_measurement_ref = None`` — which the
+runs and no baseline selection is asserted: the engine writes the refusal
+record carrying the verdict's own decision, its producing checks as refusal
+reasons, and ``selected_baseline_measurement_ref = None`` — which the
 contract's presence law requires, because absence of a selected baseline means
-BASELINE_UNAVAILABLE and nothing else. Structural faults the engine detects
-itself (non-current operands, identity mismatches, non-finite values) raise
-:class:`ChangeDerivationError` instead; they are faults in the inputs to
-derivation, not decisions the sealed replay made.
+BASELINE_UNAVAILABLE and nothing else. The refusal record is built from the
+**canonical registry-resolved comparison**, exactly like a positive record —
+refusal records are not exempt from registered lookup, currentness, metric
+identity or methodology identity, because canonical replay checks 9–11 precede
+coverage and comparability. Candidate refs are recorded as supplied, after
+structural existence validation; an empty candidate set cannot be recorded
+(the contract's ``min_length=1`` has no placeholder). Structural faults the
+engine detects itself (non-current operands, identity mismatches, non-finite
+values, unresolvable candidates) raise :class:`ChangeDerivationError` instead;
+they are faults in the inputs to derivation, not decisions the sealed replay
+made.
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from typing import Final
+from typing import Callable, Final
 
 from .book6_comparison_contracts import (
     ChangeKind,
     ChangeObservation,
     ComparisonRule,
-    CoverageObservationState,
     CoverageRequirementStatus,
     CoverageVerdict,
     DeltaOperator,
     TemporalComparabilityStatus,
 )
-from .book6_comparison_coverage import ComparabilityVerdict, ReplayCheck
+from .book6_comparison_coverage import (
+    ComparabilityVerdict,
+    CoverageAuthorization,
+    ReplayCheck,
+)
 from .book6_comparison_registry import (
     ComparisonRuleRegistry,
     baseline_selector_fingerprint,
     comparison_rule_fingerprint,
+)
+from .book6_comparison_selector import (
+    BaselineOutcome,
+    BaselineSelectorError,
+    select_baseline,
 )
 from .book6_records import MeasurementObservation
 from .book6_registry import Book6MeasurementRegistry
@@ -149,14 +190,23 @@ OPERAND_NOT_FINITE_VALUE_BEARING: Final[str] = (
     "operand does not carry a finite stored binary64 value"
 )
 
-#: The sealed-replay reason fragment Rung 7 writes when check 16 recomputed a
-#: verdict. The engine consumes these recordings; it never recomputes them.
-_SUFFICIENT_RECORDING: Final[str] = "-> SUFFICIENT"
-_INSUFFICIENT_RECORDING: Final[str] = "-> INSUFFICIENT"
+#: The refusal reason for a candidate ref that does not resolve in the
+#: registry. Candidates fail closed as a set: no silent removal, no substitute.
+BASELINE_CANDIDATE_REF_UNRESOLVED: Final[str] = (
+    "BASELINE_CANDIDATE_REF_UNRESOLVED"
+)
 
-#: The sealed-replay reason fragment Rung 7 writes when coverage applicability
-#: resolved to REQUIRED for the exact metric.
-_REQUIRED_RECORDING: Final[str] = "coverage is REQUIRED"
+#: The refusal reason for a sealed verdict that arrives without its structured
+#: coverage authorization. Diagnostic prose is never a fallback.
+STRUCTURED_COVERAGE_RESULT_REQUIRED: Final[str] = (
+    "STRUCTURED_COVERAGE_RESULT_REQUIRED"
+)
+
+#: The refusal reason when the sealed selection cannot resolve a baseline for a
+#: COMPARABLE comparison. Not a record: the sealed replay made no such decision.
+BASELINE_UNAVAILABLE_AT_DERIVATION: Final[str] = (
+    "BASELINE_UNAVAILABLE_AT_DERIVATION"
+)
 
 
 @dataclass(frozen=True)
@@ -172,20 +222,6 @@ class DerivedChange:
     change_kind: ChangeKind
 
 
-@dataclass(frozen=True)
-class SealedCoverage:
-    """The coverage facts the sealed Rung 7 result carries for one record.
-
-    Read out of the frozen :class:`ComparabilityVerdict` — never recomputed.
-    ``required`` and ``verdict`` are the replay's own answers; ``state`` is
-    the R-3 discriminator derived from them.
-    """
-
-    required: bool
-    verdict: CoverageVerdict
-    state: CoverageObservationState
-
-
 def _validate_operand_cardinality(
     comparison_measurement_refs: tuple[str, ...],
 ) -> None:
@@ -193,12 +229,12 @@ def _validate_operand_cardinality(
 
     This is the executable-cardinality firewall of
     ``BOOK6-COMPARISON-OPERAND-CARDINALITY-v0.1``. The engine receives the
-    comparison set only as it stamps it — one ref, from the one observation —
-    so this check runs on every authoritative production path, before any
-    operand is examined or used. A set of any size other than one is refused
-    as a set: there is no comparison-side selector, tie-break, reducer or
-    aggregation to reduce it with, and none may be invented. The empty set is
-    refused here in the same terms, so even a Python caller bypassing the
+    comparison set only as it stamps it — one ref, from the one identity it
+    resolved — so this check runs on every authoritative production path,
+    before any operand is examined or used. A set of any size other than one is
+    refused as a set: there is no comparison-side selector, tie-break, reducer
+    or aggregation to reduce it with, and none may be invented. The empty set
+    is refused here in the same terms, so even a Python caller bypassing the
     contract's ``min_length=1`` can never reach arithmetic with zero operands.
     """
 
@@ -235,6 +271,34 @@ def _resolve_operand(
             f"{role} measurement {measurement_ref} is not current at derivation "
             f"time ({OPERAND_NOT_CURRENT}): {exc}"
         ) from exc
+
+
+def _load_candidate(
+    registry: Book6MeasurementRegistry, measurement_ref: str
+) -> MeasurementObservation:
+    """Structurally load one candidate ref, or fail closed.
+
+    Existence only — currency is the selector's eligibility gate. A candidate
+    ref that does not resolve is refused as supplied: the candidate set is
+    never silently pruned, and no other ref is ever substituted for it.
+    """
+
+    try:
+        return registry.registered_measurement(measurement_ref)
+    except Exception as exc:  # noqa: BLE001 - registry refusal is fail-closed
+        raise ChangeDerivationError(
+            f"{BASELINE_CANDIDATE_REF_UNRESOLVED}: baseline candidate "
+            f"{measurement_ref} does not resolve to a registered observation; "
+            f"the candidate set fails closed as supplied"
+        ) from exc
+
+
+def _is_current(
+    registry: Book6MeasurementRegistry,
+) -> Callable[[str], bool]:
+    """The selector's currentness authority: the GAP-7 resolver, live."""
+
+    return registry.is_authoritative_now
 
 
 def _derive_direction(absolute_delta: float) -> ChangeKind:
@@ -292,56 +356,26 @@ def _derive_deltas(
     )
 
 
-def _sealed_coverage(comparability: ComparabilityVerdict) -> SealedCoverage:
-    """Read the coverage facts the sealed Rung 7 result already carries.
+def _sealed_coverage(
+    comparability: ComparabilityVerdict,
+) -> CoverageAuthorization:
+    """The structured coverage authorization the sealed Rung 7 result carries.
 
-    Check 12's recorded reason says whether applicability resolved to
-    REQUIRED; check 16's recorded reason says what verdict the ratified rule
-    produced — ``-> SUFFICIENT`` or ``-> INSUFFICIENT`` — when a
-    determination was reached at all. A failed check 16 means no verdict was
-    claimed, which is ``UNKNOWN``: an absence of basis, never a recomputed
-    finding. Nothing here replays or recomputes anything; the recordings are
-    the rung's own sealed output.
+    A sealed verdict without its structured result cannot drive arithmetic:
+    reconstructing the facts from ``ReplayCheck.reason`` text would make
+    diagnostic prose into authority, which the sealing erratum forbids. There
+    is deliberately no prose fallback.
     """
 
-    check_12 = _check_of(comparability, 12)
-    check_16 = _check_of(comparability, 16)
-
-    required = _REQUIRED_RECORDING in check_12.reason
-
-    if check_16.passed and _SUFFICIENT_RECORDING in check_16.reason:
-        verdict = CoverageVerdict.SUFFICIENT
-    elif check_16.passed and _INSUFFICIENT_RECORDING in check_16.reason:
-        verdict = CoverageVerdict.INSUFFICIENT
-    else:
-        verdict = CoverageVerdict.UNKNOWN
-
-    if not required:
-        state = CoverageObservationState.NOT_APPLICABLE
-    elif verdict is CoverageVerdict.UNKNOWN:
-        state = CoverageObservationState.UNAVAILABLE
-    else:
-        state = CoverageObservationState.PRESENT
-
-    return SealedCoverage(required=required, verdict=verdict, state=state)
-
-
-def _check_of(comparability: ComparabilityVerdict, number: int) -> ReplayCheck:
-    """One replayed check from the sealed result, or fail closed.
-
-    A sealed result that does not carry the checks it claims to seal cannot be
-    consumed; guessing would be recomputation by another name.
-    """
-
-    check = next(
-        (c for c in comparability.coverage_checks if c.number == number), None
-    )
-    if check is None:
+    authorization = comparability.coverage
+    if authorization is None:
         raise ChangeDerivationError(
-            f"the sealed Rung 7 result carries no check {number}; a coverage "
-            f"fact cannot be consumed without the replay that produced it"
+            f"{STRUCTURED_COVERAGE_RESULT_REQUIRED}: the sealed Rung 7 result "
+            f"carries no structured CoverageAuthorization; diagnostic check "
+            f"reasons are not a canonical authority surface and will not be "
+            f"parsed as one"
         )
-    return check
+    return authorization
 
 
 def _refusal_reasons(
@@ -353,7 +387,9 @@ def _refusal_reasons(
     verdict carries is a producer: structural failures first (they are
     decisions), then the coverage replay, then check 19 itself — which is
     always failed on a non-COMPARABLE verdict, so the tuple is never empty and
-    the contract's producing-gate law is satisfiable by construction.
+    the contract's producing-gate law is satisfiable by construction. Reasons
+    are diagnostics attached to a decision the sealed replay made; they are
+    never the decision itself.
     """
 
     failed: list[ReplayCheck] = [
@@ -372,12 +408,12 @@ def _refusal_reasons(
 
 def derive_change_observation(
     *,
-    comparison: MeasurementObservation,
+    comparison_measurement_ref: str,
     baseline_measurement_refs: tuple[str, ...],
-    selected_baseline_ref: str | None,
     rule: ComparisonRule,
     registry: Book6MeasurementRegistry,
     comparison_rules_registry: ComparisonRuleRegistry,
+    semantic_fingerprint_of: Callable[[str], str],
     comparability: ComparabilityVerdict,
     change_observation_id: str,
     derivation_binding_ref: str,
@@ -386,34 +422,58 @@ def derive_change_observation(
 
     Parameters the caller may not supply, on purpose, because the engine owns
     them: ``absolute_delta``, ``relative_delta``, ``change_kind``,
-    ``comparison_measurement_refs`` (stamped from ``comparison``), the record's
-    ``selected_baseline_measurement_ref`` (``selected_baseline_ref`` is the
-    Rung 6 selector's resolved result and becomes an operand only through the
-    engine's own live resolution), and ``comparison_rule_fingerprint`` (derived
-    from the rule's canonical content; a fingerprint is content, not an
-    assertion). The signature has no parameter that could carry any of them.
+    ``comparison_measurement_refs`` (stamped from the one resolved operand),
+    the record's ``selected_baseline_measurement_ref`` (the Rung 6 selector's
+    engine-derived result, never a caller value), and
+    ``comparison_rule_fingerprint`` (derived from the rule's canonical
+    content). The signature has no parameter that could carry any of them —
+    and, per grammar v0.6 §3.2, no ``selected_baseline_ref``,
+    ``baseline_selector_result`` or ``baseline_is_valid``.
 
-    The engine consumes the sealed Rung 7 ``ComparabilityVerdict`` — check 19's
-    own result. It never replays coverage, never recomputes a verdict, and
-    never lets a caller assert a comparability the verdict does not carry.
+    The caller supplies the comparison measurement **ref** and the candidate
+    baseline refs. The engine resolves the canonical comparison through the
+    GAP-7 registry, loads every candidate structurally, replays the ratified
+    selector, and consumes the sealed Rung 7 result's structured coverage
+    authorization — never its diagnostic prose.
+
+    ``semantic_fingerprint_of`` is the same injected resolution authority the
+    ratified selector takes from its operator — one of the "same ratified
+    inputs" the sealing erratum names. The engine does not fabricate a
+    fingerprint algorithm: replaying the rule's declared
+    ``metric_definition_semantic_fingerprint`` against a canonical
+    recomputation is reserved as Rung 9 check 17, and until that helper exists
+    the gate stays injected rather than invented. ``is_current`` needs no
+    injection: the GAP-7 resolver on the accepted registry IS the currentness
+    authority, and the engine derives it.
     """
 
     if rule is None:  # pragma: no cover - typed signature forbids it
         raise ChangeDerivationError("a resolved ComparisonRule is required")
 
-    # -- 1. the operand law, before anything else --------------------------
-    comparison_refs: tuple[str, ...] = (comparison.measurement_id,)
+    # -- 1. canonical comparison resolution, before anything else ----------
+    # Refusal records are downstream of the same resolution: canonical replay
+    # checks 9-11 (registered lookup, currentness, identity) precede coverage
+    # and comparability, so no record is ever built from a caller object.
+    comparison_current = _resolve_operand(
+        registry, comparison_measurement_ref, role="comparison"
+    )
+
+    # -- 2. the operand law, before anything else --------------------------
+    comparison_refs: tuple[str, ...] = (comparison_current.measurement_id,)
     _validate_operand_cardinality(comparison_refs)
 
-    # -- 2. the sealed Rung 7 decision is the only comparability input -----
+    # -- 3. the sealed Rung 7 decision is the only comparability input, and
+    #       it must carry its structured coverage authorization ------------
     status = comparability.status
+    sealed = _sealed_coverage(comparability)
+    _require_declared_and_sealed_agree(rule, sealed)
 
     if status is not TemporalComparabilityStatus.COMPARABLE:
         # No arithmetic runs on an unresolved or refused comparison. The
         # record carries the verdict's own decision, its own reasons, and no
-        # baseline resolution — and no operands are resolved, because a
-        # refusal record must not depend on operand state the refusal
-        # already supersedes.
+        # baseline selection. Candidates are recorded as supplied, after
+        # structural existence validation — the refusal does not launder a
+        # dangling ref, and an empty set cannot be recorded at all.
         if not baseline_measurement_refs:
             raise ChangeDerivationError(
                 "the contract requires at least one baseline candidate ref on "
@@ -421,13 +481,13 @@ def derive_change_observation(
                 "be recorded (record the refusal through the selector's own "
                 "exclusions instead)"
             )
-        sealed = _sealed_coverage(comparability)
-        _require_declared_and_sealed_agree(rule, sealed)
+        for ref in baseline_measurement_refs:
+            _load_candidate(registry, ref)
         return ChangeObservation(
             change_observation_id=change_observation_id,
-            subject_ref=comparison.subject_ref,
-            valid_time=comparison.valid_time,
-            metric_definition_ref=comparison.metric_definition_ref,
+            subject_ref=comparison_current.subject_ref,
+            valid_time=comparison_current.valid_time,
+            metric_definition_ref=comparison_current.metric_definition_ref,
             metric_definition_semantic_fingerprint=(
                 rule.metric_definition_semantic_fingerprint
             ),
@@ -449,32 +509,28 @@ def derive_change_observation(
                 if status is TemporalComparabilityStatus.NOT_COMPARABLE
                 else ChangeKind.INSUFFICIENT_DATA
             ),
-            unit=comparison.unit or "unknown",
-            source_measurement_refs=(comparison.measurement_id,),
-            measurement_methodology_refs=(comparison.methodology_identity,),
-            coverage_requirement_status=rule.coverage_requirement_status,
+            unit=comparison_current.unit or "unknown",
+            source_measurement_refs=(comparison_current.measurement_id,),
+            measurement_methodology_refs=(comparison_current.methodology_identity,),
+            coverage_requirement_status=sealed.applicability.requirement_status,
             coverage_applicability_source_ref=(
-                rule.coverage_applicability_source_ref if sealed.required else None
-            ),
-            coverage_observation_state=sealed.state,
-            coverage_observation_ref=(
-                comparison.coverage_observation_id
-                if sealed.state is CoverageObservationState.PRESENT
+                rule.coverage_applicability_source_ref
+                if sealed.applicability.requirement_status
+                is CoverageRequirementStatus.REQUIRED
                 else None
             ),
+            coverage_observation_state=sealed.observation_state,
+            coverage_observation_ref=sealed.observation_ref,
             coverage_verdict=sealed.verdict,
-            missingness=comparison.missingness_state.value,
+            missingness=comparison_current.missingness_state.value,
             comparability_status=status,
             comparability_refusal_reasons=_refusal_reasons(comparability),
             display_metadata={},
         )
 
-    # -- 3. the sealed replay and the governing rule must agree, and
-    #       COMPARABLE requires the sealed replay to have recomputed a
-    #       SUFFICIENT verdict; the engine enforces both instead of
-    #       trusting either -------------------------------------------------
-    sealed = _sealed_coverage(comparability)
-    _require_declared_and_sealed_agree(rule, sealed)
+    # -- 4. COMPARABLE requires the sealed replay to have recomputed a
+    #       SUFFICIENT verdict; the engine enforces this on the STRUCTURED
+    #       verdict instead of trusting either side ------------------------
     if sealed.verdict is not CoverageVerdict.SUFFICIENT:
         raise ChangeDerivationError(
             "comparability is COMPARABLE but the sealed Rung 7 replay did not "
@@ -482,29 +538,73 @@ def derive_change_observation(
             "result and will not perform arithmetic that contradicts it"
         )
 
-    # -- 4. live currentness of BOTH operands ------------------------------
-    if selected_baseline_ref is None:
+    # -- 5. exact rule metric binding: the comparison operand must measure
+    #       the metric the governing rule governs. Pairwise operand equality
+    #       alone would let a rule for metric B drive metric A arithmetic. --
+    if comparison_current.metric_definition_ref != rule.metric_definition_ref:
         raise ChangeDerivationError(
-            "COMPARABLE arithmetic requires a selected baseline; None means "
-            "BASELINE_UNAVAILABLE and no arithmetic can run"
+            f"the comparison measures {comparison_current.metric_definition_ref} "
+            f"but the governing rule {rule.comparison_rule_id} is bound to "
+            f"{rule.metric_definition_ref}; exact rule metric binding forbids "
+            f"the derivation and no substitution exists"
         )
-    comparison_current = _resolve_operand(
-        registry, comparison.measurement_id, role="comparison"
-    )
-    baseline_current = _resolve_operand(
-        registry, selected_baseline_ref, role="baseline"
-    )
 
-    # -- 5. same metric definition, same exact unit ------------------------
-    if (
-        baseline_current.metric_definition_ref
-        != comparison_current.metric_definition_ref
-    ):
+    # -- 6. candidate integrity: every candidate ref must structurally
+    #       resolve. The set fails closed as supplied — no pruning, no
+    #       substitution, and the selector's answer must be one of them. ----
+    candidates = tuple(
+        _load_candidate(registry, ref) for ref in baseline_measurement_refs
+    )
+    candidate_refs = frozenset(baseline_measurement_refs)
+
+    # -- 7. the ratified Rung 6 selector, replayed by the engine. Same
+    #       function, same ratified inputs; there is no second selector. ----
+    try:
+        selection = select_baseline(
+            comparison=comparison_current,
+            candidates=candidates,
+            rule=rule,
+            semantic_fingerprint_of=semantic_fingerprint_of,
+            is_current=_is_current(registry),
+        )
+    except BaselineSelectorError as exc:
+        raise ChangeDerivationError(
+            f"{BASELINE_UNAVAILABLE_AT_DERIVATION}: the ratified selector "
+            f"could not run fail-closed ({exc})"
+        ) from exc
+    if selection.outcome is not BaselineOutcome.RESOLVED:
+        exclusions = ", ".join(
+            f"{ref}: {reason.value}" for ref, reason in selection.exclusions
+        ) or "no candidates were supplied"
+        raise ChangeDerivationError(
+            f"{BASELINE_UNAVAILABLE_AT_DERIVATION}: no candidate satisfied the "
+            f"ratified PRIOR_COMPARABLE_WINDOW gates for rule metric "
+            f"{rule.metric_definition_ref} and comparison metric "
+            f"{comparison_current.metric_definition_ref} (exclusions: "
+            f"{exclusions}); no unit conversion exists and no candidate "
+            f"substitution is permitted"
+        )
+    selected_ref = selection.selected_measurement_ref
+    if selected_ref is None or selected_ref not in candidate_refs:
+        # Unreachable through the selector's own contract; guarded because the
+        # selected operand must provably be a member of the supplied set.
+        raise ChangeDerivationError(  # pragma: no cover - selector invariant
+            f"{BASELINE_UNAVAILABLE_AT_DERIVATION}: the selector's result "
+            f"{selected_ref!r} is not a member of the supplied candidate set"
+        )
+
+    # -- 8. live currentness of the selected baseline, through the same
+    #       GAP-7 resolver the comparison went through ----------------------
+    baseline_current = _resolve_operand(registry, selected_ref, role="baseline")
+
+    # -- 9. the three-way binding completes: the selected baseline measures
+    #       the rule's metric too, and the operands share one exact unit ----
+    if baseline_current.metric_definition_ref != rule.metric_definition_ref:
         raise ChangeDerivationError(
             f"baseline {baseline_current.measurement_id} measures "
-            f"{baseline_current.metric_definition_ref}, comparison measures "
-            f"{comparison_current.metric_definition_ref}; same-metric exact-unit "
-            f"identity forbids cross-metric arithmetic and no conversion exists"
+            f"{baseline_current.metric_definition_ref} but the governing rule "
+            f"is bound to {rule.metric_definition_ref}; exact rule metric "
+            f"binding forbids the derivation"
         )
     if baseline_current.unit != comparison_current.unit:
         raise ChangeDerivationError(
@@ -520,10 +620,10 @@ def derive_change_observation(
             "not an arithmetic value this engine may compare"
         )
 
-    # -- 6. the rule itself must hold authority now ------------------------
+    # -- 10. the rule itself must hold authority now ------------------------
     _require_rule_authority(comparison_rules_registry, rule)
 
-    # -- 7. finite stored operands, then the arithmetic, exactly once ------
+    # -- 11. finite stored operands, then the arithmetic, exactly once ------
     comparison_value = _finite_operand_value(
         comparison_current.value, role="comparison"
     )
@@ -535,16 +635,17 @@ def derive_change_observation(
         delta_operator=rule.delta_operator,
     )
 
-    # -- 8. the coverage observation ref travels with its evidence ---------
-    if comparison_current.coverage_observation_id is None:
+    # -- 12. the sealed coverage facts are the record's coverage facts ------
+    if sealed.observation_ref is None:
         raise ChangeDerivationError(
-            f"coverage replay reached SUFFICIENT for "
-            f"{comparison_current.measurement_id} but the observation record "
-            f"cites no coverage_observation_id; a PRESENT coverage state "
-            f"without its observation ref is not a record this engine may write"
+            f"the sealed Rung 7 replay recomputed SUFFICIENT for "
+            f"{comparison_current.measurement_id} but its structured "
+            f"authorization names no coverage observation ref; a PRESENT "
+            f"coverage state without its observation ref is not a record this "
+            f"engine may write (R-3)"
         )
 
-    # -- 9. assemble the authoritative record ------------------------------
+    # -- 13. assemble the authoritative record ------------------------------
     return ChangeObservation(
         change_observation_id=change_observation_id,
         subject_ref=comparison_current.subject_ref,
@@ -576,10 +677,10 @@ def derive_change_observation(
             comparison_current.methodology_identity,
             baseline_current.methodology_identity,
         ),
-        coverage_requirement_status=CoverageRequirementStatus.REQUIRED,
+        coverage_requirement_status=sealed.applicability.requirement_status,
         coverage_applicability_source_ref=rule.coverage_applicability_source_ref,
-        coverage_observation_state=sealed.state,
-        coverage_observation_ref=comparison_current.coverage_observation_id,
+        coverage_observation_state=sealed.observation_state,
+        coverage_observation_ref=sealed.observation_ref,
         coverage_verdict=sealed.verdict,
         missingness=comparison_current.missingness_state.value,
         comparability_status=status,
@@ -589,7 +690,7 @@ def derive_change_observation(
 
 
 def _require_declared_and_sealed_agree(
-    rule: ComparisonRule, sealed: SealedCoverage
+    rule: ComparisonRule, sealed: CoverageAuthorization
 ) -> None:
     """Fail closed when the sealed replay and the governing rule disagree.
 
@@ -603,10 +704,13 @@ def _require_declared_and_sealed_agree(
     declared_required = (
         rule.coverage_requirement_status is CoverageRequirementStatus.REQUIRED
     )
-    if sealed.required != declared_required:
+    sealed_required = (
+        sealed.applicability.requirement_status is CoverageRequirementStatus.REQUIRED
+    )
+    if sealed_required != declared_required:
         raise ChangeDerivationError(
             f"the sealed coverage replay resolved applicability "
-            f"{'REQUIRED' if sealed.required else 'UNRESOLVED'} but the "
+            f"{'REQUIRED' if sealed_required else 'UNRESOLVED'} but the "
             f"governing rule declares "
             f"{rule.coverage_requirement_status.value}; the engine consumes "
             f"sealed results and will not record a coverage basis that "
@@ -652,11 +756,13 @@ def _finite_operand_value(value: float | None, *, role: str) -> float:
 
 __all__ = [
     "AUTHORITATIVE_COMPARISON_MEASUREMENT_COUNT",
+    "BASELINE_CANDIDATE_REF_UNRESOLVED",
+    "BASELINE_UNAVAILABLE_AT_DERIVATION",
     "MULTI_COMPARISON_MEASUREMENT_SET_NOT_AUTHORIZED",
     "OPERAND_NOT_CURRENT",
     "OPERAND_NOT_FINITE_VALUE_BEARING",
+    "STRUCTURED_COVERAGE_RESULT_REQUIRED",
     "ChangeDerivationError",
     "DerivedChange",
-    "SealedCoverage",
     "derive_change_observation",
 ]

@@ -205,12 +205,23 @@ class CoverageAuthorization:
 
 @dataclass(frozen=True)
 class ComparabilityVerdict:
-    """The GAP-4 / 4D answer, with check 19 separable from 12–16."""
+    """The GAP-4 / 4D answer, with check 19 separable from 12–16.
+
+    ``coverage`` carries the structured :class:`CoverageAuthorization` this
+    verdict was derived from — the applicability, observation state,
+    observation ref and verdict themselves, not their diagnostic prose.
+    Consumers must read authority from it and never from check reasons, which
+    remain present for check-by-check falsifiability only. It is optional so
+    the value object remains constructible by a caller who has no structured
+    result; an authoritative consumer refuses a verdict without one rather
+    than reconstructing facts from reason text.
+    """
 
     status: TemporalComparabilityStatus
     check_19: ReplayCheck
     coverage_checks: tuple[ReplayCheck, ...]
     structural_failures: tuple[ReplayCheck, ...] = ()
+    coverage: CoverageAuthorization | None = None
 
     @property
     def is_comparable(self) -> bool:
@@ -477,7 +488,7 @@ def replay_coverage_checks(
     )
 
     resolved_state = (
-        CoverageObservationState.NOT_APPLICABLE
+        CoverageObservationState.UNAVAILABLE
         if not required
         else (
             CoverageObservationState.PRESENT
@@ -541,6 +552,7 @@ def derive_temporal_comparability(
             check_19=check_19,
             coverage_checks=coverage.checks,
             structural_failures=explicit_failures,
+            coverage=coverage,
         )
 
     # Coverage authority: could a determination be established at all?
@@ -560,6 +572,7 @@ def derive_temporal_comparability(
             status=TemporalComparabilityStatus.UNRESOLVED,
             check_19=check_19,
             coverage_checks=coverage.checks,
+            coverage=coverage,
         )
 
     if coverage.verdict is CoverageVerdict.INSUFFICIENT:
@@ -577,6 +590,7 @@ def derive_temporal_comparability(
             status=TemporalComparabilityStatus.NOT_COMPARABLE,
             check_19=check_19,
             coverage_checks=coverage.checks,
+            coverage=coverage,
         )
 
     if coverage.verdict is not CoverageVerdict.SUFFICIENT:
@@ -592,6 +606,7 @@ def derive_temporal_comparability(
             status=TemporalComparabilityStatus.UNRESOLVED,
             check_19=check_19,
             coverage_checks=coverage.checks,
+            coverage=coverage,
         )
 
     check_19 = ReplayCheck(
@@ -604,6 +619,7 @@ def derive_temporal_comparability(
         status=TemporalComparabilityStatus.COMPARABLE,
         check_19=check_19,
         coverage_checks=coverage.checks,
+        coverage=coverage,
     )
 
 

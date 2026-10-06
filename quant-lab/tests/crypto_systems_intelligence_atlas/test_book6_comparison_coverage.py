@@ -30,6 +30,7 @@ from crypto_systems_intelligence_atlas.book6_comparison_coverage import (
     resolve_coverage_applicability,
 )
 from crypto_systems_intelligence_atlas.book6_comparison_contracts import (
+    CoverageObservationState,
     CoverageRequirementStatus,
     CoverageVerdict,
     TemporalComparabilityStatus,
@@ -358,6 +359,27 @@ def test_unratified_named_rule_claims_no_verdict() -> None:
     assert auth.verdict is CoverageVerdict.UNKNOWN
     assert derive_temporal_comparability(coverage=auth).status is (
         TemporalComparabilityStatus.UNRESOLVED)
+
+
+def test_unresolved_applicability_is_unavailable_never_not_applicable() -> None:
+    """R-3 / AC-17: an absence encoding is UNAVAILABLE, never NOT_APPLICABLE.
+
+    Applicability UNRESOLVED means no authoritative determination exists — an
+    absence. ``NOT_APPLICABLE`` means coverage is authoritatively known not to
+    apply, and grammar v0.6 §6 forbids reading it as an absence encoding:
+    ``NOT_APPLICABLE is never an absence encoding under this grammar``. The
+    sealed observation state carries that distinction: an absent determination
+    is UNAVAILABLE in exactly the same way an absent observation is.
+    """
+
+    auth = _replay(_registry(_rule(), ratify=False),
+                   observation=_observation(fraction=0.99))
+    assert auth.applicability.requirement_status is (
+        CoverageRequirementStatus.UNRESOLVED
+    )
+    assert auth.observation_state is CoverageObservationState.UNAVAILABLE
+    assert auth.observation_state is not CoverageObservationState.NOT_APPLICABLE
+    assert auth.observation_ref is None
 
 
 def test_coverage_ref_is_dropped_when_observation_is_absent() -> None:

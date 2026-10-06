@@ -3532,6 +3532,230 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "registration is not authority",
         "test_book6_comparison_change_derivation.py",
         "test_rule_without_live_authority_is_refused",
+    ),
+    # -- Rung 8 authority sealing erratum v0.1: baseline authority ------------
+    (
+        "CMP.CHANGE.21",
+        "CMP.CHANGE_ARITHMETIC",
+        "the derivation API has no selected_baseline_ref, "
+        "baseline_selector_result or baseline_is_valid parameter; the caller "
+        "may not author the selected baseline (grammar v0.6 §3.2)",
+        "test_book6_comparison_change_derivation.py",
+        "test_caller_cannot_provide_selected_baseline_ref",
+    ),
+    (
+        "CMP.CHANGE.22",
+        "CMP.CHANGE_ARITHMETIC",
+        "an observation outside the supplied candidate set can never become "
+        "the selected baseline; the outsider appears nowhere on the record",
+        "test_book6_comparison_change_derivation.py",
+        "test_outsider_cannot_become_the_selected_baseline",
+    ),
+    (
+        "CMP.CHANGE.23",
+        "CMP.CHANGE_ARITHMETIC",
+        "the candidate set is the caller's only influence on selection; the "
+        "selector's deterministic answer cannot be forced to another member",
+        "test_book6_comparison_change_derivation.py",
+        "test_caller_cannot_force_b_when_the_selector_selects_a",
+    ),
+    (
+        "CMP.CHANGE.24",
+        "CMP.CHANGE_ARITHMETIC",
+        "the derivation is independent of caller candidate ordering: every "
+        "derived field and the selected ref are identical either way",
+        "test_book6_comparison_change_derivation.py",
+        "test_candidate_ordering_does_not_change_the_result",
+    ),
+    (
+        "CMP.CHANGE.25",
+        "CMP.CHANGE_ARITHMETIC",
+        "the engine-derived selected baseline is always a member of the "
+        "supplied candidate set",
+        "test_book6_comparison_change_derivation.py",
+        "test_selected_baseline_is_always_in_the_candidate_set",
+    ),
+    (
+        "CMP.CHANGE.26",
+        "CMP.CHANGE_ARITHMETIC",
+        "an unknown or dangling candidate ref fails the whole set closed: "
+        "no silent pruning, no substitution",
+        "test_book6_comparison_change_derivation.py",
+        "test_unknown_candidate_fails_closed",
+    ),
+    (
+        "CMP.CHANGE.27",
+        "CMP.CHANGE_ARITHMETIC",
+        "a dangling candidate is refused even alongside a viable one, and an "
+        "unregistered ref fails the same way",
+        "test_book6_comparison_change_derivation.py",
+        "test_unknown_candidate_is_refused_even_alongside_a_viable_one",
+    ),
+    (
+        "CMP.CHANGE.28",
+        "CMP.CHANGE_ARITHMETIC",
+        "SELECTOR_IMPLEMENTATIONS = 1: the Rung 8 selection equals a direct "
+        "Rung 6 select_baseline call over the same ratified inputs",
+        "test_book6_comparison_change_derivation.py",
+        "test_rung8_selector_result_equals_direct_rung6_selector_result",
+    ),
+    (
+        "CMP.CHANGE.29",
+        "CMP.CHANGE_ARITHMETIC",
+        "coverage never influences baseline selection: the selector reads no "
+        "coverage state and a differing live coverage state under one sealed "
+        "verdict does not move the selection",
+        "test_book6_comparison_change_derivation.py",
+        "test_coverage_never_influences_baseline_selection",
+    ),
+    # -- Rung 8 authority sealing erratum v0.1: structured coverage -----------
+    (
+        "CMP.CHANGE.30",
+        "CMP.CHANGE_ARITHMETIC",
+        "reason-wording-only mutation of a sealed verdict changes nothing in "
+        "the derived record; DIAGNOSTIC_TEXT_IS_AUTHORITY = FALSE",
+        "test_book6_comparison_change_derivation.py",
+        "test_reason_wording_cannot_change_the_coverage_verdict",
+    ),
+    (
+        "CMP.CHANGE.31",
+        "CMP.CHANGE_ARITHMETIC",
+        "the coverage requirement status is a structured field; check 12's "
+        "prose cannot move it",
+        "test_book6_comparison_change_derivation.py",
+        "test_reason_wording_cannot_change_the_requirement_status",
+    ),
+    (
+        "CMP.CHANGE.32",
+        "CMP.CHANGE_ARITHMETIC",
+        "the derivation module carries no reason-fragment authority and no "
+        "prose parser; the structured-coverage refusal is named in source",
+        "test_book6_comparison_change_derivation.py",
+        "test_rung8_reads_no_reason_string_for_semantic_decisions",
+    ),
+    (
+        "CMP.CHANGE.33",
+        "CMP.CHANGE_ARITHMETIC",
+        "a sealed verdict without its structured CoverageAuthorization cannot "
+        "drive arithmetic on either the positive or the refusal path; prose is "
+        "never a fallback",
+        "test_book6_comparison_change_derivation.py",
+        "test_sealed_verdict_without_structured_coverage_cannot_drive_arithmetic",
+    ),
+    (
+        "CMP.CHANGE.34",
+        "CMP.CHANGE_ARITHMETIC",
+        "a SUFFICIENT structured verdict persists its state, ref and "
+        "requirement status onto the record",
+        "test_book6_comparison_change_derivation.py",
+        "test_sufficient_structured_verdict_persists",
+    ),
+    (
+        "CMP.CHANGE.35",
+        "CMP.CHANGE_ARITHMETIC",
+        "an INSUFFICIENT structured verdict persists and maps to the sealed "
+        "NOT_COMPARABLE decision",
+        "test_book6_comparison_change_derivation.py",
+        "test_insufficient_structured_verdict_persists",
+    ),
+    (
+        "CMP.CHANGE.36",
+        "CMP.CHANGE_ARITHMETIC",
+        "an UNKNOWN structured verdict persists as UNAVAILABLE / "
+        "INSUFFICIENT_DATA — an absence encoding, never NOT_APPLICABLE",
+        "test_book6_comparison_change_derivation.py",
+        "test_unknown_structured_verdict_persists",
+    ),
+    (
+        "CMP.CHANGE.37",
+        "CMP.CHANGE_ARITHMETIC",
+        "ReplayCheck reasons remain present for check-by-check falsifiability "
+        "alongside structured consumption; they are never canonical",
+        "test_book6_comparison_change_derivation.py",
+        "test_replaycheck_reasons_remain_present_for_diagnostics",
+    ),
+    # -- erratum: metric binding / canonical object ----------------------------
+    (
+        "CMP.CHANGE.38",
+        "CMP.CHANGE_ARITHMETIC",
+        "exact rule metric binding: a rule bound to metric B is refused for "
+        "metric A operands before selection and arithmetic",
+        "test_book6_comparison_change_derivation.py",
+        "test_rule_metric_b_with_metric_a_operands_is_refused",
+    ),
+    (
+        "CMP.CHANGE.39",
+        "CMP.CHANGE_ARITHMETIC",
+        "the three-way binding refuses a baseline whose metric differs from "
+        "the rule's metric",
+        "test_book6_comparison_change_derivation.py",
+        "test_baseline_metric_differs_from_rule_metric_is_refused",
+    ),
+    (
+        "CMP.CHANGE.40",
+        "CMP.CHANGE_ARITHMETIC",
+        "the positive path requires comparison == baseline == rule metric "
+        "definition ref, exactly",
+        "test_book6_comparison_change_derivation.py",
+        "test_all_three_metric_refs_equal_is_the_positive_path",
+    ),
+    (
+        "CMP.CHANGE.41",
+        "CMP.CHANGE_ARITHMETIC",
+        "the derivation API accepts a ref, not an object: a mutated caller "
+        "comparison copy has no authority channel over subject, metric or "
+        "coverage ref",
+        "test_book6_comparison_change_derivation.py",
+        "test_mutated_caller_comparison_object_has_no_authority_channel",
+    ),
+    (
+        "CMP.CHANGE.42",
+        "CMP.CHANGE_ARITHMETIC",
+        "an UNRESOLVED refusal record is built from the canonical "
+        "registry-resolved comparison, never a caller copy",
+        "test_book6_comparison_change_derivation.py",
+        "test_refusal_record_uses_canonical_registered_comparison",
+    ),
+    (
+        "CMP.CHANGE.43",
+        "CMP.CHANGE_ARITHMETIC",
+        "a NOT_COMPARABLE refusal record is built from the canonical "
+        "registry-resolved comparison, never a caller copy",
+        "test_book6_comparison_change_derivation.py",
+        "test_not_comparable_refusal_record_uses_canonical_registered_comparison",
+    ),
+    (
+        "CMP.CHANGE.44",
+        "CMP.CHANGE_ARITHMETIC",
+        "methodology identity on the record derives from the canonical "
+        "resolved operands",
+        "test_book6_comparison_change_derivation.py",
+        "test_methodology_identity_derives_from_the_canonical_record",
+    ),
+    # -- erratum: fail-closed selection and state mapping ----------------------
+    (
+        "CMP.CHANGE.45",
+        "CMP.CHANGE_ARITHMETIC",
+        "BASELINE_UNAVAILABLE on a COMPARABLE verdict is a derivation fault, "
+        "not a record; no placeholder baseline ref is invented",
+        "test_book6_comparison_change_derivation.py",
+        "test_comparable_with_no_eligible_baseline_fails_closed",
+    ),
+    (
+        "CMP.CHANGE.46",
+        "CMP.CHANGE_ARITHMETIC",
+        "a superseded candidate is excluded by the selector's live currentness "
+        "gate (NOT_CURRENT) and can never be selected",
+        "test_book6_comparison_change_derivation.py",
+        "test_superseded_candidate_is_excluded_by_the_selector_gate",
+    ),
+    (
+        "CMP.CHANGE.47",
+        "CMP.COVERAGE_AUTHORITY",
+        "R-3 / AC-17: applicability UNRESOLVED is an absence encoding and "
+        "resolves the observation state to UNAVAILABLE, never NOT_APPLICABLE",
+        "test_book6_comparison_coverage.py",
+        "test_unresolved_applicability_is_unavailable_never_not_applicable",
     ),)
 
 
