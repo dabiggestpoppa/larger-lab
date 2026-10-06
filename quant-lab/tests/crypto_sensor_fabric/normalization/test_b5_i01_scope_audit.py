@@ -65,19 +65,24 @@ def test_package_exists_with_exactly_three_modules() -> None:
     assert files == ["__init__.py", "enums.py", "models.py"]
 
 
-def test_no_subpackage_directory_exists() -> None:
-    assert not [
-        entry
+def test_only_authorized_subpackages_exist() -> None:
+    """B5-I02 (operator-authorized) added ``identity/`` per bloc_05/01 §16.
+    Every other subpackage remains forbidden at this layer."""
+    allowed = {"identity"}
+    present = {
+        entry.name
         for entry in PACKAGE.iterdir()
         if entry.is_dir() and entry.name != "__pycache__"
-    ]
+    }
+    assert present <= allowed, f"unauthorized subpackages: {sorted(present - allowed)}"
 
 
 @pytest.mark.parametrize(
     "forbidden",
     [
-        # frozen doc 05 §16 module plans, none of which is authorized at I01
-        "identity",
+        # frozen doc 05 §16 module plans, none of which is authorized at I01;
+        # "identity" was operator-authorized at B5-I02 (SENSOR-B5-I02 directive)
+        # and is now the home of the identity subpackage.
         "time",
         "sensors",
         "common",
