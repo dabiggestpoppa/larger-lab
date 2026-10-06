@@ -4993,3 +4993,216 @@ Bloc 4 is closed and accepted; the Bloc 4 -> Bloc 5 handoff contract is
 operator-accepted and frozen. **Bloc 5 normalization remains unimplemented and
 B5-I01 was NOT started in this run.** No production defect was found requiring a
 source change, so no repair checkpoint is issued. Research FROZEN. STOP.
+
+---
+
+## 155 — SENSOR-B5-I01: NORMALIZATION ENUMS / BASE MODELS / T1 ENVELOPE
+
+**Checkpoint:** SENSOR-B5-I01 — the foundational type layer of Bloc 5.
+**Branch:** `agent/crypto-sensor-fabric-build`
+**Start head (mandatory):** `ae152d010f3cd8c472c6dc0593a0e94f779cb079`
+**Scope:** B5-I01 ONLY. B5-I02+ UNAUTHORIZED. Bloc 6 UNAUTHORIZED. Research FROZEN.
+**Authority:** the seven frozen `bloc_05/0*.md` planning documents (which carry
+`PASS_BLOC_05_PLAN_FROZEN`) plus the operator-accepted
+`BLOC_04_I17_BLOC5_HANDOFF_CONTRACT.md`.
+
+> **Vocabulary and container, not normalization.** B5-I01 resolves nothing. It
+> adds the type layer in which a canonical observation can eventually be
+> expressed and the vocabulary with which it must report that it could not be
+> expressed. No identity/lifecycle/alias registry or resolver, no contract
+> terms, no linear/inverse or unit conversion, no stablecoin conversion, no
+> timestamp or availability derivation, no revision engine, no methodology or
+> semantic registry, no sensor normalizer, no T1 writer / generation / manifest /
+> storage / canonical query, no provider fixture and no network access were
+> implemented. Every one of those belongs to a later frozen checkpoint.
+
+### 0. Start gate
+
+Verified before any edit: branch `agent/crypto-sensor-fabric-build`; HEAD
+`ae152d010f3cd8c472c6dc0593a0e94f779cb079`; `origin/agent/crypto-sensor-fabric-build`
+== local HEAD; `origin/main` = `7c7816f382947bbc8a1f2154435fc436f2428fa8`
+(never pushed to); clean worktree. All eleven governance values in ledger §154
+matched exactly. No reset, rebase, amend, squash or force push.
+
+### 1. Type-scope inventory (done BEFORE any code)
+
+`evidence/bloc_05/BLOC_05_I01_TYPE_SCOPE_MATRIX.json` — **61 rows: 24 implemented
+at I01, 37 deferred**, each row carrying its plan section and its reason. The
+enum suite was committed RED on purpose in B5-I01A, so the inventory is the
+executable contract rather than a retrospective summary.
+
+Two **measured vocabulary gaps were recorded, not invented**: `AvailabilityConfidence`
+(bloc_05/02 §5 names the field but never freezes its vocabulary) and `VenueScope`
+(bloc_05/01 §13 names only `MULTI_VENUE_AGGREGATE` and says "such as"). Both are
+deferred; both are asserted to still be absent.
+
+### 2. Implementation
+
+**Production (3 files, new package `quant-lab/src/crypto_sensor_fabric/normalization/`):**
+`__init__.py`, `enums.py`, `models.py`. **Tests (4 files)** in
+`quant-lab/tests/crypto_sensor_fabric/normalization/`. **Evidence (4 files)** in
+`research/crypto_foundry/sensor_fabric/evidence/bloc_05/`.
+
+**Enums (10):** `PayoffType` (5), `NormalizationStatus` (8),
+`MissingnessReason` (13), `NormalizationQualityFlag` (36),
+`QualityDimensionState` (6), `LineageState` (3), `QuarantineReason` (7),
+`IntervalTimeConvention` (4), `AvailabilityBasis` (8), `TimestampPrecision` (6).
+Plus two read-only frozen correspondences: `BLOCKED_STATUS_MISSINGNESS_REASON`
+(MappingProxyType) and `BLOCKING_QUALITY_FLAGS` (frozenset).
+
+**Models (6):** `ObservationTimeEnvelope` (15 fields, all nine frozen clocks),
+`NativeQuantity` (4), `T1Quality` (8 frozen dimensions, no defaults),
+`T1LineageRef` (7), `T1VersionContext` (5), `T1BaseEnvelope` (27). Validated
+opaque identifier types: `OpaqueIdentifier`, `T1RecordId`, `ContractInstanceId`,
+`T1GenerationId`, `RegistryVersion`. Serialization: `canonical_json_bytes`.
+
+**Public export surface:** exactly 24 names.
+
+### 3. Frozen distinctions preserved, not collapsed
+
+* `BLOCKED_IDENTITY` (status, bloc_05/03 §15) and `IDENTITY_BLOCKED`
+  (missingness, bloc_05/05 §12) are both kept exactly as frozen and related by
+  frozen read-only data rather than renamed to match each other.
+* The quality-flag vocabulary is the **union** of bloc_05/05 §11's "minimum"
+  list with bloc_05/01 §14 and bloc_05/02 §16 = 36 members, because §11's
+  identity and time groups are strict subsets. Additive only.
+* Upstream vocabularies are consumed where they already live and **zero** are
+  re-declared: `SensorFamily` (`contracts.enums`), `Granularity`
+  (`probes.enums`), `CoverageState`, `RevisionState`, `SourceUnitContract` and
+  the `SourceUnitEvidence` model itself (public `storage`). A test intersects
+  the normalization export set with the accepted 200-symbol Bloc 4 public
+  surface and requires the intersection to be empty.
+* The frozen full name **`T1ObservationEnvelope` is deliberately NOT exported**:
+  the frozen envelope also carries identity, methodology and replay-eligibility
+  fields owned by B5-I02/I09/I06, so exporting it now would let a consumer
+  mistake the base layer for the finished contract. The base layer is
+  `T1BaseEnvelope`; `T1LineageRef` is likewise the ref-only component of the
+  frozen `T1Lineage` (B5-I16).
+* `bloc_05/02 §11`'s `AS_KNOWN_THEN` / `LATEST_VERIFIED` names overlap the
+  accepted Bloc 4 `RevisionPolicy` with **different meanings** (research replay
+  policy vs raw-evidence query policy). They are therefore kept as separate
+  types, introduced at B5-I07 — neither reused nor duplicated at I01.
+
+### 4. Laws the base layer enforces (fail closed)
+
+Blank and whitespace-padded identifiers refused everywhere; naive datetimes
+refused and present values UTC-normalized; `interval_end_at >=
+interval_start_at` as the only universally valid ordering (bloc_05/02 §6's
+`published_at < effective_at` stays representable, and is tested); interval
+bounds require an explicit `interval_closed` **and**
+`interval_time_convention`; `market_available_at` requires a basis and is
+refused with `UNKNOWN`; quality flags must be in canonical order and
+duplicate-free; `lineage_state` must agree with exactly one matching lineage
+flag; a canonical status requires `contract_instance_id`, at least one native
+value and four registry/methodology versions, and may carry no blocking flag;
+each `BLOCKED_*` status requires exactly its own typed missingness cause;
+`QUARANTINED` requires a typed reason, evidence refs and non-blank remediation
+(and quarantine metadata is refused on a non-quarantined row); five
+`VERIFIED`-dimension contradictions are refused; `extra="forbid"` throughout.
+
+Native truth is structurally protected: no B5-I01 model has any
+`normalized_value`, `canonical_value`, `notional`, `usd` or `usd_equivalent`
+field, so "native was overwritten by normalized" is unrepresentable rather than a
+bug caught later. Provider and venue are separate required fields with no
+collapsed `source` field, and `provider=COINALYZE, venue=BINANCE_USDM`
+constructs. Absence is always a typed `MissingnessReason`, never a bool and
+never a zero — no model field anywhere defaults to a numeric zero, asserted
+structurally. No field name contains `usd` or `fiat`: the stablecoin firewall is
+structural. `t1_record_id` is Optional because the deterministic identity
+algorithm is B5-I16, and no identifier, hash, UUID or wall-clock value is
+generated during construction.
+
+### 5. Verification
+
+Focused (normalization + Bloc 4 handoff I16/I16R1/I16R2 + G4-13 + I11R2 +
+job-state + storage enums) = **549 passed / 0 failed** (114 s). Full storage =
+**2019 passed / 13 skipped / 0 failed** (1330 s). Full project (`pytest tests`) =
+**3702 passed / 14 skipped / 0 failed** (1172 s) — the accepted pre-B5-I01
+baseline of 3398 plus exactly the 304 new B5-I01 tests. **Zero deterministic
+failures.**
+
+Ruff `src tests` = exactly the **2 pre-existing** findings in the untouched
+`tests/crypto_sensor_fabric/storage/test_i08_evidence.py`; ruff on the new
+changed scope = **All checks passed**. mypy on
+`src/crypto_sensor_fabric/normalization` = **0 errors** in the new files (the 10
+findings reported are the accepted pre-existing baseline in
+`probes/planner.py`, `providers/rest.py`, `providers/{okx,kraken,gate,deribit}`
+probes — unchanged). compileall OK. Secret scan 4 passed.
+
+Zero network: `network_calls = 0`, proven both by the absence of any HTTP/socket
+import in production source and by importing the package with
+`socket.socket` / `socket.create_connection` patched to raise.
+
+Forbidden later-stage modules confirmed absen
+t by SENSOR-B5-I01-RESUME: the original §155 append was truncated mid-sentence
+by a session interruption; everything above is preserved verbatim, and the
+remainder of this section was appended by the resume session. All verification
+below is a FRESH final-tree re-run, not a copy of pre-interruption numbers.
+
+### 5a. Final-tree re-verification (fresh, resume session)
+
+normalization = **304 passed** (2.8 s). Focused regression = **606 passed /
+0 failed** (145 s) — superset composition: all 4 B5-I01 normalization test
+files + I16 G4-13 readiness/core/evidence + I16R1 G4-13/unit contract/unit
+semantic audit + I16R2 G4-13/real provider units/claim truth/integrity/location
++ I11R2 binding audit + I11R2 evidence + job-state/adversarial/r1 + storage
+enums. I11R2 no-update rerun = **4 passed**, audit **byte-stable** (SHA-256
+`e1bbd772…d5e36e` identical before and after).
+
+Full storage on the final tree = **2019 passed / 13 skipped / 0 failed**
+(1423 s); no teardown warning in this run. Full project on the final tree =
+**3702 passed / 14 skipped / 0 failed** (1358 s); the 2 warnings are the known
+pre-existing Windows reader-thread teardown exception in
+`test_manifest_concurrency.py::TestPointerVisibility::test_readers_never_observe_partial_pointer`
+— recorded separately, not hidden, unrelated to B5-I01. Zero deterministic
+failures in every run.
+
+Static battery re-run on the final tree: ruff on the new changed scope =
+**All checks passed**; ruff `src tests` = exactly the 2 pre-existing findings
+in the untouched `test_i08_evidence.py`; mypy = **0 new** (the 10 pre-existing
+findings are the accepted providers/probes baseline); compileall OK; secret
+scan of the B5-I01 diff = **0 hits**. Suite dirt (11 informational bloc_04
+matrices) restored after both long runs; the worktree deliberately retains only
+this ledger completion and the permitted I11R2 audit republish. Historical
+custody re-verified: `git diff ae152d01…HEAD` over `evidence/` touches only
+new bloc_05 files plus the single-line I11R2 count.
+
+### 6. I11R2 audit
+
+`python_files_scanned`: **1011 → 1018** (7 new tracked Python files: 3
+production, 4 test). Regenerated mechanically (`UPDATE_I11R2_EVIDENCE=1`) only
+after all filenames were finalized; no-update rerun byte-stable; never
+hand-edited. Diff vs the committed audit is exactly the one count line.
+
+### 7. External CI / remote custody
+
+origin/main = `7c7816f…28fa8` (unchanged). origin build at resume =
+`ae152d01…cb079` (start head; local branch 3 commits ahead — expected). No
+statuses, check-runs or workflow runs observed on the pushed head →
+`external_ci = NONE_OBSERVED`. Push after B5-I01D covers
+`agent/crypto-sensor-fabric-build` only; main is never pushed.
+
+### 8. Commit chain
+
+`ae152d010f` (origin base) → `04600b5d5` B5-I01A (type-scope matrix 61 rows =
+24 needed / 37 deferred + RED enum suite) → `83b2076b6` B5-I01B (enums.py +
+models.py + __init__.py, 24 public symbols) → `a7c82f9887` B5-I01C (N0 model
+tests, public-surface proof, measured evidence) → B5-I01D (final regression
+evidence + audit + this ledger). No amend, no squash, no reset, no rebase, no
+force push at any point, including across the interruption.
+
+### 9. Bloc 5 gates
+
+IDENTITY_GATE = TIME_GATE = SEMANTIC_GATE = UNIT_GATE = LINEAGE_GATE =
+DUPLICATE_REVISION_GATE = REPLAY_SAFETY_GATE = GOLDEN_T0_T1_GATE =
+**NOT_YET_EARNED**. B5-I01 supplies foundation vocabulary and containers only.
+
+### 10. Governance
+
+PASS_SENSOR_B5_I01_NORMALIZATION_BASE_TYPES_SEALED =
+**PENDING_OPERATOR_REVIEW**. BLOC_05_IMPLEMENTATION_STATUS =
+**I01_COMPLETE_PENDING_OPERATOR_REVIEW**. BLOC_05_NORMALIZATION_IMPLEMENTED =
+**PARTIAL_FOUNDATION_ONLY**. next_checkpoint_authorized = **FALSE**.
+recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I01**. B5-I02+ =
+UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN. No self-ratification.
+After B5-I01D + push the worktree is clean except untracked `.bu_tmp/` scratch.
