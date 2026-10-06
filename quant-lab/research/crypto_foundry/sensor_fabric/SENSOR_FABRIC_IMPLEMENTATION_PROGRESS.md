@@ -5206,3 +5206,101 @@ PASS_SENSOR_B5_I01_NORMALIZATION_BASE_TYPES_SEALED =
 recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I01**. B5-I02+ =
 UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN. No self-ratification.
 After B5-I01D + push the worktree is clean except untracked `.bu_tmp/` scratch.
+## 156 — SENSOR-B5-I01-RATIFY: NORMALIZATION BASE LAYER OPERATOR_ACCEPTED, B5-I02 AUTHORIZED ONLY
+
+Date: 2026-10-06. Directive: SENSOR-B5-I01-RATIFY (mandatory start head
+`66f5ba4aca582477139212fb250803dbf2bbb230`, expected remote main
+`7c7816f38…`, scope: ratification only).
+
+### 0. Start gate
+
+branch = agent/crypto-sensor-fabric-build; HEAD = `66f5ba4aca` (B5-I01D);
+origin build == local HEAD; origin/main = `7c7816f38…` untouched. Governance
+state matched the I01 seal exactly (PASS = PENDING_OPERATOR_REVIEW,
+I01_COMPLETE_PENDING_OPERATOR_REVIEW, PARTIAL_FOUNDATION_ONLY,
+next_checkpoint_authorized = FALSE). Ancestry strict and linear: `ae152d010f`
+→ `04600b5d5` (I01A) → `83b2076b6` (I01B) → `a7c82f9887` (I01C) →
+`66f5ba4aca` (I01D); exactly 4 commits, 0 merges, no rewrites anywhere.
+
+### 1. Ratification-time recomputation
+
+Type-scope matrix recomputed: **61 / 24 / 37**;
+`deferred_types_implemented = []`; the directive's 37 deferred names are
+set-identical to the matrix deferred set. Vocabulary gaps preserved
+un-invented: `AvailabilityConfidence` → B5-I06 (field named, vocabulary never
+frozen), `VenueScope` → B5-I02 (only `MULTI_VENUE_AGGREGATE` named, "such
+as"). Production surface = exactly `__init__.py` + `enums.py` + `models.py`;
+all 18 forbidden module filenames absent. Public API = **24 symbols**
+(`_StrEnum`/`_FLAG_ORDER` unexported). 10 enums with member counts
+5/8/13/36/6/3/7/4/8/6, every member set re-verified against plan authority.
+6 base models: `ObservationTimeEnvelope` 15, `NativeQuantity` 4, `T1Quality`
+8 (no aggregate), `T1LineageRef` 8 (all 3 chain links required),
+`T1VersionContext` 5, `T1BaseEnvelope` **27**. `T1BaseEnvelope` = STABLE
+B5-I01 FOUNDATION; `T1ObservationEnvelope` = NOT YET COMPLETE / NOT YET
+PUBLIC (requires later-stage fields owned by B5-I02/I05/I06/I09). Upstream
+reuse confirmed (SensorFamily, Granularity, CoverageState, RevisionState,
+SourceUnitContract, SourceUnitEvidence). `BLOCKED_IDENTITY` vs
+`IDENTITY_BLOCKED` preserved; `BLOCKED_STATUS_MISSINGNESS_REASON` read-only,
+mutation refused. Firewalls re-verified at source level: zero
+canonical/normalized/notional/usd/fiat field definitions, no conversion
+logic, provider ≠ venue with no merged `source`, no hash/uuid/random/
+wall-clock in production, no network/storage-backend imports.
+
+### 2. Fresh regressions (this ratification tree)
+
+B5-I01 normalization = **304 passed** (2.0 s). Focused battery (I01 + Bloc 4
+handoff I16/I16R1/I16R2 + G4-13 + I11R2 binding audit + I11R2 evidence +
+job-state ×3 + storage enums) = **616 passed / 0 failed** (166 s). Full
+storage = **2019 passed / 13 skipped / 0 failed** (1422 s). Full project =
+**3702 passed / 14 skipped / 0 failed** (1319 s). Zero deterministic
+failures. **Windows manifest-concurrency teardown warning: ABSENT this run**
+(0 occurrences); when previously observed it is classified inherited
+TEST-ENVIRONMENT DEBT and stays unrepaired by design.
+
+Static: ruff new changed scope = All checks passed; ruff repo-wide = exactly
+the 2 pre-existing `test_i08_evidence.py` findings; mypy = 0 new (10
+pre-existing providers/probes baseline); compileall OK; secret scan of the
+I01 diff = 0 hits.
+
+### 3. I11R2 / custody
+
+`python_files_scanned` **1011 → 1018** (republished in I01D, mechanically,
+after filename finalization). No-update rerun at ratification = 4 passed,
+**byte-stable** (SHA-256 `e1bbd772…d5e36e`). No republish during
+ratification. Historical custody re-verified: `git diff ae152d010f…66f5ba4ac`
+over `evidence/` = only new bloc_05 files + the single authorized I11R2 count
+line; Bloc 4 / I17 evidence and ratification artifacts untouched; no I01
+evidence rewritten.
+
+### 4. Ledger recovery truth (accepted, not rewritten)
+
+The §155 append was interrupted by rate limiting: heredoc partially succeeded
+(141 lines) and truncated mid-word ("confirmed absen"). Recovery resumed from
+the surviving bytes and completed the section append-only, explicitly
+disclosing the truncation. The seam is **accepted process history** — §155 is
+not cleaned, reconstructed, or rewritten.
+
+### 5. Governance after ratification
+
+PASS_SENSOR_B5_I01_NORMALIZATION_BASE_TYPES_SEALED = **OPERATOR_ACCEPTED**.
+BLOC_05_IMPLEMENTATION_STATUS = **I01_OPERATOR_ACCEPTED**.
+BLOC_05_NORMALIZATION_IMPLEMENTED = **PARTIAL_FOUNDATION_ONLY**. All 8 Bloc 5
+blocking gates (IDENTITY / TIME / SEMANTIC / UNIT / LINEAGE /
+DUPLICATE_REVISION / REPLAY_SAFETY / GOLDEN_T0_T1) remain **NOT_YET_EARNED** —
+type/model existence promotes nothing. next_checkpoint_authorized = **TRUE**.
+next_checkpoint = **SENSOR-B5-I02 ASSET / VENUE / CONTRACT IDENTITY MODELS +
+REGISTRIES**. authorized_scope = **B5-I02 ONLY**. B5-I03+ = UNAUTHORIZED.
+Bloc 6 = UNAUTHORIZED. research = FROZEN. recommended_next = **SENSOR-B5-I02
+IMPLEMENTATION**. B5-I02 owns CanonicalAsset, Venue, VenueInstrument,
+EconomicContract, ContractInstance + identity registry/data structures; it
+does NOT authorize lifecycle/alias/PIT resolution, conversion primitives,
+time semantics, availability resolution, revision engine, unit conversion,
+sensor normalizers, or T1 writer/query. VenueScope firewall recorded:
+B5-I02 must audit whether the type is actually required; if required and the
+plan still underdetermines it, STOP for operator decision. Identity laws
+carried forward as record (CanonicalAsset ≠ ContractInstance; USD/USDT/USDC
+distinct; provider ≠ venue; no metadata backcast).
+
+Ratification outputs (one commit): this ledger entry + `evidence/bloc_05/
+BLOC_05_I01_OPERATOR_RATIFICATION.md`. Zero production/test/evidence changes.
+B5-I02 NOT started. STOP.
