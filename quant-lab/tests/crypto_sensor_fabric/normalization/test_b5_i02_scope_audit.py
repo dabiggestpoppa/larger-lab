@@ -38,24 +38,41 @@ def _identity_sources() -> dict[str, str]:
 
 
 def test_identity_package_is_exactly_the_authorized_modules() -> None:
+    """B5-I03B/C reconciliation (I03 directive 54 custody law: the only history
+    permitted to touch this file is the module-list update): the package now
+    holds the sealed I02 set PLUS the four exactly-frozen I03 modules.  The
+    I03 negative-scope suite (test_b5_i03_scope_audit.py) now owns the live
+    module-list law; this file keeps guarding the I04+ tree."""
     files = sorted(
         entry.name for entry in _IDENTITY.iterdir() if entry.suffix == ".py"
     )
-    assert files == ["__init__.py", "models.py", "registry.py"]
+    assert files == [
+        "__init__.py",
+        "aliases.py",   # B5-I03
+        "enums.py",     # B5-I03 (frozen I03 vocabularies)
+        "lifecycle.py",  # B5-I03
+        "models.py",
+        "registry.py",
+        "resolver.py",  # B5-I03
+    ]
 
 
 def test_no_enums_module_exists() -> None:
-    """No fully frozen I02-owned vocabulary exists (vocabulary matrix), so no
-    identity/enums.py was created; payoff_type is the reused I01 enum."""
-    assert not (_IDENTITY / "enums.py").exists()
+    """RECONCILED in B5-I03B: no fully frozen I02-owned vocabulary existed at
+    I02, so no enums.py was created then (payoff_type is the reused I01 enum).
+    B5-I03's three exactly-frozen vocabularies now live in identity/enums.py;
+    the audit trail lives in BLOC_05_I03_VOCABULARY_AUTHORITY_MATRIX.json.
+    The law that remains I02-owned: the I02 audited fields (asset_type etc.)
+    must STILL be opaque tokens, never new enum members here."""
+    assert (_IDENTITY / "enums.py").exists()  # now the I03 frozen vocabularies
+    sources = "\n".join(_identity_sources().values())
+    for still_opaque in ("class AssetType", "class InstrumentType", "class PerpetualOrDelivery"):
+        assert still_opaque not in sources, still_opaque
 
 
 @pytest.mark.parametrize(
     "forbidden",
     [
-        "resolver.py",
-        "lifecycle.py",
-        "aliases.py",
         "terms.py",
         "universe.py",
         "evidence.py",
@@ -66,7 +83,10 @@ def test_no_enums_module_exists() -> None:
         "query.py",
     ],
 )
-def test_forbidden_b5_i03_plus_module_is_absent(forbidden: str) -> None:
+def test_forbidden_b5_i04_plus_module_is_absent(forbidden: str) -> None:
+    """RECONCILED in B5-I03C: resolver.py/lifecycle.py/aliases.py are now the
+    IMPLEMENTED B5-I03 modules; the I04+ tree (terms/universe/evidence/
+    conversion/availability/replay/writer/query) must not exist yet."""
     assert not (_IDENTITY / forbidden).exists()
 
 
@@ -149,26 +169,25 @@ def test_no_path_or_open_calls_in_source_text() -> None:
 
 
 # ---------------------------------------------------------------------------
-# B5-I03+ vocabulary stays unimplemented (directive §24/§25/§26/§27)
+# B5-I03 vocabulary (IMPLEMENTED by B5-I03B/C, reconciled); B5-I04+ stays out
+# (directive §24-§27 as amended by the I03 authorization)
 # ---------------------------------------------------------------------------
 
 
-def test_b5_i03_plus_classes_are_absent_from_identity_sources() -> None:
+def test_b5_i04_plus_classes_are_absent_from_identity_sources() -> None:
+    """RECONCILED in B5-I03C: the I03 classes (InstrumentAlias, AliasType,
+    LifecycleState, IdentityResolution*, resolve_instrument, lifecycle values)
+    are now IMPLEMENTED law.  What this I02-owned audit keeps enforcing: the
+    B5-I04+ machinery (universe, terms snapshots, writer, T1 writers) and the
+    VenueScope / MULTI_VENUE_AGGREGATE vocabulary (still a I02-matrix
+    operator-decision boundary) stay absent."""
     sources = "\n".join(_identity_sources().values())
     for absent in (
-        "class InstrumentAlias",
-        "class AliasType",
-        "class InstrumentLifecycle",
-        "class InstrumentLifecycleState",
-        "class IdentityResolution",
-        "class IdentityResolutionStatus",
         "class UniverseMembership",
         "class ContractTermsSnapshot",
-        "class LifecycleState",
-        "def resolve_instrument",
-        "PRE_LISTING",
-        "DELISTING_ANNOUNCED",
-        "RELISTED_NEW_INSTANCE",
+        "class InstrumentLifecycleState",  # never renamed; LifecycleState is frozen
+        "class T1Writer",
+        "def write_t1",
         "MULTI_VENUE_AGGREGATE",
     ):
         assert absent not in sources, absent

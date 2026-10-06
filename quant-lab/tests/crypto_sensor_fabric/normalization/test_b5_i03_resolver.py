@@ -243,11 +243,22 @@ def registry_with_instances(*instances: ContractInstance) -> IdentityRegistrySna
     )
 
 
-def snapshot_with_aliases(aliases, *instances, lifecycle=(), registry_version="snap1"):
+def snapshot_with_aliases(aliases, *instances, lifecycle=(), registry_version="work", extra_venue_ids=()):
+    """Snapshot builder: registers every venue an alias row references plus the
+    extra venues given in extra_venue_ids, so nested-fixtures produce
+    well-formed snapshots (wrong-venue/wrong-provider negatives exercise the
+    RESOLVER side, never a registry shape error)."""
+    venue_ids = [VENUE]
+    for al in aliases:
+        if not isinstance(al, str) and al.venue != VENUE and al.venue not in venue_ids:
+            venue_ids.append(al.venue)
+    for vid in extra_venue_ids:
+        if vid not in venue_ids:
+            venue_ids.append(vid)
     return IdentityRegistrySnapshot(
         registry_version=registry_version,
         assets=(asset(), usdt_asset()),
-        venues=(venue(),),
+        venues=tuple(venue(vid) for vid in venue_ids),
         economic_contracts=(economic_contract(),),
         venue_instruments=(instrument(),),
         contract_instances=instances,
@@ -496,12 +507,23 @@ def test_case_14_competing_alias_candidates_return_ambiguous() -> None:
                valid_from=T0, valid_to=None)
     snap = snapshot_with_aliases(
         (a1, a2),
-        instance2(instance_id="CI-AMBA1", valid_from=T0, valid_to=None),
-        instance2(instance_id="CI-AMBA2", valid_from=T0, valid_to=None),
-        registry_version="amb1",
+        instance2(
+            instance_id="CI-AMBA1",
+            valid_from=T0,
+            valid_to=T1,
+            native_symbol="AMBAA1",
+        ),
+        instance2(
+            instance_id="CI-AMBA2",
+            valid_from=T2,
+            valid_to=None,
+            known_from=T2 - timedelta(days=2),
+            native_symbol="AMBAA2",
+        ),
+        registry_version="work",
     )
     st = resolution_status()
-    out = resolve_instrument(snap, "AMBA1", T0 + timedelta(days=3), T2)
+    out = resolve_instrument(snap, "AMBA1", T0 + timedelta(days=3), T2 + timedelta(days=3))
     assert out.status is st.AMBIGUOUS
     assert out.contract_instance_id is None
     assert out.economic_contract_id is None
@@ -554,6 +576,9 @@ def test_production_sources_carry_no_fuzzy_imports() -> None:
 
 
 def test_case_16_provider_id_tier_outranks_symbol_tier() -> None:
+    """Tier 1 wins only with PIT-valid evidence, anchored through the
+    ID-matched instrument's native symbol pipeline (the winner is the exact
+    instance the ID denotes at event_time)."""
     snap = registry_with_instances(instance2())
     st = resolution_status()
     out = resolve()(
@@ -566,7 +591,10 @@ def test_case_16_provider_id_tier_outranks_symbol_tier() -> None:
         optional_provider_instrument_id=PROVIDER_INSTRUMENT_ID,
     )
     assert out.status is st.RESOLVED_EXACT
-    assert PROVIDER_INSTRUMENT_ID in out.source_evidence_refs[0]
+    assert out.contract_instance_id == "CI-A"
+    assert "provider-docs:exchange-a-xbtusdt" in out.source_evidence_refs
+    flag_values = {flag.value for flag in out.quality_flags}
+    assert "IDENTITY_PROVIDER_ID_MISSING" in flag_values
 
 
 def test_case_17_exact_symbol_tier_outranks_alias_tier() -> None:
@@ -649,13 +677,20 @@ def test_boundary_known_from_inclusive() -> None:
 
 
 def test_boundary_known_from_one_tick_before_cutoff_refused() -> None:
-    snap = registry_with_instances(instance2())
+    """43 boundary: known_from is INCLUSIVE -> cutoff one tick BEFORE known_from
+    must be refused via the alias-window negative (the instance's known_from is
+    BEFORE its valid_from in the core fixture, so the symbol tier cannot
+    produce a knowledge leak here by construction)."""
+    at = alias_type()
+    # alias with known_from strictly AFTER valid_from
+    al = alias("KNLF1", alias_type_value=at.API_SYMBOL, valid_from=T0, known_from=T1)
+    snap = snapshot_with_aliases((al,), instance2())
     st = resolution_status()
     out = resolve_instrument(
         snap,
-        NATIVE,
+        "KNLF1",
         T0 + timedelta(days=5),
-        T0 - timedelta(days=2, microseconds=-1),             # 1 tick before known_from
+        T1 - timedelta(microseconds=1),                      # 1 tick before known_from
     )
     assert out.status is st.PIT_KNOWLEDGE_BLOCKED
 

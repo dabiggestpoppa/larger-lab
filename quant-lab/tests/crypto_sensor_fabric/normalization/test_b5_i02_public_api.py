@@ -15,14 +15,24 @@ import sys
 import pytest
 
 EXPECTED_IDENTITY = [
+    # B5-I02 sealed ten, PLUS the six B5-I03 symbols reconciled in B5-I03C
+    # (public-surface reconciliation is the authorized I02D-pattern edit;
+    # the achievable-surface law lives in test_b5_i03_public_api.py now).
+    "AliasType",
     "CanonicalAsset",
     "ContractInstance",
     "EconomicContract",
     "IdentityRegistrySnapshot",
+    "IdentityResolution",
+    "IdentityResolutionStatus",
+    "InstrumentAlias",
+    "InstrumentLifecycle",
+    "LifecycleState",
     "SemanticToken",
     "Venue",
     "VenueInstrument",
     "parse_identity_registry_yaml",
+    "resolve_instrument",
     "serialize_identity_registry_yaml",
     "validate_registry_succession",
 ]
@@ -34,7 +44,7 @@ def test_identity_exports_exactly_the_authorized_symbols() -> None:
     import crypto_sensor_fabric.normalization.identity as identity
 
     assert sorted(identity.__all__) == EXPECTED_IDENTITY
-    assert len(identity.__all__) == 10
+    assert len(identity.__all__) == 17
 
 
 def test_every_export_is_importable_and_real() -> None:
@@ -53,25 +63,23 @@ def test_private_helpers_do_not_leak() -> None:
         assert not hasattr(identity, private), private
 
 
-def test_b5_i03_plus_symbols_are_absent() -> None:
-    """Directive §25/§26/§27 firewalls: resolver, alias, lifecycle, universe,
-    terms and writer machinery must not exist at B5-I02."""
+def test_b5_i04_plus_symbols_are_absent() -> None:
+    """RECONCILED in B5-I03C: the six I03 symbols are now implemented and
+    guarded by test_b5_i03_public_api.py.  This I02-era firewall keeps the
+    B5-I04+ machinery (universe/terms/writer/query plus any lifecycle-state
+    rename) absent from the package surface."""
     import crypto_sensor_fabric.normalization.identity as identity
 
     for absent in (
-        "resolve_instrument",
-        "IdentityResolution",
-        "IdentityResolutionStatus",
-        "InstrumentAlias",
-        "AliasType",
-        "InstrumentLifecycle",
-        "InstrumentLifecycleState",
+        "InstrumentLifecycleState",  # never renamed; LifecycleState is the frozen name
         "UniverseMembership",
         "ContractTermsSnapshot",
         "T1Writer",
         "T1WriterRegistry",
         "write_t1",
         "query_t1",
+        "ScopeState",  # VenueScope remains deferred (I02 matrix decision)
+        "VenueScope",
     ):
         assert not hasattr(identity, absent), absent
 
