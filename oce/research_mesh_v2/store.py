@@ -48,14 +48,13 @@ class EvidenceStore:
         count = 0
         for r in records:
             self.conn.execute(
-                """INSERT OR REPLACE INTO evidence VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
+                """INSERT OR REPLACE INTO evidence VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""",
                 (
                     r.evidence_id, r.source, r.source_id, r.title, r.abstract, r.url,
                     r.doi, r.year, json.dumps(list(r.authors)), r.citation_count,
                     r.acquired_at, r.content_sha256, r.raw_payload_sha256,
-                    r.source_revision, r.parser_version, r.rights_class, 
-                    "",
-                )[:-1],
+                    r.source_revision, r.parser_version, r.rights_class,
+                ),
             )
             count += 1
         self.conn.commit()
