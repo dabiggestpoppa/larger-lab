@@ -4519,3 +4519,58 @@ constraint; any amendment to the Rung 6 selector; any change to coverage replay
 granularity; any new field on `ChangeObservation`; any aggregation, selection,
 tie-break, or reduction over comparison measurements; any new authority-bearing
 class; any edit to a ratified record; any rebase; any Book 7 or live acquisition.
+---
+
+## ENTRY — RUNG 8 AUTHORITY SEALING (2026-10-06)
+
+**Record:** `CSIA_BOOK_6_RUNG8_AUTHORITY_SEALING_ERRATUM_v0.1.md`
+**Status:** `RATIFIED`
+**Operator selection:** none — every clause restates or seals already-ratified law
+**Decision id:** none required
+
+External review found three authority defects in the Rung 8 change derivation;
+each was reproduced by execution against the unrepaired engine at
+`2838e9ba7daccc8ef2a2f41cdd7d989e6dce17b3`, and each violates law that was
+already ratified. This erratum documents the reproductions, anchors each repair
+to its existing ratified clause, and authorizes the append-only repair.
+
+```text
+DEFECT A  caller-supplied selected_baseline_ref became the arithmetic operand
+          (grammar v0.6 §3.2: CALLER MAY NOT provide selected_baseline_ref)
+          CALLER_CAN_AUTHOR_SELECTED_BASELINE = TRUE (defect), now FALSE
+DEFECT B  Rung 8 authority depended on ReplayCheck.reason diagnostic prose
+          (v0.4 §4: prose never enters a derivation)
+          RUNG8_AUTHORITY_DEPENDS_ON_DIAGNOSTIC_TEXT = TRUE (defect), now FALSE
+DEFECT C  rule metric binding unenforced; caller object shaped refusal records
+          (GAP-2/2D same-metric identity; canonical replay order checks 1-11)
+          RULE_METRIC_BINDING_NOT_ENFORCED = TRUE (defect), now EXACT
+```
+
+```text
+CALLER_SELECTED_BASELINE        = PROHIBITED
+SELECTED_BASELINE               = ENGINE_RECOMPUTED_BY_RUNG6_SELECTOR
+SELECTOR_IMPLEMENTATIONS        = 1 (select_baseline reused as-is)
+DIAGNOSTIC_REASON_TEXT_AUTHORITY = FALSE
+COMPARISON_OPERAND              = CANONICAL_REGISTRY_RESOLUTION
+RULE_METRIC_BINDING             = EXACT (three-way)
+COVERAGE_STATE_MAPPING          = UNRESOLVED applicability -> UNAVAILABLE
+                                  (R-3 / AC-17; NOT_APPLICABLE is never an
+                                  absence encoding)
+SEMANTIC_FINGERPRINT_REPLAY     = DEFERRED to Rung 9 check 17 (no canonical
+                                  helper exists; none invented)
+DOCTRINE_CHANGED                = FALSE
+NEW_AUTHORITY_CLASS             = FALSE
+```
+
+```text
+IMPLEMENTATION_AUTHORIZED   = TRUE  (append-only repair on 2838e9ba7d, offline scope)
+STOP_CONDITIONS_TRIGGERED   = FALSE
+BOOK_7 / LIVE_ACQUISITION   = FALSE
+```
+
+**Not authorized and not performed:** any new baseline policy or selector
+semantics; any comparison-side selector; any coverage aggregation; any new
+observation-state enum member; any new authority-bearing class; any fingerprint
+algorithm; any unit conversion; any epsilon/tolerance; any edit to a ratified
+record; any schema rewrite; any rebase/amend/squash; any Book 7 or live
+acquisition.

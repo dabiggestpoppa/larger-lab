@@ -4836,3 +4836,65 @@ No ratified record was edited. No schema was rewritten.
 
 **Next:** append-only Rung 8 cardinality firewall + deterministic change
 arithmetic on `b9ef5c7b028f`.
+---
+
+## 2026-10-06 — RUNG 8 AUTHORITY SEALING (erratum v0.1 ratified; repair authorized)
+
+External review reproduced three Rung 8 authority defects by execution against
+the unrepaired engine (`2838e9ba7daccc8ef2a2f41cdd7d989e6dce17b3`):
+
+```text
+DEFECT A  caller-authored selected_baseline_ref reached arithmetic
+          (outsider ref became the operand: delta -92.5; forced-B delta 5.5
+          where the selector deterministically picks A -> 6.5)
+DEFECT B  rewording check 16's diagnostic reason (without changing number,
+          passed state, or verdict semantics) changed Rung 8 semantics
+DEFECT C  rule bound to metric.other accepted metric.tx operands; a mutated
+          caller copy (subject:EVIL / metric.other) shaped a refusal record
+```
+
+Erratum `CSIA_BOOK_6_RUNG8_AUTHORITY_SEALING_ERRATUM_v0.1.md` (RATIFIED) anchors
+each repair to already-ratified law — grammar v0.6 §3.2 caller authority, v0.4
+§4 no-prose-in-derivation, GAP-2/2D same-metric identity, canonical replay
+order, R-3 / AC-17 absence encoding — and authorizes the append-only repair:
+
+```text
+CALLER_SELECTED_BASELINE         = PROHIBITED
+SELECTED_BASELINE                = ENGINE_RECOMPUTED_BY_RUNG6_SELECTOR
+SELECTOR_IMPLEMENTATIONS         = 1  (select_baseline reused as-is)
+DIAGNOSTIC_REASON_TEXT_AUTHORITY = FALSE
+COMPARISON_OPERAND               = CANONICAL_REGISTRY_RESOLUTION
+RULE_METRIC_BINDING              = EXACT (three-way)
+COVERAGE_STATE_MAPPING           = UNRESOLVED applicability -> UNAVAILABLE
+SEMANTIC_FINGERPRINT_REPLAY      = DEFERRED to Rung 9 check 17 (no canonical
+                                   helper exists; none invented)
+DOCTRINE_CHANGED                 = FALSE
+NEW_AUTHORITY_CLASS              = FALSE
+```
+
+### Standing state
+
+```text
+RUNG_8_AUTHORITY_REPAIR         = AUTHORIZED (append-only on 2838e9ba7d)
+RUNG_8_ARITHMETIC_LAW           = UNCHANGED (stored binary64 / zero-baseline /
+                                  non-finite firewall re-proven by regression)
+IMPLEMENTATION_SOURCE_EDITED    = FALSE (repair not yet written)
+TEST_CODE_EDITED                = FALSE
+IMPLEMENTATION_HEAD             = 2838e9ba7daccc8ef2a2f41cdd7d989e6dce17b3
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_RUNG8_AUTHORITY_SEALING_ERRATUM_v0.1.md   RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md                         appended
+CSIA_PLANNING_PROGRESS.md                             appended
+```
+
+No ratified record was edited. No schema was rewritten. No stop condition was
+triggered.
+
+**Next:** append-only repair (baseline authority / structured coverage /
+canonical comparison / exact metric binding / state mapping) on
+`2838e9ba7daccc8ef2a2f41cdd7d989e6dce17b3`, then full regression.
