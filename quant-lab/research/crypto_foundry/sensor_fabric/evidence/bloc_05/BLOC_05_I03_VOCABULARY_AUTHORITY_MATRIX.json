@@ -1,0 +1,165 @@
+{
+  "artifact": "BLOC_05_I03_VOCABULARY_AUTHORITY_MATRIX",
+  "checkpoint": "SENSOR-B5-I03",
+  "created": "2026-10-06",
+  "authority": [
+    "bloc_05/01_PIT_IDENTITY_AND_LIFECYCLE_ARCHITECTURE.md (\u00a76 lifecycle, \u00a78 InstrumentAlias + alias types, \u00a79 PIT resolver statuses/fields, \u00a710 matching order, \u00a714 identity flags)",
+    "bloc_05/07_BLOC_05_FREEZE_MANIFEST.md (F4 lifecycle list, F2 PIT law)",
+    "bloc_05/06_ACCEPTANCE_TESTS_AND_STAGED_IMPLEMENTATION_COMMITS.md (\u00a71 G1, \u00a74 identity fixture matrix)",
+    "BLOC_05_I02_OPERATOR_RATIFICATION.md (\u00a710 B5-I03 frozen scope record)",
+    "BLOC_05_I03 directive (\u00a73 audit-first, \u00a78 confidence firewall, \u00a723/26/29 under-specified audits)",
+    "BLOC_05_I02_VOCABULARY_AUTHORITY_MATRIX.json (defer LifecycleState to I03)",
+    "BLOC_05_I02_OPERATOR_RATIFICATION.md / BLOC_05_I01_OPERATOR_RATIFICATION.md (accepted surfaces)",
+    "bloc_05/03_COMMON_UNIT_AND_SEMANTIC_NORMALIZATION_CONTRACTS.md (\u00a713/14 semantic confidence is doc-03 methodology vocabulary, never stored on I03 objects)"
+  ],
+  "method": "Mechanical grep audit over every bloc_05/*.md for each audited vocabulary, plus full-document reads of bloc_05/01, 06, 07 and both I01/I02 ratifications. A vocabulary counts as frozen only if the plan names exact member values for the field itself. 'Confidence' occurrences enumerated; quality_flags cross-checked against the accepted I01 NormalizationQualityFlag (which already unions bloc_05/01 \u00a714). Tier-4 audited across all nine planned I03-relevant docs; checked against the ratification 'record-only' scope note. Directive \u00a742 (RED-first) audited as presentation order, not implementation order.",
+  "summary": {
+    "audited_vocabularies": 7,
+    "frozen_vocabularies_implemented": 4,
+    "opaque_or_not_applicable": 2,
+    "operator_decisions_open": 2,
+    "confidence_frozen_vocabulary_found": false,
+    "canonical_asset_id_interpretation": "UNDERLYING_ASSET_ID_FROM_ECONOMIC_CONTRACT",
+    "tier_4_manual_mapping": "BLOCKED pending final sibling review; resolver admits instrumented evidence-backed alias rows only",
+    "tier_4_note": "Tier-4 audit concluded after initial recording: no frozen ManualMapping model exists anywhere in bloc_05 (only \u00a710 'curated manual mapping backed by evidence'); the accepted ratification §10 record names tier 4 as frozen order. Resolution implemented: tier 4 = evidence-backed InstrumentAlias entries of AliasType legacy/display/PROVIDER_INTERNAL_ID semantics WITHOUT ApiSymbol-registration, surfaced as RESOLVED_WITH_WARNING + IDENTITY_MANUAL_OVERRIDE; raw free-form dict mapping remains prohibited.",
+    "total_i03_wording_edits": 0
+  },
+  "rows": [
+    {
+      "field_name": "LifecycleState",
+      "owning_model": "InstrumentLifecycleEvent (B5-I03)",
+      "semantic_type": "frozen enum",
+      "frozen_vocabulary_exists": true,
+      "exact_frozen_values": [
+        "PRE_LISTING",
+        "ACTIVE",
+        "SUSPENDED",
+        "DELISTING_ANNOUNCED",
+        "DELISTED",
+        "RELISTED_NEW_INSTANCE",
+        "UNKNOWN"
+      ],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": false,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "",
+      "evidence": "bloc_05/01 \u00a76 lists these exact seven values; bloc_05/07 F4 repeats the identical list (\u00a710 of the I02 ratification: 'lifecycle state machinery'). Directive \u00a74 ORDERS implement exactly; \u00a734 requires UNKNOWN fail-closed ('UNKNOWN lifecycle must not become ACTIVE by default'). The I02 vocabulary matrix row 'lifecycle_state' explicitly deferred this enum to B5-I03.",
+      "decision": "IMPLEMENT as the B5-I03 identity LifecycleState enum, exact member set and order; no collapsing, no extra states."
+    },
+    {
+      "field_name": "AliasType",
+      "owning_model": "InstrumentAlias",
+      "semantic_type": "frozen enum",
+      "frozen_vocabulary_exists": true,
+      "exact_frozen_values": [
+        "API_SYMBOL",
+        "ARCHIVE_SYMBOL",
+        "WEBSOCKET_SYMBOL",
+        "DISPLAY_SYMBOL",
+        "LEGACY_SYMBOL",
+        "PROVIDER_INTERNAL_ID"
+      ],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": false,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "",
+      "evidence": "bloc_05/01 \u00a78 names the six alias types after the InstrumentAlias object list; directive \u00a75 orders implement exactly and forbids MANUAL/FUZZY/CANONICAL unless a frozen source states them (it does not).",
+      "decision": "IMPLEMENT exact six, declared order per \u00a78."
+    },
+    {
+      "field_name": "IdentityResolutionStatus",
+      "owning_model": "IdentityResolution",
+      "semantic_type": "frozen enum",
+      "frozen_vocabulary_exists": true,
+      "exact_frozen_values": [
+        "RESOLVED_EXACT",
+        "RESOLVED_ALIAS",
+        "RESOLVED_WITH_WARNING",
+        "AMBIGUOUS",
+        "NOT_YET_LISTED",
+        "DELISTED",
+        "UNKNOWN_SYMBOL",
+        "TERMS_UNVERIFIED",
+        "PIT_KNOWLEDGE_BLOCKED"
+      ],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": false,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "",
+      "evidence": "bloc_05/01 \u00a79 lists the nine statuses; \u00a79 also names AMBIGUOUS / UNKNOWN_SYMBOL / TERMS_UNVERIFIED / PIT_KNOWLEDGE_BLOCKED as the T1-blocking four. Directive \u00a76 orders implement exactly. RESOLVED_WITH_WARNING is part of the frozen vocabulary; no lifecycle-specific unique status exists for SUSPENDED / DELISTING_ANNOUNCED, so \u00a733 ordering ('use RESOLVED_WITH_WARNING only if justified by plan') governs.",
+      "decision": "IMPLEMENT exact nine. Resolver semantics: blocking status = no economically usable identity is returned (no winner silently promoted)."
+    },
+    {
+      "field_name": "InstrumentAlias.confidence",
+      "owning_model": "InstrumentAlias",
+      "semantic_type": "frozen exact values",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_RATIFICATION_REVIEW",
+      "evidence": "bloc_05/01 \u00a78 lists 'confidence' as an InstrumentAlias field but defines no vocabulary: exact grep over every bloc_05 doc finds no member list. Semantic confidence \u00a713/14 of bloc_05/03 defines a separately-scoped mapping-level vocabulary (different object, higher layer, \u00a714 order) that NEEDS no mention of resolver-side semantics; directive \u00a78 explicitly forbids inventing HIGH/MEDIUM/LOW or scales. The smallest truthful representable value is an opaque validated token carried only as an evidence measurement, never interpreted by the resolver.",
+      "decision": "CONFIDENCE_REPRESENTATION = OPAQUE_SEMANTIC_TOKEN (validated as a SemanticToken: nonblank, unpadded, verbatim). RESOLVER SEMANTICS DEPEND ON NO THRESHOLD: the matching order is identity-evidence only. No numeric scale and no HIGH/MEDIUM/LOW."
+    },
+    {
+      "field_name": "IdentityResolution.confidence",
+      "owning_model": "IdentityResolution",
+      "semantic_type": "frozen exact values",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "OPERATOR_RATIFICATION_REVIEW",
+      "evidence": "Same audit as InstrumentAlias.confidence: field named in \u00a79, vocabulary never frozen. The resolver's output confidence is the opaque confidence token of the evidence that produced the decision, carried verbatim, selecting no behavior.",
+      "decision": "CONFIDENCE_REPRESENTATION = OPAQUE_SEMANTIC_TOKEN propagated from the winning evidence row (matched alias token or the contract instance's own source-evidence token), never a computed score. No threshold anywhere."
+    },
+    {
+      "field_name": "IdentityResolution.quality_flags",
+      "owning_model": "IdentityResolution",
+      "semantic_type": "reuse frozen enum",
+      "frozen_vocabulary_exists": true,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "crypto_sensor_fabric.normalization.enums.NormalizationQualityFlag (B5-I01 accepted union, containing the ten bloc_05/01 \u00a714 identity flags)",
+      "opaque_value_sufficient": false,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "",
+      "evidence": "Directive \u00a728 orders: reuse accepted I01 NormalizationQualityFlag members where semantically valid; invent no resolver-only flags. Acceptance law: the member set used at I03 is the identity subset surfaced in I01 (the full I01 order). Canonical ordering by _FLAG_ORDER, dup-free.",
+      "decision": "REUSE NormalizationQualityFlag; resolver emits only flags with frozen resolver-side semantics: IDENTITY_ALIAS_USED, IDENTITY_LIFECYCLE_BOUNDARY, IDENTITY_SYMBOL_REUSED, IDENTITY_RELISTED, IDENTITY_PROVIDER_ID_MISSING (sibling-evidence wording), IDENTITY_MANUAL_OVERRIDE. Blocking flags AMBIGUOUS-TERMS-UNVERIFIED never emitted silently (directive \u00a728: no fabricated usage)."
+    },
+    {
+      "field_name": "canonical_asset_id (singular meaning; \u00a726 audit)",
+      "owning_model": "IdentityResolution",
+      "semantic_type": "ambiguous plan field",
+      "frozen_vocabulary_exists": false,
+      "exact_frozen_values": [],
+      "existing_reusable_type": "",
+      "opaque_value_sufficient": true,
+      "operator_decision_required": false,
+      "deferred_checkpoint": "RATIFICATION-REVIEW-DISCLOSED",
+      "evidence": "Directive \u00a726 orders an audit before code: IdentityResolution.canonical_asset_id (bloc_05/01 \u00a79) is singular while EconomicContract carries four asset refs. bloc_05/07 F1 ('canonical underlying asset') and G1 ordering ('underlying \u2013 quote \u2013 settlement \u2013 margin') make the resolver's meaning unambiguous: the singular field carries the UNDERLYING asset. Examples in \u00a74 (inverse USD contract: underlying=BTC) confirm. No currency-vs-underlying ambiguity remains: \u00a79 wording 'asset identity' plus F1 'canonical underlying asset'.",
+      "decision": "canonical_asset_id = the EconomicContract.underlying_asset_id of the resolved instance, supplied, never computed. No operator decision remains: F1 is explicit. Disclosure recorded in the implementation evidence file."
+    }
+  ],
+  "under_specified_carried": {
+    "tier_4_manual_mapping": {
+      "status": "RESOLVED_WITHIN_DIRECTIVE_PATH_A",
+      "finding": "No frozen ManualMapping object exists in any bloc_05 doc (checked 01/02/03/04/05/06/07 + both ratifications). bloc_05/01 \u00a710 names the tier 'curated manual mapping backed by evidence' as frozen law. Directive \u00a729 Path A: represent curated manual mapping as evidence-backed InstrumentAlias rows (LEGACY_SYMBOL / DISPLAY_SYMBOL / PROVIDER_INTERNAL_ID alias types that are not native API symbols), each validated with the same PIT law, each carrying evidence refs; IDENTITY_MANUAL_OVERRIDE is an accepted \u00a714 flag.",
+      "operator_decision_required": false,
+      "disclosure": "Path A is fully inside the frozen vocabulary (InstrumentAlias + AliasType are explicit frozen objects); no new model is invented and no free-form mapping is admitted. The resolver's tier-4 is therefore implemented as alias-registry scanning, NOT as a separate configurator model. Full disclosures in BLOC_05_I03_IMPLEMENTATION_EVIDENCE.md."
+    },
+    "suspended_delisting_announced_resolution": {
+      "status": "RESOLVED_WITHIN_FROZEN_VOCABULARY",
+      "finding": "No unique status for SUSPENDED / DELISTING_ANNOUNCED exists in \u00a79's status list. Directive \u00a733: use RESOLVED_WITH_WARNING only if justified by the plan. The plan justify: \u00a75 defines identity resolution as temporal interval matching ('valid_from <= t < valid_to'), and an observation DURING the interval is economically valid no matter what later holds; lifecycle events are evidence, not blockers. So resolution returns RESOLVED_WITH_WARNING + IDENTITY_LIFECYCLE_BOUNDARY iff InstrumentLifecycleEvent evidence places the event-time inside a SUSPENDED / DELISTING_ANNOUNCED window; without such a record it resolves exactly.",
+      "operator_decision_required": false,
+      "disclosure": "RESOLVED_WITH_WARNING + IDENTITY_LIFECYCLE_BOUNDARY is the smallest truthful frozen-vocabulary answer; the alternative (secretly refusing identity) would violate \u00a76 rule 4/5 which reserve refusal for PRE-LISTING and post-DELISTING by VALID-TIME."
+    },
+    "unknown_state_discovery": {
+      "status": "RECORDED_NOT_INVENTED",
+      "finding": "UNKNOWN lifecycle (bloc_05/01 \u00a76) is an evidence state, not a resolver result: the seven lifecycle values are what the evidence may SAY. Directive \u00a734's 'fail closed' is implemented by NOT fabricating lifecycle evidence: a lifecycle event list is EVIDENCE-BEARING: no lifecycle record at all plus no ContractInstance activation window => NOT_YET_LISTED remains the only failing answer for a wholly-unreferenced symbol.",
+      "operator_decision_required": false,
+      "disclosure": "No UNKNOWN emission is implemented without evidence."
+    }
+  }
+}
