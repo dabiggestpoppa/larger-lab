@@ -46,6 +46,12 @@ __all__ = [
     "validate_registry_succession",
 ]
 
+# B5-I03: alias/lifecycle collections reuse the exact same canonicalization
+# discipline as the five I02 collections (sorted, dup-free, referentially
+# closed).  Import stays local so the I02 modules keep their sealed shape.
+from .aliases import InstrumentAlias
+from .lifecycle import InstrumentLifecycle
+
 
 def _canonical_assets(values: tuple[CanonicalAsset, ...]) -> tuple[CanonicalAsset, ...]:
     ids = [value.asset_id for value in values]
@@ -97,6 +103,67 @@ def _canonical_contract_instances(
     return tuple(sorted(values, key=lambda value: value.contract_instance_id))
 
 
+def _alias_key(value: InstrumentAlias) -> tuple[str, str, str, str, str]:
+    """Full identity of an alias row (directive 31 discipline)."""
+    return (
+        value.provider,
+        value.venue,
+        value.alias_text,
+        value.alias_type.value,
+        value.alias_id,
+    )
+
+
+def _canonical_aliases(
+    values: tuple[InstrumentAlias, ...],
+) -> tuple[InstrumentAlias, ...]:
+    keys = [_alias_key(value) for value in values]
+    if len(set(keys)) != len(keys):
+        raise ValueError("duplicate alias identity in registry snapshot (alias_id reused)")
+    return tuple(sorted(values, key=_alias_key))
+
+
+def _lifecycle_key(value: InstrumentLifecycle) -> tuple[str, str, str, str, str]:
+    return (
+        value.provider,
+        value.venue,
+        value.contract_instance_id,
+        value.lifecycle_state.value,
+        value.valid_from.isoformat(),
+    )
+
+
+def _canonical_lifecycle(
+    values: tuple[InstrumentLifecycle, ...],
+) -> tuple[InstrumentLifecycle, ...]:
+    """Same instance + same state must not have two overlapping windows
+    (contradictory evidence); abutting windows are fine.  Two identical-window
+    rows of the same state are duplicate evidence and refused."""
+    keys = [_lifecycle_key(value) for value in values]
+    if len(set(keys)) != len(keys):
+        raise ValueError("duplicate lifecycle event identity in registry snapshot")
+    ordered = tuple(sorted(values, key=_lifecycle_key))
+    groups: dict[tuple[str, str, str, str], list[InstrumentLifecycle]] = {}
+    for value in ordered:
+        groups.setdefault(
+            (
+                value.provider,
+                value.venue,
+                value.contract_instance_id,
+                value.lifecycle_state.value,
+            ),
+            [],
+        ).append(value)
+    for group in groups.values():
+        for earlier, later in zip(group, group[1:]):
+            if earlier.valid_to is None or later.valid_from < earlier.valid_to:
+                raise ValueError(
+                    "overlapping lifecycle windows for one instance/state "
+                    "without an explicit ambiguity surface"
+                )
+    return ordered
+
+
 class IdentityRegistrySnapshot(NormalizationModelBase):
     """One immutable, versioned, referentially-closed identity registry snapshot.
 
@@ -121,6 +188,12 @@ class IdentityRegistrySnapshot(NormalizationModelBase):
     ] = ()
     contract_instances: Annotated[
         tuple[ContractInstance, ...], AfterValidator(_canonical_contract_instances)
+    ] = ()
+    aliases: Annotated[
+        tuple[InstrumentAlias, ...], AfterValidator(_canonical_aliases)
+    ] = ()
+    lifecycle_events: Annotated[
+        tuple[InstrumentLifecycle, ...], AfterValidator(_canonical_lifecycle)
     ] = ()
 
     @model_validator(mode="after")
@@ -164,6 +237,26 @@ class IdentityRegistrySnapshot(NormalizationModelBase):
                     raise ValueError(
                         f"contract instance {ci.contract_instance_id!r} {label} {ref!r} is not a registered asset"
                     )
+
+        instance_ids = {ci.contract_instance_id for ci in self.contract_instances}
+        for al in self.aliases:
+            if al.contract_instance_id not in instance_ids:
+                raise ValueError(
+                    f"alias {al.alias_id!r} references unregistered contract instance {al.contract_instance_id!r}"
+                )
+            if al.venue not in venue_ids:
+                raise ValueError(
+                    f"alias {al.alias_id!r} references unregistered venue {al.venue!r}"
+                )
+        for le in self.lifecycle_events:
+            if le.contract_instance_id not in instance_ids:
+                raise ValueError(
+                    f"lifecycle event references unregistered contract instance {le.contract_instance_id!r}"
+                )
+            if le.venue not in venue_ids:
+                raise ValueError(
+                    f"lifecycle event references unregistered venue {le.venue!r}"
+                )
         return self
 
     @model_validator(mode="after")
