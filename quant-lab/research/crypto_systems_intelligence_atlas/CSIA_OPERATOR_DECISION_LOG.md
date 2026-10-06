@@ -4574,3 +4574,59 @@ observation-state enum member; any new authority-bearing class; any fingerprint
 algorithm; any unit conversion; any epsilon/tolerance; any edit to a ratified
 record; any schema rewrite; any rebase/amend/squash; any Book 7 or live
 acquisition.
+
+---
+
+## 2026-10-06 — COVERAGE AUTHORIZATION IDENTITY SEALING (erratum v0.1 ratified; repair authorized)
+
+External review reproduced four Rung 7 identity-bundle defects by execution
+against the unrepaired engine (`4ddac952bf11ce6c4a20a90bf12dae774515767e`):
+
+```text
+DEFECT A1  caller-supplied metric_id redefined coverage scope
+           (obs:c / metric:A replayed with metric_id=metric:B -> checks 12-16
+           green, SUFFICIENT; no metric:A rule current at all)
+           CALLER_SUPPLIED_METRIC_CAN_REDEFINE_COVERAGE_SCOPE = TRUE (defect)
+DEFECT A2  unregistered CoverageObservation (fraction 1.00) substituted for the
+           registered 0.40 evidence -> SUFFICIENT
+           CALLER_CAN_SUBSTITUTE_UNREGISTERED_COVERAGE_EVIDENCE = TRUE (defect)
+DEFECT A3  CoverageAuthorization carried no identity seal; AUTH-B
+           (obs:b / metric:B / cov:B) drove obs:a arithmetic and stamped the
+           record with obs:b's coverage facts
+           STRUCTURED_COVERAGE_AUTHORIZATION_IDENTITY = UNSEALED (defect)
+DEFECT A4  agreement check compared REQUIRED-vs-UNRESOLVED only; equal REQUIRED
+           status admitted the foreign bundle
+           SAME_STATUS_DIFFERENT_AUTHORITY_BUNDLE = ACCEPTED (defect)
+```
+
+Each violates already-accepted substrate law (canonical measurement registry;
+canonical `metric_definition_ref`; `coverage_of` keyed by `measurement_id`;
+R-2 single meanings). The repair re-binds every replay input to its accepted
+canonical home. No doctrine is created or amended.
+
+```text
+COVERAGE_REPLAY_COMPARISON_SOURCE    = CANONICAL MEASUREMENT REGISTRY
+COVERAGE_REPLAY_METRIC_SOURCE        = CANONICAL COMPARISON MEASUREMENT
+                                       .metric_definition_ref
+COVERAGE_REPLAY_OBSERVATION_SOURCE   = coverage_of(comparison_measurement_ref)
+CALLER_SUPPLIED_METRIC_AUTHORITY     = FALSE
+CALLER_SUPPLIED_COVERAGE_OBSERVATION_AUTHORITY = FALSE
+COVERAGE_AUTHORIZATION_IDENTITY_SEALED = TRUE
+RUNG8_MUST_VERIFY_SEALED_BUNDLE_AGAINST_RULE   = TRUE
+COVERAGE_REGISTRY_OWNERSHIP          = SINGLE (measurement_registry.coverage_rules)
+RUNG9_CHECK17_RUNTIME_HELPER         = MISSING (audit recorded; none invented)
+DOCTRINE_CHANGED                     = FALSE
+NEW_AUTHORITY_CLASS                  = FALSE
+```
+
+```text
+IMPLEMENTATION_AUTHORIZED   = TRUE  (append-only repair on 4ddac952bf11, offline scope)
+STOP_CONDITIONS_TRIGGERED   = FALSE
+BOOK_7 / LIVE_ACQUISITION   = FALSE
+```
+
+**Not authorized and not performed:** any new coverage doctrine; any new
+authority-bearing contract; any new registry; any baseline-unavailable schema
+amendment; any fingerprint algorithm; any unit conversion; any epsilon or
+tolerance; any aggregation; any edit to a ratified record; any
+rebase/amend/squash; any Book 7 or live acquisition.

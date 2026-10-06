@@ -4898,3 +4898,44 @@ triggered.
 **Next:** append-only repair (baseline authority / structured coverage /
 canonical comparison / exact metric binding / state mapping) on
 `2838e9ba7daccc8ef2a2f41cdd7d989e6dce17b3`, then full regression.
+
+## 2026-10-06 — Coverage Authorization Identity Sealing (erratum v0.1)
+
+Four Rung 7 identity-bundle defects (A1 caller metric / A2 unregistered
+evidence object / A3 unsealed structured bundle / A4 status-only agreement)
+reproduced by execution against `4ddac952bf11ce6c4a20a90bf12dae774515767e`.
+All four violate already-accepted substrate law; repair authorized, no
+doctrine changed.
+
+```text
+RUNG7_IDENTITY_REPAIR           = AUTHORIZED (append-only on 4ddac952bf11)
+COVERAGE_REPLAY_AUTHORITY_INPUTS = REGISTRY-DERIVED (metric, evidence,
+                                  comparison identity all from the measurement
+                                  registry; no caller metric/observation params)
+COVERAGE_AUTHORIZATION_IDENTITY = SEALED (comparison/metric/rule recorded on
+                                  the internal frozen value object)
+RUNG8_BUNDLE_AGREEMENT          = EXACT IDENTITY (not status-only)
+REGISTRY_OWNERSHIP              = SINGLE (measurement_registry.coverage_rules)
+RUNG9_CHECK17_RUNTIME_HELPER    = MISSING (MetricDefinition field audit
+                                  recorded; fingerprint spec deferred to the
+                                  next operator round)
+IMPLEMENTATION_SOURCE_EDITED    = FALSE (repair not yet written)
+TEST_CODE_EDITED                = FALSE
+IMPLEMENTATION_HEAD             = 4ddac952bf11ce6c4a20a90bf12dae774515767e
+BOOK_6_IMPLEMENTATION_AUTHORITY = REMAINS TRUE (OFFLINE AMENDMENT SCOPE ONLY)
+```
+
+## Artifacts
+
+```text
+CSIA_BOOK_6_COVERAGE_AUTHORIZATION_IDENTITY_SEALING_ERRATUM_v0.1.md  RATIFIED
+CSIA_OPERATOR_DECISION_LOG.md                                        appended
+CSIA_PLANNING_PROGRESS.md                                            appended
+```
+
+No ratified record was edited. No schema was rewritten. No stop condition was
+triggered.
+
+**Next:** append-only repair (registry-derived replay API / sealed bundle
+identity / exact Rung 8 agreement) on
+`4ddac952bf11ce6c4a20a90bf12dae774515767e`, then full regression.
