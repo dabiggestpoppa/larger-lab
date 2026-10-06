@@ -1705,3 +1705,27 @@ untouched. Accounting: cloud mutations = the four authorized detachments only;
 broker mutations 0; capital mutations 0; execution mutations 0; recurring cost
 $0; `capital.authority = none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains
 **open and unmerged**.
+
+## B4-FINAL-LOCAL-ONLY-GOVERNANCE -- local topology sealed, detachment verified
+
+Supersedes sections 18.3/21/22 claims. Earlier removal claims were premature and
+were correctly falsified by the prior markers. OCE topology is sealed
+**local-only**; `oce/frontend` is internal and untouched. SonarQubeCloud
+(installation 132008043), Kilo Code Bot (127368601), Vercel (60739006), and
+Railway App (148981864) are detached from `larger-lab`: all four installations
+narrowed to 25 preserved unrelated repositories with `larger-lab` absent from
+every saved selection; SonarCloud project deleted; Vercel enumerates no
+larger-lab project. Removed from the governance boundary, **not classified as
+passing**; historical check runs preserved; Freebuff (1734312) out of scope and
+untouched. Census on marker `0b5fa5c77263775c0b3b2bc28ea983ce871e9d91`
+(pushed 2026-10-06T15:14:27Z): polls at T+26s, T+330s, T+639s - zero runs and
+zero suites from all four targeted apps at every poll; only OCE-owned
+github-actions suites plus one ignored freebuff-web suite present. All five
+OCE-owned workflows `success` on the marker; artifact
+`b1-i1r-evidence-756f324fe14a`: 35/0/0/0, adversarial 49/49, cleanup PASS,
+independent gate READY_FOR_OPERATOR_REVIEW, merge-context parent-linked to the
+marker. Accounting: external hosting authority = none; OCE hosting topology =
+local-only; OCE frontend ownership = internal; cloud mutations = the four
+authorized detachments only; broker mutations 0; capital mutations 0; execution
+mutations 0; recurring cost $0; `capital.authority = none`.
+**`MERGE_AUTHORIZED = false`.** PR #4 remains **open and unmerged**.

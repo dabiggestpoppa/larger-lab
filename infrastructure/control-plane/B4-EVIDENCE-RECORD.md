@@ -5896,3 +5896,93 @@ authorized integrations only; broker mutations 0; capital mutations 0; execution
 mutations 0; recurring cost $0; `capital.authority = none`. No merge. No amend,
 squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas Program
 Block 4. PR #4 remains open and unmerged.
+
+## 24. B4-FINAL-LOCAL-ONLY-GOVERNANCE: LOCAL TOPOLOGY SEALED, EXTERNAL-SERVICE DETACHMENT EMPIRICALLY VERIFIED
+
+This section supersedes every earlier removal claim in sections 18.3, 21, and
+22. It is written only after the census gate closed. Statements, in order:
+
+1. The earlier removal claims (section 18.3 and the two actions it recorded)
+   were premature: they were falsified by check runs created seconds after the
+   pushes that followed them.
+2. The previous marker commits (4867c78f, d0e4b30b, 6875ca4d, 81cc3a05,
+   1ae5aff0) correctly falsified those claims; none of them asserted a removal
+   that the evidence supported, and the evidence record preserved each
+   falsification verbatim.
+3. The operator has decided and this record now seals it: the approved OCE
+   deployment topology is **local-only**. External hosting authority = none.
+4. OCE owns its frontend/dashboard source: `oce/frontend` (8 tracked files,
+   Next.js 15 + React 19, `/api/*` proxied to `http://localhost:8000`) is
+   internal property and was not modified by this mission.
+5. Vercel (app 8329) and Railway App (app 73253) were external deployment
+   integrations, not OCE architectural requirements. The repository carries no
+   `vercel.json`, no `.vercel/`, no Railway configuration, no provider
+   environment variables, and no provider deployment workflow.
+6. SonarQubeCloud (app 12526) and Kilo Code Bot (app 2193792) were never
+   operator-authorized Book 4 dependencies.
+7. SonarQubeCloud, Kilo Code Bot, Vercel, and Railway App are **detached from
+   `dabiggestpoppa/larger-lab`**. GitHub-side (the authoritative event-delivery
+   surface): installations 132008043, 127368601, 60739006, and 148981864 were
+   each narrowed from "All repositories" to "Only select repositories" with the
+   25 unrelated repositories preserved and `larger-lab` (1238194136) absent
+   from every saved selection, each re-read from the server-rendered Configure
+   page after saving. Provider-side: the SonarCloud project
+   `dabiggestpoppa_larger-lab` was deleted (HTTP 204; post-delete lookup 404);
+   the authenticated Vercel account enumerates no project connected to
+   `larger-lab` (only the two preserved `madlabs-landing` projects); Kilo and
+   Railway provider-console verification was explicitly skipped by operator
+   instruction and stands on the GitHub-side removals alone.
+8. These four applications are removed from the governance boundary. They are
+   **not classified as passing**. No external result was waived, suppressed,
+   relabelled, or fabricated.
+9. Historical check runs remain preserved exactly as they occurred, as
+   historical truth. None was deleted, falsified, or erased.
+10. Freebuff Web (app 1734312, installation 154046121) was outside the
+    authorized scope of this mission and was not changed, configured, or
+    characterized. Its queued suite on the marker SHA was observed and ignored
+    per the census rule.
+11. All five OCE-owned validation workflows passed on the exact verification
+    marker `0b5fa5c77263775c0b3b2bc28ea983ce871e9d91`: B1-I1R Validation,
+    b1-local-ground-validation, b2-control-plane-validation,
+    b3-worker-fabric-validation, b4-config-spine-validation - all `success`.
+    Artifact `b1-i1r-evidence-756f324fe14a` (run 37485779043, artifact
+    11423756778): stage totals PASS 35 / FAIL 0 / BLOCKED 0 / SKIPPED 0;
+    initial validation PASS 31 / FAIL 0 / BLOCKED 0 / SKIPPED 0; adversarial
+    suite 49/49 PASS (24 negative, 25 meta), suite_result PASS; worktree
+    cleanup removed=true pruned=true; independent gate
+    READY_FOR_OPERATOR_REVIEW; stage log steps d through n clean. SHA binding:
+    the run's merge context `2b393f4e3b62bf4bee61c07b06bbd271c14d3d59` is the
+    merge of the marker into `origin/main`
+    (`7c7816f382947bbc8a1f2154435fc436f2428fa8`), proven by parent link. No
+    duplicate full node IDs were found in any result artifact (zero qualified
+    identifiers present, hence zero collisions).
+12. PR #4 remains **open and unmerged**, under operator control.
+    `MERGE_AUTHORIZED = false`.
+
+Census evidence (section 23's gate, applied to the marker SHA): push observed
+at 2026-10-06T15:14:27Z; polls at T+26s (15:14:53Z), T+330s (15:19:57Z), and
+T+639s (15:25:06Z) - beyond the required ten complete minutes. At every poll:
+**zero** check runs and **zero** check suites from apps 12526, 2193792, 8329,
+and 73253, including no queued suites. The only suites present were five
+`github-actions` (app 15368, OCE-owned) suites and one `freebuff-web`
+(app 1734312) suite, explicitly ignored. For comparison, the best prior
+answer latency was 2 seconds and every one of the five earlier censuses was
+answered; this is the first fully silent push in the record.
+
+Root cause of the five falsifications, now identified and closed: all four
+installations were in the "Select all repositories" state and had never been
+narrowed or removed; the earlier attempts removed objects other than these
+installation objects. The detachment now acts on the installations themselves.
+
+Change: append-only. Documentation only. Sections 1 through 23 preserved
+byte-for-byte; CRLF preserved; prefix equality verified before and after the
+append. No production code, test, workflow, trigger, registry, configuration,
+rule, or protection setting touched. No NOSONAR, exclusion, waiver, severity,
+profile, rating, threshold, gate, or coverage change.
+
+Accounting: external hosting authority = none; OCE hosting topology =
+local-only; OCE frontend ownership = internal; cloud mutations = the four
+authorized detachments only; broker mutations 0; capital mutations 0; execution
+mutations 0; recurring cost $0; `capital.authority = none`. No merge. No amend,
+squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas
+Program Block 4. PR #4 remains open and unmerged.
