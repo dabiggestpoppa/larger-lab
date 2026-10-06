@@ -5393,3 +5393,66 @@ no gate; identity proof requires B5-I03 resolution semantics.
 next_checkpoint_authorized = **FALSE**. recommended_next = **OPERATOR REVIEW
 OF SENSOR-B5-I02**. B5-I03+ = UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research =
 FROZEN. No self-ratification. B5-I03 NOT started.
+## 158 — SENSOR-B5-I02-RATIFY: IDENTITY FOUNDATION OPERATOR_ACCEPTED, B5-I03 AUTHORIZED ONLY
+
+Date: 2026-10-06. Start head `1cb9962a53` (I02D); governance verified
+(PENDING_OPERATOR_REVIEW, next_checkpoint_authorized = FALSE). Ancestry
+strict and linear: `8d220ad1cd` → `32a88ef2a` (I02A) → `dc7703eeb` (I02B) →
+`6bc6ca4d5` (I02C) → `1cb9962a53` (I02D); 4 commits, 0 merges, no rewrites.
+
+### 1. Ratification-time verification
+
+Mechanical verifier (56 checks) **ALL PASS**: vocabulary authority matrix
+row-verified (VenueScope = NOT_REQUIRED_DEFERRED; 8 fields = SemanticToken;
+payoff_type = the I01 PayoffType object; no identity/enums.py); five model
+contracts recomputed (7/1/8/9/23 = 48 fields, set-identical to frozen §2
+lists, all frozen-immutable); registry structure/laws verified live
+(duplicate refusal ×5, nine integrity paths, overlap refusal with adjacency
+accepted, succession conflict-refusal with order-insensitive idempotence);
+YAML safe-load round-trip byte-stable with exact Decimals; text-in/text-out
+(no filesystem behavior, zero config catalogs added — `git log
+--diff-filter=A` over config/** in the I02 range is empty); backcast and
+alias/lifecycle/PIT/universe/conversion firewalls absent. Adversarial
+red-team rerun: **93/93 probes, 59 refusal laws held, 34 recorded
+observations, 0 gaps**. I01 scope reconciliation verified deliberate and
+minimal (allowlist {"identity"}; time/sensors/common and all other params
+still forbidden; I01 surface still 24 symbols; gates untouched).
+
+### 2. Fresh regressions
+
+Focused = **728 passed / 0 failed**. Full storage = **2019 passed / 13
+skipped / 0 failed**. Full project = **3814 passed / 14 skipped / 0 failed**
+with **1 warning = the known Windows manifest-concurrency reader-thread
+teardown race** (inherited TEST-ENVIRONMENT DEBT; intermittent across runs;
+unrepaired by design). Static: ruff changed scope clean / 2 pre-existing
+repo-wide; mypy 0 new (10 pre-existing); compileall OK; the secret-scan
+lexical hit `SemanticToken = ` is the known `token =` false positive.
+
+### 3. Audit / custody
+
+I11R2 **1018 → 1025** (committed in I02D), no-update byte-stable
+(`0cdd4352…10542`), no republish during ratification. Custody: only new
+bloc_05 files + the permitted audit count differ from `8d220ad1`;
+I01/Bloc 4/I17 evidence untouched. Authoring defects (three malformed
+docstrings + one F811 duplicate test name, captured in commit I02A, repaired
+by I02D) are disclosed in the ratification artifact and remain visible in
+history — no rewrite. The untracked I06 spike remains untracked/unmodified.
+
+### 4. Governance after ratification
+
+PASS_SENSOR_B5_I02_IDENTITY_MODELS_REGISTRIES_SEALED = **OPERATOR_ACCEPTED**.
+BLOC_05_IMPLEMENTATION_STATUS = **I02_OPERATOR_ACCEPTED**.
+BLOC_05_NORMALIZATION_IMPLEMENTED = **PARTIAL_IDENTITY_FOUNDATION**. All 8
+gates (IDENTITY / TIME / SEMANTIC / UNIT / LINEAGE / DUPLICATE_REVISION /
+REPLAY_SAFETY / GOLDEN_T0_T1) remain **NOT_YET_EARNED** — IDENTITY_GATE
+requires B5-I03 PIT resolution proof and is NOT pre-authorized.
+next_checkpoint_authorized = **TRUE**. next_checkpoint = **SENSOR-B5-I03
+LIFECYCLE / ALIAS / PIT IDENTITY RESOLVER**. authorized_scope = **B5-I03
+ONLY**. B5-I04+ = UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN.
+recommended_next = **SENSOR-B5-I03 IMPLEMENTATION**. I03 matching order and
+PIT law carried forward verbatim (provider-ID → exact symbol+venue+interval
+→ registered alias → curated evidence-backed manual mapping → no result;
+fuzzy = candidates only; `valid_from <= event_time < valid_to` AND
+`known_from <= cutoff`; no future leakage; relisting = new instance unless
+continuity evidenced; no multiplier/notional/unit work — B5-I04+). B5-I03
+NOT started. STOP.
