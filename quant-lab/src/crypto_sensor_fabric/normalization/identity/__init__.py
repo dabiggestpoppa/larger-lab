@@ -27,12 +27,22 @@ from .models import (
     Venue,
     VenueInstrument,
 )
+from .registry import (
+    IdentityRegistrySnapshot,
+    parse_identity_registry_yaml,
+    serialize_identity_registry_yaml,
+    validate_registry_succession,
+)
 
 __all__ = [
     "CanonicalAsset",
     "ContractInstance",
     "EconomicContract",
+    "IdentityRegistrySnapshot",
     "SemanticToken",
     "Venue",
     "VenueInstrument",
+    "parse_identity_registry_yaml",
+    "serialize_identity_registry_yaml",
+    "validate_registry_succession",
 ]
