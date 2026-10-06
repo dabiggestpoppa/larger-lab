@@ -1,13 +1,21 @@
 """Rung 7 — comparison coverage and temporal comparability.
 
-Discharges GAP-3 / 3C (checks 12–16) and GAP-4 / 4D (check 19), and repairs
-the two authority defects found at the Rung 7 candidate `92b954e5`:
+Discharges GAP-3 / 3C (checks 12–16) and GAP-4 / 4D (check 19), and repairs the
+authority defects found across three rounds:
 
-* a caller-supplied callback could assert a coverage verdict, and
-* applicability selected a rule by lexical ordering.
-
-Both are now structurally impossible, not merely avoided: the replay path has
-no callable parameter, and check 12 returns no authoritative rule at all.
+* at the Rung 7 candidate `92b954e5`: a caller-supplied callback could assert a
+  coverage verdict, and applicability selected a rule by lexical ordering.
+  Both are now structurally impossible: the replay path has no callable
+  parameter, and check 12 returns no authoritative rule at all.
+* at `53ac5ea2`: check 16 never asked WHICH observation was measured, so another
+  measurement's coverage could authorize this comparison. Per
+  BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1 the evidence attaches to the
+  comparison measurement, and only to it.
+* at `4ddac952bf11` (coverage authorization identity sealing erratum v0.1):
+  the metric and the evidence object were still caller-supplied, and the
+  structured authorization carried no identity seal. Every replay input is now
+  derived from the accepted measurement registry, and the authorization seals
+  the identity of the bundle that produced it.
 """
 
 from __future__ import annotations
@@ -20,10 +28,11 @@ import pytest
 
 from crypto_systems_intelligence_atlas.book6_comparison_coverage import (
     COVERAGE_CHECK_NUMBERS,
-    COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED,
     COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT,
+    COVERAGE_OBSERVATION_NAMES_ANOTHER_RULE,
     NO_UPSTREAM_DETERMINATION_EXISTS,
     TEMPORAL_COMPARABILITY_CHECK,
+    ComparisonCoverageError,
     ReplayCheck,
     derive_temporal_comparability,
     replay_coverage_checks,
@@ -44,7 +53,20 @@ from crypto_systems_intelligence_atlas.book6_definitions import (
     CoverageObservation,
     CoverageSufficiencyRule,
 )
-from crypto_systems_intelligence_atlas.book6_grammar import MissingnessState, WindowClass
+from crypto_systems_intelligence_atlas.book6_grammar import (
+    MissingnessState,
+    RestatementReason,
+    WindowClass,
+)
+from crypto_systems_intelligence_atlas.book6_registry import Book6MeasurementRegistry
+from crypto_systems_intelligence_atlas.book6_support import (
+    CLAIM_ID,
+    build_engine,
+    definition,
+    register_definition,
+    register_measurement,
+    windowed_observation,
+)
 
 NOW = datetime(2026, 10, 5, tzinfo=timezone.utc)
 METRIC = "metric.tx"
@@ -79,6 +101,7 @@ def _observation(*, measurement_id=EXPECTED_MEASUREMENT, fraction=0.95,
 
 
 def _registry(*rules, ratify=True):
+    """A bare CoverageRuleRegistry — for applicability-resolution tests."""
     reg = CoverageRuleRegistry()
     for rule in rules:
         reg.register(rule)
@@ -87,12 +110,87 @@ def _registry(*rules, ratify=True):
     return reg
 
 
-def _replay(reg, *, named="cov:1", metric=METRIC, observation="default",
-            comparison=EXPECTED_MEASUREMENT):
+def _measurement_registry(*rules, ratify=True, coverage="default",
+                          metric=METRIC, measurement_id=EXPECTED_MEASUREMENT):
+    """A populated Book6MeasurementRegistry — the replay's canonical home.
+
+    Registers the metric definition, one current measurement under
+    ``measurement_id``, the coverage rules (transferred into the registry's OWN
+    ``coverage_rules`` member), and the coverage evidence under its declared
+    measurement id. ``coverage`` may be ``"default"`` (the ordinary 0.95
+    observation), ``None`` (no evidence), or an explicit object.
+    """
+    engine, *_ = build_engine(CLAIM_ID)
+    register_definition(engine, definition(metric, unit="count"))
+    register_measurement(engine, windowed_observation(
+        measurement_id, metric, value=1.0, missingness=MissingnessState.OBSERVED,
+        claim_refs=(CLAIM_ID,), unit="count",
+        window_class=WindowClass.INSTANTANEOUS, valid_time=NOW))
+    reg = engine.registry
+    for rule in rules:
+        reg.coverage_rules.register(rule)
+        if ratify:
+            reg.coverage_rules.ratify(
+                rule.rule_id, operator="operator:1", at=NOW)
+    obs = {"default": _observation()}.get(coverage, coverage)
+    if obs is not None:
+        reg.register_coverage(obs)
+    return reg
+
+
+def _as_measurement_registry(rule_reg, **kwargs):
+    """Transfer a bare CoverageRuleRegistry into a populated measurement registry.
+
+    Ratification state is preserved exactly: a rule that holds live authority in
+    the source registry is ratified here; a stale one is registered but not
+    re-ratified. Re-ratifying unconditionally would resurrect superseded rules
+    and destroy the very fault the stale-rule tests pin.
+    """
+
+    rules = tuple(rule_reg.registered_rule(ref) for ref in rule_reg.registered_rule_refs())
+    sufficient = tuple(
+        rule for rule in rules
+        if rule_reg.is_sufficient(metric_id=rule.scope_metric_id, rule_ref=rule.rule_id)
+    )
+    mreg = _measurement_registry(*sufficient, ratify=True, **kwargs)
+    for rule in rules:
+        if rule not in sufficient:
+            mreg.coverage_rules.register(rule)
+    return mreg
+
+
+def _replay(regs, *, named="cov:1", observation="default",
+            metric=METRIC, comparison=EXPECTED_MEASUREMENT):
+    """Replay through the canonical registry-derived API.
+
+    ``observation`` is a fixture for the REGISTERED evidence — ``"default"``,
+    ``None``, or an explicit object registered under its declared measurement
+    id. The replay itself takes no evidence and no metric: both are derived.
+    """
     obs = {"default": _observation(), "none": None}.get(observation, observation)
+    if isinstance(regs, Book6MeasurementRegistry):
+        mreg = regs
+        if obs is None:
+            if mreg.coverage_of(comparison) is not None:
+                raise AssertionError(
+                    "fixture error: the registry carries evidence for "
+                    f"{comparison} but the replay fixture expects none")
+        else:
+            existing = mreg.coverage_of(obs.measurement_id)
+            if existing is None:
+                mreg.register_coverage(obs)
+            elif existing != obs:
+                raise AssertionError(
+                    "fixture error: the registry's registered evidence differs "
+                    "from the replay fixture's evidence; build the registry with "
+                    "coverage=... so the two agree")
+    else:
+        mreg = _as_measurement_registry(
+            regs, coverage=obs, metric=metric, measurement_id=comparison)
     return replay_coverage_checks(
-        registry=reg, metric_id=metric, named_rule_ref=named,
-        comparison_measurement_ref=comparison, coverage_observation=obs,
+        measurement_registry=mreg,
+        comparison_measurement_ref=comparison,
+        named_rule_ref=named,
     )
 
 
@@ -100,7 +198,7 @@ def _check(auth, number):
     return next(c for c in auth.checks if c.number == number)
 
 
-# -- the two repaired defects ----------------------------------------------
+# -- the repaired defects (rounds one and two) ------------------------------
 
 
 def test_no_callable_or_verdict_parameter_exists_on_the_replay_path() -> None:
@@ -110,7 +208,6 @@ def test_no_callable_or_verdict_parameter_exists_on_the_replay_path() -> None:
     for banned in ("coverage_verdict_of", "verdict_of", "verdict",
                    "resolve_verdict", "determine"):
         assert banned not in params, banned
-    assert "coverage_observation" in params
     assert not any(
         p.kind is inspect.Parameter.VAR_KEYWORD
         for p in inspect.signature(replay_coverage_checks).parameters.values()
@@ -142,10 +239,9 @@ def test_caller_cannot_inject_a_sufficient_verdict() -> None:
 
     with pytest.raises(TypeError):
         replay_coverage_checks(
-            registry=_registry(_rule()), metric_id=METRIC,
-            named_rule_ref="cov:1",
+            measurement_registry=_measurement_registry(_rule()),
             comparison_measurement_ref=EXPECTED_MEASUREMENT,
-            coverage_observation=_observation(),
+            named_rule_ref="cov:1",
             coverage_verdict_of=lambda r, m: CoverageVerdict.SUFFICIENT,  # type: ignore[call-arg]
         )
 
@@ -178,14 +274,13 @@ def test_comparison_rule_may_name_either_currently_authorized_rule() -> None:
     """NAMED_RULE_BINDING_CONTROLS: either rule, whichever the operator bound."""
 
     reg = _registry(_rule("zzz-strict", fraction=0.99), _rule("aaa-loose", fraction=0.10))
-    # The SAME observation, replayed under each rule in turn, must follow the
+    # The SAME fraction, replayed under each rule in turn, must follow the
     # rule and not the identifier: 0.50 clears the loose rule and fails the
     # strict one.
-    observation = _observation(fraction=0.50, rule_ref="aaa-loose")
     strict = _replay(reg, named="zzz-strict",
-                     observation=observation.model_copy(
-                         update={"sufficiency_rule_ref": "zzz-strict"}))
-    loose = _replay(reg, named="aaa-loose", observation=observation)
+                     observation=_observation(fraction=0.50, rule_ref="zzz-strict"))
+    loose = _replay(reg, named="aaa-loose",
+                    observation=_observation(fraction=0.50, rule_ref="aaa-loose"))
     assert strict.verdict is CoverageVerdict.INSUFFICIENT
     assert loose.verdict is CoverageVerdict.SUFFICIENT
     assert _check(strict, 13).passed and _check(loose, 13).passed
@@ -262,14 +357,14 @@ def test_applicability_is_deterministic() -> None:
 
 
 def test_all_five_coverage_checks_are_replayed() -> None:
-    auth = _replay(_registry(_rule()))
+    auth = _replay(_measurement_registry(_rule()))
     assert tuple(c.number for c in auth.checks) == COVERAGE_CHECK_NUMBERS
 
 
 def test_check_13_requires_the_named_ref_when_required() -> None:
-    assert _check(_replay(_registry(_rule())), 13).passed is True
-    assert _check(_replay(_registry(_rule()), named=None), 13).passed is False
-    assert _check(_replay(_registry(), named=None), 13).passed is True
+    assert _check(_replay(_measurement_registry(_rule())), 13).passed is True
+    assert _check(_replay(_measurement_registry(_rule()), named=None), 13).passed is False
+    assert _check(_replay(_measurement_registry(), named=None), 13).passed is True
 
 
 def test_check_14_fails_for_a_stale_named_rule() -> None:
@@ -291,11 +386,11 @@ def test_check_15_fails_for_a_wrong_metric_named_rule() -> None:
         reg.authorize(metric_id=METRIC, rule_ref="cov:1")
 
 
-# -- check 16: actual observation against the named rule ------------------
+# -- check 16: the registered evidence against the named rule --------------
 
 
 def test_actual_fraction_above_required_is_sufficient() -> None:
-    auth = _replay(_registry(_rule(fraction=0.90)),
+    auth = _replay(_measurement_registry(_rule(fraction=0.90)),
                    observation=_observation(fraction=0.95, rule_ref="cov:1"))
     assert auth.verdict is CoverageVerdict.SUFFICIENT
     assert _check(auth, 16).passed is True
@@ -304,30 +399,34 @@ def test_actual_fraction_above_required_is_sufficient() -> None:
 
 
 def test_actual_fraction_below_required_is_insufficient() -> None:
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_observation(fraction=0.80, rule_ref="cov:1"))
+    auth = _replay(
+        _measurement_registry(_rule(fraction=0.90),
+                              coverage=_observation(fraction=0.80)),
+        observation=_observation(fraction=0.80, rule_ref="cov:1"))
     assert auth.verdict is CoverageVerdict.INSUFFICIENT
     assert _check(auth, 16).passed is True
 
 
 def test_boundary_fraction_equal_to_required_is_sufficient() -> None:
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_observation(fraction=0.90, rule_ref="cov:1"))
+    auth = _replay(
+        _measurement_registry(_rule(fraction=0.90),
+                              coverage=_observation(fraction=0.90)),
+        observation=_observation(fraction=0.90, rule_ref="cov:1"))
     assert auth.verdict is CoverageVerdict.SUFFICIENT
 
 
 def test_check_16_is_deterministic() -> None:
-    reg = _registry(_rule())
-    first = _replay(reg, observation=_observation(fraction=0.95))
-    second = _replay(reg, observation=_observation(fraction=0.95))
+    mreg = _measurement_registry(_rule(), coverage=_observation(fraction=0.95))
+    first = _replay(mreg, observation=_observation(fraction=0.95))
+    second = _replay(mreg, observation=_observation(fraction=0.95))
     assert [c.reason for c in first.checks] == [c.reason for c in second.checks]
 
 
 def test_missing_required_observation_fails_check_16() -> None:
-    auth = _replay(_registry(_rule()), observation="none")
+    auth = _replay(_measurement_registry(_rule(), coverage=None), observation=None)
     assert auth.verdict is CoverageVerdict.UNKNOWN
     assert _check(auth, 16).passed is False
-    assert "no applicable" in _check(auth, 16).reason
+    assert "no registered" in _check(auth, 16).reason
     assert auth.observation_state.value == "UNAVAILABLE"
     assert auth.observation_ref is None
     verdict = derive_temporal_comparability(coverage=auth)
@@ -343,7 +442,7 @@ def test_observation_naming_the_wrong_rule_fails_check_16() -> None:
 
 
 def test_observation_naming_no_rule_fails_check_16() -> None:
-    auth = _replay(_registry(_rule()),
+    auth = _replay(_measurement_registry(_rule(), coverage=None),
                    observation=_observation(fraction=0.99, rule_ref=None))
     assert _check(auth, 16).passed is False
 
@@ -351,7 +450,7 @@ def test_observation_naming_no_rule_fails_check_16() -> None:
 def test_unratified_named_rule_claims_no_verdict() -> None:
     """No current ratified rule -> applicability UNRESOLVED, no verdict claimed."""
 
-    auth = _replay(_registry(_rule(), ratify=False),
+    auth = _replay(_measurement_registry(_rule(), ratify=False, coverage=None),
                    observation=_observation(fraction=0.99))
     assert auth.applicability.requirement_status is CoverageRequirementStatus.UNRESOLVED
     assert _check(auth, 16).passed is True, "check 16 claims nothing, so it is honest"
@@ -372,7 +471,7 @@ def test_unresolved_applicability_is_unavailable_never_not_applicable() -> None:
     is UNAVAILABLE in exactly the same way an absent observation is.
     """
 
-    auth = _replay(_registry(_rule(), ratify=False),
+    auth = _replay(_measurement_registry(_rule(), ratify=False, coverage=None),
                    observation=_observation(fraction=0.99))
     assert auth.applicability.requirement_status is (
         CoverageRequirementStatus.UNRESOLVED
@@ -383,13 +482,16 @@ def test_unresolved_applicability_is_unavailable_never_not_applicable() -> None:
 
 
 def test_coverage_ref_is_dropped_when_observation_is_absent() -> None:
-    auth = _replay(_registry(_rule()), observation="none")
+    auth = _replay(_measurement_registry(_rule(), coverage=None), observation=None)
     assert auth.observation_state.value == "UNAVAILABLE"
     assert auth.observation_ref is None
 
 
 def test_observation_ref_is_reported_when_present() -> None:
-    auth = _replay(_registry(_rule()),
+    mreg = _measurement_registry(
+        _rule(), coverage=_observation(measurement_id="cov:obs-42", fraction=0.95),
+        measurement_id="cov:obs-42")
+    auth = _replay(mreg, comparison="cov:obs-42",
                    observation=_observation(measurement_id="cov:obs-42", fraction=0.95))
     assert auth.observation_state.value == "PRESENT"
     assert auth.observation_ref == "cov:obs-42"
@@ -401,8 +503,10 @@ def test_observation_ref_is_reported_when_present() -> None:
 def test_recomputed_insufficient_is_check_success_then_not_comparable() -> None:
     """CHECK16_SUCCEEDED_WITH_INSUFFICIENT -> NOT_COMPARABLE."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_observation(fraction=0.80))
+    auth = _replay(
+        _measurement_registry(_rule(fraction=0.90),
+                              coverage=_observation(fraction=0.80)),
+        observation=_observation(fraction=0.80))
     assert all(c.passed for c in auth.checks), "every replay check succeeded"
     assert auth.verdict is CoverageVerdict.INSUFFICIENT
     verdict = derive_temporal_comparability(coverage=auth)
@@ -413,7 +517,7 @@ def test_recomputed_insufficient_is_check_success_then_not_comparable() -> None:
 def test_failed_check_16_is_unresolved_not_not_comparable() -> None:
     """CHECK16_FAILED -> UNRESOLVED, never NOT_COMPARABLE."""
 
-    auth = _replay(_registry(_rule()), observation="none")
+    auth = _replay(_measurement_registry(_rule(), coverage=None), observation=None)
     assert _check(auth, 16).passed is False
     verdict = derive_temporal_comparability(coverage=auth)
     assert verdict.status is TemporalComparabilityStatus.UNRESOLVED
@@ -422,10 +526,13 @@ def test_failed_check_16_is_unresolved_not_not_comparable() -> None:
 
 def test_the_two_are_not_the_same_outcome() -> None:
     recomputed = derive_temporal_comparability(
-        coverage=_replay(_registry(_rule(fraction=0.90)),
-                         observation=_observation(fraction=0.80)))
+        coverage=_replay(
+            _measurement_registry(_rule(fraction=0.90),
+                                  coverage=_observation(fraction=0.80)),
+            observation=_observation(fraction=0.80)))
     failed = derive_temporal_comparability(
-        coverage=_replay(_registry(_rule()), observation="none"))
+        coverage=_replay(_measurement_registry(_rule(), coverage=None),
+                         observation=None))
     assert recomputed.status is not failed.status
     assert recomputed.status is TemporalComparabilityStatus.NOT_COMPARABLE
     assert failed.status is TemporalComparabilityStatus.UNRESOLVED
@@ -436,7 +543,7 @@ def test_the_two_are_not_the_same_outcome() -> None:
 
 @pytest.mark.parametrize("failing_number", COVERAGE_CHECK_NUMBERS)
 def test_each_coverage_check_is_individually_falsifiable(failing_number) -> None:
-    auth = _replay(_registry(_rule()))
+    auth = _replay(_measurement_registry(_rule()))
     tampered = tuple(
         ReplayCheck(c.number, c.name, c.number != failing_number, c.reason)
         for c in auth.checks
@@ -448,14 +555,14 @@ def test_each_coverage_check_is_individually_falsifiable(failing_number) -> None
 
 def test_check_19_is_separate_from_the_coverage_block() -> None:
     assert TEMPORAL_COMPARABILITY_CHECK not in COVERAGE_CHECK_NUMBERS
-    auth = _replay(_registry(_rule()))
+    auth = _replay(_measurement_registry(_rule()))
     verdict = derive_temporal_comparability(coverage=auth)
     assert verdict.check_19.number == 19
     assert all(c.number in COVERAGE_CHECK_NUMBERS for c in verdict.coverage_checks)
 
 
 def test_check_19_can_fail_while_every_coverage_check_passes() -> None:
-    auth = _replay(_registry(_rule()))
+    auth = _replay(_measurement_registry(_rule()))
     assert all(c.passed for c in auth.checks)
     failed = ReplayCheck(5, "baseline candidate eligibility", False, "no eligible prior")
     verdict = derive_temporal_comparability(coverage=auth, structural_checks=(failed,))
@@ -464,7 +571,7 @@ def test_check_19_can_fail_while_every_coverage_check_passes() -> None:
 
 
 def test_coverage_checks_are_carried_into_the_verdict_unchanged() -> None:
-    auth = _replay(_registry())
+    auth = _replay(_measurement_registry())
     assert derive_temporal_comparability(coverage=auth).coverage_checks == auth.checks
 
 
@@ -472,7 +579,7 @@ def test_coverage_checks_are_carried_into_the_verdict_unchanged() -> None:
 
 
 def test_comparable_path() -> None:
-    auth = _replay(_registry(_rule(fraction=0.90)),
+    auth = _replay(_measurement_registry(_rule(fraction=0.90)),
                    observation=_observation(fraction=0.95))
     verdict = derive_temporal_comparability(coverage=auth)
     assert verdict.status is TemporalComparabilityStatus.COMPARABLE
@@ -481,14 +588,14 @@ def test_comparable_path() -> None:
 
 
 def test_unresolved_path_when_no_upstream_determination_exists() -> None:
-    auth = _replay(_registry(), named=None)
+    auth = _replay(_measurement_registry(), named=None)
     verdict = derive_temporal_comparability(coverage=auth)
     assert verdict.status is TemporalComparabilityStatus.UNRESOLVED
     assert NO_UPSTREAM_DETERMINATION_EXISTS in verdict.check_19.reason
 
 
 def test_an_explicit_structural_failure_outranks_an_unresolved_basis() -> None:
-    auth = _replay(_registry(), named=None)
+    auth = _replay(_measurement_registry(), named=None)
     failed = ReplayCheck(9, "comparison measurement refs", False, "unit mismatch")
     verdict = derive_temporal_comparability(coverage=auth, structural_checks=(failed,))
     assert verdict.status is TemporalComparabilityStatus.NOT_COMPARABLE
@@ -503,7 +610,6 @@ def _comparison_stack():
     from crypto_systems_intelligence_atlas.book6_comparison_contracts import (
         BaselineSelectorKind, BaselineSelectorSpec, ComparisonRule, DeltaOperator,
     )
-    from crypto_systems_intelligence_atlas.book6_support import windowed_observation
 
     t0 = datetime(2026, 1, 1, tzinfo=timezone.utc)
 
@@ -558,13 +664,13 @@ def test_baseline_selection_is_unchanged_by_coverage() -> None:
                   is_current=lambda _: True)
     before = select_baseline(comparison=comparison, candidates=cands, rule=rule, **kwargs)
 
-    reg = _registry(_rule(fraction=0.90))
     chosen = {before.selected_measurement_ref}
     for observation in (_observation(fraction=0.95), _observation(fraction=0.80), None):
+        mreg = _measurement_registry(_rule(fraction=0.90), coverage=observation)
         auth = replay_coverage_checks(
-            registry=reg, metric_id=METRIC, named_rule_ref=None,
+            measurement_registry=mreg,
             comparison_measurement_ref=EXPECTED_MEASUREMENT,
-            coverage_observation=observation)
+            named_rule_ref=None)
         derive_temporal_comparability(coverage=auth)
         chosen.add(select_baseline(comparison=comparison, candidates=cands,
                                    rule=rule, **kwargs).selected_measurement_ref)
@@ -593,8 +699,6 @@ def test_no_new_authority_bearing_class_is_introduced() -> None:
         and obj is not Book6FrozenModel and obj.__module__ == m.__name__
     }
     assert declared == {}, f"no new record contract allowed here: {sorted(declared)}"
-    assert m.CoverageObservation.__module__.endswith("book6_definitions")
-    assert CoverageSufficiencyRule.__module__.endswith("book6_definitions")
 
 
 def test_rung_7_adds_no_aggregation_or_tolerance_field() -> None:
@@ -633,16 +737,20 @@ def test_no_threshold_was_added_to_the_comparison_rule() -> None:
 #
 # The third Rung 7 defect, found at the repair 53ac5ea2. Check 16 enforced
 # rule match (14), currentness and scope, but never asked WHICH observation was
-# measured, so another measurement's coverage could authorize this comparison.
-# Per BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1 the evidence attaches to the
-# comparison measurement, and only to it.
+# measured. Per BOOK6-COVERAGE-MEASUREMENT-BINDING-v0.1 the evidence attaches
+# to the comparison measurement. Under the registry-derived API the binding is
+# doubly enforced: the evidence is FETCHED BY the comparison measurement ref,
+# and check 16 still verifies the fetched object's own declared measurement id,
+# because the store is keyed by what the evidence declares.
 
 
 def _substituted(**kwargs):
     """A perfectly ordinary observation — for the WRONG measurement.
 
-    Same named rule, same metric, fraction comfortably above the floor. Every
-    property the old check 16 looked at is correct; only the identity is not.
+    Same named rule, same metric, fraction comfortably above the floor. It can
+    be REGISTERED (the store keys it by its own id), but it is unfetchable for
+    the comparison measurement: which is exactly the substitution the law
+    forbids.
     """
 
     return _observation(measurement_id=OTHER_MEASUREMENT, **kwargs)
@@ -651,7 +759,7 @@ def _substituted(**kwargs):
 def test_coverage_observation_for_the_exact_expected_measurement_passes() -> None:
     """1 — the ordinary case: right measurement, right rule, right metric."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
+    auth = _replay(_measurement_registry(_rule(fraction=0.90)),
                    observation=_observation(fraction=0.95))
     assert _check(auth, 16).passed is True
     assert auth.verdict is CoverageVerdict.SUFFICIENT
@@ -661,9 +769,11 @@ def test_coverage_observation_for_the_exact_expected_measurement_passes() -> Non
 def test_same_rule_same_metric_wrong_measurement_fails() -> None:
     """2 — identical in every respect except which observation was measured."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_substituted(fraction=0.95),
-                   comparison=EXPECTED_MEASUREMENT)
+    auth = _replay(
+        _measurement_registry(_rule(fraction=0.90),
+                              coverage=_substituted(fraction=0.95)),
+        observation=_substituted(fraction=0.95),
+        comparison=EXPECTED_MEASUREMENT)
     assert _check(auth, 12).passed is True
     assert _check(auth, 13).passed is True
     assert _check(auth, 14).passed is True
@@ -675,8 +785,9 @@ def test_same_rule_same_metric_wrong_measurement_fails() -> None:
 def test_wrong_measurement_cannot_produce_sufficient(fraction) -> None:
     """3 — no fraction, however high, buys a verdict from another measurement."""
 
-    reg = _registry(_rule(fraction=0.90))
-    auth = _replay(reg, observation=_substituted(fraction=fraction),
+    mreg = _measurement_registry(
+        _rule(fraction=0.90), coverage=_substituted(fraction=fraction))
+    auth = _replay(mreg, observation=_substituted(fraction=fraction),
                    comparison=EXPECTED_MEASUREMENT)
     assert auth.verdict is not CoverageVerdict.SUFFICIENT
     assert auth.verdict is CoverageVerdict.UNKNOWN
@@ -690,8 +801,9 @@ def test_wrong_measurement_cannot_produce_insufficient(fraction) -> None:
     never made, and it would route to NOT_COMPARABLE downstream.
     """
 
-    reg = _registry(_rule(fraction=0.90))
-    auth = _replay(reg, observation=_substituted(fraction=fraction),
+    mreg = _measurement_registry(
+        _rule(fraction=0.90), coverage=_substituted(fraction=fraction))
+    auth = _replay(mreg, observation=_substituted(fraction=fraction),
                    comparison=EXPECTED_MEASUREMENT)
     assert auth.verdict is not CoverageVerdict.INSUFFICIENT
     assert _check(auth, 16).passed is False
@@ -700,23 +812,24 @@ def test_wrong_measurement_cannot_produce_insufficient(fraction) -> None:
 def test_wrong_measurement_yields_check_16_failure_with_unknown_verdict() -> None:
     """5 — the check fails; the reason names the fault."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_substituted(fraction=0.95),
+    mreg = _measurement_registry(_rule(fraction=0.90), coverage=_substituted(fraction=0.95))
+    auth = _replay(mreg, observation=_substituted(fraction=0.95),
                    comparison=EXPECTED_MEASUREMENT)
     check16 = _check(auth, 16)
     assert check16.passed is False
     assert check16.failed is True
     assert auth.verdict is CoverageVerdict.UNKNOWN
-    assert COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT in check16.reason
-    assert OTHER_MEASUREMENT in check16.reason
+    assert "no registered" in check16.reason
     assert EXPECTED_MEASUREMENT in check16.reason
+    # the foreign evidence exists in the registry — under ITS OWN id only
+    assert mreg.coverage_of(OTHER_MEASUREMENT) is not None
 
 
 def test_wrong_measurement_yields_temporal_comparability_unresolved() -> None:
     """6 — an absence of basis, never NOT_COMPARABLE."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_substituted(fraction=0.95),
+    mreg = _measurement_registry(_rule(fraction=0.90), coverage=_substituted(fraction=0.95))
+    auth = _replay(mreg, observation=_substituted(fraction=0.95),
                    comparison=EXPECTED_MEASUREMENT)
     verdict = derive_temporal_comparability(coverage=auth)
     assert verdict.status is TemporalComparabilityStatus.UNRESOLVED
@@ -727,7 +840,7 @@ def test_wrong_measurement_yields_temporal_comparability_unresolved() -> None:
 def test_correct_measurement_and_sufficient_fraction_still_works() -> None:
     """7 — the positive path is untouched by the repair."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
+    auth = _replay(_measurement_registry(_rule(fraction=0.90)),
                    observation=_observation(fraction=0.95))
     assert _check(auth, 16).passed is True
     assert auth.verdict is CoverageVerdict.SUFFICIENT
@@ -737,8 +850,10 @@ def test_correct_measurement_and_sufficient_fraction_still_works() -> None:
 def test_correct_measurement_and_insufficient_fraction_still_works() -> None:
     """8 — and a faithful INSUFFICIENT is still a SUCCESSFUL replay."""
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_observation(fraction=0.80))
+    auth = _replay(
+        _measurement_registry(_rule(fraction=0.90),
+                              coverage=_observation(fraction=0.80)),
+        observation=_observation(fraction=0.80))
     assert _check(auth, 16).passed is True
     assert auth.verdict is CoverageVerdict.INSUFFICIENT
     verdict = derive_temporal_comparability(coverage=auth)
@@ -748,11 +863,12 @@ def test_correct_measurement_and_insufficient_fraction_still_works() -> None:
 def test_rule_mismatch_still_fails_independently() -> None:
     """9 — the binding did not swallow the rule-ref check."""
 
-    auth = _replay(_registry(_rule()),
+    auth = _replay(_measurement_registry(_rule(), coverage=None),
                    observation=_observation(fraction=0.95, rule_ref="cov:other"))
     assert _check(auth, 16).passed is False
     assert auth.verdict is CoverageVerdict.UNKNOWN
     assert "cov:other" in _check(auth, 16).reason
+    assert COVERAGE_OBSERVATION_NAMES_ANOTHER_RULE in _check(auth, 16).reason
 
 
 def test_rule_currentness_still_fails_independently() -> None:
@@ -811,18 +927,17 @@ def test_measurement_binding_is_independently_falsifiable_from_14_and_15() -> No
     never silently cures another.
     """
 
-    reg = _registry(_rule(fraction=0.90))
-
-    # identity fault only: 12-15 all green, 16 red
-    binding_only = _replay(reg, observation=_substituted(fraction=0.95),
+    # identity fault only: 12-15 all green, 16 red — the foreign evidence is
+    # registered under its own id, so it is unfetchable for this comparison
+    foreign = _measurement_registry(
+        _rule(fraction=0.90), coverage=_substituted(fraction=0.95))
+    binding_only = _replay(foreign, observation=_substituted(fraction=0.95),
                            comparison=EXPECTED_MEASUREMENT)
     assert (_check(binding_only, 12).passed
             and _check(binding_only, 13).passed
             and _check(binding_only, 14).passed
             and _check(binding_only, 15).passed
             and _check(binding_only, 16).passed is False)
-    assert COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT in (
-        _check(binding_only, 16).reason)
 
     # ratification fault only: correct identity, 14 red, 15 green
     stale = _registry(_rule("cov:current", fraction=0.90),
@@ -859,28 +974,31 @@ def test_no_coverage_substitution_from_another_measurement() -> None:
     """13 — the Rung 7 reproducer, kept as a permanent regression test.
 
     At 53ac5ea2 this exact arrangement produced check 16 PASS, SUFFICIENT and
-    COMPARABLE, and wrote the substituted measurement id into the record.
+    COMPARABLE, and wrote the substituted measurement id into the record. Under
+    the registry-derived API another measurement's evidence is not even
+    fetchable for this comparison: the store returns None.
     """
 
-    reg = _registry(_rule(fraction=0.90))
-    auth = _replay(reg, observation=_observation(
+    mreg = _measurement_registry(
+        _rule(fraction=0.90),
+        coverage=_observation(measurement_id="meas:unrelated-other-subject",
+                              fraction=0.97, rule_ref="cov:1"))
+    auth = _replay(mreg, observation=_observation(
         measurement_id="meas:unrelated-other-subject", fraction=0.97,
         rule_ref="cov:1"), comparison=EXPECTED_MEASUREMENT)
 
+    assert mreg.coverage_of(EXPECTED_MEASUREMENT) is None
     assert _check(auth, 16).passed is False
     assert auth.verdict is CoverageVerdict.UNKNOWN
     assert derive_temporal_comparability(coverage=auth).status is (
         TemporalComparabilityStatus.UNRESOLVED)
-    assert (COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT
-            in _check(auth, 16).reason)
 
 
-def test_no_caller_may_omit_the_expected_measurement_identity() -> None:
-    """14 — omission is structurally impossible, and None is caught anyway.
+def test_no_caller_may_omit_or_null_the_replayed_measurement_identity() -> None:
+    """14 — omission is structurally impossible, and None resolves to refusal.
 
-    The parameter carries no default, so a caller cannot forget it. Python does
-    not enforce the annotation, so a deliberate None is guarded in check 16
-    rather than silently treated as a match.
+    The parameter carries no default, so a caller cannot forget it. A None ref
+    resolves to nothing and the replay refuses before any check runs.
     """
 
     param = inspect.signature(replay_coverage_checks).parameters[
@@ -890,24 +1008,21 @@ def test_no_caller_may_omit_the_expected_measurement_identity() -> None:
 
     with pytest.raises(TypeError):
         replay_coverage_checks(
-            registry=_registry(_rule(fraction=0.90)), metric_id=METRIC,
-            named_rule_ref="cov:1", coverage_observation=_observation())
+            measurement_registry=_measurement_registry(_rule(fraction=0.90)),
+            named_rule_ref="cov:1")
 
-    auth = _replay(_registry(_rule(fraction=0.90)),
-                   observation=_observation(fraction=0.95),
-                   comparison=None)  # type: ignore[arg-type]
-    assert _check(auth, 16).passed is False
-    assert auth.verdict is CoverageVerdict.UNKNOWN
-    assert COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED in _check(auth, 16).reason
-    assert derive_temporal_comparability(coverage=auth).status is (
-        TemporalComparabilityStatus.UNRESOLVED)
+    with pytest.raises(ComparisonCoverageError):
+        replay_coverage_checks(
+            measurement_registry=_measurement_registry(_rule(fraction=0.90)),
+            comparison_measurement_ref=None,  # type: ignore[arg-type]
+            named_rule_ref="cov:1")
 
 
 def test_multiple_rule_named_binding_is_unchanged_by_the_measurement_binding() -> None:
     """15 — the operator's named rule still decides, not the observation's.
 
     Two separately ratified rules disagree about sufficiency. The measurement
-    binding neither picks between them nor lets the observation's own rule ref
+    binding neither picks between them nor lets the evidence's own rule ref
     override the ComparisonRule's citation.
     """
 
@@ -923,7 +1038,7 @@ def test_multiple_rule_named_binding_is_unchanged_by_the_measurement_binding() -
     assert _check(strict, 16).passed is True
     assert _check(loose, 16).passed is True
 
-    # the observation naming a different rule still loses to the citation
+    # the evidence naming a different rule still loses to the citation
     substituted_rule = _replay(
         reg, named="zzz-strict",
         observation=_observation(fraction=0.95, rule_ref="aaa-loose"))
@@ -935,8 +1050,7 @@ def test_multiple_rule_named_binding_is_unchanged_by_the_measurement_binding() -
         reg, named="zzz-strict",
         observation=_observation(measurement_id=OTHER_MEASUREMENT,
                                 fraction=0.95, rule_ref="zzz-strict"))
-    assert COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT in (
-        _check(wrong_measurement, 16).reason)
+    assert _check(wrong_measurement, 16).passed is False
 
 
 def test_metric_identity_and_measurement_identity_are_distinct() -> None:
@@ -945,16 +1059,23 @@ def test_metric_identity_and_measurement_identity_are_distinct() -> None:
     field = CoverageObservation.model_fields["measurement_id"]
     assert field.is_required()
 
-    reg = _registry(_rule(fraction=0.90))
+    mreg = _measurement_registry(_rule(fraction=0.90), coverage=_substituted(fraction=0.95))
     # same metric, same rule, same scope, same fraction — other measurement only
-    auth = _replay(reg, observation=_substituted(fraction=0.95),
+    auth = _replay(mreg, observation=_substituted(fraction=0.95),
                    comparison=EXPECTED_MEASUREMENT)
     assert _check(auth, 15).passed is True
     assert _check(auth, 16).passed is False
 
 
-def test_the_binding_is_not_derived_from_the_observation_or_the_rule() -> None:
-    """No inference path exists: the identity arrives or the replay refuses."""
+def test_the_binding_is_fetched_and_verified_never_inferred() -> None:
+    """The identity is derived from the registry and re-verified on the evidence.
+
+    No inference path exists: the replay derives the identity from the ref it
+    was given, fetches the evidence BY that ref, and still verifies the fetched
+    object's declared id against it — the store is keyed by what the evidence
+    declares, so the check guards the store's own keying rather than substituting
+    for it.
+    """
 
     import crypto_systems_intelligence_atlas.book6_comparison_coverage as m
 
@@ -968,10 +1089,174 @@ def test_the_binding_is_not_derived_from_the_observation_or_the_rule() -> None:
     }
     source = ast.unparse(ast.Module(
         body=[n for n in tree.body if id(n) not in docstrings], type_ignores=[]))
+    # no INFERENCE from the observation or the rule: the ref is the input
     assert "== coverage_observation.measurement_id" not in source
     assert "measurement_id ==" not in source.replace(" ", "")
 
-    # the accepted substrate binds coverage to its measurement; this module
-    # performs that binding rather than inventing a second notion of identity
-    assert "measurement_id" not in m.CoverageApplicability.__dataclass_fields__
-    assert "measurement_id" not in m.CoverageAuthorization.__dataclass_fields__
+    # the identity seal travels on the structured authorization
+    assert "comparison_measurement_ref" in m.CoverageAuthorization.__dataclass_fields__
+    assert "metric_id" in m.CoverageAuthorization.__dataclass_fields__
+    assert "named_rule_ref" in m.CoverageAuthorization.__dataclass_fields__
+
+    # the accepted substrate binds coverage to its measurement; the store is
+    # keyed by it, so foreign evidence is unfetchable for this comparison
+    mreg = _measurement_registry(
+        _rule(), coverage=_observation(measurement_id=OTHER_MEASUREMENT))
+    assert mreg.coverage_of(EXPECTED_MEASUREMENT) is None
+
+
+# -- COVERAGE AUTHORIZATION IDENTITY SEALING (erratum v0.1) -----------------
+#
+# The fourth Rung 7 round. The metric and the evidence object were still
+# caller-supplied authority inputs, and the structured authorization carried no
+# record of WHICH bundle produced it. Every replay input is now registry-derived
+# and the authorization seals its own identity.
+
+
+def test_no_metric_or_observation_parameter_exists_on_the_replay_path() -> None:
+    """A1/A2: CALLER_SUPPLIED_METRIC_AUTHORITY = FALSE, by signature."""
+
+    params = set(inspect.signature(replay_coverage_checks).parameters)
+    for banned in ("metric_id", "coverage_observation", "coverage_observation_of",
+                   "coverage_evidence", "observation"):
+        assert banned not in params, f"{banned} must not be a parameter"
+    for required in ("measurement_registry", "comparison_measurement_ref",
+                     "named_rule_ref"):
+        assert required in params, required
+    assert not any(
+        p.kind is inspect.Parameter.VAR_KEYWORD
+        for p in inspect.signature(replay_coverage_checks).parameters.values()
+    )
+
+
+def test_unregistered_forged_coverage_object_has_no_api_path() -> None:
+    """A2: a fresh object with a favorable fraction cannot be smuggled in."""
+
+    with pytest.raises(TypeError):
+        replay_coverage_checks(
+            measurement_registry=_measurement_registry(_rule(fraction=0.90)),
+            comparison_measurement_ref=EXPECTED_MEASUREMENT,
+            named_rule_ref="cov:1",
+            coverage_observation=_observation(fraction=1.00),  # type: ignore[call-arg]
+        )
+
+
+def test_canonical_measurement_metric_drives_check_12() -> None:
+    """A1: the measurement's canonical metric decides the coverage scope."""
+
+    mreg = _measurement_registry(_rule(), metric=METRIC)
+    comparison = mreg.resolve_current(EXPECTED_MEASUREMENT)
+    assert comparison.metric_definition_ref == METRIC
+    auth = _replay(mreg)
+    assert auth.metric_id == METRIC
+    assert auth.applicability.requirement_status is CoverageRequirementStatus.REQUIRED
+    assert _check(auth, 12).passed is True
+
+
+def test_metric_a_comparison_with_metric_b_scoped_rule_fails_check_15() -> None:
+    """A1: the caller cannot redefine the scope the rule is judged against."""
+
+    mreg = _measurement_registry(_rule(metric=OTHER))
+    auth = _replay(mreg, named="cov:1")
+    # the comparison measures METRIC; the named rule is scoped to OTHER
+    assert auth.metric_id == METRIC
+    assert _check(auth, 15).passed is False
+    assert OTHER in _check(auth, 15).reason
+    assert auth.verdict is CoverageVerdict.UNKNOWN
+
+
+def test_registered_canonical_coverage_fraction_is_used() -> None:
+    """A2: check 16 recomputes from the REGISTERED evidence, nothing else."""
+
+    mreg = _measurement_registry(
+        _rule(fraction=0.90), coverage=_observation(fraction=0.40))
+    auth = _replay(mreg, observation=_observation(fraction=0.40))
+    assert auth.verdict is CoverageVerdict.INSUFFICIENT
+    assert "observed 0.4" in _check(auth, 16).reason
+
+
+def test_changing_canonical_registry_coverage_changes_replay() -> None:
+    """A2: the replay tracks the registry's evidence, and only it."""
+
+    low = _measurement_registry(_rule(fraction=0.90), coverage=_observation(fraction=0.40))
+    high = _measurement_registry(_rule(fraction=0.90), coverage=_observation(fraction=0.95))
+    assert _replay(low, observation=_observation(fraction=0.40)).verdict is (
+        CoverageVerdict.INSUFFICIENT)
+    assert _replay(high, observation=_observation(fraction=0.95)).verdict is (
+        CoverageVerdict.SUFFICIENT)
+
+
+def test_registry_can_never_return_another_measurements_evidence() -> None:
+    """A2: the store is keyed by measurement id; foreign evidence is unfetchable."""
+
+    mreg = _measurement_registry(
+        _rule(fraction=0.90),
+        coverage=_observation(measurement_id=OTHER_MEASUREMENT, fraction=0.97))
+    assert mreg.coverage_of(EXPECTED_MEASUREMENT) is None
+    assert mreg.coverage_of(OTHER_MEASUREMENT) is not None
+
+
+def test_a_non_current_comparison_measurement_cannot_be_replayed() -> None:
+    """The canonical resolution is the LIVE resolver, not a store read."""
+
+    mreg = _measurement_registry(_rule())
+    superseding = windowed_observation(
+        "cov:obs-2", METRIC, value=2.0, missingness=MissingnessState.OBSERVED,
+        claim_refs=(CLAIM_ID,), unit="count",
+        window_class=WindowClass.INSTANTANEOUS, valid_time=NOW + timedelta(days=1),
+        supersedes=EXPECTED_MEASUREMENT,
+        restatement_reason=RestatementReason.INDEXER_CORRECTION)
+    mreg.register_measurement(superseding)
+    with pytest.raises(ComparisonCoverageError):
+        _replay(mreg)
+
+
+def test_coverage_authorization_records_comparison_measurement_identity() -> None:
+    """A3: the seal names the measurement the bundle was derived for."""
+
+    auth = _replay(_measurement_registry(_rule()))
+    assert auth.comparison_measurement_ref == EXPECTED_MEASUREMENT
+
+
+def test_coverage_authorization_records_canonical_metric_identity() -> None:
+    """A3: the seal names the metric applicability was resolved for."""
+
+    mreg = _measurement_registry(_rule())
+    auth = _replay(mreg)
+    assert auth.metric_id == METRIC
+    assert auth.metric_id == mreg.resolve_current(
+        EXPECTED_MEASUREMENT).metric_definition_ref
+
+
+def test_coverage_authorization_records_named_rule_identity() -> None:
+    """A3: the seal names the rule the replay ran under — or its honest absence."""
+
+    auth = _replay(_measurement_registry(_rule()), named="cov:1")
+    assert auth.named_rule_ref == "cov:1"
+    unresolved = _replay(_measurement_registry(), named=None)
+    assert unresolved.named_rule_ref is None
+    assert unresolved.applicability.requirement_status is (
+        CoverageRequirementStatus.UNRESOLVED)
+    assert unresolved.applicability.source_ref is None
+
+
+def test_sealed_identity_travels_through_the_comparability_verdict() -> None:
+    """A3: the structured bundle Rung 8 consumes carries the same seal."""
+
+    verdict = derive_temporal_comparability(
+        coverage=_replay(_measurement_registry(_rule())))
+    assert verdict.coverage is not None
+    assert verdict.coverage.comparison_measurement_ref == EXPECTED_MEASUREMENT
+    assert verdict.coverage.metric_id == METRIC
+    assert verdict.coverage.named_rule_ref == "cov:1"
+
+
+def test_the_replay_reads_the_measurement_registrys_own_coverage_rules() -> None:
+    """One registry authorizes one replay: the measurement registry's member."""
+
+    mreg = _measurement_registry(_rule())
+    auth = _replay(mreg)
+    assert mreg.coverage_rules.registered_rule("cov:1") is not None
+    assert auth.applicability.requirement_status is CoverageRequirementStatus.REQUIRED
+    # no separately-injected rule registry exists on the replay path
+    assert "registry" not in inspect.signature(replay_coverage_checks).parameters

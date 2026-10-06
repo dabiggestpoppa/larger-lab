@@ -64,6 +64,19 @@ because ``ReplayCheck.reason`` is diagnostic prose, not a canonical authority
 field. Changing reason wording changes nothing; the reasons remain present for
 check-by-check falsifiability, and are never canonical.
 
+**The sealed bundle's identity seal is verified, not merely read.** A
+structured authorization records which authority bundle produced it — the
+comparison measurement, the metric, and the named rule. Before the record's
+deltas, and before any refusal record, the engine proves that bundle is THIS
+comparison's bundle: the sealed measurement identity equals the canonical
+resolved comparison, the sealed metric equals the comparison's canonical
+metric AND the governing rule's ``metric_definition_ref``, the sealed rule
+identity equals the rule's ``coverage_sufficiency_rule_ref`` (absent exactly
+when the rule declares coverage not REQUIRED, per R-2), and the sealed
+applicability source equals the rule's ``coverage_applicability_source_ref``.
+Equal requirement STATUS alone proves nothing: same status, different
+authority bundle, is a substitution and is refused.
+
 Under Rung 7's own law, ``COMPARABLE`` is reachable only when the sealed
 coverage replay recomputed ``SUFFICIENT`` under a live, ratified, in-scope rule
 (anything less maps to ``UNRESOLVED`` or ``NOT_COMPARABLE``). The engine
@@ -463,10 +476,11 @@ def derive_change_observation(
     _validate_operand_cardinality(comparison_refs)
 
     # -- 3. the sealed Rung 7 decision is the only comparability input, and
-    #       it must carry its structured coverage authorization ------------
+    #       it must carry its structured coverage authorization, whose
+    #       identity seal must agree with THIS rule and THIS comparison ------
     status = comparability.status
     sealed = _sealed_coverage(comparability)
-    _require_declared_and_sealed_agree(rule, sealed)
+    _require_declared_and_sealed_agree(rule, sealed, comparison_current)
 
     if status is not TemporalComparabilityStatus.COMPARABLE:
         # No arithmetic runs on an unresolved or refused comparison. The
@@ -690,15 +704,30 @@ def derive_change_observation(
 
 
 def _require_declared_and_sealed_agree(
-    rule: ComparisonRule, sealed: CoverageAuthorization
+    rule: ComparisonRule,
+    sealed: CoverageAuthorization,
+    comparison_current: MeasurementObservation,
 ) -> None:
-    """Fail closed when the sealed replay and the governing rule disagree.
+    """Fail closed when the sealed bundle, the rule and the operand disagree.
 
-    The replay resolved applicability for the exact metric; the rule declares
-    what the operator ratified. Honest inputs agree, because the rule's own
-    R-2 validator ties its declared status to a recorded upstream
-    determination. A disagreement means one of the two is not what it claims
-    and neither may be recorded.
+    Status agreement alone proves nothing: a sealed ``REQUIRED`` result derived
+    for another measurement, another metric or another coverage rule would
+    carry the same status. The sealed authorization's identity seal (coverage
+    identity sealing erratum v0.1) is therefore verified field by field:
+
+    * ``sealed.comparison_measurement_ref`` is the canonical comparison
+      resolved through the registry — not merely the ref the caller named;
+    * ``sealed.metric_id`` is that comparison's canonical metric AND the
+      governing rule's ``metric_definition_ref``;
+    * ``sealed.named_rule_ref`` is the rule's
+      ``coverage_sufficiency_rule_ref`` — present exactly when the rule
+      declares coverage REQUIRED, absent otherwise (R-2 single meanings);
+    * ``sealed.applicability.source_ref`` is the rule's
+      ``coverage_applicability_source_ref`` — the operator's recorded upstream
+      determination, or absence meaning NO_UPSTREAM_DETERMINATION_EXISTS.
+
+    A disagreement means the sealed verdict belongs to another authority
+    bundle, and neither side may be recorded.
     """
 
     declared_required = (
@@ -715,6 +744,48 @@ def _require_declared_and_sealed_agree(
             f"{rule.coverage_requirement_status.value}; the engine consumes "
             f"sealed results and will not record a coverage basis that "
             f"disagrees with itself"
+        )
+
+    if sealed.comparison_measurement_ref != comparison_current.measurement_id:
+        raise ChangeDerivationError(
+            f"the sealed coverage bundle was derived for "
+            f"{sealed.comparison_measurement_ref!r}, not for the canonical "
+            f"comparison {comparison_current.measurement_id!r}; same coverage "
+            f"status from another measurement's authority bundle is a "
+            f"substitution and is refused"
+        )
+    if sealed.metric_id != comparison_current.metric_definition_ref:
+        raise ChangeDerivationError(
+            f"the sealed coverage bundle resolved applicability for metric "
+            f"{sealed.metric_id!r}, but the canonical comparison measures "
+            f"{comparison_current.metric_definition_ref!r}; same coverage "
+            f"status from another metric's authority bundle is a substitution "
+            f"and is refused"
+        )
+    if sealed.metric_id != rule.metric_definition_ref:
+        raise ChangeDerivationError(
+            f"the sealed coverage bundle resolved applicability for metric "
+            f"{sealed.metric_id!r} but the governing rule "
+            f"{rule.comparison_rule_id} is bound to "
+            f"{rule.metric_definition_ref!r}; exact rule metric binding "
+            f"forbids the derivation and no substitution exists"
+        )
+    declared_rule_ref = (
+        rule.coverage_sufficiency_rule_ref if declared_required else None
+    )
+    if sealed.named_rule_ref != declared_rule_ref:
+        raise ChangeDerivationError(
+            f"the sealed coverage bundle was derived under coverage rule "
+            f"{sealed.named_rule_ref!r}, not the governing rule's bound "
+            f"{declared_rule_ref!r}; same coverage status from another "
+            f"coverage rule's authority bundle is a substitution and is refused"
+        )
+    if sealed.applicability.source_ref != rule.coverage_applicability_source_ref:
+        raise ChangeDerivationError(
+            f"the sealed coverage bundle's applicability source "
+            f"{sealed.applicability.source_ref!r} is not the governing rule's "
+            f"declared source {rule.coverage_applicability_source_ref!r}; the "
+            f"upstream determination must be the one the operator recorded"
         )
 
 

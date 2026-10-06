@@ -259,18 +259,36 @@ def _seal(
 ) -> ComparabilityVerdict:
     """A sealed Rung 7 result, produced by the REAL Rung 7 code path.
 
-    ``mutate_reasons`` rewrites check-reason text WITHOUT touching any check
-    number, passed state, or verdict — the diagnostic-text independence
-    fixture. The structured authorization travels with the verdict either way.
+    The registry-derived replay consumes the canonical registered evidence; the
+    ``coverage_observation`` fixture is what the engine's own store carries for
+    the comparison. ``mutate_reasons`` rewrites check-reason text WITHOUT
+    touching any check number, passed state, or verdict — the diagnostic-text
+    independence fixture. The structured authorization travels with the verdict
+    either way, carrying its identity seal (comparison, metric, named rule).
     """
 
-    reg = _cov_registry(fraction=cov_fraction)
+    engine = _engine()
+    # the seal's own registry must carry the canonical comparison measurement:
+    # the registry-derived replay resolves it live before any check runs
+    register_measurement(
+        engine, _obs(comparison_id, day=10, value=7.5, cov_ref=comparison_id))
+    reg = engine.registry
+    reg.coverage_rules.register(
+        CoverageSufficiencyRule(
+            rule_id=COV_RULE, version="1", required_fraction=cov_fraction,
+            scope_metric_id=METRIC, rationale="ratified coverage sufficiency floor",
+        )
+    )
+    reg.coverage_rules.ratify(COV_RULE, operator="operator:1", at=NOW)
     obs = {"default": _coverage_obs(comparison_id), "none": None}.get(
         coverage_observation, coverage_observation
     )
+    if obs is not None:
+        reg.register_coverage(obs)
     auth = replay_coverage_checks(
-        registry=reg, metric_id=METRIC, named_rule_ref=COV_RULE,
-        comparison_measurement_ref=comparison_id, coverage_observation=obs,
+        measurement_registry=reg,
+        comparison_measurement_ref=comparison_id,
+        named_rule_ref=COV_RULE,
     )
     verdict = derive_temporal_comparability(
         coverage=auth, structural_checks=_STRUCTURAL_PASSED
@@ -1231,3 +1249,143 @@ def test_no_aggregation_path_exists() -> None:
         with pytest.raises(ChangeDerivationError) as excinfo:
             _validate_operand_cardinality(tuple(f"m{i}" for i in range(count)))
         assert MULTI_COMPARISON_MEASUREMENT_SET_NOT_AUTHORIZED in str(excinfo.value)
+
+
+# -- SEALED BUNDLE IDENTITY AGREEMENT (identity sealing erratum v0.1) --------
+#
+# Status agreement alone proves nothing: a sealed REQUIRED verdict derived for
+# another measurement, metric or coverage rule carries the same status. The
+# engine verifies the sealed authorization's identity seal field by field
+# before trusting the bundle — same status, different authority bundle, is a
+# substitution and is refused.
+
+
+def test_rung8_refuses_sealed_result_from_another_measurement() -> None:
+    """The AUTH-B reproducer: an honest foreign bundle cannot drive arithmetic."""
+
+    engine = _engine(extra_definitions=True)
+    register_measurement(engine, _obs("obs:c", day=10, value=7.5, cov_ref="obs:c"))
+    register_measurement(engine, _obs("obs:b", day=0, value=3.0))
+    engine.registry.register_coverage(_coverage_obs("obs:c"))
+    # an honest sealed bundle for ANOTHER measurement, metric and rule
+    foreign_engine = _engine(extra_definitions=True)
+    foreign_reg = foreign_engine.registry
+    foreign_reg.coverage_rules.register(
+        CoverageSufficiencyRule(
+            rule_id="cov:foreign", version="1", required_fraction=0.9,
+            scope_metric_id=OTHER_METRIC,
+            rationale="foreign coverage floor",
+        )
+    )
+    foreign_reg.coverage_rules.ratify(
+        "cov:foreign", operator="operator:1", at=NOW)
+    register_measurement(
+        foreign_engine,
+        _obs("obs:b", day=10, value=9.9, metric=OTHER_METRIC, cov_ref="obs:b"))
+    foreign_reg.register_coverage(
+        _coverage_obs("obs:b").model_copy(update={"sufficiency_rule_ref": "cov:foreign"}))
+    foreign_auth = replay_coverage_checks(
+        measurement_registry=foreign_reg,
+        comparison_measurement_ref="obs:b",
+        named_rule_ref="cov:foreign",
+    )
+    foreign_rule = _rule(
+        metric_definition_ref=OTHER_METRIC,
+        comparison_rule_id="cmp:foreign",
+        coverage_applicability_source_ref=f"exact-metric:{OTHER_METRIC}:1",
+        coverage_sufficiency_rule_ref="cov:foreign",
+    )
+    foreign_verdict = derive_temporal_comparability(
+        coverage=foreign_auth, structural_checks=_STRUCTURAL_PASSED)
+    assert foreign_verdict.status.value == "COMPARABLE"
+    with pytest.raises(ChangeDerivationError) as excinfo:
+        _derive(
+            engine, comparability=foreign_verdict, rule=foreign_rule,
+            rules_registry=_rules_registry(foreign_rule),
+            baseline_measurement_refs=("obs:b",),
+        )
+    text = str(excinfo.value)
+    assert "obs:b" in text and "obs:c" in text
+    assert "substitution" in text
+
+
+def test_rung8_refuses_sealed_result_from_another_metric() -> None:
+    """A sealed bundle claiming another metric is refused before arithmetic."""
+
+    engine = _candidate_engine()
+    sealed = _seal()
+    relabeled = replace(
+        sealed, coverage=replace(sealed.coverage, metric_id=OTHER_METRIC))
+    with pytest.raises(ChangeDerivationError) as excinfo:
+        _derive(engine, comparability=relabeled,
+                baseline_measurement_refs=("obs:a", "obs:b3"))
+    assert "another metric" in str(excinfo.value)
+    assert OTHER_METRIC in str(excinfo.value)
+
+
+def test_rung8_refuses_sealed_result_from_another_coverage_rule() -> None:
+    """A sealed bundle derived under another rule is refused."""
+
+    engine = _candidate_engine()
+    sealed = _seal()
+    foreign_rule_bundle = replace(
+        sealed, coverage=replace(sealed.coverage, named_rule_ref="cov:other"))
+    with pytest.raises(ChangeDerivationError) as excinfo:
+        _derive(engine, comparability=foreign_rule_bundle,
+                baseline_measurement_refs=("obs:a", "obs:b3"))
+    assert "cov:other" in str(excinfo.value)
+    assert "substitution" in str(excinfo.value)
+
+
+def test_rung8_refuses_a_different_applicability_source_ref() -> None:
+    """The upstream determination must be the one the operator recorded."""
+
+    engine = _candidate_engine()
+    sealed = _seal()
+    relabeled = replace(
+        sealed,
+        coverage=replace(
+            sealed.coverage,
+            applicability=replace(
+                sealed.coverage.applicability,
+                source_ref="exact-metric:metric.tx:99",
+            ),
+        ),
+    )
+    with pytest.raises(ChangeDerivationError) as excinfo:
+        _derive(engine, comparability=relabeled,
+                baseline_measurement_refs=("obs:a", "obs:b3"))
+    assert "exact-metric:metric.tx:99" in str(excinfo.value)
+    assert COV_SOURCE in str(excinfo.value)
+
+
+def test_same_required_status_alone_cannot_satisfy_bundle_agreement() -> None:
+    """A4: status equality is necessary and provably insufficient.
+
+    Every identity field is crossed with the honest bundle in turn — each
+    mismatch is refused even though the requirement status matches throughout.
+    """
+
+    engine = _candidate_engine()
+    sealed = _seal()
+    assert sealed.coverage.applicability.requirement_status is (
+        CoverageRequirementStatus.REQUIRED
+    )
+    mutations = (
+        {"comparison_measurement_ref": "obs:elsewhere"},
+        {"metric_id": OTHER_METRIC},
+        {"named_rule_ref": "cov:other"},
+        {"applicability": replace(
+            sealed.coverage.applicability, source_ref="exact-metric:other:1")},
+    )
+    for kwargs in mutations:
+        forged = replace(sealed, coverage=replace(sealed.coverage, **kwargs))
+        with pytest.raises(ChangeDerivationError) as excinfo:
+            _derive(engine, comparability=forged,
+                    baseline_measurement_refs=("obs:a", "obs:b3"))
+        assert "substitution" in str(excinfo.value) or "source" in str(
+            excinfo.value), kwargs
+    # the honest bundle still derives
+    record = _derive(engine, comparability=sealed,
+                     baseline_measurement_refs=("obs:a", "obs:b3"))
+    assert record.absolute_delta == 6.5

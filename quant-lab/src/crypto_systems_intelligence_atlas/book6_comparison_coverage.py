@@ -23,13 +23,32 @@ ratification mechanism, no comparison-local coverage authority, and no benchmark
 authority. ``CoverageSufficiencyRule`` and ``CoverageObservation`` are not
 re-declared here; the accepted types are imported and used as-is.
 
-**No caller-supplied verdict.** There is deliberately no callable parameter on
-the replay path. Check 16 recomputes its verdict from an actual
-``CoverageObservation``'s ``observed_fraction`` against the named rule's
-``required_fraction`` — two fields of accepted frozen models, both constrained
-to ``[0, 1]``, compared with no epsilon, no tolerance and no rounding. A
-caller-supplied ``CoverageVerdict`` would be a self-declared coverage claim,
-which is precisely what the accepted corpus forbids.
+**No caller-supplied authority input of any kind.** There is deliberately no
+callable parameter on the replay path, no ``metric_id`` parameter, and no
+``coverage_observation`` parameter (coverage-authorization identity sealing
+erratum v0.1). Check 16 recomputes its verdict from the canonical registered
+evidence — the ``CoverageObservation`` the measurement registry returns for
+the comparison measurement — against the named rule's ``required_fraction``.
+Two fields of accepted frozen models, both constrained to ``[0, 1]``, compared
+with no epsilon, no tolerance and no rounding. A caller-supplied
+``CoverageVerdict`` would be a self-declared coverage claim, a caller-supplied
+metric would redefine the coverage scope, and a caller-supplied observation
+would substitute unregistered evidence — precisely what the accepted corpus
+forbids in each case.
+
+**Every replay input is registry-derived.** The replay receives the measurement
+registry and the comparison measurement ref, and derives everything else at
+replay start:
+
+    comparison = measurement_registry.resolve_current(ref)
+    metric_id  = comparison.metric_definition_ref
+    evidence   = measurement_registry.coverage_of(ref)
+
+The metric is never inferred from the coverage rule, the measurement is never
+inferred from a coverage observation, and no caller-supplied substitute exists
+in the signature. The coverage rule registry is the measurement registry's own
+``coverage_rules`` member — the single accepted ``CoverageRuleRegistry`` — so
+two independent registries can never jointly authorize one replay.
 
 **No lexical rule selection.** Check 12 answers one question — does *any*
 current, ratified, exact-metric rule exist — and selects nothing. Which rule
@@ -42,21 +61,11 @@ already carries the binding: ``CoverageObservation.measurement_id`` is a
 required field, ``register_coverage`` keys the store by it, and ``coverage_of``
 reads by it, so no accepted path can return measurement B's coverage when asked
 for measurement A's. Check 16 performs that binding rather than assuming it, and
-it performs it **before** reading ``observed_fraction``:
-
-    coverage_observation.measurement_id == comparison_measurement_ref
-
-A rule match, a live ratification and an exact metric scope say nothing about
-which observation was measured, so passing checks 14 and 15 with another
-measurement's observation is not evidence for this comparison at all:
-
-    CROSS_MEASUREMENT_COVERAGE_SUBSTITUTION = PROHIBITED
-    RULE_MATCH_ALONE_IS_NOT_ENOUGH          = TRUE
-
-The expected identity arrives as a required parameter and is never inferred from
-the rule, the metric, a caller convention, the registry, or the observation
-itself — inferring it from the observation would satisfy the check with the very
-substitution the check exists to catch.
+it performs it **before** reading ``observed_fraction``. With the
+registry-derived API the binding is doubly enforced: the evidence object is
+fetched BY the comparison measurement ref, and the check still verifies
+``coverage_observation.measurement_id == comparison_measurement_ref`` because
+the store is keyed by what the evidence itself declares.
 
 **A wrong-measurement observation yields no verdict at all.** It is not a
 recomputed ``INSUFFICIENT`` and not a finding; it is an absence of basis:
@@ -119,7 +128,7 @@ from .book6_comparison_contracts import (
     TemporalComparabilityStatus,
 )
 from .book6_coverage_rules import CoverageRuleError, CoverageRuleRegistry
-from .book6_definitions import CoverageObservation
+from .book6_registry import Book6MeasurementRegistry, Book6RegistryError
 
 
 class ComparisonCoverageError(ValueError):
@@ -149,6 +158,14 @@ COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT: Final[str] = (
 #: distinct: omitting the expectation is not the same fault as contradicting it.
 COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED: Final[str] = (
     "coverage is REQUIRED but no expected measurement identity was supplied"
+)
+
+#: Check 16's failure reason when the registered evidence names another rule.
+#: The registry keys evidence by measurement; a mismatched rule citation is the
+#: same no-rule-substitution fault it always was, now discovered on the
+#: canonical object.
+COVERAGE_OBSERVATION_NAMES_ANOTHER_RULE: Final[str] = (
+    "registered coverage observation names another coverage rule"
 )
 
 
@@ -194,6 +211,14 @@ class CoverageAuthorization:
     ``observation_state`` answers *was an observation supplied* (grammar §3.1
     R-3), not *was it accepted*. A rejected observation is still PRESENT on the
     record; check 16 is where acceptance is decided, so the two never collapse.
+
+    The identity seal records WHICH authority bundle produced the verdict: the
+    comparison measurement it was replayed for, the canonical metric that
+    drove applicability and scope, and the named rule the operator bound.
+    ``applicability.source_ref`` already carries the applicability determination
+    and is deliberately not duplicated here. A consumer (Rung 8) verifies the
+    seal against the rule and the resolved operands before trusting a verdict:
+    same status, different authority bundle, is a substitution.
     """
 
     applicability: CoverageApplicability
@@ -201,6 +226,9 @@ class CoverageAuthorization:
     observation_ref: str | None
     verdict: CoverageVerdict
     checks: tuple[ReplayCheck, ...]
+    comparison_measurement_ref: str
+    metric_id: str
+    named_rule_ref: str | None
 
 
 @dataclass(frozen=True)
@@ -274,31 +302,37 @@ def resolve_coverage_applicability(
 
 def replay_coverage_checks(
     *,
-    registry: CoverageRuleRegistry,
-    metric_id: str,
-    named_rule_ref: str | None,
+    measurement_registry: Book6MeasurementRegistry,
     comparison_measurement_ref: str,
-    coverage_observation: CoverageObservation | None,
+    named_rule_ref: str | None,
 ) -> CoverageAuthorization:
     """Replay canonical checks 12–16, each independently.
+
+    Every authority input is derived from the accepted measurement registry at
+    replay start — none arrives from the caller:
+
+    * the canonical comparison is ``measurement_registry.resolve_current(
+      comparison_measurement_ref)`` (registered lookup, live currentness —
+      registration is not authority here either);
+    * the coverage metric is ``comparison.metric_definition_ref``, the
+      measurement's own metric identity. It is never inferred from the rule
+      and never supplied by the caller: a caller-named metric would redefine
+      the scope the rule is judged against;
+    * the coverage evidence is ``measurement_registry.coverage_of(
+      comparison_measurement_ref)`` — the registered observation, keyed by the
+      exact measurement id, or ``None`` when none exists. It is never a caller
+      object: a fresh ``CoverageObservation`` with a favorable fraction would
+      substitute unregistered evidence for the canonical record.
 
     ``named_rule_ref`` is ``ComparisonRule.coverage_sufficiency_rule_ref`` — the
     citation the operator bound into the ratified rule. It is the authoritative
     binding and no registry ordering may substitute for it.
 
-    ``comparison_measurement_ref`` is the exact identity of the measurement whose
-    coverage is being replayed. It is a **required** parameter with no default
-    and no optional path: the expected identity is never inferred from the rule
-    id, the metric id, a caller convention, registry ordering, or the observation
-    itself, because the last of those would satisfy the check with the very
-    substitution it exists to reject.
-
-    ``coverage_observation`` is an actual accepted ``CoverageObservation``. There
-    is deliberately **no** callable parameter: a caller-supplied verdict would
-    be a self-declared coverage claim, which the corpus forbids. Check 16
-    recomputes the verdict from two ratified-bounded numbers — the
-    observation's ``observed_fraction`` against the named rule's
-    ``required_fraction`` — with no epsilon, tolerance or caller input.
+    There is deliberately **no** callable parameter and no verdict parameter:
+    check 16 recomputes the verdict from two ratified-bounded numbers on
+    accepted frozen models — the canonical observation's ``observed_fraction``
+    against the named rule's ``required_fraction`` — with no epsilon, tolerance
+    or caller input.
 
     Check 16 succeeds when it faithfully recomputes the rule's verdict,
     *whatever* that verdict is. A recomputed ``INSUFFICIENT`` is a successful
@@ -306,10 +340,28 @@ def replay_coverage_checks(
     absence of basis. The distinction is load-bearing and is what keeps
     ``NOT_COMPARABLE`` distinct from ``UNRESOLVED`` downstream.
 
-    The same distinction governs the measurement binding. An observation that
-    belongs to another measurement does not recompute ``INSUFFICIENT`` — it
-    fails, and a failure is an absence of basis.
+    The same distinction governs the measurement binding. Evidence naming
+    another measurement cannot even be fetched through the registry; evidence
+    naming another rule still fails, on the canonical object, exactly as
+    before. A failure is an absence of basis, not a recomputed verdict.
     """
+
+    # -- canonical comparison resolution, before anything else -------------
+    try:
+        comparison = measurement_registry.resolve_current(comparison_measurement_ref)
+    except Book6RegistryError as exc:
+        raise ComparisonCoverageError(
+            f"the comparison measurement {comparison_measurement_ref} does not "
+            f"resolve as current in the measurement registry; coverage cannot "
+            f"be replayed against an absent or superseded operand ({exc})"
+        ) from exc
+    metric_id = comparison.metric_definition_ref
+
+    # -- canonical coverage evidence, from the registry's own store ---------
+    coverage_observation = measurement_registry.coverage_of(comparison_measurement_ref)
+
+    # -- the single coverage rule registry: the measurement registry's own ---
+    registry = measurement_registry.coverage_rules
 
     applicability = resolve_coverage_applicability(
         registry=registry, metric_id=metric_id
@@ -412,8 +464,8 @@ def replay_coverage_checks(
         ReplayCheck(15, "coverage scope match", scope_ok, scope_reason)
     )
 
-    # 16 — deterministic recomputation from an ACTUAL observation under the
-    #      NAMED rule, bound to the EXACT measurement under comparison.
+    # 16 — deterministic recomputation from the CANONICAL registered evidence
+    #      under the NAMED rule, bound to the EXACT measurement under comparison.
     #      No caller input of any kind beyond the required identities.
     if not required:
         verdict, verdict_ok, verdict_reason = (
@@ -431,30 +483,22 @@ def replay_coverage_checks(
         verdict, verdict_ok, verdict_reason = (
             CoverageVerdict.UNKNOWN,
             False,
-            f"coverage is REQUIRED under {named_rule_ref} but no applicable "
-            f"CoverageObservation exists for this comparison",
+            f"coverage is REQUIRED under {named_rule_ref} but no registered "
+            f"CoverageObservation exists for {comparison_measurement_ref}",
         )
     elif coverage_observation.sufficiency_rule_ref != named_rule_ref:
         verdict, verdict_ok, verdict_reason = (
             CoverageVerdict.UNKNOWN,
             False,
-            f"CoverageObservation names "
-            f"{coverage_observation.sufficiency_rule_ref}, not the bound rule "
-            f"{named_rule_ref}; no rule substitution is permitted",
-        )
-    elif comparison_measurement_ref is None:
-        # Unreachable through the typed signature; guarded because a Python
-        # caller can still pass None and a silently unbound replay would be the
-        # exact defect this branch exists to close.
-        verdict, verdict_ok, verdict_reason = (
-            CoverageVerdict.UNKNOWN,
-            False,
-            COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED,
+            f"{COVERAGE_OBSERVATION_NAMES_ANOTHER_RULE}: the registered "
+            f"evidence names {coverage_observation.sufficiency_rule_ref}, not "
+            f"the bound rule {named_rule_ref}; no rule substitution is permitted",
         )
     elif coverage_observation.measurement_id != comparison_measurement_ref:
-        # The binding, and it comes BEFORE observed_fraction is read: another
-        # measurement's fraction says nothing about this one, however good it
-        # looks or however well it matches the rule.
+        # The binding, and it comes BEFORE observed_fraction is read. The
+        # registry already fetched BY the comparison ref, so this guards the
+        # store's own keying: evidence whose declared measurement contradicts
+        # the ref it was fetched for is not evidence for this comparison.
         verdict, verdict_ok, verdict_reason = (
             CoverageVerdict.UNKNOWN,
             False,
@@ -507,6 +551,9 @@ def replay_coverage_checks(
         ),
         verdict=verdict,
         checks=tuple(checks),
+        comparison_measurement_ref=comparison_measurement_ref,
+        metric_id=metric_id,
+        named_rule_ref=named_rule_ref,
     )
 
 
@@ -627,6 +674,7 @@ __all__ = [
     "COVERAGE_CHECK_NUMBERS",
     "COVERAGE_EXPECTED_MEASUREMENT_NOT_SUPPLIED",
     "COVERAGE_OBSERVATION_BELONGS_TO_ANOTHER_MEASUREMENT",
+    "COVERAGE_OBSERVATION_NAMES_ANOTHER_RULE",
     "NO_UPSTREAM_DETERMINATION_EXISTS",
     "TEMPORAL_COMPARABILITY_CHECK",
     "ComparabilityVerdict",

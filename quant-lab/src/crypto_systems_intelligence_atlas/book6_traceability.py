@@ -3339,10 +3339,10 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
     (
         "CMP.BINDING.75",
         "CMP.COVERAGE_AUTHORITY",
-        "no caller may omit the expected measurement identity: the parameter "
-        "carries no default and a deliberate None fails closed",
+        "no caller may omit or null the replayed measurement identity: the "
+        "parameter carries no default and a deliberate None fails closed",
         "test_book6_comparison_coverage.py",
-        "test_no_caller_may_omit_the_expected_measurement_identity",
+        "test_no_caller_may_omit_or_null_the_replayed_measurement_identity",
     ),
     (
         "CMP.BINDING.76",
@@ -3355,10 +3355,10 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
     (
         "CMP.BINDING.77",
         "CMP.COVERAGE_AUTHORITY",
-        "the expected identity is never derived from the observation, the rule "
-        "or the registry, and no second notion of identity is introduced",
+        "the identity is fetched by the comparison ref and re-verified on the "
+        "fetched evidence; the seal travels on the structured authorization",
         "test_book6_comparison_coverage.py",
-        "test_the_binding_is_not_derived_from_the_observation_or_the_rule",
+        "test_the_binding_is_fetched_and_verified_never_inferred",
     ),    (
         "CMP.BINDING.78",
         "CMP.COVERAGE_AUTHORITY",
@@ -3756,6 +3756,128 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "resolves the observation state to UNAVAILABLE, never NOT_APPLICABLE",
         "test_book6_comparison_coverage.py",
         "test_unresolved_applicability_is_unavailable_never_not_applicable",
+    ),
+    # -- coverage authorization identity sealing erratum v0.1 -----------------
+    (
+        "CMP.CHANGE.48",
+        "CMP.COVERAGE_AUTHORITY",
+        "the authority replay takes no metric and no coverage-observation "
+        "parameter: metric and evidence are registry-derived (A1/A2 sealed)",
+        "test_book6_comparison_coverage.py",
+        "test_no_metric_or_observation_parameter_exists_on_the_replay_path",
+    ),
+    (
+        "CMP.CHANGE.49",
+        "CMP.COVERAGE_AUTHORITY",
+        "check 12 resolves applicability for the canonical comparison "
+        "measurement's own metric_definition_ref, never a caller string",
+        "test_book6_comparison_coverage.py",
+        "test_canonical_measurement_metric_drives_check_12",
+    ),
+    (
+        "CMP.CHANGE.50",
+        "CMP.COVERAGE_AUTHORITY",
+        "a rule scoped to another metric than the comparison's canonical "
+        "metric fails check 15; the caller cannot redefine the scope",
+        "test_book6_comparison_coverage.py",
+        "test_metric_a_comparison_with_metric_b_scoped_rule_fails_check_15",
+    ),
+    (
+        "CMP.CHANGE.51",
+        "CMP.COVERAGE_AUTHORITY",
+        "check 16 recomputes from the registered canonical evidence's "
+        "observed_fraction against the named rule's required_fraction",
+        "test_book6_comparison_coverage.py",
+        "test_registered_canonical_coverage_fraction_is_used",
+    ),
+    (
+        "CMP.CHANGE.52",
+        "CMP.COVERAGE_AUTHORITY",
+        "an unregistered forged CoverageObservation has no API path into the "
+        "replay: evidence substitution is structurally impossible",
+        "test_book6_comparison_coverage.py",
+        "test_unregistered_forged_coverage_object_has_no_api_path",
+    ),
+    (
+        "CMP.CHANGE.53",
+        "CMP.COVERAGE_AUTHORITY",
+        "the replay tracks the registry's canonical evidence, and only it: "
+        "changing registered coverage changes the recomputed verdict",
+        "test_book6_comparison_coverage.py",
+        "test_changing_canonical_registry_coverage_changes_replay",
+    ),
+    (
+        "CMP.CHANGE.54",
+        "CMP.COVERAGE_AUTHORITY",
+        "the coverage store is keyed by measurement id, so another "
+        "measurement's evidence is unfetchable for this comparison",
+        "test_book6_comparison_coverage.py",
+        "test_registry_can_never_return_another_measurements_evidence",
+    ),
+    (
+        "CMP.CHANGE.55",
+        "CMP.COVERAGE_AUTHORITY",
+        "the replay resolves the comparison through the live GAP-7 resolver: "
+        "a superseded comparison measurement cannot be replayed at all",
+        "test_book6_comparison_coverage.py",
+        "test_a_non_current_comparison_measurement_cannot_be_replayed",
+    ),
+    (
+        "CMP.CHANGE.56",
+        "CMP.COVERAGE_AUTHORITY",
+        "the structured CoverageAuthorization seals the identity of its "
+        "authority bundle: comparison measurement, canonical metric and named "
+        "rule (or the honest absence)",
+        "test_book6_comparison_coverage.py",
+        "test_coverage_authorization_records_named_rule_identity",
+    ),
+    (
+        "CMP.CHANGE.57",
+        "CMP.COVERAGE_AUTHORITY",
+        "the identity seal travels intact through the sealed ComparabilityVerdict "
+        "Rung 8 consumes",
+        "test_book6_comparison_coverage.py",
+        "test_sealed_identity_travels_through_the_comparability_verdict",
+    ),
+    (
+        "CMP.CHANGE.58",
+        "CMP.CHANGE_ARITHMETIC",
+        "Rung 8 refuses a sealed bundle derived for another measurement: same "
+        "status from a foreign authority bundle is a substitution",
+        "test_book6_comparison_change_derivation.py",
+        "test_rung8_refuses_sealed_result_from_another_measurement",
+    ),
+    (
+        "CMP.CHANGE.59",
+        "CMP.CHANGE_ARITHMETIC",
+        "Rung 8 refuses a sealed bundle whose metric identity is not the "
+        "comparison's canonical metric and the rule's metric",
+        "test_book6_comparison_change_derivation.py",
+        "test_rung8_refuses_sealed_result_from_another_metric",
+    ),
+    (
+        "CMP.CHANGE.60",
+        "CMP.CHANGE_ARITHMETIC",
+        "Rung 8 refuses a sealed bundle derived under a coverage rule other "
+        "than the governing rule's bound citation",
+        "test_book6_comparison_change_derivation.py",
+        "test_rung8_refuses_sealed_result_from_another_coverage_rule",
+    ),
+    (
+        "CMP.CHANGE.61",
+        "CMP.CHANGE_ARITHMETIC",
+        "Rung 8 refuses a sealed bundle whose applicability source is not the "
+        "upstream determination the operator recorded on the rule",
+        "test_book6_comparison_change_derivation.py",
+        "test_rung8_refuses_a_different_applicability_source_ref",
+    ),
+    (
+        "CMP.CHANGE.62",
+        "CMP.CHANGE_ARITHMETIC",
+        "equal REQUIRED status alone cannot satisfy bundle agreement: every "
+        "identity field is verified against the rule and the canonical operand",
+        "test_book6_comparison_change_derivation.py",
+        "test_same_required_status_alone_cannot_satisfy_bundle_agreement",
     ),)
 
 
