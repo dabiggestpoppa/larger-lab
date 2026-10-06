@@ -127,6 +127,7 @@ CMP_FAMILIES: Final[tuple[str, ...]] = (
     "CMP.COVERAGE_APPLICABILITY",
     "CMP.COVERAGE_AUTHORITY",
     "CMP.TEMPORAL_COMPARABILITY",
+    "CMP.CHANGE_ARITHMETIC",
 )
 
 #: Every family the matrix must cover.
@@ -3358,8 +3359,7 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "or the registry, and no second notion of identity is introduced",
         "test_book6_comparison_coverage.py",
         "test_the_binding_is_not_derived_from_the_observation_or_the_rule",
-    ),
-    (
+    ),    (
         "CMP.BINDING.78",
         "CMP.COVERAGE_AUTHORITY",
         "the operator's named rule still decides among several current rules; "
@@ -3367,7 +3367,172 @@ TRACEABILITY_ROWS: Final[tuple[tuple[str, str, str, str, str], ...]] = (
         "test_book6_comparison_coverage.py",
         "test_multiple_rule_named_binding_is_unchanged_by_the_measurement_binding",
     ),
-)
+    # -- Rung 8: deterministic change arithmetic -----------------------------
+    (
+        "CMP.CHANGE.01",
+        "CMP.CHANGE_ARITHMETIC",
+        "one authoritative ChangeObservation carries exactly one comparison "
+        "measurement ref, stamped by the engine from the one operand it "
+        "received",
+        "test_book6_comparison_change_derivation.py",
+        "test_exactly_one_comparison_ref_is_accepted",
+    ),
+    (
+        "CMP.CHANGE.02",
+        "CMP.CHANGE_ARITHMETIC",
+        "a comparison set of any size other than one is refused as a set with "
+        "MULTI_COMPARISON_MEASUREMENT_SET_NOT_AUTHORIZED; no first, last, "
+        "sort, average, sum, time, coverage or caller-order selection exists",
+        "test_book6_comparison_change_derivation.py",
+        "test_no_aggregation_path_exists",
+    ),
+    (
+        "CMP.CHANGE.03",
+        "CMP.CHANGE_ARITHMETIC",
+        "no parameter of the derivation engine could carry a caller-authored "
+        "comparison set, delta, or change kind; caller order cannot select an "
+        "operand",
+        "test_book6_comparison_change_derivation.py",
+        "test_caller_order_cannot_select_a_comparison_operand",
+    ),
+    (
+        "CMP.CHANGE.04",
+        "CMP.CHANGE_ARITHMETIC",
+        "absolute_delta is the stored binary64 subtraction, with no epsilon "
+        "and no tolerance: 0.1+0.2 vs 0.3 keeps binary64 semantics and is "
+        "INCREASE, not NO_CHANGE",
+        "test_book6_comparison_change_derivation.py",
+        "test_stored_binary64_semantics_0_1_plus_0_2_vs_0_3",
+    ),
+    (
+        "CMP.CHANGE.05",
+        "CMP.CHANGE_ARITHMETIC",
+        "direction derives from the sign of the canonical UNROUNDED delta; "
+        "+0.0 and -0.0 both compare equal under IEEE-754 and are NO_CHANGE",
+        "test_book6_comparison_change_derivation.py",
+        "test_signed_zero_in_both_directions_is_no_change",
+    ),
+    (
+        "CMP.CHANGE.06",
+        "CMP.CHANGE_ARITHMETIC",
+        "exact stored-value equality is NO_CHANGE, and nothing below a "
+        "materiality threshold exists to soften it",
+        "test_book6_comparison_change_derivation.py",
+        "test_exact_equality_is_no_change",
+    ),
+    (
+        "CMP.CHANGE.07",
+        "CMP.CHANGE_ARITHMETIC",
+        "at baseline 0.0 the relative delta is UNDEFINED (None) and the kind "
+        "is CHANGE_UNDEFINED; never 0, inf, NaN, capped or a percentage",
+        "test_book6_comparison_change_derivation.py",
+        "test_zero_baseline_relative_is_change_undefined",
+    ),
+    (
+        "CMP.CHANGE.08",
+        "CMP.CHANGE_ARITHMETIC",
+        "the zero-baseline law does not suppress the absolute delta: it still "
+        "computes and stays finite",
+        "test_book6_comparison_change_derivation.py",
+        "test_zero_baseline_absolute_still_computes",
+    ),
+    (
+        "CMP.CHANGE.09",
+        "CMP.CHANGE_ARITHMETIC",
+        "NaN, +Inf and -Inf in the comparison operand fail closed before any "
+        "arithmetic; no non-finite delta can be derived or persisted",
+        "test_book6_comparison_change_derivation.py",
+        "test_non_finite_comparison_is_refused",
+    ),
+    (
+        "CMP.CHANGE.10",
+        "CMP.CHANGE_ARITHMETIC",
+        "a non-finite baseline operand fails closed the same way, before the "
+        "subtraction",
+        "test_book6_comparison_change_derivation.py",
+        "test_non_finite_baseline_is_refused",
+    ),
+    (
+        "CMP.CHANGE.11",
+        "CMP.CHANGE_ARITHMETIC",
+        "cross-metric operands never reach arithmetic: same-metric identity "
+        "is re-checked at derivation and no conversion exists",
+        "test_book6_comparison_change_derivation.py",
+        "test_metric_mismatch_never_reaches_arithmetic",
+    ),
+    (
+        "CMP.CHANGE.12",
+        "CMP.CHANGE_ARITHMETIC",
+        "exact-unit identity is enforced from the record model up; a unit "
+        "mismatch cannot register, so it can never be an operand",
+        "test_book6_comparison_change_derivation.py",
+        "test_unit_mismatch_never_reaches_arithmetic",
+    ),
+    (
+        "CMP.CHANGE.13",
+        "CMP.CHANGE_ARITHMETIC",
+        "a sealed UNRESOLVED verdict produces an INSUFFICIENT_DATA record with "
+        "producing gates recorded, no deltas and no baseline resolution",
+        "test_book6_comparison_change_derivation.py",
+        "test_unresolved_comparability_never_reaches_arithmetic",
+    ),
+    (
+        "CMP.CHANGE.14",
+        "CMP.CHANGE_ARITHMETIC",
+        "a sealed NOT_COMPARABLE verdict produces a NOT_COMPARABLE record; "
+        "arithmetic never runs on a refused comparison",
+        "test_book6_comparison_change_derivation.py",
+        "test_not_comparable_never_reaches_arithmetic",
+    ),
+    (
+        "CMP.CHANGE.15",
+        "CMP.CHANGE_ARITHMETIC",
+        "the engine consumes the sealed Rung 7 coverage result and never "
+        "recomputes it: the same sealed verdict yields the same recorded "
+        "verdict from engines in different live coverage states",
+        "test_book6_comparison_change_derivation.py",
+        "test_coverage_result_is_consumed_not_recomputed",
+    ),
+    (
+        "CMP.CHANGE.16",
+        "CMP.CHANGE_ARITHMETIC",
+        "the selected baseline becomes an operand only through the engine's "
+        "live resolution; a superseded selection is refused at derivation time",
+        "test_book6_comparison_change_derivation.py",
+        "test_selected_baseline_is_engine_derived",
+    ),
+    (
+        "CMP.CHANGE.17",
+        "CMP.CHANGE_ARITHMETIC",
+        "deltas and change kind are engine-derived; test helpers may cross-check "
+        "only and a mismatch raises rather than overrides",
+        "test_book6_comparison_change_derivation.py",
+        "test_caller_cannot_author_deltas",
+    ),
+    (
+        "CMP.CHANGE.18",
+        "CMP.CHANGE_ARITHMETIC",
+        "change_kind has no caller-authorable parameter; direction is derived, "
+        "never asserted",
+        "test_book6_comparison_change_derivation.py",
+        "test_caller_cannot_author_change_kind",
+    ),
+    (
+        "CMP.CHANGE.19",
+        "CMP.CHANGE_ARITHMETIC",
+        "display_metadata cannot alter arithmetic and is fingerprint-invisible: "
+        "no rounding, epsilon or label reaches the stored delta",
+        "test_book6_comparison_change_derivation.py",
+        "test_display_metadata_cannot_alter_arithmetic",
+    ),
+    (
+        "CMP.CHANGE.20",
+        "CMP.CHANGE_ARITHMETIC",
+        "the governing rule's authority is re-checked live at derivation time; "
+        "registration is not authority",
+        "test_book6_comparison_change_derivation.py",
+        "test_rule_without_live_authority_is_refused",
+    ),)
 
 
 def rows_for_family(family: str) -> tuple[tuple[str, str, str, str, str], ...]:
