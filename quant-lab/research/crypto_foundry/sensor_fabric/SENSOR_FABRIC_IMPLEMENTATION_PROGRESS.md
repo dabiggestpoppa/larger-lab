@@ -5304,3 +5304,92 @@ distinct; provider ≠ venue; no metadata backcast).
 Ratification outputs (one commit): this ledger entry + `evidence/bloc_05/
 BLOC_05_I01_OPERATOR_RATIFICATION.md`. Zero production/test/evidence changes.
 B5-I02 NOT started. STOP.
+## 157 — SENSOR-B5-I02: IDENTITY MODELS + REGISTRIES (PENDING_OPERATOR_REVIEW)
+
+Date: 2026-10-06. Start head `8d220ad1cd` (I01-RATIFY); governance verified
+(OPERATOR_ACCEPTED, next_checkpoint_authorized = TRUE, scope B5-I02 ONLY).
+
+### 0. Staged commits (no amend/squash at any point)
+
+`32a88ef2a` B5-I02A (vocabulary authority audit + RED model/registry suites,
+confirmed collection-RED) → `dc7703eeb` B5-I02B (five identity models +
+minimal identity package + deliberate I01 scope-test reconciliation) →
+`6bc6ca4d5` B5-I02C (versioned registry + referential integrity) → B5-I02D
+(this commit: remaining N0 tests, 4 measured evidence artifacts, audit,
+governance).
+
+### 1. Vocabulary authority (audit BEFORE code)
+
+`BLOC_05_I02_VOCABULARY_AUTHORITY_MATRIX.json`: 10 audited fields; exactly 1
+frozen vocabulary (payoff_type → reused B5-I01 `PayoffType`, never
+redefined); 8 under-specified fields carried as validated opaque
+`SemanticToken`s (asset_type, instrument_type, perpetual_or_delivery,
+chain_or_issuer_context, index_family, multiplier/price/quantity_unit — unit
+vocabularies belong to B5-I08); VenueScope = **NOT_REQUIRED_DEFERRED**
+(directive §36 answer: none of the five frozen models carries a
+venue_scope field; inventing members would breach the I01 ratification §38
+firewall). identity/enums.py deliberately NOT created. Lifecycle vocabulary
+(frozen in 01 §6) deliberately unimplemented — machinery is B5-I03.
+
+### 2. Implementation (measured)
+
+`normalization/identity/` = exactly `__init__.py` + `models.py` +
+`registry.py`; **10 public symbols**; top-level normalization surface
+unchanged at 24 (no re-export). Field counts: CanonicalAsset 7, Venue 1
+(bloc_05/01 §2.2 freezes no Venue fields; venue_id is the minimum referential
+anchor, examples are not an enum), VenueInstrument 8, EconomicContract 9,
+ContractInstance 23 — 48 total; all records frozen-immutable. Registry:
+frozen snapshot, canonically ordered, duplicate-ID refusal, referential
+integrity (asset/venue/economic-contract), no-overlapping-active-terms
+refusal (bloc_05/01 §17.3), byte-stable YAML text serialization (measured
+stable), round-trip equality (measured), succession law refusing
+same-version conflicting content (canonical-bytes comparison as the
+fingerprint — no hashing machinery added), v1/v2 both loadable, no wall-clock
+minting, no IDs computed, text-in/text-out only (no config-tree files — the
+frozen yaml layout is a deployment concern deferred until a seeded registry is
+authorized). Terms logic, conversion, aliasing, lifecycle, PIT lookup,
+universe membership: all absent (measured).
+
+### 3. Verification (fresh, final tree)
+
+B5-I02 tests = **113** (models 54, registry 29, public API 6, scope audit 24).
+Normalization package = **416 passed** (I01 303 after the authorized
+one-param scope reconciliation + 113). Focused battery = **728 passed /
+0 failed** (118 s). Full storage = **2019 passed / 13 skipped / 0 failed**
+(1400 s). Full project = **3814 passed / 14 skipped / 0 failed** (1075 s),
+no warnings; zero deterministic failures.
+
+Static: ruff changed scope = All checks passed (repo-wide: the 2 pre-existing
+I08 findings; one mid-run F811 duplicate-test-name finding was fixed before
+commit and the affected suite re-run); mypy = 0 new (10 pre-existing
+providers/probes baseline); compileall OK; secret-scan grep hit on
+`SemanticToken = ` is a false positive of the `token =` pattern — no secrets.
+
+### 4. I11R2 audit
+
+Tracked-Python count **1018 → 1025** (7 new files: 3 production, 4 test),
+regenerated mechanically only after filenames were finalized; no-update rerun
+byte-stable; never hand-edited.
+
+### 5. Custody disclosures
+
+Bloc 4 / I17 / I01 evidence untouched; the I01 scope test was deliberately
+reconciled in B5-I02B (blanket subpackage ban → allowlist {"identity"},
+"identity" removed from the forbidden-module parametrization) and all other
+negative-scope laws remain enforced. Commit A captured three mangled
+docstrings and a duplicate test name from chunked authoring; the syntax
+repairs ride in B5-I02D and are disclosed here. The untracked I06 spike file
+remains untracked and untouched (directive §45).
+
+### 6. Governance
+
+PASS_SENSOR_B5_I02_IDENTITY_MODELS_REGISTRIES_SEALED =
+**PENDING_OPERATOR_REVIEW**. BLOC_05_IMPLEMENTATION_STATUS =
+**I02_COMPLETE_PENDING_OPERATOR_REVIEW**. BLOC_05_NORMALIZATION_IMPLEMENTED =
+**PARTIAL_IDENTITY_FOUNDATION**. All 8 Bloc 5 gates (IDENTITY / TIME /
+SEMANTIC / UNIT / LINEAGE / DUPLICATE_REVISION / REPLAY_SAFETY /
+GOLDEN_T0_T1) remain **NOT_YET_EARNED** — registry/model infrastructure earns
+no gate; identity proof requires B5-I03 resolution semantics.
+next_checkpoint_authorized = **FALSE**. recommended_next = **OPERATOR REVIEW
+OF SENSOR-B5-I02**. B5-I03+ = UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research =
+FROZEN. No self-ratification. B5-I03 NOT started.

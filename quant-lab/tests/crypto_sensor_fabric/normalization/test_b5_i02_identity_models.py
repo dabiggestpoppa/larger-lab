@@ -168,10 +168,10 @@ def test_aware_valid_from_normalized_to_utc() -> None:
         asset_id="USDT",
         symbol_canonical="USDT",
         asset_type="STABLECOIN",
-        valid_from=datetime(2024, 1, 1, 2, 0, tzinfo=timezone.utc),
+        valid_from=datetime(2024, 1, 1, 2, 0, tzinfo=timezone(timedelta(hours=2))),
         metadata_version="1",
     )
-    assert a.valid_from == datetime(2024, 1, 1, 2, 0, tzinfo=UTC)
+    assert a.valid_from == datetime(2024, 1, 1, 0, 0, tzinfo=UTC)
 
 
 def test_valid_to_after_valid_from_enforced() -> None:
@@ -416,14 +416,24 @@ def test_margin_asset_optional_on_economic_contract() -> None:
 
 
 def test_asset_reference_fields_stay_separate() -> None:
-    """§11: underlying/quote/settlement/margin are separate fields, never a
-    collapsed or derived asset (bloc_05/07 F6)."""
-    ec = economic_contract()
-    for distinct in (
-        (ec.underlying_asset_id, ec.quote_asset_id),
-        (ec.quote_asset_id, ec.settlement_asset_id),
-    ):
-        assert distinct[0] != distinct[1]
+    """§11: underlying/quote/settlement/margin are separate FIELDS, never a
+    collapsed or derived asset (bloc_05/07 F6).  Values may legitimately
+    coincide (a linear USDT perp settles in its quote asset, bloc_05/01 §4);
+    the inverse example is where they genuinely diverge."""
+    linear = economic_contract()
+    assert linear.settlement_asset_id == linear.quote_asset_id  # §4 example 1
+    inverse = EconomicContract(
+        economic_contract_id="EC-BTCUSD-INVERSE",
+        underlying_asset_id="BTC",
+        quote_asset_id="USD",
+        settlement_asset_id="BTC",
+        margin_asset_id="BTC",
+        instrument_type="PERPETUAL_FUTURE",
+        perpetual_or_delivery="PERPETUAL",
+        payoff_type=PayoffType.INVERSE,
+    )
+    assert inverse.quote_asset_id != inverse.settlement_asset_id  # §4 example 2
+    assert inverse.settlement_asset_id == inverse.margin_asset_id
 
 
 def test_payoff_type_unknown_representable() -> None:
@@ -453,7 +463,7 @@ def test_blank_economic_contract_id_refused() -> None:
 
 
 def test_payoff_type_is_the_reused_b5_i01_enum() -> None:
-    ""§5: B5-I02 must not redefine PayoffType."""
+    """Directive §5: B5-I02 must not redefine PayoffType."""
     from crypto_sensor_fabric.normalization import enums as base_enums
 
     assert PayoffType is base_enums.PayoffType
@@ -528,7 +538,7 @@ def test_blank_contract_instance_id_refused() -> None:
         ContractInstance(**fields)
 
 
-def test_naive_valid_from_refused() -> None:
+def test_contract_instance_naive_valid_from_refused() -> None:
     base = instance()
     fields = base.model_dump()
     fields["valid_from"] = datetime(2024, 1, 1)
@@ -584,7 +594,7 @@ def test_duplicate_source_evidence_refs_refused() -> None:
 
 
 def test_path_shaped_source_evidence_refused() -> None:
-    ""§17: durable identifiers only - no filesystem paths, no local filenames."""
+    """Directive §17: durable identifiers only - no filesystem paths, no local filenames."""
     base = instance()
     for bad_ref in (
         "/abs/path/evidence.json",
@@ -599,7 +609,7 @@ def test_path_shaped_source_evidence_refused() -> None:
 
 
 def test_inverse_payoff_claiming_not_inverse_refused() -> None:
-    ""§16: structural contradiction the frozen model explicitly supports."""
+    """Directive §16: structural contradiction the frozen model explicitly supports."""
     with pytest.raises(ValidationError):
         instance(payoff=PayoffType.INVERSE, inverse_flag=False)
 

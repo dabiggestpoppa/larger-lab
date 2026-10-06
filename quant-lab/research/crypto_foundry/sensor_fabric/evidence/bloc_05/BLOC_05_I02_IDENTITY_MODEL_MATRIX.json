@@ -1,0 +1,154 @@
+{
+  "artifact": "BLOC_05_I02_IDENTITY_MODEL_MATRIX",
+  "checkpoint": "SENSOR-B5-I02",
+  "measured_head": "SENSOR-B5-I02C working tree",
+  "authority": [
+    "bloc_05/01 \u00a72-\u00a74/\u00a77/\u00a712-\u00a715",
+    "directive \u00a76-\u00a717"
+  ],
+  "models": [
+    {
+      "model": "CanonicalAsset",
+      "field_count": 7,
+      "fields": {
+        "asset_id": "required",
+        "symbol_canonical": "required",
+        "asset_type": "required",
+        "chain_or_issuer_context": "optional",
+        "valid_from": "optional",
+        "valid_to": "optional",
+        "metadata_version": "required"
+      },
+      "frozen_immutable": true,
+      "extra": "forbid",
+      "laws": [
+        "non-blank unpadded asset_id/symbol_canonical",
+        "asset_type is an opaque SemanticToken (no frozen vocabulary)",
+        "valid_to strictly after valid_from when both finite",
+        "naive datetimes refused; aware values normalized to UTC",
+        "metadata_version required",
+        "no fiat/stablecoin classification field exists"
+      ],
+      "note": "Economic identity only; never identifies a derivative contract instance (bloc_05/01 \u00a72.1)."
+    },
+    {
+      "model": "Venue",
+      "field_count": 1,
+      "fields": {
+        "venue_id": "required"
+      },
+      "frozen_immutable": true,
+      "extra": "forbid",
+      "laws": [
+        "non-blank unpadded venue_id"
+      ],
+      "note": "bloc_05/01 \u00a72.2 freezes no Venue fields; the \u00a72.2 list is examples, not a closed enum (directive \u00a78). venue_id is the minimum referential anchor; any metadata field would be invented and requires an operator decision."
+    },
+    {
+      "model": "VenueInstrument",
+      "field_count": 8,
+      "fields": {
+        "provider": "required",
+        "venue": "required",
+        "native_symbol": "required",
+        "provider_instrument_id": "optional",
+        "instrument_type": "required",
+        "native_metadata_hash": "required",
+        "first_seen_at": "required",
+        "last_seen_at": "required"
+      },
+      "frozen_immutable": true,
+      "extra": "forbid",
+      "laws": [
+        "provider != venue as separate required fields",
+        "native_symbol preserved verbatim, never parsed",
+        "native_metadata_hash is format-checked 64-hex lowercase SHA-256",
+        "last_seen_at >= first_seen_at",
+        "provider_instrument_id optional",
+        "naive datetimes refused"
+      ],
+      "note": "What raw payloads refer to (bloc_05/01 \u00a72.3); an aggregator provider may reference a venue it does not operate (\u00a713)."
+    },
+    {
+      "model": "EconomicContract",
+      "field_count": 9,
+      "fields": {
+        "economic_contract_id": "required",
+        "underlying_asset_id": "required",
+        "quote_asset_id": "required",
+        "settlement_asset_id": "required",
+        "margin_asset_id": "optional",
+        "instrument_type": "required",
+        "perpetual_or_delivery": "required",
+        "payoff_type": "required",
+        "index_family": "optional"
+      },
+      "frozen_immutable": true,
+      "extra": "forbid",
+      "laws": [
+        "underlying/quote/settlement/margin are separate reference fields (values may legitimately coincide, bloc_05/01 \u00a74)",
+        "payoff_type reuses the B5-I01 PayoffType; UNKNOWN representable",
+        "margin_asset_id and index_family optional",
+        "no conversion semantics"
+      ],
+      "note": "Economic grouping only; never replaces ContractInstance (bloc_05/01 \u00a72.4, F1)."
+    },
+    {
+      "model": "ContractInstance",
+      "field_count": 23,
+      "fields": {
+        "contract_instance_id": "required",
+        "provider": "required",
+        "venue": "required",
+        "native_symbol": "required",
+        "economic_contract_id": "required",
+        "valid_from": "required",
+        "valid_to": "optional",
+        "known_from": "required",
+        "known_to": "optional",
+        "contract_multiplier": "required",
+        "multiplier_unit": "required",
+        "price_unit": "required",
+        "quantity_unit": "required",
+        "settlement_asset_id": "required",
+        "margin_asset_id": "optional",
+        "payoff_type": "required",
+        "inverse_flag": "required",
+        "quanto_flag": "required",
+        "tick_size": "required",
+        "lot_size": "required",
+        "expiry": "optional",
+        "contract_terms_version": "required",
+        "source_evidence_refs": "required"
+      },
+      "frozen_immutable": true,
+      "extra": "forbid",
+      "laws": [
+        "valid_to/known_to strictly after valid_from/known_from where finite (open intervals representable as None)",
+        "contract_multiplier/tick_size/lot_size are explicit Decimals with no defaults",
+        "inverse_flag/quanto_flag required explicit bools; payoff_type=INVERSE cannot claim inverse_flag=False and QUANTO cannot claim quanto_flag=False",
+        "source_evidence_refs: non-empty, duplicate-free, path-shaped references refused",
+        "expiry optional",
+        "naive datetimes refused"
+      ],
+      "note": "DATA MODEL only (directive \u00a713/\u00a714): stores frozen term fields, computes nothing; PIT lookup is B5-I03."
+    }
+  ],
+  "measured": {
+    "total_fields_across_five_models": 48,
+    "payoff_type_is_reused_b5_i01_enum": true,
+    "contract_instance_terms_fields_have_no_defaults": true,
+    "stablecoin_identity_proof": {
+      "rule": "USD/USDT/USDC independently representable; no USDT->USD or USDC->USD mapping logic exists; no fiat classification derived from symbol text",
+      "source": "bloc_05/01 \u00a712; tested by test_usd_usdt_usdc_are_three_distinct_assets and test_no_usdt_to_usd_aliased_by_symbol_text"
+    },
+    "all_records_frozen_immutable": true
+  },
+  "vocabulary_decisions": {
+    "identity_enums_module_created": false,
+    "reason": "No fully frozen I02-owned vocabulary exists; see BLOC_05_I02_VOCABULARY_AUTHORITY_MATRIX.json",
+    "venuescope": "NOT_REQUIRED_DEFERRED (directive \u00a736 answer: the five models carry no venue_scope field)",
+    "asset_type_instrument_type_perpetual_or_delivery": "opaque SemanticToken, no speculative enum (directive \u00a74/\u00a737)",
+    "unit_fields": "SemanticToken now; unit vocabulary ownership is SENSOR-B5-I08 (bloc_05/03)"
+  }
+}

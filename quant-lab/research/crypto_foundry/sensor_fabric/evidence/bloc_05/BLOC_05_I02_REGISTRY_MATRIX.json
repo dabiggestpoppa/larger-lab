@@ -1,0 +1,40 @@
+{
+  "artifact": "BLOC_05_I02_REGISTRY_MATRIX",
+  "checkpoint": "SENSOR-B5-I02",
+  "representation_chosen": "frozen pydantic IdentityRegistrySnapshot holding the five canonically-ordered collections plus an explicit registry_version; text-in/text-out YAML serialization (sort_keys, canonical order, exact decimal strings); NO filesystem knowledge, NO config-tree files created (frozen docs' asset/venue/identity_registry.yaml layout is a deployment layout deferred until a seeded registry is authorized; nothing in I02 requires a file)",
+  "snapshot_fields": [
+    "registry_version",
+    "assets",
+    "venues",
+    "venue_instruments",
+    "economic_contracts",
+    "contract_instances"
+  ],
+  "snapshot_frozen_immutable": true,
+  "laws_measured": {
+    "explicit_registry_version_required": true,
+    "duplicate_id_refusal": [
+      "assets",
+      "venues",
+      "venue_instruments",
+      "economic_contracts",
+      "contract_instances"
+    ],
+    "canonical_ordering_enforced": "input order irrelevant; collections stored sorted by identity key",
+    "referential_integrity": [
+      "VenueInstrument.venue must be a registered venue",
+      "EconomicContract underlying/quote/settlement/(margin) must be registered assets",
+      "ContractInstance economic_contract_id must be a registered economic contract",
+      "ContractInstance venue must be a registered venue",
+      "ContractInstance settlement/(margin) must be registered assets",
+      "provider is NOT required to be a venue (directive \u00a733)"
+    ],
+    "no_overlapping_active_terms": "same (provider, venue, native_symbol) with overlapping [valid_from, valid_to) intervals refused; adjacent intervals accepted (bloc_05/01 \u00a717.3); no ambiguity state exists at I02 so refusal is the only fail-closed answer",
+    "serialization_byte_stable_measured": true,
+    "yaml_round_trip_equality_measured": true,
+    "no_wall_clock_defaults": "no datetime.now/utcnow, no uuid/random/hashlib anywhere in identity sources",
+    "no_silent_overwrite": "records are frozen; validate_registry_succession refuses same registry_version with conflicting canonical content and accepts identical republish (idempotent) or any new version",
+    "fingerprint_choice": "canonical JSON bytes comparison instead of a stored hash: deterministic serialization IS the fingerprint; zero hashing machinery added",
+    "registry_versioning_law": "v1 and v2 both loadable; updating truth = new version/snapshot, never in-place rewrite (bloc_05/01 \u00a715, directive \u00a720)"
+  }
+}

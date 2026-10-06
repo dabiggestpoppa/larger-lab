@@ -303,8 +303,8 @@ def test_dangling_venue_instrument_venue_refused() -> None:
 
 
 def test_provider_does_not_have_to_be_a_venue() -> None:
-    ""§33: provider is a separate provider identifier, never required to be a
-    registered venue."""
+    """Directive §33: provider is a separate provider identifier, never required
+    to be a registered venue."""
     snap = IdentityRegistrySnapshot(
         registry_version="1",
         assets=assets("BTC", "USDT"),
@@ -326,6 +326,7 @@ def test_overlapping_valid_intervals_for_same_instrument_refused() -> None:
         IdentityRegistrySnapshot(
             registry_version="1",
             assets=assets("BTC", "USDT"),
+            venues=(venue("KRAKEN_FUTURES"),),
             economic_contracts=(contract(),),
             contract_instances=(
                 inst(instance_id="CI-A", valid_from=T0, valid_to=T2),
@@ -338,6 +339,7 @@ def test_adjacent_intervals_accepted() -> None:
     snap = IdentityRegistrySnapshot(
         registry_version="1",
         assets=assets("BTC", "USDT"),
+        venues=(venue("KRAKEN_FUTURES"),),
         economic_contracts=(contract(),),
         contract_instances=(
             inst(instance_id="CI-A", valid_from=T0, valid_to=T1),
@@ -351,6 +353,7 @@ def test_overlapping_intervals_for_distinct_symbols_accepted() -> None:
     snap = IdentityRegistrySnapshot(
         registry_version="1",
         assets=assets("BTC", "USDT"),
+        venues=(venue("KRAKEN_FUTURES"),),
         economic_contracts=(contract(),),
         contract_instances=(
             inst(instance_id="CI-A", native_symbol="SYM-1", valid_from=T0),
@@ -377,7 +380,7 @@ def test_registry_version_required_and_nonblank() -> None:
 
 
 def test_canonical_ordering_is_enforced() -> None:
-    ""Input order is irrelevant: the snapshot stores a stable canonical order."""
+    """Input order is irrelevant: the snapshot stores a stable canonical order."""
     snap = IdentityRegistrySnapshot(
         registry_version="1",
         assets=(asset("USDT"), asset("BTC"), asset("USDC")),
@@ -406,6 +409,7 @@ def test_decimal_precision_survives_round_trip() -> None:
     snap = IdentityRegistrySnapshot(
         registry_version="1",
         assets=assets("BTC", "USDT"),
+        venues=(venue("KRAKEN_FUTURES"),),
         economic_contracts=(contract(),),
         contract_instances=(precise,),
     )
@@ -471,7 +475,7 @@ def test_v1_remains_loadable_after_v2_exists() -> None:
 
 
 def test_no_wall_clock_defaults_anywhere() -> None:
-    ""Constructing registries never mints timestamps: every datetime on every
+    """Constructing registries never mints timestamps: every datetime on every
     record was explicitly supplied."""
     snap = full_snapshot()
     for i in snap.venue_instruments:

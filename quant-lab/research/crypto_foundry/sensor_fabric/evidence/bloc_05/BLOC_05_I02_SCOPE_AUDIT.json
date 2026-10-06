@@ -1,0 +1,48 @@
+{
+  "artifact": "BLOC_05_I02_SCOPE_AUDIT",
+  "checkpoint": "SENSOR-B5-I02",
+  "identity_production_files_measured": [
+    "__init__.py",
+    "models.py",
+    "registry.py"
+  ],
+  "forbidden_module_files_absent": {
+    "resolver.py": true,
+    "lifecycle.py": true,
+    "aliases.py": true,
+    "terms.py": true,
+    "universe.py": true,
+    "evidence.py": true,
+    "enums.py": true
+  },
+  "b5_i03_plus_symbols_absent_measured": {
+    "resolve_instrument": true,
+    "IdentityResolution": true,
+    "IdentityResolutionStatus": true,
+    "InstrumentAlias": true,
+    "AliasType": true,
+    "InstrumentLifecycleState": true,
+    "UniverseMembership": true,
+    "ContractTermsSnapshot": true,
+    "PRE_LISTING": true,
+    "DELISTING_ANNOUNCED": true,
+    "RELISTED_NEW_INSTANCE": true,
+    "MULTI_VENUE_AGGREGATE": true
+  },
+  "no_network_imports": true,
+  "no_filesystem_imports": true,
+  "no_id_generation_or_wall_clock": true,
+  "no_metadata_backcast": true,
+  "i01_top_level_surface_unchanged": 24,
+  "i01_scope_test_reconciliation": "test_b5_i01_scope_audit.py deliberately updated in B5-I02B: the identity subpackage is now operator-authorized (bloc_05/01 \u00a716), so the blanket subpackage ban became an allowlist {'identity'} and 'identity' left the forbidden-module parametrization. All other negative-scope laws unchanged and still enforced.",
+  "gates": {
+    "IDENTITY_GATE": "NOT_YET_EARNED",
+    "TIME_GATE": "NOT_YET_EARNED",
+    "SEMANTIC_GATE": "NOT_YET_EARNED",
+    "UNIT_GATE": "NOT_YET_EARNED",
+    "LINEAGE_GATE": "NOT_YET_EARNED",
+    "DUPLICATE_REVISION_GATE": "NOT_YET_EARNED",
+    "REPLAY_SAFETY_GATE": "NOT_YET_EARNED",
+    "GOLDEN_T0_T1_GATE": "NOT_YET_EARNED"
+  }
+}
