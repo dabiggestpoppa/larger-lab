@@ -1,0 +1,41 @@
+{
+  "format": "oce-adversarial-results-v1",
+  "totals": {
+    "PASS": 8,
+    "FAIL": 0
+  },
+  "checks": [
+    {
+      "check": "cloud apply denied without authorization (rc=5 as expected)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "bootstrap fail-closed without secrets (rc=3)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "unauthorized worker rejected (rc=1 as expected)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "corrupt backup rejected (rc=3 as expected)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "unknown backup scope rejected (rc=2 as expected)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "full backup blocked without runtime (rc=3 as expected)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "state-only backup with full-replace rejected (rc=3 as expected)",
+      "outcome": "PASS"
+    },
+    {
+      "check": "unknown runtime target rejected (rc=2 as expected)",
+      "outcome": "PASS"
+    }
+  ]
+}

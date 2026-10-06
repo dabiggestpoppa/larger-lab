@@ -1,1 +1,28 @@
 *.parquet filter=lfs diff=lfs merge=lfs -text
+
+# LF normalization is SCOPED to the trees this project writes code in
+# (infrastructure/ and .github/) rather than applied to every *.py/*.sh/*.yml
+# in the repository.  See B4-CXR7U9X1.
+#
+# A repository-wide `*.py text eol=lf` rule cannot survive the main
+# reconciliation: main stores two Python files with CRLF line endings in
+# quant-lab/ (research/crypto_foundry/alpha_1_1/build_alpha_1_1.py and
+# src/crypto_sensor_fabric/providers/base/conformance.py).  With a text/eol
+# rule in force, git's clean filter normalizes a CRLF working tree to LF while
+# the indexed blob stays CRLF, so those files are reported modified on every
+# Linux checkout (core.eol=native=lf) even immediately after `git checkout`.
+# That is exactly why b1-local-ground run 35173531507 failed its clean-source
+# phase with "FATAL: source dirty (2)" on the merge commit.
+infrastructure/**/*.sh text eol=lf
+infrastructure/**/*.py text eol=lf
+infrastructure/**/*.yml text eol=lf
+infrastructure/**/*.yaml text eol=lf
+.github/**/*.sh text eol=lf
+.github/**/*.py text eol=lf
+.github/**/*.yml text eol=lf
+.github/**/*.yaml text eol=lf
+
+# Extensionless shell entrypoints: force LF so Windows clones (core.autocrlf)
+# never break shellcheck SC1017 on them.
+infrastructure/cloud-ground/scripts/* text eol=lf
+infrastructure/cloud-ground/scripts/*.py text eol=lf

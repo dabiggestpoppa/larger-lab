@@ -1,0 +1,14 @@
+# OCE Cloud Ground - Ansible validation toolchain (CI-only).
+# B4-CXR7U9R22 - CI installs the .lock file (the resolved, hash-verified
+# set); this list stays the direct-dependency source. Regenerate the lock
+# after editing this list:
+#   uv pip compile <this file> --python-platform x86_64-unknown-linux-gnu \
+#       --python-version 3.12 --generate-hashes --only-binary ':all:' \
+#       --constraint requirements.txt -o requirements-ansible.lock.txt
+# uv resolves for the Linux CI target; plain pip cannot off Linux, because
+# ansible-lint declares a Windows-only blocker dependency. The constraint
+# keeps pyyaml/jsonschema identical to the cloud-ground lock so the two
+# installs cannot move each other's pins.
+ansible-core==2.16.0
+ansible-lint==6.22.0
+ansible-compat==4.1.11

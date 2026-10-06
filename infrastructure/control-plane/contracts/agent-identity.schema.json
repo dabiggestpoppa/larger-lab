@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/agent-identity.json",
+  "title": "OCE Agent Identity",
+  "description": "Stable identity for Operator, PO, Hermes, service, app, and worker actors. B3.C1.S2 / B2-C1.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["agent_id", "agent_type", "trust_zone", "created_at", "expires_at", "schema_version"],
+  "properties": {
+    "agent_id": { "type": "string", "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$" },
+    "agent_type": { "enum": ["operator", "po", "hermes", "service", "worker", "app"] },
+    "display_name": { "type": "string" },
+    "trust_zone": { "enum": ["operator", "control", "worker-local", "worker-burst", "worker-windows", "backup", "external"] },
+    "authentication_provenance": { "type": "string" },
+    "session_binding": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "revocation_path": { "type": "string" },
+    "issuer": { "type": "string" },
+    "schema_version": { "type": "string", "const": "1.0.0" }
+  }
+}

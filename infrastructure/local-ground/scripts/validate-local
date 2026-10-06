@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# validate-local — thin wrapper around the Local Ground shared runner.
+# Generates a single local OCE_RUN_ID and delegates; no duplicated logic.
+#
+#   ./validate-local [--evidence-dir PATH]
+set -uo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+RUNNER="$SCRIPT_DIR/run-validation.sh"
+
+if [ "${1:-}" = "--evidence-dir" ]; then
+  export OCE_EVIDENCE_DIR="${2:?}"
+fi
+export OCE_RUN_ID="${OCE_RUN_ID:-$(python3 -c "import secrets; print(secrets.token_hex(6))")}"
+export OCE_CI_MODE="${OCE_CI_MODE:-false}"
+export OCE_RUNTIME_TARGET="${OCE_RUNTIME_TARGET:-local}"
+
+echo "=== OCE Local Ground validate-local ==="
+echo "OCE_RUN_ID: $OCE_RUN_ID"
+exec bash "$RUNNER"

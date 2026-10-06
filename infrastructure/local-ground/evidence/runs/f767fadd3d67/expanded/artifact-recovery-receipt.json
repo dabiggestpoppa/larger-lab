@@ -1,0 +1,8 @@
+{
+  "format": "oce-artifact-recovery-receipt-v1",
+  "artifact_archive_sha256": "f4cfcb0a3d84cc60ebea904d201b40b3cb826744cbb0cfc372cac093f0bc6ea8",
+  "artifact_archive_size": 3290,
+  "artifact_replaced": true,
+  "artifact_verify": "ok",
+  "timestamp": "2026-08-30T12:33:19Z"
+}

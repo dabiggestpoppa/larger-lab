@@ -1,0 +1,143 @@
+# OCE Cloud Ground — Network Access Policy
+# B1-I1R3A — Expanded worker denials for postgresql, redis, ssh, docker
+# Document: B1-ARCH-TRUST-001
+# Ratified: Block 1 Cloud Ground Plan 1.0
+
+# Network zones
+zones:
+  operator:
+    description: "Operator administrative access via Tailscale"
+    interface: tailscale
+    allowed_services: [postgresql, redis, docker, ssh, observability]
+    trust_level: full
+
+  control:
+    description: "Internal control plane services"
+    interface: docker-internal
+    allowed_services: [postgresql, redis, observability]
+    trust_level: service-scoped
+
+  worker-local:
+    description: "Operator's local machine as worker"
+    interface: tailscale
+    allowed_services: [worker-task-api, artifact-storage]
+    trust_level: task-scoped
+
+  worker-burst:
+    description: "Ephemeral burst compute workers"
+    interface: tailscale
+    allowed_services: [worker-task-api, artifact-storage]
+    trust_level: task-scoped, expired
+
+  worker-windows:
+    description: "Windows/MT5 isolated worker"
+    interface: tailscale
+    allowed_services: [worker-task-api, artifact-storage]
+    trust_level: task-scoped, paper-only
+
+  backup:
+    description: "Backup agent access"
+    interface: tailscale
+    allowed_services: [object-storage]
+    trust_level: write-only, backup-scope
+
+# Access rules — 14 worker denials (3 classes × 4 services) + admin rules
+rules:
+  # === worker-local denials ===
+  - from: worker-local
+    to: postgresql
+    action: DENY
+    reason: "Workers never receive direct database access"
+
+  - from: worker-local
+    to: redis
+    action: DENY
+    reason: "Workers never receive direct cache access"
+
+  - from: worker-local
+    to: ssh
+    action: DENY
+    reason: "Workers never access host SSH"
+
+  - from: worker-local
+    to: docker
+    action: DENY
+    reason: "Workers never access Docker daemon"
+
+  # === worker-burst denials ===
+  - from: worker-burst
+    to: postgresql
+    action: DENY
+    reason: "Burst workers are untrusted, no database access"
+
+  - from: worker-burst
+    to: redis
+    action: DENY
+    reason: "Burst workers are untrusted, no cache access"
+
+  - from: worker-burst
+    to: ssh
+    action: DENY
+    reason: "Burst workers never access host SSH"
+
+  - from: worker-burst
+    to: docker
+    action: DENY
+    reason: "Burst workers never access Docker daemon"
+
+  # === worker-windows denials ===
+  - from: worker-windows
+    to: postgresql
+    action: DENY
+    reason: "Windows worker is isolated from control plane data"
+
+  - from: worker-windows
+    to: redis
+    action: DENY
+    reason: "Windows worker is isolated from control plane cache"
+
+  - from: worker-windows
+    to: ssh
+    action: DENY
+    reason: "Windows worker never accesses host SSH"
+
+  - from: worker-windows
+    to: docker
+    action: DENY
+    reason: "Windows worker never accesses Docker daemon"
+
+  # === backup denials ===
+  - from: backup
+    to: postgresql
+    action: DENY
+    reason: "Backup uses WAL archive, not direct DB connection"
+
+  # === worker isolation ===
+  - from: worker-local
+    to: worker-burst
+    action: DENY
+    reason: "Workers do not communicate directly"
+
+# Public access (Block 1)
+public_access:
+  enabled: false
+  approved_services: []
+
+# Firewall
+firewall:
+  default_incoming: deny
+  default_outgoing: allow
+  allowed_inbound:
+    - port: 22
+      source: tailscale
+      protocol: tcp
+      interface: tailscale0
+      description: "SSH through Tailscale only"
+
+# Enforcement state
+enforcement:
+  policy_file: this
+  consumer: "Ansible UFW role (B1-I2+), Docker network config"
+  verified: false
+  verification_date: null
+  notes: "B1-I1R3A expanded worker denials to cover SSH and Docker."

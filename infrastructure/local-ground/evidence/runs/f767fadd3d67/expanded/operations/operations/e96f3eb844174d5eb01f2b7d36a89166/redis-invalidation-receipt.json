@@ -1,0 +1,13 @@
+{
+  "format": "oce-redis-invalidation-receipt-v1",
+  "redis_restored": false,
+  "redis_invalidation_required": true,
+  "redis_invalidation_attempted": true,
+  "redis_invalidated": true,
+  "redis_verification": "ok",
+  "redis_failure": null,
+  "postgres_promoted": true,
+  "postgres_exit_status": 0,
+  "started_at": "2026-08-30T12:32:37Z",
+  "finished_at": "2026-08-30T12:32:37Z"
+}

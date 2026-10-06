@@ -1,0 +1,9 @@
+identity: 7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f repo=dabiggestpoppa/larger-lab branch=oce-program-build
+source clean (pre)
+doctor fingerprint captured
+acceptance + contract tests executed
+adversarial suite passed
+cloud plan deterministic + zero mutation; cloud apply denied; local unaffected
+source clean (post)
+cleanup ok
+independent gate PASS; final status LOCAL_GROUND_READY_FOR_OPERATOR_REVIEW

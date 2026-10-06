@@ -1,0 +1,84 @@
+# OCE Cloud Ground — Resource Classes Policy
+# B1-I1 — Static data (enforcement deferred to B1-I2+)
+# Document: B1-C1.S1 Workload Envelope
+# Ratified: Block 1 Cloud Ground Plan 1.0
+
+# Host baseline
+host:
+  provider: netcup
+  plan: rs-4000-g12
+  cpu_cores: 12
+  memory_gb: 32
+  storage_gb: 1000
+  type: dedicated
+  os: ubuntu-24.04-lts
+
+# Resource classes for job admission
+classes:
+  light:
+    description: "Small tasks, administrative work, monitoring"
+    max_cpu_cores: 2
+    max_memory_mb: 4096
+    max_disk_gb: 20
+    max_runtime_seconds: 3600
+    max_cost_usd: 0
+    placement: control-plane
+
+  medium:
+    description: "Build tasks, moderate processing"
+    max_cpu_cores: 4
+    max_memory_mb: 8192
+    max_disk_gb: 100
+    max_runtime_seconds: 14400
+    max_cost_usd: 0
+    placement: control-plane-or-local
+
+  heavy:
+    description: "CPU-intensive workloads, backtests, compilation"
+    max_cpu_cores: 8
+    max_memory_mb: 16384
+    max_disk_gb: 200
+    max_runtime_seconds: 28800
+    max_cost_usd: 0
+    placement: local-worker-or-burst
+
+  gpu:
+    description: "GPU-accelerated workloads"
+    max_cpu_cores: 8
+    max_memory_mb: 32768
+    max_disk_gb: 500
+    max_runtime_seconds: 28800
+    max_cost_usd: 25
+    placement: burst-only
+    gpu_required: true
+
+# Hard ceilings (non-negotiable)
+ceilings:
+  control_plane:
+    max_cpu_percent: 70
+    max_memory_percent: 75
+    max_disk_percent: 70
+    headroom_gb: 10
+    interactive_latency_slo_ms: 500
+
+  total_system:
+    max_cpu_percent: 90
+    max_memory_percent: 90
+    max_disk_percent: 85
+
+# Admission rules
+admission:
+  single_job_max_cpu_percent: 50
+  single_job_max_memory_percent: 30
+  single_job_max_runtime_hours: 8
+  no_unbounded_jobs: true
+  no_resource_class_absent: true
+  no_control_plane_starvation: true
+
+# Enforcement state
+enforcement:
+  policy_file: this
+  consumer: "Future job scheduler and admission controller"
+  verified: false
+  verification_date: null
+  notes: "B1-I1 defines the policy. Enforcement requires the scheduler component."

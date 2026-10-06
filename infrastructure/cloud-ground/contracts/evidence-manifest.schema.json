@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/evidence-manifest/v1.0.0",
+  "title": "OCE Evidence Manifest",
+  "description": "Schema for evidence records linking claims to proof. Version 1.0.0 — B1-I1.",
+  "type": "object",
+  "required": [
+    "evidence_id",
+    "claim_id",
+    "protocol",
+    "inputs",
+    "environment",
+    "actor",
+    "timestamp",
+    "result",
+    "pass_criteria",
+    "verifier",
+    "schema_version"
+  ],
+  "properties": {
+    "evidence_id": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9][a-zA-Z0-9_-]{7,63}$"
+    },
+    "claim_id": {
+      "type": "string",
+      "description": "The capability claim being evidenced"
+    },
+    "protocol": {
+      "type": "string",
+      "description": "How the evidence was collected (test name, command, scenario)"
+    },
+    "inputs": {
+      "type": "object",
+      "description": "Exact inputs used in the evidence run"
+    },
+    "environment": {
+      "type": "object",
+      "required": ["os", "tool_versions"],
+      "properties": {
+        "os": { "type": "string" },
+        "tool_versions": { "type": "object" },
+        "container_digest": { "type": "string" },
+        "network_config": { "type": "string" }
+      }
+    },
+    "actor": {
+      "type": "string",
+      "description": "Who or what collected this evidence"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "BLOCKED", "UNKNOWN", "SKIP"]
+    },
+    "pass_criteria": {
+      "type": "string",
+      "description": "What conditions constituted pass"
+    },
+    "actual_output": {
+      "type": "string",
+      "description": "What actually happened"
+    },
+    "artifacts": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "References to evidence artifacts (logs, traces, screenshots)"
+    },
+    "limitations": {
+      "type": "string",
+      "description": "What this evidence does NOT prove"
+    },
+    "verifier": {
+      "type": "string",
+      "description": "Who or what verified this evidence"
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    }
+  },
+  "additionalProperties": false
+}

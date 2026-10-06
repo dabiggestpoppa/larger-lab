@@ -1,0 +1,210 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dabiggestpoppa/larger-lab/schema/control-plane/job-envelope.json",
+  "title": "OCE Typed Job Envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "job_id",
+    "job_type",
+    "schema_version",
+    "submitting_actor",
+    "authority_context",
+    "resource_scope",
+    "environment",
+    "priority",
+    "idempotency_key",
+    "payload_hash",
+    "created_at",
+    "scheduled_at",
+    "attempt_number",
+    "retry_policy",
+    "timeout",
+    "lease",
+    "correlation_id",
+    "status"
+  ],
+  "properties": {
+    "job_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16,64}$"
+    },
+    "job_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "submitting_actor": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "grant_id",
+        "actor_id",
+        "action",
+        "target",
+        "environment",
+        "expires_at"
+      ],
+      "properties": {
+        "grant_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "actor_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environment": {
+          "enum": [
+            "local",
+            "local-test",
+            "local-recovery",
+            "cloud-plan",
+            "cloud"
+          ]
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "resource_scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "environment": {
+      "enum": [
+        "local",
+        "local-test",
+        "local-recovery",
+        "cloud-plan",
+        "cloud"
+      ]
+    },
+    "priority": {
+      "enum": [
+        "low",
+        "normal",
+        "high",
+        "critical"
+      ]
+    },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16,128}$"
+    },
+    "payload_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "scheduled_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "attempt_number": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "retry_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_attempts",
+        "backoff_strategy"
+      ],
+      "properties": {
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "backoff_strategy": {
+          "enum": [
+            "fixed",
+            "linear",
+            "exponential",
+            "none"
+          ]
+        },
+        "initial_delay_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "max_delay_seconds": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "timeout": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 86400
+    },
+    "lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {}
+    },
+    "correlation_id": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{16,64}$"
+    },
+    "parent_job_id": {
+      "type": "string"
+    },
+    "child_job_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "enum": [
+        "pending",
+        "scheduled",
+        "leased",
+        "running",
+        "succeeded",
+        "failed",
+        "cancelled",
+        "quarantined",
+        "expired"
+      ]
+    },
+    "result": {
+      "type": "object",
+      "properties": {}
+    },
+    "failure_envelope": {
+      "type": "object",
+      "properties": {}
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

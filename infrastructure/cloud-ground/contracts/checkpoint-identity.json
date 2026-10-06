@@ -1,0 +1,104 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oce.dev/schemas/checkpoint-identity/v1.0.0",
+  "title": "OCE Block 1 Checkpoint Identity Contract",
+  "description": "Machine-readable identity contract. SOURCE-IDENTITY gate verifies runtime matches all required fields.",
+  "type": "object",
+  "required": [
+    "checkpoint_id",
+    "block",
+    "increment",
+    "repository",
+    "accepted_origins",
+    "authorized_branch",
+    "authoritative_base_sha",
+    "expected_project_root",
+    "expected_implementation_commit_source",
+    "ci_workflow_name",
+    "evidence_schema_version",
+    "constitutional_gates"
+  ],
+  "properties": {
+    "checkpoint_id": {
+      "type": "string",
+      "const": "B1-I1R3A-SOURCE-IDENTITY-CI-CLOSURE"
+    },
+    "block": {
+      "type": "string",
+      "const": "B1"
+    },
+    "increment": {
+      "type": "string",
+      "const": "B1-I1R3A"
+    },
+    "repository": {
+      "type": "object",
+      "required": ["owner", "name", "full_name"],
+      "properties": {
+        "owner": { "type": "string", "const": "dabiggestpoppa" },
+        "name": { "type": "string", "const": "larger-lab" },
+        "full_name": { "type": "string", "const": "dabiggestpoppa/larger-lab" }
+      }
+    },
+    "accepted_origins": {
+      "type": "array",
+      "items": { "type": "string" },
+      "const": [
+        "https://github.com/dabiggestpoppa/larger-lab.git",
+        "git@github.com:dabiggestpoppa/larger-lab.git"
+      ]
+    },
+    "authorized_branch": {
+      "type": "string",
+      "const": "oce/block-1-i1r3-source-identity-ci-closure"
+    },
+    "authoritative_base_sha": {
+      "type": "string",
+      "const": "dd376a4b9a2404479200f96a5871ddc03e7c4f3b"
+    },
+    "expected_project_root": {
+      "type": "string",
+      "const": "infrastructure/cloud-ground"
+    },
+    "expected_implementation_commit_source": {
+      "type": "string",
+      "description": "Set to the actual implementation SHA after commit. Validator verifies HEAD matches."
+    },
+    "expected_tree_sha": {
+      "type": "string",
+      "description": "Set to the actual tree SHA after commit. Validator verifies HEAD^{tree} matches."
+    },
+    "ci_workflow_name": {
+      "type": "string",
+      "const": "b1-i1r3-validation.yml"
+    },
+    "evidence_schema_version": {
+      "type": "string",
+      "const": "3.0.0"
+    },
+    "constitutional_gates": {
+      "type": "object",
+      "required": [
+        "no_cloud_provisioning",
+        "no_purchases",
+        "no_deployments",
+        "no_port_exposure",
+        "no_real_credentials",
+        "no_live_trading",
+        "no_merge_to_main",
+        "no_block2_advance"
+      ],
+      "properties": {
+        "no_cloud_provisioning": { "type": "boolean", "const": true },
+        "no_purchases": { "type": "boolean", "const": true },
+        "no_deployments": { "type": "boolean", "const": true },
+        "no_port_exposure": { "type": "boolean", "const": true },
+        "no_real_credentials": { "type": "boolean", "const": true },
+        "no_live_trading": { "type": "boolean", "const": true },
+        "no_merge_to_main": { "type": "boolean", "const": true },
+        "no_block2_advance": { "type": "boolean", "const": true }
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,8 @@
+{
+  "profile": "cloud",
+  "default": false,
+  "mutates_external": true,
+  "requires_authorization": false,
+  "contact_provider": true,
+  "cost": "ZERO"
+}

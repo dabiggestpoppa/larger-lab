@@ -1,0 +1,8 @@
+{ "format": "oce-local-ground-backup-v1", "schema_version": "2",
+  "hash_algorithm": "sha256", "scope": "full", "backup_id": "6d492a0f77cb4cd6b7f1f9f6402e8534",
+  "disaster_recovery_capable": true, "includes": "state postgres artifacts",
+  "database": "oce_local", "pg_dump_version": "pg_dump (PostgreSQL) 16.2",
+  "pg_dump_format": "custom",
+  "pg_version_num": "160002",
+  "source_commit": "7e5e91c1fc49a461f27cfeb49994e3f4d176ac4f", "run_id": "f767fadd3d67",
+  "created_at": "2026-08-30T12:32:22Z" }
