@@ -1688,3 +1688,20 @@ mutations 0, capital mutations 0, execution mutations 0, recurring cost $0,
 `capital.authority = none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains **open
 and unmerged**.
 
+
+## B4-FINAL-LOCAL-ONLY-V1 -- detachment-census marker (claim-free)
+
+Four GitHub App installations (SonarQubeCloud 132008043, Kilo Code Bot
+127368601, Vercel 60739006, Railway App 148981864) were narrowed from
+"All repositories" to "Only select repositories" (25 unrelated repositories
+preserved, `larger-lab` removed from every selection), and the SonarCloud
+project `dabiggestpoppa_larger-lab` was deleted. Removal is OBSERVED in the
+configuration surfaces, NOT empirically verified; this commit exists only to
+create the observable push event for the ten-minute four-app census on its own
+SHA. Zero check suites and zero check runs from apps 12526, 2193792, 8329, and
+73253 is required (queued counts as presence; Freebuff 1734312 is ignored).
+OCE topology is sealed local-only; `oce/frontend` is untouched; Freebuff is
+untouched. Accounting: cloud mutations = the four authorized detachments only;
+broker mutations 0; capital mutations 0; execution mutations 0; recurring cost
+$0; `capital.authority = none`. **`MERGE_AUTHORIZED = false`.** PR #4 remains
+**open and unmerged**.

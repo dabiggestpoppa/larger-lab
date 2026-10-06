@@ -5835,3 +5835,64 @@ execution mutations 0, recurring cost $0, `capital.authority = none`. No merge;
 squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas Program
 Block 4. PR #4 remains **open and unmerged**.
 
+
+## 23. B4-FINAL-LOCAL-ONLY-V1 CLAIM-FREE DETACHMENT-CENSUS MARKER
+
+**Status when written: removals OBSERVED in the configuration surfaces, NOT yet
+empirically verified.** This commit is claim-free. It exists solely to create
+one observable push event for the post-removal detachment census. No closure,
+no passing-gate, and no verified-removal claim is made by this commit.
+
+Operator decision (supersedes earlier ambiguity): the approved OCE topology is
+**local-only**. OCE owns `oce/frontend` (intact, untouched by this mission).
+Vercel and Railway were external deployment integrations, not OCE architectural
+requirements. SonarQubeCloud and Kilo Code Bot were never operator-authorized.
+Freebuff Web (app 1734312) is out of scope and was not opened, modified, or
+characterized.
+
+Observed removals (2026-10-06, agent-executed under operator authorization,
+inside the `dabiggestpoppa` Installed-GitHub-Apps surface, session identity
+verified as `dabiggestpoppa` before mutation):
+
+| App | Installation | Prior scope | Post-action saved scope |
+|---|---|---|---|
+| SonarQubeCloud 12526 | 132008043 | All repositories | Only select - 25 selected, larger-lab absent (server-verified) |
+| Kilo Code Bot 2193792 | 127368601 | All repositories | Only select - 25 selected, larger-lab absent (server-verified) |
+| Vercel 8329 | 60739006 | All repositories | Only select - 25 selected, larger-lab absent (server-verified) |
+| Railway App 73253 | 148981864 | All repositories | Only select - 25 selected, larger-lab absent (server-verified) |
+
+All 25 unrelated repositories were explicitly preserved in every selection;
+`larger-lab` (ID 1238194136) is absent from all four saved lists, each re-read
+from the server-rendered Configure page after saving. Provider-side: the
+SonarCloud project `dabiggestpoppa_larger-lab` was deleted (HTTP 204;
+post-delete lookup 404); the Vercel account enumerates no project connected to
+`larger-lab` (only the two preserved `madlabs-landing` projects, untouched);
+Kilo and Railway provider-console verification was explicitly skipped by
+operator instruction and stands on the GitHub-side removals alone. Root cause
+of the five earlier falsifications is now identified: all four installations
+were "Select all repositories" and had never been narrowed or removed; every
+earlier attempt removed objects other than these installations.
+
+This marker is subject to the census gate: at least ten complete minutes on
+this exact SHA, requiring zero check runs and zero check suites (queued counts
+as presence) from apps 12526, 2193792, 8329, and 73253. Freebuff 1734312 may
+appear; its presence neither passes nor fails the gate and must not be acted
+upon. If any targeted app appears, the census fails and no final correction is
+written.
+
+Change: append-only. Documentation only. Sections 1 through 22 preserved
+byte-for-byte; CRLF preserved; prefix hashes measured before and after (see
+commit-verification below). No production code, test, workflow, trigger,
+registry, configuration, rule, or protection setting touched. No NOSONAR,
+exclusion, waiver, suppression, or quality-gate change.
+
+Reality lock before this change: local HEAD = live `origin/oce-program-build` =
+`1ae5aff0a05b968c475f3da336c045e4258a3b02`; 0 ahead / 0 behind; tracked tree
+clean; `origin/main` untouched at
+`7c7816f382947bbc8a1f2154435fc436f2428fa8`; PR #4 open and unmerged.
+
+Accounting: cloud mutations = removal/disconnection of the four explicitly
+authorized integrations only; broker mutations 0; capital mutations 0; execution
+mutations 0; recurring cost $0; `capital.authority = none`. No merge. No amend,
+squash, rebase, reset, or force-push. No Book 5, no R49 or X10, no Atlas Program
+Block 4. PR #4 remains open and unmerged.
