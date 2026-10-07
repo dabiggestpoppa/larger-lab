@@ -3,13 +3,13 @@
 
 **Document ID:** OCE-B5-I1-DECISION-PACKET-001
 **Version:** 1.0
-**Status:** RECOMMENDATION_ONLY — AWAITING_OPERATOR_SELECTION
+**Status:** RECOMMENDATION_ONLY — CAND-004 OPERATOR-SELECTED (selection recorded 2026-10-07)
 **Governing protocol:** `OCE_B5_I0_SELECTION_PROTOCOL_v1.0.md` (OPERATOR_RATIFIED — FROZEN), §7.10
 **Governing amendment:** `OCE_B5_I0_AMEND-001_SEQUENTIAL_DUAL_PASS_REVIEW_v1.0.md` (OPERATOR_RATIFIED — ACTIVE)
 **Stage scope:** `AUTHORIZED_STAGE=B5-I1-EVALUATION` (exclusive); no application code, no Product Charter, no B5-I2
 
-> ### `RECOMMENDATION ONLY — THE OPERATOR SELECTS`
-> This packet recommends. It does not select. No candidate is selected, no Product Charter is created, and no application-selection field is filled anywhere in this artifact set. Selection of the reference application is exclusively the operator's decision at B5-I1 (protocol §7.10), recorded by the operator.
+> ### `RECOMMENDATION ONLY — THE OPERATOR HAS SELECTED (2026-10-07)`
+> At publication this packet recommended and selected nothing (protocol §7.10). **On 2026-10-07 the operator selected CAND-004** under `AUTHORIZED_STAGE=B5-I1-OPERATOR-SELECTION_AND_CHARTER_DRAFT`; the selection is recorded verbatim in §9 below. The recommendation sections §1–§8 are preserved exactly as published, unedited. The operator's selection — not this packet's recommendation — is the recorded decision (protocol §7.10). B5-I1 completion additionally requires the operator-approved Product Charter; no B5-I2 or implementation work follows from this selection.
 
 ---
 
@@ -119,15 +119,21 @@ Not applied: after adoption exactly one candidate satisfies §5.4 conditions 1�
 >
 > This packet recommends; **only the operator selects** (protocol §7.10). Selection is recorded by the operator, produces the Product Charter at B5-I1, and nothing in this packet constitutes selection, charter, or implementation authority. If the operator selects a NOT-PASSED candidate, the scorecard's operator-decision section requires a recorded rationale plus a versioned amendment reference (template §9 last row). If the operator selects no candidate, B5-I1 remains incomplete and no downstream increment is authorized.
 
-## 9. Operator-only decision section (NOT completed — §7.10)
+## 9. Operator-only decision section (COMPLETED BY THE OPERATOR — §7.10)
+
+Recorded by the operator under `AUTHORIZED_STAGE=B5-I1-OPERATOR-SELECTION_AND_CHARTER_DRAFT`; this section is the recorded selection (protocol §7.10) and nothing here grants implementation authority.
 
 | Field | Entry |
 |---|---|
-| Selected candidate identifier | *(operator only)* |
-| Operator decision statement | *(operator only)* |
-| Decision date | *(operator only)* |
-| Product Charter reference (created at B5-I1 by the selection) | *(operator only)* |
-| If a non-selected or below-threshold candidate chosen: recorded rationale + versioned amendment ref | *(operator only)* |
+| Selected candidate identifier | **`CAND-004`** (Local Job Console) |
+| Operator decision statement | The operator selects `CAND-004` because it is the only candidate that passed both sequential review lenses and every frozen threshold condition — adopted weighted score `82.75`; mandatory floors `C1=3, C2=4, C3=3, C5=3`; `D1–D14`: zero triggered, zero UNKNOWN; evidence/compliance and adversarial scores agree; grounded in the existing tested OCE control plane (`infrastructure/control-plane/src/oce_control/`); supports an internal OCE-owned frontend and local-only operation; requires no external hosting authority; recurring cost remains `$0`; no broker, capital, trading, or execution authority; its disclosed limitations can be converted into explicit charter acceptance gates. This selection authorizes charter drafting only — it does not authorize B5-I2 implementation. |
+| Decision date | 2026-10-07 |
+| Product Charter reference (created at B5-I1 by the selection) | `docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md` — Product identity: **OCE Local Job Console**; selection identity `CAND-004` preserved; status `DRAFT_FOR_OPERATOR_RATIFICATION` — awaiting operator ratification |
+| Scorecard/seal evidence — Pass A / Pass B | Pass A sealed at commit `b05c61d0a547d3b9287eac55c7a0f1def7487fb7` — file SHA-256 `6a937706a42debda35b5d4e170c5c47b9745f80f26c307457f8a766878b6917c`; Pass B sealed at commit `8f5a06c925b4ebd161ad1f8b6ad8cac02300373f` — file SHA-256 `95ca2c6f830185088bce17a65a12400b823abc94b0887475ad31e75f98fecf9b` |
+| Reconciliation / P2 commit | `20825493b7de6a60e8b5699eac342101e4536641` — reconciliation record, this decision packet, and ledger published as RECOMMENDATION_ONLY — AWAITING_OPERATOR_SELECTION |
+| Review-mechanism acknowledgement | The operator acknowledges the reviews were executed sequentially under AMEND-001 (one agent: Pass A evidence/compliance, then Pass B adversarial/red-team, separately sealed in order) and were **NOT independent and NOT blind**; no result in this record may be described as independently reviewed, blind-scored, or dual-reviewer verified |
+| Disclosed-limitation acknowledgement | The operator acknowledges the three disclosed limitations and directs that each becomes a charter acceptance gate: (1) the loopback-only web-view guarantee must become executable; (2) the interface is a client and never a second authority; (3) the expected 6–8-increment implementation window is a ceiling, not permission for scope expansion |
+| If a non-selected or below-threshold candidate chosen: recorded rationale + versioned amendment ref | N/A — the selected candidate passed conditions 1–5 on the adopted record (W = 82.75; floors met; zero disqualifiers; zero UNKNOWN); no amendment reference is required (template §9 last row) |
 
 ## 10. Amendment log (§10 of template)
 
