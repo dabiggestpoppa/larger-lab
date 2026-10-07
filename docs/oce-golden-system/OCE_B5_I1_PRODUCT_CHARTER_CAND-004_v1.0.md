@@ -3,14 +3,14 @@
 
 **Document ID:** OCE-B5-I1-CHARTER-CAND-004
 **Version:** 1.0
-**Status:** DRAFT_FOR_OPERATOR_RATIFICATION
+**Status:** OPERATOR_RATIFIED — FROZEN (ratified 2026-10-07; pre-ratification state `DRAFT_FOR_OPERATOR_RATIFICATION` preserved in Git history)
 **Selected candidate:** CAND-004 - selection identity preserved; working title of record: **OCE Local Job Console**
 **Selection provenance:** Operator decision dated 2026-10-07, recorded by the operator in `OCE_B5_I1_DECISION_PACKET_v1.0.md` section 9 (rationale, scorecard seal commits `b05c61d0a547d3b9287eac55c7a0f1def7487fb7` / `8f5a06c925b4ebd161ad1f8b6ad8cac02300373f` with file SHA-256 pins, reconciliation/P2 commit `20825493b7de6a60e8b5699eac342101e4536641`; adopted W = 82.75; floors C1=3/C2=4/C3=3/C5=3; D1-D14 zero triggered, zero UNKNOWN)
 **Governing authorities:** Block 5 Reference Application Factory Plan 1.0 section 7 (B5-I1 gate: operator-approved Product Charter); `OCE_B5_I0_SELECTION_PROTOCOL_v1.0.md` section 7.10 (operator decision boundary); `OCE_B5_I0_AMEND-001_SEQUENTIAL_DUAL_PASS_REVIEW_v1.0.md`; `OCE_B5_I1_RECONCILIATION_v1.0.md`; decision packet sections 1-11; OCE Constitution 1.1
 **Stage scope:** `AUTHORIZED_STAGE=B5-I1-OPERATOR-SELECTION_AND_CHARTER_DRAFT` (exclusive). This charter is a planning document. It contains no code, implements nothing, modifies nothing, and authorizes no implementation.
 
-> ### `DRAFT - AWAITING OPERATOR RATIFICATION`
-> This charter is a draft produced under the operator's selection of CAND-004. It has NOT been ratified. Ratification is the operator's exclusive act; no agent may self-ratify this document. Until ratification: no implementation is authorized, B5-I2 and every later increment remain LOCKED, and B5-I1 is not fully accepted. Nothing in this document grants authority - it packages, freezes, and makes testable the scope the operator may choose to ratify.
+> ### `OPERATOR RATIFIED - FROZEN (2026-10-07)`
+> This charter was produced as a draft under the operator's selection of CAND-004, passed the final adversarial ratification audit (two narrow documentation repairs, recorded in the audit commits), and was **ratified by the operator on 2026-10-07** under `AUTHORIZED_STAGE=B5-I1-CHARTER_RATIFICATION_AND_MERGE` (ratification artifact: `OCE_B5_I1_OPERATOR_RATIFICATION_v1.0.md`). Ratification freezes the scope, law, gates, and increment ceiling of this document. It does NOT authorize implementation: `IMPLEMENTATION_AUTHORIZED = FALSE`, B5-I2 and every later increment remain LOCKED, and B5-I2 requires a fresh `AUTHORIZED_STAGE=B5-I2` from the operator. The pre-ratification draft state is preserved in Git history (charter commits `5b082164…` and `d4bb8e60…`).
 
 ---
 
@@ -242,7 +242,7 @@ Ceiling accounting: I-1 through I-6 are the required kernel; I-7 and I-8 are opt
 | Field | Value |
 |---|---|
 | Charter version | 1.0 |
-| Status | DRAFT_FOR_OPERATOR_RATIFICATION |
+| Status | OPERATOR_RATIFIED — FROZEN (2026-10-07) |
 | Ratification authority | Operator exclusively; no agent may self-ratify |
 | Before ratification | No implementation authorized; B5-I2-I9 LOCKED; B5-I1 not fully accepted |
 | Upon operator ratification | Status becomes OPERATOR_RATIFIED with the date recorded in the ledger and acceptance matrix; sections 5-7 law and section 8 scope freeze; the 6-8-increment sequence may then be considered by the operator increment by increment, each still requiring its own fresh `AUTHORIZED_STAGE` |
@@ -254,7 +254,7 @@ Documentation only. No code implemented; nothing under `oce/frontend` modified; 
 ## 16. Exit state
 
 ```
-PRODUCT_CHARTER_STATUS = DRAFT_FOR_OPERATOR_RATIFICATION
+PRODUCT_CHARTER_STATUS = OPERATOR_RATIFIED — FROZEN
 IMPLEMENTATION_AUTHORIZED = FALSE
 B5_I2_PLUS = LOCKED
 CAPITAL_AUTHORITY = NONE
