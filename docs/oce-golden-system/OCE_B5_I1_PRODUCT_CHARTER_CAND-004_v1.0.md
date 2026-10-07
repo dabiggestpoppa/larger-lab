@@ -201,9 +201,9 @@ Every material CAND-004 limitation and residual risk is converted into a testabl
 
 All seventeen must pass for the product to hold any release claim. Gates G1/G2 convert disclosed limitation (1); Gates G3, G4, G5, and G7 convert limitation (2) plus packet section 12's anti-extraction mitigation; Gate G17 plus the section 12 stop conditions convert limitation (3).
 
-## 12. Increment ceiling (proposed only - no increment is authorized)
+## 12. Increment ceiling (planning only - proposed, not begun - no increment is authorized)
 
-The implementation sequence is proposed as **six to eight increments** and this number is a hard ceiling (Gate G17). **No increment is authorized by this charter.** `B5_I2_PLUS = LOCKED`. Each increment additionally requires a fresh `AUTHORIZED_STAGE` from the operator. The proposal aligns with Block 5 plan section 7 (B5-I2 through B5-I7):
+The implementation sequence is proposed as **six to eight increments** and this number is a hard ceiling (Gate G17). This is planning only. **No increment is authorized by this charter.** `B5_I2_PLUS = LOCKED`. Each increment additionally requires a fresh `AUTHORIZED_STAGE` from the operator. The proposal aligns with Block 5 plan section 7 (B5-I2 through B5-I7):
 
 | Incr | Plan anchor | Purpose |
 |---|---|---|
