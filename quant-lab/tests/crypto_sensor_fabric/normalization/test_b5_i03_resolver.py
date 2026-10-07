@@ -734,7 +734,6 @@ def test_provider_id_reused_does_not_cross_instances() -> None:
         instance2(),
         instance2(instance_id="CI-B", valid_from=T2, valid_to=None, known_from=T2 - timedelta(days=2)),
     )
-    st = resolution_status()
     out_old = resolve()(
         snap,
         provider=PROVIDER,
@@ -807,3 +806,46 @@ def test_resolver_is_deterministic() -> None:
     assert out1.model_dump_json() == out2.model_dump_json()
     assert serialize_identity_registry_yaml(snap) == serialize_identity_registry_yaml(snap)
     assert parse_identity_registry_yaml(serialize_identity_registry_yaml(snap)) == snap
+
+
+# ----------------------------------------------------------------------------
+# I03 33 + I03D red-team finding A12: lifecycle downgrade of an alias match
+# ----------------------------------------------------------------------------
+
+
+def test_alias_match_inside_suspended_window_downgrades_without_alias_id() -> None:
+    """B5-I03D adversarial finding (red-team case A12): an alias match inside
+    a knowledge-valid SUSPENDED window must DOWNGRADE to
+    RESOLVED_WITH_WARNING, never crash on the matched_alias_id-only-on-
+    RESOLVED_ALIAS validator law.  Provenance stays with the alias evidence
+    refs, the confidence token and IDENTITY_ALIAS_USED; matched_alias_id stays
+    None because that field is reserved for RESOLVED_ALIAS (I03 validator
+    law: RESOLVED_WITH_WARNING carries its own lifecycle evidence)."""
+    at = alias_type()
+    al = alias("SUSP1", alias_type_value=at.API_SYMBOL, known_from=T0)
+    lc = lifecycle_event(
+        lifecycle_state().SUSPENDED, state_from=T0, state_to=None, known_from=T0
+    )
+    snap = snapshot_with_aliases((al,), instance2(), lifecycle=(lc,))
+    st = resolution_status()
+    out = resolve_instrument(snap, "SUSP1", T0 + timedelta(days=3), T2)
+    assert out.status is st.RESOLVED_WITH_WARNING
+    assert out.contract_instance_id == "CI-A"          # identity still selected
+    assert out.matched_alias_id is None                # reserved for RESOLVED_ALIAS
+    flag_values = {flag.value for flag in out.quality_flags}
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" in flag_values
+    assert "IDENTITY_ALIAS_USED" in flag_values        # alias provenance retained
+    assert "provider-docs:alias-registration" in out.source_evidence_refs
+    assert out.confidence == "operator-curated"        # alias provenance retained
+
+
+def test_alias_match_outside_warning_windows_keeps_matched_alias_id() -> None:
+    """The paired law: with no lifecycle warning over the event, an alias
+    match stays RESOLVED_ALIAS and keeps matched_alias_id (directive 17)."""
+    at = alias_type()
+    al = alias("KPA1", alias_type_value=at.API_SYMBOL, known_from=T0)
+    snap = snapshot_with_aliases((al,), instance2())
+    st = resolution_status()
+    out = resolve_instrument(snap, "KPA1", T0 + timedelta(days=3), T2)
+    assert out.status is st.RESOLVED_ALIAS
+    assert out.matched_alias_id == "AL:CI-A:KPA1"

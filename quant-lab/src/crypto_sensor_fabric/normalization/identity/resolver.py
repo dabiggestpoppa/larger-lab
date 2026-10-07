@@ -18,11 +18,16 @@ IdentityRegistrySnapshot`:
 * frozen five-tier order (section 10): (1) provider instrument id valid at
   event time, (2) exact native symbol + venue + lifecycle interval,
   (3) documented alias valid at event time, (4) curated evidence-backed manual
-  mapping (carried, per the vocabulary matrix, as InstrumentAlias rows; the
-  resolver emits IDENTITY_MANUAL_OVERRIDE when such a row is the winner),
-  (5) no result;
+  mapping (carried, per the vocabulary matrix, as InstrumentAlias rows), and
+  (5) no result.  Tiers 3 and 4 are ONE pooled scan by design (ambiguity
+  dominates convenience, section 9): splitting curated carriers into a later
+  sequential tier would let a convenience match silently outrank an ambiguity
+  the pooled scan can see.  Tier-4 semantics live in the discrimination of
+  the winner: a curated non-API carrier that wins the scan surfaces
+  IDENTITY_MANUAL_OVERRIDE (section 14) instead of IDENTITY_ALIAS_USED;
 * ambiguity refuses (section 9, directive 24): at one tier, several equally
   PIT-valid candidates yield AMBIGUOUS and NEVER a sorted/first/last winner;
+  a curated carrier can never outrank an ambiguity the pooled alias scan sees;
 * lifecycle-verdict law (section 6; directives 11/12/13/33): a queried symbol
   with instances known by the cutoff but no instance valid at event_time is
   NOT_YET_LISTED strictly before the earliest valid_from and DELISTED at/after
@@ -31,7 +36,10 @@ IdentityRegistrySnapshot`:
   lifecycle evidence (SUSPENDED / DELISTING_ANNOUNCED windows over the event
   time) downgrades a resolution to RESOLVED_WITH_WARNING with
   IDENTITY_LIFECYCLE_BOUNDARY - nothing is invented beyond the frozen nine
-  statuses;
+  statuses.  A downgraded ALIAS match keeps its status RESOLVED_WITH_WARNING
+  and its provenance (alias evidence refs, confidence, IDENTITY_ALIAS_USED)
+  but carries NO matched_alias_id: that field is only set for RESOLVED_ALIAS
+  (I03 validator law);
 * unresolved answers carry NO fabricated identifiers (directive 25):
   contract_instance_id / economic_contract_id / canonical_asset_id /
   matched_alias_id / terms_version stay None and source refs stay empty
@@ -58,7 +66,7 @@ from .enums import (
     IdentityResolutionStatus,
     LifecycleState,
 )
-from .models import _require_unique
+from .registry import IdentityRegistrySnapshot
 
 __all__ = [
     "IdentityResolution",
@@ -84,6 +92,16 @@ _RESOLVED_SET = frozenset(
         IdentityResolutionStatus.RESOLVED_ALIAS,
         IdentityResolutionStatus.RESOLVED_WITH_WARNING,
     }
+)
+
+#: Section 8 alias kinds that are provider-documented symbol surfaces: a win
+#: through one of these is an ordinary registered-alias match (tier 3).  Every
+#: other frozen kind is a curated, evidence-backed carrier (vocabulary matrix
+#: directive 29 path A): a win through one of those carries tier-4 semantics
+#: and surfaces IDENTITY_MANUAL_OVERRIDE (section 14) instead of
+#: IDENTITY_ALIAS_USED.
+_DOCUMENTED_SYMBOL_ALIAS_TYPES = frozenset(
+    {AliasType.API_SYMBOL, AliasType.WEBSOCKET_SYMBOL}
 )
 
 
@@ -349,31 +367,16 @@ def resolve_instrument(
     if outcome is not None:
         return outcome
 
-    # -- tier 3: registered alias valid at event time (FULL registry scan:
-    #    documented symbol surfaces and evidence-backed curated carriers
-    #    alike; several equally-valid candidates are AMBIGUOUS, never a
-    #    winner) ---------------------------------------------
+    # -- tiers 3+4: registered alias scan (section 10).  ONE pooled scan:
+    #    documented symbol surfaces AND curated evidence-backed carriers
+    #    (vocabulary matrix directive 29 path A) are candidates alike, so
+    #    several equally PIT-valid candidates are AMBIGUOUS and a curated
+    #    carrier can never quietly outrank an ambiguity (ambiguity dominates
+    #    convenience).  Tier-4 semantics are carried by the winner's alias
+    #    kind: a curated non-API carrier wins with IDENTITY_MANUAL_OVERRIDE
+    #    (section 14) instead of IDENTITY_ALIAS_USED.
     outcome = _tier_alias(
-        snapshot,
-        provider,
-        venue,
-        native_symbol,
-        event_time,
-        knowledge_cutoff,
-        manual_override=False,
-    )
-    if outcome is not None:
-        return outcome
-
-    # -- tier 4: curated evidence-backed manual mapping ---------------------
-    outcome = _tier_alias(
-        snapshot,
-        provider,
-        venue,
-        native_symbol,
-        event_time,
-        knowledge_cutoff,
-        manual_override=True,
+        snapshot, provider, venue, native_symbol, event_time, knowledge_cutoff
     )
     if outcome is not None:
         return outcome
@@ -434,7 +437,6 @@ def _tier_provider_id(snapshot, provider, venue, event_time, knowledge_cutoff,
             matches[0],
             alias_row=None,
             extra_flags=[NormalizationQualityFlag.IDENTITY_PROVIDER_ID_MISSING],
-            manual_override=False,
         )
     if len(matches) > 1:
         return _empty(IdentityResolutionStatus.AMBIGUOUS)
@@ -471,7 +473,6 @@ def _tier_exact_symbol(snapshot, provider, venue, native_symbol, event_time, kno
             valid_now[0],
             alias_row=None,
             extra_flags=[],
-            manual_override=False,
         )
     if len(valid_now) > 1:
         # Registry refuses overlapping active terms at publication time; two
@@ -486,34 +487,23 @@ def _tier_exact_symbol(snapshot, provider, venue, native_symbol, event_time, kno
 
 
 def _tier_alias(snapshot, provider, venue, alias_text, event_time,
-                knowledge_cutoff, manual_override):
-    """Tier 3 (registered alias) / tier 4 (curated manual mapping carried as
-    evidence-backed alias rows per the vocabulary matrix, directive 29):
-    provider exact, venue exact, alias_text exact, alias valid-time +
-    knowledge-time admissible, linked instance doubly PIT-valid (directive 17).
-    Multiple equally valid candidates at one tier are AMBIGUOUS, never a
-    winner (directives 17/24):
-
-    * manual_override=False  -> tier 3 scan: EVERY registered alias row whose
-      text/provider/venue/window matches (API and non-API types alike);
-    * manual_override=True   -> tier 4 restricted re-scan of the curated
-      non-API carriers (ARCHIVE/DISPLAY/LEGACY/PROVIDER_INTERNAL_ID); the
-      winner carries IDENTITY_MANUAL_OVERRIDE per bloc_05/01 section 14.
+                knowledge_cutoff):
+    """Tiers 3+4 (section 10; vocabulary matrix directive 29 path A): the
+    registered-alias scan.  Provider exact, venue exact, alias_text exact,
+    alias valid-time + knowledge-time admissible, linked instance doubly
+    PIT-valid (directive 17).  ONE pooled scan over EVERY registered alias
+    kind - documented symbol surfaces and curated non-API carriers alike - so
+    several equally valid candidates at the tier are AMBIGUOUS, never a winner
+    (directives 17/24).  The winner's alias kind decides the tier-3 vs tier-4
+    reading of the match: a curated non-API carrier wins with
+    IDENTITY_MANUAL_OVERRIDE (section 14) instead of IDENTITY_ALIAS_USED
+    (discriminated in :func:`_resolved`).
     """
-    manual_types = {
-        AliasType.ARCHIVE_SYMBOL,
-        AliasType.DISPLAY_SYMBOL,
-        AliasType.LEGACY_SYMBOL,
-        AliasType.PROVIDER_INTERNAL_ID,
-    }
     matched = []
     for alias in snapshot.aliases:
         if alias.provider != provider or alias.venue != venue:
             continue
         if alias.alias_text != alias_text:
-            continue
-        if manual_override and alias.alias_type == AliasType.API_SYMBOL:
-            # tier 4 re-scan carries only non-API curated carriers
             continue
         if not _valid_at(event_time, alias.valid_from, alias.valid_to):
             continue
@@ -553,8 +543,7 @@ def _tier_alias(snapshot, provider, venue, alias_text, event_time,
         knowledge_cutoff,
         found[0],
         alias_row=matched[0],
-        extra_flags=[NormalizationQualityFlag.IDENTITY_ALIAS_USED],
-        manual_override=manual_override,
+        extra_flags=[],
     )
 
 
@@ -567,7 +556,6 @@ def _resolved(
     winner,
     alias_row,
     extra_flags,
-    manual_override,
 ):
     """Build the final resolved verdict for one PIT-valid winner."""
     economic = next(
@@ -595,7 +583,11 @@ def _resolved(
         matched_alias_id = alias_row.alias_id
         confidence = alias_row.confidence
         evidence = list(alias_row.source_evidence_refs) + evidence
-        flags.append(NormalizationQualityFlag.IDENTITY_ALIAS_USED)
+        flags.append(
+            NormalizationQualityFlag.IDENTITY_ALIAS_USED
+            if alias_row.alias_type in _DOCUMENTED_SYMBOL_ALIAS_TYPES
+            else NormalizationQualityFlag.IDENTITY_MANUAL_OVERRIDE
+        )
     evidence = list(dict.fromkeys(evidence))
     status = (
         IdentityResolutionStatus.RESOLVED_ALIAS
@@ -605,8 +597,11 @@ def _resolved(
     if lifecycle_boundary:
         flags.append(NormalizationQualityFlag.IDENTITY_LIFECYCLE_BOUNDARY)
         status = IdentityResolutionStatus.RESOLVED_WITH_WARNING
-    if manual_override:
-        flags.append(NormalizationQualityFlag.IDENTITY_MANUAL_OVERRIDE)
+        # The warning status carries its own lifecycle evidence (I03 validator
+        # law): matched_alias_id is reserved for RESOLVED_ALIAS.  Alias
+        # provenance stays in source_evidence_refs, confidence and
+        # IDENTITY_ALIAS_USED - nothing is lost, nothing is fabricated.
+        matched_alias_id = None
     return IdentityResolution(
         status=status,
         contract_instance_id=winner.contract_instance_id,

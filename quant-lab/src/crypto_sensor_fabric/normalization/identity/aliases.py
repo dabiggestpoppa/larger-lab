@@ -21,7 +21,6 @@ matching order must never depend on it or on any threshold.
 
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Annotated
 
 from pydantic import AfterValidator, ConfigDict, Field, model_validator
