@@ -67,6 +67,7 @@
 | 2026-10-06 | Six B5-I0 artifacts authored, documentation-only, one commit | Agent | This ledger §2 |
 | (pending) | Operator review of B5-I0 | **Operator** | Status decision on this ledger |
 | 2026-10-06 | Operator ratification of B5-I0 at commit `bcbeacf88bd8d55e4bef1396c0ac50b3fc1b6334`: protocol accepted and frozen with no amendments; evidence map repaired (acceptance-matrix heading → `all ten candidate criteria`, E3 `L §11` → `L §3`); B5-I0 → OPERATOR_ACCEPTED; B5-I1–I9 remain LOCKED; normal merge of PR #8 authorized (`MERGE_AUTHORIZED=true` for PR #8 only) | **Operator** | `AUTHORIZED_STAGE=B5-I0-RATIFICATION`; protocol §10; this ledger §1 |
+| 2026-10-07 | AMEND-001 ratified (`OCE_B5_I0_AMEND-001_SEQUENTIAL_DUAL_PASS_REVIEW_v1.0.md`): operator declined additional chats/agents/external reviewer threads; two-isolated-reviewer mechanism superseded for the B5-I1 evaluation by one agent performing two ordered, separately sealed passes (Pass A evidence/compliance; Pass B adversarial/red-team). The passes are NOT independent and NOT blind; no candidate result existed before the amendment. All frozen criteria/weights/thresholds/disqualifiers/tie-breaks unchanged; prior launch procedure preserved as historical evidence | **Operator** | `AUTHORIZED_STAGE=B5-I1-SEQUENTIAL-DUAL-PASS`; amendment §7 ratification block |
 
 ## 5. Downstream contract (what B5-I1 may rely on, only after ratification)
 

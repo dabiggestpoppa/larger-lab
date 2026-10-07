@@ -9,6 +9,8 @@
 
 ---
 
+> **AMEND-001 BANNER (2026-10-07, OPERATOR_RATIFIED):** `OCE_B5_I0_AMEND-001_SEQUENTIAL_DUAL_PASS_REVIEW_v1.0.md` supersedes §1 (isolation rules) for the B5-I1 evaluation: one agent performs two ordered, separately sealed passes — Pass A (evidence/compliance) and Pass B (adversarial/red-team). The passes are NOT independent and NOT blind and must never be described as such; the reviewer/builder COI is recorded on both scorecards. §2–§4 scoring/sealing obligations apply to both passes unchanged. §1 below is preserved verbatim as historical evidence.
+
 ## 1. Independence rules (verbatim requirements, unaltered)
 
 - Two reviewers, Reviewer A and Reviewer B, execute in isolated contexts created from the same frozen intake commit.

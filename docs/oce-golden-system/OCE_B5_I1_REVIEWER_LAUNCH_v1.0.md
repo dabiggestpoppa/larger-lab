@@ -9,6 +9,8 @@
 
 ---
 
+> **AMEND-001 BANNER (2026-10-07, OPERATOR_RATIFIED):** `OCE_B5_I0_AMEND-001_SEQUENTIAL_DUAL_PASS_REVIEW_v1.0.md` supersedes §1–§3 (two-isolated-thread mechanics, absolute blindness, `BLOCKED_REVIEWER_ISOLATION_FAILED`) for the B5-I1 evaluation: one agent performs two ordered, separately sealed passes in one context (Pass A evidence/compliance, Pass B adversarial/red-team); the passes are NOT independent and NOT blind. §4 applies after both sequential seals. §1–§4 below are preserved verbatim as historical evidence.
+
 ## 1. Isolation mechanics
 
 - Reviewer A and Reviewer B are separate agent threads (separate contexts, separate sessions). They never communicate.
