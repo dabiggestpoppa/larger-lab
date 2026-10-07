@@ -5456,3 +5456,134 @@ fuzzy = candidates only; `valid_from <= event_time < valid_to` AND
 `known_from <= cutoff`; no future leakage; relisting = new instance unless
 continuity evidenced; no multiplier/notional/unit work — B5-I04+). B5-I03
 NOT started. STOP.
+## 159 - SENSOR-B5-I03: LIFECYCLE/ALIAS/PIT IDENTITY RESOLVER COMPLETE (PENDING_OPERATOR_REVIEW)
+
+Date: 2026-10-07. Start head `9ad8279e2` (I02-RATIFY; remote build head).
+Ancestry strict and linear: `9ad8279e2` -> `e06c26452` (I03A) ->
+`06dcc7eb9` (I03B) -> `5e9424835` (I03C) -> `61148c02e` (I03D-impl); 4
+commits, 0 merges, no rewrites, no amend/squash. Remote build still
+`9ad8279e2` at sealing time. MAIN_DIVERGENCE_STATUS =
+EXTERNAL / UNRECONCILED / NON-BLOCKING_FOR_I03 (origin/main moved
+independently to `f89883471dbc93d481b43d73757c716afc817441` during the Bloc 5
+workstream; per the FINALIZE directive no merge/rebase/cherry-pick/reset was
+performed; the build branch remains the checkpoint authority; reconciliation
+requires a separate operator decision).
+
+### 1. Implementation-time verification (measured at final tree `61148c02e`)
+
+Scope audit: identity = exactly the 7 authorized modules (`__init__`,
+`aliases`, `enums`, `lifecycle`, `models`, `registry`, `resolver`); all
+forbidden modules/behaviors absent; identity `__all__` = **17** symbols;
+top-level normalization surface unchanged at **24**. Resolver entry point
+`resolve_instrument(snapshot, provider, venue, native_symbol, event_time,
+knowledge_cutoff, optional_provider_instrument_id=None)` - snapshot leads
+(documented deviation; pure function over one explicit immutable registry
+snapshot, no ambient state, no wall clock). Dual-clock law enforced on every
+candidate at every tier (`valid_from <= event_time < valid_to` AND
+`known_from <= knowledge_cutoff`, known_to where applicable). Frozen five-tier
+order: provider instrument ID -> exact native symbol + venue + lifecycle
+interval -> documented alias at event time -> curated evidence-backed manual
+mapping -> no result; **tiers 3+4 are ONE pooled alias scan** (ambiguity
+dominates convenience); tier-4 semantics live in winner discrimination via
+`_DOCUMENTED_SYMBOL_ALIAS_TYPES = {API_SYMBOL, WEBSOCKET_SYMBOL}` ->
+`IDENTITY_ALIAS_USED` vs curated carriers (ARCHIVE/DISPLAY/LEGACY/
+PROVIDER_INTERNAL_ID) -> `IDENTITY_MANUAL_OVERRIDE`; tier-4 winner stays
+RESOLVED_ALIAS with `matched_alias_id` (disclosed wording deviation from the
+vocabulary matrix's "RESOLVED_WITH_WARNING" phrasing - emitting
+`matched_alias_id` under any other status would violate the frozen validator
+law, and dropping it would destroy manual-mapping attribution). Ambiguity
+refuses winners (never first/latest/sorted/lexicographic). Lifecycle-verdict
+law: NOT_YET_LISTED strictly before earliest valid_from, DELISTED at/after
+latest valid_to; cutover is the relisting law, not a silent latest-win.
+Fail-closed tier-5 sweep: late alias/instance evidence -> PIT_KNOWLEDGE_BLOCKED;
+unresolved answers carry no fabricated identifiers. Exact-only law: no
+fuzzy/prefix/substring/case-fold/display-or-archive guessing; USD/USDT/USDC
+structurally distinct (no conversion behavior exists). No I04 leakage:
+no multiplier/inverse/quantity/notional/unit math in the identity package;
+`canonical_asset_id` supplied by the registry, never computed; `terms_version`
+mirrored verbatim. Vocabulary (nothing invented): LifecycleState 7 exact
+members (PRE_LISTING, ACTIVE, SUSPENDED, DELISTING_ANNOUNCED, DELISTED,
+RELISTED_NEW_INSTANCE, UNKNOWN); AliasType 6 (API_SYMBOL, ARCHIVE_SYMBOL,
+WEBSOCKET_SYMBOL, DISPLAY_SYMBOL, LEGACY_SYMBOL, PROVIDER_INTERNAL_ID);
+IdentityResolutionStatus 9 exact members + BLOCKING set {AMBIGUOUS,
+UNKNOWN_SYMBOL, TERMS_UNVERIFIED, PIT_KNOWLEDGE_BLOCKED}. Flags emitted by
+I03 paths: IDENTITY_ALIAS_USED, IDENTITY_MANUAL_OVERRIDE,
+IDENTITY_LIFECYCLE_BOUNDARY, IDENTITY_PROVIDER_ID_MISSING; sanctioned flags
+N/A in I03 paths documented, not invented. UNKNOWN lifecycle windows are
+inert evidence (neither block nor warn); the frozen plan under-specifies
+resolver behavior for them and no behavior was invented (recorded choice).
+
+### 2. A12 defect + repair (preserved in history)
+
+PRE-REPAIR (real defect, found by the I03 red-team case A12): an
+alias-derived match landing inside a knowledge-valid SUSPENDED window
+produced a downgraded result still carrying `matched_alias_id` - lawful only
+on RESOLVED_ALIAS under the I03C validator - so `resolve_instrument`
+crashed on a legal input. POST-REPAIR (`61148c02e`, no history rewrite): the
+lifecycle downgrade drops `matched_alias_id`, preserves provenance (alias
+evidence refs, confidence, IDENTITY_ALIAS_USED, plus
+IDENTITY_LIFECYCLE_BOUNDARY), does not misrepresent alias resolution as
+active canonical identity, and no validator crash occurs; the validator law
+itself unchanged. Two regression pins added:
+`test_alias_match_inside_suspended_window_downgrades_without_alias_id` and
+`test_alias_match_outside_warning_windows_keeps_matched_alias_id`. Static
+hygiene in the same commit: unused imports removed, resolver imports
+`IdentityRegistrySnapshot` from `.registry` (3 F821/mypy resolved), dead
+test variable removed.
+
+### 3. Fresh regressions (measured at `61148c02e`, not stale)
+
+B5-I03 tests **69 passed** (47 resolver incl. the 2 A12 pins + public API +
+scope audit). I01+I02 explicit regression suites **413 passed**.
+Normalization package **482 passed**. Focused battery **794 passed / 0
+failed**. Full storage **2019 passed / 13 skipped / 0 failed**. Full project
+**3880 passed / 14 skipped / 0 failed** with 2 warnings - both the known
+Windows manifest-concurrency reader-thread teardown race
+(`test_manifest_concurrency.py::TestPointerVisibility::
+test_readers_never_observe_partial_pointer`, PermissionError in reader
+thread; inherited TEST-ENVIRONMENT DEBT, intermittent, unrepaired by design
+per directive 25). Zero deterministic failures. Static: ruff changed scope
+all-pass (7 findings fixed during I03D before sealing); mypy 0 new identity
+findings (10 pre-existing providers/probes baseline); compileall OK;
+secret scan only the known `SemanticToken = ` false positive (models.py:115).
+
+### 4. Evidence artifacts (all regenerated after `61148c02e`)
+
+Mechanical generators (`.bu_tmp/`, never committed) re-run at the final
+tree: FUTURE_LEAKAGE_MATRIX 4/4 PASS, MATCH_ORDER_MATRIX 6/6 PASS,
+LIFECYCLE_MATRIX 9/9 PASS, ALIAS_MATRIX 6/6 PASS - every row carries
+acceptance clause / probe / input condition / observed result / disposition /
+evidence reference, no prose-only rows. ADVERSARIAL_MATRIX 25/25 PASS
+(mechanical wrapper over the red-team run; per-class acceptance-clause map
+disclosed in the artifact; the stale pre-fix red-team artifact showing
+23/25 with A3+A12 FAIL was discarded - A12 FAIL is the pre-repair defect
+history preserved in section 2, not current behavior). SCOPE_AUDIT.json:
+identity files exactly the 7 authorized modules, forbidden absent.
+IMPLEMENTATION_EVIDENCE.md authored from the measured numbers. Zero network,
+zero filesystem, zero wall-clock in production identity code.
+
+### 5. Audit / custody
+
+I11R2 tracked-Python count regenerated mechanically: **1025 -> 1033** (exactly
+one line changed; no-update rerun byte-stable), committed in the evidence
+commit. Custody: Bloc 4 / I17 / B5-I01 / B5-I02 evidence untouched; eleven
+suite-dirtied informational bloc_04 JSONs restored before commit; the
+untracked I06 spike remains untracked/unmodified; `.bu_tmp/` stays untracked
+and is never committed.
+
+### 6. Governance after I03 (no self-ratification)
+
+PASS_SENSOR_B5_I03_LIFECYCLE_ALIAS_PIT_RESOLVER_SEALED =
+**PENDING_OPERATOR_REVIEW**. BLOC_05_IMPLEMENTATION_STATUS =
+**I03_COMPLETE_PENDING_OPERATOR_REVIEW**. BLOC_05_NORMALIZATION_IMPLEMENTED
+= **PARTIAL_PIT_IDENTITY_FOUNDATION**. I03_IDENTITY_RESOLVER_SUBGATE =
+**IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW**. All 8 gates (IDENTITY /
+TIME / SEMANTIC / UNIT / LINEAGE / DUPLICATE_REVISION / REPLAY_SAFETY /
+GOLDEN_T0_T1) remain **NOT_YET_EARNED** - the IDENTITY_GATE is a
+program-level gate and later PIT/property/integration/golden stages still
+exist; it is NOT earned at I03 and NOT pre-authorized.
+next_checkpoint_authorized = **FALSE**. recommended_next = **OPERATOR REVIEW
+OF SENSOR-B5-I03**. B5-I04+ = UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research
+= FROZEN. Evidence/governance commit SENSOR-B5-I03D then push of the build
+branch only (never main); I04 authorization occurs only after operator
+review of the pushed I03 final tree. HARD STOP.

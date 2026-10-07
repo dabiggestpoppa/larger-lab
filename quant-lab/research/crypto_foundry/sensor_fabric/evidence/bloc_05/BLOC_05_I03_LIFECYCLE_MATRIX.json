@@ -1,0 +1,162 @@
+{
+  "artifact": "BLOC_05_I03_LIFECYCLE_MATRIX",
+  "authority": [
+    "bloc_05/01 section 6; bloc_05/07 F4; I03 directives 4/33/34/46"
+  ],
+  "checkpoint": "SENSOR-B5-I03",
+  "created": "2026-10-07",
+  "evidence_class": "measured_executable",
+  "generated_by": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py)",
+  "law": "all seven states enumerated without collapsing; lifecycle record = minimal InstrumentLifecycle evidence rows (documented choice per directive 9); UNKNOWN never optimistically activates; PRE_LISTING/DELISTED/UNKNOWN are never collapsed into one absence state",
+  "rows": [
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": false,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_4_before_listing_is_not_yet_listed",
+      "fabricated_ids": false,
+      "input_condition": "event=2022-12-31T12:00Z, cutoff=2025-01-01T12:00Z, instance CI-A valid [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "NOT_YET_LISTED",
+      "probe": "event one day before valid_from with the instance evidence known by the cutoff",
+      "result": "PASS",
+      "result_block_or_resolved": "VERDICT/BLOCKED (NOT_YET_LISTED)",
+      "state_enumerated": "PRE_LISTING",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_boundary_valid_from_inclusive",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z, cutoff=2025-01-01T12:00Z, instance CI-A valid [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "event inside the instance valid window",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "ACTIVE",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py lifecycle warning cases",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-03T12:00Z, cutoff=2025-01-01T12:00Z, SUSPENDED window [2023-01-02T12:00Z, 2023-01-06T12:00Z) known_from=2022-12-31T12:00Z",
+      "note": "no unique frozen status exists for suspended (bloc_05/01 section 9); RESOLVED_WITH_WARNING + IDENTITY_LIFECYCLE_BOUNDARY is the plan-justified smallest answer (directive 33)",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "RESOLVED_WITH_WARNING",
+      "probe": "event inside a knowledge-valid SUSPENDED lifecycle window over the instance",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_WITH_WARNING)",
+      "state_enumerated": "SUSPENDED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py lifecycle warning cases",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-03T12:00Z, cutoff=2025-01-01T12:00Z, DELISTING_ANNOUNCED window [2023-01-02T12:00Z, 2024-01-01T12:00Z) known_from=2022-12-31T12:00Z",
+      "note": "same frozen-vocabulary justification as SUSPENDED",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "RESOLVED_WITH_WARNING",
+      "probe": "event inside a knowledge-valid DELISTING_ANNOUNCED window over the instance",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_WITH_WARNING)",
+      "state_enumerated": "DELISTING_ANNOUNCED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": false,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_5_after_delisting_is_delisted",
+      "fabricated_ids": false,
+      "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, instance CI-A valid_to=2024-01-01T12:00Z (exclusive)",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "DELISTED",
+      "probe": "event at/after valid_to with the instance evidence known by the cutoff",
+      "result": "PASS",
+      "result_block_or_resolved": "VERDICT/BLOCKED (DELISTED)",
+      "state_enumerated": "DELISTED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": false,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_8_break_interval_does_not_silently_choose_latest",
+      "fabricated_ids": false,
+      "input_condition": "event=2024-01-02T12:00Z, cutoff=2025-01-02T12:00Z, CI-A valid [T0, T1), CI-B valid [T2, open)",
+      "note": "the between-gap refuses to silently select the future instance (no latest-win); DELISTED is the frozen not-active-at-event verdict (section 6 cutover law, directives 12/13)",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "DELISTED",
+      "probe": "event inside the relisting break between CI-A (ends T1) and CI-B (starts T2)",
+      "result": "PASS",
+      "result_block_or_resolved": "VERDICT/BLOCKED (DELISTED)",
+      "state_enumerated": "RELISTED_NEW_INSTANCE",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_7_relisting_selects_new_instance_only_after_new_valid_from",
+      "fabricated_ids": false,
+      "input_condition": "event=2025-01-02T12:00Z, cutoff=2025-01-02T12:00Z, CI-B valid [2025-01-01T12:00Z, open) known_from=2024-12-31T12:00Z",
+      "note": "symbol reuse resolves to the NEW instance only after its valid_from (directive 12)",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "event after the new instance's valid_from: cutover to the new contract instance id",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "RELISTED_NEW_INSTANCE",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); UNKNOWN semantics pinned by tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py (directive 34 posture)",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z, cutoff=2025-01-01T12:00Z, instance CI-A valid [T0, T1) known by cutoff; UNKNOWN window [T0, open) known_from=2022-12-31T12:00Z",
+      "note": "documented under-specified choice: UNKNOWN lifecycle evidence neither gates nor activates nor warns - the instance interval law alone governs (activation comes from the instance row, never from the UNKNOWN row; directive 34 forbids optimistic activation FROM UNKNOWN evidence). Surfaced here rather than silently assumed.",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "event inside the instance window while an UNKNOWN lifecycle row is registered for the same instance",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "UNKNOWN",
+      "under_specified_surfaced": true
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": false,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_1_future_known_exact_symbol_must_not_resolve_backward (same gate, no lifecycle row)",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z, cutoff=2023-01-02T12:00Z, instance CI-A valid [T0, T1) but known_from=2024-01-01T12:00Z (> cutoff)",
+      "note": "directive 34: UNKNOWN lifecycle must not become ACTIVE by default; with the instance row unknown at the cutoff the answer is PIT_KNOWLEDGE_BLOCKED (fail closed), never a fabricated identity",
+      "observed_flags": [],
+      "observed_status": "PIT_KNOWLEDGE_BLOCKED",
+      "probe": "instance (and its UNKNOWN lifecycle row) known only AFTER the cutoff: no optimistic activation",
+      "result": "PASS",
+      "result_block_or_resolved": "VERDICT/BLOCKED (PIT_KNOWLEDGE_BLOCKED)",
+      "state_enumerated": "UNKNOWN",
+      "under_specified_surfaced": false
+    }
+  ],
+  "summary": {
+    "all_results_pass": true,
+    "collapse_events": 0,
+    "rows": 9,
+    "states_enumerated": 7,
+    "under_specified_rows": 1
+  }
+}

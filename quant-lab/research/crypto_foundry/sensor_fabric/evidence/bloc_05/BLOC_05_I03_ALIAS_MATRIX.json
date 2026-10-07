@@ -1,0 +1,203 @@
+{
+  "artifact": "BLOC_05_I03_ALIAS_MATRIX",
+  "authority": [
+    "bloc_05/01 section 8; I03 directives 5/17/47"
+  ],
+  "checkpoint": "SENSOR-B5-I03",
+  "created": "2026-10-07",
+  "evidence_class": "measured_executable",
+  "generated_by": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py)",
+  "law": "registered alias matches ONLY while its dual-clock gate is open (valid-time AND knowledge-time) in the exact (provider, venue, text) context; wrong venue/provider/text never matches; all six AliasType values enumerated without extension",
+  "rows": [
+    {
+      "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
+      "alias_type": "API_SYMBOL",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "inside_window_and_cutoff": {
+        "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+        "matched_alias_id": "AL:CI-A:TXT_API_SYMBOL:API_SYMBOL",
+        "observed_confidence": "operator-curated",
+        "observed_status": "RESOLVED_ALIAS",
+        "probe": "query the alias text at an instant inside [valid_from, valid_to) with the cutoff past known_from",
+        "result": "PASS"
+      },
+      "past_alias_valid_to": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (dual-clock gate closed)",
+        "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, alias valid_to=2024-01-01T12:00Z (exclusive)",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "query the same text one microsecond past the alias valid_to (queried text has no registered instances, so no tier-2 verdict fires)",
+        "result": "PASS"
+      },
+      "result": "PASS",
+      "wrong_venue_probe": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (venue gate exact, never cross-venue)",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias venue=OTHER_FUT, query venue=EXA_FUT",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "same text/type registered ONLY on venue OTHER_FUT (registered venue), queried against EXA_FUT",
+        "result": "PASS"
+      }
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
+      "alias_type": "ARCHIVE_SYMBOL",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "inside_window_and_cutoff": {
+        "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+        "matched_alias_id": "AL:CI-A:TXT_ARCHIVE_SYMBOL:ARCHIVE_SYMBOL",
+        "observed_confidence": "operator-curated",
+        "observed_status": "RESOLVED_ALIAS",
+        "probe": "query the alias text at an instant inside [valid_from, valid_to) with the cutoff past known_from",
+        "result": "PASS"
+      },
+      "past_alias_valid_to": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (dual-clock gate closed)",
+        "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, alias valid_to=2024-01-01T12:00Z (exclusive)",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "query the same text one microsecond past the alias valid_to (queried text has no registered instances, so no tier-2 verdict fires)",
+        "result": "PASS"
+      },
+      "result": "PASS",
+      "wrong_venue_probe": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (venue gate exact, never cross-venue)",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias venue=OTHER_FUT, query venue=EXA_FUT",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "same text/type registered ONLY on venue OTHER_FUT (registered venue), queried against EXA_FUT",
+        "result": "PASS"
+      }
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
+      "alias_type": "WEBSOCKET_SYMBOL",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "inside_window_and_cutoff": {
+        "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+        "matched_alias_id": "AL:CI-A:TXT_WEBSOCKET_SYMBOL:WEBSOCKET_SYMBOL",
+        "observed_confidence": "operator-curated",
+        "observed_status": "RESOLVED_ALIAS",
+        "probe": "query the alias text at an instant inside [valid_from, valid_to) with the cutoff past known_from",
+        "result": "PASS"
+      },
+      "past_alias_valid_to": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (dual-clock gate closed)",
+        "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, alias valid_to=2024-01-01T12:00Z (exclusive)",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "query the same text one microsecond past the alias valid_to (queried text has no registered instances, so no tier-2 verdict fires)",
+        "result": "PASS"
+      },
+      "result": "PASS",
+      "wrong_venue_probe": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (venue gate exact, never cross-venue)",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias venue=OTHER_FUT, query venue=EXA_FUT",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "same text/type registered ONLY on venue OTHER_FUT (registered venue), queried against EXA_FUT",
+        "result": "PASS"
+      }
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
+      "alias_type": "DISPLAY_SYMBOL",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "inside_window_and_cutoff": {
+        "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+        "matched_alias_id": "AL:CI-A:TXT_DISPLAY_SYMBOL:DISPLAY_SYMBOL",
+        "observed_confidence": "operator-curated",
+        "observed_status": "RESOLVED_ALIAS",
+        "probe": "query the alias text at an instant inside [valid_from, valid_to) with the cutoff past known_from",
+        "result": "PASS"
+      },
+      "past_alias_valid_to": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (dual-clock gate closed)",
+        "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, alias valid_to=2024-01-01T12:00Z (exclusive)",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "query the same text one microsecond past the alias valid_to (queried text has no registered instances, so no tier-2 verdict fires)",
+        "result": "PASS"
+      },
+      "result": "PASS",
+      "wrong_venue_probe": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (venue gate exact, never cross-venue)",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias venue=OTHER_FUT, query venue=EXA_FUT",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "same text/type registered ONLY on venue OTHER_FUT (registered venue), queried against EXA_FUT",
+        "result": "PASS"
+      }
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
+      "alias_type": "LEGACY_SYMBOL",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "inside_window_and_cutoff": {
+        "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+        "matched_alias_id": "AL:CI-A:TXT_LEGACY_SYMBOL:LEGACY_SYMBOL",
+        "observed_confidence": "operator-curated",
+        "observed_status": "RESOLVED_ALIAS",
+        "probe": "query the alias text at an instant inside [valid_from, valid_to) with the cutoff past known_from",
+        "result": "PASS"
+      },
+      "past_alias_valid_to": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (dual-clock gate closed)",
+        "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, alias valid_to=2024-01-01T12:00Z (exclusive)",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "query the same text one microsecond past the alias valid_to (queried text has no registered instances, so no tier-2 verdict fires)",
+        "result": "PASS"
+      },
+      "result": "PASS",
+      "wrong_venue_probe": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (venue gate exact, never cross-venue)",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias venue=OTHER_FUT, query venue=EXA_FUT",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "same text/type registered ONLY on venue OTHER_FUT (registered venue), queried against EXA_FUT",
+        "result": "PASS"
+      }
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
+      "alias_type": "PROVIDER_INTERNAL_ID",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "inside_window_and_cutoff": {
+        "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
+        "matched_alias_id": "AL:CI-A:TXT_PROVIDER_INTERNAL_ID:PROVIDER_INTERNAL_ID",
+        "observed_confidence": "operator-curated",
+        "observed_status": "RESOLVED_ALIAS",
+        "probe": "query the alias text at an instant inside [valid_from, valid_to) with the cutoff past known_from",
+        "result": "PASS"
+      },
+      "past_alias_valid_to": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (dual-clock gate closed)",
+        "input_condition": "event=2024-01-01T12:00:00.000001Z, cutoff=2025-01-01T12:00Z, alias valid_to=2024-01-01T12:00Z (exclusive)",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "query the same text one microsecond past the alias valid_to (queried text has no registered instances, so no tier-2 verdict fires)",
+        "result": "PASS"
+      },
+      "result": "PASS",
+      "wrong_venue_probe": {
+        "expected": "UNKNOWN_SYMBOL with matched_alias_id=None (venue gate exact, never cross-venue)",
+        "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias venue=OTHER_FUT, query venue=EXA_FUT",
+        "matched_alias_id": null,
+        "observed_status": "UNKNOWN_SYMBOL",
+        "probe": "same text/type registered ONLY on venue OTHER_FUT (registered venue), queried against EXA_FUT",
+        "result": "PASS"
+      }
+    }
+  ],
+  "summary": {
+    "alias_types_probed": 6,
+    "all_results_pass": true
+  }
+}

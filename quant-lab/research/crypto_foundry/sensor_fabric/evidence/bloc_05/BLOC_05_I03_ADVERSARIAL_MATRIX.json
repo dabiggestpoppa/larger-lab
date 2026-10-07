@@ -1,0 +1,296 @@
+{
+  "artifact": "BLOC_05_I03_ADVERSARIAL_MATRIX",
+  "authority": [
+    "bloc_05/01 sections 5-6 (dual clock, statuses); I03 directives 2/5/6/7/8/9/10/12/13/14/20; A12 regression law (matched_alias_id downgrade)"
+  ],
+  "checkpoint": "SENSOR-B5-I03",
+  "created": "2026-10-07",
+  "evidence_class": "measured_executable",
+  "generated_by": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab; 25/25 PASS on resolver at final implementation tree), wrapped mechanically by ../../../.bu_tmp/b5_i03_adv_wrap.py (no hand-authored row content)",
+  "law": "every adversarial case must PASS: same-tier ambiguity refuses a winner; valid-time is half-open [valid_from, valid_to); provider instrument ID never bypasses the knowledge-time gate; wrong venue never resolves; late alias/instance/lifecycle knowledge never leaks backward; permutation order never changes resolution output; registry refuses duplicates and dangling references; a knowledge-valid suspension downgrades an alias match by dropping matched_alias_id while preserving provenance",
+  "clause_map": {
+    "multiple candidates same tier (alias scan)": "bloc_05/01 ambiguity law; directive 10 (AMBIGUOUS, no winner selection)",
+    "multiple candidates same tier (symbol tier unreachable by construction)": "bloc_05/01 registry laws (I02); directive 7 (no symbol-identity shortcut, overlap refusal)",
+    "multiple candidates same tier (boundary)": "bloc_05/01 section 5 (valid-time law); directive 8 (boundary behavior)",
+    "alias overlap": "bloc_05/01 alias validity windows; directives 9/10 (alias law, ambiguity)",
+    "alias validity-window boundaries": "bloc_05/01 section 5 (half-open valid-time law); directive 9 (alias law)",
+    "provider-ID conflict (id vs symbol text)": "directive 13 (provider instrument ID is tier 1 anchor, never symbol text)",
+    "provider-ID conflict (missing id)": "directive 13 (nonexistent provider ID is not a lifeline)",
+    "provider-ID conflict (late instance behind id)": "bloc_05/01 section 5 (dual clock); directives 5/6/13 (knowledge-time gate over tier 1)",
+    "venue mismatch": "directive 14 (wrong-venue law; provider != venue; no cross-venue resolution)",
+    "nonexistent instance references": "directive 20 (I02 referential integrity consumed, not weakened)",
+    "lifecycle-state incompatibility": "directive 8 (lifecycle vocabulary; contradictory evidence refused)",
+    "lifecycle-state incompatibility (inert states)": "directive 8 (only SUSPENDED/DELISTING_ANNOUNCED knowledge-valid windows warn)",
+    "lifecycle-state incompatibility (late knowledge)": "bloc_05/01 section 5 (dual clock); directives 5/6 (late lifecycle knowledge never leaks)",
+    "event-vs-knowledge disagreement": "bloc_05/01 section 5 (dual clock); directives 5/6 (verdicts require knowledge)",
+    "information not yet known": "directive 6 (future-leakage negatives; fail-closed tier-5 sweep)",
+    "information not yet known (instrument metadata)": "bloc_05/01 section 5; directives 5/6/13 (first_seen_at is discovery metadata, not validity)",
+    "missing evidence / reference": "directive 12 (quality flags and evidence provenance carried on resolved answers)",
+    "conflicting signals between tiers": "frozen matching order (directives 2/13): tier precedence is deterministic",
+    "equivalent-input permutation determinism": "directive 12 (lifecycle downgrade drops matched_alias_id, preserves provenance/flags)",
+    "duplicate registry records": "directive 20 (I02 duplicate-refusal laws intact under I03 additions)",
+    "referential-integrity failure": "directives 14/20 (venue legality + referential integrity fail closed)"
+  },
+  "rows": [
+    {
+      "acceptance_clause": "bloc_05/01 ambiguity law; directive 10 (AMBIGUOUS, no winner selection)",
+      "adversarial_class": "multiple candidates same tier (alias scan)",
+      "case_id": "A1a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A1a",
+      "input_condition": "two same-text alias rows -> different instances, both PIT-valid: refuse a winner",
+      "observed": "two same-text carriers -> AMBIGUOUS, ids carried: False",
+      "probe": "b5_i03_redteam.py adversarial case A1a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 ambiguity law; directive 10 (AMBIGUOUS, no winner selection)",
+      "adversarial_class": "multiple candidates same tier (alias scan)",
+      "case_id": "A1b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A1b",
+      "input_condition": "two same-text alias rows -> SAME instance: not ambiguity, deterministic unique identity",
+      "observed": "two same-text carriers -> SAME instance: unique identity RESOLVED_ALIAS -> CI-A",
+      "probe": "b5_i03_redteam.py adversarial case A1b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 registry laws (I02); directive 7 (no symbol-identity shortcut, overlap refusal)",
+      "adversarial_class": "multiple candidates same tier (symbol tier unreachable by construction)",
+      "case_id": "A1c",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A1c",
+      "input_condition": "two overlapping instances for the same (provider, venue, symbol): the registry must refuse, so tier-2 dual-candidate ambiguity is unreachable by construction",
+      "observed": "overlapping active terms for one native symbol refused at the registry: ValidationError",
+      "probe": "b5_i03_redteam.py adversarial case A1c",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5 (valid-time law); directive 8 (boundary behavior)",
+      "adversarial_class": "multiple candidates same tier (boundary)",
+      "case_id": "A1d",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A1d",
+      "input_condition": "adjacent instances abutting at T1: event exactly T1 must resolve uniquely to the NEW instance (no double-claim)",
+      "observed": "adjacent terms at the shared boundary instant -> unique CI-B",
+      "probe": "b5_i03_redteam.py adversarial case A1d",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 alias validity windows; directives 9/10 (alias law, ambiguity)",
+      "adversarial_class": "alias overlap",
+      "case_id": "A2a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A2a",
+      "input_condition": "overlapping alias windows on the SAME instance collapse to one unique identity",
+      "observed": "overlapping windows, same instance -> RESOLVED_ALIAS -> CI-A",
+      "probe": "b5_i03_redteam.py adversarial case A2a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 alias validity windows; directives 9/10 (alias law, ambiguity)",
+      "adversarial_class": "alias overlap",
+      "case_id": "A2b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A2b",
+      "input_condition": "partially overlapping alias windows: ambiguous only while BOTH carriers are valid; unique after one expires",
+      "observed": "overlap window: both open -> AMBIGUOUS (no ids); one open -> RESOLVED_ALIAS -> CI-B",
+      "probe": "b5_i03_redteam.py adversarial case A2b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5 (half-open valid-time law); directive 9 (alias law)",
+      "adversarial_class": "alias validity-window boundaries",
+      "case_id": "A3",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A3",
+      "input_condition": "[valid_from, valid_to) half-open law + open-ended valid_to, probed exactly at both boundaries",
+      "observed": "start-inclusive RESOLVED_ALIAS | end-exclusive UNKNOWN_SYMBOL | before UNKNOWN_SYMBOL | open-ended-still-valid RESOLVED_ALIAS",
+      "probe": "b5_i03_redteam.py adversarial case A3",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 13 (provider instrument ID is tier 1 anchor, never symbol text)",
+      "adversarial_class": "provider-ID conflict (id vs symbol text)",
+      "case_id": "A4a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A4a",
+      "input_condition": "queried text XBTUSDT but pid PID-2 anchored to ETHUSDT: the ID anchors the instrument (directive 15)",
+      "observed": "pid PID-2 anchors the ETHUSDT instrument: tier 1 resolves the ANCHORED instance (CI-ETH), queried text does not override",
+      "probe": "b5_i03_redteam.py adversarial case A4a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 13 (nonexistent provider ID is not a lifeline)",
+      "adversarial_class": "provider-ID conflict (missing id)",
+      "case_id": "A4b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A4b",
+      "input_condition": "nonexistent provider id is not a lifeline: falls through to symbol tiers",
+      "observed": "nonexistent pid falls through to the symbol tiers -> RESOLVED_EXACT via symbol",
+      "probe": "b5_i03_redteam.py adversarial case A4b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5 (dual clock); directives 5/6/13 (knowledge-time gate over tier 1)",
+      "adversarial_class": "provider-ID conflict (late instance behind id)",
+      "case_id": "A4c",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A4c",
+      "input_condition": "the id alone must not leak an instance the cutoff has not caught up with",
+      "observed": "pid present but instance unknown at cutoff -> PIT_KNOWLEDGE_BLOCKED (no identity leak through the id)",
+      "probe": "b5_i03_redteam.py adversarial case A4c",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 14 (wrong-venue law; provider != venue; no cross-venue resolution)",
+      "adversarial_class": "venue mismatch",
+      "case_id": "A5",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A5",
+      "input_condition": "registry-valid cross-venue fixture: venue gate is exact, never cross-venue",
+      "observed": "alias on OTHER_FUT invisible from EXA_FUT (UNKNOWN_SYMBOL); own-venue symbol still resolves (RESOLVED_EXACT)",
+      "probe": "b5_i03_redteam.py adversarial case A5",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 20 (I02 referential integrity consumed, not weakened)",
+      "adversarial_class": "nonexistent instance references",
+      "case_id": "A6a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A6a",
+      "input_condition": "alias row pointing at an unregistered contract instance must fail snapshot validation",
+      "observed": "alias -> unregistered instance refused: ValidationError",
+      "probe": "b5_i03_redteam.py adversarial case A6a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 20 (I02 referential integrity consumed, not weakened)",
+      "adversarial_class": "nonexistent instance references",
+      "case_id": "A6b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A6b",
+      "input_condition": "lifecycle row pointing at an unregistered contract instance must fail snapshot validation",
+      "observed": "lifecycle -> unregistered instance refused: ValidationError",
+      "probe": "b5_i03_redteam.py adversarial case A6b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 8 (lifecycle vocabulary; contradictory evidence refused)",
+      "adversarial_class": "lifecycle-state incompatibility",
+      "case_id": "A7a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A7a",
+      "input_condition": "two overlapping windows of the SAME state for one instance: contradictory evidence refused",
+      "observed": "overlapping SUSPENDED windows for one instance refused: ValidationError",
+      "probe": "b5_i03_redteam.py adversarial case A7a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 8 (only SUSPENDED/DELISTING_ANNOUNCED knowledge-valid windows warn)",
+      "adversarial_class": "lifecycle-state incompatibility (inert states)",
+      "case_id": "A7b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A7b",
+      "input_condition": "a DELISTED lifecycle row covering a live instance does not block or warn: only SUSPENDED/DELISTING_ANNOUNCED carry resolver semantics (documented choice)",
+      "observed": "DELISTED lifecycle row over a PIT-valid instance is inert evidence; interval law governs -> RESOLVED_EXACT",
+      "probe": "b5_i03_redteam.py adversarial case A7b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5 (dual clock); directives 5/6 (late lifecycle knowledge never leaks)",
+      "adversarial_class": "lifecycle-state incompatibility (late knowledge)",
+      "case_id": "A7c",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A7c",
+      "input_condition": "a suspension the cutoff has not caught up with must not downgrade the resolution",
+      "observed": "SUSPENDED row known only AFTER the cutoff: no warning leak -> RESOLVED_EXACT flags=[]",
+      "probe": "b5_i03_redteam.py adversarial case A7c",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5 (dual clock); directives 5/6 (verdicts require knowledge)",
+      "adversarial_class": "event-vs-knowledge disagreement",
+      "case_id": "A8a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A8a",
+      "input_condition": "temporal verdicts require knowledge: pre-listing event with late-known instance is PIT-blocked, not NOT_YET_LISTED",
+      "observed": "event before valid_from AND instance known after cutoff -> PIT_KNOWLEDGE_BLOCKED (blocked, not NOT_YET_LISTED)",
+      "probe": "b5_i03_redteam.py adversarial case A8a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5 (dual clock); directives 5/6 (verdicts require knowledge)",
+      "adversarial_class": "event-vs-knowledge disagreement",
+      "case_id": "A8b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A8b",
+      "input_condition": "identical event, earlier knowledge: NOT_YET_LISTED verdict becomes reachable only once the row is known",
+      "observed": "same pre-listing event but instance known by cutoff -> NOT_YET_LISTED (knowledge decides the verdict form)",
+      "probe": "b5_i03_redteam.py adversarial case A8b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 6 (future-leakage negatives; fail-closed tier-5 sweep)",
+      "adversarial_class": "information not yet known",
+      "case_id": "A9a",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A9a",
+      "input_condition": "alias row registered after the cutoff: PIT_KNOWLEDGE_BLOCKED via the tier-5 sweep",
+      "observed": "registered-but-late alias -> PIT_KNOWLEDGE_BLOCKED (fail-closed sweep, never silent unknown)",
+      "probe": "b5_i03_redteam.py adversarial case A9a",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 5; directives 5/6/13 (first_seen_at is discovery metadata, not validity)",
+      "adversarial_class": "information not yet known (instrument metadata)",
+      "case_id": "A9b",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A9b",
+      "input_condition": "VenueInstrument.first_seen_at is discovery metadata, not a validity law: the dual-clock gate lives on the ContractInstance (documented, not silently assumed)",
+      "observed": "instrument row first_seen after the event: tier 1 still resolves because the IDENTITY carrier (instance) is knowledge-gated; VenueInstrument has no known_from field in the frozen model (documented observation)",
+      "probe": "b5_i03_redteam.py adversarial case A9b",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 12 (quality flags and evidence provenance carried on resolved answers)",
+      "adversarial_class": "missing evidence / reference",
+      "case_id": "A10",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A10",
+      "input_condition": "resolved answers name their evidence; alias matches prepend alias evidence; unresolved answers carry none",
+      "observed": "exact evidence ('provider-docs:base',) | alias evidence ('provider-docs:alias', 'provider-docs:base') | unresolved evidence ()",
+      "probe": "b5_i03_redteam.py adversarial case A10",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "frozen matching order (directives 2/13): tier precedence is deterministic",
+      "adversarial_class": "conflicting signals between tiers",
+      "case_id": "A11",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A11",
+      "input_condition": "one text registered as both native symbol and alias; alias-only text; pid+symbol: tier order decides every conflict",
+      "observed": "alias-text==native-symbol -> tier2 (RESOLVED_EXACT); alias-only -> tier3 (RESOLVED_ALIAS); pid present -> tier1 (RESOLVED_EXACT)",
+      "probe": "b5_i03_redteam.py adversarial case A11",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 12 (lifecycle downgrade drops matched_alias_id, preserves provenance/flags)",
+      "adversarial_class": "equivalent-input permutation determinism",
+      "case_id": "A12",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A12",
+      "input_condition": "same logical snapshot in shuffled collection order: every resolution field-identical, serialization byte-identical",
+      "observed": "alias+suspension -> RESOLVED_WITH_WARNING (matched_alias_id dropped, provenance kept); 10 query x cutoff pairs identical across permutations; YAML byte-identical: True",
+      "probe": "b5_i03_redteam.py adversarial case A12",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directive 20 (I02 duplicate-refusal laws intact under I03 additions)",
+      "adversarial_class": "duplicate registry records",
+      "case_id": "A13",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A13",
+      "input_condition": "every duplicate identity (alias row, instance id, lifecycle row, instrument key, venue id, asset id) refused at the snapshot boundary",
+      "observed": "duplicate alias identity=refused; duplicate contract_instance_id=refused; duplicate lifecycle row=refused; duplicate venue instrument key=refused; duplicate venue_id=refused; duplicate asset_id=refused",
+      "probe": "b5_i03_redteam.py adversarial case A13",
+      "result": "PASS"
+    },
+    {
+      "acceptance_clause": "directives 14/20 (venue legality + referential integrity fail closed)",
+      "adversarial_class": "referential-integrity failure",
+      "case_id": "A14",
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_redteam.py (from quant-lab) -> .bu_tmp/b5_i03_redteam_results.json; case A14",
+      "input_condition": "dangling references (alias/instance/instrument/lifecycle -> unregistered venue, instance -> unregistered economic contract) all refused",
+      "observed": "alias->unregistered venue=refused; instance->unregistered venue=refused; instance->unregistered economic contract=refused; instrument->unregistered venue=refused; lifecycle->unregistered venue=refused",
+      "probe": "b5_i03_redteam.py adversarial case A14",
+      "result": "PASS"
+    }
+  ],
+  "summary": {
+    "all_results_pass": true,
+    "cases": 25,
+    "passed": 25,
+    "source_summary": {
+      "all_pass": true,
+      "cases": 25,
+      "passed": 25
+    }
+  }
+}
