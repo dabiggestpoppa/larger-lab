@@ -47,6 +47,19 @@ from oce_control.plane import ControlPlane
 CONTRACTS_DIR = CONTRACT_PATH.parent
 CONTRACT_SHA256 = "45bcb4f63fdb44c039e81fa51ac01a877bb05faee048efa8193ed7fc16af14aa"
 
+# Exact property set of the EXISTING job-envelope.schema.json (created by
+# B2-C1, pre-dates B5-I2), pinned so a silently added, removed or renamed
+# schema field fails this suite instead of drifting past the projection
+# checks (B5-I2 audit: subset checks alone cannot see a schema addition).
+JOB_ENVELOPE_SCHEMA_FIELDS = (
+    "job_id", "job_type", "schema_version", "submitting_actor",
+    "authority_context", "resource_scope", "environment", "priority",
+    "idempotency_key", "payload_hash", "created_at", "scheduled_at",
+    "attempt_number", "retry_policy", "timeout", "lease", "correlation_id",
+    "parent_job_id", "child_job_ids", "status", "result", "failure_envelope",
+    "evidence_refs",
+)
+
 
 def _pack_sha256() -> str:
     import hashlib
@@ -82,35 +95,55 @@ class TestContractPack:
 
     def test_every_declared_operation_exists_on_the_governed_module(self):
         """Authority-owner binding: each surface binds to a real, callable
-        operation on the live governed module (positive trace audit, Gate G4)."""
-        import oce_control.api as api_mod
+        operation on the live governed module (positive trace audit, Gate G4).
+
+        Strict (B5-I2 audit repair): every binding's full attribute chain is
+        resolved through an actual module import and must be callable — a
+        missing module, a missing member (placeholder / future route) or a
+        non-callable binding fails this node. The previous form used
+        `assert ... or True`, which was tautological and proved nothing; it
+        is superseded by this form, which implements the frozen contract's
+        section 9.1 requirement literally."""
+        import importlib
 
         for section in ("reads", "invokes"):
             for entry in load_contract()[section]:
                 binding = entry["binds_to"]
-                assert binding["module"] == "oce_control.api" or binding["module"].startswith("oce_control.")
-                if binding["module"] == "oce_control.api":
-                    owner = api_mod
-                    name = binding["callable"]
-                    if "." in name:
-                        cls_name, attr = name.split(".", 1)
-                        assert hasattr(getattr(owner, cls_name), attr.split(".")[0]) or True
-                        # bound later per-instance; here assert the class attr exists
-                        assert callable(getattr(getattr(owner, cls_name), attr.split(".")[0], None)) or True
-                        continue
-                    assert callable(getattr(owner, name))
+                assert binding["module"].startswith("oce_control."), (
+                    f"{entry['surface']} binds outside oce_control: "
+                    f"{binding['module']}")
+                owner = importlib.import_module(binding["module"])
+                target = owner
+                for part in binding["callable"].split("."):
+                    assert hasattr(target, part), (
+                        f"{entry['surface']}: "
+                        f"{binding['module']}.{binding['callable']} does not "
+                        f"exist (missing {part!r})")
+                    target = getattr(target, part)
+                assert callable(target), (
+                    f"{entry['surface']}: "
+                    f"{binding['module']}.{binding['callable']} is not callable")
 
     def test_invoke_routes_match_http_api_registrations(self):
-        """Every invoke surface's HTTP route string matches the route actually
-        registered by http_api.py (no new endpoints declared)."""
+        """Every declared HTTP route string — read and invoke alike — matches
+        a route actually registered by http_api.py (no new endpoints
+        declared; B5-I2 audit extended this from invokes-only to both
+        sections). Embedded (denial/evidence) bindings declare no route and
+        are pinned to that form instead."""
         import inspect
 
         import oce_control.http_api as http_api
         source = inspect.getsource(http_api)
-        for entry in load_contract()["invokes"]:
-            route = entry["binds_to"]["http_route"]
-            method, path = route.split(" ", 1)
-            assert f'@app.{method.lower()}("{path}")' in source, route
+        for section in ("reads", "invokes"):
+            for entry in load_contract()[section]:
+                route = entry["binds_to"]["http_route"]
+                if not (route.startswith("GET ") or route.startswith("POST ")):
+                    assert route.startswith("embedded "), (
+                        f"{entry['surface']}: route is neither a registered "
+                        f"method path nor an embedded binding: {route}")
+                    continue
+                method, path = route.split(" ", 1)
+                assert f'@app.{method.lower()}("{path}")' in source, route
 
     def test_pack_identity_is_pinned_in_this_test_file(self):
         """The committed pack is the tested pack: its content hash equals the
@@ -315,6 +348,16 @@ class TestCanonicalStateAgreement:
         # The projection is exactly the pinned schema field set — nothing added.
         from oce_control.console_contracts import JOB_ENVELOPE_PROJECTED_FIELDS
         assert set(projected) == set(JOB_ENVELOPE_PROJECTED_FIELDS)
+        # Schema two-sided pin (B5-I2 audit): the EXISTING schema's property
+        # set equals the pinned field list, and the projection is a subset of
+        # it. A silently added, removed or renamed schema field fails here
+        # (runtime validation alone cannot see an added optional property).
+        schema = json.loads(
+            (CONTRACTS_DIR / "job-envelope.schema.json").read_text(encoding="utf-8"))
+        assert set(schema["properties"]) == set(JOB_ENVELOPE_SCHEMA_FIELDS), (
+            "job-envelope.schema.json field set drifted from its pin")
+        assert set(JOB_ENVELOPE_PROJECTED_FIELDS) <= set(schema["properties"]), (
+            "projection emits fields the existing schema does not declare")
 
     def test_reads_render_governed_responses_verbatim(self, plane):
         grant = _grant(plane, "read")
@@ -393,6 +436,26 @@ class TestDeterminism:
         allowed = {"__future__", "json", "hashlib", "pathlib", "dataclasses",
                    "typing", "ast", "sys", "oce_control"}
         assert imported_roots <= allowed, imported_roots - allowed
+
+        # 1b) Dynamic import escapes: the AST walk above only sees import
+        # STATEMENTS; a call-form escape must fail the same proof
+        # (B5-I2 audit: demonstrated red with a planted `__import__` call).
+        dynamic_lines = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            if isinstance(node.func, ast.Name):
+                fname = node.func.id
+            elif isinstance(node.func, ast.Attribute):
+                fname = node.func.attr
+            else:
+                fname = ""
+            if fname in {"__import__", "import_module", "reload"}:
+                dynamic_lines.append(getattr(node, "lineno", -1))
+        assert not dynamic_lines, (
+            f"dynamic import escape in module source at line(s) {dynamic_lines}")
+        source_text = Path(cc.__file__).read_text(encoding="utf-8")
+        assert "__import__" not in source_text, "dynamic import token in source"
 
         # 2) Runtime namespace: modules the module object itself references.
         for value in vars(cc).values():
