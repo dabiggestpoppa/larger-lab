@@ -188,7 +188,104 @@ operator's call (HARD STOP after push).
 
 ---
 
-## 10. Governance and divergence (recorded, not self-ratified)
+## 10. Evidence correction record (B5-I03I, operator-directed, 2026-10-08)
+
+Operator directive: correct demonstrable inconsistencies in the committed
+I03 evidence and establish reproducibility of evidence generation from
+tracked source. No identity semantics changed; production code untouched
+(`resolver.py`, `aliases.py`, `lifecycle.py` byte-identical to the I03H
+seal).
+
+### 1. Original KB3 discrepancy
+
+The sealed knowledge-boundary matrix narrated `cutoff =
+2023-11-30T23:59:59.999999Z` for KB3 while claiming the cutoff equals
+`known_to - 1 microsecond` with `known_to = 2023-12-01T12:00:00Z` — the
+narrated instant sits 12 hours + 1µs BEFORE `known_to`, not one microsecond.
+Independent reproduction (fixture rebuilt from the production models, not
+importing the generator) proved the error was confined to hand-typed
+`input_condition` narration: the generator executed
+`K1 - timedelta(microseconds=1)` = `2023-12-01T11:59:59.999999Z`, a true
+one-microsecond boundary. The narration strings had been copied from the
+standing-test fixture, whose K0/K1 are midnight-based, while the generator
+fixture is noon-based. The same narration error affected KB1
+(`known_from - 1µs`) and KB5 (gap cutoff). No probe ever executed a wrong
+timestamp; every observed status was measured at the claimed boundary; no
+test result was relabeled.
+
+### 2. Corrected executable input + measured result
+
+KB1/KB3/KB5 `input_condition` strings now state the executed instants
+(`2023-06-01T11:59:59.999999Z == known_from - 1us`,
+`2023-12-01T11:59:59.999999Z == known_to - 1us < known_to=2023-12-01T12:00Z`,
+and the KB5 gap cutoff re-anchored against the noon window) with the window
+`[2023-06-01T12:00Z, 2023-12-01T12:00Z)` spelled out. Regenerated KB matrix:
+**14/14 PASS**, `expected_status == observed_status` on every row.
+
+### 3. Generator source custody
+
+No frozen tracked generator existed; the producers lived only in `.bu_tmp/`.
+The four deterministic producers were promoted verbatim to
+`research/crypto_foundry/sensor_fabric/scripts/`: `b5_i03_mats.py`,
+`b5_i03_scope.py`, `b5_i03_redteam.py`, `b5_i03_adv_wrap.py`. Only edits:
+GEN_REF invocation strings now name the tracked path, the three narration
+corrections above, and repo-convention `# noqa: E402` on the two post-`sys.path`
+imports in redteam (matching existing tracked scripts). Invocation (from
+`quant-lab/`): `PYTHONIOENCODING=utf-8 python
+research/crypto_foundry/sensor_fabric/scripts/<name>.py`. Runtime dependency
+on `.bu_tmp/` is zero (redteam results and the adversarial wrap read/write
+next to the scripts); the remaining `.bu_tmp` strings inside the ADVERSARIAL
+matrix are sealed-run provenance literals describing the original 2026-10-07
+invocation, deliberately preserved. No scratch, cache, or I06 files were
+promoted.
+
+### 4. Artifact reproducibility (sha256; double-run byte-identical)
+
+| Artifact | sha256 |
+|---|---|
+| BLOC_05_I03H_KNOWLEDGE_BOUNDARY_MATRIX.json | `ae24942540a6b26a6096eefee3186a393482913d8f1d50f1ca2d6011387ffeac` |
+| BLOC_05_I03_ALIAS_MATRIX.json | `efd7ac47f2c8852badc356e4fc60cdc7af8eb746f2ac92a19f313dad5a48c2bb` |
+| BLOC_05_I03_FUTURE_LEAKAGE_MATRIX.json | `09b487e8622326a618be03373d20cb8dbf442520f931482d979e2df1850167bf` |
+| BLOC_05_I03_LIFECYCLE_MATRIX.json | `4efae87d0772fed1f5a000eba1bd548a4459ddb028f4a4ebe63da0f4e6125ace` |
+| BLOC_05_I03_MATCH_ORDER_MATRIX.json | `737e1d7846a8375f5809e593d32b7456483c4b7cfba6c08ccb295d7950a08a3f` |
+| BLOC_05_I03_SCOPE_AUDIT.json | `92eb13a44166e5c9518068225d43e7346589b2fa23ab31f3b5283d00d5ec26a8` |
+
+Re-running all four producers from tracked source reproduced all six
+artifacts byte-identically (6/6). Run dates are pinned literals in the
+scripts, not `date.today()`, so outputs are stable across days.
+
+### 5. Test verification (this tree, vs I03H baseline)
+
+- I03 focused: **84 passed** (baseline 84).
+- Normalization: **497 passed** (baseline 497).
+- I11R2: **14 passed**, byte-stability digest unchanged (baseline 14).
+- Full project: **3895 passed / 14 skipped / 0 failed** in 1035.68s
+  (baseline 3895/14).
+- Static: ruff all-pass (changed scope), mypy 10 inherited / 0 identity,
+  compileall OK, secret scan clean (new scripts included).
+
+### 6. Cross-artifact audit + remaining limitations
+
+Every lifecycle, match-order, future-leakage, alias, venue-isolation,
+stablecoin, future-leakage-L1..L4, and scope-audit narration was audited
+against its executed fixture values — all consistent; only the three KB
+narrations were wrong (corrected above). `created` stamps on the
+alias/future-leakage/lifecycle matrices moved 2026-10-07 → 2026-10-08
+(regeneration day; row content unchanged apart from GEN_REF paths).
+
+Limitations (disclosed, not masked): alias `known_to` remains structurally
+absent (frozen eleven-field schema); cross-revision overlapping-knowledge
+cutover not separately probed; ADVERSARIAL matrix not regenerated with new
+rows (no `known_to` fixtures; byte-identical reproduction confirmed);
+regenerating the sealed B4-I15 secret-safety matrix in this tree measures
+`files_scanned` 132/309/257 vs sealed 122/279/207 (the workspace grew after
+the B4-I15 seal — pre-existing, out of I03I scope; `result: OK` unchanged;
+sealed bloc_04 restored, not rewritten); inherited Windows
+manifest-concurrency teardown race not triggered this run.
+
+---
+
+## 11. Governance and divergence (recorded, not self-ratified)
 
 `MAIN_DIVERGENCE_STATUS = EXTERNAL / UNRECONCILED / NON-BLOCKING_FOR_I03`  -  origin/main moved independently to `f89883471dbc93d481b43d73757c716afc817441` during the Bloc 5 workstream; per the FINALIZE directive no merge/rebase/cherry-pick/reset was performed and no reconciliation is implied. The build branch `agent/crypto-sensor-fabric-build` remains the checkpoint authority.
 

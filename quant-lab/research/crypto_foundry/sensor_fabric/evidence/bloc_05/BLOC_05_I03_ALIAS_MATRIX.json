@@ -4,15 +4,15 @@
     "bloc_05/01 section 8; I03 directives 5/17/47"
   ],
   "checkpoint": "SENSOR-B5-I03",
-  "created": "2026-10-07",
+  "created": "2026-10-08",
   "evidence_class": "measured_executable",
-  "generated_by": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py)",
+  "generated_by": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py)",
   "law": "registered alias matches ONLY while its dual-clock gate is open (valid-time AND knowledge-time) in the exact (provider, venue, text) context; wrong venue/provider/text never matches; all six AliasType values enumerated without extension",
   "rows": [
     {
       "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
       "alias_type": "API_SYMBOL",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
       "inside_window_and_cutoff": {
         "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
         "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
@@ -43,7 +43,7 @@
     {
       "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
       "alias_type": "ARCHIVE_SYMBOL",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
       "inside_window_and_cutoff": {
         "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
         "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
@@ -74,7 +74,7 @@
     {
       "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
       "alias_type": "WEBSOCKET_SYMBOL",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
       "inside_window_and_cutoff": {
         "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
         "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
@@ -105,7 +105,7 @@
     {
       "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
       "alias_type": "DISPLAY_SYMBOL",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
       "inside_window_and_cutoff": {
         "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
         "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
@@ -136,7 +136,7 @@
     {
       "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
       "alias_type": "LEGACY_SYMBOL",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
       "inside_window_and_cutoff": {
         "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
         "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",
@@ -167,7 +167,7 @@
     {
       "acceptance_clause": "bloc_05/01 section 8; directives 5/17/47",
       "alias_type": "PROVIDER_INTERNAL_ID",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve",
       "inside_window_and_cutoff": {
         "expected": "RESOLVED_ALIAS with matched_alias_id set and opaque confidence passthrough",
         "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, alias window [2023-01-01T12:00Z, 2024-01-01T12:00Z)",

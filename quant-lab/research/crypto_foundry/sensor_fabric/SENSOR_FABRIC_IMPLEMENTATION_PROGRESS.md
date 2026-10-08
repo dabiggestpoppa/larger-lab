@@ -5744,3 +5744,100 @@ recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I03H**. B5-I04+ =
 UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN.
 MAIN_DIVERGENCE_STATUS unchanged: EXTERNAL / UNRECONCILED /
 NON-BLOCKING_FOR_I03. HARD STOP after push and report.
+
+---
+
+## 162 - SENSOR-B5-I03I: EVIDENCE REPRODUCIBILITY + KB3 NARRATION CORRECTION (PENDING_OPERATOR_REVIEW)
+
+Date: 2026-10-08. Start head `67b7f4de1` (I03H; remote build head).
+Operator-directed bounded evidence amendment only: correct demonstrable
+inconsistencies in committed evidence and make evidence generation
+reproducible from tracked source. No identity semantics authorized or
+changed; production code byte-identical to the I03H seal.
+
+### 1. Original KB3 discrepancy (reproduced independently)
+
+The sealed knowledge-boundary matrix narrated KB3 `cutoff =
+2023-11-30T23:59:59.999999Z` while claiming `known_to - 1 microsecond` with
+`known_to = 2023-12-01T12:00:00Z` — 12 hours + 1µs early, not 1µs. A fresh
+fixture rebuilt from the production models (not importing the generator)
+proved the error was **confined to hand-typed `input_condition` narration**:
+the generator executed `K1 - timedelta(microseconds=1)` =
+`2023-12-01T11:59:59.999999Z`, a true µs boundary. Cause: narration strings
+copied from the standing-test fixture (midnight-based K0/K1) while the
+generator fixture is noon-based. Same narration error in KB1 and KB5. No
+probe executed a wrong timestamp; no observed status was relabeled.
+
+### 2. Corrected executable input + measured result
+
+KB1/KB3/KB5 `input_condition` strings now state the executed instants
+(`2023-06-01T11:59:59.999999Z`, `2023-12-01T11:59:59.999999Z`,
+`2023-12-02T12:00:00Z`) against the noon window
+`[2023-06-01T12:00Z, 2023-12-01T12:00Z)`. Regenerated KB matrix: **14/14
+PASS**, expected == observed on every row. Cross-artifact audit of every
+lifecycle / match-order / future-leakage / alias / venue / stablecoin /
+scope-audit narration against executed fixture values: all consistent;
+only the three KB narrations were wrong.
+
+### 3. Generator source custody
+
+No frozen tracked generator existed. The four deterministic producers were
+promoted verbatim to tracked `research/crypto_foundry/sensor_fabric/scripts/`
+(`b5_i03_mats.py`, `b5_i03_scope.py`, `b5_i03_redteam.py`,
+`b5_i03_adv_wrap.py`); edits limited to GEN_REF invocation strings, the three
+narration fixes, and repo-convention `# noqa: E402` on two post-bootstrap
+imports. Invocation: `PYTHONIOENCODING=utf-8 python
+research/crypto_foundry/sensor_fabric/scripts/<name>.py` (from quant-lab).
+No `.bu_tmp` runtime dependency (redteam results + adversarial wrap live
+beside the scripts); `.bu_tmp` strings inside the ADVERSARIAL matrix are
+sealed-run provenance literals, deliberately preserved. No scratch, cache,
+or I06 files promoted; `.bu_tmp/` and the I06 spike remain untracked.
+
+### 4. Artifact reproducibility hashes (sha256, double-run byte-identical 6/6)
+
+- KB: `ae24942540a6b26a6096eefee3186a393482913d8f1d50f1ca2d6011387ffeac`
+- ALIAS: `efd7ac47f2c8852badc356e4fc60cdc7af8eb746f2ac92a19f313dad5a48c2bb`
+- FUTURE_LEAKAGE: `09b487e8622326a618be03373d20cb8dbf442520f931482d979e2df1850167bf`
+- LIFECYCLE: `4efae87d0772fed1f5a000eba1bd548a4459ddb028f4a4ebe63da0f4e6125ace`
+- MATCH_ORDER: `737e1d7846a8375f5809e593d32b7456483c4b7cfba6c08ccb295d7950a08a3f`
+- SCOPE_AUDIT: `92eb13a44166e5c9518068225d43e7346589b2fa23ab31f3b5283d00d5ec26a8`
+
+Run dates are pinned literals (no `date.today()`), so regeneration is stable
+across days. `created` on alias/future-leakage/lifecycle moved
+2026-10-07 → 2026-10-08 (regeneration day; row content unchanged apart from
+GEN_REF paths).
+
+### 5. Test verification (this tree, vs I03H baseline)
+
+I03 focused **84 passed** (baseline 84). Normalization **497 passed**
+(baseline 497). I11R2 **14 passed**, byte-stability digest unchanged
+(baseline 14). Full project **3895 passed / 14 skipped / 0 failed** in
+1035.68s (baseline 3895/14). Ruff changed-scope all-pass; mypy 10 inherited
+/ 0 identity; compileall OK; secret scan clean. Suite side effects: the
+full run rewrites sealed bloc_04 JSONs (line-ending churn + I15
+`files_scanned` counts 122/279/207 → 132/309/257, workspace grew since the
+B4-I15 seal; `result: OK` unchanged; pre-existing, zero files added there by
+I03I) — restored to sealed state after every run; I11R2 re-verified green on
+the restored tree.
+
+### 6. Evidence narrative
+
+`BLOC_05_I03_IMPLEMENTATION_EVIDENCE.md` gains section 10 (I03I correction
+record: discrepancy, corrected input, measured result, custody, hashes,
+verification, limitations); governance renumbered 11, content unchanged.
+Earlier ledger entries and sealed commits preserved; §161 untouched.
+
+### 7. Custody + governance (unchanged disposition, no self-ratification)
+
+New commit on `agent/crypto-sensor-fabric-build` only (fast-forward push;
+report SHA in final report). Bloc 4 / I17 / B5-I01 / B5-I02 evidence
+untouched; tracked worktree clean after commit; `.bu_tmp/` remains
+untracked. PASS_SENSOR_B5_I03_LIFECYCLE_ALIAS_PIT_RESOLVER_SEALED =
+**PENDING_OPERATOR_REVIEW**. BLOC_05_IMPLEMENTATION_STATUS =
+**I03_COMPLETE_PENDING_OPERATOR_REVIEW**. I03_IDENTITY_RESOLVER_SUBGATE =
+**IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW**. IDENTITY_GATE and all other
+gates = **NOT_YET_EARNED**. next_checkpoint_authorized = **FALSE**.
+recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I03I**. B5-I04+ =
+UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN.
+MAIN_DIVERGENCE_STATUS unchanged: EXTERNAL / UNRECONCILED /
+NON-BLOCKING_FOR_I03. HARD STOP after push and report.
