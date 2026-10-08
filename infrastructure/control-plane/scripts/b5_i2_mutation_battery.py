@@ -290,7 +290,7 @@ def _sha256_file(path: Path) -> str:
 
 def _git(root: Path, *args: str) -> str:
     r = subprocess.run(["git", "-C", str(root), *args],
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, errors="replace")
     if r.returncode != 0:
         raise HarnessError(f"git {' '.join(args)} failed: {r.stderr.strip()}")
     return r.stdout.strip()
@@ -380,7 +380,7 @@ def _pytest_env() -> dict[str, str]:
 def _run_cmd(cmd: list[str], cwd: Path, timeout: int) -> tuple[int, str]:
     try:
         r = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True,
-                           timeout=timeout, env=_pytest_env())
+                           errors="replace", timeout=timeout, env=_pytest_env())
     except subprocess.TimeoutExpired:
         raise HarnessError(f"command timed out after {timeout}s: {' '.join(cmd[:4])}...") from None
     return r.returncode, (r.stdout or "") + (r.stderr or "")
@@ -449,6 +449,11 @@ def prove_control(tree: Path, test_relpath: str, expected_nodes: int,
     if len(nodes) != len(unique):
         dupes = sorted({n for n in nodes if nodes.count(n) > 1})
         problems.append(f"duplicate node ids: {dupes}")
+    if problems:
+        # Fail fast on inventory problems BEFORE executing anything: a wrong
+        # or duplicated inventory is already a terminal, fail-closed state.
+        raise HarnessError(
+            f"control proof ({phase}) inventory failed: " + "; ".join(problems))
 
     run = run_tests(tree, test_relpath, tree / f".junit-{phase}.xml", timeout)
     t = run["totals"]
