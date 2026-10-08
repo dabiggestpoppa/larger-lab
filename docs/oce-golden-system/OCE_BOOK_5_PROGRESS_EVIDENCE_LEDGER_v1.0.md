@@ -257,3 +257,17 @@ The exact-head run / check-run / artifact identifiers for this section’s evide
 - B5-I2 production behavior, contract pack, schemas, frozen tests and the merged implementation remain **unchanged** by this stage — no production file is touched (`test_console_contracts.py` blob stays `85e1b17b…`; `console_contracts.py`, `console-contract.json` and the three schemas are byte-identical to the merged B5-I2).
 - The Book 5 acceptance/ratification artifacts required no wording correction: they record mutation *results* (M1/M4/M6 citations) and never named the scratch paths.
 - B5-I3–I9 remain **LOCKED**; a fresh `AUTHORIZED_STAGE=B5-I3` is required to begin them.
+
+#### Exact-head CI proof (appended append-only after the runs completed)
+
+| Run | Head | Conclusion |
+|---|---|---|
+| `37824894774` | `3af34c956…` (R1) | `success` (workflow step not yet present) |
+| `37826140353` | `7210df105…` (R2) | `failure` — stale-bytecode incident, recorded in §10.2 chronology |
+| `37826223948` | `c82fc18cd…` (R2b) | `failure` — stale-bytecode incident, recorded in §10.2 chronology |
+| `37827592594` | `1814aa74f…` (R2c) | `success` (purge fix proven: integrity + battery step green) |
+| `37827782039` | `018b2f98d…` (EVIDENCE) | `success` — authoritative proving run, identities below |
+
+EVIDENCE-head exact binding: run `37827782039` conclusion `success`, `head_sha = 018b2f98de4d0cfce1097073eb8207e21b08d511`, check-suite `102489108183`, check-run `113484971259` (`validate`, `success`, same `head_sha`), artifact `11573010013` (`b1-i1r-evidence-5496a7937bdd`, not expired, 22453 bytes).
+
+Artifact parse (downloaded and parsed, not badge-inferred): emitted `b5-i2-reproducibility-result.json` **byte-identical** to the committed canonical artifact (12546 bytes); baseline 24 nodes → **24/0/0/0**; **11/11 `DISCRIMINATED`** (raw observations all `matched_by: node`, zero via fallback class); integrity junit **16/0/0/0**; B5-I2 junit **24/0/0/0**; registry proof `PASS` (collected = executed = 24, zero duplicates); `b5-i2-repro-worktree-check.txt` empty (tracked source byte-identical after execution); gate `READY_FOR_OPERATOR_REVIEW`. The final head’s own run identity is recorded in PR #11 (an artifact cannot contain its own CI run identity).
