@@ -377,6 +377,21 @@ def _pytest_env() -> dict[str, str]:
     return env
 
 
+def _purge_bytecode(tree: Path) -> None:
+    """Delete bytecode caches under the ISOLATED tree before every pytest
+    invocation.
+
+    Timestamp-based .pyc validation uses second-granularity mtime plus file
+    size: a mutation that changes neither (e.g. ``assert 1 + 1 == 2`` ->
+    ``== 3``, or ``api.submit_job`` -> ``api.cancel_job``) applied within
+    the same second as the previous run would otherwise execute the STALE
+    rewritten bytecode and wrongly stay green. Purging makes every run
+    compile the current source — deterministically fail-closed.
+    """
+    for pycache in tree.rglob("__pycache__"):
+        shutil.rmtree(pycache, ignore_errors=True)
+
+
 def _run_cmd(cmd: list[str], cwd: Path, timeout: int) -> tuple[int, str]:
     try:
         r = subprocess.run(cmd, cwd=str(cwd), capture_output=True, text=True,
@@ -387,6 +402,7 @@ def _run_cmd(cmd: list[str], cwd: Path, timeout: int) -> tuple[int, str]:
 
 
 def collect_nodes(tree: Path, test_relpath: str, timeout: int) -> tuple[list[str], Optional[int]]:
+    _purge_bytecode(tree)
     rc, out = _run_cmd(
         [*_PYTEST, test_relpath, "--collect-only", "-q", "-o", "addopts="],
         tree, timeout)
@@ -403,6 +419,7 @@ def collect_nodes(tree: Path, test_relpath: str, timeout: int) -> tuple[list[str
 
 
 def run_tests(tree: Path, test_relpath: str, junit_path: Path, timeout: int) -> dict[str, Any]:
+    _purge_bytecode(tree)
     rc, out = _run_cmd(
         [*_PYTEST, test_relpath, "-q", "--tb=line", "-rfE",
          "-o", "addopts=", f"--junitxml={junit_path}"],
