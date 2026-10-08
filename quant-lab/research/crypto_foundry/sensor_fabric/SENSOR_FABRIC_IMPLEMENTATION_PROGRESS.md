@@ -5587,3 +5587,73 @@ OF SENSOR-B5-I03**. B5-I04+ = UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research
 = FROZEN. Evidence/governance commit SENSOR-B5-I03D then push of the build
 branch only (never main); I04 authorization occurs only after operator
 review of the pushed I03 final tree. HARD STOP.
+## 160 - SENSOR-B5-I03 AMENDMENT: LIFECYCLE-ROW STATE LAWS + WARNING-WINDOW BOUNDARIES PINNED (PENDING_OPERATOR_REVIEW)
+
+Date: 2026-10-07 (same day as the B5-I03D sealing in section 159; governing
+head changes from `02eac405` by this amendment commit only). Scope: an
+operator-directed evidence gap sweep reported laws pinned by implementation
+omission rather than measurement; the operator authorized closing the
+lifecycle-ROW state law group within B5-I03 scope. No production source
+change was required - the resolver already implements these laws (S6/I03D33
+warning enumeration) - the amendment converts omission into measured
+evidence. A12 history and all earlier I03 commits remain untouched.
+
+### 1. Laws newly pinned (4 tests + 8 lifecycle-matrix rows)
+
+* RELISTED_NEW_INSTANCE lifecycle ROW over a PIT-valid instance is inert
+  evidence (neither gates, warns, nor activates); the relisting cutover is
+  carried by the NEW instance's own valid_from, never by the state row.
+  Pinned by `test_relisted_new_instance_lifecycle_row_is_inert` + 1 matrix
+  row.
+* PRE_LISTING lifecycle ROW over a PIT-valid instance is inert evidence,
+  exactly the A7b law (DELISTED row over a live instance). Pinned by
+  `test_pre_listing_lifecycle_row_is_inert` + 1 matrix row.
+* Warning windows (SUSPENDED and DELISTING_ANNOUNCED) are half-open
+  [valid_from, valid_to): start-inclusive, end-exclusive; downgrade fires
+  exactly at the start instant, one microsecond before it the resolution is
+  plain RESOLVED_EXACT, still-warning one microsecond before the end
+  instant, plain at the end instant. Pinned for BOTH warning states x 4
+  boundary instants by `test_suspended_warning_window_boundaries_are_half_open`
+  and `test_delisting_announced_warning_window_boundaries_are_half_open` + 6
+  matrix rows.
+
+### 2. Verification (measured at the amendment tree)
+
+B5-I03 tests **73 passed** (69 + 4 new pins). Normalization package **486
+passed**. I11R2 audit no-update rerun **4 passed, byte-stable** (SHA
+`bebda72beeaba50aa73b3c0032311282140f831ce0adcf2a813ce70a55cbfa8c`
+unchanged). Full project **3884 passed / 14 skipped / 0 failed with 1
+warning** - the known intermittent Windows manifest-concurrency reader-thread
+teardown race (same inherited TEST-ENVIRONMENT DEBT; unrepaired by design).
+Static: ruff changed scope all-pass; mypy 0 identity findings (10 pre-existing
+providers/probes baseline); compileall OK; secret scan clean. Lifecycle
+matrix regenerated from the live resolver: **17 rows / 17 PASS, all 7 states
+enumerated** (was 9 rows); ASCII-clean; no row content hand-authored.
+Mojibake scan: allowed non-ASCII only. Evidence narrative amended (new
+section 8: Evidence amendment). Adversarial red-team, other matrices, SCOPE
+AUDIT unchanged from section 159 (regenerated outputs byte-equivalent in
+content class; no generator change affecting them).
+
+### 3. Custody
+
+Bloc 4 / I17 / B5-I01 / B5-I02 evidence untouched; suite-dirtied
+informational bloc_04 JSONs restored; I11R2 audit NOT republished
+(byte-stable no-update). I06 spike and `.bu_tmp/` remain untracked.
+Tracked worktree clean after the amendment commit.
+
+### 4. Governance (unchanged disposition, no self-ratification)
+
+PASS_SENSOR_B5_I03_LIFECYCLE_ALIAS_PIT_RESOLVER_SEALED =
+**PENDING_OPERATOR_REVIEW**. BLOC_05_IMPLEMENTATION_STATUS =
+**I03_COMPLETE_PENDING_OPERATOR_REVIEW**. BLOC_05_NORMALIZATION_IMPLEMENTED
+= **PARTIAL_PIT_IDENTITY_FOUNDATION**. I03_IDENTITY_RESOLVER_SUBGATE =
+**IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW**. IDENTITY_GATE and all other
+gates = **NOT_YET_EARNED**. next_checkpoint_authorized = **FALSE**.
+recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I03**. B5-I04+ =
+UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN.
+MAIN_DIVERGENCE_STATUS unchanged:
+EXTERNAL / UNRECONCILED / NON-BLOCKING_FOR_I03. Remaining known evidence
+gaps recorded for operator decision (NOT closed here): dual-clock `known_to`
+(superseded knowledge) coverage; provider-ID + wrong-venue tier-1 probe;
+stablecoin/negative-alias/flag matrix backfill; TERMS_UNVERIFIED
+reachability statement. HARD STOP.

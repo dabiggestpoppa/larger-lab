@@ -849,3 +849,144 @@ def test_alias_match_outside_warning_windows_keeps_matched_alias_id() -> None:
     out = resolve_instrument(snap, "KPA1", T0 + timedelta(days=3), T2)
     assert out.status is st.RESOLVED_ALIAS
     assert out.matched_alias_id == "AL:CI-A:KPA1"
+
+
+# ----------------------------------------------------------------------------
+# I03D evidence amendment (operator gap sweep): lifecycle-ROW state laws and
+# warning-window boundary instants.  The warning law enumerates only
+# SUSPENDED / DELISTING_ANNOUNCED (S6, I03D33); every other lifecycle row is
+# inert evidence.  These probes pin that by measurement, not by omission.
+# ----------------------------------------------------------------------------
+
+
+def test_relisted_new_instance_lifecycle_row_is_inert() -> None:
+    """A RELISTED_NEW_INSTANCE lifecycle row over a PIT-valid instance is
+    inert evidence: it neither gates, nor warns, nor activates.  The instance
+    interval law alone governs (S6 cutover law; the relisting cutover is
+    carried by the NEW instance's own valid_from, never by the state row)."""
+    lc = lifecycle_event(
+        lifecycle_state().RELISTED_NEW_INSTANCE,
+        state_from=T0,
+        state_to=None,
+        known_from=T0,
+    )
+    snap = snapshot_with_aliases((), instance2(), lifecycle=(lc,))
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, T0 + timedelta(days=3), T2)
+    assert out.status is st.RESOLVED_EXACT
+    assert out.contract_instance_id == "CI-A"
+    flag_values = {flag.value for flag in out.quality_flags}
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in flag_values
+
+
+def test_pre_listing_lifecycle_row_is_inert() -> None:
+    """A PRE_LISTING lifecycle row over a PIT-valid instance is inert
+    evidence, exactly like the DELISTED row (A7b law): the instance interval
+    law alone governs; PRE_LISTING evidence about one instance never
+    de-activates the instance's own PIT-valid interval."""
+    lc = lifecycle_event(
+        lifecycle_state().PRE_LISTING,
+        state_from=T0 - timedelta(days=30),
+        state_to=T0,
+        known_from=T0,
+    )
+    snap = snapshot_with_aliases((), instance2(), lifecycle=(lc,))
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, T0 + timedelta(days=3), T2)
+    assert out.status is st.RESOLVED_EXACT
+    assert out.contract_instance_id == "CI-A"
+    flag_values = {flag.value for flag in out.quality_flags}
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in flag_values
+
+
+def test_suspended_warning_window_boundaries_are_half_open() -> None:
+    """The lifecycle warning window is half-open [valid_from, valid_to):
+    start-inclusive, end-exclusive.  Probed at all four boundary instants
+    (directive 43 temporal axes): at the start instant the downgrade fires;
+    one microsecond before it, or at/after the end instant, the resolution
+    stays RESOLVED_EXACT with no IDENTITY_LIFECYCLE_BOUNDARY flag."""
+    lc = lifecycle_event(
+        lifecycle_state().SUSPENDED,
+        state_from=T0 + timedelta(days=1),
+        state_to=T0 + timedelta(days=5),
+        known_from=T0,
+    )
+    snap = snapshot_with_aliases((), instance2(), lifecycle=(lc,))
+    st = resolution_status()
+    start = T0 + timedelta(days=1)
+    end = T0 + timedelta(days=5)
+
+    at_start = resolve_instrument(snap, NATIVE, start, T2)
+    assert at_start.status is st.RESOLVED_WITH_WARNING          # start-inclusive
+    assert at_start.contract_instance_id == "CI-A"
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" in {
+        flag.value for flag in at_start.quality_flags
+    }
+
+    before_start = resolve_instrument(
+        snap, NATIVE, start - timedelta(microseconds=1), T2
+    )
+    assert before_start.status is st.RESOLVED_EXACT             # not yet warning
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in {
+        flag.value for flag in before_start.quality_flags
+    }
+
+    at_end = resolve_instrument(snap, NATIVE, end, T2)
+    assert at_end.status is st.RESOLVED_EXACT                   # end-exclusive
+    assert at_end.contract_instance_id == "CI-A"
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in {
+        flag.value for flag in at_end.quality_flags
+    }
+
+    before_end = resolve_instrument(
+        snap, NATIVE, end - timedelta(microseconds=1), T2
+    )
+    assert before_end.status is st.RESOLVED_WITH_WARNING
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" in {
+        flag.value for flag in before_end.quality_flags
+    }
+
+
+def test_delisting_announced_warning_window_boundaries_are_half_open() -> None:
+    """Same half-open law for the DELISTING_ANNOUNCED warning window
+    [valid_from, valid_to): start-inclusive, end-exclusive, probed at the
+    start instant, one microsecond before it, at the end instant, and one
+    microsecond before it."""
+    lc = lifecycle_event(
+        lifecycle_state().DELISTING_ANNOUNCED,
+        state_from=T0 + timedelta(days=1),
+        state_to=T0 + timedelta(days=9),
+        known_from=T0,
+    )
+    snap = snapshot_with_aliases((), instance2(), lifecycle=(lc,))
+    st = resolution_status()
+    start = T0 + timedelta(days=1)
+    end = T0 + timedelta(days=9)
+
+    at_start = resolve_instrument(snap, NATIVE, start, T2)
+    assert at_start.status is st.RESOLVED_WITH_WARNING          # start-inclusive
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" in {
+        flag.value for flag in at_start.quality_flags
+    }
+
+    before_start = resolve_instrument(
+        snap, NATIVE, start - timedelta(microseconds=1), T2
+    )
+    assert before_start.status is st.RESOLVED_EXACT
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in {
+        flag.value for flag in before_start.quality_flags
+    }
+
+    at_end = resolve_instrument(snap, NATIVE, end, T2)
+    assert at_end.status is st.RESOLVED_EXACT                   # end-exclusive
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in {
+        flag.value for flag in at_end.quality_flags
+    }
+
+    before_end = resolve_instrument(
+        snap, NATIVE, end - timedelta(microseconds=1), T2
+    )
+    assert before_end.status is st.RESOLVED_WITH_WARNING
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" in {
+        flag.value for flag in before_end.quality_flags
+    }

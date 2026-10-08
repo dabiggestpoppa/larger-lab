@@ -57,7 +57,17 @@ Static: ruff changed scope all-pass (7 findings present mid-I03D were all fixed 
 
 Mechanical tracked-Python count regenerated: **1025 -> 1033** (`BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json`, exactly one line changed; no-update rerun byte-stable). Historical custody intact: Bloc 4, I17, B5-I01, B5-I02 evidence untouched; suite-generated informational dirt in eleven other bloc_04 JSONs restored before commit; the I06 spike file and `.bu_tmp/` remain untracked.
 
-## 8. Governance and divergence (recorded, not self-ratified)
+## 8. Evidence amendment (operator gap sweep, 2026-10-07, same day as sealing)
+
+An operator-directed evidence sweep identified laws pinned by implementation omission rather than measurement. Three were closed in the B5-I03D scope (lifecycle-ROW state laws and warning-window boundary instants; the remaining sweep items are recorded for future operator decision and were NOT acted on):
+
+* **RELISTED_NEW_INSTANCE lifecycle row is inert evidence** - a state row over a PIT-valid instance neither gates, warns, nor activates; the relisting cutover is carried by the NEW instance's own valid_from (S6 cutover law), never by the state row. Pinned by `test_relisted_new_instance_lifecycle_row_is_inert` and one new lifecycle-matrix row.
+* **PRE_LISTING lifecycle row is inert evidence** - exactly the A7b law (DELISTED row over a live instance): a PRE_LISTING row about one instance never de-activates the instance's own PIT-valid interval. Pinned by `test_pre_listing_lifecycle_row_is_inert` and one new lifecycle-matrix row.
+* **Warning windows are half-open [valid_from, valid_to)** - start-inclusive, end-exclusive; the downgrade fires exactly at the start instant, one microsecond before it the resolution is plain, and equally at/one microsecond before the end instant. Pinned for BOTH warning states (SUSPENDED, DELISTING_ANNOUNCED) x 4 boundary instants each by 2 boundary tests and 6 new lifecycle-matrix rows.
+
+No production source change: the resolver already implemented these laws (S6/I03D33 warning enumeration); this amendment converts omission into measured evidence. Re-measured at the final tree: I03 tests **73 passed** (69 + 4 new pins); normalization package **486 passed**; I11R2 audit no-update byte-stable (4 passed, SHA `bebda72...` unchanged); full project **3884 passed / 14 skipped / 0 failed with 1 warning** (the known intermittent Windows manifest-concurrency reader-thread teardown race). Static: ruff all-pass, mypy 0 identity findings (10 pre-existing baseline), compileall OK, secret scan clean. Lifecycle matrix regenerated: **17 rows / 17 PASS, all 7 states enumerated** (was 9). Remaining known evidence gaps (recorded, not closed here): dual-clock `known_to` (superseded knowledge) coverage; provider-ID + wrong-venue tier-1 probe; stablecoin/negative-alias/flag matrix backfill; TERMS_UNVERIFIED reachability statement.
+
+## 9. Governance and divergence (recorded, not self-ratified)
 
 `MAIN_DIVERGENCE_STATUS = EXTERNAL / UNRECONCILED / NON-BLOCKING_FOR_I03`  -  origin/main moved independently to `f89883471dbc93d481b43d73757c716afc817441` during the Bloc 5 workstream; per the FINALIZE directive no merge/rebase/cherry-pick/reset was performed and no reconciliation is implied. The build branch `agent/crypto-sensor-fabric-build` remains the checkpoint authority.
 

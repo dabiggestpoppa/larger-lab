@@ -150,12 +150,138 @@
       "result_block_or_resolved": "VERDICT/BLOCKED (PIT_KNOWLEDGE_BLOCKED)",
       "state_enumerated": "UNKNOWN",
       "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_relisted_new_instance_lifecycle_row_is_inert",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z, cutoff=2025-01-01T12:00Z, instance CI-A valid [2023-01-01T12:00Z, 2024-01-01T12:00Z); RELISTED_NEW_INSTANCE window [2023-01-01T12:00Z, open) known_from=2023-01-01T12:00Z",
+      "note": "the warning law enumerates only SUSPENDED / DELISTING_ANNOUNCED (S6/I03D33); the relisting cutover is carried by the NEW instance's own valid_from, never by the state row. Pinned by probe, not by omission.",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "a RELISTED_NEW_INSTANCE lifecycle ROW over a PIT-valid instance is inert evidence",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "RELISTED_NEW_INSTANCE",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_pre_listing_lifecycle_row_is_inert",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z, cutoff=2025-01-01T12:00Z, instance CI-A valid [T0, T1); PRE_LISTING window [2022-12-02T12:00Z, 2023-01-01T12:00Z) known_from=2023-01-01T12:00Z",
+      "note": "exactly the A7b law (DELISTED row over a live instance is inert): PRE_LISTING evidence about one instance never de-activates the instance's own PIT-valid interval",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "a PRE_LISTING lifecycle ROW over a PIT-valid instance is inert evidence",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "PRE_LISTING",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_suspended_warning_window_boundaries_are_half_open",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z == SUSPENDED valid_from; window [2023-01-02T12:00Z, 2023-01-06T12:00Z)",
+      "note": "half-open warning-window law pinned at the start instant (directive 43 temporal axes)",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "RESOLVED_WITH_WARNING",
+      "probe": "event exactly AT the SUSPENDED window start: warning is start-inclusive",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_WITH_WARNING)",
+      "state_enumerated": "SUSPENDED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_suspended_warning_window_boundaries_are_half_open",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T11:59:59.999999Z < SUSPENDED valid_from; same window as above",
+      "note": "not-yet-warning side of the start boundary",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "event one microsecond BEFORE the SUSPENDED window start: no warning",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "SUSPENDED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_suspended_warning_window_boundaries_are_half_open",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-06T12:00Z == SUSPENDED valid_to (exclusive); window [2023-01-02T12:00Z, 2023-01-06T12:00Z)",
+      "note": "half-open warning-window law pinned at the end instant",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "event exactly AT the SUSPENDED window end: warning is end-exclusive",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "SUSPENDED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_suspended_warning_window_boundaries_are_half_open",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-06T11:59:59.999999Z < SUSPENDED valid_to; same window as above",
+      "note": "still-warning side of the end boundary",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "RESOLVED_WITH_WARNING",
+      "probe": "event one microsecond BEFORE the SUSPENDED window end: still warning",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_WITH_WARNING)",
+      "state_enumerated": "SUSPENDED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_delisting_announced_warning_window_boundaries_are_half_open",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-02T12:00Z == DELISTING_ANNOUNCED valid_from; window [2023-01-02T12:00Z, 2023-01-10T12:00Z)",
+      "note": "half-open warning-window law pinned at the start instant",
+      "observed_flags": [
+        "IDENTITY_LIFECYCLE_BOUNDARY"
+      ],
+      "observed_status": "RESOLVED_WITH_WARNING",
+      "probe": "event exactly AT the DELISTING_ANNOUNCED window start: warning is start-inclusive",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_WITH_WARNING)",
+      "state_enumerated": "DELISTING_ANNOUNCED",
+      "under_specified_surfaced": false
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 6; bloc_05/07 F4; directives 4/33/34/46",
+      "carries_identity": true,
+      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_delisting_announced_warning_window_boundaries_are_half_open",
+      "fabricated_ids": false,
+      "input_condition": "event=2023-01-10T12:00Z == DELISTING_ANNOUNCED valid_to (exclusive); window [2023-01-02T12:00Z, 2023-01-10T12:00Z)",
+      "note": "half-open warning-window law pinned at the end instant",
+      "observed_flags": [],
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "event exactly AT the DELISTING_ANNOUNCED window end: warning is end-exclusive",
+      "result": "PASS",
+      "result_block_or_resolved": "RESOLVED (RESOLVED_EXACT)",
+      "state_enumerated": "DELISTING_ANNOUNCED",
+      "under_specified_surfaced": false
     }
   ],
   "summary": {
     "all_results_pass": true,
     "collapse_events": 0,
-    "rows": 9,
+    "rows": 17,
     "states_enumerated": 7,
     "under_specified_rows": 1
   }
