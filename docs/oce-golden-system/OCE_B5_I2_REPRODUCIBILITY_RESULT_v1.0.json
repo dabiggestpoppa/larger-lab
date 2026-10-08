@@ -1,0 +1,184 @@
+{
+  "baseline": {
+    "collected": 24,
+    "control_green": true,
+    "errors": 0,
+    "failed": 0,
+    "nodes": [
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_reads_render_governed_responses_verbatim",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_stale_or_unknown_job_inspect_is_not_fabricated",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestContractPack::test_every_declared_operation_exists_on_the_governed_module",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestContractPack::test_invoke_routes_match_http_api_registrations",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestContractPack::test_pack_identity_is_pinned_in_this_test_file",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestContractPack::test_pack_is_structurally_valid",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_identical_inputs_produce_byte_identical_projections",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_module_import_closure_has_no_llm_hosting_or_broker_dependencies",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_refusal_law_operates_without_any_model",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestEvidenceIdentityBinding::test_denial_envelope_from_governed_authority_is_rendered_verbatim",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestEvidenceIdentityBinding::test_evidence_manifest_binds_to_schema_and_operation",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_without_authority_yields_schema_valid_denial",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestMalformedInputRefusal::test_cancel_with_missing_job_id_refused",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestMalformedInputRefusal::test_missing_required_field_refused",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestMalformedInputRefusal::test_oversize_payload_refused",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestMalformedInputRefusal::test_unexpected_field_refused",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestMalformedInputRefusal::test_unknown_job_type_refused_before_admission",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_non_vacuous_negative_control_weakened_guard_admits",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_read_surface_id_used_as_invoke_is_refused",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_unknown_invoke_surface_refused_before_side_effects",
+      "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_unknown_read_surface_refused_before_side_effects"
+    ],
+    "passed": 24,
+    "restore_control_green": true,
+    "skipped": 0,
+    "unique_nodes": 24
+  },
+  "caller_tracked_worktree_unmodified": true,
+  "discriminated_count": 11,
+  "implementation": {
+    "harness_path": "infrastructure/control-plane/scripts/b5_i2_mutation_battery.py",
+    "harness_sha256": "1c05b0213dacfa4e39e40aeb3fb7c755db8d8927093a43a2489089cc6ef80d6a",
+    "merged_b5_i2_sha": "e3e38e83866fd6b1897531b0149c568a16b80177",
+    "test_file": "infrastructure/control-plane/tests/test_console_contracts.py",
+    "test_file_blob_sha": "85e1b17b79a1e06093619a5e1d604a9b753fb207"
+  },
+  "mutation_count": 11,
+  "mutations": [
+    {
+      "description": "pack refusal wording altered; Python untouched",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestContractPack::test_pack_identity_is_pinned_in_this_test_file"
+      ],
+      "id": "M1",
+      "name": "M1-pack-changed-python-did-not",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/contracts/console-contract.json"
+    },
+    {
+      "description": "read_surface entry/kind guard disabled (unknown surface not refused)",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_non_vacuous_negative_control_weakened_guard_admits",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_unknown_read_surface_refused_before_side_effects"
+      ],
+      "id": "M2",
+      "name": "M2-py-weakened-refusal-guard",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    },
+    {
+      "description": "jobs.submit rebound to api.cancel_job inside dispatch",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_identical_inputs_produce_byte_identical_projections",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestEvidenceIdentityBinding::test_denial_envelope_from_governed_authority_is_rendered_verbatim",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestEvidenceIdentityBinding::test_evidence_manifest_binds_to_schema_and_operation",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_without_authority_yields_schema_valid_denial"
+      ],
+      "id": "M3",
+      "name": "M3-py-wrong-authority-owner",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    },
+    {
+      "description": "invoke kind guard weakened: read-surface ids admitted as invoke",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestUnsupportedOperationRefusal::test_read_surface_id_used_as_invoke_is_refused"
+      ],
+      "id": "M4",
+      "name": "M4-py-read-kind-as-invoke-allowed",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    },
+    {
+      "description": "jobs.submit returns fabricated response; api.submit_job never called",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_identical_inputs_produce_byte_identical_projections",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestEvidenceIdentityBinding::test_denial_envelope_from_governed_authority_is_rendered_verbatim",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestEvidenceIdentityBinding::test_evidence_manifest_binds_to_schema_and_operation",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_without_authority_yields_schema_valid_denial"
+      ],
+      "id": "M5",
+      "name": "M5-py-submit-bypasses-dispatcher",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    },
+    {
+      "description": "projection fabricates unknown status 'completed'",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation"
+      ],
+      "id": "M6",
+      "name": "M6-py-fabricated-status",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    },
+    {
+      "description": "job-envelope schema gains an extra optional property",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state"
+      ],
+      "id": "M7a",
+      "name": "M7a-schema-field-added",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/contracts/job-envelope.schema.json"
+    },
+    {
+      "description": "job-envelope schema loses property 'lease'",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation"
+      ],
+      "id": "M7b",
+      "name": "M7b-schema-field-removed",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/contracts/job-envelope.schema.json"
+    },
+    {
+      "description": "job-envelope schema renames 'job_type' -> 'jobKind'",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation"
+      ],
+      "id": "M7c",
+      "name": "M7c-schema-field-renamed",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/contracts/job-envelope.schema.json"
+    },
+    {
+      "description": "module source gains 'import requests' (banned root)",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_module_import_closure_has_no_llm_hosting_or_broker_dependencies"
+      ],
+      "id": "M8",
+      "name": "M8-forbidden-static-import",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    },
+    {
+      "description": "module source gains a __import__ call-form escape",
+      "expected_discriminator": [
+        "infrastructure/control-plane/tests/test_console_contracts.py::TestDeterminism::test_module_import_closure_has_no_llm_hosting_or_broker_dependencies"
+      ],
+      "id": "M9",
+      "name": "M9-dynamic-import-escape",
+      "outcome": "DISCRIMINATED",
+      "target": "infrastructure/control-plane/src/oce_control/console_contracts.py"
+    }
+  ],
+  "schema": "oce.b5-i2.reproducibility-result",
+  "schema_version": "1.0.0",
+  "skipped_mutations": 0,
+  "unresolved_mutations": 0,
+  "verdict": "ALL_DISCRIMINATED"
+}

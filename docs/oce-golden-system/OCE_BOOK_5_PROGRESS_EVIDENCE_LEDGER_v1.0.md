@@ -214,3 +214,60 @@ The Windows `/proc` failure is reproduced at base with the same command: `test_l
 ### 9.9 Gate status at this section
 
 24 nodes executed in authoritative Linux CI ✓; zero failures/errors/skips ✓; zero duplicate full node IDs ✓; JSON/Python two-sided agreement proven ✓; all 12 operations map to existing authority owners, no placeholder capability ✓; negative controls discriminate 11/11 ✓; implementation head `d5801e104…` exact-head CI success (`37791367627`) ✓. Evidence-head and ratification-head CI runs are recorded in the B5-I2 operator-ratification artifact when this section's commit and the ratification commit have each passed exact-head CI. This stage implements only charter increment I-1; B5-I3+ remains LOCKED and requires a fresh `AUTHORIZED_STAGE`.
+
+---
+
+## 10. B5-I2 post-merge reproducibility closure (AUTHORIZED_STAGE=B5-I2-POST-MERGE-REPRODUCIBILITY-REPAIR)
+
+> Appended after the merge of PR #10 (merge `e3e38e83…`). Section 9.5 above is NOT edited or erased; this section supersedes only its reproduction-vehicle designation.
+
+### 10.1 What §9.5 recorded correctly, and what is corrected here
+
+- **Stands:** §9.5 truthfully recorded the local execution result — baseline 24/24 green, each of the 11 mutations failed at least one node, sources restored, verdict `ALL DISCRIMINATED`. The committed §9.5 table, the PR #10 body, the ratification artifact and commit messages remain accurate records of that historical execution.
+- **Corrected:** §9.5 additionally stated “runner `.b5i2_mutation_battery.py` retained untracked for reproduction” and named `C:\tmp\b5i2_mutations.json` as the archived results JSON. That designation was wrong: both were unpublished local scratch paths outside the repository. Neither was ever committed, ever part of a CI artifact, or ever required by a passing gate. They are superseded and non-authoritative as reproduction vehicles.
+
+### 10.2 The governed replacement (committed, CI-executed, deterministic)
+
+| Item | Value |
+|---|---|
+| Governed harness path | `infrastructure/control-plane/scripts/b5_i2_mutation_battery.py` |
+| Harness publish commit (R1) | `3af34c956…` |
+| Harness integrity tests (16 nodes) | `infrastructure/control-plane/tests/test_b5_i2_mutation_harness.py` |
+| Integrity + CI wiring commit (R2) | `7210df105…` |
+| Harness hardening commit (R2b) | `c82fc18cd…` (fail-fast inventory gate + decode robustness) |
+| Harness bytecode-purge fix (R2c) | `1814aa74f…` — FINAL harness content, git blob `865c75a8bce0341cdd8516ab17ec35489f4f7570` |
+| Canonical result artifact | `docs/oce-golden-system/OCE_B5_I2_REPRODUCIBILITY_RESULT_v1.0.json` (schema `oce.b5-i2.reproducibility-result`, version `1.0.0`) |
+| Tested implementation | merged B5-I2 `e3e38e83866fd6b1897531b0149c568a16b80177` |
+| Test-file blob SHA | `85e1b17b79a1e06093619a5e1d604a9b753fb207` (unchanged) |
+| Harness content SHA-256 | `1c05b0213dac…` (recorded inside the artifact; byte-bound by CI `--verify`) |
+| Baseline | exactly 24 nodes — 24 passed / 0 failed / 0 errors / 0 skipped |
+| Mutations | M1, M2, M3, M4, M5, M6, M7a, M7b, M7c, M8, M9 — **11/11 `DISCRIMINATED`**, verdict `ALL_DISCRIMINATED`, 0 unresolved, 0 skipped |
+
+Harness law (executable, not aspirational): execution happens only in an isolated temporary copy — the caller’s tracked worktree is never written; the control is proven green before AND after the battery; every patch anchor must occur exactly once; no-op mutations are refused; the run exits nonzero on any incomplete, vacuous, duplicated, skipped or non-discriminating state; the canonical JSON is byte-deterministic (sorted keys; no timestamps, temp paths, host names, user names or durations). The authoritative workflow step additionally proves the tracked source is byte-identical after execution.
+
+Honest chronology of this repair: the first two exact-head runs of the new CI step (`37826140353` on `7210df105…`, `37826223948` on `c82fc18cd…`) **failed** — the integrity fixture’s same-size mutation (`assert 1 + 1 == 2` → `== 3`) landed in the same second as the preceding compile, so timestamp+size `.pyc` validation reused stale assertion-rewritten bytecode and the mutated tree wrongly stayed green (`exit=0`). Root cause fixed in R2c by purging `__pycache__` under the isolated tree before every pytest invocation (the same latent exposure existed for real mutation M3, `api.submit_job` → `api.cancel_job`, identical byte length). No test, gate or assertion was weakened; the failing runs are recorded rather than hidden.
+
+### 10.3 Authoritative CI (exact-head)
+
+The exact-head run / check-run / artifact identifiers for this section’s evidence commit are appended in §10.4 below, append-only, once the run is proven green and its artifact has been downloaded and parsed (an artifact cannot contain its own CI run identity).
+
+### 10.4 Supersession and invariants
+
+- `.b5i2_mutation_battery.py` (untracked scratch runner) and `C:\tmp\b5i2_mutations.json` (untracked scratch results) are **superseded and non-authoritative**; after merge verification they are deleted from the local machine. The durable evidence package is now: §9.5 (historical result record), this §10 (correction), the canonical result artifact, the committed harness + integrity tests, and the CI evidence artifacts.
+- B5-I2 production behavior, contract pack, schemas, frozen tests and the merged implementation remain **unchanged** by this stage — no production file is touched (`test_console_contracts.py` blob stays `85e1b17b…`; `console_contracts.py`, `console-contract.json` and the three schemas are byte-identical to the merged B5-I2).
+- The Book 5 acceptance/ratification artifacts required no wording correction: they record mutation *results* (M1/M4/M6 citations) and never named the scratch paths.
+- B5-I3–I9 remain **LOCKED**; a fresh `AUTHORIZED_STAGE=B5-I3` is required to begin them.
+
+#### Exact-head CI proof (appended append-only after the runs completed)
+
+| Run | Head | Conclusion |
+|---|---|---|
+| `37824894774` | `3af34c956…` (R1) | `success` (workflow step not yet present) |
+| `37826140353` | `7210df105…` (R2) | `failure` — stale-bytecode incident, recorded in §10.2 chronology |
+| `37826223948` | `c82fc18cd…` (R2b) | `failure` — stale-bytecode incident, recorded in §10.2 chronology |
+| `37827592594` | `1814aa74f…` (R2c) | `success` (purge fix proven: integrity + battery step green) |
+| `37827782039` | `018b2f98d…` (EVIDENCE) | `success` — authoritative proving run, identities below |
+
+EVIDENCE-head exact binding: run `37827782039` conclusion `success`, `head_sha = 018b2f98de4d0cfce1097073eb8207e21b08d511`, check-suite `102489108183`, check-run `113484971259` (`validate`, `success`, same `head_sha`), artifact `11573010013` (`b1-i1r-evidence-5496a7937bdd`, not expired, 22453 bytes).
+
+Artifact parse (downloaded and parsed, not badge-inferred): emitted `b5-i2-reproducibility-result.json` **byte-identical** to the committed canonical artifact (12546 bytes); baseline 24 nodes → **24/0/0/0**; **11/11 `DISCRIMINATED`** (raw observations all `matched_by: node`, zero via fallback class); integrity junit **16/0/0/0**; B5-I2 junit **24/0/0/0**; registry proof `PASS` (collected = executed = 24, zero duplicates); `b5-i2-repro-worktree-check.txt` empty (tracked source byte-identical after execution); gate `READY_FOR_OPERATOR_REVIEW`. The final head’s own run identity is recorded in PR #11 (an artifact cannot contain its own CI run identity).

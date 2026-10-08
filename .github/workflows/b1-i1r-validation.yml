@@ -273,6 +273,80 @@ jobs:
           fi
           echo "B5-I2 authoritative selection PASSED: whole-file collection == execution == JUnit, zero skips/failures/errors/duplicates, floor $B5I2_FLOOR met"
 
+      # ── B5-I2-REPRO-R2: authoritative execution of the published
+      # reproducibility harness and its integrity tests ───────────────────────
+      # The formerly unpublished scratch battery now lives as governed
+      # tooling (scripts/b5_i2_mutation_battery.py). This step proves, in
+      # the authoritative runner: (a) the harness-integrity tests all pass
+      # with zero skips/failures/errors and executed == collected; (b) the
+      # harness itself is green — clean control 24/24 and all 11 frozen
+      # mutations discriminated — because the harness exits nonzero on any
+      # incomplete, vacuous, duplicated, skipped or non-discriminating run;
+      # (c) the tracked source remains byte-identical afterwards (the
+      # harness only ever writes an isolated temporary copy). Outputs land
+      # in the same evidence artifact. Triggers, gates, shared-runner
+      # behavior and cleanup are untouched. The EVIDENCE commit binds the
+      # run byte-for-byte to the committed canonical result artifact via
+      # --verify (exit 2 on any mismatch), so "canonical result matches the
+      # committed evidence artifact" is proven, not asserted.
+      - name: Execute B5-I2 reproducibility harness (integrity + battery)
+        env:
+          OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          INTEGRITY_FILE="infrastructure/control-plane/tests/test_b5_i2_mutation_harness.py"
+          rc=0
+          COLLECTED=$(python3 -m pytest "$INTEGRITY_FILE" --collect-only -q -o addopts= \
+            | grep -c '::' || true)
+          python3 -m pytest "$INTEGRITY_FILE" -q --tb=short -rfE \
+            --junitxml="$OCE_EVIDENCE_DIR/b5-i2-repro-integrity-junit.xml" \
+            2>&1 | tee "$OCE_EVIDENCE_DIR/b5-i2-repro-integrity-output.txt" || rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "B5-I2 harness-integrity selection FAILED (exit $rc)"
+            exit 1
+          fi
+          python3 - "$OCE_EVIDENCE_DIR/b5-i2-repro-integrity-junit.xml" "$COLLECTED" <<'REPRO_INTEGRITY_EOF' || exit 1
+          import sys
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse(sys.argv[1]).getroot()
+          suites = [s for s in root.iter("testsuite") if s.get("name")] or list(root.iter("testsuite"))
+          totals = {k: sum(int(s.get(k) or 0) for s in suites)
+                    for k in ("tests", "failures", "errors", "skipped")}
+          collected = int(sys.argv[2])
+          problems = []
+          if collected <= 0:
+              problems.append(f"integrity collection parsed {collected} nodes")
+          if totals["tests"] != collected:
+              problems.append(f"integrity executed {totals['tests']} != collected {collected}")
+          for key in ("failures", "errors", "skipped"):
+              if totals[key]:
+                  problems.append(f"integrity {key}={totals[key]}")
+          if problems:
+              raise SystemExit("integrity registry proof failed: " + "; ".join(problems))
+          print("integrity registry proof PASS:", totals, "collected", collected)
+          REPRO_INTEGRITY_EOF
+          python3 infrastructure/control-plane/scripts/b5_i2_mutation_battery.py \
+            --verify docs/oce-golden-system/OCE_B5_I2_REPRODUCIBILITY_RESULT_v1.0.json \
+            --output "$OCE_EVIDENCE_DIR/b5-i2-reproducibility-result.json" \
+            --raw-output "$OCE_EVIDENCE_DIR/b5-i2-repro-battery-raw.json" \
+            2>&1 | tee "$OCE_EVIDENCE_DIR/b5-i2-repro-harness-output.txt" || rc=$?
+          if [ "$rc" -ne 0 ]; then
+            echo "B5-I2 reproducibility harness FAILED (exit $rc — battery failure or committed-artifact byte mismatch)"
+            exit 1
+          fi
+          if ! git diff --exit-code > "$OCE_EVIDENCE_DIR/b5-i2-repro-worktree-check.txt" 2>&1; then
+            echo "tracked source modified by harness/integrity execution"
+            exit 1
+          fi
+          if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+            echo "tracked worktree not clean after harness execution"
+            git status --porcelain --untracked-files=no
+            exit 1
+          fi
+          echo "B5-I2 reproducibility harness PASSED: integrity tests green (zero skips), control 24/24, 11/11 discriminated, tracked source unmodified"
+
       - name: Upload evidence artifact
         # B4-CXR7U9R24: only when the evidence directory was actually created.
         # An unset path would add a second, misleading artifact error on top of
