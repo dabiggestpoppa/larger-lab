@@ -285,7 +285,10 @@ jobs:
       # (c) the tracked source remains byte-identical afterwards (the
       # harness only ever writes an isolated temporary copy). Outputs land
       # in the same evidence artifact. Triggers, gates, shared-runner
-      # behavior and cleanup are untouched.
+      # behavior and cleanup are untouched. The EVIDENCE commit binds the
+      # run byte-for-byte to the committed canonical result artifact via
+      # --verify (exit 2 on any mismatch), so "canonical result matches the
+      # committed evidence artifact" is proven, not asserted.
       - name: Execute B5-I2 reproducibility harness (integrity + battery)
         env:
           OCE_EVIDENCE_DIR: ${{ steps.evidence.outputs.evidence_dir }}
@@ -325,11 +328,12 @@ jobs:
           print("integrity registry proof PASS:", totals, "collected", collected)
           REPRO_INTEGRITY_EOF
           python3 infrastructure/control-plane/scripts/b5_i2_mutation_battery.py \
+            --verify docs/oce-golden-system/OCE_B5_I2_REPRODUCIBILITY_RESULT_v1.0.json \
             --output "$OCE_EVIDENCE_DIR/b5-i2-reproducibility-result.json" \
             --raw-output "$OCE_EVIDENCE_DIR/b5-i2-repro-battery-raw.json" \
             2>&1 | tee "$OCE_EVIDENCE_DIR/b5-i2-repro-harness-output.txt" || rc=$?
           if [ "$rc" -ne 0 ]; then
-            echo "B5-I2 reproducibility harness FAILED (exit $rc)"
+            echo "B5-I2 reproducibility harness FAILED (exit $rc — battery failure or committed-artifact byte mismatch)"
             exit 1
           fi
           if ! git diff --exit-code > "$OCE_EVIDENCE_DIR/b5-i2-repro-worktree-check.txt" 2>&1; then
