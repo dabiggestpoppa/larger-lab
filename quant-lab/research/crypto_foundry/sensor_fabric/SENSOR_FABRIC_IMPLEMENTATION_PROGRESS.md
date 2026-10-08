@@ -5657,3 +5657,90 @@ gaps recorded for operator decision (NOT closed here): dual-clock `known_to`
 (superseded knowledge) coverage; provider-ID + wrong-venue tier-1 probe;
 stablecoin/negative-alias/flag matrix backfill; TERMS_UNVERIFIED
 reachability statement. HARD STOP.
+## 161 - SENSOR-B5-I03H: DUAL-CLOCK KNOWLEDGE-BOUNDARY CLOSURE (PENDING_OPERATOR_REVIEW)
+
+**Date:** 2026-10-08 · **Start head:** `13f05ae7a71749ef7b2847f67c090e484d0ddf39`
+(branch `agent/crypto-sensor-fabric-build`, custody verified Phase 0). ·
+**Scope:** operator-directed bounded amendment closing the classified B5-I03
+evidence omissions (G1–G4). Append-only: no prior section or sealed artifact
+was modified.
+
+### 1. Operator-selected semantics (prospective, not retro-attributed)
+
+Option 1 authorized for records that possess `known_to`:
+`known_from <= knowledge_cutoff < known_to` (half-open). Absent `known_to` =
+open-ended knowledge interval. Prospective clarification only — no earlier
+frozen contract is claimed to have stated it, and no sealed evidence was
+rewritten. `InstrumentAlias` NOT altered: frozen eleven-field schema remains
+authoritative; alias knowledge is open-ended by construction (pass `None`
+upper bound).
+
+### 2. Changed production paths (exactly one file)
+
+`src/crypto_sensor_fabric/normalization/identity/resolver.py` —
+`_known_by(known_from, known_to, cutoff)` now enforces the bounded knowledge
+interval; applied at `_pit_valid`, `_lifecycle_warning`,
+`_tier_exact_symbol`; alias scan open-ended. Blocking outcome for expired
+knowledge with no eligible candidate: existing `PIT_KNOWLEDGE_BLOCKED` /
+`UNKNOWN` (no new status/flag/enum; no supersession engine; no replacement
+selection). Valid-time filtering, tier priorities, alias behavior, lifecycle
+warnings, and fail-closed identity handling preserved.
+
+### 3. Regression evidence (Phase 2 — 11 new, both clocks independent)
+
+`test_b5_i03_resolver.py` +11: before/at `known_from`, −1µs/at/after
+`known_to`, absent `known_to`, historical event + later cutoff, nonoverlapping
+revision windows (gap blocked; old probe → OLD record; new probe → NEW
+record), ambiguous overlapping eligible records stay AMBIGUOUS, lifecycle
+warning with expired knowledge inert (control warns), G2 wrong-venue
+regression (correct provider ID + wrong venue → `UNKNOWN_SYMBOL`, control
+resolves). Knowledge-clock probes hold event time fixed — never substituted.
+All prior valid-time and lifecycle-boundary tests unchanged and passing.
+
+### 4. Generator + artifact changes (Phase 3)
+
+`.bu_tmp/b5_i03_mats.py` extended: knowledge-boundary matrix (KB1–KB10 + 3
+lifecycle rows → new `BLOC_05_I03H_KNOWLEDGE_BOUNDARY_MATRIX.json`), tier-1
+venue-isolation row (G2), negative-prefix/case-fold/separator probes, S12
+stablecoin firewall row, identity-flag coverage (4 emitted live / 6
+not-emitted absent), `TERMS_UNVERIFIED` construction-reachability pin (G4).
+`.bu_tmp/b5_i03_scope.py` extended with the G4 AST pin. Regenerated:
+MATCH_ORDER (10 rows), FUTURE_LEAKAGE (4/4), LIFECYCLE (17/17), ALIAS (6/6,
+byte-identical), SCOPE_AUDIT, new I03H knowledge-boundary (14/14). Untouched:
+ADVERSARIAL (re-measured unchanged), I02 matrices, I11R2 audit
+(byte-stable no-update), all bloc_04.
+
+### 5. Measured verification (this tree)
+
+I03 focused **84 passed** (73 + 11). Normalization **497 passed** (486 + 11).
+I11R2 **14 passed**, SHA `bebda72beeaba50aa73b3c0032311282140f831ce0adcf2a813ce70a55cbfa8c`
+byte-identical. Full project **3895 passed / 14 skipped / 0 failed (0 warnings)** (new failures:
+none (baseline 3884 + 11 new = 3895; 14 skipped unchanged); inherited Windows manifest-concurrency teardown race =
+TEST-ENVIRONMENT DEBT). Ruff changed scope all-pass; mypy 10 inherited / 0
+identity; compileall OK; secret scan clean. Evidence narrative amended
+(new section 9: knowledge-boundary closure amendment; governance renumbered
+10, content unchanged).
+
+### 6. G1–G4 closure status
+
+G1 dual-clock `known_to` — **CLOSED**. G2 provider-ID + wrong-venue —
+**CLOSED** (matrix row + standing regression). G3 stablecoin/negative-alias/
+identity-flag backfill — **CLOSED** (matrix rows). G4 `TERMS_UNVERIFIED`
+reachability — **CLOSED** (reserved; never constructed through I03 paths;
+terms machinery remains B5-I04+). §160's four "not closed here" gaps are now
+closed at operator direction.
+
+### 7. Custody + governance (unchanged disposition, no self-ratification)
+
+New commit on `agent/crypto-sensor-fabric-build` only (fast-forward push;
+report SHA in final report). Bloc 4 / I17 / B5-I01 / B5-I02 evidence
+untouched; tracked worktree clean after commit; `.bu_tmp/` remains untracked.
+PASS_SENSOR_B5_I03_LIFECYCLE_ALIAS_PIT_RESOLVER_SEALED =
+**PENDING_OPERATOR_REVIEW**. BLOC_05_IMPLEMENTATION_STATUS =
+**I03_COMPLETE_PENDING_OPERATOR_REVIEW**. I03_IDENTITY_RESOLVER_SUBGATE =
+**IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW**. IDENTITY_GATE and all other
+gates = **NOT_YET_EARNED**. next_checkpoint_authorized = **FALSE**.
+recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I03H**. B5-I04+ =
+UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN.
+MAIN_DIVERGENCE_STATUS unchanged: EXTERNAL / UNRECONCILED /
+NON-BLOCKING_FOR_I03. HARD STOP after push and report.

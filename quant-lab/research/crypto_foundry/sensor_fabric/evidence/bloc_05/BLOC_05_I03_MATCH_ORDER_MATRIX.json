@@ -4,15 +4,15 @@
     "bloc_05/01 section 10; I03 directives 14/45"
   ],
   "checkpoint": "SENSOR-B5-I03",
-  "created": "2026-10-07",
+  "created": "2026-10-08",
   "disclosure": "tier 4 is implemented per the vocabulary matrix path A: curated manual mappings are carried as evidence-backed InstrumentAlias rows of non-API kinds. Tiers 3 and 4 are ONE pooled scan (ambiguity dominates convenience: a later sequential tier could outrank an ambiguity the pooled scan sees); tier-4 semantics are carried by the winner's alias kind -> IDENTITY_MANUAL_OVERRIDE on a curated-carrier win, status stays RESOLVED_ALIAS with matched_alias_id (directive 17). The vocabulary matrix's RESOLVED_WITH_WARNING wording for tier 4 is NOT used because it would conflict with the matched_alias_id-only-on-RESOLVED_ALIAS law; this wording deviation is disclosed in BLOC_05_I03_IMPLEMENTATION_EVIDENCE.md.",
   "evidence_class": "measured_executable",
-  "generated_by": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py)",
+  "generated_by": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py)",
   "law": "tier rank hard-laws the resolver: a higher tier wins ONLY with PIT-valid evidence; no lowered-priority candidate may override a valid higher-priority match; no arbitrary winner inside one tier (AMBIGUOUS); fuzzy never enters",
   "rows": [
     {
       "acceptance_clause": "bloc_05/01 section 10 (matching order); directives 14/15/45",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_16_provider_id_tier_outranks_symbol_tier",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_16_provider_id_tier_outranks_symbol_tier",
       "expected": "RESOLVED_EXACT via tier 1 (with IDENTITY_PROVIDER_ID_MISSING tier-1 marker); matched_alias_id stays None",
       "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, pid=PID-1, symbol=XBTUSDT (tier-1 and tier-2 candidates coexist)",
       "matched_alias_id": null,
@@ -27,7 +27,7 @@
     },
     {
       "acceptance_clause": "bloc_05/01 section 10 (matching order); directives 14/16/45",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_17_exact_symbol_tier_outranks_alias_tier",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_17_exact_symbol_tier_outranks_alias_tier",
       "expected": "RESOLVED_EXACT with matched_alias_id=None (symbol tier outranks alias tier)",
       "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, symbol=XBTUSDT registered both as native symbol and as alias of CI-A",
       "matched_alias_id": null,
@@ -40,7 +40,7 @@
     },
     {
       "acceptance_clause": "bloc_05/01 section 10 + section 8; directives 14/17/45",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); alias-match law pinned by tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve (negatives)",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); alias-match law pinned by tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_11_expired_alias_does_not_resolve / ::test_case_12_wrong_venue_alias_does_not_resolve (negatives)",
       "expected": "RESOLVED_ALIAS with matched_alias_id=AL:CI-A:DIRECTA:API_SYMBOL and IDENTITY_ALIAS_USED",
       "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, text=DIRECTA (no instance registered under this text)",
       "matched_alias_id": "AL:CI-A:DIRECTA:API_SYMBOL",
@@ -55,7 +55,7 @@
     },
     {
       "acceptance_clause": "bloc_05/01 section 10 + section 14; vocabulary matrix directive 29 path A; directives 14/45",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); vocabulary authority: BLOC_05_I03_VOCABULARY_AUTHORITY_MATRIX.json (tier-4 path A row)",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); vocabulary authority: BLOC_05_I03_VOCABULARY_AUTHORITY_MATRIX.json (tier-4 path A row)",
       "expected": "RESOLVED_ALIAS with IDENTITY_MANUAL_OVERRIDE (tier-4 semantics inside the pooled tier-3/4 scan) and matched_alias_id set",
       "input_condition": "event=2025-01-02T12:00Z, cutoff=2025-01-02T12:00Z, alias LEGACYX/LEGACY_SYMBOL valid [2025-01-01T12:00Z, open), known_from=2024-12-31T12:00Z",
       "matched_alias_id": "AL:CI-B:LEGACYX:LEGACY_SYMBOL",
@@ -70,7 +70,7 @@
     },
     {
       "acceptance_clause": "bloc_05/01 section 10; directives 14/24/45",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_prefix_candidates_do_not_match family",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_prefix_candidates_do_not_match family",
       "expected": "UNKNOWN_SYMBOL with no identity payload",
       "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z, text=GHOSTX (absent from the registry)",
       "matched_alias_id": null,
@@ -83,7 +83,7 @@
     },
     {
       "acceptance_clause": "bloc_05/01 section 9 + section 10; directives 17/24/45 (ambiguity dominates convenience)",
-      "evidence_ref": "live run 2026-10-07: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_14_competing_alias_candidates_return_ambiguous",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_14_competing_alias_candidates_return_ambiguous",
       "expected": "AMBIGUOUS with no identity payload (never a sorted/first/last winner)",
       "input_condition": "event=2023-01-02T12:00Z, cutoff=2025-01-02T12:00Z, two same-text carriers (API_SYMBOL->CI-A, DISPLAY_SYMBOL->CI-B), both windows open at the event",
       "matched_alias_id": null,
@@ -93,10 +93,87 @@
       "rank": "3/4 (pooled)",
       "result": "PASS",
       "tier": "ambiguity inside the pooled alias scan"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 10 (tier 1 requires provider + venue + time + knowledge context, never the bare ID); directive 15; G2 closure (B5-I03H)",
+      "control_contract_instance_id": "CI-A",
+      "control_observed_status": "RESOLVED_EXACT",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_provider_id_on_the_wrong_venue_does_not_anchor",
+      "expected": "UNKNOWN_SYMBOL with no identity payload on the wrong venue; the control call on EXA_FUT resolves RESOLVED_EXACT CI-A (difference is the venue axis alone)",
+      "input_condition": "event=2023-01-04T12:00Z, cutoff=2025-01-01T12:00Z, pid=PID-1 (registered on EXA_FUT), query venue=EXB_FUT (registered, instrument absent); control call identical but venue=EXA_FUT",
+      "matched_alias_id": null,
+      "observed_flags": [],
+      "observed_status": "UNKNOWN_SYMBOL",
+      "probe": "provider instrument ID PID-1 is correct for the instrument, but the query carries registered venue EXB_FUT where no instrument/instance exists: the ID must not anchor across venues",
+      "rank": "1 (venue axis)",
+      "result": "PASS",
+      "tier": "provider instrument id - venue isolation"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 10 (EXACT matching only: no fuzzy, no prefix, no substring, no case folding, no separator normalization); section 8; directives 5/17/47",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_prefix_candidates_do_not_match / ::test_fuzzy_one_char_deviation_cannot_resolve / ::test_case_fold_cannot_resolve",
+      "expected": "UNKNOWN_SYMBOL with no identity payload for all three variants (fuzzy never enters)",
+      "input_condition": "event=2023-01-01T12:00Z, cutoff=2025-01-01T12:00Z; registered texts: native XBTUSDT + alias XBTUSDT (API_SYMBOL) + alias DIRECTA",
+      "observed_flags": {
+        "case_fold": [],
+        "prefix": [],
+        "separator": []
+      },
+      "observed_status": {
+        "case_fold": "UNKNOWN_SYMBOL",
+        "prefix": "UNKNOWN_SYMBOL",
+        "separator": "UNKNOWN_SYMBOL"
+      },
+      "probe": "prefix (XBTUSDTZ), case-folded (xbtusdt) and separator-inserted (XBT-USDT) variants of the registered text XBTUSDT, each queried against a registry where that exact text is registered",
+      "rank": "3/4 (exactness)",
+      "result": "PASS",
+      "tier": "negative alias / exact-text law"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 12 (stablecoin firewall: no USD/USDT/USDC substitution); directives 6/7",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); standing regression: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py::test_case_stablecoin_never_usd_substituted",
+      "expected": "RESOLVED_EXACT with canonical_asset_id=BTC (underlying, never quote); no USD/USDT substitution",
+      "input_condition": "event=2023-01-04T12:00Z, cutoff=2025-01-01T12:00Z, quote_asset_id=USDT, settlement_asset_id=USDT, underlying_asset_id=BTC",
+      "observed_canonical_asset_id": "BTC",
+      "observed_status": "RESOLVED_EXACT",
+      "probe": "USDT-quoted contract queried by its native symbol: canonical identity must be the underlying asset, never a quote/stablecoin asset",
+      "rank": "2 (stablecoin firewall)",
+      "result": "PASS",
+      "tier": "exact native symbol - quote/asset firewall"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 section 14 (quality flags); BLOC_05_I03_IMPLEMENTATION_EVIDENCE.md section 2 (flag inventory: four emitted, six sanctioned NOT emitted)",
+      "evidence_ref": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python ../../../.bu_tmp/b5_i03_mats.py (from quant-lab; resolver under test = src/crypto_sensor_fabric/normalization/identity/resolver.py); flag inventory: BLOC_05_I03_IMPLEMENTATION_EVIDENCE.md section 2; standing regressions: tests/crypto_sensor_fabric/normalization/test_b5_i03_resolver.py (alias/manual/pid/lifecycle flag assertions)",
+      "expected": "all four sanctioned-emitted flags observed; zero occurrences of the six sanctioned NOT-emitted flags on any path",
+      "input_condition": "alias win=DIRECTA@T0/cutoff T2; curated win=LEGACYX@2025-01-02; tier-1=XBTUSDT+PID-1@T0/cutoff T2; lifecycle=SUSPENDED row known [T0, T0+5d), event=T0+2d, cutoff=T0+4d",
+      "observed_flags_by_probe": {
+        "IDENTITY_ALIAS_USED": [
+          "IDENTITY_ALIAS_USED"
+        ],
+        "IDENTITY_LIFECYCLE_BOUNDARY": [
+          "IDENTITY_LIFECYCLE_BOUNDARY"
+        ],
+        "IDENTITY_MANUAL_OVERRIDE": [
+          "IDENTITY_MANUAL_OVERRIDE"
+        ],
+        "IDENTITY_PROVIDER_ID_MISSING": [
+          "IDENTITY_PROVIDER_ID_MISSING"
+        ]
+      },
+      "observed_flags_union": [
+        "IDENTITY_ALIAS_USED",
+        "IDENTITY_LIFECYCLE_BOUNDARY",
+        "IDENTITY_MANUAL_OVERRIDE",
+        "IDENTITY_PROVIDER_ID_MISSING"
+      ],
+      "probe": "four flag-producing paths run live (alias win, curated-carrier win, tier-1 pid match, lifecycle warning) and the union of observed flags is compared against the sanctioned inventory",
+      "rank": "coverage",
+      "result": "PASS",
+      "tier": "identity quality-flag coverage"
     }
   ],
   "summary": {
     "all_results_pass": true,
-    "tiers_probed": 6
+    "tiers_probed": 10
   }
 }

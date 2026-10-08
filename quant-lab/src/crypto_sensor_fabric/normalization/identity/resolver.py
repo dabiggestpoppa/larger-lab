@@ -222,9 +222,29 @@ def _valid_at(event_time: datetime, valid_from: datetime, valid_to: datetime | N
     return valid_from <= event_time and (valid_to is None or event_time < valid_to)
 
 
-def _known_by(known_from: datetime, knowledge_cutoff: datetime) -> bool:
-    """knowledge-time law: known_from <= knowledge_cutoff (inclusive)."""
-    return known_from <= knowledge_cutoff
+def _known_by(
+    known_from: datetime,
+    known_to: datetime | None,
+    knowledge_cutoff: datetime,
+) -> bool:
+    """knowledge-time law (operator-directed Option 1 closure, B5-I03H):
+
+    A record possesses a knowledge interval when it is known at all:
+    ``known_from <= knowledge_cutoff``.  Where the record carries an explicit
+    upper knowledge boundary ``known_to``, the interval is bounded above as well:
+    ``knowledge_cutoff < known_to``.  An absent ``known_to`` means an
+    open-ended knowledge interval (no upper knowledge boundary).
+
+    This is a prospective semantic clarification authorized for
+    :class:`ContractInstance` and :class:`InstrumentLifecycle` only.  It is not
+    attributed to any earlier sealed contract and it does not alter the frozen
+    ``InstrumentAlias`` schema, which has no ``known_to`` field by frozen design.
+    """
+    if not known_from <= knowledge_cutoff:
+        return False
+    if known_to is not None and not knowledge_cutoff < known_to:
+        return False
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -273,12 +293,19 @@ def _instances_for(
 
 
 def _pit_valid(instances, event_time: datetime, knowledge_cutoff: datetime) -> list:
-    """Dual-clock gate applied per instance (valid-time AND knowledge-time)."""
+    """Dual-clock gate applied per instance (valid-time AND knowledge-time).
+
+    Knowledge eligibility uses the operator-directed Option 1 closure implemented
+    in :func:`_known_by`: ``known_from <= knowledge_cutoff``, plus an upper
+    knowledge boundary ``knowledge_cutoff < known_to`` where the record carries
+    one.  Alias records are unaffected: they carry no ``known_to`` by frozen
+    design, so the upper boundary is simply absent for them.
+    """
     return [
         ci
         for ci in instances
         if _valid_at(event_time, ci.valid_from, ci.valid_to)
-        and _known_by(ci.known_from, knowledge_cutoff)
+        and _known_by(ci.known_from, ci.known_to, knowledge_cutoff)
     ]
 
 
@@ -297,7 +324,7 @@ def _lifecycle_warning(
             event.provider == provider
             and event.venue == venue
             and event.contract_instance_id == instance_id
-            and _known_by(event.known_from, knowledge_cutoff)
+            and _known_by(event.known_from, event.known_to, knowledge_cutoff)
             and _valid_at(event_time, event.valid_from, event.valid_to)
             and event.lifecycle_state
             in (LifecycleState.SUSPENDED, LifecycleState.DELISTING_ANNOUNCED)
@@ -451,13 +478,21 @@ def _tier_exact_symbol(snapshot, provider, venue, native_symbol, event_time, kno
     Verdict law for temporal negatives (directives 11/12/13): known-but-not-
     valid resolves NOT_YET_LISTED strictly before the earliest valid_from and
     DELISTED otherwise (event_time >= some valid_to with no valid instance
-    left; the between-gap relisting law does not fabricate an identity)."""
+    left; the between-gap relisting law does not fabricate an identity).
+    ``known`` for this verdict law means knowledge-eligible under the Option 1
+    closure: a record whose knowledge window expired at the cutoff does not
+    count as known.  If no record remains eligible at all, this tier returns
+    PIT_KNOWLEDGE_BLOCKED above, never one of these temporal verdicts."""
     known_any = _instances_for(snapshot, provider, venue, native_symbol)
     if not known_any:
         # Symbol never registered in this context (covers BTC-vs-XBT and all
         # prefix/fuzzy/case-fold probes); tiers 3/4 still get their chance.
         return None
-    pit_known_at_all = [ci for ci in known_any if _known_by(ci.known_from, knowledge_cutoff)]
+    pit_known_at_all = [
+        ci
+        for ci in known_any
+        if _known_by(ci.known_from, ci.known_to, knowledge_cutoff)
+    ]
     if not pit_known_at_all:
         return _empty(IdentityResolutionStatus.PIT_KNOWLEDGE_BLOCKED)
     valid_now = [
@@ -507,7 +542,10 @@ def _tier_alias(snapshot, provider, venue, alias_text, event_time,
             continue
         if not _valid_at(event_time, alias.valid_from, alias.valid_to):
             continue
-        if not _known_by(alias.known_from, knowledge_cutoff):
+        # Aliases carry no ``known_to`` by frozen schema (section 8, directive
+        # 7): their knowledge interval is open-ended by construction, so the
+        # upper-bound term of the Option 1 closure is None here.
+        if not _known_by(alias.known_from, None, knowledge_cutoff):
             continue
         matched.append(alias)
     matched.sort(key=lambda alias: alias.alias_id)  # deterministic canonical scan

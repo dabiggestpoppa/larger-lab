@@ -297,6 +297,7 @@ def lifecycle_event(
     state_from: datetime = T0,
     state_to: datetime | None = None,
     known_from: datetime = T0 - timedelta(days=1),
+    known_to: datetime | None = None,
     instance_id: str = "CI-A",
 ):
     return instrument_lifecycle()(
@@ -307,6 +308,7 @@ def lifecycle_event(
         valid_from=state_from,
         valid_to=state_to,
         known_from=known_from,
+        known_to=known_to,
         source_evidence_refs=("provider-docs:lifecycle-notices",),
     )
 
@@ -990,3 +992,282 @@ def test_delisting_announced_warning_window_boundaries_are_half_open() -> None:
     assert "IDENTITY_LIFECYCLE_BOUNDARY" in {
         flag.value for flag in before_end.quality_flags
     }
+# ----------------------------------------------------------------------------
+# B5-I03H: Option 1 knowledge-interval closure (known_from <= cutoff < known_to)
+# ----------------------------------------------------------------------------
+#
+# Operator-directed prospective clarification (B5-I03H): a record that carries
+# ``known_to`` is knowledge-eligible at the cutoff only while
+# ``known_from <= knowledge_cutoff < known_to``; an absent ``known_to`` means an
+# open-ended knowledge interval.  Every probe below holds the event-time clock
+# FIXED (event inside the instance's valid window) and moves only the knowledge
+# cutoff, so no event-time boundary test substitutes for a knowledge-time
+# boundary test.  ``InstrumentAlias`` is untouched: its frozen eleven-field
+# schema has no ``known_to`` and its knowledge interval is open-ended.
+
+K0 = datetime(2023, 6, 1, tzinfo=UTC)               # knowledge window opens
+K1 = datetime(2023, 12, 1, tzinfo=UTC)              # knowledge window closes
+EVENT_IN_WINDOW = datetime(2023, 9, 1, tzinfo=UTC)  # inside valid [T0, T1)
+
+
+def bounded_knowledge_instance(**kw) -> ContractInstance:
+    """CI-A carrying a bounded knowledge window [K0, K1)."""
+    return instance2(known_from=K0, known_to=K1, **kw)
+
+
+def test_knowledge_cutoff_before_known_from_is_blocked() -> None:
+    """Option 1 lower bound: a cutoff strictly before known_from leaves no
+    eligible candidate -> PIT_KNOWLEDGE_BLOCKED (fail closed, no fabricated
+    identity)."""
+    snap = registry_with_instances(bounded_knowledge_instance())
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, EVENT_IN_WINDOW, K0 - INCLUDE_MARGIN)
+    assert out.status is st.PIT_KNOWLEDGE_BLOCKED
+    assert out.contract_instance_id is None
+    assert out.economic_contract_id is None
+    assert out.canonical_asset_id is None
+
+
+def test_knowledge_cutoff_exactly_at_known_from_resolves() -> None:
+    """Option 1 lower bound is INCLUSIVE: cutoff exactly at known_from is
+    eligible -> RESOLVED_EXACT (same event, same valid window as the blocked
+    probe one microsecond earlier)."""
+    snap = registry_with_instances(bounded_knowledge_instance())
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, EVENT_IN_WINDOW, K0)
+    assert out.status is st.RESOLVED_EXACT
+    assert out.contract_instance_id == "CI-A"
+
+
+def test_knowledge_cutoff_one_microsecond_before_known_to_still_resolves() -> None:
+    """Option 1 upper bound: one microsecond before known_to is still inside
+    the knowledge interval -> RESOLVED_EXACT."""
+    snap = registry_with_instances(bounded_knowledge_instance())
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, EVENT_IN_WINDOW, K1 - INCLUDE_MARGIN)
+    assert out.status is st.RESOLVED_EXACT
+    assert out.contract_instance_id == "CI-A"
+
+
+def test_knowledge_cutoff_exactly_at_known_to_is_blocked() -> None:
+    """Option 1 upper bound is EXCLUSIVE: a cutoff exactly at known_to is past
+    the knowledge interval -> PIT_KNOWLEDGE_BLOCKED, and the unresolved answer
+    carries no identifiers and no evidence refs."""
+    snap = registry_with_instances(bounded_knowledge_instance())
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, EVENT_IN_WINDOW, K1)
+    assert out.status is st.PIT_KNOWLEDGE_BLOCKED
+    assert out.contract_instance_id is None
+    assert out.economic_contract_id is None
+    assert out.canonical_asset_id is None
+    assert out.source_evidence_refs == ()
+
+
+def test_knowledge_cutoff_after_known_to_is_blocked() -> None:
+    """Option 1 upper bound: a cutoff past known_to -> PIT_KNOWLEDGE_BLOCKED."""
+    snap = registry_with_instances(bounded_knowledge_instance())
+    st = resolution_status()
+    out = resolve_instrument(
+        snap, NATIVE, EVENT_IN_WINDOW, K1 + timedelta(days=1)
+    )
+    assert out.status is st.PIT_KNOWLEDGE_BLOCKED
+    assert out.contract_instance_id is None
+
+
+def test_absent_known_to_is_open_ended() -> None:
+    """Option 1 open-ended rule: with known_to absent the knowledge interval
+    has no upper boundary, so an arbitrarily late cutoff still resolves."""
+    snap = registry_with_instances(instance2())  # known_to defaults to None
+    st = resolution_status()
+    out = resolve_instrument(snap, NATIVE, EVENT_IN_WINDOW, FAR_FUTURE)
+    assert out.status is st.RESOLVED_EXACT
+    assert out.contract_instance_id == "CI-A"
+
+
+def test_historical_event_resolves_only_inside_the_knowledge_window() -> None:
+    """Historical event queried with a LATER knowledge cutoff: Option 1 keeps
+    answering while the cutoff sits inside the record's knowledge window and
+    blocks once the window has closed.  Both probes share the same historical
+    event and the same valid-time window; only the knowledge cutoff moves, so
+    this pins the knowledge clock, not the event clock."""
+    snap = registry_with_instances(bounded_knowledge_instance())
+    st = resolution_status()
+
+    later_inside_window = resolve_instrument(
+        snap, NATIVE, EVENT_IN_WINDOW, K1 - INCLUDE_MARGIN
+    )
+    assert later_inside_window.status is st.RESOLVED_EXACT
+    assert later_inside_window.contract_instance_id == "CI-A"
+
+    later_after_close = resolve_instrument(
+        snap, NATIVE, EVENT_IN_WINDOW, K1 + timedelta(days=1)
+    )
+    assert later_after_close.status is st.PIT_KNOWLEDGE_BLOCKED
+    assert later_after_close.contract_instance_id is None
+
+
+def test_nonoverlapping_revisions_gap_cutoff_blocks_without_supersession() -> None:
+    """Two revisions with nonoverlapping knowledge windows.  A cutoff in the
+    gap between the old window closing and the new window opening leaves no
+    eligible candidate: Option 1 invents no supersession engine and selects no
+    replacement record - the resolver fails closed with PIT_KNOWLEDGE_BLOCKED.
+    A cutoff inside the old window still answers with the OLD record (no
+    arbitrary replacement selection) and a cutoff inside the new window
+    answers with the NEW record (valid-time cutover law, not knowledge law)."""
+    k2 = datetime(2024, 3, 1, tzinfo=UTC)  # the new revision's knowledge opens
+    old = instance2(
+        instance_id="CI-OLD",
+        valid_from=T0,
+        valid_to=PAUSE,
+        known_from=K0,
+        known_to=K1,
+    )
+    new = instance2(
+        instance_id="CI-NEW",
+        valid_from=T2,
+        valid_to=None,
+        known_from=k2,
+        known_to=None,
+    )
+    snap = registry_with_instances(old, new)
+    st = resolution_status()
+
+    in_gap = datetime(2024, 1, 15, tzinfo=UTC)  # K1 < gap < k2
+    blocked = resolve_instrument(snap, NATIVE, PAUSE, in_gap)
+    assert blocked.status is st.PIT_KNOWLEDGE_BLOCKED
+    assert blocked.contract_instance_id is None
+
+    old_window = datetime(2023, 9, 1, tzinfo=UTC)  # CI-OLD valid + known
+    with_old = resolve_instrument(snap, NATIVE, old_window, K1 - INCLUDE_MARGIN)
+    assert with_old.status is st.RESOLVED_EXACT
+    assert with_old.contract_instance_id == "CI-OLD"
+
+    new_window = T2 + timedelta(days=1)  # CI-NEW valid, at/after k2
+    with_new = resolve_instrument(snap, NATIVE, new_window, k2)
+    assert with_new.status is st.RESOLVED_EXACT
+    assert with_new.contract_instance_id == "CI-NEW"
+
+
+def test_overlapping_eligible_records_stay_ambiguous() -> None:
+    """Two alias-matched records that are both knowledge-eligible at the
+    cutoff and both valid at the event stay AMBIGUOUS: Option 1 eligibility
+    must never manufacture a winner (ambiguity dominates convenience, S9),
+    and the unresolved answer fabricates no identifiers."""
+    at = alias_type()
+    a1 = alias("AMBK1", alias_type_value=at.API_SYMBOL, instance_id="CI-KBA1",
+               valid_from=T0, valid_to=None)
+    a2 = alias("AMBK1", alias_type_value=at.DISPLAY_SYMBOL, instance_id="CI-KBA2",
+               valid_from=T0, valid_to=None)
+    snap = snapshot_with_aliases(
+        (a1, a2),
+        instance2(
+            instance_id="CI-KBA1",
+            valid_from=T0,
+            valid_to=T1,
+            native_symbol="AMBKA1",
+            known_from=K0,
+            known_to=K1,
+        ),
+        instance2(
+            instance_id="CI-KBA2",
+            valid_from=T0,
+            valid_to=T1,
+            native_symbol="AMBKA2",
+            known_from=K0,
+            known_to=None,
+        ),
+        registry_version="work",
+    )
+    st = resolution_status()
+    cutoff = datetime(2023, 10, 1, tzinfo=UTC)  # inside BOTH knowledge windows
+    out = resolve_instrument(
+        snap, "AMBK1", datetime(2023, 9, 1, tzinfo=UTC), cutoff
+    )
+    assert out.status is st.AMBIGUOUS
+    assert out.contract_instance_id is None
+    assert out.economic_contract_id is None
+    assert out.matched_alias_id is None
+
+
+def test_lifecycle_warning_row_with_expired_knowledge_is_inert() -> None:
+    """A SUSPENDED warning row whose own knowledge window closed before the
+    cutoff is not knowledge-eligible, so no downgrade fires.  The control probe
+    at a cutoff inside the row's knowledge window shows the warning, proving
+    the difference is the knowledge clock alone: same event, same valid-time
+    windows, only the cutoff moves."""
+    lc = lifecycle_event(
+        lifecycle_state().SUSPENDED,
+        state_from=T0 + timedelta(days=1),
+        state_to=T0 + timedelta(days=9),
+        known_from=T0,
+        known_to=T0 + timedelta(days=5),
+    )
+    snap = snapshot_with_aliases((), instance2(), lifecycle=(lc,))
+    st = resolution_status()
+    event = T0 + timedelta(days=2)  # inside the SUSPENDED valid window
+
+    control = resolve_instrument(snap, NATIVE, event, T0 + timedelta(days=4))
+    assert control.status is st.RESOLVED_WITH_WARNING
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" in {
+        flag.value for flag in control.quality_flags
+    }
+
+    expired = resolve_instrument(snap, NATIVE, event, T0 + timedelta(days=5))
+    assert expired.status is st.RESOLVED_EXACT
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in {
+        flag.value for flag in expired.quality_flags
+    }
+
+    long_expired = resolve_instrument(snap, NATIVE, event, T0 + timedelta(days=6))
+    assert long_expired.status is st.RESOLVED_EXACT
+    assert "IDENTITY_LIFECYCLE_BOUNDARY" not in {
+        flag.value for flag in long_expired.quality_flags
+    }
+
+
+# ----------------------------------------------------------------------------
+# B5-I03H G2: the provider instrument ID is venue-scoped (tier-1 isolation)
+# ----------------------------------------------------------------------------
+
+OTHER_VENUE = "EXB_FUT"
+
+
+def test_provider_id_on_the_wrong_venue_does_not_anchor() -> None:
+    """G2 closure (B5-I03H): tier-1 requires provider + venue + time +
+    knowledge context, never the bare ID.  The provider instrument ID is
+    correct for the instrument, but the query carries a different (registered)
+    venue: the ID must not anchor across venues, every tier falls through, and
+    the answer is UNKNOWN_SYMBOL with no fabricated identity.  The control call
+    on the correct venue resolves, proving the difference is the venue axis."""
+    snap = snapshot_with_aliases((), instance2(), extra_venue_ids=(OTHER_VENUE,))
+    st = resolution_status()
+    event = T0 + timedelta(days=3)
+
+    control = resolve()(
+        snap,
+        provider=PROVIDER,
+        venue=VENUE,
+        native_symbol=NATIVE,
+        event_time=event,
+        knowledge_cutoff=T2,
+        optional_provider_instrument_id=PROVIDER_INSTRUMENT_ID,
+    )
+    assert control.status is st.RESOLVED_EXACT
+    assert control.contract_instance_id == "CI-A"
+
+    wrong_venue = resolve()(
+        snap,
+        provider=PROVIDER,
+        venue=OTHER_VENUE,
+        native_symbol=NATIVE,
+        event_time=event,
+        knowledge_cutoff=T2,
+        optional_provider_instrument_id=PROVIDER_INSTRUMENT_ID,
+    )
+    assert wrong_venue.status is st.UNKNOWN_SYMBOL
+    assert wrong_venue.contract_instance_id is None
+    assert wrong_venue.economic_contract_id is None
+    assert wrong_venue.canonical_asset_id is None
+    assert wrong_venue.matched_alias_id is None
+    assert wrong_venue.terms_version is None
+    assert wrong_venue.source_evidence_refs == ()
