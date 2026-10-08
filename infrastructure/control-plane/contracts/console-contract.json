@@ -1,0 +1,126 @@
+{
+  "$comment": "OCE B5-I2 contract pack - charter increment I-1 (console-control-plane deterministic interface contracts). Binds every console-read / console-invoke surface to EXISTING governed control-plane operations and EXISTING schemas. No new server endpoint, no console code, no UI. Authority law: the console is a client; the control plane remains the only authority; every mutation maps to exactly one governed operation (charter Gates G3/G4/G5).",
+  "contract_id": "oce.console-control-plane.contracts",
+  "contract_version": "1.0.0",
+  "charter": "OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+  "charter_increment": "I-1",
+  "policy_version": "b5-i2",
+  "schemas": {
+    "job_envelope": "job-envelope.schema.json",
+    "denial_envelope": "denial-envelope.schema.json",
+    "evidence_manifest": "evidence-manifest.schema.json"
+  },
+  "reads": [
+    {
+      "surface": "health.read",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.health", "http_route": "GET /api/health" },
+      "response_projection": "verbatim",
+      "governing_schema": null
+    },
+    {
+      "surface": "readiness.read",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.readiness", "http_route": "GET /api/readiness" },
+      "response_projection": "verbatim",
+      "governing_schema": null
+    },
+    {
+      "surface": "jobs.inspect",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.inspect_job", "http_route": "GET /api/jobs/{job_id}" },
+      "response_projection": "job_envelope_projected",
+      "governing_schema": "job-envelope.schema.json"
+    },
+    {
+      "surface": "jobs.schedules",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.list_schedules", "http_route": "GET /api/schedules" },
+      "response_projection": "verbatim",
+      "governing_schema": null
+    },
+    {
+      "surface": "workers.list",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.list_workers", "http_route": "GET /api/workers" },
+      "response_projection": "verbatim",
+      "governing_schema": null
+    },
+    {
+      "surface": "system.read",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.system_state", "http_route": "GET /api/system" },
+      "response_projection": "verbatim",
+      "governing_schema": null
+    },
+    {
+      "surface": "audit.read",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.audit_history", "http_route": "GET /api/audit" },
+      "response_projection": "verbatim",
+      "governing_schema": null
+    },
+    {
+      "surface": "denial.read",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.authority", "callable": "AuthorityEngine.record_denial", "http_route": "embedded in denied APIResponse.data.denial" },
+      "response_projection": "verbatim",
+      "governing_schema": "denial-envelope.schema.json"
+    },
+    {
+      "surface": "evidence.read",
+      "kind": "read",
+      "binds_to": { "module": "oce_control.evidence", "callable": "EvidenceBuilder.build_manifest", "http_route": "embedded in job evidence_refs / evidence records" },
+      "response_projection": "verbatim",
+      "governing_schema": "evidence-manifest.schema.json"
+    }
+  ],
+  "invokes": [
+    {
+      "surface": "jobs.submit",
+      "kind": "invoke",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.submit_job", "http_route": "POST /api/jobs" },
+      "request_fields": ["job_type", "payload", "resource_scope", "environment", "priority", "grant_id", "actor_id"],
+      "required_request_fields": ["job_type", "payload", "grant_id", "actor_id"],
+      "bounded_job_types_from": "oce_control.representative_jobs.supported_job_types",
+      "max_payload_bytes": 65536,
+      "governing_schema": "job-envelope.schema.json",
+      "failure": "denial-envelope.schema.json"
+    },
+    {
+      "surface": "jobs.cancel",
+      "kind": "invoke",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.cancel_job", "http_route": "POST /api/jobs/{job_id}/cancel" },
+      "request_fields": ["job_id", "grant_id", "actor_id"],
+      "required_request_fields": ["job_id", "grant_id", "actor_id"],
+      "governing_schema": "job-envelope.schema.json",
+      "failure": "denial-envelope.schema.json"
+    },
+    {
+      "surface": "jobs.retry",
+      "kind": "invoke",
+      "binds_to": { "module": "oce_control.api", "callable": "ControlPlaneAPI.retry_job", "http_route": "POST /api/jobs/{job_id}/retry" },
+      "request_fields": ["job_id", "grant_id", "actor_id"],
+      "required_request_fields": ["job_id", "grant_id", "actor_id"],
+      "governing_schema": "job-envelope.schema.json",
+      "failure": "denial-envelope.schema.json"
+    }
+  ],
+  "refusals": {
+    "unsupported_surface": "unknown or non-declared surface id: refused before any side effect",
+    "unsupported_job_type": "job_type outside the bounded representative catalog: refused before admission",
+    "payload_too_large": "serialized payload exceeds max_payload_bytes: refused before admission",
+    "malformed_request": "missing required request fields or wrong types: refused before admission",
+    "authority_denial": "identity/authority failures are owned by the existing AuthorityEngine denial path and rendered verbatim (denial-envelope.schema.json); the console never mints or reinterprets them"
+  },
+  "law": {
+    "authority_owner": "oce_control.authority.AuthorityEngine (existing, sole owner)",
+    "console_is_client_only": true,
+    "every_mutation_is_one_governed_operation": true,
+    "unsupported_ops_fail_closed_before_side_effects": true,
+    "no_llm_in_operation_path": true,
+    "loopback_only": true,
+    "no_external_hosting_or_paid_provider": true,
+    "recurring_cost_usd": 0
+  }
+}
