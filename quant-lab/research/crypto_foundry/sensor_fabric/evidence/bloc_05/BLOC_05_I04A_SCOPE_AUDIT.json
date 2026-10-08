@@ -1,0 +1,108 @@
+{
+  "all_results_pass": true,
+  "artifact": "BLOC_05_I04A_SCOPE_AUDIT",
+  "checkpoint": "SENSOR-B5-I04A",
+  "checks": {
+    "forbidden_terms_module_file_absent": {
+      "law": "B5-I01 forbidden module list still holds (terms.py beside package)",
+      "measured": "path absence",
+      "pass": true,
+      "value": true
+    },
+    "no_fabricated_status_enum": {
+      "law": "D2: no new status enum is authorized",
+      "measured": "IdentityResolutionStatus member set (frozen nine)",
+      "pass": true,
+      "value": [
+        "AMBIGUOUS",
+        "DELISTED",
+        "NOT_YET_LISTED",
+        "PIT_KNOWLEDGE_BLOCKED",
+        "RESOLVED_ALIAS",
+        "RESOLVED_EXACT",
+        "RESOLVED_WITH_WARNING",
+        "TERMS_UNVERIFIED",
+        "UNKNOWN_SYMBOL"
+      ]
+    },
+    "no_i01_i02_model_changes": {
+      "law": "S11.1: no existing production identity model modification",
+      "measured": "enums.py/models.py/__init__.py diff vs HEAD (empty because unchanged)",
+      "pass": true,
+      "value": []
+    },
+    "no_i03_resolver_changes": {
+      "law": "D2: the I03 identity resolver is consumed, never modified",
+      "measured": "quant-lab/src/.../identity/ diff vs HEAD",
+      "pass": true,
+      "value": []
+    },
+    "no_i08_common_conversion": {
+      "law": "S04: I04A must not own normalization/common/conversion.py",
+      "measured": "absence of normalization/common directory",
+      "pass": true,
+      "value": true
+    },
+    "no_linear_inverse_conversion_engine": {
+      "law": "explicit I04A non-scope: no conversion implementation",
+      "measured": "forbidden tokens in terms/ sources",
+      "pass": true,
+      "value": {
+        "convert": false,
+        "exposure": false,
+        "notional": false,
+        "reference_price": false
+      }
+    },
+    "no_reference_price_sourcing": {
+      "law": "explicit I04A non-scope",
+      "measured": "network/filesystem imports in terms/ sources",
+      "pass": true,
+      "value": {
+        "aiohttp": false,
+        "httpx": false,
+        "open(": false,
+        "pathlib": false,
+        "requests": false,
+        "socket": false,
+        "urllib": false
+      }
+    },
+    "no_research_or_plan_changes": {
+      "law": "S11.1: no research canon / frozen plan modification",
+      "measured": "git status porcelain (untracked scratch allowed, plan/research tracked untouched)",
+      "pass": true,
+      "value": []
+    },
+    "no_reserved_status_construction": {
+      "law": "D2: TERMS_UNVERIFIED stays reserved; no construction path",
+      "measured": "AST scan (docstrings excluded) of terms/ sources + return-line scan of identity resolver",
+      "pass": true,
+      "value": {
+        "identity_construction": [],
+        "terms_non_docstring_mentions": {}
+      }
+    },
+    "top_level_surface_unchanged_24": {
+      "law": "B5-I02/I03 directive 29: top-level normalization surface stays 24",
+      "measured": "__all__ length in normalization/__init__.py",
+      "pass": true,
+      "value": 24
+    }
+  },
+  "created": "2026-10-08",
+  "evidence_class": "PRODUCED_MEASURED",
+  "generator": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/)",
+  "results": {
+    "forbidden_terms_module_file_absent": "PASS",
+    "no_fabricated_status_enum": "PASS",
+    "no_i01_i02_model_changes": "PASS",
+    "no_i03_resolver_changes": "PASS",
+    "no_i08_common_conversion": "PASS",
+    "no_linear_inverse_conversion_engine": "PASS",
+    "no_reference_price_sourcing": "PASS",
+    "no_research_or_plan_changes": "PASS",
+    "no_reserved_status_construction": "PASS",
+    "top_level_surface_unchanged_24": "PASS"
+  }
+}

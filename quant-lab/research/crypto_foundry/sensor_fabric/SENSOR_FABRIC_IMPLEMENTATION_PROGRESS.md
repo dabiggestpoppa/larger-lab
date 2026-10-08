@@ -5939,3 +5939,105 @@ were written. I04_READINESS = **MEASURED_AND_REPORTED**. Verdict:
 granted by any clause). I04_IMPLEMENTATION_AUTHORIZATION = **FALSE**.
 recommended_next = **OPERATOR DECISION ON D1/D2, THEN A SEPARATE I04
 IMPLEMENTATION DIRECTIVE IF DESIRED**. HARD STOP after push and report.
+
+## 164 - SENSOR-B5-I04A: CONTRACT TERMS SNAPSHOT + PROJECTION FOUNDATION (IMPLEMENTATION PASS, PENDING OPERATOR REVIEW)
+
+- **Custody:** required = actual starting HEAD
+  `72984adbcc29580bb7942b119f59d3372ebccd8e`, `git status --short`
+  clean, remote build head equal; frozen plan blobs re-verified
+  SAME against `agent/crypto-sensor-fabric-plan`; I03J ratification
+  reachable. One bounded I04A implementation commit; no squash,
+  amend, reset or rebase; ff-only push to
+  `agent/crypto-sensor-fabric-build`.
+- **Operator decisions applied:** D1 = interpretation A —
+  `ContractTermsSnapshot` is a PIT projection of terms already recorded
+  on the I02-accepted `ContractInstance` (plus `quote_asset_id` read
+  from its accepted `EconomicContract`, required verbatim by
+  bloc_05/03 §6 quote_asset); every field mapped field-by-field to a
+  frozen clause in `BLOC_05_I04A_SCHEMA_AUTHORITY_MATRIX.json` (32
+  source rows, 17 projected, 0 unmapped, 0 invented terms, 0 defaults).
+  D2 = interpretation B — I03 resolver consumed, never modified
+  (identity diff vs HEAD empty); `TERMS_UNVERIFIED` stays reserved
+  (AST-verified: zero non-docstring mentions in `terms/`, zero
+  construction lines in resolver.py); terms verification enforced at
+  the I04 boundary (resolved identity + `payoff_type=UNKNOWN` → no
+  snapshot, status untouched); no new enum, flag, or public response
+  contract (snapshot | typed `None` absence), so no STOP fired.
+- **Implementation:** new subpackage
+  `src/crypto_sensor_fabric/normalization/terms/` (`__init__.py`,
+  `snapshot.py`, `projection.py`) — 17-field frozen immutable model +
+  pure `project_contract_terms()` with clock/payoff/referential
+  fail-closed refusal; no conversion, price, or identity logic.
+  Placement avoids I08 `common/conversion.py` ownership and the
+  forbidden `normalization/terms.py`. I01 scope-audit subpackage
+  allowlist extended `{"identity"} → {"identity","terms"}` under the
+  I02 precedent (disclosed); top-level API stays exactly 24 symbols;
+  all other scope laws untouched.
+- **RED-first:** suite authored before any module existed;
+  pre-implementation run failed `ModuleNotFoundError` (pytest exit 2);
+  no existing code touched to produce RED; Stage C then 28/28
+  (T04A-01..20 + A1-A8).
+- **Evidence (V4):** tracked generator
+  `research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py`
+  (committed in the same stage as its evidence); double-run 4/4
+  byte-identical, sha256 — schema `014f5aac…cca9351f` (32 rows), PIT
+  `79de338f…43ef2538` (12/12 PASS), adversarial
+  `19741acc…2fcd9b27` (8/8 PASS), scope `07ca4a69…17ed02fb`
+  (10/10 PASS). Defect fixed + disclosed: first generation embedded
+  `repr()` memory addresses for nested `Annotated` validators →
+  nondeterministic schema hash; stable address-stripped repr now
+  reproduces byte-identically.
+- **Verification:** V1 focused **28 passed**; V2 normalization
+  **525 passed** (I03I baseline 497 + 28); V3 I03 resolver **84
+  passed**; V4 as above; V5 protected historical evidence — see
+  disclosure below; V6 I11R2 count **1037 → 1042** (5 new tracked
+  Python files) republished via `UPDATE_I11R2_EVIDENCE=1`, disclosed;
+  V7 full project **3923 passed / 14 skipped / 0 failed** in 19:43
+  (3895 I03I baseline + exactly the 28 new I04A tests), exit 0; V8
+  ruff changed-scope all checks passed, mypy **0 new** (10 inherited
+  provider/probe errors unchanged), compileall OK, secret scan clean.
+- **V5 disclosure (Windows test-environment artifact):** the full suite
+  regenerates 7 sealed Bloc 4 evidence JSONs
+  (`BLOC_04_I03R1_ATOMIC_ORDER`, `BLOC_04_I03R1_NAMESPACE_DURABILITY`,
+  `BLOC_04_I04R1_POINTER_SCHEMA`, `BLOC_04_I04R1_PROVENANCE_MATRIX`,
+  `BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX`,
+  `BLOC_04_I04_CATALOG_SCHEMAS`, `BLOC_04_I04_MANIFEST_CONCURRENCY`)
+  through `Path.write_text` text-mode writes → CRLF line endings on
+  Windows. Content verified identical modulo EOL
+  (`git diff --ignore-cr-at-eol` empty) and all 7 restored to HEAD
+  bytes pre-commit; **not** part of this commit. Zero semantic change
+  to any historical evidence.
+- **Acceptance (§10, each predicate reported in the final report):**
+  15/15 satisfied for I04A scope: D1 mapping grounded, D2 preserved,
+  schema fidelity, PIT clock fidelity, no false verified terms, no
+  identity mutation, no fabricated economic values, no
+  unverified→verified promotion, 20/20 T04A, 8/8 adversarial, 4/4
+  reproducibility, protected evidence intact, regressions green, no
+  unauthorized expansion. R1–R15: I04A closes only the contract/schema
+  portion (R1, R6, R13, R14, R15 + snapshot half of R10); conversion
+  obligations (R2–R5, R7-class) remain open for I04B.
+- **Governance state:**
+
+```text
+B5-I03_SUBGATE = IMPLEMENTATION_PASS
+B5-I03_RATIFICATION = OPERATOR_ACCEPTED
+B5-I04A = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+B5-I04_COMPLETE = FALSE
+IDENTITY_GATE = NOT_YET_EARNED
+TIME_GATE = NOT_YET_EARNED
+SEMANTIC_GATE = NOT_YET_EARNED
+UNIT_GATE = NOT_YET_EARNED
+LINEAGE_GATE = NOT_YET_EARNED
+DUPLICATE_REVISION_GATE = NOT_YET_EARNED
+REPLAY_SAFETY_GATE = NOT_YET_EARNED
+GOLDEN_T0_T1_GATE = NOT_YET_EARNED
+next_checkpoint_authorized = FALSE
+B5-I04B+ = UNAUTHORIZED
+BLOC_06 = UNAUTHORIZED
+RESEARCH = FROZEN
+```
+
+`IDENTITY_GATE` remains NOT_YET_EARNED pending runtime execution proof
+at finalized GOLDEN_T0_T1 frames. I04A does not self-ratify; operator
+review required before any I04B directive. **HARD STOP after push and
+report.**

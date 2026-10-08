@@ -67,8 +67,12 @@ def test_package_exists_with_exactly_three_modules() -> None:
 
 def test_only_authorized_subpackages_exist() -> None:
     """B5-I02 (operator-authorized) added ``identity/`` per bloc_05/01 §16.
-    Every other subpackage remains forbidden at this layer."""
-    allowed = {"identity"}
+    B5-I04A (operator-authorized) adds ``terms/`` per the I04A directive
+    scope (new I04 terms-model/projection module) -- disclosed scope-audit
+    extension on the established I02 precedent; the ``terms.py`` MODULE
+    beside the package remains forbidden below, and every other subpackage
+    remains forbidden at this layer."""
+    allowed = {"identity", "terms"}
     present = {
         entry.name
         for entry in PACKAGE.iterdir()

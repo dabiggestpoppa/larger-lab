@@ -1,0 +1,176 @@
+{
+  "artifact": "BLOC_05_I04A_PIT_TERMS_MATRIX",
+  "checkpoint": "SENSOR-B5-I04A",
+  "created": "2026-10-08",
+  "evidence_class": "PRODUCED_MEASURED",
+  "generator": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/)",
+  "rows": [
+    {
+      "case_id": "P01",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "PIT_KNOWLEDGE_BLOCKED",
+      "input_condition": "cutoff=known_from-1us; identity blocked and I04 gate absent",
+      "knowledge_cutoff": "2023-05-31T23:59:59.999999Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_06_cutoff_before_known_from_blocks"
+    },
+    {
+      "case_id": "P02",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "SNAPSHOT",
+      "identity_status": "RESOLVED_EXACT",
+      "input_condition": "cutoff==known_from; lower knowledge bound inclusive",
+      "knowledge_cutoff": "2023-06-01T00:00:00Z",
+      "observed_result": "SNAPSHOT",
+      "source_evidence_refs": [
+        "provider-docs:exchange-a-xbtusdt"
+      ],
+      "terms_version": "1",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_07_cutoff_at_known_from_projects"
+    },
+    {
+      "case_id": "P03",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "SNAPSHOT",
+      "identity_status": "RESOLVED_EXACT",
+      "input_condition": "cutoff=known_to-1us == 2023-12-01T11:59:59.999999Z inside [known_from, known_to)",
+      "knowledge_cutoff": "2023-11-30T23:59:59.999999Z",
+      "observed_result": "SNAPSHOT",
+      "source_evidence_refs": [
+        "provider-docs:exchange-a-xbtusdt"
+      ],
+      "terms_version": "1",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_08_one_microsecond_before_known_to_projects"
+    },
+    {
+      "case_id": "P04",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "PIT_KNOWLEDGE_BLOCKED",
+      "input_condition": "cutoff==known_to; half-open knowledge bound exclusive at both layers",
+      "knowledge_cutoff": "2023-12-01T00:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_09_cutoff_exactly_at_known_to_blocks"
+    },
+    {
+      "case_id": "P05",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "PIT_KNOWLEDGE_BLOCKED",
+      "input_condition": "cutoff=known_to+1d; knowledge window closed",
+      "knowledge_cutoff": "2023-12-02T00:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_10_cutoff_after_known_to_blocks"
+    },
+    {
+      "case_id": "P06",
+      "disposition": "PASS",
+      "event_time": "2022-12-31T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "NOT_YET_LISTED",
+      "input_condition": "event=valid_from-1d; NOT_YET_LISTED verdict carries no terms",
+      "knowledge_cutoff": "2023-10-01T12:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_11_event_before_valid_from_blocks"
+    },
+    {
+      "case_id": "P07",
+      "disposition": "PASS",
+      "event_time": "2024-01-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "DELISTED",
+      "input_condition": "event==valid_to; half-open validity exclusive at both layers",
+      "knowledge_cutoff": "2023-10-01T12:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_12_event_at_valid_to_blocks"
+    },
+    {
+      "case_id": "P08",
+      "disposition": "PASS",
+      "event_time": "2023-01-01T12:00:00Z",
+      "expected_result": "SNAPSHOT",
+      "identity_status": "RESOLVED_EXACT",
+      "input_condition": "event==valid_from; valid-time lower bound inclusive",
+      "knowledge_cutoff": "2023-10-01T12:00:00Z",
+      "observed_result": "SNAPSHOT",
+      "source_evidence_refs": [
+        "provider-docs:exchange-a-xbtusdt"
+      ],
+      "terms_version": "1",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_01_valid_resolved_linear_terms_project_faithfully"
+    },
+    {
+      "case_id": "P09",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "AMBIGUOUS",
+      "input_condition": "AMBIGUOUS resolution carries no instance id; no snapshot fabricated",
+      "knowledge_cutoff": "2023-10-01T12:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_13_ambiguous_identity_yields_no_snapshot"
+    },
+    {
+      "case_id": "P10",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "UNKNOWN_SYMBOL",
+      "input_condition": "symbol registered only at EXA_FUT; UNKNOWN_SYMBOL at EXB_FUT",
+      "knowledge_cutoff": "2023-10-01T12:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_14_wrong_venue_provides_no_terms"
+    },
+    {
+      "case_id": "P11",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "RESOLVED_EXACT",
+      "input_condition": "resolution RESOLVED_EXACT at in-window cutoff; projection independently asked at cutoff==known_to",
+      "knowledge_cutoff": "2023-12-01T00:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_09_cutoff_exactly_at_known_to_blocks"
+    },
+    {
+      "case_id": "P12",
+      "disposition": "PASS",
+      "event_time": "2023-09-01T12:00:00Z",
+      "expected_result": "ABSENT",
+      "identity_status": "RESOLVED_EXACT",
+      "input_condition": "identity RESOLVED_EXACT but payoff_type=UNKNOWN (unverified terms); no reserved status constructed",
+      "knowledge_cutoff": "2023-10-01T12:00:00Z",
+      "observed_result": "ABSENT",
+      "source_evidence_refs": [],
+      "terms_version": null,
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_t04a_15_unverified_terms_do_not_qualify_for_conversion"
+    }
+  ],
+  "summary": {
+    "all_results_pass": true,
+    "cases": 12,
+    "passed": 12
+  }
+}

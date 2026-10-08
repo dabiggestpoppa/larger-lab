@@ -1,0 +1,102 @@
+{
+  "artifact": "BLOC_05_I04A_ADVERSARIAL_MATRIX",
+  "checkpoint": "SENSOR-B5-I04A",
+  "created": "2026-10-08",
+  "evidence_class": "PRODUCED_MEASURED",
+  "generator": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/)",
+  "rows": [
+    {
+      "acceptance_clause": "bloc_05/03 S7: no 1-contract-1-base assumption",
+      "case_id": "A1",
+      "disposition": "PASS",
+      "expected_result": "multiplier=0.25",
+      "fixture": "LINEAR instance with contract_multiplier=0.25",
+      "forbidden_result": "multiplier=1",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "multiplier=0.25",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a1_one_contract_one_base_assumption_trap"
+    },
+    {
+      "acceptance_clause": "bloc_05/07 F7: USD and USDT stay distinct canonical assets",
+      "case_id": "A2",
+      "disposition": "PASS",
+      "expected_result": "quote=USD,settlement=USDT",
+      "fixture": "quote_asset_id=USD with settlement_asset_id=USDT",
+      "forbidden_result": "quote=USDT or settlement=USD",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "quote=USD,settlement=USDT",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a2_stablecoin_equivalence_trap"
+    },
+    {
+      "acceptance_clause": "bloc_05/01 S7: terms-version fidelity, no silent upgrade",
+      "case_id": "A3",
+      "disposition": "PASS",
+      "expected_result": "version=1",
+      "fixture": "sequential CI-OLD v1 / CI-NEW v2, query bound to old window",
+      "forbidden_result": "version=2",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "version=1",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a3_stale_terms_version_not_silent_upgraded"
+    },
+    {
+      "acceptance_clause": "C2: no knowledge leaks backward across known_from",
+      "case_id": "A4",
+      "disposition": "PASS",
+      "expected_result": "PIT_KNOWLEDGE_BLOCKED+ABSENT",
+      "fixture": "known_from=2024-01-01 queried at cutoff=2023-10-01",
+      "forbidden_result": "any snapshot",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "PIT_KNOWLEDGE_BLOCKED+ABSENT",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a4_knowledge_time_leakage_blocked"
+    },
+    {
+      "acceptance_clause": "D2/F3: resolved identity + unverified terms is not verified exposure",
+      "case_id": "A5",
+      "disposition": "PASS",
+      "expected_result": "RESOLVED_EXACT+ABSENT",
+      "fixture": "RESOLVED_EXACT identity with payoff_type=UNKNOWN",
+      "forbidden_result": "RESOLVED_EXACT+SNAPSHOT",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "RESOLVED_EXACT+ABSENT",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a5_identity_to_terms_escalation_denied"
+    },
+    {
+      "acceptance_clause": "S10/C6: equal multipliers never collapse two candidates",
+      "case_id": "A6",
+      "disposition": "PASS",
+      "expected_result": "AMBIGUOUS+ABSENT",
+      "fixture": "two alias-eligible instances, identical contract_multiplier=1",
+      "forbidden_result": "any single selection",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "AMBIGUOUS+ABSENT",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a6_ambiguity_laundering_by_equal_multipliers_blocked"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S22 inv.5: null != zero; missing term never becomes 0",
+      "case_id": "A7",
+      "disposition": "PASS",
+      "expected_result": "missing_refused=True,required=True",
+      "fixture": "attempt to build an instance without contract_multiplier",
+      "forbidden_result": "missing_refused=False or required=False",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "missing_refused=True,required=True",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a7_null_to_zero_laundering_blocked"
+    },
+    {
+      "acceptance_clause": "A8 law: snapshot refs are copied from authorized sources only",
+      "case_id": "A8",
+      "disposition": "PASS",
+      "expected_result": "prov:only-this-one",
+      "fixture": "instance with exactly one evidence ref",
+      "forbidden_result": "any fabricated ref",
+      "nonmutation_assertion": "HELD",
+      "observed_result": "prov:only-this-one",
+      "test_reference": "live run 2026-10-08: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i04_terms.py (from quant-lab; terms surface under test = src/crypto_sensor_fabric/normalization/terms/); tests/crypto_sensor_fabric/normalization/test_b5_i04_terms.py::test_a8_source_evidence_fabrication_blocked"
+    }
+  ],
+  "summary": {
+    "all_results_pass": true,
+    "passed": 8,
+    "traps": 8
+  }
+}
