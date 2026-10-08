@@ -5841,3 +5841,101 @@ recommended_next = **OPERATOR REVIEW OF SENSOR-B5-I03I**. B5-I04+ =
 UNAUTHORIZED. Bloc 6 = UNAUTHORIZED. research = FROZEN.
 MAIN_DIVERGENCE_STATUS unchanged: EXTERNAL / UNRECONCILED /
 NON-BLOCKING_FOR_I03. HARD STOP after push and report.
+
+---
+
+## 163 - SENSOR-B5-I03J: I03 OPERATOR RATIFICATION + I04 READINESS (I04 NOT AUTHORIZED)
+
+Date: 2026-10-08. Start head `dcd23e94f` (I03I; required starting HEAD,
+verified equal to remote build head; tracked tree clean; origin/main
+`e3e38e838` untouched). Operator decision via directive SENSOR-B5-I03J:
+the operator **ACCEPTED** the I03 technical subgate and its accumulated
+evidence chain. Governance-only checkpoint: zero production or test
+changes (tracked outputs = this entry, `BLOC_05_I03_OPERATOR_RATIFICATION.md`,
+`BLOC_05_I04_READINESS_ASSESSMENT.md`, plus the disclosed one-line
+mechanical republish of `BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json`,
+see §2).
+
+### 1. Accepted chain (8 commits, 0 merges, linear)
+
+`9ad8279e2` (I02-RATIFY) → `e06c26452` (I03A) → `06dcc7eb9` (I03B) →
+`5e9424835` (I03C) → `61148c02e` (I03D-impl) → `02eac4053` (I03D) →
+`13f05ae7a` (I03D amendment) → `67b7f4de1` (I03H Option 1 + G1–G4) →
+`dcd23e94f` (I03I reproducibility + KB narration correction). Repair
+records §159–§162 and evidence narrative sections 4/8/9/10 preserved;
+I03H recorded as prospective operator authorization; I03I changed evidence
++ generator custody only (`git diff 67b7f4de1..dcd23e94f -- quant-lab/src`
+is empty); only production change since the I03D amendment is `resolver.py`
+inside I03H. Git proves committed linear ancestry and reachable evidence;
+Git alone is not claimed to prove absence of pre-push local rewrites.
+
+### 2. Ratification-time verification
+
+Contract matrix C1–C10 all RATIFIED with per-invariant evidence (see
+`BLOC_05_I03_OPERATOR_RATIFICATION.md` §2): valid-time half-open law;
+Option 1 knowledge law in `_known_by` (prospective-authorization docstring
+intact); `InstrumentAlias` = exactly 11 frozen fields; provider-ID/venue
+isolation; lifecycle state laws; ambiguity never manufactures a winner;
+`_empty()` fabricates no identifiers or evidence refs; `TERMS_UNVERIFIED`
+reserved and never constructed (G4 pin re-verified); tracked-source
+reproducibility 6/6. Fresh matrix recount from committed bytes: KB 14/14,
+adversarial 25/25, alias 6/6, leakage 4/4, lifecycle 17/17, match-order
+10/10 — all PASS. External CI on accepted head: 0 check-runs →
+`external_ci = NONE_OBSERVED`. L2 (cross-revision knowledge overlap)
+**ruled non-blocking**: no frozen supersession behavior exists to violate,
+overlapping eligible candidates already fail closed to AMBIGUOUS, registry
+refuses overlapping active terms; the probe gap belongs to later authorized
+coverage work. Carried-forward I03I baseline (previously measured on this
+byte-identical tree, **not rerun here**): I03 84 / normalization 497 /
+full 3895 passed / 14 skipped / I11R2 14 byte-stable / ruff / compileall /
+secret scan clean / mypy 10 inherited 0 identity. The full project suite
+was NOT rerun for this governance-only checkpoint (no executable surface
+changed) — disclosed per directive.
+
+**Custody defect discovered + repaired (disclosed).** The governance-binding
+test was RED at the required starting HEAD `dcd23e94f`: I03I added four
+tracked generator `.py` files without republishing
+`BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` (still claiming
+`python_files_scanned: 1033`; measured 1037) — the I02D mechanical-republish
+precedent was missed because I03I's test battery ran pre-commit. This is
+I11R2-era bookkeeping drift, not an I03 invariant contradiction (C1–C10
+unaffected; not `I03_RATIFICATION_BLOCKED`). Repaired via the artifact's
+designed path (`UPDATE_I11R2_EVIDENCE=1`): diff = exactly one line
+`1033 → 1037`, rows byte-unchanged, disclosed as the single protected-
+evidence exception in this commit. Post-repair governance battery (binding
+audit, I11R2 digest, job-state, I07R1I/I10/I16): **84 passed / 0 failed**.
+
+### 3. Governance promotion (established vocabulary)
+
+PASS_SENSOR_B5_I03_LIFECYCLE_ALIAS_PIT_RESOLVER_SEALED =
+**OPERATOR_ACCEPTED** (was PENDING_OPERATOR_REVIEW).
+I03_IDENTITY_RESOLVER_SUBGATE = **IMPLEMENTATION_PASS** (was
+IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW; Bloc 4 precedent: operator
+acceptance sets IMPLEMENTATION_PASS). BLOC_05_IMPLEMENTATION_STATUS =
+**I03_OPERATOR_ACCEPTED** (was I03_COMPLETE_PENDING_OPERATOR_REVIEW;
+parallel to I02_OPERATOR_ACCEPTED §158).
+BLOC_05_NORMALIZATION_IMPLEMENTED = PARTIAL_PIT_IDENTITY_FOUNDATION
+(unchanged). **All 8 bloc gates remain NOT_YET_EARNED**, including
+**IDENTITY_GATE** — the program-level gate is NOT earned by subgate
+ratification. next_checkpoint_authorized = **FALSE** (unchanged — I04 is
+NOT authorized by this directive). BLOC_05 = INCOMPLETE. BLOC_06 =
+UNAUTHORIZED. research = FROZEN. MAIN_DIVERGENCE_STATUS unchanged:
+EXTERNAL / UNRECONCILED / NON-BLOCKING_FOR_I03.
+
+### 4. I04 readiness (read-only reconstruction, Operation B)
+
+`BLOC_05_I04_READINESS_ASSESSMENT.md` reconstructs the frozen checkpoint
+**SENSOR-B5-I04 “contract terms + linear/inverse conversion primitives”**
+(bloc_05/06 §19 + bloc_05/07 §10, blob-identical plan copies verified
+against `agent/crypto-sensor-fabric-plan`), with authority clauses,
+dependency table, interface inventory, identity→I04 status map,
+permission/prohibition citations, staged blueprint A–G, adversarial
+test-class plan with exact-set inventory, tracked-generator evidence plan,
+and historical-noninterference rules. No I04 code, tests, or placeholders
+were written. I04_READINESS = **MEASURED_AND_REPORTED**. Verdict:
+**REQUIRES_OPERATOR_DECISION** on exactly two smallest questions — D1
+`ContractTermsSnapshot` schema source (name frozen, field list not), D2
+`TERMS_UNVERIFIED` construction ownership (resolver modification not
+granted by any clause). I04_IMPLEMENTATION_AUTHORIZATION = **FALSE**.
+recommended_next = **OPERATOR DECISION ON D1/D2, THEN A SEPARATE I04
+IMPLEMENTATION DIRECTIVE IF DESIRED**. HARD STOP after push and report.
