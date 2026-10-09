@@ -6134,3 +6134,78 @@ RESEARCH = FROZEN
 
 I04B does not self-ratify; operator review required before any further
 directive. **HARD STOP after push and report.**
+
+## 166 - SENSOR-B5-I04R1: I04 OPERATOR RATIFICATION (COMPLETE CHECKPOINT) + I05 READINESS
+
+Date: 2026-10-09. Start head `3da805b1c` (I04B; required starting HEAD,
+verified equal to remote build head; tracked tree clean except the three
+pre-existing scratch items; plan branch `4bb677f9e` untouched). Operator
+decision via directive SENSOR-B5-I04R1: the operator **ACCEPTED** the
+complete frozen I04 checkpoint (contract terms + linear/inverse conversion
+primitives). Governance-only checkpoint: zero production or test changes
+(tracked outputs = this entry, `BLOC_05_I04_OPERATOR_RATIFICATION.md`,
+`BLOC_05_I05_READINESS_ASSESSMENT.md`; no I11R2 republish — this checkpoint
+adds no tracked `.py`, inventory stays measured and reported at **1045**).
+
+### 1. Accepted chain (3 required commits, single parents, 0 merges)
+
+`72984adb` (I03J I03 ratification / I04 readiness) -> `4f18a589` (I04A terms
+snapshot + PIT projection) -> `3da805b1c` (I04B linear/inverse conversion
+engine). Frozen plan documents verified blob-identical to
+`agent/crypto-sensor-fabric-plan` @ `4bb677f9e` (all seven Bloc 5 docs,
+hash-by-hash zero diff).
+
+### 2. Ratification-time verification (freshly measured)
+
+R1–R15 exact-set coverage: all COVERED, UNCOVERED = ∅, UNAUTHORIZED_EXTRA = ∅
+(per-table clause/test/evidence mapping in
+`BLOC_05_I04_OPERATOR_RATIFICATION.md` §3). Dual-clock audit executed six
+counterexamples against the committed implementation (read-only probe, exit 0):
+CXT-01 convert; CXT-02 value only under the later caller cutoff / blocked under
+the event-context cutoff (ownership recorded: I05 + I10+ normalizers supply the
+call context; I04 primitives stay caller-clock-bound per frozen 03 §7/§8 — no
+frozen clause assigns event-time binding to I04); CXT-03 availability >
+cutoff blocked; CXT-04 expired knowledge interval refuses at projection;
+CXT-05 foreign snapshot never re-bound (result stamps its own instance id);
+CXT-06 type substitution + NaN refused. Fresh battery: I04B 54 / I04A 28 /
+I03 84 / normalization 579 / binding+digest 9 / I11R2 evidence 10 — all exit
+0; both evidence producers re-run: I04B 7/7 byte-identical at HEAD, I04A 4/4
+byte-identical at the I04A tree (temporary detached worktree, removed;
+disclosure: the I04A scope audit's I04A-era `no_linear_inverse_conversion_engine`
+predicate legitimately reads I04B's operator-authorized `terms/conversion.py`
+at HEAD — checkpoint-time scope truth, sealed artifact untouched, same class
+as I03 L4). Independent Decimal oracle 19/19; 34 expectation edits remain 34
+format-equivalent / 0 semantic. Full suite NOT rerun (governance-only,
+directive §09); carried measurement 3977 passed / 14 skipped on the
+byte-identical `3da805b1c` tree, disclosed as historical.
+
+### 3. Governance promotion (established vocabulary only)
+
+PASS_SENSOR_B5_I04A_TERMS_FOUNDATION PROPOSED -> **OPERATOR_ACCEPTED**;
+B5-I04B IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW -> **OPERATOR_ACCEPTED**;
+B5-I04 -> **OPERATOR_ACCEPTED**; B5-I04_COMPLETE FALSE -> **TRUE**;
+BLOC_05_IMPLEMENTATION_STATUS I03_OPERATOR_ACCEPTED -> **I04_OPERATOR_ACCEPTED**
+(parallel to I02 §158 / I03 §163); I05_READINESS ->
+**MEASURED_AND_REPORTED** (parallel to I04_READINESS §163);
+I05_IMPLEMENTATION_AUTHORIZATION = **FALSE** (unchanged); B5-I03 =
+OPERATOR_ACCEPTED (unchanged). **All 8 program gates remain NOT_YET_EARNED.**
+next_checkpoint_authorized = **FALSE** (unchanged — this ratification grants
+no I05 authority; a separate implementation directive is required).
+B5-I04C+ = UNAUTHORIZED (unchanged — R1–R15 complete, so no I04C work
+package exists to authorize). BLOC_05 = INCOMPLETE (I05..I23 remain).
+BLOC_06 = UNAUTHORIZED. RESEARCH = FROZEN. No status value was invented; no
+program gate was promoted; I04 did not self-ratify.
+
+### 4. I05 readiness (read-only reconstruction, Operation D)
+
+`BLOC_05_I05_READINESS_ASSESSMENT.md` reconstructs frozen checkpoint
+**SENSOR-B5-I05 "time semantics registry + interval conventions"**
+(bloc_05/06 §19 + bloc_05/07 §10, blob-identical plan copies verified): 18
+governing clause rows (bloc_05/02 §2–§18, G2, F8), dependency table (I01–I04
+all accepted), required-module inventory (7/7 modules + 2/2 configs ABSENT —
+correctly, I05 not started), input/output schema contract, test layers
+(bloc_05/06 §13), evidence artifact `bloc_05_time_validation.json` (ABSENT
+correctly), acceptance predicates, forbidden behavior and stop conditions.
+No I05 code, tests, or placeholders were written. Recommended next =
+**OPERATOR DECISION ON AN I05 IMPLEMENTATION DIRECTIVE, IF DESIRED**.
+HARD STOP after push and report.
