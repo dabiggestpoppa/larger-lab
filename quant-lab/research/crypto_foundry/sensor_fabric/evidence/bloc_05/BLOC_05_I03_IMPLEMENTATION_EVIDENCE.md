@@ -283,6 +283,39 @@ the B4-I15 seal — pre-existing, out of I03I scope; `result: OK` unchanged;
 sealed bloc_04 restored, not rewritten); inherited Windows
 manifest-concurrency teardown race not triggered this run.
 
+### 7. Amendment A (B5-I03I re-verification, 2026-10-09): row labels in §10.1/§10.2
+
+Prospective amendment appended to the sealed record; the sentences in §10.1
+and §10.2 above are retained verbatim as originally published. On 2026-10-09
+the I03I directive was re-verified against start head `67b7f4de1`: the sealed
+knowledge-boundary matrix at `67b7f4de1` was diffed against the regenerated
+matrix at current HEAD, and `input_condition` changed on exactly three rows —
+**KB1, KB3, KB7b**.
+
+- §10.1 states "The same narration error affected KB1 (`known_from - 1µs`) and
+  KB5 (gap cutoff)". Measured: the affected rows are KB1, KB3 and **KB7b**
+  (old narration `cutoff=2023-11-30T23:59:59.999999Z`; executed
+  `K1 - timedelta(microseconds=1)` = `2023-12-01T11:59:59.999999Z`). KB5's
+  `input_condition` (`cutoff=2023-12-02T12:00Z > known_to`) was already
+  correct at the I03H seal and is unchanged by I03I. KB7b is the "cutoff
+  inside the OLD knowledge window" row — neither the gap row (KB7a) nor KB5.
+- §10.2's "KB1/KB3/KB5 `input_condition` strings now state the executed
+  instants" should read **KB1/KB3/KB7b**. The parenthetical
+  `2023-12-02T12:00:00Z` is KB5's executed instant (true, and never
+  misnarrated); KB7b's corrected instant is `2023-12-01T11:59:59.999999Z`.
+
+Error scope: prose row labels only — no matrix row, expected status,
+observed status, flag, evidence reference, or artifact byte changed as a
+result of this amendment. Re-verified 2026-10-09: all four tracked producers
+ran twice from tracked source; 7/7 artifacts byte-identical to the committed
+bytes (knowledge-boundary sha256 unchanged:
+`ae24942540a6b26a6096eefee3186a393482913d8f1d50f1ca2d6011387ffeac`); all 76
+matrix rows PASS (KB 14, leakage 4, match-order 10, lifecycle 17, alias 6,
+adversarial 25) with zero expected/observed mismatches; an independent
+fixture rebuilt from the production models (not importing the generator)
+reproduces the five KB boundary verdicts 5/5. Custody: append-only; ledger
+§167 records this amendment. No identity semantics, status, or gate changed.
+
 ---
 
 ## 11. Governance and divergence (recorded, not self-ratified)

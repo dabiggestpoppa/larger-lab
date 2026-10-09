@@ -6209,3 +6209,93 @@ correctly), acceptance predicates, forbidden behavior and stop conditions.
 No I05 code, tests, or placeholders were written. Recommended next =
 **OPERATOR DECISION ON AN I05 IMPLEMENTATION DIRECTIVE, IF DESIRED**.
 HARD STOP after push and report.
+
+## 167 - SENSOR-B5-I03I RE-VERIFICATION: EVIDENCE AMENDMENT A + REPRODUCIBILITY RE-RUN (PENDING_OPERATOR_REVIEW)
+
+Date: 2026-10-09. The SENSOR-B5-I03I directive was re-issued with required
+start head `67b7f4de1` (I03H). Reality lock: the repository had already
+advanced past that point — I03I itself landed as `dcd23e94f`, then I03J
+ratification (`72984adbc`), I04A (`4f18a589c`), I04B (`3da805b1c`), I04R1
+(`19ffc740a`). Local HEAD = remote `agent/crypto-sensor-fabric-build` =
+`19ffc740a40f1264ceca2f8b4ceed13a4a8c3208` (verified via ls-remote,
+fast-forward); tracked worktree clean apart from the three pre-existing
+untracked scratch items. The I03I checkpoint was therefore **verified in
+place, not re-executed**: no duplicate checkpoint commit, no sealed evidence
+rewritten, no earlier ledger section modified.
+
+### 1. Phases 1-3 re-verification (measured, 2026-10-09)
+
+- Independent fixture rebuilt from the production models (generator NOT
+  imported): the five KB boundary verdicts reproduce 5/5 (`known_from - 1us`
+  blocked; `== known_from` resolves; `known_to - 1us` resolves;
+  `== known_to` blocked; `> known_to` blocked).
+- Diff of the I03H-sealed KB matrix (`67b7f4de1`) vs the current matrix:
+  `input_condition` changed on exactly **KB1, KB3, KB7b**; every other row
+  changed only its GEN_REF path. Diff of the original `.bu_tmp` producer vs
+  the tracked producer: execution lines byte-identical (only GEN_REF strings,
+  the three narration strings, and the `_ts` helper differ) — proving the
+  I03H run executed true 1us boundaries and the defect was narration-only,
+  as §162 recorded.
+- **New finding — Amendment A (prospective, disclosed):** §162 §1/§2 and
+  evidence §10.1/§10.2 label the three corrected rows "KB1/KB3/KB5"; the
+  measured corrected set is **KB1/KB3/KB7b**. KB5's narration
+  (`cutoff=2023-12-02T12:00Z > known_to`) was already correct at the I03H
+  seal and unchanged by I03I; KB7b's old narration
+  (`2023-11-30T23:59:59.999999Z`) was the third instance of the
+  midnight/noon error. Prose row labels only — no matrix row, expected
+  status, observed status, flag, evidence reference, or artifact byte is
+  affected. Recorded in evidence §10.7 (Amendment A); evidence §10.1/§10.2
+  and this ledger's §162 are retained verbatim (append-only custody).
+- Cross-artifact sweep: all 76 matrix rows PASS (KB 14, leakage 4,
+  match-order 10, lifecycle 17, alias 6, adversarial 25) with zero
+  expected/observed mismatches; scope audit clean (forbidden imports absent,
+  no wall-clock/filesystem tokens).
+
+### 2. Generator custody re-run (tracked source only, double run)
+
+All four tracked producers invoked twice from quant-lab
+(`PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/<name>.py`):
+mats (leakage 4/4, match-order 10/10, lifecycle 17/17, alias 6/6, KB 14/14),
+scope, redteam (25/25 PASS), adv_wrap. 7/7 artifacts byte-identical across
+both runs and to the committed bytes; tracked worktree clean of generated
+changes after both runs. sha256s match evidence §10.4 (KB `ae249425...`,
+ALIAS `efd7ac47...`, LEAKAGE `09b487e8...`, LIFECYCLE `4efae87d...`,
+MATCH_ORDER `737e1d78...`, SCOPE `92eb13a4...`) plus ADVERSARIAL
+`d19f29ce3d9b1f3810888a943e698d44bf70ab00f87631df5814d1a4b18a25ce`.
+
+### 3. Test verification vs directive baselines (this tree)
+
+- I03 focused: **84 passed** (baseline 84) — match.
+- Normalization: **579 passed** (baseline 497). Reconciled: the I04A/I04B
+  checkpoint test files add exactly **82** tests (measured: those two files
+  alone = 82); 579 - 82 = 497 — match after accounting for later authorized
+  checkpoints.
+- I11R2: **14 passed** (baseline 14) — match; re-verified on the restored
+  sealed bloc_04 tree.
+- Full project: **3977 passed / 14 skipped / 0 failed**, exit 0, 1217.70s
+  (baseline 3895/14; 3895 + 82 I04 = 3977 — reconciled).
+- KB matrix: **14/14 PASS** — match.
+- Static: ruff clean on the four tracked I03 producers (changed scope;
+  repo-wide inherited baseline untouched); mypy 10 errors, **0 in identity**
+  (all inherited in providers); compileall OK; secret scan clean.
+- Suite side effects: the full run rewrote sealed bloc_04 JSONs (documented
+  line-ending/files_scanned churn, §162 §5) — restored to sealed state via
+  `git checkout` of `evidence/bloc_04/`; I11R2 re-verified green on the
+  restored tree.
+
+### 4. Custody + governance (unchanged disposition, no self-ratification)
+
+Single minimal commit on `agent/crypto-sensor-fabric-build` only (evidence
+§10.7 Amendment A + this ledger section; fast-forward push; SHA reported in
+the final report). No production code, test, matrix, or earlier evidence
+changed; `.bu_tmp/` and the I06 spike remain untracked. Governance values
+unchanged from §166: B5-I03 = **OPERATOR_ACCEPTED** (Amendment A is
+narration-label correction only, no acceptance predicate affected);
+B5-I04 = OPERATOR_ACCEPTED; B5-I05_IMPLEMENTATION_AUTHORIZATION = **FALSE**;
+all 8 program gates (IDENTITY_GATE included) = **NOT_YET_EARNED**;
+next_checkpoint_authorized = **FALSE**; B5-I04C+ = UNAUTHORIZED; BLOC_06 =
+UNAUTHORIZED; RESEARCH = FROZEN. MAIN_DIVERGENCE_STATUS unchanged: EXTERNAL /
+UNRECONCILED / NON_BLOCKING_FOR_BLOC_5. recommended_next = **OPERATOR
+REVIEW OF THE I03I RE-VERIFICATION + AMENDMENT A, THEN THE ALREADY-RECORDED
+I05 DIRECTIVE DECISION (§166 §4)**. HARD STOP after push and report.
+
