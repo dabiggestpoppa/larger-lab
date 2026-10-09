@@ -3,8 +3,12 @@
 The I04-specific terms subpackage: an immutable :class:`ContractTermsSnapshot`
 projection of accepted ``ContractInstance``/``EconomicContract`` terms (D1)
 and the pure :func:`project_contract_terms` eligibility/verification gate
-(D2).  This package deliberately owns NO conversion math (linear/inverse
-primitives are I04B+), NO common-unit or stablecoin conversion (I08 owns
+(D2).  This package deliberately owns the I04B conversion primitives as the SIBLING
+submodule ``conversion`` (reached as ``...normalization.terms.conversion``;
+NOT I08's ``common/conversion.py``) under the operator's SENSOR-B5-I04B
+directive.  The package root keeps exactly the ratified I04A surface --
+the I04A firewall test still requires that no conversion name appears at
+this level -- while NO common-unit or stablecoin conversion exists (I08 owns
 ``normalization/common/``), NO identity resolution (I03 owns ``identity/``),
 and NO time-semantics registry (I05).  The top-level normalization surface
 stays exactly the 24 ratified B5-I01 public symbols: these names are reached

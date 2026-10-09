@@ -75,7 +75,7 @@
     "dashboard_heading_literal": "## Current state",
     "governance_ledger_filename": "SENSOR_FABRIC_IMPLEMENTATION_PROGRESS"
   },
-  "python_files_scanned": 1042,
+  "python_files_scanned": 1045,
   "rows": [
     {
       "case": "no_unexpected_dashboard_dependency",

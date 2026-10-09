@@ -6041,3 +6041,96 @@ RESEARCH = FROZEN
 at finalized GOLDEN_T0_T1 frames. I04A does not self-ratify; operator
 review required before any I04B directive. **HARD STOP after push and
 report.**
+
+## 165 - SENSOR-B5-I04B: LINEAR/INVERSE CONVERSION ENGINE (IMPLEMENTATION PASS, PENDING OPERATOR REVIEW) + I04A OPERATOR ACCEPTANCE
+
+- **Operator acceptance recorded (I04B directive Book 0.1):** the operator
+  accepts the I04A technical foundation delivered at
+  `4f18a589c12bae41b4dd29860823fd8570507c7b` (ContractTermsSnapshot +
+  project_contract_terms + PIT eligibility, D1/D2, 20 functional + 8
+  adversarial cases, 4 reproducible artifacts) as an implementation
+  foundation. `B5-I04A = OPERATOR_ACCEPTED` (implementation foundation
+  only -- this does NOT ratify the complete I04 checkpoint).
+- **Custody:** required = actual starting HEAD
+  `4f18a589c12bae41b4dd29860823fd8570507c7b`, branch
+  `agent/crypto-sensor-fabric-build`, repository `dabiggestpoppa/larger-lab`.
+  Verification directive: no restart, no scope broadening, repair only
+  demonstrated defects, seal only if earned.
+- **Defects found during verification and repaired (bounded):**
+  (a) the first completed full run raced a duplicate concurrent pytest run
+  and reported 2 non-reproducible failures (stale module cache predating the
+  in-session `terms/__init__` firewall repair; duplicate-process rewrite of
+  Bloc 4 JSONs inside `test_evidence_directory_untouched`'s before/after
+  window) -- both pass in isolation; the uncontested rerun passed clean;
+  (b) the I04B producer named the governance ledger file in its changed-path
+  allowlist, tripping the I11R2 binding predicate -- the path was removed
+  (generation-before-append ordering documented in the producer docstring);
+  NO allowlist entry was added.
+- **Evidence (V4):** tracked producer
+  `research/crypto_foundry/sensor_fabric/scripts/b5_i04b_conversion.py`;
+  four consecutive runs byte-identical; sha256 --
+  dimensional authority `029280ca...bb640c` (5 rows),
+  linear `b675d95c...1bb6f29` (7 rows), inverse `7aa3fc21...90c015f1`
+  (17 rows), blocked `cde6e4ce...0cec62a6` (11 rows), adversarial
+  `0e6516a7...d2c580a71` (10 rows), scope audit `26cba7eb...276a095`
+  (8/8), unit validation `8945a679...07a9572cb` (35 rows) -- 58 measured
+  rows, 0 failed. Independent Decimal oracle (no production import)
+  recomputed 19/19 arithmetic expectations from the frozen formulas
+  (0.003, 75.000, 0.4, 3.303/0.0005, 4.000004) -- all match.
+  The 34 first-generation expectation edits were recovered and classified
+  from the transcript: 34 NUMERICALLY_EQUIVALENT_FORMAT_CHANGE, 0
+  semantic, 0 incorrect-oracle (full table in
+  BLOC_05_I04B_IMPLEMENTATION_EVIDENCE.md section 3).
+- **Price availability (PIT):** `market_available_at` (bloc_05/02 S4) is a
+  required field; six counterexamples PRICE-PIT-01..06 all behave fail-closed
+  (available-after-cutoff BLOCK, control VALUE, observation-after-cutoff
+  BLOCK, type substitution BLOCK, missing availability field BLOCK at model
+  construction, blank source BLOCK). Disclosure: primitives enforce
+  observation/availability against the caller-supplied knowledge cutoff;
+  event-time binding is the caller's cutoff choice (probed both ways).
+- **Verification:** V1 I04B focused **54 passed**; V2 normalization **579
+  passed** (525 I04A baseline + 54); V3 I03 focused **84 passed** (exact
+  historical match); V4 as above; V5 protected historical evidence -- 11
+  Bloc 4 JSONs dirtied by the full suite (CRLF + machine counters, L4
+  behavior) restored to HEAD bytes, digest+binding re-run **9 passed**;
+  V6 I11R2 count **1042 -> 1045** (3 new tracked Python files) republished
+  via `UPDATE_I11R2_EVIDENCE=1`, disclosed; V7 full project **3977 passed /
+  14 skipped / 0 failed** in 1362.28s, exit 0 (3923 I04A baseline + exactly
+  the 54 new I04B tests), command `python -m pytest tests -q` from
+  quant-lab -- the same command lineage as the 3895/3923 historical runs
+  (the earlier broad-collection SystemExit is a pre-existing research-script
+  hazard outside this suite, classified EXTERNAL_COLLECTION_HAZARD); V8
+  ruff changed-scope clean, mypy **0 errors in I04B files** (inherited
+  baselines: 10 scoped / 15 repo-wide, all in untouched provider/probe
+  files), compileall OK, secret scan clean.
+- **Public API noninterference:** `terms/snapshot.py` and
+  `terms/projection.py` byte-identical to HEAD; `terms/__init__.py`
+  export section identical (docstring-only); zero tracked test
+  modifications; identity/ diff empty; top-level surface = 24 symbols.
+- **Acceptance (§09 G01-G22):** each gate adjudicated individually in the
+  operator report; all mandatory gates PASS. R1-R15: all COVERED for I04B
+  scope (evidence doc section 13); I04 checkpoint still awaits operator
+  acceptance of this stage.
+- **Governance state:**
+
+```text
+B5-I03 = OPERATOR_ACCEPTED
+B5-I04A = OPERATOR_ACCEPTED
+B5-I04B = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW
+B5-I04_COMPLETE = FALSE
+IDENTITY_GATE = NOT_YET_EARNED
+TIME_GATE = NOT_YET_EARNED
+SEMANTIC_GATE = NOT_YET_EARNED
+UNIT_GATE = NOT_YET_EARNED
+LINEAGE_GATE = NOT_YET_EARNED
+DUPLICATE_REVISION_GATE = NOT_YET_EARNED
+REPLAY_SAFETY_GATE = NOT_YET_EARNED
+GOLDEN_T0_T1_GATE = NOT_YET_EARNED
+next_checkpoint_authorized = FALSE
+B5-I04C+ = UNAUTHORIZED
+BLOC_06 = UNAUTHORIZED
+RESEARCH = FROZEN
+```
+
+I04B does not self-ratify; operator review required before any further
+directive. **HARD STOP after push and report.**

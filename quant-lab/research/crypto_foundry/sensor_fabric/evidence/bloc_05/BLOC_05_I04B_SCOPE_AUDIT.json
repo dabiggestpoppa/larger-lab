@@ -1,0 +1,62 @@
+{
+  "artifact": "BLOC_05_I04B_SCOPE_AUDIT.json",
+  "checkpoint": "SENSOR-B5-I04B",
+  "checks": [
+    {
+      "check": "i08_common_conversion_absent",
+      "disposition": "PASS",
+      "observed": "absent",
+      "requirement": "I04B does not take I08's common/conversion.py (bloc_05/03 S21)"
+    },
+    {
+      "check": "conversion_owned_under_terms",
+      "disposition": "PASS",
+      "observed": "present",
+      "requirement": "conversion lives only at normalization/terms/conversion.py"
+    },
+    {
+      "check": "top_level_surface_unchanged",
+      "disposition": "PASS",
+      "observed": "24 symbols",
+      "requirement": "top-level normalization surface stays exactly 24 ratified symbols"
+    },
+    {
+      "check": "no_conversion_leak_into_identity",
+      "disposition": "PASS",
+      "observed": "none",
+      "requirement": "I03 identity sources reference no I04B conversion symbol"
+    },
+    {
+      "check": "price_type_vocabulary_frozen",
+      "disposition": "PASS",
+      "observed": "INTERVAL_CLOSE,MID_PRICE,PROVIDER_INDEX,PROVIDER_MARK,TRADE_PRICE",
+      "requirement": "exactly the five bloc_05/03 S8 types, no sixth"
+    },
+    {
+      "check": "blocked_flag_vocabulary",
+      "disposition": "PASS",
+      "observed": "UNIT_CONVERSION_BLOCKED",
+      "requirement": "only the accepted UNIT_CONVERSION_BLOCKED flag is referenced"
+    },
+    {
+      "check": "no_wallclock_network_io",
+      "disposition": "PASS",
+      "observed": "none",
+      "requirement": "conversion module is pure: no wall clock, network, or file I/O"
+    },
+    {
+      "check": "changed_paths_authorized",
+      "disposition": "PASS",
+      "observed": "all authorized",
+      "requirement": "git status contains only I04B-authorized paths plus known scratch"
+    }
+  ],
+  "created": "2026-10-08",
+  "evidence_class": "scope-audit",
+  "generator": "research/crypto_foundry/sensor_fabric/scripts/b5_i04b_conversion.py",
+  "summary": {
+    "checks": 8,
+    "fail": 0,
+    "pass": 8
+  }
+}
