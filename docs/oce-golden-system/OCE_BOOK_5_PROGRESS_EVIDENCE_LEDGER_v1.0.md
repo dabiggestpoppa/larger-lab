@@ -17,7 +17,7 @@
 | **B5-I0** | Freeze candidate criteria, risk ceiling and evaluation protocol | **OPERATOR_ACCEPTED** | Operator-ratified 2026-10-06 (protocol §10); this ledger's §2 evidence set; selection process frozen before any scoring |
 | **B5-I1** | C1 compare/select/freeze application → operator-approved Product Charter | **OPERATOR_ACCEPTED** | Intake + evidence packets commit `52843ffc11ff97511ec7e7242f6adc7083290360`; AMEND-001 ratified (`f381ce0e…`) with both passes sealed (`b05c61d0…`, `8f5a06c9…`); reconciliation and decision packet published (`OCE_B5_I1_RECONCILIATION_v1.0.md`, `OCE_B5_I1_DECISION_PACKET_v1.0.md` — recommendation only); **operator selected CAND-004 (Local Job Console) 2026-10-07** on the adopted record (W 82.75; floors C1=3/C2=4/C3=3/C5=3; zero disqualifiers; zero UNKNOWN; reviews sequential, NOT independent, NOT blind per AMEND-001) — see decision packet §9; Product Charter drafted (`5b082164…`), audited (repairs `1534305778…`, `d4bb8e6064c3…`), and **ratified 2026-10-07** (`OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md` → `OPERATOR_RATIFIED — FROZEN`; ratification artifact `OCE_B5_I1_OPERATOR_RATIFICATION_v1.0.md`). B5-I1 complete. B5-I2–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I2`; no implementation has begun
 | B5-I2 | C2 outcome/domain/interfaces — charter increment I-1: console-control-plane deterministic interface contracts | **OPERATOR_ACCEPTED** — authorized 2026-10-07 under `AUTHORIZED_STAGE=B5-I2`; ratified 2026-10-08 under `AUTHORIZED_STAGE=B5-I2-AUDIT_REPAIR_AND_RATIFICATION` (§9; `OCE_B5_I2_OPERATOR_RATIFICATION_v1.0.md`) | Branch `oce-book-5-i2` created from exact merged main `882835dac…`; implementation contract frozen (`OCE_B5_I2_IMPLEMENTATION_CONTRACT_v1.0.md`): contract pack for every console-read/invoke surface (jobs, workers, leases, health, submit, denial) bound to existing governed control-plane operations and existing schemas (`job-envelope.schema.json`, `denial-envelope.schema.json`, `evidence-manifest.schema.json`); gate = contract tests pass on both sides; non-goals per charter section 12 I-1 (no console code, no UI, no new server endpoints) |
-| B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **READY_FOR_OPERATOR_REVIEW_B5_I3** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3` | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11); stage reports READY_FOR_OPERATOR_REVIEW — operator acceptance still pending |
+| B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **OPERATOR_ACCEPTED** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3`; ratified 2026-10-09 under `AUTHORIZED_STAGE=B5-I3-RATIFICATION` (§11.10; `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`) | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11), evidence-head `37871316871` and proof-record-head `37914160504` (all SUCCESS; manifest 7/7; merge-ref parent+tree identity, §11.10); operator review 2026-10-09 → B5-I3 `OPERATOR_ACCEPTED`; ratification artifact `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`. B5-I3 complete. B5-I4–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I4`; no implementation has begun |
 | B5-I4 | C3 deterministic kernel and first vertical slice | **LOCKED** | Requires B5-I3 complete |
 | B5-I5 | C3 complete build/tests/lineage/operator review | **LOCKED** | Requires B5-I4 complete |
 | B5-I6 | C4 local deployment, observability and recovery | **LOCKED** | Requires B5-I5 complete |
@@ -398,3 +398,23 @@ B5-I3 status at the proof-record head: **`READY_FOR_OPERATOR_REVIEW_B5_I3`** (ne
 ### 11.9 Gate status at this section
 
 B5-I3 gate *Requirement-test registry complete* (plan §7; charter §12 I-2 executable gate *registry complete; every gate has an executable test or an explicitly deferred owner*): **PROVEN** — 28/28 requirements bound (17 + 4 + 7), executed in authoritative CI (§11.4), negative controls discriminate (§11.5), base-vs-head regression-clean (§11.3). Stage reports **`READY_FOR_OPERATOR_REVIEW_B5_I3`**. No acceptance, merge or ratification occurred in this stage. `B5_I4_THROUGH_B5_I9 = LOCKED`; `IMPLEMENTATION_MERGE_AUTHORIZED = FALSE`; PR #12 draft/open/unmerged with `(NOT MERGE AUTHORIZED)`.
+
+### 11.10 Operator ratification and merge decision (2026-10-09)
+
+| Item | Value |
+|---|---|
+| Ratification stage | `AUTHORIZED_STAGE=B5-I3-RATIFICATION` |
+| Ratification artifact | `docs/oce-golden-system/OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md` |
+| Base | `c60e07456559431e560ac4d69141063dd89a9325` |
+| Implementation head | `39fd324e36c8983c5b135328a7bb8f94e434211e` |
+| Evidence head | `e7dbc9aeb121b50f3b118ad13165e88ad15533c9` |
+| Proof-record head | `b2db82ed76d11c50318675c4c46b7665854709e6` |
+| Proving runs (all SUCCESS) | `37869921075` / `37871316871` / `37914160504` |
+| Proof-record artifact | `11609366409` `b1-i1r-evidence-69b2a6b0064b`; JUnit 51/51/0/0/0; manifest 7/7 recomputed; cleanup PASS |
+| Merge-ref binding | `d3048753…` = merge of `c60e0745…`(main) + `b2db82ed7…`(head); tree `5a43a65…` = `tree(b2db82ed7…)` |
+| Registry closure | 28 entries (17 G + 4 S + 7 F), all MAPPED; bindings 24 test / 2 attestation / 1 runner / 1 deferred (G16→B5-I8) |
+| Negative controls | N1–N9 discriminate (10 nodes); base/head identical 32-failure sets, +51 exactly, skips 103=103 |
+| Fresh audit scores | SPEC 9/10, DESIGN 10/10, CORRECTNESS 10/10, QUALITY 8/10 (deductions: R1 needed X1 schema + X2 EOL-portability repairs — historical, repaired, disclosed; no current defect) |
+| Demonstrated defects at ratification | none — single coherent documentation commit |
+| Operator decision | review 2026-10-09 → B5-I3 **`OPERATOR_ACCEPTED`**; ratification commits and PR-#12 merge are two-parent, append-only (no squash/rebase/force) |
+| Boundaries | `B5_I4_THROUGH_B5_I9 = LOCKED`; `MERGE_AUTHORIZED=true` for PR #12 only; next stage requires fresh `AUTHORIZED_STAGE=B5-I4`; no UI/product/hosting/cloud/provider/broker/capital/execution/LLM authority; recurring cost `$0` |
