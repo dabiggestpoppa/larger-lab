@@ -374,7 +374,26 @@ The run/check/artifact identifiers for this commit's head are appended below onc
 
 #### Appended after the evidence-head run completed
 
-_(appended by the B5-I3-EVIDENCE-CI-PROOF commit)_
+Recorded by the proof-record commit (subject `B5-I3-CI-PROOF: bind evidence head to authoritative execution`) after downloading and parsing the evidence-head artifact itself — no value below is badge-inferred. Evidence head: `e7dbc9aeb121b50f3b118ad13165e88ad15533c9` (the B5-I3-EVIDENCE commit this section was born in).
+
+| Identity | Exact value | Source |
+|---|---|---|
+| Workflow / run | `B1-I1R Validation` run `37871316871`, conclusion `success`, run id `8558646abb01` | `gh run view`; `run-context.json` |
+| Check-suite / check-run | suite `102608877996` (success); run `113629832941` (`validate`, success) | `gh api` |
+| Artifact | id `11589928493`, name `b1-i1r-evidence-8558646abb01`, 27212 bytes, not expired | `gh api` |
+| Workflow `head_sha` / PR head | `e7dbc9aeb121b50f3b118ad13165e88ad15533c9` (both) | `gh run view`; PR #12 |
+| Tested checkout | PR merge ref `de879ccb4c9a5dfe6979a509c1e014a930cde6c6` = merge of parents [`c60e0745…` main, `e7dbc9aeb…` exact head] | `git rev-list --parents` |
+| Tested tree | `0c7104f6203639ff8e362b6c1ca99ed529592f32` == `tree(e7dbc9aeb…)` | `git rev-parse` on both refs |
+
+Parsed results (artifact `b1-i1r-evidence-8558646abb01`, downloaded + parsed): B5-I3 junit **51/51/0/0/0** (collected/executed/passed; failed 0; errors 0; skipped 0), duplicate full node ids **0**, registry floor 51, orphan-file count **0**, `b5-i3-registry-proof.json` verdict **PASS**; B5-I2 compatibility step **24/24** (0/0/0) with frozen blob intact; B5-I2 reproducibility integrity step **16/16**; governed B5-I2 mutation battery **11/11 discriminated** (control 24/24 green, restored control green, caller worktree unmodified); shared validation runner PASS — initial 31/31, static 35/35, adversarial 49/49, regression battery **67 PASS / 0 FAIL**, engine gate `READY_FOR_OPERATOR_REVIEW`; `evidence-manifest.json` schema 3.6.0 lists 7 artifacts and **all 7 sha256 hashes and sizes were recomputed independently from the downloaded bytes — 7/7 match**; cleanup `worktree-cleanup.json` removed=true, pruned=true; tracked tree clean at the evidence head.
+
+Base-vs-head (same command both sides, ledger §11.3): `c60e0745…` (base) vs `39fd324e3…` (implementation head) — identical 32-failure pre-existing environmental sets, **+51 passed exactly**, skips 103 = 103. Rechecked after EVIDENCE: no relevant file changed after `39fd324e3…` except the §1 row flip, this §11.8 append and the A20 status cell (this commit), so the comparison remains valid at the proof-record head.
+
+Failed/superseded runs on this branch: **none** — runs `37869921075` (implementation head `39fd324e3…`, success) and `37871316871` (evidence head `e7dbc9aeb…`, success) are the branch's only runs; they bind successive heads and neither supersedes the other.
+
+Acceptance row **A20** transitions `NOT YET PROVEN` → `PROVEN` in this proof-record commit (transition pre-declared by this section's placeholder in the EVIDENCE commit and directed by mission §3; A20's proof artifact could not exist before the evidence head's own run completed), citing run `37871316871` + artifact `11589928493` parsed above: `pr_head_sha == e7dbc9aeb…` (exact evidence head), merge-ref tree + second-parent identity proven, manifest hash/size verification 7/7, wording matches execution. The final proof-record head's own run identity is recorded append-only in PR #12 — an artifact cannot contain its own CI run identity (same protocol as §10.3/§10.4).
+
+B5-I3 status at the proof-record head: **`READY_FOR_OPERATOR_REVIEW_B5_I3`** (never `OPERATOR_ACCEPTED` — only the operator may transition further); `B5_I4_THROUGH_B5_I9 = LOCKED`; `IMPLEMENTATION_MERGE_AUTHORIZED = FALSE`; `MERGE_AUTHORIZED=false`; PR #12 draft/open/unmerged, title ends `(NOT MERGE AUTHORIZED)`; recurring cost $0; no hosting/cloud/broker/capital/execution/LLM authority introduced.
 
 ### 11.9 Gate status at this section
 
