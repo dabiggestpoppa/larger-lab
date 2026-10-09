@@ -181,11 +181,17 @@ def pack_surfaces() -> dict[str, dict]:
     return out
 
 
-def blob_sha256(rel_path: str) -> str:
-    """SHA-256 of the COMMITTED (git blob, LF-canonical) bytes — platform independent."""
+def git_blob_bytes(rel_path: str) -> bytes:
+    """Committed (git blob) bytes for a path — identical on every platform,
+    independent of the checkout machine's core.autocrlf translation."""
     proc = subprocess.run(["git", "show", f"HEAD:{rel_path}"], cwd=str(ROOT),
                           capture_output=True, check=True)
-    return hashlib.sha256(proc.stdout).hexdigest()
+    return proc.stdout
+
+
+def blob_sha256(rel_path: str) -> str:
+    """SHA-256 of the COMMITTED (git blob, LF-canonical) bytes — platform independent."""
+    return hashlib.sha256(git_blob_bytes(rel_path)).hexdigest()
 
 
 def git_changed_paths(args: list[str]) -> list[str]:
@@ -384,8 +390,6 @@ def registry_problems(registry: dict, raw: bytes | None = None) -> list[str]:
     if raw is not None:
         if len(raw) > MAX_REGISTRY_BYTES:
             problems.append(f"registry-too-large:{len(raw)}>{MAX_REGISTRY_BYTES}")
-        if b"\r" in raw:
-            problems.append("non-lf-bytes: registry must be LF-only canonical")
     for path, value in _walk_strings(registry):
         if len(value) > MAX_STRING_FIELD_CHARS:
             problems.append(f"string-too-long:{path}:{len(value)}")
@@ -469,10 +473,22 @@ class TestRegistryStructure:
         raw, _ = load_registry()
         assert raw, "registry must not be empty"
 
-    def test_registry_bytes_are_canonical(self):
+    def test_registry_committed_blob_is_canonical(self):
+        """The committed artifact bytes (what CI and auditors consume) must be
+        exactly the canonical serialization — asserted on the git blob, so the
+        proof holds on Windows and Linux regardless of core.autocrlf."""
+        blob = git_blob_bytes("docs/oce-golden-system/OCE_B5_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json")
+        registry = json.loads(blob.decode("utf-8"))
+        assert blob == canonical_bytes(registry), (
+            "committed registry bytes must equal json.dumps(indent=2, sort_keys=True) + LF newline")
+
+    def test_registry_working_copy_is_canonical_modulo_git_eol(self):
+        """Working-copy content must be canonical once git's declared EOL
+        translation (core.autocrlf) is undone — content law, not environment."""
         raw, registry = load_registry()
-        assert raw == canonical_bytes(registry), (
-            "registry bytes must equal json.dumps(indent=2, sort_keys=True) + LF newline")
+        normalized = raw.replace(b"\r\n", b"\n")
+        assert normalized == canonical_bytes(registry), (
+            "working-copy content must equal the canonical serialization (after CRLF->LF)")
 
     def test_registry_is_deterministic_across_loads(self):
         raw_a, reg_a = load_registry()
