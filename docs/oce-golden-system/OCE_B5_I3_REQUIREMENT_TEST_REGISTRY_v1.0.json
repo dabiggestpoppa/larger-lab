@@ -27,7 +27,7 @@
       },
       "id": "F-1",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Dependency outage fails closed without false success or canonical-state loss",
       "source": "plan section 4 B5.C2.S4 failure class 1 (dependency outage)",
       "test_class": "failure-behavior test"
@@ -58,7 +58,7 @@
       ],
       "id": "F-2",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "notes": "Contract-boundary refusal frozen at increment I-1; later console surfaces render the same refusals through the pack.",
       "requirement": "Invalid data is refused before any side effect",
       "source": "plan section 4 B5.C2.S4 failure class 2 (invalid data)",
@@ -85,7 +85,7 @@
       },
       "id": "F-3",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Partial task never reports false success and leaves no partial canonical state",
       "source": "plan section 4 B5.C2.S4 failure class 3 (partial task)",
       "test_class": "failure-behavior test"
@@ -111,7 +111,7 @@
       },
       "id": "F-4",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Crash recovers without losing canonical state or duplicating effects",
       "source": "plan section 4 B5.C2.S4 failure class 4 (crash)",
       "test_class": "failure-behavior test"
@@ -137,7 +137,7 @@
       },
       "id": "F-5",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Stale state is detected and cleaned by the engine, never rendered as fresh truth",
       "source": "plan section 4 B5.C2.S4 failure class 5 (stale state)",
       "test_class": "failure-behavior test"
@@ -164,7 +164,7 @@
       ],
       "id": "F-6",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "notes": "Contract-level retry is a single governed operation; engine retry durability executes in the B5-I3 selection step.",
       "requirement": "Retry is idempotent and never duplicates an authoritative effect",
       "source": "plan section 4 B5.C2.S4 failure class 6 (retry)",
@@ -192,7 +192,7 @@
       ],
       "id": "F-7",
       "kind": "failure_class",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Cancellation is a single governed state transition and refuses malformed or unauthorized attempts",
       "source": "plan section 4 B5.C2.S4 failure class 7 (cancellation)",
       "test_class": "failure-behavior test"
@@ -223,7 +223,7 @@
       },
       "id": "G1",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "notes": "Engine-side loopback enforcement executes in the B5-I3 selection step; the web-view surface belongs to its own authorized increment.",
       "requirement": "Loopback-only access is executable and negatively tested",
       "source": "charter section 11 gate 1 (test class: negative test)",
@@ -245,7 +245,7 @@
       ],
       "id": "G10",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "No LLM is required for core operation",
       "source": "charter section 11 gate 10 (test class: dependency/behavior audit)",
       "test_class": "dependency/behavior audit"
@@ -259,7 +259,7 @@
       },
       "id": "G11",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "notes": "Dependency audit over the console import closure; the B5-I3 suite's own import surface is stdlib plus pytest only.",
       "requirement": "No external hosting or paid provider is required",
       "source": "charter section 11 gate 11 (test class: dependency audit)",
@@ -278,7 +278,7 @@
       },
       "id": "G12",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Cloud, broker, capital, and execution-authority mutations remain zero",
       "source": "charter section 11 gate 12 (test class: ledger attestation + dependency audit)",
       "test_class": "ledger attestation + dependency audit"
@@ -291,7 +291,7 @@
       },
       "id": "G13",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Recurring cost remains $0",
       "source": "charter section 11 gate 13 (test class: ledger attestation)",
       "test_class": "ledger attestation"
@@ -305,7 +305,7 @@
       },
       "id": "G14",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Existing OCE validation remains green",
       "source": "charter section 11 gate 14 (test class: test-suite gate)",
       "test_class": "test-suite gate"
@@ -336,7 +336,7 @@
       },
       "id": "G15",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Negative controls demonstrate that bypassed authority would be detected",
       "source": "charter section 11 gate 15 (test class: adversarial negative control)",
       "test_class": "adversarial negative control"
@@ -350,7 +350,7 @@
       },
       "id": "G16",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Accessibility and operator usability are verified without weakening authority",
       "source": "charter section 11 gate 16 (test class: usability protocol/results)",
       "test_class": "usability protocol/results"
@@ -363,7 +363,7 @@
       },
       "id": "G17",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "notes": "Charter section 12 ceiling accounting: 6 required increments plus up to 2 optional, never more than 8; every deferred owner in this registry is a charter section 12 row.",
       "requirement": "Scope remains within the frozen increment ceiling",
       "source": "charter section 11 gate 17 (test class: ledger/plan cross-audit)",
@@ -400,7 +400,7 @@
       },
       "id": "G2",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Non-loopback binding or request paths fail closed",
       "source": "charter section 11 gate 2 (test class: negative test)",
       "test_class": "negative test"
@@ -431,7 +431,7 @@
       },
       "id": "G3",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "The UI cannot mutate canonical state directly",
       "source": "charter section 11 gate 3 (test class: negative test)",
       "test_class": "negative test"
@@ -462,7 +462,7 @@
       ],
       "id": "G4",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Every allowed mutation maps to one existing governed control-plane operation",
       "source": "charter section 11 gate 4 (test class: positive trace audit)",
       "test_class": "positive trace audit"
@@ -493,7 +493,7 @@
       },
       "id": "G5",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Unsupported operations are refused before side effects",
       "source": "charter section 11 gate 5 (test class: negative test)",
       "test_class": "negative test"
@@ -519,7 +519,7 @@
       },
       "id": "G6",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Frontend loss/restart does not alter governed state",
       "source": "charter section 11 gate 6 (test class: crash/restart test)",
       "test_class": "crash/restart test"
@@ -550,7 +550,7 @@
       },
       "id": "G7",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Lifecycle state shown in the UI agrees with authoritative state",
       "source": "charter section 11 gate 7 (test class: verbatim-agreement test)",
       "test_class": "verbatim-agreement test (S-1)"
@@ -581,7 +581,7 @@
       },
       "id": "G8",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "notes": "The B5-I3 suite additionally asserts the contract pack declares no recovery, scheduler or store-mutation surface (engine-ownership closure).",
       "requirement": "Recovery and reconciliation remain engine-owned",
       "source": "charter section 11 gate 8 (test class: engine-ownership trace audit)",
@@ -601,7 +601,7 @@
       },
       "id": "G9",
       "kind": "gate",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Evidence and artifact identities bind to the correct operation and commit",
       "source": "charter section 11 gate 9 (test class: binding audit)",
       "test_class": "binding audit"
@@ -627,7 +627,7 @@
       },
       "id": "S-1",
       "kind": "scenario",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Console lists jobs, workers and health matching the control plane API responses verbatim",
       "source": "packet section 2 scenario 1 (S-1)",
       "test_class": "scenario acceptance test"
@@ -647,7 +647,7 @@
       },
       "id": "S-2",
       "kind": "scenario",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Submit one representative job and show pending to leased to running to succeeded with both clocks",
       "source": "packet section 2 scenario 2 (S-2)",
       "test_class": "scenario acceptance test"
@@ -673,7 +673,7 @@
       },
       "id": "S-3",
       "kind": "scenario",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Worker loss mid-job shows lease expiry, re-queue and eventual completion with no duplicate effect",
       "source": "packet section 2 scenario 3 (S-3)",
       "test_class": "scenario acceptance test"
@@ -700,7 +700,7 @@
       },
       "id": "S-4",
       "kind": "scenario",
-      "mapping_status": "NOT_YET_PROVEN",
+      "mapping_status": "MAPPED",
       "requirement": "Denied request renders the control plane denial envelope verbatim with no silent retry",
       "source": "packet section 2 scenario 4 (S-4)",
       "test_class": "scenario acceptance test"

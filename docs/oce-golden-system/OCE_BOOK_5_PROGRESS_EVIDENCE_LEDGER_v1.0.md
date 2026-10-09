@@ -17,7 +17,7 @@
 | **B5-I0** | Freeze candidate criteria, risk ceiling and evaluation protocol | **OPERATOR_ACCEPTED** | Operator-ratified 2026-10-06 (protocol §10); this ledger's §2 evidence set; selection process frozen before any scoring |
 | **B5-I1** | C1 compare/select/freeze application → operator-approved Product Charter | **OPERATOR_ACCEPTED** | Intake + evidence packets commit `52843ffc11ff97511ec7e7242f6adc7083290360`; AMEND-001 ratified (`f381ce0e…`) with both passes sealed (`b05c61d0…`, `8f5a06c9…`); reconciliation and decision packet published (`OCE_B5_I1_RECONCILIATION_v1.0.md`, `OCE_B5_I1_DECISION_PACKET_v1.0.md` — recommendation only); **operator selected CAND-004 (Local Job Console) 2026-10-07** on the adopted record (W 82.75; floors C1=3/C2=4/C3=3/C5=3; zero disqualifiers; zero UNKNOWN; reviews sequential, NOT independent, NOT blind per AMEND-001) — see decision packet §9; Product Charter drafted (`5b082164…`), audited (repairs `1534305778…`, `d4bb8e6064c3…`), and **ratified 2026-10-07** (`OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md` → `OPERATOR_RATIFIED — FROZEN`; ratification artifact `OCE_B5_I1_OPERATOR_RATIFICATION_v1.0.md`). B5-I1 complete. B5-I2–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I2`; no implementation has begun
 | B5-I2 | C2 outcome/domain/interfaces — charter increment I-1: console-control-plane deterministic interface contracts | **OPERATOR_ACCEPTED** — authorized 2026-10-07 under `AUTHORIZED_STAGE=B5-I2`; ratified 2026-10-08 under `AUTHORIZED_STAGE=B5-I2-AUDIT_REPAIR_AND_RATIFICATION` (§9; `OCE_B5_I2_OPERATOR_RATIFICATION_v1.0.md`) | Branch `oce-book-5-i2` created from exact merged main `882835dac…`; implementation contract frozen (`OCE_B5_I2_IMPLEMENTATION_CONTRACT_v1.0.md`): contract pack for every console-read/invoke surface (jobs, workers, leases, health, submit, denial) bound to existing governed control-plane operations and existing schemas (`job-envelope.schema.json`, `denial-envelope.schema.json`, `evidence-manifest.schema.json`); gate = contract tests pass on both sides; non-goals per charter section 12 I-1 (no console code, no UI, no new server endpoints) |
-| B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **IN_PROGRESS** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3` | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) |
+| B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **READY_FOR_OPERATOR_REVIEW_B5_I3** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3` | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11); stage reports READY_FOR_OPERATOR_REVIEW — operator acceptance still pending |
 | B5-I4 | C3 deterministic kernel and first vertical slice | **LOCKED** | Requires B5-I3 complete |
 | B5-I5 | C3 complete build/tests/lineage/operator review | **LOCKED** | Requires B5-I4 complete |
 | B5-I6 | C4 local deployment, observability and recovery | **LOCKED** | Requires B5-I5 complete |
@@ -271,3 +271,111 @@ The exact-head run / check-run / artifact identifiers for this section’s evide
 EVIDENCE-head exact binding: run `37827782039` conclusion `success`, `head_sha = 018b2f98de4d0cfce1097073eb8207e21b08d511`, check-suite `102489108183`, check-run `113484971259` (`validate`, `success`, same `head_sha`), artifact `11573010013` (`b1-i1r-evidence-5496a7937bdd`, not expired, 22453 bytes).
 
 Artifact parse (downloaded and parsed, not badge-inferred): emitted `b5-i2-reproducibility-result.json` **byte-identical** to the committed canonical artifact (12546 bytes); baseline 24 nodes → **24/0/0/0**; **11/11 `DISCRIMINATED`** (raw observations all `matched_by: node`, zero via fallback class); integrity junit **16/0/0/0**; B5-I2 junit **24/0/0/0**; registry proof `PASS` (collected = executed = 24, zero duplicates); `b5-i2-repro-worktree-check.txt` empty (tracked source byte-identical after execution); gate `READY_FOR_OPERATOR_REVIEW`. The final head’s own run identity is recorded in PR #11 (an artifact cannot contain its own CI run identity).
+
+## 11. B5-I3 evidence (AUTHORIZED_STAGE=B5-I3; append-only)
+
+### 11.1 Stage identity, ladder, changed-file inventory, scope
+
+- Base `c60e07456559431e560ac4d69141063dd89a9325`; branch `oce-book-5-i3` (fresh dedicated worktree from the exact base; 0/0 relation at creation); **implementation head `39fd324e36c8983c5b135328a7bb8f94e434211e`** (tree `f8db1d0d5ec53cdfc7ed1b0a83f03813b7bbfd2b`).
+- Ladder (append-only; no amend/squash/rebase/reset/force at any point):
+
+| Rung | Commit | Subject |
+|---|---|---|
+| P0 | `856c69dea` | freeze implementation contract + acceptance matrix; §1 row LOCKED → IN_PROGRESS |
+| R1 | `47172b323` | requirement-test registry + C2.S4 failure matrix + construction plan |
+| X1 | `755a8fcdd` | conform registry to the frozen P0 §4 schema (top-level key set, sorted entries) |
+| R2 | `d59136adb` | registry closure, binding and compatibility proofs |
+| X2 | `6e0205b3e` | canonical-bytes proof asserted on the git blob (checkout-EOL independence) |
+| R3 | `75c920624` | adversarial registry negative controls (N1–N9) |
+| R4 | `39fd324e3` | authoritative selection step in the existing workflow |
+| EVIDENCE | this commit | ledger §11 append, acceptance-matrix statuses, mapping_status → MAPPED |
+
+- Changed-file inventory by category: **new docs 4** (`OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md`, `OCE_B5_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json`, `OCE_B5_I3_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md`, `OCE_B5_I3_CONSTRUCTION_PLAN_v1.0.md`); **new test 1** (`infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py`, 51 nodes); **workflow edit 1** (`.github/workflows/b1-i1r-validation.yml`, one added step, +160 lines, triggers/permissions/shared runner/both B5-I2 steps/upload/gate-check untouched); **ledger edit** (§1 status row at P0; §11 append here); **registry edit** (28 × `mapping_status` NOT_YET_PROVEN → MAPPED in this commit). Production `src/` untouched; frozen B5-I2 instruments byte-identical (suite nodes + blob hash `45bcb4f6…`).
+- Exact scope authority: plan §7 row `B5-I3` = *C2 failures/acceptance and construction plan* (gate *Requirement-test registry complete*) = charter §12 row `I-2` (requirement-test registry and acceptance plan), delivering plan §4 `B5.C2.S4` (failure matrix), `B5.C2.S5` (acceptance registry) and the §5 `B5.C3.S1` bounded construction plan. Charter non-goal *no tests for unproposed features* held: no console/UI/drill surface exists or is exercised.
+- Prohibited-authority accounting: cloud mutations **0**; broker mutations **0**; capital mutations **0**; execution mutations **0**; external hosting authority **none**; LLM required for any proof **none**; recurring cost **`$0`**; `capital.authority = none`. `B5_I4_THROUGH_B5_I9 = LOCKED`; `IMPLEMENTATION_MERGE_AUTHORIZED = FALSE`; PR #12 remains draft, unmerged, `(NOT MERGE AUTHORIZED)`; no operator acceptance is claimed by this section.
+
+### 11.2 Red/green chronology (honest record)
+
+The B5-I3 suite was authored first and executed against the pre-R1 tree (registry, failure matrix and construction plan all absent): **21 failed, 2 passed** — every structure/closure/binding/traceability node red because the artifacts did not exist; the 2 passing nodes are engine-ownership closure properties of the existing B5-I2 pack (true at base). R1 landed next and the suite went green. Git history contains **no committed failing-test rung** — the red run existed only in the working tree and is recorded here (same disclosure discipline as §9.6; contract §18 pre-declared this). Chronology also discloses two self-found pre-CI repairs: **X1** (the R1 registry did not match the frozen P0 §4 key set/ordering; found by re-reading the contract before R2 — artifact repaired, contract unchanged) and **X2** (a working-copy LF assertion would fail after a `core.autocrlf` checkout; proof moved to the git blob + content-normalized working copy). Each repair re-ran the suite green; no assertion was weakened and no negative control was removed.
+
+### 11.3 Local parsed totals and validation matrix
+
+| Check | Result |
+|---|---|
+| Focused B5-I3 suite (local, Windows) | **51 / 0 failed / 0 errors / 0 skipped**; ruff clean; py_compile OK |
+| B5-I2 compatibility suites (local) | **40 / 0 / 0 / 0** (24 console-contract + 16 harness-integrity) |
+| B5-I2 mutation battery (local) | `ALL_DISCRIMINATED` — control 24/24 green, 11/11 discriminated, restored control green, caller worktree unmodified (`--verify` byte-compare is CI-side: Windows checkouts are CRLF-translated by `core.autocrlf` — environment limitation) |
+| Full control-plane suite, exact base `c60e0745` (detached sparse worktree) | 32 failed / 810 passed / 103 skipped |
+| Full control-plane suite, exact head `39fd324e3` | 32 failed / **861 passed** / 103 skipped |
+| Failure-set comparison | **identical sets of 32 node ids** (diff empty): `test_b4_startup_gate.py` 26, `test_b4_cxr7_trusted_program.py` 4, `test_local_lifecycle.py` 1, `test_b4_cxr6_activation_capability.py` 1 — pre-existing Windows-environmental (incl. `ModuleNotFoundError: scripts.oce_b3_worker`), reproduced at base |
+| Difference classification | expected B5-I3 additions **+51**; pre-existing/environmental **32 = 32 identical**; genuine B5-I3 regressions **0**; mandatory skips **0** (103 = 103) |
+| Static battery (local) | ruff OK; py_compile OK; YAML parse OK (15 steps); `bash -n` OK; `shellcheck -s bash -S error` OK on the new step (parity with the CI-green B5-I2 step); `git diff --check` clean; JSON validation OK |
+| Secret scan (changed files) | no hits (GitHub/AWS token shapes, private keys, `api_key`/`password` assignments); gitleaks authoritative in CI (static validation 35/35 PASS) |
+| Duplicate full node ids (union of all CI-selected files, 24+16+51 = 91) | **0** |
+| Collection-vs-execution reconciliation | 51 collected == 51 executed == 51 JUnit (`executed_equals_collected = true`) |
+| Tracked-tree cleanliness | clean after every local run; CI `b5-i3-worktree-check.txt` and `b5-i2-repro-worktree-check.txt` empty; `worktree-cleanup.json` = {removed:true, pruned:true} |
+| Shared authoritative runner, local | not runnable on this Windows host (ansible/gitleaks/docker toolchain absent — environment limitation, pre-existing per §9.7); executed authoritatively in CI (§11.4) |
+
+### 11.4 Authoritative CI (exact-head; artifacts downloaded and parsed)
+
+| Run | Head tested | Conclusion | Note |
+|---|---|---|---|
+| `37864642024` | `856c69deafa6e910e778f5e923084ca272d3095c` (P0) | success | predates the B5-I3 step — selection not yet present (disclosed, not counted as B5-I3 proof) |
+| `37869921075` | `pr_head_sha` **`39fd324e36c8983c5b135328a7bb8f94e434211e`** (R4 = implementation head) | **success** | first run executing the B5-I3 step; run #170; 2026-10-09T01:28:12Z → 01:34:39Z; https://github.com/dabiggestpoppa/larger-lab/actions/runs/37869921075 |
+
+Identity binding (proven, not assumed): registry proof `pr_head_sha = 39fd324e36c8983c5b135328a7bb8f94e434211e`; the tested checkout is the PR merge ref `33293dce26781eec6b88b2dceda8063da59eba2b`, parents **[`c60e0745…` (main), `39fd324e3…` (exact PR head)]** — second-parent identity proven by `git log` — with tree `f8db1d0d5ec53cdfc7ed1b0a83f03813b7bbfd2b`, **byte-equal to `tree(39fd324e3)`** proven by `git rev-parse` locally; static validation recorded the same `tested_tree`.
+
+Artifact `b1-i1r-evidence-88e278820556` (artifact id `11590375769`, 27177 bytes; run id `88e278820556`), parsed (not badge-inferred):
+
+- `b5-i3-registry-proof.json`: verdict **PASS** — floor 51, pytest-reported collected 51, parsed 51, JUnit **51/0/0/0**, duplicate full node ids `[]`, duplicate JUnit ids `[]`, `executed_equals_collected = true`, `orphan_b5_i3_files = []`, worktree check empty.
+- `b5-i2-registry-proof.json`: PASS, 24/0/0/0; harness-integrity JUnit 16/0/0/0; battery `--verify` byte-compared the emitted result against the committed canonical artifact (CI, LF) and passed; B5-I2 repro worktree check empty.
+- Shared runner: static validation **35/35 PASS** (gitleaks, shellcheck, YAML/bash, identity), initial validation **31/31**, adversarial suite **49/49** (24 negative + 25 meta), regression battery green, identity gate OK against the merge ref tree.
+- `stage-status.json` gate: **READY_FOR_OPERATOR_REVIEW**; `evidence-manifest.json` schema 3.6.0, run `88e278820556`, 7 artifacts, generated 2026-10-09T01:34:00Z; cleanup `worktree-cleanup.json` {removed:true, pruned:true}.
+
+**Mandatory B5-I3 node floor 51; duplicate full node ids 0; failed 0; errors 0; mandatory skips 0; orphan B5-I3 test files 0; registry verdict PASS.**
+
+### 11.5 Negative controls (contract §14; each control demonstrably turns red)
+
+Executed in CI on every run (nodes of `TestNegativeControls`, 10 nodes, green in run `37869921075`):
+
+| # | Mutation | Real validator | Weakened validator |
+|---|---|---|---|
+| N1 | remove gate `G5` | refused `requirement-ids` | admits |
+| N2 | duplicate id | refused `duplicate-ids` | admits |
+| N3 | forged node `test_forged_nonexistent_node` | format-level passes; **collection-equality refuses** (`missing_bound_nodes`) | admits |
+| N4 | `deferred` owner stripped | refused `deferred-keys` | admits |
+| N5 | unknown `binding.type` | refused `binding-type` | admits |
+| N6 | 4100-char field | refused `string-too-long` | admits |
+| N7 | URL injected | refused `forbidden-content:url` | admits |
+| N8 | extra top-level key | refused `top-level-keys` | admits |
+| N9 | aggregate (7 mutations incl. forged `mapping_status`) | all refused with named codes | weakened structural validator admits every one — non-vacuity proven in CI |
+| + | pack mutated with a `recovery` surface (G8) | `engine_ownership_violations` flags it | detector deterministic |
+| N10 | registry absent (pre-R1 tree) | suite red **21F/2P**, recorded in §11.2 | n/a (pre-commit state; not reproducible post-commit by design) |
+
+### 11.6 Requirement-to-proof matrix (28/28 bound) and selection topology
+
+All 28 entries (17 gates + 4 scenarios + 7 failure classes) carry an executable binding, an attestation/runner binding, or an explicitly deferred charter-assigned owner. Executed at this head: `TestRequirementClosure` 5 (exact id set, kinds, vocabularies, 12-surface references), `TestExecutableBindings` 7 (per-file subprocess **collection equality**, per-surface reconciliation, attestation/runner resolution), `TestDeferredOwners` 3 (closed owner set, planned-node grammar, reasons), `TestB5I2Compatibility` 5 (blob hash `45bcb4f6…`, base→head frozen-path diff empty, 12/12 surfaces resolve live, floors 24/16), `TestFailureMatrixConsistency` 3, `TestConstructionPlanTraceability` 3 (ids both directions), `TestStageBoundaries` 4 (src module list pinned, production tree unchanged base→head, forbidden-content scan, own AST import closure), `TestRegistryStructure` 9 (canonical blob bytes, content-normalized working copy, determinism, bounds, pinned constants, authority sections), `TestNegativeControls` 10, `TestEngineOwnershipClosure` 2.
+
+Selection homes (each `execution_surface` machine-verified): `b5-i2-selection-step` → console/harness files named by the preexisting workflow steps; `book2-mandatory-registry` → **22 engine-bound nodes present in `scripts/b2_registry.py`** (the Book 2 mandatory registry executed authoritatively by the `b2-control-plane-validation` workflow on `oce-program-build`); `shared-validation-runner` → `run-validation.sh` step executed in run `37869921075`. `mapping_status`: all 28 → `MAPPED` in this commit citing run `37869921075` — a **mapping** claim only; no charter gate status is transitioned by this stage (gates transition through their owning increments and operator review).
+
+Selection-topology disclosure (for the final audit): the PR-authoritative run executes the B5-I3 suite (51), both B5-I2 steps (24 + 16) and the shared runner battery. The 22 engine-bound proof nodes are pytest-executed authoritatively by the Book 2 mandatory registry (and their **collection** is executed at this PR head by `test_every_bound_node_collects`); locally they were executed at base and head with identical results (§11.3). No load-bearing proof rests on a single platform: structural/binding/negative-control proofs run in Linux CI; engine proofs run in Linux CI (Book 2 registry) and were re-executed on Windows at both heads.
+
+### 11.7 Known limitations (honest record)
+
+1. Local Windows cannot execute the shared runner (toolchain absent) or the battery `--verify` byte-compare (`core.autocrlf` CRLF working copies); both are proven in authoritative CI instead.
+2. 32 pre-existing Windows-environmental failures exist at base and head **identically** (§11.3); none in B5-I3-touched files; the authoritative Linux run is fully green.
+3. PR runs test GitHub's merge ref; binding to the exact PR head is by proven tree equality + second-parent identity (§11.4), not by direct head checkout (GitHub `pull_request` semantics; same pattern B5-I2 recorded in §9.3).
+4. The added workflow step was dry-run locally before push (verdict PASS); a Windows path-form defect in orphan detection was found and fixed pre-push (recorded in the R4 commit message — chronology never hidden).
+5. Transient red/step-dry-run files live under the local temp dir outside the repository and are non-authoritative; no scratch file is named as authoritative tooling.
+
+### 11.8 Exact-head CI proof for this evidence commit (appended append-only)
+
+The run/check/artifact identifiers for this commit's head are appended below once the run is proven green and its artifact downloaded and parsed (an artifact cannot contain its own CI run identity — same protocol as §10.3/§10.4). The final head's own run identity is recorded in PR #12.
+
+#### Appended after the evidence-head run completed
+
+_(appended by the B5-I3-EVIDENCE-CI-PROOF commit)_
+
+### 11.9 Gate status at this section
+
+B5-I3 gate *Requirement-test registry complete* (plan §7; charter §12 I-2 executable gate *registry complete; every gate has an executable test or an explicitly deferred owner*): **PROVEN** — 28/28 requirements bound (17 + 4 + 7), executed in authoritative CI (§11.4), negative controls discriminate (§11.5), base-vs-head regression-clean (§11.3). Stage reports **`READY_FOR_OPERATOR_REVIEW_B5_I3`**. No acceptance, merge or ratification occurred in this stage. `B5_I4_THROUGH_B5_I9 = LOCKED`; `IMPLEMENTATION_MERGE_AUTHORIZED = FALSE`; PR #12 draft/open/unmerged with `(NOT MERGE AUTHORIZED)`.
