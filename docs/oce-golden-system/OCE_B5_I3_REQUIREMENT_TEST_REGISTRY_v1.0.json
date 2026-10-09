@@ -1,0 +1,780 @@
+{
+  "authority": {
+    "charter": {
+      "document": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+      "section": "## 11. Acceptance gates"
+    },
+    "contract": {
+      "document": "docs/oce-golden-system/OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md",
+      "section": "## 13. Test architecture"
+    },
+    "ledger": {
+      "document": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "section": "## 6. Accounting"
+    },
+    "packet": {
+      "document": "docs/oce-golden-system/OCE_B5_I1_CAND-004_EVIDENCE_PACKET_v1.0.md",
+      "section": "## 2. Operator-testable acceptance scenarios"
+    },
+    "plan": {
+      "document": "docs/oce-golden-system/OCE_BLOCK_05_REFERENCE_APPLICATION_FACTORY_PLAN_v1.0.md",
+      "section": "B5.C2.S4 Failure behavior"
+    }
+  },
+  "binding_type_vocabulary": [
+    "attestation",
+    "deferred",
+    "runner",
+    "test"
+  ],
+  "deferred_owner_vocabulary": [
+    "B5-I8",
+    "I-3",
+    "I-4",
+    "I-5",
+    "I-6",
+    "I-7",
+    "I-8"
+  ],
+  "entries": [
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b4_config_spine.py",
+        "node": "TestDenialGates::test_0_0_0_0_listen_denied",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_config_spine.py",
+          "node": "TestDeterministicResolution::test_public_listen_cannot_activate"
+        },
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_config_spine.py",
+          "node": "TestStartupFailClosed::test_public_listen_true_rejected"
+        }
+      ],
+      "deferred": {
+        "owner": "I-7",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i7_web_view.py::TestLoopbackOnly::test_non_loopback_bind_and_request_refused",
+        "reason": "Charter section 12 row I-7 requires gates G1/G2 negative tests recorded for the optional loopback web view; today's executable form is the config-spine bind denial."
+      },
+      "id": "G1",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "notes": "Engine-side loopback enforcement executes in the B5-I3 selection step; the web-view surface belongs to its own authorized increment.",
+      "requirement": "Loopback-only access is executable and negatively tested",
+      "source": "charter section 11 gate 1 (test class: negative test)",
+      "test_class": "negative test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b4_config_spine.py",
+        "node": "TestDenialGates::test_secure_looking_https_endpoint_still_no_binding_expansion",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_config_spine.py",
+          "node": "TestDenialGates::test_0_0_0_0_listen_denied"
+        },
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_config_spine.py",
+          "node": "TestDenialGates::test_public_egress_denied"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestUnsupportedOperationRefusal::test_unknown_read_surface_refused_before_side_effects"
+        }
+      ],
+      "deferred": {
+        "owner": "I-7",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i7_web_view.py::TestLoopbackOnly::test_non_loopback_origin_request_fail_closed",
+        "reason": "Web-view request-path origin enforcement executes with gates G1/G2 at row I-7 per charter section 12; binding paths and default-deny egress are proven now."
+      },
+      "id": "G2",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Non-loopback binding or request paths fail closed",
+      "source": "charter section 11 gate 2 (test class: negative test)",
+      "test_class": "negative test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestUnsupportedOperationRefusal::test_unknown_invoke_surface_refused_before_side_effects",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestMalformedInputRefusal::test_unexpected_field_refused"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestContractPack::test_every_declared_operation_exists_on_the_governed_module"
+        }
+      ],
+      "deferred": {
+        "owner": "I-3",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestClientOnlyReads::test_no_direct_store_read",
+        "reason": "Charter section 12 row I-3 stop condition binds the UI read path to gate G3: any direct store read stops the increment; the contract-level refusal proof exists now."
+      },
+      "id": "G3",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "The UI cannot mutate canonical state directly",
+      "source": "charter section 11 gate 3 (test class: negative test)",
+      "test_class": "negative test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestContractPack::test_every_declared_operation_exists_on_the_governed_module",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestContractPack::test_invoke_routes_match_http_api_registrations"
+        }
+      ],
+      "id": "G4",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Every allowed mutation maps to one existing governed control-plane operation",
+      "source": "charter section 11 gate 4 (test class: positive trace audit)",
+      "test_class": "positive trace audit"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestUnsupportedOperationRefusal::test_unknown_read_surface_refused_before_side_effects",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestUnsupportedOperationRefusal::test_read_surface_id_used_as_invoke_is_refused"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestUnsupportedOperationRefusal::test_non_vacuous_negative_control_weakened_guard_admits"
+        }
+      ],
+      "deferred": {
+        "owner": "I-6",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestFailClosed::test_unsupported_drill_operation_refused",
+        "reason": "Charter section 12 row I-6 lists gate G5 for the drill surfaces; the contract-pack refusal law is executable now."
+      },
+      "id": "G5",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Unsupported operations are refused before side effects",
+      "source": "charter section 11 gate 5 (test class: negative test)",
+      "test_class": "negative test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+        "node": "TestHealthAndRecovery::test_recovery_after_restart",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_cxr7_configure_atomic.py",
+          "node": "TestCompleteOrNothingConfigure::test_repeated_configure_preserves_authority_byte_for_byte"
+        }
+      ],
+      "deferred": {
+        "owner": "I-6",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_restart_preserves_session_record",
+        "reason": "Charter section 9 Restart row and section 12 row I-6: console restart-identity executes with the recovery drill; engine restart preservation is proven now."
+      },
+      "id": "G6",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Frontend loss/restart does not alter governed state",
+      "source": "charter section 11 gate 6 (test class: crash/restart test)",
+      "test_class": "crash/restart test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestCanonicalStateAgreement::test_reads_render_governed_responses_verbatim"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestCanonicalStateAgreement::test_stale_or_unknown_job_inspect_is_not_fabricated"
+        }
+      ],
+      "deferred": {
+        "owner": "I-3",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusAgreement::test_status_view_matches_api_verbatim",
+        "reason": "Charter section 12 row I-3 executable gate: the I-2 registry S-1/G7 tests pass; contract-level verbatim agreement exists now."
+      },
+      "id": "G7",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Lifecycle state shown in the UI agrees with authoritative state",
+      "source": "charter section 11 gate 7 (test class: verbatim-agreement test)",
+      "test_class": "verbatim-agreement test (S-1)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+        "node": "TestHealthAndRecovery::test_no_duplicate_effects_after_recovery",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+          "node": "TestHealthAndRecovery::test_recovery_after_restart"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestContractPack::test_every_declared_operation_exists_on_the_governed_module"
+        }
+      ],
+      "deferred": {
+        "owner": "I-6",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestEngineOwnedRecovery::test_console_reports_recovery_without_enacting",
+        "reason": "Charter section 9 Recovery row and section 12 row I-6: console reports engine-owned recovery without enacting it; engine recovery executes now."
+      },
+      "id": "G8",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "notes": "The B5-I3 suite additionally asserts the contract pack declares no recovery, scheduler or store-mutation surface (engine-ownership closure).",
+      "requirement": "Recovery and reconciliation remain engine-owned",
+      "source": "charter section 11 gate 8 (test class: engine-ownership trace audit)",
+      "test_class": "engine-ownership trace audit"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestEvidenceIdentityBinding::test_evidence_manifest_binds_to_schema_and_operation",
+        "type": "test"
+      },
+      "deferred": {
+        "owner": "I-5",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i5_evidence_binding.py::TestArtifactBinding::test_timeline_binds_to_operation_and_commit",
+        "reason": "Charter section 12 row I-5: timeline-to-evidence binding is the I-5 executable gate; manifest-to-operation binding exists now."
+      },
+      "id": "G9",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Evidence and artifact identities bind to the correct operation and commit",
+      "source": "charter section 11 gate 9 (test class: binding audit)",
+      "test_class": "binding audit"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestDeterminism::test_module_import_closure_has_no_llm_hosting_or_broker_dependencies",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestDeterminism::test_refusal_law_operates_without_any_model"
+        }
+      ],
+      "id": "G10",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "No LLM is required for core operation",
+      "source": "charter section 11 gate 10 (test class: dependency/behavior audit)",
+      "test_class": "dependency/behavior audit"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestDeterminism::test_module_import_closure_has_no_llm_hosting_or_broker_dependencies",
+        "type": "test"
+      },
+      "id": "G11",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "notes": "Dependency audit over the console import closure; the B5-I3 suite's own import surface is stdlib plus pytest only.",
+      "requirement": "No external hosting or paid provider is required",
+      "source": "charter section 11 gate 11 (test class: dependency audit)",
+      "test_class": "dependency audit"
+    },
+    {
+      "attestation": {
+        "document": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+        "section": "Cloud mutations 0; broker mutations 0; capital mutations 0; execution mutations 0"
+      },
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestDeterminism::test_module_import_closure_has_no_llm_hosting_or_broker_dependencies",
+        "type": "test"
+      },
+      "id": "G12",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Cloud, broker, capital, and execution-authority mutations remain zero",
+      "source": "charter section 11 gate 12 (test class: ledger attestation + dependency audit)",
+      "test_class": "ledger attestation + dependency audit"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+        "section": "recurring cost `$0`",
+        "type": "attestation"
+      },
+      "id": "G13",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Recurring cost remains $0",
+      "source": "charter section 11 gate 13 (test class: ledger attestation)",
+      "test_class": "ledger attestation"
+    },
+    {
+      "binding": {
+        "execution_surface": "shared-validation-runner",
+        "note": "Executed by the authoritative workflow step Run shared authoritative validation runner in b1-i1r-validation.yml; exit code preserved.",
+        "script": "infrastructure/cloud-ground/scripts/run-validation.sh",
+        "type": "runner"
+      },
+      "id": "G14",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Existing OCE validation remains green",
+      "source": "charter section 11 gate 14 (test class: test-suite gate)",
+      "test_class": "test-suite gate"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i2_mutation_harness.py",
+        "node": "test_unexpected_green_mutation_fails_the_harness",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b5_i2_mutation_harness.py",
+          "node": "test_mini_battery_discriminates_and_restores_source_bytes"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b5_i2_mutation_harness.py",
+          "node": "test_skipped_control_fails_the_zero_skip_law"
+        }
+      ],
+      "deferred": {
+        "owner": "I-6",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestAdversarialControls::test_bypassed_authority_detected",
+        "reason": "Charter section 12 row I-6: negative controls recorded for the drill surface; the B5-I3 registry negative controls run in this increment."
+      },
+      "id": "G15",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Negative controls demonstrate that bypassed authority would be detected",
+      "source": "charter section 11 gate 15 (test class: adversarial negative control)",
+      "test_class": "adversarial negative control"
+    },
+    {
+      "binding": {
+        "owner": "B5-I8",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i8_independent_audit.py::TestUsabilityProtocol::test_accessibility_and_usability_verified",
+        "reason": "Charter section 11 gate 16 requires usability protocol/results; plan section 7 assigns independent adversarial, usability and evidence audit to B5-I8; no UI surface exists before increment I-3.",
+        "type": "deferred"
+      },
+      "id": "G16",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Accessibility and operator usability are verified without weakening authority",
+      "source": "charter section 11 gate 16 (test class: usability protocol/results)",
+      "test_class": "usability protocol/results"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+        "section": "this number is a hard ceiling",
+        "type": "attestation"
+      },
+      "id": "G17",
+      "kind": "gate",
+      "mapping_status": "NOT_YET_PROVEN",
+      "notes": "Charter section 12 ceiling accounting: 6 required increments plus up to 2 optional, never more than 8; every deferred owner in this registry is a charter section 12 row.",
+      "requirement": "Scope remains within the frozen increment ceiling",
+      "source": "charter section 11 gate 17 (test class: ledger/plan cross-audit)",
+      "test_class": "ledger/plan cross-audit"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestCanonicalStateAgreement::test_reads_render_governed_responses_verbatim",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestCanonicalStateAgreement::test_projected_job_agrees_verbatim_with_governed_state"
+        }
+      ],
+      "deferred": {
+        "owner": "I-3",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim",
+        "reason": "Charter section 12 row I-3 executable gate references the I-2 registry S-1 tests; contract-level verbatim rendering exists now."
+      },
+      "id": "S-1",
+      "kind": "scenario",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Console lists jobs, workers and health matching the control plane API responses verbatim",
+      "source": "packet section 2 scenario 1 (S-1)",
+      "test_class": "scenario acceptance test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestGovernedInvokeSurfaces::test_submit_through_pack_is_the_governed_operation",
+        "type": "test"
+      },
+      "deferred": {
+        "owner": "I-4",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_timeline.py::TestDualClockTimeline::test_s2_transitions_rendered_with_both_clocks",
+        "reason": "Charter section 12 row I-4 executable gate: S-2 tests pass and the timeline is reproducible; governed submission exists now."
+      },
+      "id": "S-2",
+      "kind": "scenario",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Submit one representative job and show pending to leased to running to succeeded with both clocks",
+      "source": "packet section 2 scenario 2 (S-2)",
+      "test_class": "scenario acceptance test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+        "node": "TestHealthAndRecovery::test_no_duplicate_effects_after_recovery",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b3_adversarial.py",
+          "node": "TestAdversarialFabric::test_duplicate_result_detected"
+        }
+      ],
+      "deferred": {
+        "owner": "I-6",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillReport::test_s3_lease_requeue_completion_no_duplicate_effect",
+        "reason": "Charter section 12 row I-6 completes S-3 with the recovery-drill report and duplicate-effect check; row I-5 covers S-3 beginnings."
+      },
+      "id": "S-3",
+      "kind": "scenario",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Worker loss mid-job shows lease expiry, re-queue and eventual completion with no duplicate effect",
+      "source": "packet section 2 scenario 3 (S-3)",
+      "test_class": "scenario acceptance test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestEvidenceIdentityBinding::test_denial_envelope_from_governed_authority_is_rendered_verbatim",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestGovernedInvokeSurfaces::test_submit_without_authority_yields_schema_valid_denial"
+        }
+      ],
+      "deferred": {
+        "owner": "I-6",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_s4_denial_rendered_verbatim_no_silent_retry",
+        "reason": "Charter section 12 row I-6: denial rendering verbatim completes S-4 end to end; contract-level rendering exists now."
+      },
+      "id": "S-4",
+      "kind": "scenario",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Denied request renders the control plane denial envelope verbatim with no silent retry",
+      "source": "packet section 2 scenario 4 (S-4)",
+      "test_class": "scenario acceptance test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+        "node": "TestHealthAndRecovery::test_pg_unavailable_fail_closed",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+          "node": "TestHealthAndRecovery::test_redis_unavailable_degraded"
+        }
+      ],
+      "deferred": {
+        "owner": "I-3",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStackUnreachable::test_stack_unreachable_renders_fail_closed",
+        "reason": "Charter section 12 row I-3 exact scope: fail-closed STACK_UNREACHABLE console rendering when the stack is unreachable."
+      },
+      "id": "F-1",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Dependency outage fails closed without false success or canonical-state loss",
+      "source": "plan section 4 B5.C2.S4 failure class 1 (dependency outage)",
+      "test_class": "failure-behavior test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestMalformedInputRefusal::test_missing_required_field_refused",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestMalformedInputRefusal::test_unexpected_field_refused"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestMalformedInputRefusal::test_oversize_payload_refused"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestMalformedInputRefusal::test_unknown_job_type_refused_before_admission"
+        }
+      ],
+      "id": "F-2",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "notes": "Contract-boundary refusal frozen at increment I-1; later console surfaces render the same refusals through the pack.",
+      "requirement": "Invalid data is refused before any side effect",
+      "source": "plan section 4 B5.C2.S4 failure class 2 (invalid data)",
+      "test_class": "failure-behavior test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b4_cxr7_configure_atomic.py",
+        "node": "TestCompleteOrNothingConfigure::test_no_failure_leaves_false_initialized_state",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_cxr7_configure_atomic.py",
+          "node": "TestCompleteOrNothingConfigure::test_failure_on_first_configure_leaves_no_state"
+        }
+      ],
+      "deferred": {
+        "owner": "I-4",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_timeline.py::TestPartialTask::test_failure_envelope_rendered_without_false_success",
+        "reason": "Job-side partial-task rendering joins the S-2 timeline at charter section 12 row I-4; engine atomicity is proven now."
+      },
+      "id": "F-3",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Partial task never reports false success and leaves no partial canonical state",
+      "source": "plan section 4 B5.C2.S4 failure class 3 (partial task)",
+      "test_class": "failure-behavior test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_health_api_boundaries.py",
+        "node": "TestHealthAndRecovery::test_recovery_after_restart",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_cxr7_configure_crash.py",
+          "node": "TestConfigureSubprocessCrash::test_reconfigure_killed_before_commit_preserves_prior_authority"
+        }
+      ],
+      "deferred": {
+        "owner": "I-5",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i5_drills.py::TestConsoleCrash::test_session_record_marked_partial_on_crash",
+        "reason": "Charter section 9 Interruption row: console crash mid-drill marks its session record partial while control-plane state stays untouched; row I-5 owns drill session records."
+      },
+      "id": "F-4",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Crash recovers without losing canonical state or duplicating effects",
+      "source": "plan section 4 B5.C2.S4 failure class 4 (crash)",
+      "test_class": "failure-behavior test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i3-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b4_cxr7_configure_atomic.py",
+        "node": "TestCompleteOrNothingConfigure::test_recover_only_mutation_is_classified_stale_pid_cleanup",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b4_cxr7_configure_crash.py",
+          "node": "TestConfigureConcurrency::test_failed_concurrent_configure_never_restores_stale_snapshot"
+        }
+      ],
+      "deferred": {
+        "owner": "I-3",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestNoStaleGreen::test_unverifiable_gap_never_renders_green",
+        "reason": "Charter section 9 Progress observation row keeps unknown or unverifiable gaps explicit; console live reads execute at charter section 12 row I-3."
+      },
+      "id": "F-5",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Stale state is detected and cleaned by the engine, never rendered as fresh truth",
+      "source": "plan section 4 B5.C2.S4 failure class 5 (stale state)",
+      "test_class": "failure-behavior test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b3_adversarial.py",
+          "node": "TestAdversarialFabric::test_process_crash_is_retryable_then_dl"
+        },
+        {
+          "execution_surface": "b5-i3-selection-step",
+          "file": "infrastructure/control-plane/tests/test_b3_adversarial_closure.py",
+          "node": "TestHermesBoundaryReal::test_retry_coordinator_persists_durable_dead_letter"
+        }
+      ],
+      "id": "F-6",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "notes": "Contract-level retry is a single governed operation; engine retry durability executes in the B5-I3 selection step.",
+      "requirement": "Retry is idempotent and never duplicates an authoritative effect",
+      "source": "plan section 4 B5.C2.S4 failure class 6 (retry)",
+      "test_class": "failure-behavior test"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i2-selection-step",
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "node": "TestMalformedInputRefusal::test_cancel_with_missing_job_id_refused",
+        "type": "test"
+      },
+      "corroborations": [
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestGovernedInvokeSurfaces::test_cancel_and_retry_are_single_governed_operations"
+        },
+        {
+          "execution_surface": "b5-i2-selection-step",
+          "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+          "node": "TestGovernedInvokeSurfaces::test_submit_without_authority_yields_schema_valid_denial"
+        }
+      ],
+      "id": "F-7",
+      "kind": "failure_class",
+      "mapping_status": "NOT_YET_PROVEN",
+      "requirement": "Cancellation is a single governed state transition and refuses malformed or unauthorized attempts",
+      "source": "plan section 4 B5.C2.S4 failure class 7 (cancellation)",
+      "test_class": "failure-behavior test"
+    }
+  ],
+  "execution_surface_vocabulary": [
+    "b5-i2-selection-step",
+    "b5-i3-selection-step",
+    "shared-validation-runner"
+  ],
+  "increment": "B5-I3",
+  "mapping_status_vocabulary": [
+    "NOT_YET_PROVEN"
+  ],
+  "objective": "Make CAND-004 acceptance executable before construction by publishing a requirement-test registry that maps every charter gate (section 11, G1-G17), every scenario (S-1-S-4) and every plan failure class (B5.C2.S4, F-1-F-7) to a concrete runnable test or an explicitly deferred owner, with the C2.S4 failure matrix and the bounded construction plan for increments I-3 through I-8.",
+  "schema_version": "1.0",
+  "selection": {
+    "steps": [
+      {
+        "files": [
+          "infrastructure/control-plane/tests/test_console_contracts.py"
+        ],
+        "kind": "preexisting",
+        "name": "Execute B5-I2 console-contract proofs (whole-file selection)"
+      },
+      {
+        "files": [
+          "infrastructure/control-plane/tests/test_b5_i2_mutation_harness.py"
+        ],
+        "kind": "preexisting",
+        "name": "Execute B5-I2 reproducibility harness (integrity + battery)"
+      },
+      {
+        "files": [
+          "infrastructure/control-plane/tests/test_b3_adversarial.py",
+          "infrastructure/control-plane/tests/test_b3_adversarial_closure.py",
+          "infrastructure/control-plane/tests/test_b4_cxr7_configure_atomic.py",
+          "infrastructure/control-plane/tests/test_b4_cxr7_configure_crash.py",
+          "infrastructure/control-plane/tests/test_b4_config_spine.py",
+          "infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py",
+          "infrastructure/control-plane/tests/test_health_api_boundaries.py"
+        ],
+        "kind": "declared_pending",
+        "name": "Execute B5-I3 requirement registry proofs"
+      }
+    ],
+    "workflow": ".github/workflows/b1-i1r-validation.yml"
+  },
+  "title": "C2 failures/acceptance and construction plan"
+}
