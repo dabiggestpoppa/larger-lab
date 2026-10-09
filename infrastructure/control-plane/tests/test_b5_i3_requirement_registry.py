@@ -843,3 +843,178 @@ class TestEngineOwnershipClosure:
         first = engine_ownership_violations(pack)
         second = engine_ownership_violations(pack)
         assert first == second
+
+
+def weakened_registry_problems(registry: dict) -> list[str]:
+    """CONTRACT SECTION 14 CONTROL N9 — deliberately weakened validator.
+
+    Structural skeleton only: entries exist and entry/binding keys stay
+    inside the closed sets. Every load-bearing law (exact id set, sortedness,
+    vocabularies, size bounds, forbidden content, collection equality) is
+    REMOVED. The negative controls require this function to admit exactly
+    the inputs the real validator refuses — demonstrating that the real
+    proof discriminates rather than being silent (never `or True`).
+    """
+    problems: list[str] = []
+    if not isinstance(registry, dict):
+        return ["not-a-dict"]
+    entries = registry.get("entries")
+    if not isinstance(entries, list):
+        return ["entries-not-list"]
+    for i, entry in enumerate(entries):
+        if not isinstance(entry, dict):
+            problems.append(f"entry-not-dict:{i}")
+            continue
+        extra = sorted(set(entry) - ENTRY_ALL_KEYS)
+        if extra:
+            problems.append(f"entry-extra-keys:{i}:{extra}")
+        binding = entry.get("binding")
+        if not isinstance(binding, dict) or "type" not in binding:
+            problems.append(f"binding-skeleton:{i}")
+    return problems
+
+
+def mutated_registry(mutator) -> dict:
+    """Deep copy of the real registry with one controlled mutation applied."""
+    _, registry = load_registry()
+    registry = json.loads(json.dumps(registry))
+    mutator(registry)
+    return registry
+
+
+def _entry(registry: dict, eid: str) -> dict:
+    return next(e for e in registry["entries"] if e["id"] == eid)
+
+
+class TestNegativeControls:
+    """Contract section 14 (N1-N9): every control runs in CI on every run.
+
+    Each mutation is refused by the REAL validator with a named problem code
+    (or, for N3, by the collection-equality proof) while the weakened
+    validator admits it — the checks can turn red, and do.
+    """
+
+    # -- N1: a required gate removed ----------------------------------------
+    def test_n1_missing_gate_is_refused(self):
+        reg = mutated_registry(lambda r: r["entries"].remove(_entry(r, "G5")))
+        problems = registry_problems(reg)
+        assert any(p.startswith("requirement-ids") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N1"
+
+    # -- N2: duplicate requirement id ---------------------------------------
+    def test_n2_duplicate_id_is_refused(self):
+        def dup(r):
+            r["entries"].append(json.loads(json.dumps(r["entries"][0])))
+        reg = mutated_registry(dup)
+        problems = registry_problems(reg)
+        assert any(p.startswith("duplicate-ids") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N2"
+
+    # -- N3: forged node (format passes; only collection can catch it) ------
+    def test_n3_forged_node_is_caught_by_collection_not_by_format(self):
+        def forge(r):
+            _entry(r, "G1")["binding"]["node"] = "test_forged_nonexistent_node"
+        reg = mutated_registry(forge)
+        # Structure alone cannot detect this — which is exactly why the
+        # collection-equality proof exists:
+        assert registry_problems(reg) == [], "format-valid forgery must pass structure"
+        assert NODE_RE.match("test_forged_nonexistent_node"), "weakened format check admits it"
+        missing = missing_bound_nodes(reg)
+        assert "infrastructure/control-plane/tests/test_b4_config_spine.py" in missing
+        assert "test_forged_nonexistent_node" in missing["infrastructure/control-plane/tests/test_b4_config_spine.py"]
+
+    # -- N4: deferred entry stripped of its owner ---------------------------
+    def test_n4_ownerless_deferral_is_refused(self):
+        def strip(r):
+            del _entry(r, "S-1")["deferred"]["owner"]
+        reg = mutated_registry(strip)
+        problems = registry_problems(reg)
+        assert any(p.startswith("deferred-keys") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N4"
+
+    # -- N5: unknown binding type -------------------------------------------
+    def test_n5_unknown_binding_type_is_refused(self):
+        def warp(r):
+            _entry(r, "G1")["binding"]["type"] = "teleport"
+        reg = mutated_registry(warp)
+        problems = registry_problems(reg)
+        assert any(p.startswith("binding-type") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N5"
+
+    # -- N6: oversized text field -------------------------------------------
+    def test_n6_oversized_field_is_refused(self):
+        def big(r):
+            _entry(r, "G2")["requirement"] = "x" * (MAX_STRING_FIELD_CHARS + 1)
+        reg = mutated_registry(big)
+        problems = registry_problems(reg)
+        assert any(p.startswith("string-too-long") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N6"
+
+    # -- N7: forbidden content (URL) ----------------------------------------
+    def test_n7_forbidden_url_is_refused(self):
+        def url(r):
+            _entry(r, "F-2")["notes"] = "see https://example.invalid/details"
+        reg = mutated_registry(url)
+        problems = registry_problems(reg)
+        assert any(p.startswith("forbidden-content:url") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N7"
+
+    # -- N8: extra top-level key --------------------------------------------
+    def test_n8_extra_top_level_key_is_refused(self):
+        def extra(r):
+            r["extra_key"] = True
+        reg = mutated_registry(extra)
+        problems = registry_problems(reg)
+        assert any(p.startswith("top-level-keys") for p in problems), problems
+        assert weakened_registry_problems(reg) == [], "weakened validator must admit N8"
+
+    # -- N9: aggregate non-vacuity — the weakened validator discriminates ----
+    def test_n9_weakened_validator_admits_every_mutation_the_real_one_refuses(self):
+        def drop_g17(r):
+            r["entries"].remove(_entry(r, "G17"))
+
+        def dup_first(r):
+            r["entries"].append(json.loads(json.dumps(r["entries"][0])))
+
+        def strip_owner(r):
+            del _entry(r, "S-2")["deferred"]["owner"]
+
+        def bad_status(r):
+            _entry(r, "G9")["mapping_status"] = "PROVEN_BY_ASSERTION"
+
+        def oversized(r):
+            _entry(r, "G10")["requirement"] = "y" * (MAX_STRING_FIELD_CHARS + 5)
+
+        def with_url(r):
+            _entry(r, "G11")["notes"] = "https://example.invalid"
+
+        def extra_key(r):
+            r["unexpected"] = 1
+
+        cases = [
+            ("missing-id", drop_g17, "requirement-ids"),
+            ("duplicate-id", dup_first, "duplicate-ids"),
+            ("ownerless-deferral", strip_owner, "deferred-keys"),
+            ("forged-status", bad_status, "mapping-status"),
+            ("oversize", oversized, "string-too-long"),
+            ("forbidden-content", with_url, "forbidden-content"),
+            ("extra-top-key", extra_key, "top-level-keys"),
+        ]
+        for label, mutator, token in cases:
+            reg = mutated_registry(mutator)
+            problems = registry_problems(reg)
+            assert any(token in p for p in problems), f"{label}: real validator failed to refuse: {problems}"
+            assert weakened_registry_problems(reg) == [], (
+                f"{label}: weakened validator must admit what the real one refuses")
+
+    # -- engine-ownership detector (gate G8) discriminates on a mutated pack --
+    def test_engine_ownership_detector_flags_a_recovery_surface(self):
+        pack = json.loads(CONTRACT_PACK_PATH.read_text(encoding="utf-8"))
+        pack = json.loads(json.dumps(pack))
+        pack["invokes"].append({
+            "surface": "recovery.enact",
+            "kind": "invoke",
+            "binds_to": {"module": "oce_control.recovery", "callable": "recovery.recover"},
+        })
+        violations = engine_ownership_violations(pack)
+        assert violations, "mutated pack with a recovery surface must be flagged"
