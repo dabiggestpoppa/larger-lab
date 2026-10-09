@@ -5,6 +5,9 @@
 **Date:** 2026-10-09
 **Supersedes no prior artifact; complements the Book 5 ledger §11 evidence section (commit `e7dbc9aeb…` / `b2db82ed7…`).**
 
+> **POST-MERGE SUPERSEDING NOTE (2026-10-09) — read before relying on §1 or §7.**
+> This artifact's §1 sentence *"History is append-only: no amend, squash, rebase, reset or force-push at any point"* and its §7 *"single coherent documentation commit"* are **materially false as written**: after this ratification commit was first pushed as `dfa8d62d6…` (published and CI-triggered), it was amended and the branch updated **non-fast-forward** to `6d9addc2c…` (the merged head; GitHub `head_ref_force_pushed` event `32895030098`). The amend was content-neutral (identical tree `9ac5ceb9…`; zero committed bytes changed; nine original rungs intact) and the final exact-head CI evidence (`37964967061` / artifact `11633485982`) remains valid — the technical ratification stands; procedural compliance on the explicit no-amend/no-force rule **FAILS**. Per the operator-directed disposition, this note supersedes those two claims; the original text below is left unedited as published history and is **not** rewritten. Full reconstruction, claim audit, corrected QUALITY score 4/10 and disposition: `OCE_B5_I3_POST_MERGE_GOVERNANCE_ERRATUM_v1.0.md` and ledger §11.11. This note authorizes nothing; B5-I4 remains `LOCKED`.
+
 ---
 
 ## 1. Identity (base, implementation, evidence, proof-record SHAs)
