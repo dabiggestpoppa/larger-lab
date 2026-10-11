@@ -6420,3 +6420,118 @@ NON_BLOCKING_FOR_BLOC_5). No status value was invented and no gate was
 promoted. recommended_next = **OPERATOR REVIEW OF THE I05 IMPLEMENTATION,
 THEN AN I06 IMPLEMENTATION DIRECTIVE DECISION IF DESIRED**. HARD STOP after
 push and report.
+
+---
+
+## 169 - SENSOR-B5-I05R1: I05 OPERATOR RATIFICATION (COMPLETE CHECKPOINT) + I06 READINESS
+
+Date: 2026-10-11. Directive SENSOR-B5-I05R1 — operator technical acceptance
++ bounded ratification, four operations (audit / temporal adjudication /
+ratification / I06 readiness). Start head `70de701cb` (required starting
+HEAD, re-verified equal to remote after fetch; tracked worktree clean apart
+from the three pre-existing untracked scratch items, never staged; plan
+branch `4bb677f9e` untouched and all seven bloc_05 plan blobs re-measured
+hash-identical plan-vs-build, zero diffs; chain `19ffc740a <- 745b3797b <-
+70de701cb` single parents, 0 merges). Authority: ratify I05 if earned,
+append-only ledger, I06 readiness READ-ONLY; production changes prohibited.
+
+### 1. Ratification decision (BOOK 10)
+
+**I05_COMPLETE_AND_RATIFIABLE → `B5-I05 = OPERATOR_ACCEPTED`.** Exact
+contract matrix C01..C22 (frozen clauses 02 §2–§18, 06 G2/§3 N0/§13/§17,
+07 F8/F9/F10/F11): UNCOVERED = ∅, UNAUTHORIZED_EXTRA = ∅; items on later
+checkpoints named per-row (latency policy → I06/M-register, four revision
+modes → B5-I07, row-level T1 construction → I16/I18/I19, golden replay →
+I22). All 24 acceptance gates R01..R24 adjudicated individually, all PASS
+(artifact §12). Books 03–07 audits: 10/10 model checks, 8-class schema
+inventory, vocabulary reconciliation (9+6+6+6 verbatim, 4 modes
+declared-and-refused), INT-R1..R10 all PASS, F05-01..06 all PASS
+individually with per-case fixture/observed/evidence-row. Acceptance artifact:
+`BLOC_05_I05_OPERATOR_RATIFICATION.md`.
+
+### 2. Confidence and replay-vocabulary dispositions (BOOK 04.2 / 06.2)
+
+`availability_confidence`: field mandatory at the T1-row layer (02 §5
+"should carry"), vocabulary/threshold NOT FROZEN anywhere in the seven
+documents (plan-wide grep = 1 occurrence, no members); I05 obligation =
+use-time rule — the gate BLOCKS on missing confidence
+(`gate_missing_availability_confidence_blocks`) with an opaque non-numeric
+validated token (I03 alias-confidence precedent). No threshold exists in
+02 §15's six conditions, so none was invented; no non-null token is claimed
+as "verified confidence". Vocabulary/ordering/provider-latency coupling =
+operator decision recorded as missing-authority M1 (I06 readiness). Replay
+result vocabulary: six frozen values retained; `UnassessableReplayEvidence`
+ratified as the correct I05-boundary refusal for unbucketed blocking flags
+(no seventh status, no ELIGIBLE laundering); caller-built `ReplayEvidence`
+means row-level T0→evidence construction stays with I16/I18/I19; no golden
+replay claim.
+
+### 3. Fresh measurements (this tree, offline, exit codes captured)
+
+| check | exit | result |
+|---|---|---|
+| I05 focused (9 files) | 0 | 219 passed |
+| normalization I01–I05 | 0 | 798 passed |
+| governance readers (I11R2 binding + I11R2 evidence + job-state) | 0 | 43 passed (§168's 40 = its reader-subset selection; both green) |
+| protected-digest reader `test_i08_evidence.py` | 0 | 5 passed |
+| evidence producer ×2 (BOOK 08) | 0, 0 | 86/86 + 7/7, both artifacts byte-identical to committed: `bloc_05_time_validation.json` = `8e8a9da18dc2e6221467481700d2bfa33d86c9ad9c6b83f0ae99dc6c6106f1cd`, scope audit = `ca0afa33ca43c64e6dcc45e8b45d9b5a2a32a234500bfe176377edccd5fc164e`; `git status` fixpoint |
+| tracked `.py` inventory | — | **1063** = binding-audit `python_files_scanned`; no republish needed or performed |
+| canonical full suite | carried | §168 recorded `4196 passed / 14 skipped / 0 failed, exit 0, 1037.23s` on these exact bytes; independently re-executed on a detached checkout of `70de701cb` (4196/14, 1087.87s); not re-run here per §09 (bytes unchanged) |
+
+Protected history (BOOK 09.1): `git show --name-only` of `70de701cb` = the
+authorized 25 paths only; zero I01–I04 source/test/evidence diffs, zero
+frozen-plan diffs, zero research-canon diffs; the I05-authorized I01 scope
+allowlist line and I11R2 republish are disclosed in §168. This ratification
+adds no production, test, config, or existing-evidence changes.
+
+### 4. Custody
+
+Authorized mutations executed: 2 new evidence artifacts
+(`BLOC_05_I05_OPERATOR_RATIFICATION.md`, `BLOC_05_I06_READINESS_ASSESSMENT.md`)
++ this append-only §169 entry. Commit on `agent/crypto-sensor-fabric-build`
+only, fast-forward push, local == remote SHA verified after fetch. No
+reset/rebase/amend/merge/squash/force-push/cherry-pick; scratch items left
+untouched.
+
+### 5. Governance promotion (established vocabulary only; before → after)
+
+```text
+B5-I05
+    IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW → OPERATOR_ACCEPTED
+BLOC_05_IMPLEMENTATION_STATUS
+    I04_OPERATOR_ACCEPTED                      → I05_OPERATOR_ACCEPTED
+        (parallel to I02 §158, I03 §163, I04 §166)
+I06_READINESS                                  → MEASURED_AND_REPORTED
+        (parallel to I04_READINESS §163, I05_READINESS §166)
+B5-I01..I04                                    (unchanged) OPERATOR_ACCEPTED
+BLOC_05                                        (unchanged) INCOMPLETE
+IDENTITY_GATE / TIME_GATE / SEMANTIC_GATE / UNIT_GATE / LINEAGE_GATE /
+DUPLICATE_REVISION_GATE / REPLAY_SAFETY_GATE / GOLDEN_T0_T1_GATE
+    (all unchanged) NOT_YET_EARNED — checkpoint ratification earns no
+    program-level gate
+next_checkpoint_authorized                     (unchanged) FALSE
+B5-I06+ = UNAUTHORIZED; BLOC_06 = UNAUTHORIZED; RESEARCH = FROZEN
+```
+
+No status value was invented (BOOK 10.1/15 keys only). The historical §167
+`I05_IMPLEMENTATION_AUTHORIZATION = FALSE` remains verbatim as
+pre-authorization history.
+
+### 6. I06 readiness (BOOK 11, READ-ONLY)
+
+`BLOC_05_I06_READINESS_ASSESSMENT.md`: CHECKPOINT_ID = SENSOR-B5-I06,
+FROZEN_TITLE = "market-availability derivation + replay eligibility"
+(06 §19 L464) / "market availability + replay eligibility" (07 §10 L414)
+— quoted from frozen documents, not from any agent recommendation; the
+title's core surfaces were frozen into I05 by 02 §17, so the scope delta is
+flagged as operator decision M2. Missing-authority register M1..M7:
+confidence vocabulary (M1), I06 scope delta (M2), provider feed-latency
+documentation (02 §6 line, M3), real-provider registry rows (M4), row-level
+T1 construction ownership (M5), golden fixture = I22 (M6), untracked I06
+spike note is not authority (M7). Contract-to-interface matrix built;
+`bloc_05_replay_safety_validation.json` (06 §17) correctly ABSENT; no I06
+code/tests/config/evidence created; authorization = FALSE.
+
+recommended_next = **OPERATOR REVIEW OF THE I05R1 RATIFICATION PACKAGE,
+THEN AN I06 IMPLEMENTATION DIRECTIVE DECISION IF DESIRED**. HARD STOP after
+push and report.
