@@ -6535,3 +6535,107 @@ code/tests/config/evidence created; authorization = FALSE.
 recommended_next = **OPERATOR REVIEW OF THE I05R1 RATIFICATION PACKAGE,
 THEN AN I06 IMPLEMENTATION DIRECTIVE DECISION IF DESIRED**. HARD STOP after
 push and report.
+
+---
+
+## 170 - SENSOR-B5-I06D1: I06 SCOPE RESOLUTION + CONFIDENCE/LATENCY AUTHORITY ASSESSMENT + REPLAY-SAFETY EVIDENCE SPEC (GOVERNANCE ONLY)
+
+Date: 2026-10-11. Directive SENSOR-B5-I06D1 — read-only contract adjudication
+with bounded governance output; production code and I06 implementation NOT
+authorized. Start head `913a4c159` (required starting HEAD, verified equal to
+remote after fetch; tracked tree clean apart from the three pre-existing
+untracked scratch items, never staged; I05 ratification + §169 reachable;
+all seven bloc_05 plan blobs re-measured hash-identical plan-branch-vs-build,
+zero diffs). Deliverable: `BLOC_05_I06D1_DECISION_PACKAGE.md` + this
+append-only entry; ZERO production/test/config/plan/existing-evidence changes.
+
+### 1. Scope-delta resolution (register M2)
+
+D01..D11 matrix built with full per-obligation fields (frozen clause,
+current implementation/test/evidence, remaining behavior, owner,
+implementation authority, disposition): **7 SATISFIED_BY_I05** (D01
+ derivation, D02 basis, D05 interval-close, D06 archive rule, D07 revision
+selection, D08 gate, D09 family declaration), **1 RESIDUAL_I06** (D11
+`bloc_05_replay_safety_validation.json`), **1 OWNED_BY_LATER_CHECKPOINT**
+(D10 row-level T1 construction — I16/I18/I19 titles re-verified from 06 §19 /
+07 §10), **2 REQUIRES_OPERATOR_DECISION** (D03 confidence, D04 latency).
+**Zero I05 primitives rebuilt**; accepted primitives become upstream
+dependencies. I06's honest residual = two operator decisions + one evidence
+artifact + one interface contract. M2 = RESOLVED, pending operator
+acknowledgment at directive time.
+
+### 2. Confidence decision M1 (PROPOSED — not ratified)
+
+Options A (evidence-class categorical) / B (opaque preservation) / C (deferred)
+evaluated against 02 §5 (field, no vocabulary/ordering/threshold anywhere),
+02 §15 (six conditions contain no confidence term) and the I01 NOT_FROZEN
+record. **PROPOSED_DECISION = Option B with C's review trigger**; Option A is
+NOT selectable in this phase (would create vocabulary the freeze does not
+contain) and is recorded as an open alternative requiring explicit operator
+approval. All eight §04.2 fields returned; no enum, threshold, or scale
+created; current I05 behavior remains accepted unchanged.
+
+### 3. Provider latency authority M3/M4
+
+The only frozen latency text is 02 §6's `market_available_at ~=
+source_event_at + documented/minimal feed latency policy` plus the v1 license
+(anchor only when explicitly classified contemporaneous-public — already
+implemented and accepted). Plan-wide grep `latency` = that one line; no
+provider documentation exists in tracked sources; registry ships zero real
+rows. **No latency number is admissible now; missing data is not zero
+latency; ingestion never becomes market availability.** Fail-closed path =
+existing refusal chain (UNKNOWN/SYSTEM_ONLY, blocked). Twelve-field provider
+evidence package specified (assessment inventory only, frozen names
+preserved); synthetic fixtures validated logic only and cannot establish
+real exchange latency (M3/M4 remain OPEN).
+
+### 4. Replay-safety evidence specification (D11 residual)
+
+`bloc_05_replay_safety_validation.json` scope specified as RS-01..RS-14
+each with frozen clause, expected result, current I05 proof, ADDITIONAL I06
+proof required, evidence owner. Distinctness established: consolidated
+admission-policy proof + refusal-classification table + two genuinely new
+boundaries (RS-04 cutoff filtering, explicitly assigned to I19 query filters,
+I06 documents the contract without implementing it; RS-14 latency-claim
+without evidence cannot shift availability earlier). Explicitly NOT a copy of
+I05's 86 rows and NOT golden T0→T1 acceptance (06 §16 → I22). Production of
+the artifact remains BLOCKED pending a future I06 implementation directive.
+
+### 5. Downstream ownership + interface contract
+
+Frozen sequence I07..I23 titles re-read and quoted from 06 §19 / 07 §10 (not
+assumed from prior reports): I07 revision policies, I08 units, I09
+methodology/semantics, I10–I15 sensor normalizers, I16 lineage, I17
+duplicate/revision engine, I18 T1 generation, I19 canonical query/replay
+filters, I20 golden semantic fixtures, I21 property/regression, I22 golden
+replay slice, I23 acceptance + handoff. Explicit consumer contract recorded:
+I05 sealed signatures (derivation, gate, selection, registry, completion law)
++ per-checkpoint consumer obligations; no consumer may derive its own
+availability time or mint a seventh replay status.
+
+### 6. Decision gates and states
+
+**S01..S14 all PASS** (each with clause + observed evidence, package §8).
+Per directive: scope resolution = EARNED; **implementation authority remains
+BLOCKED** (M1 selection + M3 evidence + a separate directive required) —
+recorded as distinct states. Register statuses refreshed: M1 OPEN (proposal
+filed), M2 RESOLVED, M3/M4 OPEN, M5/M6 OWNED_BY_LATER, M7 untracked scratch
+is not authority. §7 contains a PROPOSED minimal I06 implementation
+direction draft — clearly marked NOT AUTHORIZED.
+
+### 7. Custody and terminal status
+
+Changed paths: exactly 2 (this §170 append + the new decision-package
+document). Commit with institutional I06D1 subject on
+`agent/crypto-sensor-fabric-build`, fast-forward push, remote == local
+verified (SHA in the final report). Terminal preserved verbatim:
+B5-I01..I05 = OPERATOR_ACCEPTED; **B5-I06 = NOT_IMPLEMENTED**; BLOC_05 =
+INCOMPLETE; all eight program gates = NOT_YET_EARNED;
+next_checkpoint_authorized = FALSE; BLOC_06 = UNAUTHORIZED; RESEARCH =
+FROZEN. No status value invented; no gate promoted; no semantic decision
+ratified.
+
+recommended_next = **OPERATOR: (1) SELECT CONFIDENCE OPTION A/B/C, (2)
+ACKNOWLEDGE THE M2 SCOPE RESOLUTION, (3) SUPPLY OR DEFER M3 PROVIDER
+EVIDENCE, (4) DECIDE WHETHER TO ISSUE THE MINIMAL I06 IMPLEMENTATION
+DIRECTIVE**. HARD STOP after push and report.
