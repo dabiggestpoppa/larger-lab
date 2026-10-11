@@ -1,0 +1,1241 @@
+{
+  "all_results_pass": true,
+  "artifact": "bloc_05_time_validation",
+  "authority": [
+    "bloc_05/02 sections 2-18",
+    "bloc_05/06 section 1 G2",
+    "bloc_05/06 section 13",
+    "bloc_05/06 section 17",
+    "bloc_05/07 F8/F9"
+  ],
+  "checkpoint": "SENSOR-B5-I05",
+  "evidence_truth": "Every row is an executed probe: `observed` is produced by the real production functions over deterministic fixtures, `expected` is the literal written from the frozen contract, and `pass` is their equality.  No live clock, no network, no untracked dependency.",
+  "generator": "live run 2026-10-10: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i05_time.py (from quant-lab; time surface under test = src/crypto_sensor_fabric/normalization/time/ + config/crypto_sensor_fabric/{provider_time_semantics,revision_policies}.yaml)",
+  "rows": [
+    {
+      "clause": "bloc_05/02 s2",
+      "expected": [
+        "SOURCE_EVENT_AT",
+        "INTERVAL_START_AT",
+        "INTERVAL_END_AT",
+        "EFFECTIVE_AT",
+        "PUBLISHED_AT",
+        "MARKET_AVAILABLE_AT",
+        "OBSERVED_AT",
+        "INGESTED_AT",
+        "NORMALIZED_AT"
+      ],
+      "index": 0,
+      "observed": [
+        "SOURCE_EVENT_AT",
+        "INTERVAL_START_AT",
+        "INTERVAL_END_AT",
+        "EFFECTIVE_AT",
+        "PUBLISHED_AT",
+        "MARKET_AVAILABLE_AT",
+        "OBSERVED_AT",
+        "INGESTED_AT",
+        "NORMALIZED_AT"
+      ],
+      "pass": true,
+      "row_id": "vocab_timestamp_roles"
+    },
+    {
+      "clause": "bloc_05/02 s2/s3",
+      "expected": {
+        "EFFECTIVE_AT": "effective_at",
+        "INGESTED_AT": "ingested_at",
+        "INTERVAL_END_AT": "interval_end_at",
+        "INTERVAL_START_AT": "interval_start_at",
+        "MARKET_AVAILABLE_AT": "market_available_at",
+        "NORMALIZED_AT": "normalized_at",
+        "OBSERVED_AT": "observed_at",
+        "PUBLISHED_AT": "published_at",
+        "SOURCE_EVENT_AT": "source_event_at"
+      },
+      "index": 1,
+      "observed": {
+        "EFFECTIVE_AT": "effective_at",
+        "INGESTED_AT": "ingested_at",
+        "INTERVAL_END_AT": "interval_end_at",
+        "INTERVAL_START_AT": "interval_start_at",
+        "MARKET_AVAILABLE_AT": "market_available_at",
+        "NORMALIZED_AT": "normalized_at",
+        "OBSERVED_AT": "observed_at",
+        "PUBLISHED_AT": "published_at",
+        "SOURCE_EVENT_AT": "source_event_at"
+      },
+      "pass": true,
+      "row_id": "vocab_timestamp_role_field_map"
+    },
+    {
+      "clause": "bloc_05/02 s10",
+      "expected": [
+        "ORIGINAL",
+        "PROVIDER_CORRECTED",
+        "SOURCE_MUTATION_REPARSED",
+        "NORMALIZATION_REBUILD",
+        "IDENTITY_REBUILD",
+        "SEMANTIC_REINTERPRETATION"
+      ],
+      "index": 2,
+      "observed": [
+        "ORIGINAL",
+        "PROVIDER_CORRECTED",
+        "SOURCE_MUTATION_REPARSED",
+        "NORMALIZATION_REBUILD",
+        "IDENTITY_REBUILD",
+        "SEMANTIC_REINTERPRETATION"
+      ],
+      "pass": true,
+      "row_id": "vocab_revision_status"
+    },
+    {
+      "clause": "bloc_05/02 s11",
+      "expected": [
+        "AS_KNOWN_THEN",
+        "LATEST_VERIFIED",
+        "FIRST_SEEN",
+        "EXACT_REVISION",
+        "ALL_REVISIONS",
+        "ERROR_ON_AMBIGUITY"
+      ],
+      "index": 3,
+      "observed": [
+        "AS_KNOWN_THEN",
+        "LATEST_VERIFIED",
+        "FIRST_SEEN",
+        "EXACT_REVISION",
+        "ALL_REVISIONS",
+        "ERROR_ON_AMBIGUITY"
+      ],
+      "pass": true,
+      "row_id": "vocab_revision_mode"
+    },
+    {
+      "clause": "bloc_05/02 s15",
+      "expected": [
+        "ELIGIBLE",
+        "RETROSPECTIVE_ONLY",
+        "BLOCKED_TIMESTAMP",
+        "BLOCKED_REVISION",
+        "BLOCKED_IDENTITY",
+        "BLOCKED_LINEAGE"
+      ],
+      "index": 4,
+      "observed": [
+        "ELIGIBLE",
+        "RETROSPECTIVE_ONLY",
+        "BLOCKED_TIMESTAMP",
+        "BLOCKED_REVISION",
+        "BLOCKED_IDENTITY",
+        "BLOCKED_LINEAGE"
+      ],
+      "pass": true,
+      "row_id": "vocab_replay_eligibility"
+    },
+    {
+      "clause": "bloc_05/02 s5/s7/s8/s16",
+      "expected": [],
+      "index": 5,
+      "observed": [],
+      "pass": true,
+      "row_id": "vocab_i01_enums_reused_not_redeclared"
+    },
+    {
+      "clause": "bloc_05/02 s5",
+      "expected": [
+        "REALTIME_PUBLIC_EVENT",
+        "REALTIME_PUBLIC_SNAPSHOT",
+        "PUBLIC_INTERVAL_CLOSE",
+        "DELAYED_PUBLICATION",
+        "HISTORICAL_ARCHIVE_RECONSTRUCTION",
+        "PROVIDER_DECLARED_PUBLIC_TIME",
+        "SYSTEM_ONLY_OBSERVED",
+        "UNKNOWN"
+      ],
+      "index": 6,
+      "observed": [
+        "REALTIME_PUBLIC_EVENT",
+        "REALTIME_PUBLIC_SNAPSHOT",
+        "PUBLIC_INTERVAL_CLOSE",
+        "DELAYED_PUBLICATION",
+        "HISTORICAL_ARCHIVE_RECONSTRUCTION",
+        "PROVIDER_DECLARED_PUBLIC_TIME",
+        "SYSTEM_ONLY_OBSERVED",
+        "UNKNOWN"
+      ],
+      "pass": true,
+      "row_id": "vocab_availability_basis_eight"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": [
+        "LEFT_CLOSED_RIGHT_OPEN",
+        "LEFT_OPEN_RIGHT_CLOSED",
+        "PROVIDER_NATIVE_UNKNOWN",
+        "POINT_SAMPLE"
+      ],
+      "index": 7,
+      "observed": [
+        "LEFT_CLOSED_RIGHT_OPEN",
+        "LEFT_OPEN_RIGHT_CLOSED",
+        "PROVIDER_NATIVE_UNKNOWN",
+        "POINT_SAMPLE"
+      ],
+      "pass": true,
+      "row_id": "vocab_interval_conventions_four"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 1",
+      "expected": "REFUSED",
+      "index": 8,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "model_naive_timestamp_refused"
+    },
+    {
+      "clause": "bloc_05/02 s8",
+      "expected": "2023-07-01T12:00:00+00:00",
+      "index": 9,
+      "observed": "2023-07-01T12:00:00+00:00",
+      "pass": true,
+      "row_id": "model_offset_normalized_to_utc"
+    },
+    {
+      "clause": "bloc_05/02 s8",
+      "expected": "REFUSED",
+      "index": 10,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "model_second_precision_refuses_subsecond"
+    },
+    {
+      "clause": "bloc_05/02 s8",
+      "expected": "REFUSED",
+      "index": 11,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "model_millisecond_precision_refuses_microsecond"
+    },
+    {
+      "clause": "bloc_05/02 s8",
+      "expected": "REFUSED",
+      "index": 12,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "model_date_only_requires_midnight"
+    },
+    {
+      "clause": "bloc_05/02 s9",
+      "expected": "REFUSED",
+      "index": 13,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "model_skew_methodology_needs_a_measured_skew"
+    },
+    {
+      "clause": "bloc_05/02 s9",
+      "expected": "2024-06-01T12:00:00+00:00",
+      "index": 14,
+      "observed": "2024-06-01T12:00:00+00:00",
+      "pass": true,
+      "row_id": "model_skew_never_mutates_the_raw_source_value"
+    },
+    {
+      "clause": "bloc_05/02 s10",
+      "expected": "REFUSED",
+      "index": 15,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "model_temporal_evidence_is_immutable"
+    },
+    {
+      "clause": "bloc_05/02 s17",
+      "expected": "1.0",
+      "index": 16,
+      "observed": "1.0",
+      "pass": true,
+      "row_id": "registry_config_present_and_schema_versioned"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 7",
+      "expected": 0,
+      "index": 17,
+      "observed": 0,
+      "pass": true,
+      "row_id": "registry_carries_zero_real_exchange_rows"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 7",
+      "expected": {
+        "BINANCE_USDM": "REFUSED",
+        "BITFINEX_COMMUNITY_ARCHIVE": "REFUSED",
+        "BYBIT_LINEAR": "REFUSED",
+        "COINALYZE": "REFUSED",
+        "DERIBIT": "REFUSED",
+        "GATE_FUTURES": "REFUSED",
+        "KRAKEN_FUTURES": "REFUSED",
+        "OKX_SWAP": "REFUSED"
+      },
+      "index": 18,
+      "observed": {
+        "BINANCE_USDM": "REFUSED",
+        "BITFINEX_COMMUNITY_ARCHIVE": "REFUSED",
+        "BYBIT_LINEAR": "REFUSED",
+        "COINALYZE": "REFUSED",
+        "DERIBIT": "REFUSED",
+        "GATE_FUTURES": "REFUSED",
+        "KRAKEN_FUTURES": "REFUSED",
+        "OKX_SWAP": "REFUSED"
+      },
+      "pass": true,
+      "row_id": "registry_every_real_provider_fails_closed"
+    },
+    {
+      "clause": "bloc_05/02 s7/s8",
+      "expected": [
+        "timestamp",
+        "end",
+        "LEFT_CLOSED_RIGHT_OPEN",
+        "MILLISECOND",
+        true
+      ],
+      "index": 19,
+      "observed": [
+        "timestamp",
+        "end",
+        "LEFT_CLOSED_RIGHT_OPEN",
+        "MILLISECOND",
+        true
+      ],
+      "pass": true,
+      "row_id": "registry_synthetic_row_resolves_all_declared_semantics"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": "REFUSED",
+      "index": 20,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "registry_unmapped_role_fails_closed"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 7",
+      "expected": "REFUSED",
+      "index": 21,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "registry_unknown_provider_returns_no_default"
+    },
+    {
+      "clause": "bloc_05/02 s17",
+      "expected": "REFUSED",
+      "index": 22,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "registry_duplicate_provider_family_row_refused"
+    },
+    {
+      "clause": "bloc_05/02 s6",
+      "expected": "REFUSED",
+      "index": 23,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "registry_contemporaneous_public_requires_evidence"
+    },
+    {
+      "clause": "bloc_05/02 s17",
+      "expected": true,
+      "index": 24,
+      "observed": true,
+      "pass": true,
+      "row_id": "registry_serialization_is_byte_stable"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 7",
+      "expected": "UnknownProviderTimeSemantics",
+      "index": 25,
+      "observed": "UnknownProviderTimeSemantics",
+      "pass": true,
+      "row_id": "registry_unknown_provider_exception_type"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": [
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
+      "index": 26,
+      "observed": [
+        false,
+        true,
+        true,
+        false,
+        false
+      ],
+      "pass": true,
+      "row_id": "interval_left_closed_right_open_edges"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": [
+        false,
+        false,
+        true,
+        true,
+        false
+      ],
+      "index": 27,
+      "observed": [
+        false,
+        false,
+        true,
+        true,
+        false
+      ],
+      "pass": true,
+      "row_id": "interval_left_open_right_closed_edges"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "index": 28,
+      "observed": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "pass": true,
+      "row_id": "interval_point_sample_is_a_single_instant"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": "REFUSED",
+      "index": 29,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "interval_unknown_convention_is_undecidable"
+    },
+    {
+      "clause": "bloc_05/02 s6",
+      "expected": [
+        "2024-06-01T12:05:00+00:00",
+        "2024-06-01T12:05:00+00:00"
+      ],
+      "index": 30,
+      "observed": [
+        "2024-06-01T12:05:00+00:00",
+        "2024-06-01T12:05:00+00:00"
+      ],
+      "pass": true,
+      "row_id": "interval_completion_is_the_close_never_the_start"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 2",
+      "expected": "REFUSED",
+      "index": 31,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "interval_unclosed_window_cannot_claim_completion"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 8",
+      "expected": [
+        "2024-06-01T12:05:00+00:00",
+        true,
+        "2026-01-02T03:04:05+00:00"
+      ],
+      "index": 32,
+      "observed": [
+        "2024-06-01T12:05:00+00:00",
+        true,
+        "2026-01-02T03:04:05+00:00"
+      ],
+      "pass": true,
+      "row_id": "interval_envelope_derivation_is_read_only"
+    },
+    {
+      "clause": "bloc_05/02 s6",
+      "expected": [
+        "PUBLIC_INTERVAL_CLOSE",
+        "2024-06-01T12:05:00+00:00",
+        [],
+        true
+      ],
+      "index": 33,
+      "observed": [
+        "PUBLIC_INTERVAL_CLOSE",
+        "2024-06-01T12:05:00+00:00",
+        [],
+        true
+      ],
+      "pass": true,
+      "row_id": "avail_start_stamped_interval_is_not_available_at_start"
+    },
+    {
+      "clause": "bloc_05/02 s6",
+      "expected": [
+        "PUBLIC_INTERVAL_CLOSE",
+        "2024-06-01T12:05:03+00:00",
+        []
+      ],
+      "index": 34,
+      "observed": [
+        "PUBLIC_INTERVAL_CLOSE",
+        "2024-06-01T12:05:03+00:00",
+        []
+      ],
+      "pass": true,
+      "row_id": "avail_later_publication_pushes_availability_later"
+    },
+    {
+      "clause": "bloc_05/02 s7/s18 rule 7",
+      "expected": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 35,
+      "observed": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_unknown_interval_convention_fails_closed"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 36,
+      "observed": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_half_declared_interval_fails_closed"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 7",
+      "expected": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 37,
+      "observed": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_interval_without_registered_semantics_fails_closed"
+    },
+    {
+      "clause": "bloc_05/02 s5/s6",
+      "expected": [
+        "REALTIME_PUBLIC_SNAPSHOT",
+        "2024-06-01T12:00:00+00:00",
+        []
+      ],
+      "index": 38,
+      "observed": [
+        "REALTIME_PUBLIC_SNAPSHOT",
+        "2024-06-01T12:00:00+00:00",
+        []
+      ],
+      "pass": true,
+      "row_id": "avail_classified_point_sample_anchors_at_the_instant"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 7",
+      "expected": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 39,
+      "observed": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_INTERVAL_BOUNDARY_UNVERIFIED",
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_unclassified_point_sample_fails_closed"
+    },
+    {
+      "clause": "bloc_05/02 s5/s6",
+      "expected": [
+        "DELAYED_PUBLICATION",
+        "2024-06-01T12:00:02+00:00",
+        []
+      ],
+      "index": 40,
+      "observed": [
+        "DELAYED_PUBLICATION",
+        "2024-06-01T12:00:02+00:00",
+        []
+      ],
+      "pass": true,
+      "row_id": "avail_published_without_a_declared_field_is_delayed_publication"
+    },
+    {
+      "clause": "bloc_05/02 s3/s5",
+      "expected": [
+        "PROVIDER_DECLARED_PUBLIC_TIME",
+        "2024-06-01T12:00:02+00:00",
+        []
+      ],
+      "index": 41,
+      "observed": [
+        "PROVIDER_DECLARED_PUBLIC_TIME",
+        "2024-06-01T12:00:02+00:00",
+        []
+      ],
+      "pass": true,
+      "row_id": "avail_declared_published_field_is_provider_declared_public_time"
+    },
+    {
+      "clause": "bloc_05/02 s6/s16",
+      "expected": [
+        "HISTORICAL_ARCHIVE_RECONSTRUCTION",
+        "2022-05-12T08:00:00+00:00",
+        [
+          "TIME_ARCHIVE_RECONSTRUCTION"
+        ]
+      ],
+      "index": 42,
+      "observed": [
+        "HISTORICAL_ARCHIVE_RECONSTRUCTION",
+        "2022-05-12T08:00:00+00:00",
+        [
+          "TIME_ARCHIVE_RECONSTRUCTION"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_archive_with_contemporaneous_evidence_is_labeled"
+    },
+    {
+      "clause": "bloc_05/02 s6/s14",
+      "expected": [
+        "SYSTEM_ONLY_OBSERVED",
+        null,
+        [
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 43,
+      "observed": [
+        "SYSTEM_ONLY_OBSERVED",
+        null,
+        [
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_archive_without_evidence_is_system_only"
+    },
+    {
+      "clause": "bloc_05/02 s5/s6",
+      "expected": [
+        "REALTIME_PUBLIC_EVENT",
+        "2022-05-12T08:00:00+00:00",
+        []
+      ],
+      "index": 44,
+      "observed": [
+        "REALTIME_PUBLIC_EVENT",
+        "2022-05-12T08:00:00+00:00",
+        []
+      ],
+      "pass": true,
+      "row_id": "avail_classified_realtime_event_anchors_at_event_time"
+    },
+    {
+      "clause": "bloc_05/02 s4/s18 rule 3",
+      "expected": [
+        "SYSTEM_ONLY_OBSERVED",
+        null,
+        [
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 45,
+      "observed": [
+        "SYSTEM_ONLY_OBSERVED",
+        null,
+        [
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_ingestion_only_never_becomes_a_market_time"
+    },
+    {
+      "clause": "bloc_05/02 s5",
+      "expected": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "index": 46,
+      "observed": [
+        "UNKNOWN",
+        null,
+        [
+          "TIME_MARKET_AVAILABILITY_UNKNOWN"
+        ]
+      ],
+      "pass": true,
+      "row_id": "avail_nothing_known_is_unknown_not_invented"
+    },
+    {
+      "clause": "bloc_05/02 s4/s18 rule 3",
+      "expected": true,
+      "index": 47,
+      "observed": true,
+      "pass": true,
+      "row_id": "avail_ingested_at_is_not_an_input_to_the_derivation"
+    },
+    {
+      "clause": "bloc_05/02 s5/s18 rule 3",
+      "expected": "REFUSED",
+      "index": 48,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "avail_false_availability_claim_is_refused_at_construction"
+    },
+    {
+      "clause": "bloc_05/02 s12",
+      "expected": [
+        [
+          "rev-oi-2022-original"
+        ],
+        [
+          "rev-oi-2022-corrected-2025"
+        ],
+        true,
+        false
+      ],
+      "index": 49,
+      "observed": [
+        [
+          "rev-oi-2022-original"
+        ],
+        [
+          "rev-oi-2022-corrected-2025"
+        ],
+        true,
+        false
+      ],
+      "pass": true,
+      "row_id": "revision_as_known_then_excludes_the_future_correction"
+    },
+    {
+      "clause": "bloc_05/02 s12",
+      "expected": [
+        [],
+        [
+          "rev-oi-2022-corrected-2025"
+        ],
+        true,
+        true
+      ],
+      "index": 50,
+      "observed": [
+        [],
+        [
+          "rev-oi-2022-corrected-2025"
+        ],
+        true,
+        true
+      ],
+      "pass": true,
+      "row_id": "revision_missing_original_is_pit_revision_uncertain"
+    },
+    {
+      "clause": "bloc_05/02 s11",
+      "expected": [
+        [
+          "rev-oi-2022-corrected-2025"
+        ],
+        [
+          "rev-oi-2022-original"
+        ],
+        false,
+        false
+      ],
+      "index": 51,
+      "observed": [
+        [
+          "rev-oi-2022-corrected-2025"
+        ],
+        [
+          "rev-oi-2022-original"
+        ],
+        false,
+        false
+      ],
+      "pass": true,
+      "row_id": "revision_latest_verified_selects_the_correction_and_is_not_pit_safe"
+    },
+    {
+      "clause": "bloc_05/02 s11",
+      "expected": {
+        "ALL_REVISIONS": "REFUSED",
+        "ERROR_ON_AMBIGUITY": "REFUSED",
+        "EXACT_REVISION": "REFUSED",
+        "FIRST_SEEN": "REFUSED"
+      },
+      "index": 52,
+      "observed": {
+        "ALL_REVISIONS": "REFUSED",
+        "ERROR_ON_AMBIGUITY": "REFUSED",
+        "EXACT_REVISION": "REFUSED",
+        "FIRST_SEEN": "REFUSED"
+      },
+      "pass": true,
+      "row_id": "revision_undefined_modes_are_refused_not_improvised"
+    },
+    {
+      "clause": "bloc_05/02 s11/s17",
+      "expected": [
+        "AS_KNOWN_THEN",
+        "LATEST_VERIFIED",
+        "FIRST_SEEN",
+        "EXACT_REVISION",
+        "ALL_REVISIONS",
+        "ERROR_ON_AMBIGUITY"
+      ],
+      "index": 53,
+      "observed": [
+        "AS_KNOWN_THEN",
+        "LATEST_VERIFIED",
+        "FIRST_SEEN",
+        "EXACT_REVISION",
+        "ALL_REVISIONS",
+        "ERROR_ON_AMBIGUITY"
+      ],
+      "pass": true,
+      "row_id": "revision_config_covers_exactly_the_six_frozen_modes"
+    },
+    {
+      "clause": "bloc_05/02 s11",
+      "expected": {
+        "ALL_REVISIONS": null,
+        "AS_KNOWN_THEN": "Select only values/revisions that were available by replay cutoff.",
+        "ERROR_ON_AMBIGUITY": null,
+        "EXACT_REVISION": null,
+        "FIRST_SEEN": null,
+        "LATEST_VERIFIED": "Useful for retrospective measurement but not automatically PIT-safe."
+      },
+      "index": 54,
+      "observed": {
+        "ALL_REVISIONS": null,
+        "AS_KNOWN_THEN": "Select only values/revisions that were available by replay cutoff.",
+        "ERROR_ON_AMBIGUITY": null,
+        "EXACT_REVISION": null,
+        "FIRST_SEEN": null,
+        "LATEST_VERIFIED": "Useful for retrospective measurement but not automatically PIT-safe."
+      },
+      "pass": true,
+      "row_id": "revision_config_defines_only_the_two_frozen_definitions"
+    },
+    {
+      "clause": "bloc_05/02 s15",
+      "expected": "ELIGIBLE",
+      "index": 55,
+      "observed": "ELIGIBLE",
+      "pass": true,
+      "row_id": "gate_all_six_conditions_are_eligible"
+    },
+    {
+      "clause": "bloc_05/02 s15(1)",
+      "expected": "BLOCKED_IDENTITY",
+      "index": 56,
+      "observed": "BLOCKED_IDENTITY",
+      "pass": true,
+      "row_id": "gate_unresolved_identity_blocks_first"
+    },
+    {
+      "clause": "bloc_05/02 s15(2)",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 57,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_unverified_timestamp_semantics_block"
+    },
+    {
+      "clause": "bloc_05/02 s15(2)",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 58,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_missing_source_evidence_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s5",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 59,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_unknown_availability_basis_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s5",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 60,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_system_only_availability_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s5",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 61,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_missing_market_available_at_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s5",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 62,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_missing_availability_confidence_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 2",
+      "expected": "BLOCKED_TIMESTAMP",
+      "index": 63,
+      "observed": "BLOCKED_TIMESTAMP",
+      "pass": true,
+      "row_id": "gate_incomplete_interval_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s15(4)",
+      "expected": "BLOCKED_REVISION",
+      "index": 64,
+      "observed": "BLOCKED_REVISION",
+      "pass": true,
+      "row_id": "gate_no_revision_evaluation_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s12",
+      "expected": "BLOCKED_REVISION",
+      "index": 65,
+      "observed": "BLOCKED_REVISION",
+      "pass": true,
+      "row_id": "gate_uncertain_pit_revision_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s11/s15",
+      "expected": "RETROSPECTIVE_ONLY",
+      "index": 66,
+      "observed": "RETROSPECTIVE_ONLY",
+      "pass": true,
+      "row_id": "gate_latest_verified_is_retrospective_only"
+    },
+    {
+      "clause": "bloc_05/02 s15(5)",
+      "expected": "BLOCKED_LINEAGE",
+      "index": 67,
+      "observed": "BLOCKED_LINEAGE",
+      "pass": true,
+      "row_id": "gate_broken_lineage_blocks"
+    },
+    {
+      "clause": "bloc_05/02 s15",
+      "expected": "REFUSED",
+      "index": 68,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "gate_blocking_flag_without_a_frozen_bucket_refuses"
+    },
+    {
+      "clause": "bloc_05/02 s16",
+      "expected": [
+        "ELIGIBLE",
+        "ELIGIBLE",
+        "ELIGIBLE"
+      ],
+      "index": 69,
+      "observed": [
+        "ELIGIBLE",
+        "ELIGIBLE",
+        "ELIGIBLE"
+      ],
+      "pass": true,
+      "row_id": "gate_label_only_flags_never_block"
+    },
+    {
+      "clause": "bloc_05/02 s15",
+      "expected": "BLOCKED_IDENTITY",
+      "index": 70,
+      "observed": "BLOCKED_IDENTITY",
+      "pass": true,
+      "row_id": "gate_condition_order_is_frozen_not_input_order"
+    },
+    {
+      "clause": "bloc_05/02 s5/s16",
+      "expected": [
+        "IDENTITY_AMBIGUOUS",
+        "IDENTITY_TERMS_UNVERIFIED",
+        "LINEAGE_BROKEN",
+        "REFERENCE_PRICE_UNAVAILABLE",
+        "SEMANTICS_UNVERIFIED",
+        "STABLECOIN_CONVERSION_UNAVAILABLE",
+        "TIME_MARKET_AVAILABILITY_UNKNOWN",
+        "TIME_SEMANTICS_UNVERIFIED",
+        "UNIT_CONVERSION_BLOCKED"
+      ],
+      "index": 71,
+      "observed": [
+        "IDENTITY_AMBIGUOUS",
+        "IDENTITY_TERMS_UNVERIFIED",
+        "LINEAGE_BROKEN",
+        "REFERENCE_PRICE_UNAVAILABLE",
+        "SEMANTICS_UNVERIFIED",
+        "STABLECOIN_CONVERSION_UNAVAILABLE",
+        "TIME_MARKET_AVAILABILITY_UNKNOWN",
+        "TIME_SEMANTICS_UNVERIFIED",
+        "UNIT_CONVERSION_BLOCKED"
+      ],
+      "pass": true,
+      "row_id": "gate_blocking_flag_set_is_the_frozen_nine"
+    },
+    {
+      "clause": "bloc_05/06 s13",
+      "expected": [
+        true,
+        "2024-06-01T12:05:00+00:00"
+      ],
+      "index": 72,
+      "observed": [
+        true,
+        "2024-06-01T12:05:00+00:00"
+      ],
+      "pass": true,
+      "row_id": "F05_01_start_stamped_interval_not_available_at_start"
+    },
+    {
+      "clause": "bloc_05/06 s13",
+      "expected": [
+        "HISTORICAL_ARCHIVE_RECONSTRUCTION",
+        "ELIGIBLE"
+      ],
+      "index": 73,
+      "observed": [
+        "HISTORICAL_ARCHIVE_RECONSTRUCTION",
+        "ELIGIBLE"
+      ],
+      "pass": true,
+      "row_id": "F05_02_contemporaneous_archive_row_is_historical_reconstruction"
+    },
+    {
+      "clause": "bloc_05/06 s13",
+      "expected": [
+        false,
+        true
+      ],
+      "index": 74,
+      "observed": [
+        false,
+        true
+      ],
+      "pass": true,
+      "row_id": "F05_03_late_correction_excluded_from_as_known_then_replay"
+    },
+    {
+      "clause": "bloc_05/06 s13",
+      "expected": [
+        "rev-oi-2022-corrected-2025",
+        "RETROSPECTIVE_ONLY"
+      ],
+      "index": 75,
+      "observed": [
+        "rev-oi-2022-corrected-2025",
+        "RETROSPECTIVE_ONLY"
+      ],
+      "pass": true,
+      "row_id": "F05_04_retrospective_correction_eligible_only_in_retrospective_mode"
+    },
+    {
+      "clause": "bloc_05/06 s13",
+      "expected": [
+        "SYSTEM_ONLY_OBSERVED",
+        "BLOCKED_TIMESTAMP",
+        "REFUSED"
+      ],
+      "index": 76,
+      "observed": [
+        "SYSTEM_ONLY_OBSERVED",
+        "BLOCKED_TIMESTAMP",
+        "REFUSED"
+      ],
+      "pass": true,
+      "row_id": "F05_05_unknown_market_availability_blocks_strict_replay"
+    },
+    {
+      "clause": "bloc_05/06 s13",
+      "expected": [
+        null,
+        true,
+        "BLOCKED_TIMESTAMP"
+      ],
+      "index": 77,
+      "observed": [
+        null,
+        true,
+        "BLOCKED_TIMESTAMP"
+      ],
+      "pass": true,
+      "row_id": "F05_06_ingestion_time_cannot_replace_market_availability"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 1",
+      "expected": "REFUSED",
+      "index": 78,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "adv_dst_gap_naive_timestamp_refused"
+    },
+    {
+      "clause": "bloc_05/02 s11",
+      "expected": "UnsupportedRevisionMode",
+      "index": 79,
+      "observed": "UnsupportedRevisionMode",
+      "pass": true,
+      "row_id": "adv_unsupported_revision_mode_names_itself"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": "UndecidableIntervalBoundary",
+      "index": 80,
+      "observed": "UndecidableIntervalBoundary",
+      "pass": true,
+      "row_id": "adv_unknown_boundary_convention_names_itself"
+    },
+    {
+      "clause": "bloc_05/02 s15",
+      "expected": "UnassessableReplayEvidence",
+      "index": 81,
+      "observed": "UnassessableReplayEvidence",
+      "pass": true,
+      "row_id": "adv_unbucketed_blocking_flag_names_itself"
+    },
+    {
+      "clause": "bloc_05/02 s7",
+      "expected": "ValueError",
+      "index": 82,
+      "observed": "ValueError",
+      "pass": true,
+      "row_id": "adv_unknown_interval_convention_token_refused"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 8",
+      "expected": [],
+      "index": 83,
+      "observed": [],
+      "pass": true,
+      "row_id": "adv_time_package_has_no_wall_clock_or_hashing"
+    },
+    {
+      "clause": "bloc_05/02 s12",
+      "expected": [
+        true,
+        true,
+        true
+      ],
+      "index": 84,
+      "observed": [
+        true,
+        true,
+        true
+      ],
+      "pass": true,
+      "row_id": "adv_no_future_correction_leaks_into_any_as_known_then_selection"
+    },
+    {
+      "clause": "bloc_05/02 s18 rule 1",
+      "expected": "REFUSED",
+      "index": 85,
+      "observed": "REFUSED",
+      "pass": true,
+      "row_id": "adv_naive_knowledge_time_is_refused"
+    }
+  ],
+  "run_date": "2026-10-10",
+  "sha256_inventory": {
+    "quant-lab/config/crypto_sensor_fabric/provider_time_semantics.yaml": "17b3fe5e15966d8c159f9f810b6f4699af809460cbcab46863833e85507ad95f",
+    "quant-lab/config/crypto_sensor_fabric/revision_policies.yaml": "2a25cf9edcefe254fbc1bee1b52b4b73b52c28fc5c7a87216de61f03162e4960",
+    "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i05_time.py": "675ea4f6823cbfbaedc88bd8000a83fc12bf15deef5f0b8a14db9184abe7e624",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/__init__.py": "e60957a70bde9dbe654673fa52a01bf2335439ec22f13df11cb262e72b94d219",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/availability.py": "ba8a09d9d35e02ec76328700e556e3ce1ae130bd51002ccdbf2db35335824e53",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/enums.py": "5876a932ca4518fca5292dd74cf2eead5fed1dff83199de5622bee92cb944858",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/intervals.py": "821e144c8e45d7606992d8fd86dc3467ca7873ac72601ccec89894253f9e80af",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/models.py": "6dd238e59741f8f98c14656e979df35919479796e54435bd5f7ff199d891f740",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/replay_gate.py": "79aa9bd9a98fc76d4666689f71ea4d47a69d75f3a05036b7ccc278a269a3a936",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/revision_policy.py": "0f6033d8c404220b0c77f62e92de1f68f3ed975dc5bb240095f6ec539d08299c",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/semantics_registry.py": "78d1136205b627c0c79477c4539c23b47ec39bfcccfefd54f75e6dffa670b5d0",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_availability.py": "4422dbef3470425c5676db88176a4758f68f92af1876c628da02e4ac5960197f",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_evidence.py": "bb5fd495c24017ba6a48844031539ba421b6247c2c1905ee97b937924bbf7595",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_frozen_scenarios.py": "2704c43b2143e52668008cf22e0dfc4f7c0ccc7b983eb98b1ea0056dc5428612",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_intervals.py": "0c891caed23326e8696600d0e66deabac38fc8e6a16b62884990a900b4413eeb",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_replay_gate.py": "c84de74d8c61c852f9667d1bfe18c73188b32dbcf8f629b61b56cb17ddb91288",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_revision_policy.py": "3093384aaa3dc9100c8a6b10e757d25088b8055644a59e00d1282a9c8d85cfd8",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "91a6119a8775b01b05865c72da2d2ea044519d720bd4eb6374f9eb805c027f1f",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_semantics_registry.py": "8df0e0f09051350e7829f138ee47e4d54b505dcddb86cea78bc616fb6fe950c7",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_time_models.py": "0ef6f9ae7b1487ac59f9a220e1796cf85f028a39e3ee7ed02086b5679442cc35"
+  },
+  "summary": {
+    "fail": 0,
+    "pass": 86,
+    "rows": 86
+  },
+  "tests": "tests/crypto_sensor_fabric/normalization/test_b5_i05_*.py"
+}

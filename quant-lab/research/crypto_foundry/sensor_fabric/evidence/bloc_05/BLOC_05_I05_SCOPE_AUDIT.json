@@ -1,0 +1,121 @@
+{
+  "all_results_pass": true,
+  "artifact": "BLOC_05_I05_SCOPE_AUDIT",
+  "base_head": "745b3797bfc3f69a1df4e8bc7171436c98996490",
+  "checkpoint": "SENSOR-B5-I05",
+  "generator": "live run 2026-10-10: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i05_time.py (from quant-lab; time surface under test = src/crypto_sensor_fabric/normalization/time/ + config/crypto_sensor_fabric/{provider_time_semantics,revision_policies}.yaml)",
+  "rows": [
+    {
+      "clause": "bloc_05/02 s17",
+      "expected": [
+        "__init__.py",
+        "availability.py",
+        "enums.py",
+        "intervals.py",
+        "models.py",
+        "replay_gate.py",
+        "revision_policy.py",
+        "semantics_registry.py"
+      ],
+      "index": 0,
+      "observed": [
+        "__init__.py",
+        "availability.py",
+        "enums.py",
+        "intervals.py",
+        "models.py",
+        "replay_gate.py",
+        "revision_policy.py",
+        "semantics_registry.py"
+      ],
+      "pass": true,
+      "row_id": "scope_time_package_is_the_frozen_seven_modules_plus_init"
+    },
+    {
+      "clause": "bloc_05/02 s17",
+      "expected": [
+        "provider_time_semantics.yaml",
+        "revision_policies.yaml"
+      ],
+      "index": 1,
+      "observed": [
+        "provider_time_semantics.yaml",
+        "revision_policies.yaml"
+      ],
+      "pass": true,
+      "row_id": "scope_two_frozen_configurations_present"
+    },
+    {
+      "clause": "I05 directive section 03",
+      "expected": [],
+      "index": 2,
+      "observed": [],
+      "pass": true,
+      "row_id": "scope_i01_to_i04_sources_unchanged_since_base"
+    },
+    {
+      "clause": "bloc_05/06 s19/s20",
+      "expected": [
+        24,
+        []
+      ],
+      "index": 3,
+      "observed": [
+        24,
+        []
+      ],
+      "pass": true,
+      "row_id": "scope_i01_top_level_api_not_expanded"
+    },
+    {
+      "clause": "I05 directive section 03",
+      "expected": [],
+      "index": 4,
+      "observed": [],
+      "pass": true,
+      "row_id": "scope_no_forbidden_import_in_the_time_package"
+    },
+    {
+      "clause": "I05 directive section 09",
+      "expected": [],
+      "index": 5,
+      "observed": [],
+      "pass": true,
+      "row_id": "scope_no_gate_or_acceptance_language_in_the_time_package"
+    },
+    {
+      "clause": "I05 directive section 04",
+      "expected": [
+        "test_b5_i05_availability.py",
+        "test_b5_i05_evidence.py",
+        "test_b5_i05_frozen_scenarios.py",
+        "test_b5_i05_intervals.py",
+        "test_b5_i05_replay_gate.py",
+        "test_b5_i05_revision_policy.py",
+        "test_b5_i05_scope_audit.py",
+        "test_b5_i05_semantics_registry.py",
+        "test_b5_i05_time_models.py"
+      ],
+      "index": 6,
+      "observed": [
+        "test_b5_i05_availability.py",
+        "test_b5_i05_evidence.py",
+        "test_b5_i05_frozen_scenarios.py",
+        "test_b5_i05_intervals.py",
+        "test_b5_i05_replay_gate.py",
+        "test_b5_i05_revision_policy.py",
+        "test_b5_i05_scope_audit.py",
+        "test_b5_i05_semantics_registry.py",
+        "test_b5_i05_time_models.py"
+      ],
+      "pass": true,
+      "row_id": "scope_nine_i05_test_modules_present"
+    }
+  ],
+  "run_date": "2026-10-10",
+  "summary": {
+    "fail": 0,
+    "pass": 7,
+    "rows": 7
+  }
+}

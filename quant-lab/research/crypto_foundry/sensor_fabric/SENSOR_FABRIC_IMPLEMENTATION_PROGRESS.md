@@ -6299,3 +6299,124 @@ UNRECONCILED / NON_BLOCKING_FOR_BLOC_5. recommended_next = **OPERATOR
 REVIEW OF THE I03I RE-VERIFICATION + AMENDMENT A, THEN THE ALREADY-RECORDED
 I05 DIRECTIVE DECISION (§166 §4)**. HARD STOP after push and report.
 
+## 168 - SENSOR-B5-I05: TIME SEMANTICS REGISTRY + INTERVAL CONVENTIONS (IMPLEMENTATION PASS, PENDING OPERATOR REVIEW)
+
+Date: 2026-10-10. Directive SENSOR-B5-I05 — operator acceptance of I03I
+Amendment A as a provenance correction, plus prospective authorization to
+execute the frozen I05 checkpoint. Start head `745b3797b` (required starting
+HEAD, verified equal to remote `agent/crypto-sensor-fabric-build`; tracked
+worktree clean apart from the three pre-existing untracked scratch items;
+I04 ratification `19ffc740a` and I03I Amendment A `745b3797b` both reachable;
+plan branch `4bb677f9e` untouched). The historical ledger statement
+`I05_IMPLEMENTATION_AUTHORIZATION = FALSE` (§166/§167) is left verbatim: it
+describes the state before this prospective authorization and was not
+retroactively edited. Authority is I05 ONLY; I06+ remain unauthorized.
+
+### 1. Delivered surface (frozen bloc_05/02 §17, implemented verbatim)
+
+Seven modules plus the permitted minimal initializer in
+`src/crypto_sensor_fabric/normalization/time/` — `models`, `enums`,
+`semantics_registry`, `availability`, `intervals`, `revision_policy`,
+`replay_gate`, `__init__` — and the two frozen configurations
+`config/crypto_sensor_fabric/{provider_time_semantics,revision_policies}.yaml`.
+Tracked producer `research/crypto_foundry/sensor_fabric/scripts/b5_i05_time.py`
+emits both artifacts: `bloc_05_time_validation.json` (86 rows) and
+`BLOC_05_I05_SCOPE_AUDIT.json` (7 rows). Nine I05 test files add **219**
+focused tests. No I01–I04 source, test or sealed evidence file was modified;
+the I01 top-level normalization API stays exactly its 24 ratified symbols
+(`test_the_i01_top_level_api_does_not_reexport_time_symbols`), and the
+I01 scope audit's subpackage allowlist gained only the `time` entry, on the
+documented B5-I02/B5-I04A precedent.
+
+### 2. Frozen contract → module ownership
+
+Four NEW vocabularies are declared verbatim from doc 02 (§2/§10/§11/§15):
+`TimestampRole` (9 roles, the nine `ObservationTimeEnvelope` fields, with
+`TIMESTAMP_ROLE_FIELD` stating the role↔field correspondence as frozen data),
+`RevisionStatus` (6), `RevisionMode` (6 names, exactly 2 implemented),
+`ReplayEligibility` (6) + `STRICT_REPLAY_ELIGIBLE`. B5-I01-owned vocabularies
+(`AvailabilityBasis`, `TimestampPrecision`, `IntervalTimeConvention`,
+`NormalizationQualityFlag`) are imported, never redeclared — no second
+authority for one frozen meaning. `CanonicalTimestamp` carries `at`/`role`/
+`precision` plus optional `clock_skew_ms` + `clock_skew_methodology_id`, is
+timezone-aware-UTC only, and its declared precision is validated against the
+value (`_validate_declared_precision`), so a microsecond-claiming timestamp
+with millisecond content fails closed. `AvailabilityResolution` preserves
+`market_available_at` as a distinct nullable field beside
+`availability_basis` and `sensor_family`, so "unknown" stays typed and never
+becomes an ingestion time. `ProviderTimeSemanticsRegistry` is text-in /
+text-out (`parse_provider_time_semantics_yaml` /
+`serialize_provider_time_semantics_yaml`) and refuses undeclared
+provider×family combinations (`UnknownProviderTimeSemantics`) and undeclared
+roles — no mapping for a real exchange was invented; every registry fixture in
+tests is synthetic. `derive_market_available_at` derives conservatively from
+`AcquisitionMetadata` and never reads `ingested_at`; equality of the two
+clocks does not merge their meanings. `IntervalWindow` implements the frozen
+boundary conventions with `contains()` and the completion law
+(`earliest_justified_availability` / `earliest_justified_availability_from`),
+so a start-stamped five-minute bar is available at its justified close and
+never at its start, and an undecidable boundary raises
+`UndecidableIntervalBoundary` instead of guessing. `select_revisions` is pure
+selection over caller-supplied `RevisionRecord`s — `AS_KNOWN_THEN` admits only
+what the caller's knowledge cutoff could see (later corrections never leak
+into historical replay), `LATEST_VERIFIED` selects the verified latest, and
+the four declared-but-unspecified modes raise `UnsupportedRevisionMode`
+rather than receiving invented semantics. `assess_replay_eligibility`
+evaluates §15's admission conditions in order over `ReplayEvidence` and
+refuses an input whose blocking flag has no frozen bucket
+(`UnassessableReplayEvidence`). No revision database, supersession engine, T1
+write, network, filesystem, wall clock or hash exists in the package.
+
+### 3. Frozen scenarios and adversarial coverage
+
+F05-01 start-stamped five-minute interval not fully available at its start
+PASS; F05-02 contemporaneous-public archive observation labeled historical
+reconstruction and ELIGIBLE PASS; F05-03 future correction excluded from
+`AS_KNOWN_THEN` PASS; F05-04 verified retrospective correction eligible only
+in the authorized retrospective mode (`RETROSPECTIVE_ONLY`) PASS; F05-05
+unknown market availability blocks strict replay (`SYSTEM_ONLY_OBSERVED` →
+`BLOCKED_TIMESTAMP`, gate REFUSED) PASS; F05-06 ingestion time cannot silently
+replace market availability (`market_available_at` stays None, blocked) PASS.
+Adversarial tests add UTC/naive rejection, DST-ambiguity refusal, precision
+mismatch, provider-uncertainty propagation, interval boundary equality on
+both sides, point observations, revision leakage, false availability claims
+and source-evidence non-mutation.
+
+### 4. Measured verification (this tree, offline)
+
+I05 focused: **219 passed**. Normalization (I01–I04 protected regression +
+I05): **798 passed**. Canonical full suite `python -m pytest tests -q` from
+quant-lab: **4196 passed / 14 skipped / 0 failed**, exit 0,
+1037.23s. I11R2 governance binding + I11R2 evidence + job-state ledger
+readers: **40 passed**. Evidence producer re-run three times from quant-lab:
+all three generations byte-identical (`8e8a9da18dc2e622…`), exit 0, 86/86 +
+7/7 rows pass, SHA-256 inventory of 20 files recomputes clean. Static: ruff
+clean across the whole I05 scope (8 modules, 9 test files, 1 producer); mypy
+**0 errors in `normalization/time`** with the repo-wide inherited baseline
+unchanged (10 errors, all in providers/probes, matching §167); compileall OK;
+secret scan clean (only self-referential scan-token comments and the frozen
+BASE_HEAD constant matched). Prior-suite side effects on historical Bloc 4
+evidence were classified and restored (11 JSON matrices rewritten by the
+storage suites: 7 line-ending churn, 4 measured-value churn) and the I11R2
+binding re-verified green on the restored tree.
+
+### 5. Custody and governance (no self-ratification)
+
+Single checkpoint commit on `agent/crypto-sensor-fabric-build` only,
+fast-forward push, SHA reported in the final report; protected historical
+files byte-identical apart from the one authorized mechanical republish. The
+I11R2 governance binding audit was republished through its established
+`UPDATE_I11R2_EVIDENCE=1` mechanism: `python_files_scanned` 1045 → **1063**
+(+18 tracked `.py` = 8 time package + 1 producer + 9 test files), asserted
+line-exact by `test_the_governance_audit_republish_is_mechanical_only`.
+Disposition: **B5-I05 = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW** (not
+ratified; I05 did not ratify itself). B5-I01..I04 = **OPERATOR_ACCEPTED**
+(unchanged). BLOC_05 = **INCOMPLETE** (I06..I23 remain). All 8 program gates
+(IDENTITY, TIME, SEMANTIC, UNIT, LINEAGE, DUPLICATE_REVISION, REPLAY_SAFETY,
+GOLDEN_T0_T1) = **NOT_YET_EARNED**. next_checkpoint_authorized = **FALSE**;
+B5-I06+ = UNAUTHORIZED; BLOC_06 = UNAUTHORIZED; RESEARCH = FROZEN;
+MAIN_DIVERGENCE_STATUS unchanged (EXTERNAL / UNRECONCILED /
+NON_BLOCKING_FOR_BLOC_5). No status value was invented and no gate was
+promoted. recommended_next = **OPERATOR REVIEW OF THE I05 IMPLEMENTATION,
+THEN AN I06 IMPLEMENTATION DIRECTIVE DECISION IF DESIRED**. HARD STOP after
+push and report.

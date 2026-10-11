@@ -1,0 +1,30 @@
+# PROVIDER TIME SEMANTICS — frozen schema from bloc_05/02 §2/§7/§8/§17.
+#
+# Doctrine (B5-I05):
+#   - This file is the ONLY place provider timestamp semantics may be declared.
+#     Nothing in `normalization/time/` guesses a field, a boundary convention
+#     or a precision: an unregistered (provider, sensor_family) lookup fails
+#     closed with UnknownProviderTimeSemantics (§18 rule 7, bloc_05/06 G2).
+#   - `semantics` is deliberately EMPTY. No verified documentation or probe
+#     evidence for any real exchange's timestamp semantics exists in this
+#     repository, and inventing one is a STOP condition of the I05 directive
+#     ("Guessing a provider's timestamp semantics"). Absence is the honest,
+#     fail-closed state: every real provider therefore resolves to `None` and
+#     is refused at `require()` time.
+#   - Rows are added only with evidence (`source_evidence_refs`), and
+#     `contemporaneous_public: true` is refused without it (§6).
+#
+# Row schema (all fields required — there are no defaults):
+#   provider                    opaque, unpadded identifier
+#   sensor_family               frozen SensorFamily member
+#   timestamp_field_roles       map of frozen TimestampRole -> provider field
+#                               name; `{}` means NOT VERIFIED, never "same as"
+#   interval_time_convention    LEFT_CLOSED_RIGHT_OPEN | LEFT_OPEN_RIGHT_CLOSED
+#                               | PROVIDER_NATIVE_UNKNOWN | POINT_SAMPLE (§7)
+#   precision                   SECOND | MILLISECOND | MICROSECOND | NANOSECOND
+#                               | DATE_ONLY | UNKNOWN (§8)
+#   contemporaneous_public      §6 explicit classification (license to anchor
+#                               market availability on source_event_at)
+#   source_evidence_refs        durable identifiers, never filesystem paths
+schema_version: "1.0"
+semantics: []

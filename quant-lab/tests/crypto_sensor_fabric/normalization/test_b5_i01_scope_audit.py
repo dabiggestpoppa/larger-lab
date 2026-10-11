@@ -70,9 +70,13 @@ def test_only_authorized_subpackages_exist() -> None:
     B5-I04A (operator-authorized) adds ``terms/`` per the I04A directive
     scope (new I04 terms-model/projection module) -- disclosed scope-audit
     extension on the established I02 precedent; the ``terms.py`` MODULE
-    beside the package remains forbidden below, and every other subpackage
-    remains forbidden at this layer."""
-    allowed = {"identity", "terms"}
+    beside the package remains forbidden below.  B5-I05 (operator-authorized)
+    adds ``time/`` per bloc_05/02 §17, which freezes
+    ``normalization/time/`` as required I05 surface -- the same disclosed
+    extension on the same precedent, and the I05 directive names the seven
+    modules explicitly.  Every other subpackage remains forbidden at this
+    layer."""
+    allowed = {"identity", "terms", "time"}
     present = {
         entry.name
         for entry in PACKAGE.iterdir()
@@ -86,8 +90,15 @@ def test_only_authorized_subpackages_exist() -> None:
     [
         # frozen doc 05 §16 module plans, none of which is authorized at I01;
         # "identity" was operator-authorized at B5-I02 (SENSOR-B5-I02 directive)
-        # and is now the home of the identity subpackage.
-        "time",
+        # and is now the home of the identity subpackage; "terms" was
+        # operator-authorized at B5-I04A and is the home of the terms
+        # subpackage; "time" was operator-authorized at B5-I05
+        # (SENSOR-B5-I05 directive) and is the home of the time subpackage.
+        # The DIRECTORY entries for those three are therefore removed above
+        # (they are authorized subpackages now), while their MODULE forms
+        # stay forbidden here: a ``time.py`` beside the package would shadow
+        # the authorized ``time/`` subpackage.
+        "time.py",
         "sensors",
         "common",
         # named explicitly by the B5-I01 directive

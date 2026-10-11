@@ -1,0 +1,41 @@
+# REVISION POLICIES — frozen schema from bloc_05/02 §11 (research revision
+# modes) and §17 (config file), consumed by normalization/time/revision_policy.
+#
+# Doctrine (B5-I05):
+#   - The six modes are FROZEN NAMES. Only AS_KNOWN_THEN and LATEST_VERIFIED
+#     carry frozen prose in §11, so only those two are implemented; the parser
+#     refuses a `definition` for any other mode because writing one would
+#     invent a policy (I05 directive STOP condition: "Inventing an enum member
+#     or policy").
+#   - The catalog must cover EXACTLY the six frozen modes: a missing, unknown
+#     or duplicate mode is refused at parse time, so this file can never drift
+#     away from the `RevisionMode` vocabulary.
+#   - Selection is pure and cutoff-explicit; a revision database /supersession
+#     engine is B5-I07 and does not exist here.
+#
+# Row schema:
+#   mode          frozen RevisionMode member (required, unique)
+#   definition    verbatim §11 prose for the two defined modes, `null` for the
+#                 four the plan names but never defines
+#   source        clause citation for where the definition (or its absence)
+#                 comes from
+schema_version: "1.0"
+policies:
+  - mode: AS_KNOWN_THEN
+    definition: "Select only values/revisions that were available by replay cutoff."
+    source: "bloc_05/02 section 11"
+  - mode: LATEST_VERIFIED
+    definition: "Useful for retrospective measurement but not automatically PIT-safe."
+    source: "bloc_05/02 section 11"
+  - mode: FIRST_SEEN
+    definition: null
+    source: "bloc_05/02 section 11 (named; no frozen definition)"
+  - mode: EXACT_REVISION
+    definition: null
+    source: "bloc_05/02 section 11 (named; no frozen definition)"
+  - mode: ALL_REVISIONS
+    definition: null
+    source: "bloc_05/02 section 11 (named; no frozen definition)"
+  - mode: ERROR_ON_AMBIGUITY
+    definition: null
+    source: "bloc_05/02 section 11 (named; no frozen definition)"
