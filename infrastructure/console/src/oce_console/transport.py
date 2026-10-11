@@ -1,0 +1,140 @@
+"""Loopback-only transport for the OCE console (B5-I4, charter increment I-3).
+
+The ONLY egress this package is capable of: GET requests to declared
+contract-pack routes on a loopback base URL. Laws enforced here, before
+any socket I/O (charter sections 5/6; B5-I4 failure matrix X1/X2/X3):
+
+- base URL must be ``http://`` with a literal loopback host
+  (``127.0.0.1``, ``::1``, ``localhost``) — anything else (RFC1918,
+  public, link-local, IPv6 non-loopback, hostname, userinfo, https,
+  other schemes) is refused fail-closed BEFORE request construction;
+- GET only: no POST/PUT/PATCH/DELETE code path exists in this module;
+- only routes declared in the frozen contract pack are requestable —
+  the route set is fixed at construction from the pack, never caller-
+  widened;
+- grant/actor identity values are operator inputs passed through verbatim
+  in headers; the transport mints nothing and never retries silently;
+- connection-level failure raises ``StackUnreachable`` so the kernel can
+  collapse the whole view to ``STACK_UNREACHABLE`` (F-1 fail-closed).
+
+Stdlib only (urllib, socket); no LLM; no provider; no telemetry.
+"""
+from __future__ import annotations
+
+import json
+import socket
+import urllib.error
+import urllib.parse
+import urllib.request
+from typing import Mapping, Optional
+
+from .kernel import ConsoleRefusal, load_read_surfaces
+
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost"})
+ALLOWED_SCHEME = "http"
+DEFAULT_TIMEOUT_SECONDS = 5.0
+
+
+class StackUnreachable(Exception):
+    """Transport-level failure: the local stack could not answer a read."""
+
+
+def validate_base_url(base_url: str) -> str:
+    """Refuse any non-loopback base URL fail-closed, before any I/O.
+
+    This runs BEFORE a Request object or socket exists: no resolution,
+    no connection, no header construction happens for a refused URL
+    (matrix X1/X2).
+    """
+    if not isinstance(base_url, str) or not base_url:
+        raise ConsoleRefusal("malformed_base_url", "empty or non-string base URL")
+    for ch in ("@", " ", "\t", "\r", "\n", "#", "?"):
+        if ch in base_url:
+            raise ConsoleRefusal("malformed_base_url", "forbidden character in base URL")
+    parsed = urllib.parse.urlsplit(base_url)
+    if parsed.scheme != ALLOWED_SCHEME:
+        raise ConsoleRefusal("non_loopback_refused", f"scheme {parsed.scheme!r}")
+    if parsed.path not in ("", "/") or parsed.query or parsed.fragment:
+        raise ConsoleRefusal("malformed_base_url", "base URL must be scheme+host[:port] only")
+    host = parsed.hostname
+    if host is None or host.lower() not in LOOPBACK_HOSTS:
+        raise ConsoleRefusal("non_loopback_refused", f"host {host!r}")
+    try:
+        port = parsed.port
+    except ValueError as exc:
+        raise ConsoleRefusal("malformed_base_url", f"invalid port: {exc}") from exc
+    if port is not None and not (0 < port < 65536):
+        raise ConsoleRefusal("malformed_base_url", "port out of range")
+    return base_url.rstrip("/")
+
+
+class LoopbackTransport:
+    """GET-only client over declared contract-pack routes, loopback only."""
+
+    def __init__(
+        self,
+        base_url: str,
+        grant_id: str = "",
+        actor_id: str = "",
+        surfaces: Optional[Mapping[str, str]] = None,
+        timeout: float = DEFAULT_TIMEOUT_SECONDS,
+    ):
+        # Order matters: validate the base URL BEFORE the route table is
+        # even loaded, so a hostile URL performs zero work.
+        self._base = validate_base_url(base_url)
+        self._surfaces = dict(surfaces) if surfaces is not None else load_read_surfaces()
+        if not self._surfaces:
+            raise ConsoleRefusal("pack_malformed", "no requestable read surfaces")
+        self._grant = str(grant_id)
+        self._actor = str(actor_id)
+        self._timeout = float(timeout)
+
+    @property
+    def routes(self) -> dict:
+        """The fixed route table (surface id -> GET route). Caller-widening
+        is impossible: this is the complete requestable set."""
+        return dict(self._surfaces)
+
+    def _headers(self) -> dict:
+        headers = {"Accept": "application/json"}
+        if self._grant or self._actor:
+            # Operator-supplied identity, passed through verbatim. The
+            # transport never mints, pads, or reinterprets it (charter
+            # section 5 rule 3); a missing/invalid grant produces the
+            # governed denial, rendered verbatim upstream (X3).
+            headers["X-OCE-Grant"] = self._grant
+            headers["X-OCE-Actor"] = self._actor
+        return headers
+
+    def read(self, surface: str) -> object:
+        """Perform one declared GET; return the parsed governed envelope.
+
+        Raises ``ConsoleRefusal`` for an undeclared surface (refused
+        before any I/O) and ``StackUnreachable`` for any transport-level
+        failure — never a fabricated or cached answer.
+        """
+        route = self._surfaces.get(surface)
+        if route is None:
+            raise ConsoleRefusal("unsupported_surface", surface)
+        url = f"{self._base}{route}"
+        request = urllib.request.Request(url, headers=self._headers(), method="GET")
+        try:
+            with urllib.request.urlopen(request, timeout=self._timeout) as response:
+                body = response.read()
+        except urllib.error.HTTPError as exc:
+            # A governed HTTP answer (401/403 denial, 5xx) is DATA, not a
+            # transport failure: surface the body verbatim for the kernel
+            # to project; the denial path is never reinterpreted (X3/X4).
+            body = exc.read()
+        except (urllib.error.URLError, socket.timeout, ConnectionError, OSError) as exc:
+            raise StackUnreachable(f"{surface}: {exc}") from exc
+        try:
+            return json.loads(body.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError) as exc:
+            raise StackUnreachable(f"{surface}: unparseable body") from exc
+
+    def read_status(self) -> dict:
+        """Convenience: build the kernel status document over this client."""
+        from .kernel import build_status_document
+
+        return build_status_document(self.read, self._surfaces)
