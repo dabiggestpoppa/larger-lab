@@ -78,6 +78,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         )
         return EXIT_UNREACHABLE
     sys.stdout.write(render_status(document))
+    # F-1 fail-closed: the kernel collapses a transport failure INTO the
+    # document (whole view), so the exit code must read the document's
+    # own state — a STACK_UNREACHABLE view never exits 0.
+    if document.get("state") == STATE_UNREACHABLE:
+        return EXIT_UNREACHABLE
     return EXIT_OK
 
 

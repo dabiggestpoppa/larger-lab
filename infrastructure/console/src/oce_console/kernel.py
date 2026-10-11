@@ -34,6 +34,7 @@ CONSOLE_STATUS_VERSION = "1.0.0"
 STATUS_SECTIONS = ("health", "readiness", "system", "workers", "schedules")
 
 STATE_OK = "OK"
+STATE_DEGRADED = "DEGRADED"
 STATE_UNREACHABLE = "STACK_UNREACHABLE"
 STATE_UNVERIFIABLE = "UNVERIFIABLE"
 
@@ -90,11 +91,14 @@ def load_read_surfaces(pack_path: Optional[Path] = None) -> dict:
 
 
 def section_route(surfaces: Mapping[str, str], section: str) -> str:
-    """Map a status section to its declared GET route, fail-closed.
+    """Map a status section to its declared read surface, fail-closed.
 
-    The five status sections bind to the pack's declared read surfaces by
-    their frozen names; an unknown or non-requestable surface is refused
-    (matrix X6) rather than resolved by any fallback.
+    Returns the SURFACE id (e.g. ``health.read``) — the single argument
+    the injected ``fetch``/``read`` path accepts (the transport's only
+    requestable key). The five status sections bind to the pack's
+    declared read surfaces by their frozen names; an unknown or
+    non-requestable surface is refused (matrix X6) rather than resolved
+    by any fallback.
     """
     binding = {
         "health": "health.read",
@@ -105,7 +109,7 @@ def section_route(surfaces: Mapping[str, str], section: str) -> str:
     }.get(section)
     if binding is None or binding not in surfaces:
         raise ConsoleRefusal("unsupported_surface", section)
-    return surfaces[binding]
+    return binding
 
 
 def project_section(section: str, response: object) -> dict:
@@ -149,8 +153,9 @@ def build_status_document(
 ) -> dict:
     """Build the full status document through ONE injected read path.
 
-    ``fetch(route)`` performs the contract-validated GET and returns the
-    parsed governed envelope, or raises on any transport failure. A
+    ``fetch(surface)`` performs the contract-validated GET for the
+    section's declared read surface (e.g. ``workers.list``) and returns
+    the parsed governed envelope, or raises on any transport failure. A
     transport failure collapses the ENTIRE document to
     ``STACK_UNREACHABLE`` (F-1): no partial green, no cached section, no
     fallback. Sections are fetched and rendered in the fixed
@@ -160,9 +165,9 @@ def build_status_document(
         surfaces = load_read_surfaces()
     sections: dict[str, dict] = {}
     for section in STATUS_SECTIONS:
-        route = section_route(surfaces, section)
+        surface = section_route(surfaces, section)
         try:
-            response = fetch(route)
+            response = fetch(surface)
         except Exception:
             # Fail closed, whole view: F-1. No section survives a
             # transport failure as green, and nothing is cached.
@@ -178,6 +183,13 @@ def build_status_document(
         if section["state"] != STATE_OK:
             state = STATE_UNVERIFIABLE
             break
+        # The section envelope is intact; if the GOVERNED response itself
+        # reports not-ok (denied / error / not_found), the document summary
+        # must never read as plain green — the denial is rendered verbatim
+        # per-section and the summary says DEGRADED (X3/X4; charter section
+        # 9: never fabricates progress, never silent-green).
+        if section["response"]["ok"] is not True and state == STATE_OK:
+            state = STATE_DEGRADED
     return {
         "kind": CONSOLE_KIND,
         "version": CONSOLE_STATUS_VERSION,

@@ -33,10 +33,27 @@ from .kernel import ConsoleRefusal, load_read_surfaces
 LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost"})
 ALLOWED_SCHEME = "http"
 DEFAULT_TIMEOUT_SECONDS = 5.0
+MAX_IDENTITY_CHARS = 256
 
 
 class StackUnreachable(Exception):
     """Transport-level failure: the local stack could not answer a read."""
+
+
+def _validate_identity(kind: str, value: str) -> str:
+    """Refuse malformed identity header values fail-closed, before any I/O.
+
+    Operator-supplied grant/actor ids are passed through verbatim — the
+    transport mints nothing — but a value carrying header separators or
+    exceeding the bound is refused at construction (matrix X2) rather
+    than handed to the HTTP layer.
+    """
+    text = str(value)
+    if any(ch in text for ch in ("\r", "\n", "\t")):
+        raise ConsoleRefusal("malformed_identity", f"{kind} contains control characters")
+    if len(text) > MAX_IDENTITY_CHARS:
+        raise ConsoleRefusal("malformed_identity", f"{kind} exceeds {MAX_IDENTITY_CHARS} chars")
+    return text
 
 
 def validate_base_url(base_url: str) -> str:
@@ -85,8 +102,8 @@ class LoopbackTransport:
         self._surfaces = dict(surfaces) if surfaces is not None else load_read_surfaces()
         if not self._surfaces:
             raise ConsoleRefusal("pack_malformed", "no requestable read surfaces")
-        self._grant = str(grant_id)
-        self._actor = str(actor_id)
+        self._grant = _validate_identity("grant", grant_id)
+        self._actor = _validate_identity("actor", actor_id)
         self._timeout = float(timeout)
 
     @property
