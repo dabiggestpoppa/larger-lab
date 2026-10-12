@@ -20,6 +20,21 @@ VERBATIM into a fixed-order status document. Refusal and failure law
 
 Stdlib only; no LLM; no provider; the console is a client with zero
 authority (charter section 5 rules 1-9).
+
+Derived-state law (charter section 9 "never fabricates progress; leaves
+unknown or unverifiable gaps explicit"): ``OK`` / ``DEGRADED`` /
+``UNVERIFIABLE`` / ``STACK_UNREACHABLE`` are PRESENTATION states of this
+process's own document, not canonical backend state. ``DEGRADED`` is
+derived deterministically from exactly one thing — a returned governed
+section envelope whose own ``ok`` is not ``true`` — alongside the
+documented OCE vocabulary for a partially-failing capability
+(architecture constitution state table; ``health.py``'s healthy /
+degraded / blocked / down). It is not persisted anywhere, authorizes no
+transition, cannot reinterpret a backend state (every section keeps its
+response verbatim), cannot be written back (the transport has no write
+verb), and can never be reached by a denied, unknown or unreachable
+section collapsing to ``OK`` — a transport failure collapses the whole
+document to ``STACK_UNREACHABLE`` instead.
 """
 from __future__ import annotations
 

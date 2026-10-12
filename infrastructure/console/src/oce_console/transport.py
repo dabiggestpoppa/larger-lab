@@ -11,11 +11,27 @@ any socket I/O (charter sections 5/6; B5-I4 failure matrix X1/X2/X3):
 - GET only: no POST/PUT/PATCH/DELETE code path exists in this module;
 - only routes declared in the frozen contract pack are requestable —
   the route set is fixed at construction from the pack, never caller-
-  widened;
+  widened, and a redirect cannot widen it either;
 - grant/actor identity values are operator inputs passed through verbatim
   in headers; the transport mints nothing and never retries silently;
 - connection-level failure raises ``StackUnreachable`` so the kernel can
   collapse the whole view to ``STACK_UNREACHABLE`` (F-1 fail-closed).
+
+B5-I4-X2 (demonstrated defects repaired here, both closed BEFORE any
+socket I/O):
+
+- **Ambient proxy authority removed.** The client owns ONE opener built
+  with an EMPTY proxy map, so ``http_proxy``/``https_proxy``/``no_proxy``
+  environment variables or the Windows proxy registry can never divert a
+  declared loopback read to a third-party host. Before this repair a
+  read of ``http://127.0.0.1:8448/api/health`` with ``http_proxy`` set
+  demonstrably opened a connection to the proxy host instead.
+- **Redirects cannot escape the frozen boundary.** A 3xx answer is DATA
+  from the loopback stack, but FOLLOWING it is new I/O: the target must
+  be a declared route on a loopback host or the redirect is refused
+  fail-closed before the follow-up request is constructed. Before this
+  repair a loopback ``302 Location: http://10.0.0.5:8080/escaped``
+  demonstrably opened a connection to that non-loopback host.
 
 Stdlib only (urllib, socket); no LLM; no provider; no telemetry.
 """
@@ -38,6 +54,36 @@ MAX_IDENTITY_CHARS = 256
 
 class StackUnreachable(Exception):
     """Transport-level failure: the local stack could not answer a read."""
+
+
+class _LoopbackRouteRedirect(urllib.request.HTTPRedirectHandler):
+    """Redirect policy closed over the frozen route table (B5-I4-X2).
+
+    ``redirect_request`` runs before urllib builds the follow-up
+    ``Request``, so a refused target performs no socket I/O at all.
+    """
+
+    def __init__(self, routes: Mapping[str, str]):
+        super().__init__()
+        self._allowed_paths = frozenset(routes.values())
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        target = urllib.parse.urljoin(req.full_url, newurl)
+        parsed = urllib.parse.urlsplit(target)
+        if parsed.scheme != ALLOWED_SCHEME or (parsed.hostname or "").lower() not in LOOPBACK_HOSTS:
+            raise ConsoleRefusal("non_loopback_refused", f"redirect target {newurl!r}")
+        if parsed.path not in self._allowed_paths:
+            raise ConsoleRefusal("unsupported_surface", f"redirect target {newurl!r}")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
+
+
+def _open_url(opener, request, timeout):
+    """The single socket-I/O seam of this package (tests may substitute it).
+
+    Everything reachable from the console happens through this one
+    function; nothing else in the package opens a connection.
+    """
+    return opener.open(request, timeout=timeout)
 
 
 def _validate_identity(kind: str, value: str) -> str:
@@ -105,6 +151,13 @@ class LoopbackTransport:
         self._grant = _validate_identity("grant", grant_id)
         self._actor = _validate_identity("actor", actor_id)
         self._timeout = float(timeout)
+        # One opener, owned by this client: no ambient proxy authority
+        # (empty proxy map) and a redirect policy closed over the same
+        # frozen route table (B5-I4-X2).
+        self._opener = urllib.request.build_opener(
+            urllib.request.ProxyHandler({}),
+            _LoopbackRouteRedirect(self._surfaces),
+        )
 
     @property
     def routes(self) -> dict:
@@ -136,7 +189,7 @@ class LoopbackTransport:
         url = f"{self._base}{route}"
         request = urllib.request.Request(url, headers=self._headers(), method="GET")
         try:
-            with urllib.request.urlopen(request, timeout=self._timeout) as response:
+            with _open_url(self._opener, request, self._timeout) as response:
                 body = response.read()
         except urllib.error.HTTPError as exc:
             # A governed HTTP answer (401/403 denial, 5xx) is DATA, not a

@@ -26,13 +26,18 @@ from __future__ import annotations
 
 import ast
 import contextlib
+import http.server
 import inspect
+import io
 import json
+import os
 import socket
+import socketserver
 import subprocess
 import sys
 import threading
 import time
+import urllib.request
 from pathlib import Path
 
 import pytest
@@ -147,6 +152,102 @@ def _read_grant(plane):
     ).grant_id
 
 
+def _capture_cli(argv: list[str]) -> tuple[int, str, str]:
+    """Run the CLI in-process and return (exit code, stdout, stderr)."""
+    out, err = io.StringIO(), io.StringIO()
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        code = cli.main(list(argv))
+    return code, out.getvalue(), err.getvalue()
+
+
+@contextlib.contextmanager
+def _http_stub(payload: dict):
+    """Minimal loopback HTTP server answering EVERY declared route with one
+    fixed JSON body — no control-plane dependency, fully deterministic."""
+    body = json.dumps(payload).encode("utf-8")
+
+    class _Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):  # pragma: no cover - silence
+            pass
+
+    server = socketserver.TCPServer(("127.0.0.1", 0), _Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield f"http://127.0.0.1:{server.server_address[1]}"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=10)
+        assert not thread.is_alive(), "stub stack failed to stop"
+
+
+@contextlib.contextmanager
+def _redirect_stub(location: str):
+    """Loopback server whose ``/api/health`` answers 302 -> ``location``;
+    every other declared route answers the healthy envelope."""
+    body = json.dumps(ENVELOPE_OK).encode("utf-8")
+
+    class _Handler(http.server.BaseHTTPRequestHandler):
+        def do_GET(self):
+            if self.path == "/api/health":
+                self.send_response(302)
+                self.send_header("Location", location)
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def log_message(self, *args):  # pragma: no cover - silence
+            pass
+
+    server = socketserver.TCPServer(("127.0.0.1", 0), _Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield f"http://127.0.0.1:{server.server_address[1]}"
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=10)
+        assert not thread.is_alive(), "redirect stub failed to stop"
+
+
+@contextlib.contextmanager
+def _blocked_off_loopback():
+    """Record — and block — every connection attempt that leaves loopback.
+
+    The attempt itself IS the violation: it is raised as ``OSError``
+    before any packet leaves the machine, so the probe performs zero
+    external I/O.
+    """
+    attempts: list[tuple] = []
+    original = socket.create_connection
+
+    def guarded(address, *args, **kwargs):
+        if str(address[0]).lower() not in LOOPBACK_HOSTS:
+            attempts.append(tuple(address))
+            raise OSError("blocked off-loopback connection (probe)")
+        return original(address, *args, **kwargs)
+
+    socket.create_connection = guarded
+    try:
+        yield attempts
+    finally:
+        socket.create_connection = original
+
+
 class TestClientOnlyReads:
     """Gate G3 (UI read half): client-only, contract-mediated, no store."""
 
@@ -213,6 +314,10 @@ class TestClientOnlyReads:
 
     def test_import_closure_is_stdlib_only(self):
         """G10/G11: stdlib-only import closure; no LLM, provider, or HTTP client."""
+        # The package under test IS the in-repo one (no shadowing by an
+        # installed copy): every proof below runs against this checkout.
+        resolved_pkg = Path(oce_console.__file__).resolve().parent
+        assert resolved_pkg == (CONSOLE_SRC / "oce_console").resolve(), resolved_pkg
         allowed = {
             "__future__",
             "argparse",
@@ -261,6 +366,42 @@ class TestStatusAgreement:
         assert denied["state"] == STATE_DEGRADED, (
             "a document of governed denials must never summarize as OK"
         )
+
+        # X2 (surface-id contract): the injected read path is called with
+        # the pack's SURFACE ids in the frozen section order — never with
+        # an HTTP route. Route reconstruction has exactly one owner (the
+        # transport), and the kernel holds no route string at all.
+        seen: list[str] = []
+
+        def recording(surface: str):
+            seen.append(surface)
+            return json.loads(json.dumps(ENVELOPE_OK))
+
+        recorded = build_status_document(recording)
+        assert recorded["state"] == STATE_OK
+        assert seen == [
+            "health.read",
+            "readiness.read",
+            "system.read",
+            "workers.list",
+            "jobs.schedules",
+        ], f"kernel requested something other than the declared surfaces: {seen}"
+        routes = load_read_surfaces()
+        assert all(surface in routes for surface in seen), seen
+        assert [section_route(routes, s) for s in STATUS_SECTIONS] == seen
+        assert all("/" not in surface and " " not in surface for surface in seen), (
+            f"kernel passed a route instead of a surface id: {seen}"
+        )
+        assert "/api/" not in inspect.getsource(kernel), (
+            "kernel must not reconstruct HTTP routes"
+        )
+
+        # X2 (derived-state law): DEGRADED is derived ONLY from the
+        # returned governed section states — a fully-ok view of the same
+        # shape never degrades, and the summary cannot be written back
+        # (no write verb exists in the transport).
+        assert build_status_document(_fetch_all(ENVELOPE_OK))["state"] == STATE_OK
+        assert 'method="GET"' in inspect.getsource(transport)
 
     def test_denied_read_rendered_verbatim_not_retried(self):
         """X3: a governed denial is rendered verbatim, the fetch happens
@@ -402,8 +543,8 @@ class TestStackUnreachable:
         def explode(*args, **kwargs):  # pragma: no cover - must never run
             raise AssertionError("I/O attempted for a refused input")
 
-        original_urlopen = transport.urllib.request.urlopen
-        transport.urllib.request.urlopen = explode
+        original_open_url = transport._open_url
+        transport._open_url = explode
         try:
             for url in hostile:
                 with pytest.raises(ConsoleRefusal):
@@ -416,7 +557,47 @@ class TestStackUnreachable:
             with pytest.raises(ConsoleRefusal):
                 LoopbackTransport("http://127.0.0.1:8448", actor_id="x" * 4096)
         finally:
-            transport.urllib.request.urlopen = original_urlopen
+            transport._open_url = original_open_url
+
+        # X2 ambient-proxy law (same refusal-before-I/O class): an
+        # ambient proxy setting must never divert a declared loopback
+        # read to another host. ``http_proxy`` is set to the exact
+        # non-loopback address that PRE-REPAIR demonstrably received the
+        # connection; with the client's own proxy-free opener no
+        # off-loopback socket is attempted at all.
+        client = LoopbackTransport("http://127.0.0.1:1", timeout=1)  # dead port
+        try:
+            with _blocked_off_loopback() as attempts:
+                os.environ["http_proxy"] = "http://10.0.0.5:8080"
+                os.environ["HTTP_PROXY"] = "http://10.0.0.5:8080"
+                with pytest.raises(StackUnreachable):
+                    client.read("health.read")
+        finally:
+            os.environ.pop("http_proxy", None)
+            os.environ.pop("HTTP_PROXY", None)
+        assert attempts == [], (
+            f"ambient proxy authority: off-loopback connection attempted {attempts}"
+        )
+
+        # Non-vacuity (demonstrated red): the PRE-REPAIR client shape —
+        # urllib's own default proxy handler — DOES divert the identical
+        # loopback read to the proxy host, so the assertion above is a
+        # real guard and not theater.
+        request = urllib.request.Request("http://127.0.0.1:8448/api/health", method="GET")
+        try:
+            os.environ["http_proxy"] = "http://10.0.0.5:8080"
+            os.environ["HTTP_PROXY"] = "http://10.0.0.5:8080"
+            with _blocked_off_loopback() as weakened_attempts:
+                with contextlib.suppress(OSError):
+                    urllib.request.build_opener(urllib.request.ProxyHandler()).open(
+                        request, timeout=2
+                    )
+        finally:
+            os.environ.pop("http_proxy", None)
+            os.environ.pop("HTTP_PROXY", None)
+        assert weakened_attempts == [("10.0.0.5", 8080)], (
+            f"negative control vacuous: pre-repair path did not divert {weakened_attempts}"
+        )
 
         # The real guard admits loopback forms.
         assert validate_base_url("http://127.0.0.1:8448/") == "http://127.0.0.1:8448"
@@ -448,17 +629,17 @@ class TestReadOnlyTransport:
             def __exit__(self, *exc):
                 return False
 
-        def capture(request, timeout=None):
+        def capture(opener, request, timeout=None):
             seen.append(request)
             return _FakeResponse()
 
-        original_urlopen = transport.urllib.request.urlopen
-        transport.urllib.request.urlopen = capture
+        original_open_url = transport._open_url
+        transport._open_url = capture
         try:
             client = LoopbackTransport("http://127.0.0.1:8448")
             client.read("health.read")
         finally:
-            transport.urllib.request.urlopen = original_urlopen
+            transport._open_url = original_open_url
         assert len(seen) == 1
         assert seen[0].get_method() == "GET"
         assert seen[0].data is None, "GET must not carry a body"
@@ -479,14 +660,60 @@ class TestReadOnlyTransport:
         def explode(*args, **kwargs):  # pragma: no cover
             raise AssertionError("I/O attempted for an undeclared surface")
 
-        original_urlopen = transport.urllib.request.urlopen
-        transport.urllib.request.urlopen = explode
+        original_open_url = transport._open_url
+        transport._open_url = explode
         try:
             for undeclared in ("jobs.submit", "jobs.cancel", "jobs.retry", "bogus.surface"):
                 with pytest.raises(ConsoleRefusal):
                     client.read(undeclared)
         finally:
-            transport.urllib.request.urlopen = original_urlopen
+            transport._open_url = original_open_url
+
+        # X2 redirect law (demonstrated, then repaired): a loopback 3xx is
+        # DATA, but FOLLOWING it is new I/O and must stay inside the
+        # frozen boundary. Pre-repair, ``302 Location:
+        # http://10.0.0.5:8080/escaped`` demonstrably opened a socket to
+        # that non-loopback host. Now the redirect is refused fail-closed
+        # BEFORE the follow-up request is built — proven by blocking
+        # every off-loopback connect.
+        with _redirect_stub("http://10.0.0.5:8080/escaped") as base_url:
+            client = LoopbackTransport(base_url)
+            with _blocked_off_loopback() as attempts:
+                with pytest.raises(ConsoleRefusal) as excinfo:
+                    client.read("health.read")
+            assert excinfo.value.reason == "non_loopback_refused"
+            assert attempts == [], (
+                f"redirect escaped loopback: off-loopback connect {attempts}"
+            )
+
+        # A loopback redirect to an UNDECLARED path is refused too: the
+        # route allowlist (X6) cannot be widened by a 3xx.
+        with _redirect_stub("/api/jobs/job-1") as base_url:
+            client = LoopbackTransport(base_url)
+            with _blocked_off_loopback() as attempts:
+                with pytest.raises(ConsoleRefusal) as excinfo:
+                    client.read("health.read")
+            assert excinfo.value.reason == "unsupported_surface"
+            assert attempts == []
+
+        # Two-sided: a redirect onto a DECLARED route on the same loopback
+        # host is followed and returns the governed envelope verbatim.
+        with _redirect_stub("/api/workers") as base_url:
+            response = LoopbackTransport(base_url).read("health.read")
+        assert response == ENVELOPE_OK, "legitimate loopback redirect broken"
+
+        # Non-vacuity (demonstrated red): the PRE-REPAIR client shape —
+        # urllib's own default redirect handler — DOES follow the hostile
+        # redirect off loopback, so the refusal above is a real guard.
+        with _redirect_stub("http://10.0.0.5:8080/escaped") as base_url:
+            request = urllib.request.Request(f"{base_url}/api/health", method="GET")
+            with _blocked_off_loopback() as weakened_attempts:
+                with contextlib.suppress(OSError):
+                    urllib.request.build_opener().open(request, timeout=3)
+        assert weakened_attempts == [("10.0.0.5", 8080)], (
+            f"negative control vacuous: pre-repair path did not follow off-loopback "
+            f"{weakened_attempts}"
+        )
 
     def test_pack_unreadable_fails_closed(self, tmp_path):
         """X5: a missing or malformed pack refuses fail-closed — there is
@@ -660,6 +887,68 @@ class TestLocalRealPath:
             )
         assert exit_code == cli.EXIT_OK
 
+        # X2 (CLI exit semantics): every outcome maps to its own exit
+        # code, DERIVED from the authoritative document state — never
+        # from parsing rendered text, never a false success.
+        # (a) fully healthy document -> 0.
+        with _http_stub(ENVELOPE_OK) as base_url:
+            code, out, _err = _capture_cli(["--base-url", base_url])
+            assert code == cli.EXIT_OK
+            assert json.loads(out)["state"] == STATE_OK
+
+        # (b) governed denials across the view -> DEGRADED -> 4, never 0.
+        with _http_stub(DENIAL_ENVELOPE) as base_url:
+            code, out, _err = _capture_cli(["--base-url", base_url])
+            assert code == cli.EXIT_DEGRADED
+            assert json.loads(out)["state"] == STATE_DEGRADED
+
+        # (c) a governed non-envelope body -> UNVERIFIABLE -> 5, never 0.
+        with _http_stub({"detail": "gateway sad"}) as base_url:
+            code, out, _err = _capture_cli(["--base-url", base_url])
+            assert code == cli.EXIT_UNVERIFIABLE
+            assert json.loads(out)["state"] == STATE_UNVERIFIABLE
+
+        # (d) malformed configuration is refused BEFORE any I/O -> 3 and
+        # must never masquerade as a stack verdict (argparse's own usage
+        # exit code is 2, which collided with EXIT_UNREACHABLE).
+        code, out, err = _capture_cli(["--bogus-flag"])
+        assert code == cli.EXIT_REFUSED, code
+        assert "malformed_arguments" in err
+        code, out, _err = _capture_cli(["--base-url"])
+        assert code == cli.EXIT_REFUSED, code
+        assert out == "", "a refused invocation must not render a document"
+
+        # --help stays a clean success.
+        code, out, _err = _capture_cli(["--help"])
+        assert code == cli.EXIT_OK and "loopback" in out
+
+        # (e) unexpected internal failure -> 1: reported, never success.
+        original_build = cli.build_status_document
+
+        def explode_build(*args, **kwargs):
+            raise RuntimeError("internal defect")
+
+        cli.build_status_document = explode_build
+        try:
+            code, _out, err = _capture_cli(["--base-url", "http://127.0.0.1:8448"])
+        finally:
+            cli.build_status_document = original_build
+        assert code == cli.EXIT_INTERNAL, code
+        assert "internal_error" in err
+
+        # (f) X2 dead-branch law: the exit result reads the document's
+        # summary only — no exception branch may shadow it, so main()
+        # carries no StackUnreachable handler, and the state map can
+        # never return 0 for a non-OK summary.
+        assert "except StackUnreachable" not in inspect.getsource(cli.main)
+        assert cli.EXIT_BY_DOCUMENT_STATE[STATE_OK] == cli.EXIT_OK
+        assert set(cli.EXIT_BY_DOCUMENT_STATE.values()) == {
+            cli.EXIT_OK,
+            cli.EXIT_UNREACHABLE,
+            cli.EXIT_DEGRADED,
+            cli.EXIT_UNVERIFIABLE,
+        }
+
     def test_cli_fails_closed_when_stack_down(self):
         probe = socket.socket()
         probe.bind(("127.0.0.1", 0))
@@ -678,7 +967,7 @@ class TestLocalRealPath:
         original_out, original_err = sys.stdout, sys.stderr
         sys.stdout, sys.stderr = _Out(), _Err()
         try:
-            exit_code = cli.main([f"--base-url", f"http://127.0.0.1:{dead_port}"])
+            exit_code = cli.main(["--base-url", f"http://127.0.0.1:{dead_port}"])
         finally:
             sys.stdout, sys.stderr = original_out, original_err
         assert exit_code == cli.EXIT_UNREACHABLE

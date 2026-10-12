@@ -3,15 +3,38 @@
 Charter section 8.1: the local command interface is the mandatory
 first-release surface. This module is a thin deterministic shell over the
 kernel and transport: it parses operator input, issues contract-validated
-reads against a loopback base URL, and renders the status document. Exit
-codes are the operator contract:
+reads against a loopback base URL, and renders the status document.
 
-- ``0`` — status document rendered (state OK or UNVERIFIABLE sections;
-  the document itself carries per-section truth);
-- ``2`` — ``STACK_UNREACHABLE``: the local stack could not answer a read;
-  nothing green was rendered (F-1 fail-closed);
-- ``3`` — refused fail-closed (non-loopback URL, malformed input,
-  undeclared surface, unreadable pack) BEFORE any request.
+Exit codes are the operator contract and are DERIVED from the
+authoritative document state (never from parsing rendered text):
+
+===============================  =====  ==================================
+Document / input outcome         Exit   Meaning
+===============================  =====  ==================================
+``state == OK``                   ``0``  every section answered ``ok``
+``state == DEGRADED``             ``4``  a governed denial / not-ok section
+``state == UNVERIFIABLE``         ``5``  at least one explicit gap section
+``state == STACK_UNREACHABLE``    ``2``  stack down; nothing green rendered
+refused before any I/O            ``3``  hostile/malformed input or usage
+unexpected internal failure       ``1``  reported, never rendered as success
+===============================  =====  ==================================
+
+The frozen B5-I4 plan requires "CLI exits nonzero" for the stack-down
+class (F-1) and for pre-I/O refusals (X1); every mapping above is
+strictly nonzero for every non-healthy outcome, so no partial, denied or
+unverifiable view can be mistaken for success by a scripted operator.
+
+B5-I4-X2 repairs (demonstrated defects, each now executable-tested):
+
+- argparse usage errors (unknown flag, missing value) exited ``2`` —
+  indistinguishable from "stack unreachable" — because argparse's own
+  usage exit code collided with ``EXIT_UNREACHABLE``. A malformed
+  configuration is now ``EXIT_REFUSED`` (3), decided before any I/O;
+- the previous ``except StackUnreachable`` branch was DEAD code: the
+  kernel collapses every transport failure into the document itself, so
+  no ``StackUnreachable`` could ever reach it. The exit result now reads
+  the document's own summary state, and an unrecognized summary fails
+  closed instead of succeeding.
 
 No writes, no retries, no cache, no provider: stdlib argparse + the
 loopback transport only.
@@ -23,16 +46,32 @@ import sys
 from typing import Optional, Sequence
 
 from .kernel import (
-    ConsoleRefusal,
+    STATE_DEGRADED,
+    STATE_OK,
     STATE_UNREACHABLE,
+    STATE_UNVERIFIABLE,
+    ConsoleRefusal,
     build_status_document,
     render_status,
 )
-from .transport import LoopbackTransport, StackUnreachable, validate_base_url
+from .transport import LoopbackTransport, validate_base_url
 
 EXIT_OK = 0
+EXIT_INTERNAL = 1
 EXIT_UNREACHABLE = 2
 EXIT_REFUSED = 3
+EXIT_DEGRADED = 4
+EXIT_UNVERIFIABLE = 5
+
+# The single authoritative exit map: document summary state -> exit code.
+# There is no string parsing of rendered output and no code path that
+# returns EXIT_OK for a summary state other than OK.
+EXIT_BY_DOCUMENT_STATE = {
+    STATE_OK: EXIT_OK,
+    STATE_UNREACHABLE: EXIT_UNREACHABLE,
+    STATE_DEGRADED: EXIT_DEGRADED,
+    STATE_UNVERIFIABLE: EXIT_UNVERIFIABLE,
+}
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -54,36 +93,42 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
-    args = build_parser().parse_args(argv)
+    parser = build_parser()
+    try:
+        args = parser.parse_args(argv)
+    except SystemExit as exc:
+        # argparse exits 0 for --help and 2 for a usage error. A usage
+        # error is a MALFORMED CONFIGURATION (matrix X2) and must never
+        # masquerade as EXIT_UNREACHABLE; --help stays a clean success.
+        if exc.code in (0, None):
+            return EXIT_OK
+        sys.stderr.write("refused: malformed_arguments: see usage above\n")
+        return EXIT_REFUSED
     try:
         # Refusal ordering (matrix X1/X2): the base URL is validated
         # before the pack is even loaded — a hostile URL performs zero
         # work and no file reads.
         validate_base_url(args.base_url)
-        transport = LoopbackTransport(args.base_url, grant_id=args.grant, actor_id=args.actor)
-        document = build_status_document(transport.read, transport.routes)
+        client = LoopbackTransport(args.base_url, grant_id=args.grant, actor_id=args.actor)
+        document = build_status_document(client.read, client.routes)
     except ConsoleRefusal as refusal:
         sys.stderr.write(f"refused: {refusal.reason}: {refusal.detail}\n")
         return EXIT_REFUSED
-    except StackUnreachable as unreachable:
-        # F-1 fail-closed: render the whole-view marker, never green.
-        sys.stdout.write(
-            render_status(
-                {
-                    "kind": "oce-console-status",
-                    "state": STATE_UNREACHABLE,
-                    "detail": str(unreachable),
-                }
-            )
-        )
-        return EXIT_UNREACHABLE
+    except Exception as exc:
+        # Unexpected internal failure: reported, never rendered as
+        # success and never disguised as a stack verdict (X2).
+        sys.stderr.write(f"internal_error: {type(exc).__name__}: {exc}\n")
+        return EXIT_INTERNAL
     sys.stdout.write(render_status(document))
     # F-1 fail-closed: the kernel collapses a transport failure INTO the
-    # document (whole view), so the exit code must read the document's
-    # own state — a STACK_UNREACHABLE view never exits 0.
-    if document.get("state") == STATE_UNREACHABLE:
-        return EXIT_UNREACHABLE
-    return EXIT_OK
+    # document (whole view), so the exit code reads the document's own
+    # summary state — a STACK_UNREACHABLE, DEGRADED or UNVERIFIABLE view
+    # never exits 0, and an unknown summary cannot succeed.
+    code = EXIT_BY_DOCUMENT_STATE.get(document.get("state"))
+    if code is None:
+        sys.stderr.write(f"internal_error: unknown document state {document.get('state')!r}\n")
+        return EXIT_INTERNAL
+    return code
 
 
 if __name__ == "__main__":  # pragma: no cover — module entry shim
