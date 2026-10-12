@@ -526,6 +526,8 @@ class TestStackUnreachable:
             "http://192.168.1.5:9000",
             "http://172.16.0.2:9000",
             "http://example.com",
+            "http://localhost:8448",
+            "http://LOCALHOST:8448",
             "http://169.254.169.254/latest/meta-data",
             "http://[fd00::1]:8080",
             "http://0177.0.0.1:80",
@@ -599,11 +601,15 @@ class TestStackUnreachable:
             f"negative control vacuous: pre-repair path did not divert {weakened_attempts}"
         )
 
-        # The real guard admits loopback forms.
+        # The real guard admits LITERAL loopback addresses and refuses
+        # every name — name-based admission would hand the boundary to
+        # the ambient resolver (X4).
         assert validate_base_url("http://127.0.0.1:8448/") == "http://127.0.0.1:8448"
-        assert validate_base_url("http://localhost:8080") == "http://localhost:8080"
         assert validate_base_url("http://[::1]:8448") == "http://[::1]:8448"
-        assert LOOPBACK_HOSTS == frozenset({"127.0.0.1", "::1", "localhost"})
+        with pytest.raises(ConsoleRefusal) as excinfo:
+            validate_base_url("http://localhost:8080")
+        assert excinfo.value.reason == "non_loopback_refused"
+        assert LOOPBACK_HOSTS == frozenset({"127.0.0.1", "::1"})
 
 
 class TestReadOnlyTransport:

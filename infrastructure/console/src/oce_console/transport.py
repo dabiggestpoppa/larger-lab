@@ -4,10 +4,14 @@ The ONLY egress this package is capable of: GET requests to declared
 contract-pack routes on a loopback base URL. Laws enforced here, before
 any socket I/O (charter sections 5/6; B5-I4 failure matrix X1/X2/X3):
 
-- base URL must be ``http://`` with a literal loopback host
-  (``127.0.0.1``, ``::1``, ``localhost``) — anything else (RFC1918,
-  public, link-local, IPv6 non-loopback, hostname, userinfo, https,
-  other schemes) is refused fail-closed BEFORE request construction;
+- base URL must be ``http://`` with a LITERAL loopback host
+  (``127.0.0.1`` or ``::1``). Anything else — RFC1918, public,
+  link-local, IPv6 non-loopback, ANY hostname (including ``localhost``),
+  userinfo, https, other schemes — is refused fail-closed BEFORE request
+  construction. Name-based admission is deliberately not offered: a
+  hostname is resolved by ambient authority (hosts file / resolver), so
+  admitting one by name would make the loopback guarantee depend on
+  state the console does not own (B5-I4-X4).
 - GET only: no POST/PUT/PATCH/DELETE code path exists in this module;
 - only routes declared in the frozen contract pack are requestable —
   the route set is fixed at construction from the pack, never caller-
@@ -46,7 +50,7 @@ from typing import Mapping, Optional
 
 from .kernel import ConsoleRefusal, load_read_surfaces
 
-LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1", "localhost"})
+LOOPBACK_HOSTS = frozenset({"127.0.0.1", "::1"})
 ALLOWED_SCHEME = "http"
 DEFAULT_TIMEOUT_SECONDS = 5.0
 MAX_IDENTITY_CHARS = 256
@@ -70,7 +74,11 @@ class _LoopbackRouteRedirect(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, req, fp, code, msg, headers, newurl):
         target = urllib.parse.urljoin(req.full_url, newurl)
         parsed = urllib.parse.urlsplit(target)
-        if parsed.scheme != ALLOWED_SCHEME or (parsed.hostname or "").lower() not in LOOPBACK_HOSTS:
+        if parsed.scheme != ALLOWED_SCHEME:
+            raise ConsoleRefusal("non_loopback_refused", f"redirect target {newurl!r}")
+        if (parsed.hostname or "").lower() not in LOOPBACK_HOSTS:
+            # Same law as the base URL: literal loopback only, so a 3xx
+            # can never hand the boundary to the resolver either.
             raise ConsoleRefusal("non_loopback_refused", f"redirect target {newurl!r}")
         if parsed.path not in self._allowed_paths:
             raise ConsoleRefusal("unsupported_surface", f"redirect target {newurl!r}")
@@ -120,8 +128,12 @@ def validate_base_url(base_url: str) -> str:
     if parsed.path not in ("", "/") or parsed.query or parsed.fragment:
         raise ConsoleRefusal("malformed_base_url", "base URL must be scheme+host[:port] only")
     host = parsed.hostname
-    if host is None or host.lower() not in LOOPBACK_HOSTS:
-        raise ConsoleRefusal("non_loopback_refused", f"host {host!r}")
+    if host is None:
+        raise ConsoleRefusal("malformed_base_url", "base URL carries no host")
+    if host.lower() not in LOOPBACK_HOSTS:
+        # Literal loopback addresses only (B5-I4-X4): admitting a name
+        # would hand the loopback boundary to the ambient resolver.
+        raise ConsoleRefusal("non_loopback_refused", f"host {host!r} (literals only)")
     try:
         port = parsed.port
     except ValueError as exc:
