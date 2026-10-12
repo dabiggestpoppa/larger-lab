@@ -46,7 +46,7 @@ changed lines, both containing `python_files_scanned`, and re-counts the
 tracked files; it passes.
 
 The progress ledger (`SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md`) receives an
-append-only §170 entry, which the I05-authorized prefix list already covers.
+append-only §171 entry, which the I05-authorized prefix list already covers.
 
 ## 3. Naming/layout disclosure (why the suite sits under a `test_b5_i05_` directory)
 

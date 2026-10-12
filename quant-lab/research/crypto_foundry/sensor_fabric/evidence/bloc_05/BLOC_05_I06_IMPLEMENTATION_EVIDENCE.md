@@ -24,7 +24,7 @@ Deliverables produced (all tracked, all under I06-authorized paths):
 4. This implementation evidence narrative.
 5. `evidence/bloc_05/BLOC_05_I06_SCOPE_AUDIT.json` + `BLOC_05_I06_SCOPE_AND_NONINTERFERENCE_AUDIT.md` — scope/noninterference audit (8 rows, 8 pass).
 6. `evidence/bloc_05/BLOC_05_I06_PROVIDER_DOCUMENTATION_COLLECTION_BRIEF.md` — provider-document collection brief (documentation inventory only; zero rows admitted).
-7. Append-only progress-ledger entry (`SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md` §170).
+7. Append-only progress-ledger entry (`SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md` §171).
 
 ## 2. Operator decisions implemented (I06E1 section 00)
 
