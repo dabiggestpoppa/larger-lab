@@ -885,7 +885,36 @@ class TestLocalRealPath:
             exit_code = cli.main(
                 ["--base-url", base_url, "--grant", grant, "--actor", "b5i4-console"]
             )
-        assert exit_code == cli.EXIT_OK
+            assert exit_code == cli.EXIT_OK
+
+            # X3 (frozen interface, demonstrated then repaired): the
+            # LITERAL documented command line — ``python -m oce_console
+            # status ...`` (P0 gap/scope contract; charter section 8.1) —
+            # must work end to end in a REAL subprocess against the real
+            # stack. Before this repair the CLI's own parser rejected the
+            # ``status`` token, so the documented invocation failed.
+            env = dict(os.environ)
+            env["PYTHONPATH"] = str(CONSOLE_SRC) + os.pathsep + env.get("PYTHONPATH", "")
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "oce_console",
+                    "status",
+                    "--base-url",
+                    base_url,
+                    "--grant",
+                    grant,
+                    "--actor",
+                    "b5i4-console",
+                ],
+                capture_output=True,
+                text=True,
+                env=env,
+                timeout=180,
+            )
+            assert proc.returncode == cli.EXIT_OK, (proc.returncode, proc.stderr)
+            assert json.loads(proc.stdout)["state"] == STATE_OK
 
         # X2 (CLI exit semantics): every outcome maps to its own exit
         # code, DERIVED from the authoritative document state — never
@@ -921,6 +950,15 @@ class TestLocalRealPath:
         # --help stays a clean success.
         code, out, _err = _capture_cli(["--help"])
         assert code == cli.EXIT_OK and "loopback" in out
+
+        # X3 (frozen interface): the bare module invocation works and an
+        # unknown command is a refused usage error — both decided before
+        # any I/O.
+        with _http_stub(ENVELOPE_OK) as base_url:
+            code, out, _err = _capture_cli(["--base-url", base_url])
+            assert code == cli.EXIT_OK, code
+        code, _out, err = _capture_cli(["bogus-command"])
+        assert code == cli.EXIT_REFUSED and "malformed_arguments" in err
 
         # (e) unexpected internal failure -> 1: reported, never success.
         original_build = cli.build_status_document

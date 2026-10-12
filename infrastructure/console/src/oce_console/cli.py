@@ -36,6 +36,15 @@ B5-I4-X2 repairs (demonstrated defects, each now executable-tested):
   the document's own summary state, and an unrecognized summary fails
   closed instead of succeeding.
 
+B5-I4-X3 repair (demonstrated defect): the FROZEN interface — the
+literal command line ``python -m oce_console status`` (P0 gap/scope
+contract; charter section 8.1) — was rejected by the CLI's own parser:
+the ``status`` token was not declared, so the documented invocation
+failed with a usage error (exit 2 before this rung, i.e. misreported as
+a stack verdict). The token is now accepted explicitly, defaults to
+``status`` so the bare module invocation works too, and any other
+command stays a refused usage error decided before any I/O.
+
 No writes, no retries, no cache, no provider: stdlib argparse + the
 loopback transport only.
 """
@@ -81,6 +90,18 @@ def build_parser() -> argparse.ArgumentParser:
             "OCE console status view (client-only, loopback-only): renders "
             "governed control-plane reads verbatim. Never mutates state."
         ),
+    )
+    # B5-I4-X3: the frozen interface (P0 gap/scope contract, charter
+    # section 8.1) is the literal command line
+    # ``python -m oce_console status``. The token is accepted explicitly
+    # (and defaults to ``status``) so the documented invocation works,
+    # while any other token stays a refused usage error — before any I/O.
+    parser.add_argument(
+        "command",
+        nargs="?",
+        default="status",
+        choices=("status",),
+        help="command to run (default: %(default)s)",
     )
     parser.add_argument(
         "--base-url",
