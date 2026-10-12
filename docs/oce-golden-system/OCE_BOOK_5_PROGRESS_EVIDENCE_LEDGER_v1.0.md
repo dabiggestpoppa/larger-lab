@@ -18,7 +18,7 @@
 | **B5-I1** | C1 compare/select/freeze application → operator-approved Product Charter | **OPERATOR_ACCEPTED** | Intake + evidence packets commit `52843ffc11ff97511ec7e7242f6adc7083290360`; AMEND-001 ratified (`f381ce0e…`) with both passes sealed (`b05c61d0…`, `8f5a06c9…`); reconciliation and decision packet published (`OCE_B5_I1_RECONCILIATION_v1.0.md`, `OCE_B5_I1_DECISION_PACKET_v1.0.md` — recommendation only); **operator selected CAND-004 (Local Job Console) 2026-10-07** on the adopted record (W 82.75; floors C1=3/C2=4/C3=3/C5=3; zero disqualifiers; zero UNKNOWN; reviews sequential, NOT independent, NOT blind per AMEND-001) — see decision packet §9; Product Charter drafted (`5b082164…`), audited (repairs `1534305778…`, `d4bb8e6064c3…`), and **ratified 2026-10-07** (`OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md` → `OPERATOR_RATIFIED — FROZEN`; ratification artifact `OCE_B5_I1_OPERATOR_RATIFICATION_v1.0.md`). B5-I1 complete. B5-I2–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I2`; no implementation has begun
 | B5-I2 | C2 outcome/domain/interfaces — charter increment I-1: console-control-plane deterministic interface contracts | **OPERATOR_ACCEPTED** — authorized 2026-10-07 under `AUTHORIZED_STAGE=B5-I2`; ratified 2026-10-08 under `AUTHORIZED_STAGE=B5-I2-AUDIT_REPAIR_AND_RATIFICATION` (§9; `OCE_B5_I2_OPERATOR_RATIFICATION_v1.0.md`) | Branch `oce-book-5-i2` created from exact merged main `882835dac…`; implementation contract frozen (`OCE_B5_I2_IMPLEMENTATION_CONTRACT_v1.0.md`): contract pack for every console-read/invoke surface (jobs, workers, leases, health, submit, denial) bound to existing governed control-plane operations and existing schemas (`job-envelope.schema.json`, `denial-envelope.schema.json`, `evidence-manifest.schema.json`); gate = contract tests pass on both sides; non-goals per charter section 12 I-1 (no console code, no UI, no new server endpoints) |
 | B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **OPERATOR_ACCEPTED** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3`; ratified 2026-10-09 under `AUTHORIZED_STAGE=B5-I3-RATIFICATION` (§11.10; `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`) | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11), evidence-head `37871316871` and proof-record-head `37914160504` (all SUCCESS; manifest 7/7; merge-ref parent+tree identity, §11.10); operator review 2026-10-09 → B5-I3 `OPERATOR_ACCEPTED`; ratification artifact `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`. B5-I3 complete. B5-I4–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I4`; no implementation has begun |
-| B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **IN_PROGRESS** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4` | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
+| B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **READY_FOR_OPERATOR_REVIEW** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); `MERGE_AUTHORIZED=false` (not `OPERATOR_ACCEPTED`) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
 | B5-I5 | C3 complete build/tests/lineage/operator review | **LOCKED** | Requires B5-I4 complete |
 | B5-I6 | C4 local deployment, observability and recovery | **LOCKED** | Requires B5-I5 complete |
 | B5-I7 | C4 change cycle plus C5 measurements/learning | **LOCKED** | Requires B5-I6 complete |
@@ -430,3 +430,162 @@ B5-I3 gate *Requirement-test registry complete* (plan §7; charter §12 I-2 exec
 **Governance exception (permanent).** Procedural compliance for B5-I3 is **FAIL** on the explicit no-amend / no-force-push rule; all other dimensions PASS. The §11.10 claims "no amend/squash/rebase/force" and "single coherent documentation commit" are **materially false as written** and are corrected only by this append-only section and the correction artifact — the original text is deliberately left unedited as published history. `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md` carries a matching superseding-note banner; its §1/§7 text is likewise superseded, not rewritten. Corrected audit scores: SPEC 9/10, DESIGN 10/10, CORRECTNESS 10/10 unchanged; **QUALITY = 6/10**: baseline 10, less one point each for the historical X1 schema repair, the historical X2 EOL-portability repair, the amend-after-publication and non-fast-forward force-push itself, and the materially false no-amend/no-force claims written into the permanent record (10 − 1 − 1 − 1 − 1 = 6). The first published draft of §11.11 stated QUALITY 4/10; that figure double-counted the X1/X2 deductions, which were already reflected in the original 8/10 (§11.10), and is superseded by this corrected score.
 
 **Status after erratum.** B5-I3 remains **merged and `OPERATOR_ACCEPTED` — WITH PERMANENT GOVERNANCE EXCEPTION** attached by this section. `main` will not be rewritten to restore the superseded tip; `dfa8d62d6…` stays unreferenced and is neither restored nor republished; no history is repaired by deletion. `B5_I4_THROUGH_B5_I9 = LOCKED`; **this erratum does not authorize B5-I4**; B5-I4 still requires a fresh `AUTHORIZED_STAGE=B5-I4` after this erratum is reviewed and merged. No B5-I4 file, branch or code exists. Cloud/broker/capital/execution mutations 0; recurring cost `$0`; `capital.authority = none`.
+
+## 12. B5-I4 (charter increment I-3) — first vertical-slice evidence
+
+> This section is APPEND-ONLY. It records an executed implementation and its evidence; it
+> grants no authority, does not ratify B5-I4, does not set `OPERATOR_ACCEPTED`, and does not
+> unlock B5-I5–I9.
+
+### 12.1 Authority, base and complete implementation ladder
+
+| Item | Value (read back from Git / CI, never predicted) |
+|---|---|
+| Authorized base (exact) | `9df3bf4f00a47230b42c22ce10a2d81d1591c885` (`origin/main`, PR #13 merge commit) |
+| Authority mapping | charter §12 row **I-3** → block-5 plan §7 row `B5-I4` → B5-I3 registry I-3 deferrals (G3 UI half, G7 UI half, S-1 console half, F-1 console half, F-5 console half) → B5-I4 |
+| Grants consumed | none new: frozen B5-I2 contract pack (read-only) + existing loopback HTTP API |
+| Authority absent | no new endpoint, no schema change, no control-plane source change, no write path, no non-loopback bind, no hosting/cloud/provider/telemetry, no LLM, no B5-I5+ work |
+
+| Rung | SHA | Tree | Subject |
+|---|---|---|---|
+| P0 | `be63aea61bb0124ea6c24a39dbb054d4f4bfb667` | `5b4537682ce312f3a9b82556cbfa8baefb3f8787` | B5-I4-P0: freeze authorized increment contract and acceptance |
+| R1 | `2077f2cba6d70856033148f02f173f153fd69ab9` | `9b6f8af376340fd136559c147cad429729b8d3dd` | B5-I4-R1: deterministic console kernel and loopback-only transport |
+| R2 | `36fdb0dc0c286099b5a3afdca5cbc8a381a47ce6` | `147a7f6ede319fc27f2a438220211b9163e22ded` | B5-I4-R2: CLI status view entry point (`python -m oce_console status`) |
+| X1 | `1faab398569ccc609f84c5117e8c9461d7cf416d` | `9f39ccf1487206d16de01c6c5952c5a74cdf3a41` | B5-I4-X1: repair console fail-closed gaps demonstrated by the R3 proofs |
+| R3 | `8eae1de28d46048376764adfd74da2fb60f45aec` | `1e567591d76966ab9c74b6b1280043ac982a9335` | B5-I4-R3: two-sided console-kernel proofs with negative controls |
+| X2 | `31310a5b2931e0cac0c19894055bf24847e64887` | `0b95ff5426cf3b94ce2f311a7ca5c561c50993f2` | B5-I4-X2: close the loopback boundary over proxies, redirects, and CLI exit derivation |
+| X3 | `ec6579cde795360a74797d5a481e20aab12c5382` | `f9a35027133304312c5f753b841e9e8ce44c5f14` | B5-I4-X3: make the frozen CLI interface `python -m oce_console status` actually parse |
+| X4 | `8139284781d0fd56b3729c11a31620ab285250b4` | `3cd70eb0641bf4ec06ee2287ec04546f7af5d19b` | B5-I4-X4: admit only literal loopback addresses, never a name |
+
+Eight rungs, linear, zero merges; first-rung parent = the exact authorized base; every push a
+normal fast-forward (`origin/oce-book-5-i4` advanced `36fdb0dc0..31310a5b2..ec6579cde..813928478`);
+**no amend, no rebase, no squash, no force-push, no SHA regenerated** (contrast the B5-I3
+§11.11 exception: none of that occurred here). Changed paths vs base before this docs-only
+rung: 13 (ceiling 14); edited existing files: 2 (this ledger and
+`.github/workflows/b1-i1r-validation.yml`) — ceiling met.
+
+### 12.2 Implementation head and exact-head authoritative CI
+
+| Item | Value |
+|---|---|
+| Implementation head (exact) | `8139284781d0fd56b3729c11a31620ab285250b4` |
+| Workflow | `B1-I1R Validation` — `.github/workflows/b1-i1r-validation.yml` |
+| Run | id `38306966079`, event `pull_request`, attempt 1, conclusion **SUCCESS**, check-suite `103789149817` |
+| Check-run | id `115003244163` (`validate`), completed, success, `head_sha == 813928478…` |
+| Workflow `head_sha` | `8139284781d0fd56b3729c11a31620ab285250b4` — the exact implementation head |
+| Artifact | id `11773690190`, name `b1-i1r-evidence-98cf56fdc4cf`, 30387 bytes, not expired |
+| Run id (single, inside the artifact) | `98cf56fdc4cf` |
+| PR | #14, draft, open, unmerged |
+
+### 12.3 Parsed artifact results (downloaded and parsed independently)
+
+- **B5-I4 selection proof `b5-i4-kernel-proof.json`: verdict `PASS`** — collected 23,
+  pytest-reported collected 23, JUnit 23 tests / 0 failures / 0 errors / 0 skipped,
+  `executed_equals_collected` true, duplicate full node ids `[]`, duplicate junit testcase ids
+  `[]`, orphan B5-I4 files `[]`, floor 23 met, `problems: []`. Required **23/23/23/0/0/0** holds.
+- **Adjacent gates green:** B5-I2 console contracts JUnit **24/0/0/0** (frozen blob intact),
+  B5-I2 reproducibility integrity + governed mutation battery green, B5-I3 registry JUnit
+  **51/0/0/0**, shared validation runner regression battery `FAIL: 0`, adversarial suite green;
+  `stage-status.json` → `gate_status: READY_FOR_OPERATOR_REVIEW`, totals **35 PASS / 0 FAIL /
+  0 BLOCKED / 0 SKIPPED**, `unresolved_blockers: []`, `cost_impact_usd: 0`,
+  `cloud_mutations: 0`, `branch_provenance: GITHUB_REF_NAME`, `trusted_ci_ref: 14/merge`.
+- **Manifest:** `evidence-manifest.json` schema `3.6.0` listing 7 artifacts — **all 7 sha256
+  hashes and sizes recomputed independently from the downloaded bytes: 7/7 match**.
+- **Cleanup:** `worktree-cleanup.json` `removed: true`, `pruned: true`; the B5-I4 step's own
+  tracked-tree check passed (`b5-i4-worktree-check.txt` empty).
+
+### 12.4 Merge-ref parent/tree binding
+
+Tested checkout `282fb1d55376fafc1ac502ef08259374cf0a265a` = merge of parents
+[`9df3bf4f00a47230b42c22ce10a2d81d1591c885` (main), `8139284781d0fd56b3729c11a31620ab285250b4`
+(exact implementation head)]; merge-ref tree `3cd70eb0641bf4ec06ee2287ec04546f7af5d19b` ==
+`tree(813928478…)` — verified with `git cat-file -p` / `git rev-parse` on both refs.
+`pr_head_sha` in the proof == the exact implementation head; `origin/main` unchanged.
+
+### 12.5 Vertical-slice evidence (charter I-3 evidence output)
+
+Recorded in `OCE_B5_I4_VERTICAL_SLICE_DEMO_RECORD_v1.0.md` (this commit): real `ControlPlane` →
+real `ControlPlaneAPI` → real FastAPI app → uvicorn on `127.0.0.1` ephemeral port, driven by the
+real CLI as a subprocess. Results on the implementation head: healthy path exit `0` / state `OK`
+with all five governed sections verbatim and non-empty `request_id`s; determinism (identical
+section data and exit codes across invocations); governed denial exit `4` / `DEGRADED` (denied
+sections rendered verbatim, never summarized `OK`); hostile non-loopback exit `3` refused before
+any I/O; ambient `http_proxy` pointing off-loopback neutralized (exit `0`, still `OK`); closed
+port exit `2` / `STACK_UNREACHABLE` with zero sections. Backend authority after all slices:
+`job_store.all_jobs == {}`, `worker_protocol.workers == {}`; no external network contacted;
+grant id redacted; no secret, credential, database, cache or absolute local path recorded.
+
+### 12.6 Base-vs-head environmental comparison
+
+Identical command, cwd, environment and paths on both sides:
+`python -m pytest infrastructure/local-ground/tests -q` (758 cases each).
+
+| | base `9df3bf4f0` | head `813928478…`* |
+|---|---|---|
+| Totals | 1 failed, 698 passed, 59 skipped | 1 failed, 698 passed, 59 skipped |
+| Failed node set | `test_local_ground.py::test_29_evidence_hashes_reconcile` | identical (JUnit-derived, element-by-element) |
+| Skipped node set | 59 nodes | identical (JUnit-derived, element-by-element) |
+
+\* The comparison was executed at `31310a5b2…`; every later rung (X3, X4) touches only
+`infrastructure/console/**` and the B5-I4 test file — provably outside
+`infrastructure/local-ground/**` (`git diff --name-only` between those heads) — so the result
+holds at the implementation head without re-running the 20-minute suites. The single failure is
+a pre-existing environment dependency: the test shells out to `scripts/validate-local` through
+bash and mis-decodes the captured output on Windows. It is present at the authorized base and
+unchanged at head — **no new failure was introduced**. (The earlier B4/lifecycle subset recorded
+during the pre-push audit covered a different selection and is not conflated with this run.)
+
+### 12.7 Fresh audit (same-agent review — disclosed, not organizationally independent)
+
+| Dimension | Score | Basis |
+|---|---|---|
+| SPEC | **10/10** | every frozen plan §6 / acceptance-matrix row is executable-proven or attested: the five I-3 planned nodes verbatim, all mission-§7 matrix rows bound to nodes, boundary gates asserted against Git objects, changed-file ceiling 14/2 met (13/2 before this docs-only rung). No live unproven requirement. |
+| DESIGN | **9/10** | baseline 10, less 1: the kernel collapses **any** fetch exception into `STACK_UNREACHABLE` (kernel.py `except Exception`), so an internal transport bug would be labeled "unreachable" rather than "internal failure" — fail-closed, but an observability loss. Disclosed, not repaired (repair would change the frozen F-1 whole-view law). |
+| CORRECTNESS | **10/10** | no live defect demonstrated: 23/23 green locally and in exact-head CI with negative controls discriminating; vertical slice green on six paths; every defect found in audit was repaired before this evidence rung. |
+| QUALITY | **5/10** | baseline 10, less 1 per **distinct process failure**, counted once each: **X1** — fail-closed gaps discovered only when the R3 proofs were first executed; **X2** — four demonstrated defects (ambient-proxy diversion, redirect escape, dead CLI exception branch, argparse exit-code collision) were live in the *pushed* R1/R2 rungs until the pre-push audit; **X3** — the frozen CLI interface itself (`python -m oce_console status`) was broken in pushed R2 and found only by executing the vertical slice (a frozen-contract violation one manual invocation would have caught); **X4** — `localhost` admitted by name (ambient resolver authority) was live in pushed R1, found by audit rather than by tests; **lint debt** — R3 landed with 3 ruff violations (no lint gate on landed files). 10 − 1 − 1 − 1 − 1 − 1 = **5**. Deductions are grouped by rung so no defect is counted twice; every defect is repaired and each repair carries a demonstrated-red control. |
+
+### 12.8 Demonstrated defects and X-rungs (append-only repairs)
+
+| Rung | Defect | Demonstration | Repair |
+|---|---|---|---|
+| X1 | kernel/CLI fail-closed gaps surfaced by the R3 proofs | R3 negative controls against a weakened build | fail-closed whole-view collapse; surface-id fetch contract |
+| X2 | ambient proxy diverted a declared loopback read to `10.0.0.5:8080` | off-loopback `socket.create_connection` intercepted and blocked; attempt recorded | empty proxy map on the client-owned opener; pre-repair shape executed as a red-side control |
+| X2 | loopback `302` to a non-loopback host was followed | same interception; attempt recorded | redirect handler closed over the frozen route table; declared-route loopback redirect still works |
+| X2 | dead `except StackUnreachable` branch in `main()` | no exception can escape `build_status_document` | exit derived from the document summary through one explicit map; unknown summary fails closed |
+| X2 | argparse usage errors exited `2` (= "stack unreachable") | `--bogus-flag` → exit 2 pre-repair | usage errors are `EXIT_REFUSED` (3) before any I/O; `--help` stays 0 |
+| X3 | frozen interface `python -m oce_console status` rejected by the CLI's own parser | real subprocess invocation failed pre-repair | optional positional `command` (`choices=("status",)`, default `status`); unknown command refused |
+| X4 | `localhost` admitted by name (ambient resolver authority) | hosts-file/resolver influence on the boundary | `LOOPBACK_HOSTS = {127.0.0.1, ::1}`; every name refused before I/O and before resolution; same law for redirect targets |
+
+CLI exit contract (documented in `cli.py`, all executable-tested): `0` OK, `1` internal failure,
+`2` `STACK_UNREACHABLE`, `3` refused before I/O, `4` `DEGRADED`, `5` `UNVERIFIABLE`. `DEGRADED`
+is a **permitted derived presentation state** only: derived from a returned governed section
+envelope whose own `ok` is not `true`; not persisted; authorizes no transition; cannot
+reinterpret a backend state; cannot be written back; denied/unknown/unreachable sections can
+never collapse to `OK`.
+
+### 12.9 Historical / superseded runs on this branch
+
+Runs `38305638807` (head `31310a5b2…`, SUCCESS, artifact `11773211952`) and `38306391399` (head
+`ec6579cde…`, SUCCESS) are **historical**: they bind earlier heads that were superseded by the
+X3/X4 repairs pushed afterwards. They are recorded, not deleted; neither supersedes the other's
+evidence, and only `38306966079` binds the implementation head `813928478…`.
+
+### 12.10 Limitations
+
+1. Plain HTTP on loopback (charter topology); no TLS inside the local boundary.
+2. The kernel collapses any fetch exception into `STACK_UNREACHABLE` (see the DESIGN deduction) —
+   fail-closed, but an internal transport bug would be labeled "unreachable".
+3. `UNVERIFIABLE` takes precedence over `DEGRADED` deterministically in fixed section order.
+4. The base/head environmental comparison runs the local-ground suite on Windows; the single
+   pre-existing failure is a bash/encoding dependency of that suite, not Book 5 code.
+5. Same-agent audit: no organizational independence was exercised.
+
+### 12.11 Stage status at this section
+
+B5-I4 stage status: **`READY_FOR_OPERATOR_REVIEW_B5_I4`** — implementation and evidence
+complete, exact-head CI green, PR #14 draft/open/unmerged. **Not** `OPERATOR_ACCEPTED`; only the
+operator may transition further. `MERGE_AUTHORIZED=false`; `IMPLEMENTATION_MERGE_AUTHORIZED =
+FALSE`; `B5_I5_THROUGH_B5_I9 = LOCKED`; recurring cost `$0`; cloud mutations 0;
+`capital.authority = none`. The evidence head's own CI run identity is recorded append-only in
+PR #14 and the final report — an artifact cannot contain its own CI run identity (same protocol
+as §10.3/§10.4 and §11.8).
