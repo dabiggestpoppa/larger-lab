@@ -1,0 +1,59 @@
+{
+  "all_results_pass": true,
+  "checkpoint": "SENSOR-B5-I06",
+  "rows": [
+    {
+      "clause": "I06E1 s12 (forbidden: editing sealed I01-I05 production)",
+      "detail": "git diff 32a897436 -- quant-lab/src is empty",
+      "pass": true,
+      "row_id": "no_production_source_diff_vs_base"
+    },
+    {
+      "clause": "I06E1 s12 (forbidden: editing I01-I05 tests)",
+      "detail": "git diff 32a897436 -- tests .../test_b5_i05_*.py + i01 scope audit is empty",
+      "pass": true,
+      "row_id": "no_i05_test_diff_vs_base"
+    },
+    {
+      "clause": "I06E1 s12 + disclosure (naming, not allowlist, carries I06 tests)",
+      "detail": "test_b5_i05_scope_audit.py byte-identical to base: the I06 suite is named under the existing authorized test prefix so this sealed audit and the I05 evidence that inventories it stay untouched",
+      "pass": true,
+      "row_id": "i05_scope_audit_unchanged_allowlist_displays_closed"
+    },
+    {
+      "clause": "I06E1 s12 (forbidden: editing prior evidence)",
+      "detail": "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is empty",
+      "pass": true,
+      "row_id": "prior_checkpoint_evidence_unchanged"
+    },
+    {
+      "clause": "bloc_05/07 freeze manifest (plan is primary authority)",
+      "detail": "git diff 32a897436 -- quant-lab/research/.../bloc_05/ is empty",
+      "pass": true,
+      "row_id": "frozen_plan_unchanged"
+    },
+    {
+      "clause": "I06E1 s00 M3/M4 (registry and ladder sealed)",
+      "detail": "git diff 32a897436 -- quant-lab/config is empty",
+      "pass": true,
+      "row_id": "configurations_unchanged"
+    },
+    {
+      "clause": "I06E1 s00 M1 Option B (no I05 model change authorized)",
+      "detail": "git diff 32a897436 -- time/models.py is empty",
+      "pass": true,
+      "row_id": "confidence_model_unchanged_option_b"
+    },
+    {
+      "clause": "I06E1 s00 M3/M4 DEFERRED (no real-provider authority)",
+      "detail": "provider_time_semantics.yaml parses to zero declared rows",
+      "pass": true,
+      "row_id": "provider_registry_admits_zero_real_rows"
+    }
+  ],
+  "summary": {
+    "fail": 0,
+    "pass": 8,
+    "rows": 8
+  }
+}

@@ -1,0 +1,255 @@
+{
+  "all_results_pass": true,
+  "checkpoint": "SENSOR-B5-I06",
+  "generator": "live run 2026-10-11: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i06_replay_safety.py (from quant-lab; acceptance policy under test = accepted I05 time package imported read-only + deterministic synthetic fixtures)",
+  "refusal_class_vocabulary": [
+    "ADMITTED",
+    "BLOCKED_STATUS",
+    "BOUNDARY_SPECIFICATION",
+    "EXCLUDED_BY_CUTOFF_SELECTION",
+    "NO_EVIDENCE_NO_ADMISSION",
+    "RETROSPECTIVE_ONLY",
+    "TYPED_EXCEPTION"
+  ],
+  "rows": [
+    {
+      "case_id": "RS-01",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#gate_unknown_availability_basis_blocks",
+      "expected_result": "An UNKNOWN availability basis carries no justified market time, so strict replay must be blocked with BLOCKED_TIMESTAMP.",
+      "frozen_clause": "bloc_05/02 s5",
+      "index": 0,
+      "input_fixture": "derivation with no interval, no publication, no event and empty acquisition metadata; gate over the resulting resolution",
+      "observed_result": "derivation returned basis=UNKNOWN with market_available_at=None; gate returned BLOCKED_TIMESTAMP.",
+      "pass": true,
+      "production_functions_exercised": [
+        "derive_market_available_at",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BLOCKED_STATUS"
+    },
+    {
+      "case_id": "RS-02",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#F05_06_ingestion_time_cannot_replace_market_availability",
+      "expected_result": "Changing the system ingestion instant cannot establish or change market availability; the row must remain SYSTEM_ONLY_OBSERVED without a market time and stay blocked.",
+      "frozen_clause": "bloc_05/02 s4/s18 rule 3",
+      "index": 1,
+      "input_fixture": "system-side observation only; the same derivation re-run with ingested_at moved one hour later",
+      "observed_result": "ingested_at perturbation changed the answer = False; both runs returned basis=SYSTEM_ONLY_OBSERVED market_available_at=None; gate returned BLOCKED_TIMESTAMP.",
+      "pass": true,
+      "production_functions_exercised": [
+        "derive_market_available_at",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BLOCKED_STATUS"
+    },
+    {
+      "case_id": "RS-03",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#gate_all_six_conditions_are_eligible",
+      "expected_result": "A row satisfying all six frozen conditions must be admitted as ELIGIBLE.",
+      "frozen_clause": "bloc_05/02 s15",
+      "index": 2,
+      "input_fixture": "closed five-minute bar (12:00..12:05), defensible PUBLIC_INTERVAL_CLOSE basis at the close, presence-checked confidence, ORIGINAL known by cutoff, complete lineage, no blocking flags -- all six frozen conditions",
+      "observed_result": "gate returned ELIGIBLE: bloc_05/02 section 15: all six conditions satisfied",
+      "pass": true,
+      "production_functions_exercised": [
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "ADMITTED"
+    },
+    {
+      "case_id": "RS-04",
+      "disposition": "BOUNDARY_ONLY_NOT_END_TO_END_CUTOFF_EXECUTION__I19_QUERY_FILTER_PRECONDITION",
+      "evidence_reference": "bloc_05_time_validation.json#gate_condition_order_is_frozen_not_input_order + I06D1 package s4 RS-04",
+      "expected_result": "The I05 admission primitives carry no replay-cutoff parameter for market availability: cutoff sensitivity exists only in revision selection, and comparing market_available_at against a replay cutoff is a query-time filter owned by I19, so this case is a boundary specification rather than an end-to-end cutoff execution.",
+      "frozen_clause": "bloc_05/02 s15(3)/(4) + s11",
+      "index": 3,
+      "input_fixture": "closed bar deriving market_available_at=2024-06-01T12:05:00+00:00; revision selection evaluated at a cutoff BEFORE the original (2021-06-01) and AT it (2022-05-12); gate signature introspected; public time-package signatures scanned for a combined availability+cutoff parameter",
+      "observed_result": "assess_replay_eligibility has no cutoff parameter (parameters=['evidence']); derive_market_available_at returned market_available_at=2024-06-01T12:05:00+00:00; revision selection at the 2021 cutoff gave BLOCKED_REVISION vs ELIGIBLE at the 2022 cutoff (cutoff_sensitive=True); no public time-package function takes both market_available_at and a cutoff (availability_cutoff_filter_exists_in_i05=False).",
+      "pass": true,
+      "production_functions_exercised": [
+        "derive_market_available_at",
+        "select_revisions",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BOUNDARY_SPECIFICATION"
+    },
+    {
+      "case_id": "RS-05",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#interval_unclosed_window_cannot_claim_completion",
+      "expected_result": "An interval without justified completion must be refused by the completion law and must never be admitted to strict replay.",
+      "frozen_clause": "bloc_05/02 s18 rule 2",
+      "index": 4,
+      "input_fixture": "unclosed five-minute window asked for its completion instant; separately, a gate row declaring interval_complete=False",
+      "observed_result": "completion law raised ValueError for the unclosed window; gate returned BLOCKED_TIMESTAMP for interval_complete=False.",
+      "pass": true,
+      "production_functions_exercised": [
+        "IntervalWindow.earliest_justified_availability",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BLOCKED_STATUS"
+    },
+    {
+      "case_id": "RS-06",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#avail_archive_without_evidence_is_system_only",
+      "expected_result": "An archive event obtained later without contemporaneous-public proof must yield no market availability time and must stay blocked from strict replay.",
+      "frozen_clause": "bloc_05/02 s14/s6",
+      "index": 5,
+      "input_fixture": "2022 archive event time supplied, file ingested 2026-01-02, NO contemporaneous-public evidence refs, no provider classification",
+      "observed_result": "despite event_time=2022-05-12T08:00:00+00:00 and ingested_at=2026-01-02T03:04:05+00:00, derivation returned basis=SYSTEM_ONLY_OBSERVED market_available_at=None; gate returned BLOCKED_TIMESTAMP.",
+      "pass": true,
+      "production_functions_exercised": [
+        "derive_market_available_at",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BLOCKED_STATUS"
+    },
+    {
+      "case_id": "RS-07",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#F05_02_contemporaneous_archive_row_is_historical_reconstruction",
+      "expected_result": "A contemporaneously public archive reconstruction must keep the HISTORICAL_ARCHIVE_RECONSTRUCTION basis with its label flag, anchor at the historical event time rather than the download time, and remain admissible.",
+      "frozen_clause": "bloc_05/02 s6/s16",
+      "index": 6,
+      "input_fixture": "2022 archive event proven contemporaneously public (evidence ref present), downloaded 2026-01-02; reconstruction basis evaluated for replay with the label flag attached",
+      "observed_result": "derivation returned basis=HISTORICAL_ARCHIVE_RECONSTRUCTION market_available_at=2022-05-12T08:00:00+00:00 (download date 2026-01-02T03:04:05+00:00 ignored = True) with label flag True; gate returned ELIGIBLE.",
+      "pass": true,
+      "production_functions_exercised": [
+        "derive_market_available_at",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "ADMITTED"
+    },
+    {
+      "case_id": "RS-08",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#revision_as_known_then_excludes_the_future_correction",
+      "expected_result": "A correction that was not available at the historical cutoff must be excluded from AS_KNOWN_THEN selection.",
+      "frozen_clause": "bloc_05/02 s12",
+      "index": 7,
+      "input_fixture": "ORIGINAL known 2022-05-12 + PROVIDER_CORRECTED known 2025-03-03; AS_KNOWN_THEN selection at replay cutoff 2022-05-12",
+      "observed_result": "AS_KNOWN_THEN at 2022-05-12T08:00:00+00:00 selected ['rev-original-2022'] and excluded ['rev-corrected-2025'].",
+      "pass": true,
+      "production_functions_exercised": [
+        "select_revisions"
+      ],
+      "refusal_class": "EXCLUDED_BY_CUTOFF_SELECTION"
+    },
+    {
+      "case_id": "RS-09",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#gate_latest_verified_is_retrospective_only",
+      "expected_result": "LATEST_VERIFIED is explicitly retrospective: its selection must never be point-in-time safe and the row must evaluate RETROSPECTIVE_ONLY, never ELIGIBLE.",
+      "frozen_clause": "bloc_05/02 s11/s15",
+      "index": 8,
+      "input_fixture": "same correction chain under LATEST_VERIFIED at cutoff 2022-05-12; the verified retrospective selection feeds the gate",
+      "observed_result": "LATEST_VERIFIED selected ['rev-corrected-2025'] with pit_safe=False; gate returned RETROSPECTIVE_ONLY.",
+      "pass": true,
+      "production_functions_exercised": [
+        "select_revisions",
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "RETROSPECTIVE_ONLY"
+    },
+    {
+      "case_id": "RS-10",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#gate_broken_lineage_blocks",
+      "expected_result": "Broken lineage must be refused with BLOCKED_LINEAGE.",
+      "frozen_clause": "bloc_05/02 s15(5)",
+      "index": 9,
+      "input_fixture": "otherwise fully admissible scaffold with lineage=LINEAGE_BROKEN",
+      "observed_result": "gate returned BLOCKED_LINEAGE: bloc_05/02 section 15(5): lineage is broken",
+      "pass": true,
+      "production_functions_exercised": [
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BLOCKED_STATUS"
+    },
+    {
+      "case_id": "RS-11",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#gate_blocking_flag_without_a_frozen_bucket_refuses",
+      "expected_result": "A blocking quality flag with no frozen result bucket must raise the typed UnassessableReplayEvidence refusal; the frozen six-status vocabulary may not gain a seventh member.",
+      "frozen_clause": "bloc_05/02 s15(6)",
+      "index": 10,
+      "input_fixture": "blocking quality flag SEMANTICS_UNVERIFIED (frozen blocking set, no bucket in the six-status result vocabulary) presented to the gate",
+      "observed_result": "gate raised UnassessableReplayEvidence instead of returning a status; ReplayEligibility still has 6 members.",
+      "pass": true,
+      "production_functions_exercised": [
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "TYPED_EXCEPTION"
+    },
+    {
+      "case_id": "RS-12",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#gate_missing_availability_confidence_blocks",
+      "expected_result": "A replay-relevant row without availability_confidence must be blocked with BLOCKED_TIMESTAMP and must name the missing confidence in its reason.",
+      "frozen_clause": "bloc_05/02 s5",
+      "index": 11,
+      "input_fixture": "fully admissible scaffold with availability_confidence=None (opaque token omitted)",
+      "observed_result": "gate returned BLOCKED_TIMESTAMP; reason names the missing confidence = True: bloc_05/02 section 5: availability_confidence is required beside availability_basis on every replay-relevant row",
+      "pass": true,
+      "production_functions_exercised": [
+        "assess_replay_eligibility"
+      ],
+      "refusal_class": "BLOCKED_STATUS"
+    },
+    {
+      "case_id": "RS-13",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#registry_every_real_provider_fails_closed",
+      "expected_result": "A provider and sensor family with no declared time-semantics row must be refused by the registry and can never become verified, while the registered real-provider row count stays zero.",
+      "frozen_clause": "bloc_05/02 s18 rule 7",
+      "index": 12,
+      "input_fixture": "tracked provider_time_semantics.yaml asked for (BINANCE_USDM, MECHANICAL_TRADE) -- no declared row exists",
+      "observed_result": "registry.require raised UnknownProviderTimeSemantics; declared rows in the tracked config = 0.",
+      "pass": true,
+      "production_functions_exercised": [
+        "parse_provider_time_semantics_yaml",
+        "ProviderTimeSemanticsRegistry.require"
+      ],
+      "refusal_class": "TYPED_EXCEPTION"
+    },
+    {
+      "case_id": "RS-14",
+      "disposition": "PASS",
+      "evidence_reference": "bloc_05_time_validation.json#registry_carries_zero_real_exchange_rows + I06D1 package s3",
+      "expected_result": "No latency-adjusted availability claim may be derived from missing evidence: the derivation exposes no latency input and an unsubstantiated claim must never be assumed to be zero delay.",
+      "frozen_clause": "bloc_05/02 s6",
+      "index": 13,
+      "input_fixture": "a synthetic 'feed is instant' claim with NO provider documentation: event time supplied, no registry row, no latency declaration, empty acquisition metadata",
+      "observed_result": "derive_market_available_at exposes no latency parameter (latency inputs=[]); static latency mentions across the eight tracked time sources = 1 (one out-of-scope docstring note, no code branch); the unsubstantiated claim returned basis=UNKNOWN market_available_at=None; zero delay assumed = False.",
+      "pass": true,
+      "production_functions_exercised": [
+        "derive_market_available_at"
+      ],
+      "refusal_class": "NO_EVIDENCE_NO_ADMISSION"
+    }
+  ],
+  "sha256_inventory": {
+    "quant-lab/config/crypto_sensor_fabric/provider_time_semantics.yaml": "17b3fe5e15966d8c159f9f810b6f4699af809460cbcab46863833e85507ad95f",
+    "quant-lab/config/crypto_sensor_fabric/revision_policies.yaml": "2a25cf9edcefe254fbc1bee1b52b4b73b52c28fc5c7a87216de61f03162e4960",
+    "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i06_replay_safety.py": "822fc997dc833e380434fe8f91b578bc164c9ed9e0cc680cdf71b41fe6118086",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/__init__.py": "e60957a70bde9dbe654673fa52a01bf2335439ec22f13df11cb262e72b94d219",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/availability.py": "ba8a09d9d35e02ec76328700e556e3ce1ae130bd51002ccdbf2db35335824e53",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/enums.py": "5876a932ca4518fca5292dd74cf2eead5fed1dff83199de5622bee92cb944858",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/intervals.py": "821e144c8e45d7606992d8fd86dc3467ca7873ac72601ccec89894253f9e80af",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/models.py": "6dd238e59741f8f98c14656e979df35919479796e54435bd5f7ff199d891f740",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/replay_gate.py": "79aa9bd9a98fc76d4666689f71ea4d47a69d75f3a05036b7ccc278a269a3a936",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/revision_policy.py": "0f6033d8c404220b0c77f62e92de1f68f3ed975dc5bb240095f6ec539d08299c",
+    "quant-lab/src/crypto_sensor_fabric/normalization/time/semantics_registry.py": "78d1136205b627c0c79477c4539c23b47ec39bfcccfefd54f75e6dffa670b5d0",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py": "09d5cec93d0222ca4f06bd1a65532c479941ebac57c57aed5ee28b72aa826e34"
+  },
+  "summary": {
+    "fail": 0,
+    "pass": 14,
+    "rows": 14
+  },
+  "tests": "tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py"
+}

@@ -6639,3 +6639,93 @@ recommended_next = **OPERATOR: (1) SELECT CONFIDENCE OPTION A/B/C, (2)
 ACKNOWLEDGE THE M2 SCOPE RESOLUTION, (3) SUPPLY OR DEFER M3 PROVIDER
 EVIDENCE, (4) DECIDE WHETHER TO ISSUE THE MINIMAL I06 IMPLEMENTATION
 DIRECTIVE**. HARD STOP after push and report.
+
+## 171 - SENSOR-B5-I06E1: REPLAY-SAFETY VALIDATION IMPLEMENTATION (IMPLEMENTATION PASS, PENDING OPERATOR REVIEW)
+
+### 1. Mission and authority
+
+I06E1 bounded directive executed at base `32a89743656adb638cdaf688b62be505202f1876`
+on `agent/crypto-sensor-fabric-build`: implement the frozen I06
+replay-safety validation obligation as a consolidated, executable proof of
+the ACCEPTED I05 admission-policy chain over the fourteen frozen RS cases of
+the I06D1 package. Frozen plan primary; I06D1 defined scope, not permission
+to alter frozen behavior. VERIFY -> RED -> IMPLEMENT -> PROVE terminal.
+
+### 2. Operator decisions implemented
+
+M1 Option B: confidence stays the accepted opaque, nonnumeric,
+presence-checked token; numeric tokens still refused; models.py byte-
+identical; Option C review trigger recorded in evidence only. M2: no
+reimplementation of the accepted I05 primitives -- the producer IMPORTS
+`derive_market_available_at`, `assess_replay_eligibility`,
+`select_revisions` (AST-enforced). M3/M4 DEFERRED: zero real-provider rows,
+zero latency values; provider registry still parses to zero rows; the
+provider-document collection brief ships as documentation inventory with an
+empty table. M5/M6: no T1 writer, no query-time filter; RS-04 records the
+I19 precondition instead of faking cutoff admission. M7: spike note left
+untracked, neither staged nor deleted.
+
+### 3. Deliverables (tracked)
+
+`bloc_05_replay_safety_validation.json` (14 rows / 14 pass / 0 fail; SHA-256
+`9d3b93aa4321d8d2c89f55ce93c17f6b6a5d146be6c5bc5b5a1a25be9fd312b8`);
+producer `scripts/b5_i06_replay_safety.py` (SHA-256
+`822fc997dc833e380434fe8f91b578bc164c9ed9e0cc680cdf71b41fe6118086`);
+24-test suite `tests/.../normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py`
+(SHA-256 `09d5cec93d0222ca4f06bd1a65532c479941ebac57c57aed5ee28b72aa826e34`);
+`BLOC_05_I06_SCOPE_AUDIT.json` (8/8; SHA-256
+`14a61f2ed4ccbe7c87f230c514df121ec75ad25975298d8735821e811437af31`);
+implementation-evidence narrative, scope/noninterference audit and
+provider-document collection brief (all under `evidence/bloc_05/`).
+Layout disclosure: the I06 suite sits inside a `test_b5_i05_`-prefixed
+subdirectory because two sealed I05 checks jointly pin the directory
+(exactly nine flat `test_b5_i05_*.py` via non-recursive glob; staged test
+paths must match an authorized prefix); a subdirectory satisfies both as
+written with every sealed byte untouched -- disclosed naming, not an
+allowlist change.
+
+### 4. RED-first record and verification
+
+Suite written before producer/artifacts; executable red evidence re-captured
+by removing the three deliverables: **19 failed, 5 passed, exit 1**; restored
+byte-identically (SHA-256 -c), suite green **24 passed**. RS-04 disposition
+is BOUNDARY_SPECIFICATION (BOUNDARY_ONLY_NOT_END_TO_END_CUTOFF_EXECUTION,
+I19 query-filter precondition stated; the I05 gate has no cutoff parameter
+and no public time-package function takes both market_available_at and a
+cutoff). RS-14 fails closed: no latency parameter exists, the unsubstantiated
+claim derives no market time, zero delay is not assumed.
+
+Regression (exit 0 each): I06 focused 24 passed; I05 focused (nine sealed
+files) **219 passed -- exactly the sealed baseline**; I01-I04 protected 579
+passed; normalization 822 passed; I11R2 governance binding 14 passed with
+the mechanical `python_files_scanned` republish; canonical
+`python -m pytest tests -q` green (count in final report); generator twice
+byte-identical; ruff changed-scope clean; mypy changed-scope shows only the
+inherited import-not-found baseline class (reproduces identically on sealed
+I05 files); compileall clean; secret scan clean.
+
+### 5. Custody
+
+No production source changed (`git diff 32a897436 -- quant-lab/src` empty);
+all nine sealed I05 test files, the five sealed I05/I06D1 artifacts, all
+seven frozen Bloc 5 plan documents and both configurations byte-identical to
+base; zero real-provider rows admitted; no confidence change; no seventh
+replay status; no T1 writer or query filter. Staged paths: the seven new
+I06 files + the disclosed mechanical I11R2 audit line + this append-only
+ledger entry. Untracked: M7 spike note, pre-existing I03 scratch, `.bu_tmp`.
+
+### 6. Governance
+
+B5-I01..B5-I05 = OPERATOR_ACCEPTED; **B5-I06 =
+IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW**; BLOC_05 = INCOMPLETE; all
+eight program gates = NOT_YET_EARNED (REPLAY_SAFETY_GATE not promoted);
+next_checkpoint_authorized = FALSE; B5-I07+ = UNAUTHORIZED; BLOC_06 =
+UNAUTHORIZED; RESEARCH = FROZEN. RS-04's missing end-to-end cutoff
+execution, zero real-provider authority, declared-claim-only confidence and
+non-substitutability for the I22 golden replay are recorded as genuine
+limitations.
+
+recommended_next = **OPERATOR: (1) REVIEW AND RATIFY I06, (2) AUTHORIZE I07,
+(3) CONSIDER AUTHORIZING COLLECTION OF THE PROVIDER DOCUMENTS LISTED IN THE
+I06 COLLECTION BRIEF -- the sole path to real-provider availability rows and
+the Option C confidence review**. HARD STOP after push and report.
