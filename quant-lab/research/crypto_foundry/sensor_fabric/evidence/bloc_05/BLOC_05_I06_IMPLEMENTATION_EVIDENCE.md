@@ -147,7 +147,7 @@ rows make generation fail → `test_a_failing_mandatory_check_exits_nonzero`
 | I01–I04 protected | 13 sealed files | 0 | 579 passed |
 | Normalization | `pytest tests/crypto_sensor_fabric/normalization -q` | 0 | 822 passed (798 baseline + 24 I06) |
 | I11R2 governance binding | `pytest tests/.../storage/test_i11r2_*.py -q` | 0 | 14 passed |
-| Canonical project | `python -m pytest tests -q` | 0 | see ledger §170 for the exact count (baseline 4196 passed / 14 skipped) |
+| Canonical project | `python -m pytest tests -q` | 0 | **4220 passed, 14 skipped in 1112.23s** (baseline 4196 + 24 I06; skips unchanged) |
 | Evidence generator twice | `PYTHONIOENCODING=utf-8 python .../b5_i06_replay_safety.py` ×2 | 0 | byte-identical; digests recorded above |
 | Ruff (changed scope) | `ruff check` producer + I06 suite | 0 | All checks passed |
 | Mypy (changed scope) | `mypy` producer + I06 suite | 1 (inherited) | 5 errors, ALL `import-not-found` for the uninstalled-package invocation; the same class of error reproduces on sealed I05 files (`test_b5_i05_replay_gate.py` + `b5_i05_time.py` show 8) — inherited baseline, disclosed, not introduced |
@@ -214,7 +214,7 @@ the machine-readable `BLOC_05_I06_SCOPE_AUDIT.json`. Headlines:
 | G06-17 Regression green | §09 | §7 table | all focused suites exit 0; canonical exit 0 | PASS |
 | G06-18 Governance binding valid | §09 I11R2 | I11R2 tests 14 passed + mechanical republish | audit differs only in `python_files_scanned` | PASS |
 | G06-19 Historical custody preserved | §12 | all scope rows + sealed-file digests | unchanged | PASS |
-| G06-20 Fast-forward remote equality | §12 | post-push `git rev-parse` comparison | local == remote (recorded in ledger §170) | PASS (pending push verification at commit time) |
+| G06-20 Fast-forward remote equality | §12 | post-push `git rev-parse` comparison | fast-forward `32a897436..0f2559594`; local == remote == `0f2559594508a58e35e564230713eb4760dfdc64` | PASS |
 
 ## 10. Governance status
 
