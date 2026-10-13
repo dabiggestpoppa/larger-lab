@@ -220,3 +220,35 @@ class LoopbackTransport:
         from .kernel import build_status_document
 
         return build_status_document(self.read, self._surfaces)
+
+    def read_job(self, job_id: str) -> object:
+        """Read one job through the declared ``jobs.inspect`` route (B5-I5 I-4).
+
+        Substitutes a concrete ``job_id`` into the pack's declared
+        ``GET /api/jobs/{job_id}`` route template. The template must be a
+        declared GET surface and the id is bounded and traversal-free, so a
+        caller can only read a declared route with a concrete id — the route
+        set can never be widened, and the same loopback / proxy-free / GET-only
+        laws as ``read`` apply (B5-I4 frozen tests remain green).
+        """
+        template = self._surfaces.get("jobs.inspect", "")
+        if not template or "{job_id}" not in template:
+            raise ConsoleRefusal("unsupported_surface", "jobs.inspect")
+        jid = str(job_id)
+        if (not jid or len(jid) > 128
+                or any(ch in jid for ch in ("/", "\\", "..", "%", "?", "#", "\r", "\n"))):
+            raise ConsoleRefusal("malformed_identity", f"job_id {job_id!r}")
+        route = template.replace("{job_id}", jid)
+        url = f"{self._base}{route}"
+        request = urllib.request.Request(url, headers=self._headers(), method="GET")
+        try:
+            with _open_url(self._opener, request, self._timeout) as response:
+                body = response.read()
+        except urllib.error.HTTPError as exc:
+            body = exc.read()
+        except (urllib.error.URLError, socket.timeout, ConnectionError, OSError) as exc:
+            raise StackUnreachable(f"jobs.inspect: {exc}") from exc
+        try:
+            return json.loads(body.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError) as exc:
+            raise StackUnreachable("jobs.inspect: unparseable body") from exc
