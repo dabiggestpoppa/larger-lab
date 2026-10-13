@@ -18,7 +18,7 @@
 | **B5-I1** | C1 compare/select/freeze application → operator-approved Product Charter | **OPERATOR_ACCEPTED** | Intake + evidence packets commit `52843ffc11ff97511ec7e7242f6adc7083290360`; AMEND-001 ratified (`f381ce0e…`) with both passes sealed (`b05c61d0…`, `8f5a06c9…`); reconciliation and decision packet published (`OCE_B5_I1_RECONCILIATION_v1.0.md`, `OCE_B5_I1_DECISION_PACKET_v1.0.md` — recommendation only); **operator selected CAND-004 (Local Job Console) 2026-10-07** on the adopted record (W 82.75; floors C1=3/C2=4/C3=3/C5=3; zero disqualifiers; zero UNKNOWN; reviews sequential, NOT independent, NOT blind per AMEND-001) — see decision packet §9; Product Charter drafted (`5b082164…`), audited (repairs `1534305778…`, `d4bb8e6064c3…`), and **ratified 2026-10-07** (`OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md` → `OPERATOR_RATIFIED — FROZEN`; ratification artifact `OCE_B5_I1_OPERATOR_RATIFICATION_v1.0.md`). B5-I1 complete. B5-I2–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I2`; no implementation has begun
 | B5-I2 | C2 outcome/domain/interfaces — charter increment I-1: console-control-plane deterministic interface contracts | **OPERATOR_ACCEPTED** — authorized 2026-10-07 under `AUTHORIZED_STAGE=B5-I2`; ratified 2026-10-08 under `AUTHORIZED_STAGE=B5-I2-AUDIT_REPAIR_AND_RATIFICATION` (§9; `OCE_B5_I2_OPERATOR_RATIFICATION_v1.0.md`) | Branch `oce-book-5-i2` created from exact merged main `882835dac…`; implementation contract frozen (`OCE_B5_I2_IMPLEMENTATION_CONTRACT_v1.0.md`): contract pack for every console-read/invoke surface (jobs, workers, leases, health, submit, denial) bound to existing governed control-plane operations and existing schemas (`job-envelope.schema.json`, `denial-envelope.schema.json`, `evidence-manifest.schema.json`); gate = contract tests pass on both sides; non-goals per charter section 12 I-1 (no console code, no UI, no new server endpoints) |
 | B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **OPERATOR_ACCEPTED** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3`; ratified 2026-10-09 under `AUTHORIZED_STAGE=B5-I3-RATIFICATION` (§11.10; `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`) | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11), evidence-head `37871316871` and proof-record-head `37914160504` (all SUCCESS; manifest 7/7; merge-ref parent+tree identity, §11.10); operator review 2026-10-09 → B5-I3 `OPERATOR_ACCEPTED`; ratification artifact `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`. B5-I3 complete. B5-I4–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I4`; no implementation has begun |
-| B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **READY_FOR_OPERATOR_REVIEW** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); `MERGE_AUTHORIZED=false` (not `OPERATOR_ACCEPTED`) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
+| B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **OPERATOR_ACCEPTED** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); independently re-audited and ratified 2026-10-13 under `AUTHORIZED_STAGE=B5-I4-RATIFY` (§13); normal two-parent merge of PR #14 authorized (§13.10) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
 | B5-I5 | C3 complete build/tests/lineage/operator review | **LOCKED** | Requires B5-I4 complete |
 | B5-I6 | C4 local deployment, observability and recovery | **LOCKED** | Requires B5-I5 complete |
 | B5-I7 | C4 change cycle plus C5 measurements/learning | **LOCKED** | Requires B5-I6 complete |
@@ -589,3 +589,273 @@ FALSE`; `B5_I5_THROUGH_B5_I9 = LOCKED`; recurring cost `$0`; cloud mutations 0;
 `capital.authority = none`. The evidence head's own CI run identity is recorded append-only in
 PR #14 and the final report — an artifact cannot contain its own CI run identity (same protocol
 as §10.3/§10.4 and §11.8).
+
+## 13. B5-I4 operator ratification (`AUTHORIZED_STAGE=B5-I4-RATIFY`; append-only; 2026-10-13)
+
+> This section is APPEND-ONLY. It does not erase or rewrite §12, §1, or any prior row; those
+> remain published as history. It records an independent same-agent re-audit of B5-I4 under the
+> ratification mission, one governance-record correction, and the operator decision. It does not
+> unlock B5-I5–I9.
+
+### 13.1 Reality lock and ladder verification (reconstructed from Git objects, not from §12)
+
+Fetched live refs without rewriting anything. `origin/main` = `9df3bf4f00a47230b42c22ce10a2d81d1591c885`
+(authorized base, unchanged); local `HEAD` = live `origin/oce-book-5-i4` = `c6ce736f50a35c53f0f0519662d0b6f3c01e2701`;
+ahead/behind `0/0`; tracked tree clean and index empty; no stash created by this mission (the two
+existing stashes predate it and were never touched); PR #14 OPEN, draft, unmerged, base `main`,
+head exactly the branch head. All nine pre-ratification rungs exist, form one linear first-parent
+chain, P0's parent is exactly the authorized base, and no merge commit exists inside the ladder.
+Full per-rung metadata (author/committer `Quant Lab <quant@lab.local>`; every parent/tree/subject
+read back with `git log`/`git diff-tree`):
+
+| Rung | Commit | Parent | Tree (git truth) | Changed paths (name-status) |
+|---|---|---|---|---|
+| P0 | `be63aea61bb0124ea6c24a39dbb054d4f4bfb667` | `9df3bf4f…` | `5b4537682ce312f3a9b82556cbfa8baefb3f8787` | A×4 B5-I4 P0 docs; M ledger |
+| R1 | `2077f2cba6d70856033148f02f173f153fd69ab9` | `be63aea6…` | `9b6f8af376340fd136559c147cad429729b8d3dd` | A `__init__.py`, `kernel.py`, `transport.py` |
+| R2 | `36fdb0dc0c286099b5a3afdca5cbc8a381a47ce6` | `2077f2cba…` | `147a7f6ede319fc27f2a438220211b9163e22ded` | A `__main__.py`, `cli.py` |
+| X1 | `1faab398569ccc609f84c5117e8c9461d7cf416d` | `36fdb0dc0…` | `9f39ccf1487206d16de01c6c5952c5a74cdf3a41` | M `cli.py`, `kernel.py`, `transport.py` |
+| R3 | `8eae1de28d46048376764adfd74da2fb60f45aec` | `1faab3985…` | `1e567591d76966ab9c74b6b1280043ac982a9335` | M workflow; A addendum JSON; A B5-I4 test file |
+| X2 | `31310a5b2931e0cac0c19894055bf24847e64887` | `8eae1de28…` | `0b95ff5426cf3b94ce2f311a7ca5c561c50993f2` | M `cli.py`, `kernel.py`, `transport.py`, B5-I4 test file |
+| X3 | `ec6579cde795360a74797d5a481e20aab12c5382` | `31310a5b2…` | `f9a35027133304312c5f753b841a9e8ce44c5f14` (corrected, §13.3) | M `cli.py`, B5-I4 test file |
+| X4 | `8139284781d0fd56b3729c11a31620ab285250b4` | `ec6579cde…` | `3cd70eb0641bf4ec06ee2287ec04546f7af5d19b` | M `transport.py`, B5-I4 test file |
+| EVIDENCE | `c6ce736f50a35c53f0f0519662d0b6f3c01e2701` | `813928478…` | `31d2503ef372951c74472c1ae5ffa672b7c1ec98` | A demo record; M ledger |
+
+Append-only and linear proven (`%P` single-parent chain, zero merges); R1/R2 scopes are genuine
+production commits (R1 = the three kernel/transport modules only; R2 = the two CLI entry modules
+only); X1–X4 each occur strictly after the defects they repair. Changed paths base→evidence head
+= exactly the authorized 14-path boundary (12 added, 2 previously-existing files edited: this
+ledger and `.github/workflows/b1-i1r-validation.yml`). Zero changes to `oce/frontend`, providers,
+deployment configuration, Book 4, Sensor Fabric, frozen B5-I0–I3 implementation evidence, or any
+B5-I5+ surface (grep + `git diff --name-only` over every forbidden prefix: no hits). The workflow
+edit is exactly one added step (+161/−0 lines, single hunk at line 507): whole-file selection of
+the B5-I4 suite with a fail-closed selection proof, frozen floor 23, orphan detection over
+`test_b5_i4_*.py`; triggers, permissions, shared-runner gates, the B5-I2/B5-I3 steps and the
+artifact upload are untouched. B5-I5–I9 remain LOCKED: no B5-I5 artifact, branch, worktree or
+code exists anywhere (tree scan + branch/worktree/stash enumeration).
+
+### 13.2 Artifact-ID and exact-head reconciliation (both runs queried live; artifacts downloaded independently)
+
+The §12.2 reported artifact numbers were re-queried from the live API and are correct as written;
+the apparent ID-ordering anomaly is GitHub's artifact-ID allocation, not a swap. Attribution was
+proven per run's own live artifact list (each run has exactly one artifact) plus the internal
+run-id binding (`run-context.json` `oce_run_id` == the artifact-name suffix), and by parsing each
+downloaded artifact's own `pr_head_sha`:
+
+| | Implementation run | Evidence run |
+|---|---|---|
+| Run | `38306966079` (run #179, attempt 1) | `38308344347` (run #180, attempt 1) |
+| Event / conclusion | `pull_request` / SUCCESS (2026-10-12T20:51:57Z→20:57:55Z) | `pull_request` / SUCCESS (21:04:44Z→21:13:31Z) |
+| Workflow `head_sha` | `8139284781d0fd56b3729c11a31620ab285250b4` (exact implementation head) | `c6ce736f50a35c53f0f0519662d0b6f3c01e2701` (exact evidence head) |
+| Check-suite / check-run | `103789149817` / `115003244163` (`validate`, success, same `head_sha`) | `103792902482` / `115007727145` (`validate`, success, same `head_sha`) |
+| Artifact | id `11773690190`, `b1-i1r-evidence-98cf56fdc4cf`, 2026-10-12T20:57:52Z, 30387 bytes, not expired | id `11773338377`, `b1-i1r-evidence-fd1285a4ad9e`, 21:13:28Z, 30381 bytes, not expired |
+| Run id inside artifact | `98cf56fdc4cf` (== name suffix) | `fd1285a4ad9e` (== name suffix) |
+| Tested checkout | `282fb1d55376fafc1ac502ef08259374cf0a265a` | `974aa691eca088af958e7fc6b5f31d00db6ead57` |
+| Tested tree | `3cd70eb0641bf4ec06ee2287ec04546f7af5d19b` | `31d2503ef372951c74472c1ae5ffa672b7c1ec98` |
+
+Both artifacts were downloaded from their own runs and parsed (never badge-inferred). Parsed
+results, identical in both: B5-I4 selection proof verdict `PASS` — collected 23, pytest-reported
+collected 23, JUnit **23/0/0/0**, `executed_equals_collected` true, duplicate full node ids `[]`,
+duplicate junit testcase ids `[]`, orphan B5-I4 files `[]`, floor 23, `problems: []`; adjacent
+B5-I2 console-contracts **24/0/0/0**; B5-I2 harness-integrity **16/0/0/0**; B5-I2 mutation battery
+11/11 `ALL_DISCRIMINATED` with restored-control green and caller-worktree unmodified; B5-I3
+registry **51/0/0/0**; shared runner totals **35 PASS / 0 FAIL / 0 BLOCKED / 0 SKIPPED**,
+`unresolved_blockers: []`, `cost_impact_usd: 0`, `cloud_mutations: 0`; `evidence-manifest.json`
+schema 3.6.0 with **7 entries — all 7 sha256 hashes and sizes recomputed from the downloaded
+bytes: 7/7 match** in both artifacts; cleanup `worktree-cleanup.json` `{removed: true, pruned:
+true}` in both; B5-I4 tracked-tree check file empty in both. The two artifacts are distinct
+(different run ids, name hashes, byte sizes, tested heads) and correctly attributed.
+
+Merge-ref parent/tree proof (commits fetched from `origin` where absent locally):
+`282fb1d553…` fetched and read: parents **[`9df3bf4f…` (contemporaneous main), `813928478…`
+(exact implementation head)]**, tree `3cd70eb0…` == `tree(813928478…)`. `974aa691e…` (the
+evidence merge ref): parents **[`9df3bf4f…`, `c6ce736f5…` (exact evidence head)]**, tree
+`31d2503e…` == `tree(c6ce736f5…)`. Both second parents are the intended PR heads; both first
+parents are the authorized main base; both merge-ref trees equal their PR-head trees byte-for-byte
+(`git rev-parse <ref>^{tree}` on both sides).
+
+### 13.3 Governance-record correction (append-only; supersedes no text)
+
+The §12.1 ladder table and PR #14 §13.1 record the X3 tree as
+`f9a35027133304312c5f753b841e9e8ce44c5f14`. Git truth is
+`git rev-parse ec6579cde795360a74797d5a481e20aab12c5382^{tree}` =
+**`f9a35027133304312c5f753b841a9e8ce44c5f14`** — a one-character transcription error at index 26
+(recorded `e`, true `a`). This is classified a **governance-record defect**, self-found by this
+ratification audit's full ID cross-check against Git objects. All other eight rung SHA+tree pairs
+are byte-exact vs git truth. No CI evidence, no code, and no gate is affected (the token appears
+only in the two records). §12.1 and PR #14 §13.1 are deliberately left unedited as published
+history; the correction is made append-only here (and disclosed in PR #14 §14). No history was
+rewritten.
+
+### 13.4 Authority and state-machine disposition (two distinct tables + DEGRADED authorization decision)
+
+**A. Document summary states** (the only states the kernel serializes; `render_status` output):
+
+| State | Meaning | Sections emitted | Exit | Derived from (only) | Persisted | Proof node |
+|---|---|---|---|---|---|---|
+| `OK` | every section an intact governed envelope with its own `ok == true` | 5, each `state=OK` + verbatim `response` | `0` | all five governed responses ok | no (stateless; stdout only) | `TestStatusView::test_s1_lists_match_api_verbatim`; exit-matrix (a) |
+| `DEGRADED` | every section an intact envelope, ≥1 governed `ok != true` (denied/error/not_found) | 5, denial rendered verbatim per section | `4` | a returned governed section envelope whose own `ok` is not `true` — nothing else | no | `TestStatusAgreement::test_denied_read_rendered_verbatim_not_retried`; exit-matrix (b) |
+| `UNVERIFIABLE` | ≥1 section body is not a governed envelope (e.g. HTTP-layer 401 detail); raw body preserved | offending section carries `reason` + `raw`, never `response` | `5` | non-envelope body — an explicit gap, never green | no | `TestNoStaleGreen::test_unverifiable_gap_never_renders_green`; exit-matrix (c) |
+| `STACK_UNREACHABLE` | any transport failure collapses the WHOLE view | none (`sections: {}`) | `2` | any fetch exception — no partial green, no cache | no | `TestStackUnreachable::test_stack_unreachable_renders_fail_closed` |
+
+Per-section serialized states are exactly `OK` (envelope projected verbatim) and `UNVERIFIABLE`
+(`reason` + `raw` preserved). Deterministic precedence when multiple conditions apply:
+`STACK_UNREACHABLE` replaces the entire document (any transport exception, at any point in the
+fixed section order); otherwise `UNVERIFIABLE` wins over `DEGRADED` (the fixed-order scan breaks
+on the first non-envelope section and sets the summary); otherwise `DEGRADED` over `OK`. The
+kernel holds no cache and no state; nothing is persisted, and no state can be written back (the
+transport has no write verb).
+
+**B. Process/CLI outcomes** (a different, larger set — 8 outcomes; no record anywhere claims a
+"five document/exit states" identity, grep-proven):
+
+| Outcome | Exit | Document emitted | Decided by | Proof node |
+|---|---|---|---|---|
+| success | `0` | yes (`OK`) | document summary `OK` | exit-matrix (a) |
+| help (`--help`) | `0` | no | argparse help path | exit-matrix (`--help`) |
+| unexpected internal failure | `1` | no (unknown-summary edge: rendered then `internal_error`) | exception, or unknown summary state fails closed | exit-matrix (e) |
+| stack unreachable | `2` | yes (`STACK_UNREACHABLE`, zero sections) | document summary | `TestLocalRealPath::test_cli_fails_closed_when_stack_down` |
+| refusal before any I/O (hostile/malformed base URL, malformed identity, pack unreadable/malformed, undeclared surface) | `3` | no | `ConsoleRefusal` before request construction | `TestLocalRealPath::test_cli_refuses_hostile_base_url`; hostile-input node |
+| usage error (unknown flag/command, missing value) | `3` | no | argparse `SystemExit` ≠ 0/None → `EXIT_REFUSED` | exit-matrix (d) + bare-module block |
+| degraded governed response | `4` | yes (`DEGRADED`) | document summary | exit-matrix (b) |
+| unverifiable response | `5` | yes (`UNVERIFIABLE`) | document summary | exit-matrix (c) |
+
+**Load-bearing authorization decision — a tampered/invalid grant is (1) an authorized governed
+denial envelope, not (2) a client-side authorization refusal.** Proven from three frozen
+authorities and the real code path: the frozen charter (S-4 row: *"Render the control plane's
+denial envelope verbatim; no silent retry, no reinterpretation"*; §9 Admission/refusal: *"the
+console renders the outcome verbatim, including the full denial envelope; refusal is never
+retried silently"*; §9 Progress observation: *"never fabricates progress; leaves unknown or
+unverifiable gaps explicit"*); the frozen B5-I2 contract §8 (*"grant/authority failure is owned by
+the existing `AuthorityEngine` denial path and rendered verbatim from its `DenialEnvelope`"* —
+explicitly separated from the four mechanical client refusals `unsupported_surface` /
+`unsupported_job_type` / `payload_too_large` / `malformed_request`); and the frozen B5-I4 failure
+matrix X3 (401/403 → denial rendered verbatim, never reinterpreted, never silently retried). The
+real API maps `status == "denied"` to HTTP 403 carrying the governed envelope dict verbatim
+(`http_api._status_code`), which the transport surfaces as data and the kernel projects verbatim
+→ summary `DEGRADED`, exit `4`; missing identity headers produce the HTTP layer's 401 `detail`
+body (a non-envelope) → `UNVERIFIABLE` with `raw` preserved, exit `5`. Neither path can become
+`OK`. Client-side laws verified executable: denied authority never converts to OK (the DEGRADED
+derivation is structurally the only consumer of `ok != true`); denied sections are never
+summarized healthy (the verbatim envelope, including `status:"denied"` and the schema-enum
+`reason_code`, is the section body); no grant or actor is invented (headers pass operator input
+verbatim; `_validate_identity` only refuses malformed values); no retry under altered authority
+(call-count == section-count asserted); no derived state persisted (stateless; store-empty
+assertions); the backend is never mutated (GET-only transport; non-mutation re-proven in §13.6);
+and a refused-before-I/O condition is never reinterpreted as a server result (exit-3 paths emit
+no document at all) — nor is a server denial ever reinterpreted as a pre-I/O refusal. Presenting
+the governed denial as `DEGRADED` is therefore the truthful, charter-mandated rendering:
+strictly-below-`OK` summary, nonzero exit, denial verbatim per section — not softened service.
+**No TRUE_DEFECT; the mapping is authorized.**
+
+### 13.5 Security and transport disposition
+
+Loopback guard: `http` scheme only; host must be a LITERAL `127.0.0.1` or `::1` — every hostname
+(including `localhost`, so no hosts-file/resolver authority), RFC1918, public, link-local,
+IPv6-non-loopback, decimal/octal IP, userinfo, https and path/query/fragment forms are refused
+fail-closed before request construction (19-input hostile list executed; `_open_url` exploding if
+reached). Ambient proxies: the client owns the ONLY opener, built with an empty proxy map —
+`http_proxy`/`HTTPS_PROXY` cannot divert a declared loopback read (re-proven in §13.6 S5, and in-
+suite with every off-loopback `socket.create_connection` intercepted and blocked; the pre-repair
+urllib-default shape is executed as the red-side control). Redirects: a 3xx target must be a
+literal-loopback host and a declared route or the redirect is refused before the follow-up
+request is built — independently re-proven in this audit in-process with off-loopback connects
+guarded: **zero off-loopback connection attempts recorded**, `ConsoleRefusal(non_loopback_refused)`
+raised; declared-loopback-redirect still returns the governed envelope (two-sided). GET-only, no
+request body, one I/O seam (`_open_url`); identity values with CR/LF/tab or >256 chars refused
+before I/O; HTTP error answers (401/403/5xx) are treated as DATA — preserved verbatim, rendered
+`UNVERIFIABLE` if non-envelope, never green. No credential, token, secret or key exists in the
+console package; the grant id is operator input (redacted from records); no external network was
+contacted by any proof (every URL literal loopback). Server side untouched (0-line control-plane
+source diff); both CI runs' adversarial/static suites (incl. gitleaks) 35/35 PASS.
+
+### 13.6 Vertical-slice re-execution (independent, real stack + real CLI subprocess)
+
+Re-executed at the evidence head against the real `ControlPlane` → real FastAPI app → uvicorn on
+`127.0.0.1` ephemeral port, driving the real CLI as a REAL subprocess
+(`python -m oce_console status …`), grant issued by the real `AuthorityEngine`:
+
+| # | Scenario | Exit | Document state | Verdict |
+|---|---|---|---|---|
+| 1 | healthy governed read (real grant) | `0` | `OK`, five sections verbatim, non-empty per-call `request_id`s, empty stderr | PASS |
+| 2 | determinism | `0`,`0` | identical documents except the per-call governed `request_id` | PASS |
+| 3 | tampered grant | `4` | `DEGRADED`; `workers` = governed `ok:false, status:"denied"` verbatim | PASS |
+| 4 | hostile non-loopback base URL | `3` | no document; `non_loopback_refused` on stderr | PASS |
+| 5 | ambient `http_proxy=http://10.0.0.5:8080` | `0` | `OK` — read stayed on loopback | PASS |
+| 6 | closed loopback port | `2` | `STACK_UNREACHABLE`, zero sections | PASS |
+| 7 | missing identity | `5` | `UNVERIFIABLE`; HTTP 401 `detail` body preserved verbatim in `raw` | PASS |
+| 8 | loopback `302` escaping loopback | `2` | whole-view collapse (see adjudication) | PASS (adjudicated) |
+
+Backend after all slices: `job_store.all_jobs == {}`, `worker_protocol.workers == {}` — canonical
+state untouched. S8 adjudication: end-to-end the escape attempt yields the F-1 whole-view
+collapse (exit `2`) because the kernel collapses any mid-read exception into
+`STACK_UNREACHABLE` — the class already disclosed in §12.7 (DESIGN deduction) and §12.10 (2);
+the frozen claims for redirects (demo record §3) are transport-level and were re-proven true
+independently (§13.5: zero off-loopback attempts). No frozen record claims exit `3` for a
+redirect escape; no green, no fabrication, no escaped I/O — not a defect.
+
+### 13.7 Tests and mutation controls
+
+Local re-execution at the evidence head: B5-I4 **23/23/0/0/0**; adjacent suites **91/91** (B5-I2
+console contracts 24 + B5-I2 harness integrity 16 + B5-I3 registry 51); `ruff check` (defaults)
+**0 findings** on the console package and the B5-I4 test file (the §12.7 lint debt was retired by
+later rungs); `py_compile` clean. Authoritative exact-head CI (both runs, parsed §13.2) matches
+the local totals node-for-node. Negative controls: the in-suite N1 (weakened loopback guard
+admits `example.com`), N2 (stale-green fallback replaces the F-1 collapse), N3 (fabricated
+projection) each EXECUTE a genuinely weakened implementation and assert the discrimination inside
+the green run, with restoration re-proven; plus the pre-repair-shape controls (urllib-default
+proxy diversion; urllib-default redirect follow) demonstrated red. The B5-I2 governed battery
+remains 11/11 `ALL_DISCRIMINATED`. Base-vs-head: §12.6's identical-set comparison stands —
+git-diff-proven in this audit that every rung after the compared head touches only
+`infrastructure/console/**`, the B5-I4 test file and docs, all provably outside
+`infrastructure/local-ground/**`.
+
+### 13.8 Fresh audit scores (same-agent review — disclosed, not organizationally independent)
+
+| Dimension | Score | Basis |
+|---|---|---|
+| SPEC | **10/10** | every frozen plan §6 / acceptance-matrix row is executable-proven or attested at this head: the five I-3 planned nodes verbatim, all mission-§7 matrix rows bound to executed nodes, boundary gates asserted against Git objects, changed-file boundary exactly 14 (ceiling met), zero skips, floor 23 satisfied. |
+| DESIGN | **9/10** | baseline 10, less 1: the kernel collapses any fetch exception into `STACK_UNREACHABLE` (disclosed §12.7; the S8 presentation nuance is an instance of the same class, not a second deduction) — fail-closed, with an observability loss. Repair would change the frozen F-1 whole-view law; not repaired. |
+| CORRECTNESS | **10/10** | no live code defect demonstrated: 23/23 + 91/91 local, both exact-head CI runs parsed green node-for-node, 8-scenario slice re-execution green, negative controls discriminating, non-mutation re-proven. |
+| QUALITY | **4/10** | baseline 10, less 1 per distinct process failure, counted once each: **X1** fail-closed gaps found only at R3 execution; **X2** four demonstrated defects live in pushed R1/R2 until pre-push audit; **X3** the frozen CLI interface broken in pushed R2, found only by executing the slice; **X4** `localhost` admitted by name live in pushed R1; **lint debt** at R3 landing (now retired; counted at the time); **record defect** §13.3 (one-char X3 tree token misrecorded in two permanent records; self-found, corrected append-only here). 10 − 1 − 1 − 1 − 1 − 1 − 1 = **4**. |
+
+### 13.9 Demonstrated-defect result
+
+**No TRUE_DEFECT in code** at the audited head: the DEGRADED/exit-4 mapping is the authorized
+governed-denial presentation (§13.4), the transport boundary holds under independent re-proof
+(§13.5), and every frozen claim was verified true. One **governance-record defect** (§13.3,
+one-char tree token) was self-found and repaired append-only in this section. The S8
+presentation nuance is the already-disclosed DESIGN class (§12.7/§12.10), not repaired. No new
+X-rung was required; the nine-rung ladder stands unamended.
+
+### 13.10 Operator decision, merge authorization and boundaries
+
+Operator review 2026-10-13 under `AUTHORIZED_STAGE=B5-I4-RATIFY`: B5-I4 → **`OPERATOR_ACCEPTED`**
+(set in this commit; the §1 row is updated accordingly). A normal two-parent merge of PR #14 is
+authorized (`MERGE_AUTHORIZED=true` for PR #14 only): no squash, no rebase, no force; the branch
+and every historical rung are preserved. Ratification authorizes only the completion of B5-I4 —
+it does not begin, unlock or authorize B5-I5. `B5_I5_THROUGH_B5_I9 = LOCKED`; a fresh
+`AUTHORIZED_STAGE=B5-I5` is required. Recurring cost `$0`; cloud/broker/capital/execution
+mutations 0/0/0/0; `capital.authority = none`; no hosting, cloud, provider, telemetry, LLM,
+broker, capital or execution authority; no external integration; `oce/frontend` untouched;
+Book 4, Sensor Fabric and frozen B5-I0–I3 artifacts untouched. Audit is same-agent
+(not organizationally independent) — disclosed.
+
+### 13.11 Known limitations (carried + re-verified)
+
+1. Plain HTTP on loopback (charter topology); no TLS inside the local boundary.
+2. The kernel collapses any fetch exception — including a mid-read boundary refusal (§13.6 S8) —
+   into `STACK_UNREACHABLE`: fail-closed, with an observability loss (DESIGN deduction).
+3. `UNVERIFIABLE` takes precedence over `DEGRADED` deterministically in fixed section order.
+4. The base/head environmental comparison runs the local-ground suite on Windows; its single
+   pre-existing failure is a bash/encoding dependency of that suite, not Book 5 code.
+5. Same-agent audit: no organizational independence was exercised.
+6. Local Windows cannot execute the shared runner (toolchain absent); it executes authoritatively
+   in Linux CI, whose artifacts were downloaded and parsed here.
+
+### 13.12 Ratification-head CI identity protocol
+
+This commit is the ratification head. Its run / check-suite / check-run / artifact identities are
+appended append-only to PR #14 (final `B5-I4 RATIFICATION` section) once the run is terminal
+SUCCESS and its artifact has been downloaded and parsed — an artifact cannot contain its own CI
+run identity (same protocol as §10.3/§10.4 and §11.8). B5-I4 stage status at this commit:
+**`OPERATOR_ACCEPTED`**; PR #14 finalized and merged per §13.10; B5-I5–I9 `LOCKED`.
