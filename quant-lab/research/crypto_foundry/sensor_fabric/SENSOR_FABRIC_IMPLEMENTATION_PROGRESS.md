@@ -6963,3 +6963,116 @@ recommended_next = **OPERATOR: (1) RULE ON THE FOUR UNDEFINED REVISION MODES
 AUTHORIZE AN I07 IMPLEMENTATION DIRECTIVE; IN PARALLEL, CONSIDER AUTHORIZING
 COLLECTION OF THE PROVIDER DOCUMENTS LISTED IN THE I06 COLLECTION BRIEF**.
 HARD STOP after push and report.
+
+## 173 - SENSOR-B5-I07D1: REVISION-POLICY AUTHORITY & SCOPE RESOLUTION (GOVERNANCE ONLY)
+
+Date: 2026-10-13. Directive SENSOR-B5-I07D1 — read-only contract adjudication
+with a bounded decision package; production code, tests, configs, existing
+evidence and frozen plans all UNTOUCHED. Start head `bdc28b48f...` (= required
+= remote after fetch; tracked tree clean apart from the three pre-existing
+untracked scratch paths, never staged; single-parent chain, 0 merges; all
+seven bloc_05 plan blobs re-measured identical to the frozen plan branch
+`4bb677f9e`). Deliverable: `BLOC_05_I07D1_DECISION_PACKAGE.md` + this
+append-only entry.
+
+### 1. R1 — the four declared-but-undefined modes
+
+For each of FIRST_SEEN, EXACT_REVISION, ALL_REVISIONS, ERROR_ON_AMBIGUITY the
+package records: frozen name source, current behavior (re-measured:
+`select_revisions` raises `UnsupportedRevisionMode` for all four), Bloc 4 name
+collision, required inputs, ambiguities, safety invariants, a PROPOSED minimum
+definition, alternatives and the operator approval needed. Key findings, none
+ratified: FIRST_SEEN has **four non-interchangeable referents** (provider
+publication / system acquisition / ORIGINAL record / earliest `known_from`) —
+choosing acquisition would import the 02 §4 forbidden clock substitution;
+EXACT_REVISION has **no argument slot** in the frozen
+`select_revisions(revisions, policy, replay_cutoff)` signature, so it is an
+interface change; ALL_REVISIONS needs a scope decision (all records vs all
+known at cutoff) and a pit disposition (a multi-record answer may never carry
+PIT grade silently); ERROR_ON_AMBIGUITY needs a kind taxonomy
+(ZERO_ELIGIBLE / MULTIPLE_ELIGIBLE / CONFLICTING_KNOWLEDGE) and a new typed
+exception. **PROPOSAL = Option B (keep all four declared-but-unsupported),
+exactly today's accepted behavior;** Option C's only defensible partial
+member is ERROR_ON_AMBIGUITY. Bloc 4's raw-lake vocabulary is compared as
+NAMES ONLY; no semantics transferred.
+
+### 2. R2 — I07 scope delta and the no-work possibility
+
+Seventeen obligations classified (S1..S17): **7 SATISFIED_BY_I05** (AS_KNOWN_THEN
+selection + leakage, half-open boundary re-measured both sides,
+LATEST_VERIFIED retrospective labeling, six-mode catalog with null
+definitions, gate coupling, PIT_REVISION_UNCERTAIN disposition), **1
+SATISFIED_BY_I06** (consolidated replay-safety proof incl. RS-08/RS-09), **
+2 REQUIRES_OPERATOR_DECISION** beyond R1 (see §3), **6 OWNED_BY_I17/I19/I21/I22**
+(chains, taxonomy, query-time mode+cutoff, output mode labeling, golden slice,
+property invariants).
+**`RESIDUAL_I07 = ∅` executable.** The mandated no-work question is answered
+honestly: all currently authorized I07 behavior is already implemented, so a
+lawful I07 today would contain zero new source files and zero new tests. This
+is a measurement, NOT a no-op ratification -- no credit, no implementation
+status and no ratification was recorded; those require a separate operator
+decision grounded in 06 §19/§17/§21.
+
+### 3. Two new measured ambiguities (beyond the readiness assessment)
+
+**S9 cardinality.** AS_KNOWN_THEN returns EVERY record whose knowledge window
+contains the cutoff, and `assess_replay_eligibility` applies no cardinality
+check: measured `['rev-orig','rev-corr-early']` -> `ELIGIBLE`. Accepted I05
+behavior, uncovered by any test, and only the operator may set a rule for what
+a multi-record AS_KNOWN_THEN selection means downstream.
+**S10 refusal vocabulary.** A duplicate `source_revision_id` inside one call
+raises a bare `ValueError`; ambiguity needs a typed, kind-bearing refusal.
+Also measured: overlapping/contradictory knowledge windows are accepted (all
+three records selected, ELIGIBLE); selection is permutation-invariant; the
+half-open boundary holds at both ends (`cutoff == known_from` included,
+`cutoff == known_to` excluded); zero eligible -> `pit_uncertain` ->
+`BLOCKED_REVISION`.
+
+### 4. R5 — ownership of `bloc_05_duplicate_revision_validation.json`
+
+Named once (06 §17), assigned to no checkpoint anywhere in the seven frozen
+documents. Five of the six 06 §14 scenarios require durable acquisitions, T1
+rows or generation records that do not exist, so the artifact **cannot be
+honestly produced before I17**; only the revision-selection half of scenario 5
+is provable today and it is already proved (RS-08 / F05-03).
+**PROPOSAL (not ratified): assign the full artifact to I17**, with policy tests
+cited as dependencies; alternatives (defer to I22; two-part shared artifact)
+recorded and weighed.
+
+### 5. Boundary preservation and gates
+
+I17 keeps chains, source-byte identity, taxonomy and append-only revisions;
+I18 keeps generation writing/manifests; I19 keeps query-time mode and replay
+cutoff application; I22 keeps the golden slice. The I06 limitation
+`END_TO_END_CUTOFF_EXECUTION_PROVEN = FALSE` and `I19_QUERY_FILTER =
+NOT_IMPLEMENTED` are carried unchanged; no I19 replacement was designed.
+Decision gates D07-01..D07-14 all PASS (package §9), each with the clause and
+the observation it rests on.
+
+### 6. Custody and terminal status
+
+Changed paths: exactly 2 (this append-only §173 entry + the new decision
+package). `git diff bdc28b48f` empty for `quant-lab/src`, `quant-lab/config`,
+`quant-lab/tests`, the frozen `bloc_05/` plan directory and every existing
+evidence artifact. Fast-forward push; post-push local == remote recorded in
+the I07D1 terminal report.
+
+```text
+B5-I01..B5-I06 = OPERATOR_ACCEPTED
+B5-I07         = NOT_IMPLEMENTED
+BLOC_05        = INCOMPLETE
+IDENTITY_GATE / TIME_GATE / SEMANTIC_GATE / UNIT_GATE / LINEAGE_GATE /
+DUPLICATE_REVISION_GATE / REPLAY_SAFETY_GATE / GOLDEN_T0_T1_GATE
+               = NOT_YET_EARNED
+next_checkpoint_authorized = FALSE
+B5-I08+        = UNAUTHORIZED
+BLOC_06        = UNAUTHORIZED
+RESEARCH       = FROZEN
+```
+
+recommended_next = **OPERATOR: (1) RULE ON R1-A..R1-D (any subset), S9 AND S10,
+(2) CONFIRM THE R5 OWNER (I17 proposed) AND THE I07 SCOPE DELTA, (3) THEN
+CHOOSE PATH 1 (bounded I07 implementation directive for defined modes), PATH 2
+(explicitly close I07 as having no executable scope -- a recorded decision,
+never "implementation passed") OR PATH 3 (defer to the I19 query boundary)**.
+HARD STOP after push and report.
