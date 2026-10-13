@@ -19,7 +19,7 @@
 | B5-I2 | C2 outcome/domain/interfaces — charter increment I-1: console-control-plane deterministic interface contracts | **OPERATOR_ACCEPTED** — authorized 2026-10-07 under `AUTHORIZED_STAGE=B5-I2`; ratified 2026-10-08 under `AUTHORIZED_STAGE=B5-I2-AUDIT_REPAIR_AND_RATIFICATION` (§9; `OCE_B5_I2_OPERATOR_RATIFICATION_v1.0.md`) | Branch `oce-book-5-i2` created from exact merged main `882835dac…`; implementation contract frozen (`OCE_B5_I2_IMPLEMENTATION_CONTRACT_v1.0.md`): contract pack for every console-read/invoke surface (jobs, workers, leases, health, submit, denial) bound to existing governed control-plane operations and existing schemas (`job-envelope.schema.json`, `denial-envelope.schema.json`, `evidence-manifest.schema.json`); gate = contract tests pass on both sides; non-goals per charter section 12 I-1 (no console code, no UI, no new server endpoints) |
 | B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **OPERATOR_ACCEPTED** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3`; ratified 2026-10-09 under `AUTHORIZED_STAGE=B5-I3-RATIFICATION` (§11.10; `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`) | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11), evidence-head `37871316871` and proof-record-head `37914160504` (all SUCCESS; manifest 7/7; merge-ref parent+tree identity, §11.10); operator review 2026-10-09 → B5-I3 `OPERATOR_ACCEPTED`; ratification artifact `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`. B5-I3 complete. B5-I4–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I4`; no implementation has begun |
 | B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **OPERATOR_ACCEPTED** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); independently re-audited and ratified 2026-10-13 under `AUTHORIZED_STAGE=B5-I4-RATIFY` (§13); normal two-parent merge of PR #14 authorized (§13.10) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
-| B5-I5 | C3 complete build/tests/lineage/operator review — charter increments **I-4** (governed submission + dual-clock timeline, S-2/F-3) + **I-5** (evidence/artifact binding G9 + versioned drill playbook) + **I-6(B5-I5 half)** (restart-identity G6, engine-owned recovery reporting, duplicate-effect S-3, negative controls G15) | **IN_PROGRESS** — authorized 2026-10-13 under `AUTHORIZED_STAGE=B5-I5`; scope frozen in `OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md` (P0, documentation only); `MERGE_AUTHORIZED=false`; B5-I6–I9 remain LOCKED | Predecessor gate satisfied (B5-I4 `OPERATOR_ACCEPTED`, PR #14 merged `43720843b…`); authority: plan §7 row `B5-I5` = *C3 complete build/tests/lineage/operator review* (gate *Release candidate evidence complete*) = charter §12 I-4 (`B5-I4/B5-I5` dual anchor, B5-I4 deferred entirely) + I-5 (`B5-I5`) + I-6 B5-I5-half (`B5-I5/B5-I6`); B5-I3 registry S-2/F-3 deferred to I-4 are discharged here (addendum §5.1 file-prefix supersession disclosed); gate = I-4 *S-2 tests pass; timeline reproducible* / I-5 *G9 binding audit passes; playbook runs bounded* / I-6(B5-I5) *restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls*; frozen test floor 22 |
+| B5-I5 | C3 complete build/tests/lineage/operator review — charter increments **I-4** (governed submission + dual-clock timeline, S-2/F-3) + **I-5** (evidence/artifact binding G9 + versioned drill playbook) + **I-6(B5-I5 half)** (restart-identity G6, engine-owned recovery reporting, duplicate-effect S-3, negative controls G15) | **IMPLEMENTED — READY_FOR_OPERATOR_REVIEW (PR #15 draft, NOT merged, NOT ratified)** — authorized 2026-10-13 under `AUTHORIZED_STAGE=B5-I5`; scope frozen in `OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md` (+ Amendment A1) at P0; implementation + end-to-end/CI evidence complete (§14); same-agent audit 9.875/10 (§14.4); `MERGE_AUTHORIZED=false`; B5-I6–I9 remain LOCKED | Predecessor gate satisfied (B5-I4 `OPERATOR_ACCEPTED`, PR #14 merged `43720843b…`); authority: plan §7 row `B5-I5` = *C3 complete build/tests/lineage/operator review* (gate *Release candidate evidence complete*) = charter §12 I-4 (`B5-I4/B5-I5` dual anchor, B5-I4 deferred entirely) + I-5 (`B5-I5`) + I-6 B5-I5-half (`B5-I5/B5-I6`); B5-I3 registry S-2/F-3 deferred to I-4 are discharged here (addendum §5.1 file-prefix supersession disclosed); gate = I-4 *S-2 tests pass; timeline reproducible* / I-5 *G9 binding audit passes; playbook runs bounded* / I-6(B5-I5) *restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls*; frozen test floor 22 |
 | B5-I6 | C4 local deployment, observability and recovery | **LOCKED** | Requires B5-I5 complete |
 | B5-I7 | C4 change cycle plus C5 measurements/learning | **LOCKED** | Requires B5-I6 complete |
 | B5-I8 | Independent E2E, adversarial, usability and evidence audit | **LOCKED** | Requires B5-I7 complete |
@@ -859,3 +859,78 @@ appended append-only to PR #14 (final `B5-I4 RATIFICATION` section) once the run
 SUCCESS and its artifact has been downloaded and parsed — an artifact cannot contain its own CI
 run identity (same protocol as §10.3/§10.4 and §11.8). B5-I4 stage status at this commit:
 **`OPERATOR_ACCEPTED`**; PR #14 finalized and merged per §13.10; B5-I5–I9 `LOCKED`.
+
+---
+
+## 14. B5-I5 (charter increments I-4 + I-5 + I-6 B5-I5-half) — complete build evidence (append-only; 2026-10-13)
+
+> `AUTHORIZED_STAGE=B5-I5` only. This section records implementation and evidence; it does
+> NOT ratify, does NOT merge PR #15, and does NOT begin, unlock or authorize B5-I6.
+> `B5_I6_THROUGH_B5_I9 = LOCKED`; `MERGE_AUTHORIZED=false`. Recurring cost `$0`;
+> `capital.authority = none`.
+
+### 14.1 Authority and scope (frozen at P0, `aeda12deece94d50fb6ed98f8500d45b681a175f`)
+
+Implemented increments, derived from plan §7 row `B5-I5`, charter §12 dual anchors, and the
+B5-I4 deferral record (§12.1/§13 above): **I-4 entire** (governed submission + dual-clock
+timeline S-2 + F-3 failure envelope), **I-5** (timeline→evidence binding G9 + versioned
+bounded drill playbook), **I-6 B5-I5-half** (S-4 denial-verbatim on submit, restart-identity
+G6, engine-owned recovery G8, duplicate-effect S-3, negative controls G15). Scope contract:
+`OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md`; acceptance matrix and requirement-execution
+addendum frozen at P0; ceiling correction disclosed in
+`OCE_B5_I5_SCOPE_CONTRACT_AMENDMENT_A1_v1.0.md` (R1).
+
+### 14.2 Implementation ladder (append-only; no rewrites)
+
+| Rung | Commit | Tree |
+|---|---|---|
+| P0 | `aeda12deece94d50fb6ed98f8500d45b681a175f` | `3404d68e3bec3f293c5d68a8c48a78ccbb79b922` |
+| R1 | `c9e6afae7ebbcce4eab146bb8b433a98e9de83d4` | `26c6467ce82a9a15850e5721eb3d0499b6759d87` |
+| R2 | `bfacf1d9c07f5081f2b8134131a0a6f111dcc9e0` | `f317e959b2eed1e6a10da880a2138402ba12062f` |
+| R3 | `2c8cdaa8815ec9a3a1dff3883d98cd8dbb4c8354` | `3b02671ae77f3ed3c7b08dc67e68b4aafe902c1e` |
+| R4 | `ffccf5c3d9b5dabffaf9f8037cf168dd14ea3825` | `2ab70be70e745c7e3150759f298bf289a723c691` |
+
+New console modules `oce_console/{submit,timeline,drill}.py` (client-only, stdlib-only);
+additive `LoopbackTransport.read_job` in `transport.py` (+32 lines, zero changes to existing
+methods); 24-node suite `test_b5_i5_timeline.py`; one added authoritative selection step in
+`b1-i1r-validation.yml` (mirrors B5-I2-X1/B5-I3-R4/B5-I4-R3 exactly). Control-plane `src/`,
+contracts, schemas, frozen B5-I2/I3/I4 tests, frontend: 0-line diff.
+
+### 14.3 Evidence (parsed, not badges)
+
+- **End-to-end (real operator path, 3 processes, zero mocks):** 17/17 checks PASS —
+  primary success; deterministic repeat (identical engine-minted
+  `payload_hash 33d62e9c…a29e`); denial verbatim (1 POST, zero traces);
+  malformed refused before I/O; `STACK_UNREACHABLE` on killed stack; engine-owned
+  lease recovery (requeued 1) observed not enacted; console-process restart-identity
+  (byte-identical view); engine-restart stale read refused fail-closed
+  (`not_found`); drill report `DRILL_PASS` with duplicate-effect check true and
+  G9 binding == engine identity; 3 POSTs total / 2 jobs in store; socket-audited
+  100% loopback connects. Full record + harness hashes:
+  `OCE_B5_I5_END_TO_END_AND_CI_EVIDENCE_RECORD_v1.0.md` §2.
+- **Implementation-head CI:** run `38453887983` (head `ffccf5c3d…`, merge-ref tree
+  `2ab70be7…` == R4 tree), terminal SUCCESS; B5-I5 collected==executed==24,
+  failures/errors/skips/dupes/orphans = 0, floor 22 met; B5-I2 24 / B5-I3 51 /
+  B5-I4 23 all PASS 0/0/0; regression 67/0; adversarial 49/49; static 31/31;
+  manifest 7/7 independently recomputed; cleanup pruned; artifact
+  `b1-i1r-evidence-b90ca1c84e7b`.
+- **Local:** B5 selection 122 passed; cloud-ground regression 69 passed; 32 Book-4
+  environmental failures reproduce byte-identically at the exact base (zero caused
+  by B5-I5); Ruff/compile/YAML/diff-check/secret-scan clean.
+
+### 14.4 Same-agent audit (NOT organizationally independent)
+
+SPEC 9.5 / DESIGN 10 / CORRECTNESS 10 / QUALITY 10 → **9.875/10**. One defect (D1:
+P0 ceiling miscount caught by the §5 design audit; repaired append-only by Amendment A1 at
+R1; no residual consequence; deducted once, not double-counted). No TRUE_DEFECT in shipped
+code. Limitations: same-agent audit; in-memory engine store (durable restart = B4/Postgres
+domain; console refuses stale reads fail-closed); plain HTTP inside literal loopback;
+mid-read collapse to `STACK_UNREACHABLE`; `read_job` callers must check `ok`
+(`bind_evidence` refuses envelopes without `job_id`, demonstrated).
+
+### 14.5 Stage status at the evidence commit
+
+**B5-I5: `IMPLEMENTED — READY_FOR_OPERATOR_REVIEW`.** PR #15 is DRAFT and UNMERGED;
+no self-ratification occurred. Operator ratification (and any merge authorization) is a
+separate future operator action requiring its own `AUTHORIZED_STAGE`. B5-I6–I9 remain
+`LOCKED`.
