@@ -6729,3 +6729,237 @@ recommended_next = **OPERATOR: (1) REVIEW AND RATIFY I06, (2) AUTHORIZE I07,
 (3) CONSIDER AUTHORIZING COLLECTION OF THE PROVIDER DOCUMENTS LISTED IN THE
 I06 COLLECTION BRIEF -- the sole path to real-provider availability rows and
 the Option C confidence review**. HARD STOP after push and report.
+
+## 172 - SENSOR-B5-I06R1: I06 OPERATOR RATIFICATION (COMPLETE CHECKPOINT) + I07 READINESS (READ-ONLY)
+
+Date: 2026-10-13. Directive SENSOR-B5-I06R1 — governance-only verification,
+conditional I06 ratification, I07 readiness reconstruction. VERIFY ->
+ADJUDICATE -> RATIFY IF EARNED -> PREPARE I07 -> COMMIT -> PUSH -> HARD STOP.
+Verdict: **I06_COMPLETE_AND_RATIFIABLE** -> `B5-I06 = OPERATOR_ACCEPTED`.
+
+### 1. Reality lock and custody
+
+Required starting HEAD `06fdcde16ae2194d80d3700adce7ed42263d984c` == local
+HEAD == `git ls-remote origin refs/heads/agent/crypto-sensor-fabric-build`
+(fast-forward only, no divergence). Expected ancestor `32a897436...`
+(`merge-base --is-ancestor` = true); the three-commit implementation/evidence
+closure chain is linear with 0 merges: `32a897436` (I06D1) -> `0f2559594`
+(I06E1 implementation) -> `6fb352061` (narrative finalization) ->
+`06fdcde16` (append-only §171 cross-reference corrections); no reset, amend,
+rebase, merge, squash, cherry-pick or force push anywhere. Tracked tree clean
+at start (4 untracked paths: `.bu_tmp/`, the M7 spike note, the I03 redteam
+sidecar, and an untracked `BLOC_05_I06_OPERATOR_RATIFICATION.md` draft left by
+an interrupted earlier pass of this same directive — adopted below rather
+than silently overwritten or ignored, since it sits exactly at the record
+direction §11 authorizes). All seven frozen `bloc_05/` documents are
+byte-identical to base `32a897436` AND blob-identical to the frozen plan
+branch `agent/crypto-sensor-fabric-plan` @ `4bb677f9e` (all seven
+`git rev-parse <rev>:<path>` hashes matched, re-measured this session).
+
+### 2. Frozen authority and contract coverage
+
+`bloc_05/02` §§4–6, 13–15, 18; `bloc_05/06` G2, §§13, 14, 17, 19, 21;
+`bloc_05/07` F9/F10, F11, F28–F30, §§10–11 were read and mapped clause ->
+implementation -> test -> evidence for the I06 scope. Coverage classes:
+**COVERED** = the D11 replay-safety artifact (06 §17), the seven-class
+refusal-classification table, the RS-04/I19 boundary contract, the RS-14
+missing-latency fail-closed proof, the provider-document collection brief
+(11 named SOURCE/INTERPRETATION fields, zero rows), and M1–M7 compliance;
+**PARTIAL (by design)** = confidence posture, whose vocabulary decision
+remains an open operator item (Option A not selectable in-phase);
+**OWNED_BY_LATER_CHECKPOINT** = row-level T1 availability/replay
+construction (I16/I18/I19), query-time cutoff filtering (I19), revision
+chains/engine (I07/I17), golden T0→T1 replay (I22), the four undefined
+revision modes (I07);
+**BLOCKED-EXTERNAL** = real-provider latency evidence and registry rows
+(M3/M4). `UNAUTHORIZED_EXTRA_SET = empty`: `git diff --name-status
+32a897436 HEAD` lists exactly the eight I06 paths plus this ledger.
+
+### 3. I06D1 scope-decision compliance (M1–M7, re-measured)
+
+M1 Option B: `git diff 32a897436 -- time/models.py` empty; independent type
+probe refused `"1"`, `"0.95"`, `"1e3"`, `5`, `""`, `"  "` and accepted only a
+declared token; missing token -> `BLOCKED_TIMESTAMP` with the field named.
+M2: producer AST-imports `derive_market_available_at`,
+`assess_replay_eligibility`, `select_revisions` and defines none of them;
+`git diff 32a897436 -- quant-lab/src` empty. M3/M4: registry parses to 0
+declared rows; zero latency parameters on the derivation; exactly one
+`latency` occurrence in the eight tracked time sources (a `__init__.py`
+docstring, no code branch); collection brief ships zero rows. M5/M6: no T1
+writer, no query filter, no golden fixture in the chain. M7: all three
+pre-existing untracked items remain untracked and unmodified.
+
+### 4. RS-01..RS-14 ratification matrix (counts computed, not assumed)
+
+All fourteen cases were re-executed in this session by a standalone probe
+that imports the accepted I05 primitives directly with independent
+fixtures (not the producer's); every observed result matched the frozen-clause
+expectation. Committed-artifact counts:
+
+```text
+I06_EVIDENCE_EXPECTATIONS_SATISFIED = 14 / 14 (all_results_pass=true, fail=0)
+I06_EXECUTED_BEHAVIOR_CASES         = 13
+    (11 BEHAVIOR_EXECUTED_AND_MATCHED + 2 TYPED_REFUSAL_EXECUTED_AND_MATCHED)
+I06_SPECIFICATION_ONLY_CASES        = 1  (RS-04, BOUNDARY_SPECIFICATION)
+END_TO_END_CUTOFF_EXECUTION_PROVEN  = FALSE
+```
+
+Acceptance classes are reporting classifications only: no production enum
+member was added; `ReplayEligibility` measured at exactly 6 members and
+`refusal_class_vocabulary` at exactly the committed 7 classes.
+
+### 5. RS-04 cutoff-boundary ruling (section 04.1)
+
+All six mandated verifications re-measured: (1) the producer's RS-04 case
+never compares `market_available_at` to a replay cutoff; (2)
+`assess_replay_eligibility` parameters = `['evidence']` (pure six-condition
+gate, no query cutoff); (3) `select_revisions` never receives
+`market_available_at` — a scan of every public callable in the accepted time
+package found zero functions taking both `market_available_at` and a
+cutoff-named parameter, so revision selection cannot substitute for an
+availability-cutoff check; (4) `bloc_05/06` §19 L503–504 and `bloc_05/07` §10
+L427 freeze I19 as "canonical T1 query + strict research/replay filters",
+and `bloc_05/05` §19 + 07 F30 assign enforcement of generation/revision/
+quality/replay rules to the query boundary — I19 owns the missing
+query-time filter; (5) the explicit obligation *I19 must reject any row whose
+`market_available_at` is strictly after the replay cutoff, and may never rely
+on the I05 gate to do so* is recorded in `BLOC_05_I06_IMPLEMENTATION_EVIDENCE.md`
+§4 and in the I06D1 package §5 consumer contract — the frozen plan states the
+same duty as an ownership assignment, not as an I06 execution clause;
+(6) no test, row or narrative claims the I19 behavior passes; the artifact
+records `availability_cutoff_filter_exists_in_i05 = False` and the suite test
+`test_rs04_boundary_is_explicit_and_not_an_end_to_end_cutoff_execution`
+fails if the boundary language weakens.
+**Ratification rule applied:** no frozen clause requires an executed
+availability-cutoff exclusion inside I06 (`bloc_05/06` §13's six timestamp/
+replay scenarios are all covered), so RS-04 counts as PASS for the boundary
+documentation obligation ONLY; ratification does not stop, and the case is
+never recorded as executed end-to-end replay-safety success.
+
+### 6. RS-14 and confidence / typed-refusal integrity
+
+No unauthorized latency parameter, no fabricated delay, no zero-delay
+assumption from missing evidence (unsubstantiated claim -> `UNKNOWN` / None,
+`zero_delay_assumed = False`), zero real-provider mappings, synthetic
+fixtures labeled `SYNTHETIC_FIXTURE_ONLY`; the distinction between *a function
+correctly refusing unsupported latency evidence* (earned) and *a provider's
+actual latency being empirically validated* (not earned) is preserved.
+Option B intact: opaque nonnumeric presence-checked token, no threshold, no
+ordering, no new confidence enum, `models.py` byte-identical to base;
+unbucketed blocking flags (`UNIT_CONVERSION_BLOCKED`, `SEMANTICS_UNVERIFIED`)
+raise the typed `UnassessableReplayEvidence` while bucketed TIME flags return
+`BLOCKED_TIMESTAMP`; no permissive fallback for missing provider evidence
+(`UnknownProviderTimeSemantics`, rows=0); the typed exception is not a
+status and not an enum member; `RETROSPECTIVE_ONLY` is never labeled ELIGIBLE.
+
+### 7. Evidence reproducibility
+
+Producer `scripts/b5_i06_replay_safety.py` executed live twice from tracked
+sources: both runs exit 0 and reproduce the committed bytes exactly
+(`bloc_05_replay_safety_validation.json` =
+`9d3b93aa4321d8d2c89f55ce93c17f6b6a5d146be6c5bc5b5a1a25be9fd312b8`,
+`BLOC_05_I06_SCOPE_AUDIT.json` =
+`14a61f2ed4ccbe7c87f230c514df121ec75ad25975298d8735821e811437af31`;
+`git status` unchanged afterwards). The 12-entry SHA-256 inventory was
+recomputed independently and every digest matches. The exit contract was
+exercised directly: clean payload -> 0; a failed mandatory row with a stale
+`all_results_pass` flag -> 1; summary/row-count mismatch -> 1; `main()` with a
+failing mandatory row (writing only to a temp directory) -> 1.
+RS-04 specifically: the row's `pass` is the equality of independently written
+expected facts against measured facts, so the generator validates the
+documented boundary as a measured fact rather than mistaking a limitation
+string for executed cutoff safety.
+
+### 8. Regression, provenance and historical noninterference
+
+Fresh, exit codes captured directly (no pipelines): I06 focused **24 passed**
+(exit 0); the nine sealed I05 files listed explicitly **219 passed** (exit 0);
+normalization **822 passed** (exit 0); I11R2 governance binding selection
+**14 passed, 3 skipped** (exit 0); governance readers (binding + evidence +
+job-state ledger, 3 storage files) **43 passed** (exit 0); protected-digest
+reader `test_i08_evidence.py` **5 passed** (exit 0); canonical
+`python -m pytest tests -q` **4220 passed, 14 skipped, exit 0 in 1665.77s**,
+fully re-run this session (17:56:05Z–18:23:55Z). Running that battery left
+regenerable side-effect line-ending dirt on exactly 11 Bloc 04 evidence JSONs
+(the hazard the sealed I05 scope audit allowlists as `SIDE_EFFECT_PREFIX`);
+it was restored with `git checkout --` before any staging and never reached
+the index. Protected re-measurement: `git diff 32a897436` empty for
+`quant-lab/src`, `quant-lab/config`, the frozen `bloc_05/` plan directory and
+all nine sealed `test_b5_i05_*.py` files; Bloc 4 protected history differs
+from base only in the mechanical `python_files_scanned` republish
+(1063 -> 1065), which equals the current `git ls-files '*.py'` count (1065);
+no I07 implementation exists anywhere in the chain.
+
+### 9. Ratification decision and disclosure labels
+
+```text
+DECISION             = I06_COMPLETE_AND_RATIFIABLE
+B5-I06              : IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW -> OPERATOR_ACCEPTED
+                       (checkpoint acceptance only; no new semantic decision ratified)
+RS04_END_TO_END_CUTOFF  = NOT_PROVEN
+I19_QUERY_FILTER        = NOT_IMPLEMENTED
+REAL_PROVIDER_LATENCY   = NOT_VALIDATED
+PROVIDER_MAPPINGS       = NOT_ADMITTED
+GOLDEN_T0_T1_REPLAY     = NOT_PROVEN
+```
+
+(These are factual disclosure labels in this narrative, not machine-governance
+enum values. Program gates are NOT promoted: `REPLAY_SAFETY_GATE` and
+`TIME_GATE` — indeed all eight — remain `NOT_YET_EARNED`, because a
+consolidated admission-policy proof over synthetic fixtures is a checkpoint
+obligation, not a gate, and 06 §21/§16 require the golden end-to-end
+substrate (I22/I23).)
+
+### 10. I07 readiness (read-only reconstruction)
+
+`BLOC_05_I07_READINESS_ASSESSMENT.md` produced read-only; no I07 code, tests
+or configuration. Frozen title (06 §19 L467–468 / 07 §10 L415) = "revision
+policies / AS_KNOWN_THEN handling". Measured upstream: I05's `select_revisions`
+implements exactly the two modes whose prose is frozen (AS_KNOWN_THEN,
+LATEST_VERIFIED) and raises `UnsupportedRevisionMode` for the other four,
+with `revision_policies.yaml` declaring all six and `definition: null` for
+those four (28 sealed tests green). **The four declared modes (FIRST_SEEN,
+EXACT_REVISION, ALL_REVISIONS, ERROR_ON_AMBIGUITY) carry no frozen executable
+semantics — that is missing authority, not a pending coding task**, and the
+Bloc 4 storage layer's partially name-colliding resolution vocabulary may not
+be imported as Bloc 5 definitions without an explicit operator decision.
+Revision-chain persistence and duplicate handling remain I17; mode/cutoff
+application at query time remains I19; the plan freezes no I07 module list
+(the same M2-class scope ambiguity I06 had). `BLOC_05_I07_READINESS_ASSESSMENT`
+= `MEASURED_AND_REPORTED` — it grants no implementation authority.
+
+### 11. Changed paths and terminal state
+
+Staged paths: exactly 3 (this append-only §172 entry + the two new read-only
+governance records `BLOC_05_I06_OPERATOR_RATIFICATION.md` and
+`BLOC_05_I07_READINESS_ASSESSMENT.md`). No production, test, config, frozen-
+plan or existing-evidence byte was touched; the four pre-existing untracked
+scratch paths remain untracked and unmodified.
+
+```text
+B5-I01 = OPERATOR_ACCEPTED     B5-I04 = OPERATOR_ACCEPTED
+B5-I02 = OPERATOR_ACCEPTED     B5-I05 = OPERATOR_ACCEPTED
+B5-I03 = OPERATOR_ACCEPTED     B5-I06 = OPERATOR_ACCEPTED
+
+BLOC_05 = INCOMPLETE
+IDENTITY_GATE = NOT_YET_EARNED
+TIME_GATE = NOT_YET_EARNED
+SEMANTIC_GATE = NOT_YET_EARNED
+UNIT_GATE = NOT_YET_EARNED
+LINEAGE_GATE = NOT_YET_EARNED
+DUPLICATE_REVISION_GATE = NOT_YET_EARNED
+REPLAY_SAFETY_GATE = NOT_YET_EARNED
+GOLDEN_T0_T1_GATE = NOT_YET_EARNED
+
+next_checkpoint_authorized = FALSE
+B5-I07+ = UNAUTHORIZED
+BLOC_06 = UNAUTHORIZED
+RESEARCH = FROZEN
+```
+
+recommended_next = **OPERATOR: (1) RULE ON THE FOUR UNDEFINED REVISION MODES
+(I07 register R1), (2) CONFIRM I07'S SCOPE DELTA (R2) AND THE OWNER OF
+`bloc_05_duplicate_revision_validation.json` (R5), (3) THEN — AND ONLY THEN —
+AUTHORIZE AN I07 IMPLEMENTATION DIRECTIVE; IN PARALLEL, CONSIDER AUTHORIZING
+COLLECTION OF THE PROVIDER DOCUMENTS LISTED IN THE I06 COLLECTION BRIEF**.
+HARD STOP after push and report.
