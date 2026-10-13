@@ -1,0 +1,120 @@
+{
+  "$comment": "OCE B5-I4 execution addendum (charter increment I-3). EXTENDS the frozen B5-I3 registry OCE-B5-I3-REGISTRY-001 by addendum only; the B5-I3 registry file is referenced, never modified (append-only law). Each entry discharges one deferral whose owner was I-3 by executing the EXACT frozen planned node in the authoritative workflow. Entries still deferred keep their existing owners unchanged.",
+  "addendum_id": "OCE-B5-I4-ADDENDUM-001",
+  "addendum_version": "1.0",
+  "charter_increment": "I-3",
+  "plan_anchor": "B5-I4",
+  "base_sha": "9df3bf4f00a47230b42c22ce10a2d81d1591c885",
+  "extends": {
+    "registry_id": "OCE-B5-I3-REGISTRY-001",
+    "registry_document": "docs/oce-golden-system/OCE_B5_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+    "law": "append-only; the B5-I3 registry blob must remain byte-identical to the authorized base"
+  },
+  "authority": {
+    "charter": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+    "charter_section": "## 12. Increment ceiling (planning only - proposed, not begun - no increment is authorized)",
+    "plan": "docs/oce-golden-system/OCE_BLOCK_05_REFERENCE_APPLICATION_FACTORY_PLAN_v1.0.md",
+    "scope_contract": "docs/oce-golden-system/OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md",
+    "acceptance_matrix": "docs/oce-golden-system/OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md",
+    "failure_matrix": "docs/oce-golden-system/OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md"
+  },
+  "selection": {
+    "workflow": "b1-i1r-validation",
+    "step": "Execute B5-I4 console-kernel proofs (whole-file selection)",
+    "execution_surface": "b5-i4-selection-step",
+    "test_file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py"
+  },
+  "discharges": [
+    {
+      "id": "G3",
+      "kind": "gate",
+      "deferral_owner": "I-3",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestClientOnlyReads::test_no_direct_store_read",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestClientOnlyReads::test_no_direct_store_read",
+      "binding": {
+        "type": "test",
+        "file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py",
+        "node": "TestClientOnlyReads::test_no_direct_store_read",
+        "execution_surface": "b5-i4-selection-step"
+      },
+      "law": "Charter section 12 row I-3 stop condition: any direct store read stops the increment; client-only, contract-mediated (Gate G3)."
+    },
+    {
+      "id": "G7",
+      "kind": "gate",
+      "deferral_owner": "I-3",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusAgreement::test_status_view_matches_api_verbatim",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusAgreement::test_status_view_matches_api_verbatim",
+      "binding": {
+        "type": "test",
+        "file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py",
+        "node": "TestStatusAgreement::test_status_view_matches_api_verbatim",
+        "execution_surface": "b5-i4-selection-step"
+      },
+      "law": "Charter section 12 row I-3 executable gate: the I-2 registry's S-1/G7 tests pass; verbatim agreement with governed responses."
+    },
+    {
+      "id": "S-1",
+      "kind": "scenario",
+      "deferral_owner": "I-3",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim",
+      "binding": {
+        "type": "test",
+        "file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py",
+        "node": "TestStatusView::test_s1_lists_match_api_verbatim",
+        "execution_surface": "b5-i4-selection-step"
+      },
+      "law": "Charter section 8.1 S-1 visibility: console lists jobs/workers/health matching the control plane's own API responses verbatim, over a real loopback socket."
+    },
+    {
+      "id": "F-1",
+      "kind": "failure_class",
+      "deferral_owner": "I-3",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStackUnreachable::test_stack_unreachable_renders_fail_closed",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStackUnreachable::test_stack_unreachable_renders_fail_closed",
+      "binding": {
+        "type": "test",
+        "file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py",
+        "node": "TestStackUnreachable::test_stack_unreachable_renders_fail_closed",
+        "execution_surface": "b5-i4-selection-step"
+      },
+      "law": "Charter section 6 local-only topology: the console fails closed to STACK_UNREACHABLE when the local stack is not reachable; never renders stale-green health."
+    },
+    {
+      "id": "F-5",
+      "kind": "failure_class",
+      "deferral_owner": "I-3",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestNoStaleGreen::test_unverifiable_gap_never_renders_green",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestNoStaleGreen::test_unverifiable_gap_never_renders_green",
+      "binding": {
+        "type": "test",
+        "file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py",
+        "node": "TestNoStaleGreen::test_unverifiable_gap_never_renders_green",
+        "execution_surface": "b5-i4-selection-step"
+      },
+      "law": "Charter section 9 Progress observation: leaves unknown or unverifiable gaps explicit rather than guessing; no cached green."
+    }
+  ],
+  "still_deferred": [
+    {
+      "id": "S-2",
+      "owner": "I-4",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_timeline.py::TestDualClockTimeline::test_s2_transitions_rendered_with_both_clocks",
+      "reason": "Charter section 12 dual anchor I-4 = B5-I4/B5-I5; B5-I4 executes I-3 only (gap/scope contract section 1.1). Governed submission and dual-clock timeline remain unauthorized in this increment."
+    },
+    {
+      "id": "F-3",
+      "owner": "I-4",
+      "planned_node": "infrastructure/control-plane/tests/test_b5_i4_timeline.py::TestPartialTask::test_failure_envelope_rendered_without_false_success",
+      "reason": "Console-side failure-envelope rendering belongs to the I-4 timeline surface, not the I-3 read path."
+    }
+  ],
+  "boundary": {
+    "b5_i5_through_b5_i9": "LOCKED",
+    "merge_authorized": false,
+    "operator_ratification": false,
+    "recurring_cost_usd": 0,
+    "capital_authority": "none"
+  }
+}
