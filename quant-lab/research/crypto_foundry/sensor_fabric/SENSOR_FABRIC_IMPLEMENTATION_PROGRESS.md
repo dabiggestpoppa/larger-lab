@@ -7076,3 +7076,131 @@ CHOOSE PATH 1 (bounded I07 implementation directive for defined modes), PATH 2
 (explicitly close I07 as having no executable scope -- a recorded decision,
 never "implementation passed") OR PATH 3 (defer to the I19 query boundary)**.
 HARD STOP after push and report.
+
+## 174 - SENSOR-B5-I07E0: I07 CONDITIONAL REUSE ACCEPTANCE + I08 READINESS (GOVERNANCE ONLY)
+
+Date: 2026-10-14. Directive SENSOR-B5-I07E0. Start head
+`ef98866235f194643a72a36a77efc72502b4578a` (= required = remote after fetch;
+tracked tree clean apart from the three pre-existing untracked scratch paths,
+never staged; single-parent chain, 0 merges; all seven bloc_05 plan blobs
+re-measured identical to frozen plan branch `4bb677f9e`). Deliverable:
+`BLOC_05_I07E0_REUSE_ACCEPTANCE.md` + this append-only entry. Sealed I05
+bytes, tests, configs, frozen plan and pre-existing evidence UNTOUCHED; no I07
+engine; no I08 implementation; no gate promoted.
+
+### 1. Verification-case provenance (disclosed)
+
+`V07-01..V07-14` exists nowhere in the repository, frozen plan or prior
+governance artifact (grepped: zero hits). The only fourteen-case series the
+project defines is `D07-01..D07-14` (I07D1 package section 9), so the V07
+series was **constructed as the E0 verification re-execution of D07-01..D07-14,
+gate-for-gate, plus the E0-specific checks** -- disclosed as constructed, not
+quoted; no specification text was attributed to an artifact that lacks it.
+
+### 2. Adjudication: reuse acceptance IS justified by the frozen contract (conditional)
+
+Frozen assignment of I07: 06 s19 / 07 s10 L415 title "revision policies /
+AS_KNOWN_THEN handling"; 02 s17 requires `revision_policy.py` +
+`revision_policies.yaml` **inside the time package and names no I07-exclusive
+module**; 06 s17 names **no I07-exclusive evidence artifact**; 02 s11 freezes
+prose for two modes only. Measured reuse chain: commit `70de701cb` (staged as
+B5-I05) introduced the whole time package -- `revision_policy.py`,
+`revision_policies.yaml`, `replay_gate.py` (I06 content), `availability.py`
+(I06 content) -- and **I06 was already accepted in exactly this posture**:
+production code from the I05 commit + its own evidence commits (`0f2559594`,
+`6fb352061`, `06fdcde16`) + operator ratification (`bdc28b48f`). Blocking
+readings examined and dismissed: 06 s19 (reviewable, unsquashed commits --
+both hold; the clause does not require per-stage code exclusivity, and chain
+practice already accepted I06 under reuse), 06 s17 (no I07 artifact to
+miss; R5 now assigns the duplicate/revision artifact to I17), 06 s20 (all five
+review expectations verified), 06 s21 (gates untouched), 02 s11 (refusing the
+four undefined modes is the contract-conformant fail-closed behavior, now the
+operator's standing rule), 05 s18 + 02 s11 output-label duties (query-time,
+owned by I19/I18). **ADJUDICATION = YES, conditional** on the seven E0
+operator decisions and the carried register -- recorded as conditional
+operator-authorized reuse acceptance, explicitly NOT "implementation passed".
+
+### 3. V07-01..V07-14 results (exit codes captured; cwd = quant-lab)
+
+Suites: revision policy **31 passed exit 0**; replay gate **32 passed exit 0**;
+I06 replay safety **24 passed exit 0**; scope audit **32 passed exit 0**;
+nine sealed `test_b5_i05_*.py` **219 passed exit 0** (exact sealed baseline);
+13 runtime probes **13 PASS / 0 FAIL exit 0** (four modes refused with mode
+named; yaml null x4 + parser refuses an invented definition; multi-eligible
+AKT `['rev-orig','rev-corr-early']` -> `ELIGIBLE` unchanged; leakage excluded;
+zero-eligible -> `BLOCKED_REVISION`; LATEST_VERIFIED -> `RETROSPECTIVE_ONLY`;
+duplicate id -> `ValueError`; permutation-invariant; selector signature still
+`(revisions, policy, replay_cutoff)`; three accepted files byte-identical to
+HEAD; no engine/query dirs; six-mode catalog complete).
+
+All fourteen cases **PASS**: V07-01 frozen plan 7/7; V07-02 upstream reuse
+identified exactly (provenance + suites + probes); V07-03 I06 evidence
+preserved (diff since `bdc28b48f` = D1 package only; RS-08/RS-09 PASS, 14/14);
+V07-04 four modes unsupported without fabricated definitions; V07-05 Bloc 4 /
+Bloc 5 vocabularies distinct (no `storage` import in the time package; Bloc 4
+`revisions.py` untouched; colliding names refused, never mapped); V07-06
+`RESIDUAL_I07 = ∅` executable re-affirmed; V07-07 I17 preserved (artifact not
+produced, no duplicates engine); V07-08 I19 preserved (no query layer;
+`END_TO_END_CUTOFF_EXECUTION_PROVEN = FALSE` carried); V07-09 R5 -> I17
+recorded; V07-10 no new engine, empty protected diffs; V07-11 operator rulings
+separated from frozen clauses; V07-12 no gate promoted; V07-13 no
+implementation change (scope audit re-run staged, exit 0); V07-14 git custody
+(commit + fast-forward push + remote equality, below).
+
+### 4. Operator decisions (E0) and acceptance conditions
+
+Rulings taken from the directive: R1-E0 four modes stay declared-but-unsupported
+(D1 Option B as standing rule; no definitions created; R1-A..R1-D stay open if
+any mode is ever supported); R2-E0 reuse the two accepted I05 modes, no second
+engine; S9-E0 multi-eligible selections preserved exactly, never presented as
+one uniquely resolved economic value (presentation rule; row-level enforcement
+with I19/I18); R5-E0 full `bloc_05_duplicate_revision_validation.json` ->
+**I17** (closed as an operator decision); R19-E0 I19 keeps query-time
+filtering ownership; G-E0 all eight gates unearned; I08-E0 no I08
+implementation, no sealed I05 modification. Conditions C1..C7 (record section
+4.2) bind the acceptance: any violation reopens I07.
+
+### 5. I08 readiness (read-only reconstruction -- grants no authority)
+
+Frozen title: "common units / numeric / stablecoin conversion framework"
+(06 s19 / 07 s10). Authority re-read: 03 s1-s10/s14/s17/s20/s21/s22 + 06 s12
+(stablecoin depeg) + 06 s1 G5 / s21 (`UNIT_GATE`) + 06 s17 evidence
+`bloc_05_unit_validation.json`. Measured: `normalization/common/` does **not**
+exist -- unlike I07, I08 has genuine implementation content; accepted
+dependencies in hand (I04 terms + conversion primitives, I05 time gate).
+Open for the directive: I08-Q1 module split between I08/I09
+(`methodologies.py` / `semantic_registry.py` read as I09's in 06 s19),
+I08-Q2 evidence-row/RED-suite design, I08-Q3 carried register (S10, M1, M3/M4,
+M-I19 -- none blocks START). Verdict: **SCOPE-READY, NOT AUTHORIZED** --
+readiness reconstructs facts, never authority (same law as section 172 section
+10).
+
+### 6. Custody and terminal status
+
+Changed paths: exactly 2 (this append-only section 174 entry + the new
+`BLOC_05_I07E0_REUSE_ACCEPTANCE.md`). `git diff ef9886623` empty for
+`quant-lab/src`, `quant-lab/config`, `quant-lab/tests`, the frozen `bloc_05/`
+plan directory and every pre-existing evidence artifact. Fast-forward push;
+post-push local == remote recorded in the E0 terminal report.
+
+```text
+B5-I01..B5-I06 = OPERATOR_ACCEPTED
+B5-I07         = OPERATOR_ACCEPTED  (CONDITIONAL REUSE ACCEPTANCE; basis:
+                                     E0 record + seven E0 operator decisions;
+                                     NOT "implementation passed")
+B5-I08         = NOT_IMPLEMENTED    (READINESS RECONSTRUCTED; grants no
+                                     implementation authority)
+BLOC_05        = INCOMPLETE
+IDENTITY_GATE / TIME_GATE / SEMANTIC_GATE / UNIT_GATE / LINEAGE_GATE /
+DUPLICATE_REVISION_GATE / REPLAY_SAFETY_GATE / GOLDEN_T0_T1_GATE
+               = NOT_YET_EARNED
+next_checkpoint_authorized = FALSE
+B5-I09+        = UNAUTHORIZED
+BLOC_06        = UNAUTHORIZED
+RESEARCH       = FROZEN
+```
+
+recommended_next = **OPERATOR: (1) ISSUE THE SENSOR-B5-I08 IMPLEMENTATION
+DIRECTIVE (common units / numeric / stablecoin framework; settle I08-Q1/Q2 in
+it), (2) RULE ON S10 / M1 / M3-M4 WHEN CONVENIENT -- none blocks I08 START**.
+HARD STOP after push and report.
