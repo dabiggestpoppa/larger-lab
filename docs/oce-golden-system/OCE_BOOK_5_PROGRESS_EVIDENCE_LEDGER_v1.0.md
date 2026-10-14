@@ -19,7 +19,7 @@
 | B5-I2 | C2 outcome/domain/interfaces — charter increment I-1: console-control-plane deterministic interface contracts | **OPERATOR_ACCEPTED** — authorized 2026-10-07 under `AUTHORIZED_STAGE=B5-I2`; ratified 2026-10-08 under `AUTHORIZED_STAGE=B5-I2-AUDIT_REPAIR_AND_RATIFICATION` (§9; `OCE_B5_I2_OPERATOR_RATIFICATION_v1.0.md`) | Branch `oce-book-5-i2` created from exact merged main `882835dac…`; implementation contract frozen (`OCE_B5_I2_IMPLEMENTATION_CONTRACT_v1.0.md`): contract pack for every console-read/invoke surface (jobs, workers, leases, health, submit, denial) bound to existing governed control-plane operations and existing schemas (`job-envelope.schema.json`, `denial-envelope.schema.json`, `evidence-manifest.schema.json`); gate = contract tests pass on both sides; non-goals per charter section 12 I-1 (no console code, no UI, no new server endpoints) |
 | B5-I3 | C2 failures/acceptance and construction plan — charter increment I-2: requirement-test registry and acceptance plan | **OPERATOR_ACCEPTED** — authorized 2026-10-08 under `AUTHORIZED_STAGE=B5-I3`; ratified 2026-10-09 under `AUTHORIZED_STAGE=B5-I3-RATIFICATION` (§11.10; `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`) | Predecessor gate satisfied (B5-I2 `OPERATOR_ACCEPTED`, ledger §9/§10); scope frozen in `OCE_B5_I3_IMPLEMENTATION_CONTRACT_v1.0.md` (P0); gate = Requirement-test registry complete (plan §7; charter §12 I-2) → **PROVEN** by authoritative run `37869921075` (28/28 requirements bound, §11), evidence-head `37871316871` and proof-record-head `37914160504` (all SUCCESS; manifest 7/7; merge-ref parent+tree identity, §11.10); operator review 2026-10-09 → B5-I3 `OPERATOR_ACCEPTED`; ratification artifact `OCE_B5_I3_OPERATOR_RATIFICATION_v1.0.md`. B5-I3 complete. B5-I4–I9 remain LOCKED; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I4`; no implementation has begun |
 | B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **OPERATOR_ACCEPTED** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); independently re-audited and ratified 2026-10-13 under `AUTHORIZED_STAGE=B5-I4-RATIFY` (§13); normal two-parent merge of PR #14 authorized (§13.10) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
-| B5-I5 | C3 complete build/tests/lineage/operator review — charter increments **I-4** (governed submission + dual-clock timeline, S-2/F-3) + **I-5** (evidence/artifact binding G9 + versioned drill playbook) + **I-6(B5-I5 half)** (restart-identity G6, engine-owned recovery reporting, duplicate-effect S-3, negative controls G15) | **IMPLEMENTED — READY_FOR_OPERATOR_REVIEW (PR #15 draft, NOT merged, NOT ratified)** — authorized 2026-10-13 under `AUTHORIZED_STAGE=B5-I5`; scope frozen in `OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md` (+ Amendment A1) at P0; implementation + end-to-end/CI evidence complete (§14); same-agent audit 9.875/10 (§14.4); `MERGE_AUTHORIZED=false`; B5-I6–I9 remain LOCKED | Predecessor gate satisfied (B5-I4 `OPERATOR_ACCEPTED`, PR #14 merged `43720843b…`); authority: plan §7 row `B5-I5` = *C3 complete build/tests/lineage/operator review* (gate *Release candidate evidence complete*) = charter §12 I-4 (`B5-I4/B5-I5` dual anchor, B5-I4 deferred entirely) + I-5 (`B5-I5`) + I-6 B5-I5-half (`B5-I5/B5-I6`); B5-I3 registry S-2/F-3 deferred to I-4 are discharged here (addendum §5.1 file-prefix supersession disclosed); gate = I-4 *S-2 tests pass; timeline reproducible* / I-5 *G9 binding audit passes; playbook runs bounded* / I-6(B5-I5) *restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls*; frozen test floor 22 |
+| B5-I5 | C3 complete build/tests/lineage/operator review — charter increments **I-4** (governed submission + dual-clock timeline, S-2/F-3) + **I-5** (evidence/artifact binding G9 + versioned drill playbook) + **I-6(B5-I5 half)** (restart-identity G6, engine-owned recovery reporting, duplicate-effect S-3, negative controls G15) | **OPERATOR_ACCEPTED** — ratified 2026-10-14 under `AUTHORIZED_STAGE=B5-I5-RATIFY` (§16; `OCE_B5_I5_OPERATOR_RATIFICATION_v1.0.md`); authorized 2026-10-13 under `AUTHORIZED_STAGE=B5-I5`; scope frozen in `OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md` (+ Amendment A1) at P0; implementation + end-to-end/CI evidence complete (§14); same-agent audit corrected to 9.25/10 (§15.4, supersedes §14.4's 9.875); `MERGE_AUTHORIZED=CONDITIONAL` (PR #15 only, after every gate; normal two-parent merge); B5-I6–I9 remain LOCKED | Predecessor gate satisfied (B5-I4 `OPERATOR_ACCEPTED`, PR #14 merged `43720843b…`); authority: plan §7 row `B5-I5` = *C3 complete build/tests/lineage/operator review* (gate *Release candidate evidence complete*) = charter §12 I-4 (`B5-I4/B5-I5` dual anchor, B5-I4 deferred entirely) + I-5 (`B5-I5`) + I-6 B5-I5-half (`B5-I5/B5-I6`); B5-I3 registry S-2/F-3 deferred to I-4 are discharged here (addendum §5.1 file-prefix supersession disclosed); gate = I-4 *S-2 tests pass; timeline reproducible* / I-5 *G9 binding audit passes; playbook runs bounded* / I-6(B5-I5) *restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls*; frozen test floor 22 |
 | B5-I6 | C4 local deployment, observability and recovery | **LOCKED** | Requires B5-I5 complete |
 | B5-I7 | C4 change cycle plus C5 measurements/learning | **LOCKED** | Requires B5-I6 complete |
 | B5-I8 | Independent E2E, adversarial, usability and evidence audit | **LOCKED** | Requires B5-I7 complete |
@@ -1016,3 +1016,81 @@ B5-I4 23 all 0/0/0; regression 67/0; adversarial 49/49; static initial
 `pruned/removed: true`; `unresolved_blockers: []`; gate
 `READY_FOR_OPERATOR_REVIEW`; cost `$0`. Full-suite local failure set at R5
 is byte-identical to the authorized base (32 Book-4 environmental node IDs).
+---
+
+## 16. B5-I5 RATIFICATION (append-only; 2026-10-14, `AUTHORIZED_STAGE=B5-I5-RATIFY`)
+
+> **Disposition set in this commit: `B5_I5 = OPERATOR_ACCEPTED`** (§1 row
+> updated in this same commit — the only place this transition may occur).
+> Ratification artifact: `OCE_B5_I5_OPERATOR_RATIFICATION_v1.0.md`;
+> acceptance matrix status: §E of `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md`;
+> defect register / corrections: evidence record §7.
+> `MERGE_AUTHORIZED=CONDITIONAL` — PR #15 may be merged **only** after every
+> ratification gate passes, as a normal two-parent merge commit (no squash,
+> no rebase, no force; branch retained). **B5-I6–I9 remain `LOCKED`**;
+> this section does not begin or unlock B5-I6.
+
+### 16.1 Authority, Amendment A1, and audit dispositions (summary; details in the artifact)
+
+| Audit area | Disposition |
+|---|---|
+| Requirement scope (§2 of mission) | **Legitimate**: complete I-4 + I-5 + only the assigned B5-I5 half of I-6; requirement map 1:1 with no orphan and nothing pulled from B5-I6 (artifact §1) |
+| Amendment A1 (§3) | **Judgment A — bookkeeping correction**, forced by the frozen S-2 requirement and the pre-existing B5-I2 `jobs.inspect` interface; changed only the file ceiling; authored pre-implementation and committed with the change at R1; combination noted within D1's single deduction (artifact §2) |
+| `read_job` (§5) | **TRUE_DEFECT D2** — untyped seam demonstrated consumable as success; repaired at R5 with a typed fail-closed boundary (`JobReadRefusal`/`project_job_read`); all 8 mandated negative controls executable (artifact §3) |
+| Dual-clock timeline (§7) | Disposition clean after R5: engine-owned event time, console knowledge time, `(event_time, sequence)` ordering with discriminating controls for tie-break/regression/missing-ts/denial (artifact §4) |
+| Drill/recovery/binding (§8) | Disposition clean after R5: engine-owned recovery only, `DRILL_PASS` claim guard, binding guards (denial/missing-hash/missing-refs/cross-job), append-only version-bound sessions, honest in-memory-restart limitation (artifact §5) |
+| Submission authority (§6) | Refusals before I/O incl. missing identity (R5); engine decides grant validity and renders denial verbatim; one POST per invocation; no client-minted identity; duplicate-effect measured engine-side (artifact §6) |
+| E2E scenario/check (§9) | **10 scenarios; 35 enumerated conditions; 35/35 true** in both witnessed runs; "17 checks"/"17-scenario" superseded (evidence record §7.3) |
+| Reproducibility (§9) | **Classification B**: witnessed, non-reproducible local demonstration; claims map to committed nodes or are marked witness-only; scratch harness never named as reproduction vehicle (evidence record §7.4) |
+| Audit scores (§12) | SPEC 9.5 / DESIGN 9.5 / CORRECTNESS 8.5 / QUALITY 9.5 → **9.25/10** (arithmetic: 37/4); same-agent, not independent; supersedes §14.4's 9.875 (evidence record §7.7) |
+
+### 16.2 Final heads and CI evidence (all live-confirmed)
+
+- Authorized base `43720843b2f4c9a59044fd9d462edb0fe3b338b6`;
+  final implementation head (last production rung) **R5
+  `57cb37cf3b9d36ee8fd2d266b1d46533cab1ad30`** (tree `86ca12046f…`);
+  evidence head `07215cf41ea2ab22c6bc28dbfb700dd90145628f` (tree `ff0f8d4e…`);
+  correction head **R6 `f1e33cf8ea65b7c7ae7a24e0f7f236293eb4ea54`** (tree
+  `1efd6875…`); **ratification head = this commit** (SHA not self-embeddable;
+  recorded append-only in PR #15 `B5-I5 RATIFICATION` together with this
+  commit's exact-head CI run/check-run/artifact IDs and re-verified as merge
+  parent 2 before merge).
+- CI runs, all terminal SUCCESS with parsed artifacts (7/7 manifest entries
+  independently recomputed; 0 mismatches): implementation `38453887983`
+  (merge-ref `26f94a58…`, tree `2ab70be7…`, artifact `11841404115`);
+  evidence `38458622212` (merge-ref `5cddfc0e…`, parents
+  `[43720843…, 07215cf4…]`, tree `ff0f8d4e…`, artifact **`11843854782`**);
+  R5 `38581001417` (merge-ref `c1ccc9e4…`, parents `[43720843…, 57cb37cf3…]`,
+  tree `86ca1204…`, artifact `11903980928`); R6 `38582520500` (merge-ref
+  `b43f361c…`, parents `[43720843…, f1e33cf8…]`, tree `1efd6875…`, artifact
+  `11903987828`).
+- Parsed totals at every head: B5-I5 collected == executed == junit
+  (24 at P0-era heads, **45** at R5/R6 heads), failures 0, errors 0,
+  skipped 0, duplicate ids 0, orphans 0, floor 22 met, `problems` [];
+  adjacent B5-I2 24 / B5-I3 51 / B5-I4 23 all 0/0/0 (repro battery
+  ALL_DISCRIMINATED 11/11); shared regression 67 PASS / 0 FAIL; adversarial
+  49/49 (25 meta + 24 negative); static initial 31/31 and final 35/35;
+  cleanup `pruned/removed: true`; `unresolved_blockers: []`; gate
+  `READY_FOR_OPERATOR_REVIEW`; cost `$0`, cloud mutations 0.
+- Local: B5-I5 45/45; B5 selection 159 passed; full suite `32 failed,
+  998 passed, 103 skipped` with failure node-IDs byte-identical at base and
+  head; Ruff/compile/YAML/JSON/diff-check/secret-scan clean; 12/12 weakened
+  controls independently executed red then restored byte-identically.
+
+### 16.3 Changed-file accounting at ratification
+
+13 changed paths vs base (≤ P0 ceiling 16): 1 workflow (one additive
+selection step), 6 governance docs, 1 new ratification artifact, 4 console
+modules, 1 test file. Previously-existing files edited = 3 (ledger, workflow,
+`transport.py`) = A1's corrected ceiling. Zero-line diff: control-plane
+`src/`, contracts/schemas, frozen B5-I2/I3/I4 tests, frontend, Book 4,
+Sensor Fabric, providers, B5-I6+.
+
+### 16.4 Locks and accounting (unchanged)
+
+Cloud mutations 0; external hosting none; external network zero; recurring
+cost `$0`; `capital.authority = none`; broker/execution none; LLM authority
+none; Freebuff untouched; canonical state engine-owned.
+**B5-I6–I9 remain `LOCKED`** — the next stage requires a fresh
+`AUTHORIZED_STAGE=B5-I6` and no B5-I6 branch, worktree, document, source,
+test or evidence exists.

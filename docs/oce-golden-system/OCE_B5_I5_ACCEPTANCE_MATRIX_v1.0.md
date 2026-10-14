@@ -67,3 +67,18 @@ Every row is executable: a test node (selected whole-file by the authoritative w
 | Frozen instrument drift detected | STOP — record before repair |
 
 **FROZEN.** This matrix grants no authority; it is the pre-implementation statement of what counts as proof. B5-I6–I9 remain `LOCKED`.
+
+---
+
+## E. Ratification status (append-only; 2026-10-14, `AUTHORIZED_STAGE=B5-I5-RATIFY`)
+
+| Item | Disposition |
+|---|---|
+| Requirement rows A1–A… / stop rows | **ACCEPTED as proof** — every frozen row above is covered by an executable node in `test_b5_i5_timeline.py` (45 nodes at the repair head; floor 22) or by the frozen adjacent suites, with the §5/§7/§8 negative controls executed and discriminating (12/12 mutation battery) |
+| Stop-condition rows | No stop condition triggered. The only contract correction (Amendment A1, file ceiling ≤2 → ≤3) was audited as judgment **A** — a bookkeeping correction forced by the frozen S-2 requirement and the pre-existing `jobs.inspect` interface — recorded in `OCE_B5_I5_OPERATOR_RATIFICATION_v1.0.md` §2 |
+| Repairs | 4 demonstrated shipped defects (D2–D5) repaired forward at rung R5; evidence-language defect (D6) corrected at rung R6; proofs and register in the evidence record §7 |
+| Status | **B5-I5 = `OPERATOR_ACCEPTED`** (set only in the ratification commit) |
+| Merge | PR #15 merge is `MERGE_AUTHORIZED=CONDITIONAL` — permitted only after every ratification gate passes, as a normal two-parent merge commit |
+| Locks | **B5-I6–I9 remain `LOCKED`**; this matrix grants no further authority |
+
+**Recorded append-only; the frozen text above is preserved unedited.**
