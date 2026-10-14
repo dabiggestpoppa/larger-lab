@@ -1,0 +1,44 @@
+{
+  "document_id": "OCE-B5-I5-ADDENDUM-001",
+  "version": "1.0",
+  "extends": {
+    "registry_id": "OCE-B5-I3-REGISTRY-001",
+    "registry_file": "docs/oce-golden-system/OCE_B5_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+    "law": "addendum-only; the frozen B5-I3 registry has a 0-line diff in this increment"
+  },
+  "base_sha": "43720843b2f4c9a59044fd9d462edb0fe3b338b6",
+  "authorized_stage": "B5-I5",
+  "charter_increment": "I-4 (core) + I-5 + I-6(B5-I5 half)",
+  "discharges": [
+    {
+      "id": "S-2",
+      "frozen_planned_node": "infrastructure/control-plane/tests/test_b5_i4_timeline.py::TestDualClockTimeline::test_s2_transitions_rendered_with_both_clocks",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i5_timeline.py::TestDualClockTimeline::test_s2_transitions_rendered_with_both_clocks",
+      "supersession": "file-prefix only: test_b5_i4_timeline.py -> test_b5_i5_timeline.py because I-4 executes in B5-I5 under the charter section 12 dual anchor B5-I4/B5-I5 and a test_b5_i4_*.py filename would collide with the B5-I4 workflow step's orphan-detection glob. Class and function names are identical to the frozen planned node. No assertion or coverage weakened.",
+      "owner": "I-4",
+      "reason": "B5-I4 deferred I-4 (S-2/F-3 console halves) to B5-I5 under the charter section 12 dual anchor; B5-I4 ratification record ledger section 12.1/13."
+    },
+    {
+      "id": "F-3",
+      "frozen_planned_node": "infrastructure/control-plane/tests/test_b5_i4_timeline.py::TestPartialTask::test_failure_envelope_rendered_without_false_success",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i5_timeline.py::TestPartialTask::test_failure_envelope_rendered_without_false_success",
+      "supersession": "file-prefix only (same reason as S-2); class and function names identical to the frozen planned node.",
+      "owner": "I-4",
+      "reason": "Console-side failure-envelope rendering belongs to the I-4 timeline surface; deferred to B5-I5 with S-2."
+    }
+  ],
+  "already_satisfied_by_b5_i4": ["S-1", "G7", "F-1", "F-5", "G3"],
+  "implemented_in_b5_i5_new_nodes": [
+    {"id": "G4", "node": "test_b5_i5_timeline.py::TestGovernedSubmit::test_submit_representative_job_is_one_governed_operation"},
+    {"id": "G5", "node": "test_b5_i5_timeline.py::TestRefusals::test_out_of_catalog_job_type_refused_before_io"},
+    {"id": "G6", "node": "test_b5_i5_timeline.py::TestRestartIdentity::test_restart_rereads_identical_authoritative_state"},
+    {"id": "G8", "node": "test_b5_i5_timeline.py::TestDrillSession::test_recovery_is_engine_owned_console_enacts_nothing"},
+    {"id": "G9", "node": "test_b5_i5_timeline.py::TestEvidenceBinding::test_timeline_binds_to_engine_manifest_digest"},
+    {"id": "G15", "node": "test_b5_i5_timeline.py::TestNegativeControls"}
+  ],
+  "deferred_to_future_owner": [
+    {"id": "I-6-completion", "owner": "B5-I6", "reason": "Full C4 recovery-drill completion and observability (I-6 completion half of the B5-I5/B5-I6 dual anchor) remain B5-I6 under plan section 7 row B5-I6 (C4 local deployment, observability and recovery). The B5-I5 half delivered here is: restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls."},
+    {"id": "I-7", "owner": "B5-I6", "reason": "Optional loopback web view; not authorized in B5-I5."}
+  ],
+  "inapplicable": []
+}
