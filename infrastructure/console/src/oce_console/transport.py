@@ -60,6 +60,87 @@ class StackUnreachable(Exception):
     """Transport-level failure: the local stack could not answer a read."""
 
 
+# B5-I5 R5 — the fail-closed job-read result boundary. A governed envelope
+# must carry complete job identity before it may enter the success domain;
+# denial / partial / hostile payloads never do.
+JOB_ENVELOPE_REQUIRED_FIELDS = (
+    "job_id",
+    "status",
+    "payload_hash",
+    "created_at",
+)
+
+
+class JobReadRefusal(ConsoleRefusal):
+    """A ``jobs.inspect`` response that must not become a job.
+
+    Denials, not-found results, malformed responses and incomplete envelopes
+    are refused at this single boundary. The verbatim governed response stays
+    attached (``response``) so callers can render it, but no non-success path
+    ever returns a dict — a caller cannot consume failure data as success by
+    forgetting to check ``ok``.
+    """
+
+    def __init__(self, reason: str, detail: str = "",
+                 response: dict | None = None) -> None:
+        super().__init__(reason, detail)
+        self.response = response
+
+
+def project_job_read(response: object, *,
+                     expected_job_id: str | None = None) -> dict:
+    """Centralized fail-closed validator for ``jobs.inspect`` responses.
+
+    Returns the validated governed job envelope (``data``) only when the
+    response is an unambiguous success with complete job identity; raises
+    :class:`JobReadRefusal` for everything else (§5 negative controls 1–5, 8).
+    """
+    if not isinstance(response, dict) or not {
+        "ok", "status", "data"
+    }.issubset(response):
+        raise JobReadRefusal(
+            "not_a_governed_envelope",
+            f"response type/keys unacceptable: {type(response).__name__}",
+            response if isinstance(response, dict) else None,
+        )
+    if response.get("ok") is not True:
+        raise JobReadRefusal(
+            f"read_{response.get('status') or 'not_ok'}",
+            "jobs.inspect did not succeed",
+            response,
+        )
+    envelope = response.get("data")
+    if not isinstance(envelope, dict):
+        raise JobReadRefusal(
+            "not_a_governed_envelope",
+            f"data type unacceptable: {type(envelope).__name__}",
+            response,
+        )
+    if "denial" in envelope:
+        raise JobReadRefusal(
+            "denial_envelope",
+            "denial payload presented as job data",
+            response,
+        )
+    missing = [
+        field for field in JOB_ENVELOPE_REQUIRED_FIELDS
+        if not isinstance(envelope.get(field), str) or not envelope.get(field)
+    ]
+    if missing:
+        raise JobReadRefusal(
+            "incomplete_envelope",
+            f"missing required job identity fields: {', '.join(missing)}",
+            response,
+        )
+    if expected_job_id is not None and envelope["job_id"] != expected_job_id:
+        raise JobReadRefusal(
+            "envelope_job_mismatch",
+            f"requested {expected_job_id!r}, got {envelope['job_id']!r}",
+            response,
+        )
+    return envelope
+
+
 class _LoopbackRouteRedirect(urllib.request.HTTPRedirectHandler):
     """Redirect policy closed over the frozen route table (B5-I4-X2).
 
@@ -221,7 +302,8 @@ class LoopbackTransport:
 
         return build_status_document(self.read, self._surfaces)
 
-    def read_job(self, job_id: str) -> object:
+    def read_job(self, job_id: str, *,
+                 expected_job_id: str | None = None) -> dict:
         """Read one job through the declared ``jobs.inspect`` route (B5-I5 I-4).
 
         Substitutes a concrete ``job_id`` into the pack's declared
@@ -230,6 +312,12 @@ class LoopbackTransport:
         caller can only read a declared route with a concrete id — the route
         set can never be widened, and the same loopback / proxy-free / GET-only
         laws as ``read`` apply (B5-I4 frozen tests remain green).
+
+        Fail-closed result boundary (B5-I5 R5 §5): the return value is the
+        validated governed job envelope, or an exception. Denials,
+        not-found, malformed and incomplete responses raise
+        :class:`JobReadRefusal` carrying the verbatim response — they can
+        never be mistaken for a job by a caller that omits an ``ok`` check.
         """
         template = self._surfaces.get("jobs.inspect", "")
         if not template or "{job_id}" not in template:
@@ -249,6 +337,8 @@ class LoopbackTransport:
         except (urllib.error.URLError, socket.timeout, ConnectionError, OSError) as exc:
             raise StackUnreachable(f"jobs.inspect: {exc}") from exc
         try:
-            return json.loads(body.decode("utf-8"))
+            parsed = json.loads(body.decode("utf-8"))
         except (UnicodeDecodeError, ValueError) as exc:
             raise StackUnreachable("jobs.inspect: unparseable body") from exc
+        target = expected_job_id if expected_job_id is not None else jid
+        return project_job_read(parsed, expected_job_id=target)

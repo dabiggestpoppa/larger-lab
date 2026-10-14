@@ -19,6 +19,16 @@ Laws proven (two-sided, with executed weakened controls):
   after worker loss; the drill report carries `DRILL_PASS`;
 - restart-identity: the stateless console re-reads identical authoritative state.
 
+R5 fail-closed boundary (ratification audit §5–§8):
+- `read_job` returns a validated governed envelope or raises `JobReadRefusal`;
+  denial/partial/hostile responses can never enter the success domain, and no
+  caller can consume failure data as success by omitting an `ok` check;
+- the timeline renders denial/incomplete observations as explicit
+  UNVERIFIABLE gaps, never as lifecycle events;
+- evidence binding refuses denial payloads, missing engine identity and
+  cross-job evidence; `DRILL_PASS` is refused unless the engine-owned
+  duplicate-effect check held in this session's own record.
+
 Non-goals honored: no control-plane source/schema/contract modification, no
 frontend change, no web view, no LLM, no hosting, no cancel/retry write surface.
 """
@@ -55,7 +65,11 @@ from oce_console.drill import (  # noqa: E402
 from oce_console.kernel import ConsoleRefusal  # noqa: E402
 from oce_console.submit import CATALOG_JOB_TYPES, SubmitClient  # noqa: E402
 from oce_console.timeline import build_timeline, render_timeline  # noqa: E402
-from oce_console.transport import LoopbackTransport  # noqa: E402
+from oce_console.transport import (  # noqa: E402
+    JobReadRefusal,
+    LoopbackTransport,
+    project_job_read,
+)
 
 BASE_SHA = "43720843b2f4c9a59044fd9d462edb0fe3b338b6"
 JOB_TYPE = "b3.deterministic-hash"
@@ -123,10 +137,14 @@ class _CountingSubmit(SubmitClient):
 
 
 def _observe(transport_obj, job_id, clock):
-    """One console read of a job; returns (knowledge_time, governed envelope)."""
-    resp = transport_obj.read_job(job_id)
+    """One console read of a job; returns (knowledge_time, governed envelope).
+
+    Uses the fail-closed typed boundary: a denial/not-found/malformed answer
+    raises `JobReadRefusal`, so this helper can never hand failure data to the
+    timeline (B5-I5 R5 §5).
+    """
+    env = transport_obj.read_job(job_id)
     knowledge = clock.now().isoformat()
-    env = resp.get("data") if isinstance(resp, dict) else None
     return knowledge, env
 
 
@@ -594,3 +612,316 @@ class TestNegativeControls:
             # The real console cannot; this demonstrates the guard discriminates.
             weakened_post_count = client.post_count + 1
             assert weakened_post_count > 1, "console-owned recovery would add a write"
+
+
+def _job_env(**overrides) -> dict:
+    """A structurally complete governed job envelope for boundary controls."""
+    env = {
+        "job_id": "job-1",
+        "job_type": JOB_TYPE,
+        "status": "pending",
+        "payload_hash": "a" * 64,
+        "created_at": "2026-10-13T10:00:00+00:00",
+        "attempt_number": 1,
+        "evidence_refs": ["jobs/job-1/submit.json"],
+    }
+    env.update(overrides)
+    return env
+
+
+def _resp(data, ok: bool = True, status: str = "success") -> dict:
+    return {"ok": ok, "status": status, "data": data}
+
+
+class TestJobReadFailClosedBoundary:
+    """§5: every denial/hostile `jobs.inspect` response is refused at one seam."""
+
+    def test_c1_caller_omitting_ok_check_cannot_consume_denial(self, plane, clock):
+        """Control 1: the omitted-`ok`-check caller pattern is structurally dead."""
+        hostile = _resp(
+            _job_env(status="succeeded", attempt_number=7),
+            ok=False, status="denied",
+        )
+        hostile["data"]["denial"] = {"code": "403", "reason": "denied"}
+        # Real boundary: the naive `env = resp.get("data")` caller never runs —
+        # read_job raises instead of returning anything to destructure.
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(hostile)
+        assert excinfo.value.reason == "read_denied"
+        # Weakened boundary (raw passthrough): the OLD shipped caller pattern
+        # (`resp.get("data")` with no `ok` check) feeds the denial into the
+        # authoritative view — the red state this seam exists to forbid.
+        original = transport.project_job_read
+        transport.project_job_read = lambda response, **kw: response
+        try:
+            resp = hostile  # exactly what a raw read_job would return
+            env = resp.get("data") if isinstance(resp, dict) else None
+            forged_view = capture_authoritative_view([env])
+            forged_timeline = build_timeline([("2026-10-13T10:00:01+00:00", env)])
+        finally:
+            transport.project_job_read = original
+        assert forged_view == [{
+            "job_id": "job-1", "status": "succeeded",
+            "payload_hash": "a" * 64, "attempt_number": 7,
+        }], "negative control vacuous: denial did not forge a success view"
+        # The timeline layer refuses it too (defense in depth).
+        assert forged_timeline["state"] == "UNVERIFIABLE"
+        assert forged_timeline["transitions"][0]["reason"] == "denial_envelope"
+        # Restored: the same input is refused again.
+        with pytest.raises(JobReadRefusal):
+            project_job_read(hostile)
+
+    def test_c2_denial_dictionary_with_job_like_fields_refused(self):
+        hostile = _resp(
+            _job_env(status="succeeded"), ok=False, status="denied")
+        hostile["data"]["denial"] = {"reason": "denied"}
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(hostile)
+        assert excinfo.value.reason == "read_denied"
+        # An ok=true body whose data still carries a denial payload.
+        sneaky = _resp(_job_env(denial={"reason": "denied"}), ok=True)
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(sneaky)
+        assert excinfo.value.reason == "denial_envelope"
+
+    def test_c3_malformed_response_with_job_id_but_no_identity_refused(self):
+        # job_id present, but not a valid governed envelope (no payload_hash /
+        # created_at) — must not enter the success domain.
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(_resp({"job_id": "job-1", "status": "pending"}))
+        assert excinfo.value.reason == "incomplete_envelope"
+        assert "payload_hash" in excinfo.value.detail
+
+    def test_c4_ok_true_with_missing_required_fields_refused(self):
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(_resp(_job_env(payload_hash="")))
+        assert excinfo.value.reason == "incomplete_envelope"
+        assert "payload_hash" in excinfo.value.detail
+
+    def test_c5_ok_false_with_success_looking_fields_refused(self):
+        hostile = _resp(_job_env(status="succeeded"), ok=False, status="error")
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(hostile)
+        assert excinfo.value.reason == "read_error"
+        # The verbatim response stays attached for rendering (S-4 spirit).
+        assert excinfo.value.response is hostile
+        # The refusal IS a console refusal: the CLI's refusal renderer handles
+        # it, so denial never becomes an unhandled success-shaped dict.
+        assert issubclass(JobReadRefusal, ConsoleRefusal)
+
+    def test_c6_stale_job_after_engine_restart_refused_fail_closed(
+            self, plane, clock):
+        """Control 6: engine restarted (fresh store) -> stale job refuses."""
+        from oce_control.plane import ControlPlane
+        submit_grant, read_grant = _grants(plane)
+        with _live_stack(plane) as base:
+            client = SubmitClient(base, submit_grant, ACTOR)
+            resp = client.submit(JOB_TYPE, {"value": "stale"})
+            job_id = resp["data"]["job_id"]
+        # Engine restart: a fresh, empty authoritative store behind a new stack.
+        fresh = ControlPlane(test_clock=clock)
+        _fresh_submit, fresh_read = _grants(fresh)
+        with _live_stack(fresh) as base:
+            reader = LoopbackTransport(base, fresh_read, ACTOR)
+            with pytest.raises(JobReadRefusal) as excinfo:
+                reader.read_job(job_id)
+        assert "not_found" in excinfo.value.reason
+        assert excinfo.value.response["ok"] is False
+        # No fabricated envelope: the refusal carries no job data.
+        assert excinfo.value.response["data"] == {} or "job_id" not in (
+            excinfo.value.response.get("data") or {})
+
+    def test_c7_unauthorized_read_grant_refused_denial_attached(self, plane, clock):
+        submit_grant, read_grant = _grants(plane)
+        with _live_stack(plane) as base:
+            client = SubmitClient(base, submit_grant, ACTOR)
+            resp = client.submit(JOB_TYPE, {"value": "x"})
+            job_id = resp["data"]["job_id"]
+            reader = LoopbackTransport(base, "tampered-read-grant", ACTOR)
+            with pytest.raises(JobReadRefusal) as excinfo:
+                reader.read_job(job_id)
+            assert excinfo.value.reason == "read_denied"
+            denial = (excinfo.value.response.get("data") or {}).get("denial")
+            assert denial, "denial must stay verbatim on the refusal, not as a job"
+
+    def test_c8_unknown_response_types_refused(self):
+        for weird in ([{"ok": True}], "ok", 42, None, {"ok": True}):
+            with pytest.raises(JobReadRefusal) as excinfo:
+                project_job_read(weird)
+            assert excinfo.value.reason == "not_a_governed_envelope"
+
+    def test_c_wrong_job_id_refused_when_expected(self):
+        with pytest.raises(JobReadRefusal) as excinfo:
+            project_job_read(_resp(_job_env()), expected_job_id="job-2")
+        assert excinfo.value.reason == "envelope_job_mismatch"
+
+
+class TestTimelineOrderingControls:
+    """§7: load-bearing ordering rules each have an executable discriminator."""
+
+    def test_tiebreak_is_observation_sequence_not_knowledge_order(self):
+        # Equal event-time: observation SEQUENCE is the declared tiebreak.
+        # Knowledge times are deliberately reversed relative to sequence, so a
+        # weakened (event_time, knowledge_time) tiebreak would order differently.
+        a = _job_env(status="pending")
+        b = _job_env(status="scheduled")
+        doc1 = build_timeline([("k2", a), ("k1", b)])  # seq0 has LATER knowledge
+        doc2 = build_timeline([("k2", a), ("k1", b)])
+        states = [tr["state"] for tr in doc1["transitions"]]
+        assert states == ["pending", "scheduled"], states
+        assert [tr["sequence"] for tr in doc1["transitions"]] == [0, 1]
+        assert render_timeline(doc1) == render_timeline(doc2)
+        # Discrimination: a knowledge-time tiebreak would order b before a.
+        assert states != [tr["state"] for tr in sorted(
+            doc1["transitions"], key=lambda t: t["knowledge_time"])]
+        # Reversed input order flips with it (input order == observation order).
+        doc3 = build_timeline([("k1", b), ("k2", a)])
+        assert [tr["state"] for tr in doc3["transitions"]] == ["scheduled", "pending"]
+
+    def test_regressing_event_time_is_sorted_not_rewritten(self):
+        # A later-observed job with an EARLIER engine event-time sorts first;
+        # its event-time is preserved verbatim (never clamped to look
+        # monotonic in observation order), and observation order is carried by
+        # `sequence`, not by the sort.
+        late = _job_env(job_id="job-2", created_at="2026-10-13T09:00:00+00:00")
+        fresh = _job_env(job_id="job-3", created_at="2026-10-13T11:00:00+00:00")
+        doc = build_timeline([
+            ("2026-10-13T10:01:00+00:00", fresh),  # observed first, event later
+            ("2026-10-13T10:02:00+00:00", late),   # observed second, event earlier
+        ])
+        etimes = [tr["event_time"] for tr in doc["transitions"]]
+        assert etimes == sorted(etimes), "regressing event-time not sorted"
+        assert doc["transitions"][0]["event_time"] == "2026-10-13T09:00:00+00:00"
+        # Discrimination: sorting by observation/knowledge order would put the
+        # 11:00 event first — the real timeline does not.
+        assert doc["transitions"][0]["sequence"] == 1
+        assert doc["transitions"][1]["sequence"] == 0
+        # Knowledge-time annotations are untouched (never rewritten as event-time).
+        assert doc["transitions"][0]["knowledge_time"] == "2026-10-13T10:02:00+00:00"
+        assert doc["transitions"][1]["knowledge_time"] == "2026-10-13T10:01:00+00:00"
+
+    def test_missing_timestamp_is_explicit_gap_never_fabricated(self):
+        no_ts = _job_env()
+        no_ts.pop("created_at")
+        doc = build_timeline([("2026-10-13T10:00:01+00:00", no_ts)])
+        tr = doc["transitions"][0]
+        assert tr["state"] == "UNVERIFIABLE"
+        assert tr["event_time"] == "", "a missing engine timestamp must not be filled"
+        assert "created_at" in tr["reason"]
+        assert doc["state"] == "UNVERIFIABLE"
+
+    def test_denial_never_collapses_into_a_lifecycle_event(self):
+        denial_data = {"denial": {"reason": "denied"}}
+        doc = build_timeline([("2026-10-13T10:00:01+00:00", denial_data)])
+        assert doc["state"] == "UNVERIFIABLE"
+        assert doc["transitions"][0]["reason"] == "denial_envelope"
+        assert all(t["state"] != "succeeded" for t in doc["transitions"])
+        # Hostile denial carrying job-like fields (full identity + denial):
+        # still a gap — a denial never collapses into a lifecycle event.
+        hostile = _job_env(status="succeeded", denial={"reason": "denied"})
+        doc2 = build_timeline([("2026-10-13T10:00:01+00:00", hostile)])
+        assert doc2["state"] == "UNVERIFIABLE"
+        assert doc2["transitions"][0]["reason"] == "denial_envelope"
+
+
+class TestEvidenceBindingGuards:
+    """§8: binding refuses denial, missing identity and cross-job evidence."""
+
+    def test_denial_envelope_refused_by_binding(self):
+        env = _job_env(denial={"reason": "denied"})
+        doc = build_timeline([("k", env)])
+        with pytest.raises(DrillRefusal) as excinfo:
+            bind_evidence(doc, env)
+        assert excinfo.value.reason == "evidence_binding_denial_envelope"
+
+    def test_missing_payload_hash_refused_by_binding(self):
+        env = _job_env()
+        env.pop("payload_hash")
+        doc = build_timeline([("k", _job_env())])
+        with pytest.raises(DrillRefusal) as excinfo:
+            bind_evidence(doc, env)
+        assert excinfo.value.reason == "evidence_binding_no_payload_hash"
+
+    def test_missing_evidence_refs_refused_by_binding(self):
+        env = _job_env()
+        env.pop("evidence_refs")
+        doc = build_timeline([("k", _job_env())])
+        with pytest.raises(DrillRefusal) as excinfo:
+            bind_evidence(doc, env)
+        assert excinfo.value.reason == "evidence_binding_no_evidence_refs"
+
+    def test_cross_job_evidence_refused_by_binding(self):
+        timeline_doc = build_timeline([("k", _job_env(job_id="job-1"))])
+        other_job = _job_env(job_id="job-2")
+        with pytest.raises(DrillRefusal) as excinfo:
+            bind_evidence(timeline_doc, other_job)
+        assert excinfo.value.reason == "evidence_binding_job_mismatch"
+
+
+class TestDrillReportClaimGuard:
+    """§8: DRILL_PASS cannot be claimed without this session's own evidence."""
+
+    def _record(self, with_check: bool, check_value: bool = True) -> dict:
+        playbook = Playbook("1.0.0", ["submit_representative_job", "emit_report"])
+        rec = SessionRecorder("sess-guard", playbook)
+        rec.append_action("submit_representative_job", {"job_id": "job-1"})
+        if with_check:
+            rec.append_action("check_duplicate_effect",
+                              {"duplicate_effect_check": check_value})
+        rec.append_action("emit_report")
+        return rec.to_record()
+
+    def _bound(self) -> dict:
+        env = _job_env()
+        doc = build_timeline([("k", env)])
+        return bind_evidence(doc, env)
+
+    def test_drill_pass_refused_without_duplicate_effect_check(self):
+        record = self._record(with_check=True)
+        binding = self._bound()
+        doc = build_timeline([("k", _job_env())])
+        # dup=False: refused (no false pass).
+        with pytest.raises(DrillRefusal) as excinfo:
+            build_drill_report(record, doc, False, binding)
+        assert excinfo.value.reason == "drill_pass_requires_duplicate_effect_check"
+        # A non-pass disposition still records the observed result.
+        report = build_drill_report(record, doc, False, binding,
+                                    disposition="DRILL_INCOMPLETE")
+        assert report["disposition"] == "DRILL_INCOMPLETE"
+        assert report["duplicate_effect_check"] is False
+
+    def test_drill_pass_refused_without_session_check_action(self):
+        # dup=True claimed, but THIS session never observed the check — a
+        # reused/short-circuited record must not mint DRILL_PASS.
+        record = self._record(with_check=False)
+        with pytest.raises(DrillRefusal) as excinfo:
+            build_drill_report(record, build_timeline([("k", _job_env())]),
+                               True, self._bound())
+        assert excinfo.value.reason == "drill_pass_requires_check_action"
+
+    def test_drill_pass_refused_with_malformed_or_unbound_inputs(self):
+        record = self._record(with_check=True)
+        bad_record = dict(record)
+        bad_record.pop("session_id")
+        with pytest.raises(DrillRefusal) as excinfo:
+            build_drill_report(bad_record, build_timeline([("k", _job_env())]),
+                               True, self._bound())
+        assert excinfo.value.reason == "session_record_missing_fields"
+        unbound = dict(self._bound())
+        unbound["payload_hash"] = ""
+        with pytest.raises(DrillRefusal) as excinfo:
+            build_drill_report(record, build_timeline([("k", _job_env())]),
+                               True, unbound)
+        assert excinfo.value.reason == "drill_report_unbound"
+
+
+class TestSubmitIdentityAuthority:
+    """§6: missing operator identity refuses BEFORE any I/O."""
+
+    def test_missing_grant_or_actor_refused_before_io(self):
+        for grant, actor in (("", ACTOR), ("g", ""), ("", "")):
+            with pytest.raises(ConsoleRefusal) as excinfo:
+                SubmitClient("http://127.0.0.1:8448", grant, actor)
+            assert excinfo.value.reason == "missing_identity"
+        # The refusal happens at construction: no client (and therefore no
+        # request object or socket) can exist afterwards — before any I/O.

@@ -109,6 +109,15 @@ class SubmitClient:
         self._surface = load_invoke_surface(_SUBMIT_SURFACE, pack_path)
         self._grant = _validate_identity("grant", grant_id)
         self._actor = _validate_identity("actor", actor_id)
+        # §6 authority law: a governed submit requires non-empty operator
+        # identity and is refused HERE — before a request object or socket
+        # exists. (Malformed values are refused by _validate_identity above;
+        # well-formed but engine-invalid grants are decided by the engine and
+        # rendered verbatim as denials.)
+        for kind, value in (("grant", self._grant), ("actor", self._actor)):
+            if not value.strip():
+                raise ConsoleRefusal("missing_identity",
+                                     f"{kind} is required for submit")
         # One proxy-free opener owned by this client (no ambient proxy law).
         self._opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 

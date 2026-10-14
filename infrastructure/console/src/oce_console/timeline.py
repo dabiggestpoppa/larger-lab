@@ -81,6 +81,32 @@ def build_timeline(observations: Sequence[Observation]) -> dict:
                 "reason": "response_not_an_envelope",
             })
             continue
+        # A structurally incomplete dict (denial payload, partial or hostile
+        # response) is NOT a job: it renders as an explicit gap, never as a
+        # lifecycle state (B5-I5 R5, §7/§5 negative controls).
+        if "denial" in env:
+            # §7 law: a denial must never collapse into a lifecycle event.
+            transitions.append({
+                "state": "UNVERIFIABLE",
+                "event_time": "",
+                "knowledge_time": knowledge_time,
+                "sequence": seq,
+                "reason": "denial_envelope",
+            })
+            continue
+        missing = [
+            field for field in ("job_id", "status", "created_at")
+            if not isinstance(env.get(field), str) or not env.get(field)
+        ]
+        if missing:
+            transitions.append({
+                "state": "UNVERIFIABLE",
+                "event_time": "",
+                "knowledge_time": knowledge_time,
+                "sequence": seq,
+                "reason": f"incomplete_envelope:{','.join(missing)}",
+            })
+            continue
         job_id = job_id or env.get("job_id", "")
         status = env.get("status", "")
         transition = {

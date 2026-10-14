@@ -148,6 +148,24 @@ def bind_evidence(timeline: dict, job_envelope: dict,
     """
     if not isinstance(job_envelope, dict) or "job_id" not in job_envelope:
         raise DrillRefusal("evidence_binding_no_operation", "job envelope missing job_id")
+    # §8 fail-closed guards (B5-I5 R5): denial payloads, incomplete identity
+    # and cross-job evidence never enter the bound-success domain.
+    if "denial" in job_envelope:
+        raise DrillRefusal("evidence_binding_denial_envelope", "denial payload refused")
+    payload_hash = job_envelope.get("payload_hash")
+    if not isinstance(payload_hash, str) or not payload_hash:
+        raise DrillRefusal("evidence_binding_no_payload_hash",
+                           "engine payload_hash missing — evidence not bound")
+    if "evidence_refs" not in job_envelope or not isinstance(
+            job_envelope.get("evidence_refs"), list):
+        raise DrillRefusal("evidence_binding_no_evidence_refs",
+                           "engine evidence_refs missing — evidence not bound")
+    timeline_job = timeline.get("job_id", "") if isinstance(timeline, dict) else ""
+    if timeline_job and timeline_job != job_envelope["job_id"]:
+        raise DrillRefusal(
+            "evidence_binding_job_mismatch",
+            f"timeline job {timeline_job!r} != envelope job {job_envelope['job_id']!r}",
+        )
     # The console references the ENGINE-owned identity (job_id + payload_hash,
     # which is the engine's own sha256 of the payload, + evidence_refs) and
     # carries a deterministic canonical serialization of the timeline. It does
@@ -178,7 +196,32 @@ def build_drill_report(session_record: dict, timeline: dict,
     ``disposition`` is ``DRILL_PASS`` only when the caller has observed a
     completed drill whose engine-owned duplicate-effect check held; this
     function records the caller's observed result and never fabricates one.
+
+    Fail-closed claim guard (B5-I5 R5 §8): ``DRILL_PASS`` is refused unless
+    the engine-owned duplicate-effect check held AND this session's own
+    append-only record contains that ``check_duplicate_effect`` observation —
+    so a report can never be minted from an unobserved or reused session.
     """
+    validate_session_record(session_record)
+    binding_hash = binding.get("payload_hash", "")
+    if not isinstance(binding_hash, str) or not binding_hash:
+        raise DrillRefusal("drill_report_unbound",
+                           "binding payload_hash missing — report not bound")
+    if disposition == "DRILL_PASS":
+        if duplicate_effect_check is not True:
+            raise DrillRefusal(
+                "drill_pass_requires_duplicate_effect_check",
+                "engine-owned duplicate-effect check did not hold",
+            )
+        observed = [
+            a for a in session_record["actions"]
+            if a.get("step") == "check_duplicate_effect"
+        ]
+        if not observed:
+            raise DrillRefusal(
+                "drill_pass_requires_check_action",
+                "session record contains no check_duplicate_effect observation",
+            )
     # The report is digest-referenced via the ENGINE-owned identity carried by
     # the binding (payload_hash), never a console-minted digest (Gate G9).
     return {
