@@ -144,3 +144,202 @@ Recurring cost: `$0`. `capital.authority = none`. Broker/execution/order-routing
 LLM required/authoritative/state-owning: none. Freebuff untouched. Book 4, Sensor
 Fabric, providers, hosting config: 0-line diff. B5-I6–I9 remain `LOCKED`;
 `MERGE_AUTHORIZED=false`; no self-ratification; PR 15 stays draft and unmerged.
+---
+
+## 7. Ratification-audit corrections (append-only; 2026-10-14) — supersedes where declared
+
+Recorded by the `B5-I5-RATIFY` mission (same agent; still **NOT**
+organizationally independent). Sections 1–6 are preserved exactly as
+published; every statement superseded by this section remains as disclosed
+history and is corrected only here.
+
+### 7.1 Defects demonstrated at the evidence head and repaired forward
+
+§4.1's claim "TRUE_DEFECTs in shipped repository code: none" was **wrong**.
+The ratification audit executed failing proofs at the exact evidence head
+`07215cf41ea2ab22c6bc28dbfb700dd90145628f` before any repair and
+demonstrated four shipped defects plus the evidence-quality defect:
+
+| ID | Demonstrated defect (red proof at `07215cf4`, pre-repair) | First bad rung | Repair rung | Class | Dimension |
+|---|---|---|---|---|---|
+| D2 | `read_job` returned an untyped success-or-denial dict. A caller omitting the `ok` check (the shipped `_observe` helper's original shape) fed a job-like denial payload into `build_timeline`/`capture_authoritative_view` and received state `succeeded` / a forged authoritative view. Authorization denial entered the successful job domain. | R1 | R5 `57cb37cf3` | implementation defect (read-result seam design) | DESIGN |
+| D3 | `bind_evidence` accepted an envelope with **no `payload_hash`**, an envelope with **no `evidence_refs`**, and **cross-job evidence** (timeline `job-1` + envelope `job-2`) — all bound without refusal. | R2 | R5 `57cb37cf3` | implementation defect | CORRECTNESS |
+| D4 | `build_drill_report(disposition="DRILL_PASS", duplicate_effect_check=False)` returned `DRILL_PASS`; a session record with **no** `check_duplicate_effect` action also minted `DRILL_PASS`. | R3 | R5 `57cb37cf3` | implementation defect | CORRECTNESS |
+| D5 | `SubmitClient(base, "", actor)` (empty grant or actor) constructed a client and attempted I/O (engine 401) instead of refusing **before any I/O** as the frozen P0 §6 refusal law requires. | R1 | R5 `57cb37cf3` | implementation defect | CORRECTNESS |
+| D6 | Evidence-language defects: the "17 checks" tally (§2.1 title) and "17-scenario" (§4) conflate checks with scenarios and are not reproducible from the harness; §2's "hashes recorded for reproducibility" implied reviewer reproducibility although the harness is uncommitted scratch; §4 claimed QUALITY 10 while shipping D2–D5. | EVIDENCE `07215cf4` | this rung (R6) | evidence defect | QUALITY |
+
+No defect was dismissed on downstream grounds: in particular, `bind_evidence`
+later rejecting a missing `job_id` did NOT excuse D2 — authorization denial
+is now refused at the read boundary itself and never enters the job domain.
+
+### 7.2 Repairs (smallest forward rung; nothing weakened)
+
+**R5 `57cb37cf3b9d36ee8fd2d266b1d46533cab1ad30` (tree `86ca12046fbfb06006f39cd3b01a36a9a137bdff`)**
+— 5 files, +505/−6, all previously-changed B5-I5 paths (no new paths, zero
+workflow/control-plane/contract/frontend change):
+
+- **§5 typed fail-closed boundary:** `project_job_read()` validates
+  `ok/status/data`, refuses denial payloads and incomplete identity
+  (`job_id`,`status`,`payload_hash`,`created_at`), refuses unknown response
+  types and wrong-job envelopes; `read_job()` now returns the **validated
+  envelope or raises `JobReadRefusal`** (carrying the verbatim response).
+  A caller cannot consume failure data as success by omitting an `ok` check.
+- **§7 timeline:** denial envelopes and structurally incomplete observations
+  render as explicit `UNVERIFIABLE` gaps with a reason — never a lifecycle
+  event, never a fabricated timestamp.
+- **§8 binding:** refuses denial envelopes, missing engine `payload_hash`,
+  missing `evidence_refs`, and cross-job evidence.
+- **§8 report:** validates the session record, refuses unbound bindings, and
+  refuses `DRILL_PASS` unless the engine-owned duplicate-effect check held
+  **and** this session's own record contains the `check_duplicate_effect`
+  observation (no reuse from another run/job).
+- **§6 submit:** missing grant/actor identity refused at construction —
+  before any request object or socket exists.
+
+**Proof discipline:** 21 new executable regression nodes (B5-I5 suite
+24 → 45), including all eight §5 negative controls (omitted-`ok`-check
+caller, job-like denial, malformed-with-job_id, `ok=true` missing fields,
+`ok=false` success-looking fields, stale job after engine restart,
+unauthorized read grant, unknown response type), §7 ordering controls
+(sequence tie-break vs knowledge order, regressing event-time, missing
+timestamp, denial gap), §8 binding/report guards, and §6 identity refusal.
+External mutation battery (scratch): 12/12 weakened guards each turned at
+least one intended node red on a green baseline, with byte-identical restore
+verified by SHA-256. Full-suite failure set at R5 is **byte-identical to the
+authorized base** (32 Book-4 environmental node IDs, `diff` empty).
+
+### 7.3 Exact scenario/check reconciliation (supersedes "17 checks" and "17-scenario")
+
+| Metric | Exact value | Basis |
+|---|---|---|
+| §11 scenarios executed | **10** | §2.1 rows 1–10 |
+| Harness scenario buckets recorded | 13 | 10 scenarios + 1 supporting `drill_report` bucket + 2 bookkeeping (`clean_temp_state`, `cleanup`) |
+| Enumerated verified conditions | **35** | 7.3.1 below — 34 evaluated from the recorded JSON + 1 committed-suite external condition |
+| Conditions true — witness run | 35/35 | JSON sha256 `69b33bd4…62fe548` (§2) |
+| Conditions true — post-repair witnessed re-run (§7.5) | 35/35 | JSON sha256 `3d07b6f2…670b70` |
+| Harness hard assert statements | 4 (6 atoms) | `driver.py` abort-on-failure; `console_op.py`/`stack.py` contain none |
+| Process roles / instances | 3 / 6 | driver; engine stack (×2); console operator (×3) |
+| Submit POST attempts | 3 | 2 governed + 1 denied; malformed input = 0 POST (refused pre-I/O) |
+| Jobs created (engine-owned) | 2 | `9f571498…` succeeded, `cfba33c5…` pending |
+| Denials rendered verbatim | 1 | `missing_authority` denial envelope |
+| Stack-unreachable collapses | 1 | `STACK_UNREACHABLE` on killed stack |
+| Restart events | 2 | 1 console-process restart (G6); 1 abrupt engine kill + restart (stale-read refusal) |
+| Engine recovery transitions observed | 1 requeue | `leased → running → pending → succeeded` (4 observations) |
+
+"17" was a manual tally with no derivation in the harness; it is superseded
+and must not be re-used. The correct phrasing everywhere is **"10 scenarios;
+35 enumerated conditions"**.
+
+#### 7.3.1 Condition enumeration (source: recorded evidence JSON, §2 sha)
+
+1. **Primary success (3):** `primary_success.job_id` non-empty; `payload_hash` == `33d62e9c…22a29e` (engine-minted); `console_posts_after_first_submit == 1`.
+2. **Deterministic repeat (2):** `identical_engine_minted_hash` true AND `hash_run1 == hash_run2`; `drill_report.render_deterministic` true.
+3. **Denied authority (6):** `status == denied`; `denial_present`; `denial.reason_code == missing_authority`; `denial.denial_id` non-empty; `denial.denied_at` non-empty (engine clock); `posts_for_denied_submit == 1`.
+4. **Malformed input (2):** `refused` true; `reason == unsupported_job_type`.
+5. **Unavailable dependency (2):** `collapsed` true; `law == STACK_UNREACHABLE`.
+6. **Mid-operation failure + recovery (3):** `engine_requeued == 1`; `post_recovery_status == pending`; `observations == [leased, running, pending, succeeded]`.
+7. **Restart/recovery (4):** `identical_authoritative_view` true; view `state == succeeded`; engine-restart `fail_closed` true; `read == false` AND `refusal == not_found`.
+8. **Hostile negative control (1, external):** weakened controls executed red in the committed suite — re-proved at R5 by the 12/12 mutation battery.
+9. **Zero unauthorized mutation (4):** `console_posts_total == 3`; `engine_jobs_after == 2`; `engine_jobs_at_end == 2`; statuses == exactly one `succeeded` + one `pending` (denied/malformed left zero traces).
+10. **Zero external network (2):** `all_loopback` true (7/7 connects); `fresh_process_all_loopback` true.
+11. **Drill claim (4):** `disposition == DRILL_PASS`; `duplicate_effect_check` true; `engine_payload_hash_matches_binding` true; `timeline_transitions == [pending, leased, running, succeeded]`.
+12. **Bookkeeping (2):** `clean_temp_state.jobs_before == 0`; `cleanup.engine_final_job_count == 0` AND in-memory-durability note present.
+
+### 7.4 Reproducibility classification — **B (narrowed language)**
+
+The exact harness (`stack.py`, `console_op.py`, `driver.py`) is **not in the
+repository** (host temp files; the recorded JSON contains host paths). This
+record therefore states: **the E2E run is a witnessed, non-reproducible local
+demonstration** — not a reviewer-reproducible artifact. The §2 hashes identify
+the witnessed bytes; they do not make the run reproducible from the
+repository alone, and this record does **not** name unpublished scratch as a
+reproduction vehicle (the B5-I2 lesson). Publishing the harness as governed
+CI tooling would require a second workflow selection step, which the frozen
+B5-I5 workflow authority (exactly one additive step) forbids.
+
+Claim mapping (witness-only claims marked ✗):
+
+| E2E claim | Committed executable proof | Witness-only |
+|---|---|---|
+| Governed submit = one operation, engine-minted hash | `test_submit_representative_job_is_one_governed_operation` | scenario totals in §7.3 ✗ |
+| Deterministic timeline render | `test_timeline_is_reproducible` | cross-run identical payload hash ✗ (engine-owned; reproduced in E2E runs 1–3) |
+| Denied authority verbatim, 1 POST, no store traces | `test_denied_submit_rendered_verbatim_not_retried` | ✗ |
+| Malformed refused before I/O | `test_out_of_catalog_job_type_refused_before_io` | ✗ |
+| Unavailable dependency → `STACK_UNREACHABLE` | B5-I4 `TestStackUnreachable` (frozen) | cross-process kill ✗ |
+| Engine-owned recovery observed, console enacts nothing | `test_recovery_is_engine_owned_console_enacts_nothing`, `test_duplicate_effect_check_after_worker_loss` | ✗ |
+| Console-process restart identity | `test_restart_rereads_identical_authoritative_state` | ✗ |
+| Engine-restart stale read refused fail-closed | **new at R5** `test_c6_stale_job_after_engine_restart_refused_fail_closed` | ✗ |
+| Unauthorized read grant refused (denial attached) | **new at R5** `test_c7_unauthorized_read_grant_refused_denial_attached` | ✗ |
+| `DRILL_PASS` + G9 two-sided hash agreement | `test_drill_report_disposition_drill_pass`, `test_binding_references_correct_operation` | engine-side agreement in a live stack ✗ |
+| Process-wide socket audit (zero external network) | transport loopback laws (frozen B5-I4) only | ✗ process-wide audit |
+| Three-process topology / cross-process isolation | — | ✗ |
+
+### 7.5 Post-repair witnessed E2E re-run (2026-10-14, at R5 head `57cb37cf3`)
+
+Rerun of the same harness after R5, with `console_op.py` retyped to the new
+`read_job` boundary (denials now arrive as `JobReadRefusal`, recorded as
+refusals and never fed to the timeline). Driver exit 0; **35/35 conditions
+true**; the engine-minted deterministic payload hash `33d62e9c…22a29e`
+reproduced for a third independent run. Artifact hashes:
+
+| Artifact | SHA-256 |
+|---|---|
+| `stack.py` (unchanged) | `b1bbf004b6b786f1135f2eb89ecf57c41e2cc001c9599e8451aebda43a49bc16` |
+| `driver.py` (unchanged) | `32a91db6c0318b0c29f40027d7c90cb0299a09ed8c403928c6da378987a48d04` |
+| `console_op.py` (retyped to typed boundary) | `beb33309dda563a4a9f6a16053d8d9eb5b68afee300303fa92a1c7ef49749e66` |
+| `b5i5-e2e-evidence.json` (re-run, 35/35) | `3d07b6f2875cc01e905b69fd40cd0891b3ac074347ec23ee12af031ed7670b70` |
+| original witness JSON preserved byte-for-byte (§2) | `69b33bd479d44981a7802a70a2be222c16fa26b70aec6f78918117a0462fe548` |
+
+Still a witnessed demonstration (classification B, §7.4) — hashes identify
+bytes; they are not a claim of reviewer reproducibility.
+
+### 7.6 R5 exact-head CI (parsed artifact, not the badge)
+
+- Run `38581001417` (`b1-i1r-validation`, event `pull_request`, ref `15/merge`),
+  terminal **completed | success**; check-run `115910565848` (`validate`)
+  success with `head_sha == 57cb37cf3b9d36ee8fd2d266b1d46533cab1ad30`.
+- Tested checkout = merge-ref `c1ccc9e45475a0ed7c309e1462213b35fd4feaae`,
+  parents `[43720843…(authorized main), 57cb37cf3…(R5)]`, tree
+  `86ca12046fbfb06006f39cd3b01a36a9a137bdff` == R5 tree (in-CI
+  `SOURCE-IDENTITY` records the same commit/tree).
+- Artifact `b1-i1r-evidence-1a5935484d53` (id `11903980928`, 35117 bytes,
+  created 2026-10-14T14:34:40Z, expires 2026-11-13) downloaded and parsed:
+
+| Gate | Parsed result |
+|---|---|
+| B5-I5 selection | verdict **PASS**; collected == executed == junit == **45**; failures 0; errors 0; skipped 0; duplicate node ids 0; duplicate junit ids 0; orphan `test_b5_i5_*.py` 0; `problems` []; floor 22 met |
+| B5-I4 kernel | PASS; 23 tests, 0/0/0 (frozen) |
+| B5-I3 registry | PASS; 51 tests, 0/0/0 |
+| B5-I2 contracts | PASS; 24 tests, 0/0/0; reproducibility battery `ALL_DISCRIMINATED` (11/11, 0 skipped, 0 unresolved) |
+| Shared regression | **67 PASS, 0 FAIL** |
+| Adversarial | **49/49 PASS** (25 meta + 24 negative) |
+| Static validation | initial **31/31 PASS**; final **35/35 PASS**; 0 FAIL/BLOCKED/SKIPPED |
+| Manifest | 7/7 artifacts independently recomputed from downloaded bytes (SHA-256 + size): 0 mismatches |
+| Cleanup | `pruned: true, removed: true` |
+| Stage gate | `READY_FOR_OPERATOR_REVIEW`; `unresolved_blockers: []`; cost `0` |
+
+### 7.7 Corrected four-dimension audit (supersedes §4's 9.875)
+
+Same-agent, **NOT** organizationally independent. One root cause = one
+deduction; no double-count; no deduction merely for having repair rungs; no
+score restoration for repaired defects (the rubric has no restoration clause).
+
+| Dimension | Prior | Now | Arithmetic (distinct event, first bad rung, repair rung, residual) |
+|---|---|---|---|
+| SPEC | 9.5 | **9.5** | D1 P0 ceiling miscount — P0 → R1/A1 — no residual. −0.5, once. |
+| DESIGN | 10 | **9.5** | D2 untyped read-result seam (design of the seam, not its tests) — R1 → R5 — no residual. −0.5, counted once (not re-deducted in CORRECTNESS). |
+| CORRECTNESS | 10 | **8.5** | D3 binding accepted missing/cross-job identity — R2 → R5 (−0.5); D4 `DRILL_PASS` claimable without engine-owned sequence — R3 → R5 (−0.5); D5 empty identity attempted I/O — R1 → R5 (−0.5). Three distinct defects, three deductions. |
+| QUALITY | 10 | **9.5** | D6 evidence-precision failure ("17 checks"/"17-scenario" conflation, reproducibility overclaim, false "no TRUE_DEFECT"/QUALITY 10) — EVIDENCE rung → this rung — no residual. −0.5, once (single root cause). |
+
+**Average = (9.5 + 9.5 + 8.5 + 9.5) / 4 = 37 / 4 = 9.25 / 10.**
+
+### 7.8 Explicit supersession list
+
+| Superseded statement | Where | Corrected by |
+|---|---|---|
+| "all 17 checks PASS" (title) / "17-scenario real end-to-end" | §2.1, §4 | §7.3: 10 scenarios, 35 conditions |
+| "TRUE_DEFECTs in shipped repository code: none" | §4.1 | §7.1: D2–D5 |
+| QUALITY 10 / average 9.875 | §4 | §7.7: QUALITY 9.5, average 9.25 |
+| "`read_job` returns the raw governed response; callers must check `ok`" (limitation 4) | §5 | §7.2 R5: typed boundary raises `JobReadRefusal`; limitation 4 no longer holds |
+| "hashes recorded for reproducibility" (as a reproducibility claim) | §2 | §7.4: witnessed, non-reproducible; hashes identify bytes only |
+| static "31/31" | §3 | still true for the initial phase; final phase is 35/35 (both recorded) |

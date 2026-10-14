@@ -934,3 +934,85 @@ mid-read collapse to `STACK_UNREACHABLE`; `read_job` callers must check `ok`
 no self-ratification occurred. Operator ratification (and any merge authorization) is a
 separate future operator action requiring its own `AUTHORIZED_STAGE`. B5-I6–I9 remain
 `LOCKED`.
+---
+
+## 15. B5-I5 ratification-audit corrections and repair rung R5 (append-only; 2026-10-14)
+
+> `AUTHORIZED_STAGE=B5-I5-RATIFY`. §14 above is preserved exactly as
+> published history; the specific statements corrected in §15.5 below are
+> superseded only from here. `MERGE_AUTHORIZED=CONDITIONAL` (PR #15 only,
+> after every gate passes). `B5_I6_THROUGH_B5_I9 = LOCKED`; this section
+> does NOT begin or unlock B5-I6. Recurring cost `$0`; `capital.authority = none`.
+
+### 15.1 Extended implementation ladder (continues §14.2; append-only, no rewrites)
+
+| Rung | Commit | Tree |
+|---|---|---|
+| P0–R4 | unchanged — see §14.2 | unchanged — see §14.2 |
+| EVIDENCE | `07215cf41ea2ab22c6bc28dbfb700dd90145628f` | `ff0f8d4e021234572964ed68d69a5ba70f8dfa3f` |
+| **R5 (repair)** | `57cb37cf3b9d36ee8fd2d266b1d46533cab1ad30` | `86ca12046fbfb06006f39cd3b01a36a9a137bdff` |
+
+R5 = `B5-I5-R5: fail-closed job-read boundary, evidence/drill claim guards,
+identity refusal` — typed `read_job` boundary (`JobReadRefusal` /
+`project_job_read`), timeline denial + incomplete-envelope gaps, evidence
+binding guards (denial / missing `payload_hash` / missing `evidence_refs` /
+cross-job), `DRILL_PASS` claim guard (engine-owned duplicate-effect check
+held AND this session's own `check_duplicate_effect` observation), submit
+missing-identity refusal before I/O; +21 executable regression nodes
+(B5-I5 suite 24 → 45). 5 files, all previously-changed B5-I5 paths; zero
+workflow / control-plane / contract / frontend change.
+
+### 15.2 Defects and forward repairs (supersedes §14.4's "No TRUE_DEFECT")
+
+Four shipped defects were demonstrated with failing proofs at the evidence
+head `07215cf4` before any repair and repaired append-only at R5:
+
+| ID | Defect | First bad rung | Repair | Dimension |
+|---|---|---|---|---|
+| D2 | untyped `read_job` success-or-denial seam (denial could be consumed as success) | R1 | R5 | DESIGN |
+| D3 | `bind_evidence` accepted missing `payload_hash`/`evidence_refs` and cross-job evidence | R2 | R5 | CORRECTNESS |
+| D4 | `DRILL_PASS` mintable without the engine-owned duplicate-effect sequence | R3 | R5 | CORRECTNESS |
+| D5 | empty submit identity attempted I/O instead of refusing before I/O | R1 | R5 | CORRECTNESS |
+| D6 | evidence-language defects (scenario/check conflation, reproducibility overclaim, false "no TRUE_DEFECT"/QUALITY 10) | EVIDENCE | §14 corrections in this §15 (evidence record §7) | QUALITY |
+
+Proofs, repairs, and the 12/12 external mutation battery (each weakened guard
+turned ≥1 intended node red; byte-identical restore) are recorded in
+`OCE_B5_I5_END_TO_END_AND_CI_EVIDENCE_RECORD_v1.0.md` §7.
+
+### 15.3 Scenario/check reconciliation (supersedes "17/17 checks" in §14.3)
+
+**10 §11 scenarios** executed (not 17); **35 enumerated conditions**
+(34 evaluated from the recorded evidence JSON + 1 committed-suite external
+condition) — **35/35 true** in the witness run (JSON `69b33bd4…`) and
+**35/35 true** again in the post-repair witnessed re-run (JSON
+`3d07b6f2…`). Supporting counts: 4 harness assert statements (6 atoms);
+3 process roles / 6 process instances; 3 submit POSTs (2 governed + 1
+denied); 1 malformed refusal (0 POST); 2 engine jobs; 1 denial; 1
+`STACK_UNREACHABLE` collapse; 2 restart events; 1 engine requeue observed
+with `leased → running → pending → succeeded`. Reproducibility
+classification **B**: the E2E harness is uncommitted scratch, so the run is
+recorded as a witnessed, non-reproducible local demonstration — claims map
+to committed nodes where they exist (evidence record §7.4).
+
+### 15.4 Corrected audit scores (supersedes §14.4's 9.875)
+
+SPEC **9.5** (D1 −0.5) / DESIGN **9.5** (D2 −0.5) / CORRECTNESS **8.5**
+(D3, D4, D5 −0.5 each) / QUALITY **9.5** (D6 −0.5);
+**(9.5 + 9.5 + 8.5 + 9.5) / 4 = 37 / 4 = 9.25 / 10**. One root cause = one
+deduction; no double-count; no restoration for repaired defects; no
+deduction merely because repair rungs exist. Same-agent, **NOT**
+organizationally independent.
+
+### 15.5 R5 exact-head CI (parsed artifact, not a badge)
+
+Run `38581001417` terminal SUCCESS at head `57cb37cf3…`; check-run
+`115910565848`; tested merge-ref `c1ccc9e45475` = merge of `[43720843…,
+57cb37cf3…]` with tree `86ca12046f…` == R5 tree; artifact
+`b1-i1r-evidence-1a5935484d53` (id `11903980928`, 35117 bytes) parsed:
+B5-I5 collected == executed == junit == **45**, failures 0, errors 0,
+skipped 0, duplicates 0, orphans 0, floor 22 met; B5-I2 24 / B5-I3 51 /
+B5-I4 23 all 0/0/0; regression 67/0; adversarial 49/49; static initial
+31/31 + final 35/35; manifest 7/7 recomputed from bytes; cleanup
+`pruned/removed: true`; `unresolved_blockers: []`; gate
+`READY_FOR_OPERATOR_REVIEW`; cost `$0`. Full-suite local failure set at R5
+is byte-identical to the authorized base (32 Book-4 environmental node IDs).
