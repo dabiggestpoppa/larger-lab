@@ -48,7 +48,6 @@ from oce_console.drill import (  # noqa: E402
 )
 from oce_console.kernel import (  # noqa: E402
     STATE_UNREACHABLE,
-    build_status_document,
 )
 from oce_console.session_store import SessionStore  # noqa: E402
 from oce_console.submit import SubmitClient  # noqa: E402
@@ -362,8 +361,6 @@ class TestRestoreObjectives:
     """C4.S4: restore drill — RPO 0 and RTO within the frozen objective."""
 
     def test_restore_drill_meets_rpo_and_rto_objectives(self, plane, clock, tmp_path):
-        from datetime import datetime
-
         submit_grant, read_grant = _grants(plane)
         store = SessionStore(tmp_path / "restore-sessions")
         with _live(plane) as base:

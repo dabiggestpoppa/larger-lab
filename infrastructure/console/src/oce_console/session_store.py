@@ -38,7 +38,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
 
 from .drill import DrillRefusal, validate_session_record
 

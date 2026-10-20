@@ -31,7 +31,6 @@ import ast
 import inspect
 import json
 import sys
-import tempfile
 import threading
 import time
 from pathlib import Path
@@ -43,7 +42,6 @@ REPO_ROOT = TESTS_DIR.parents[2]
 CONSOLE_SRC = REPO_ROOT / "infrastructure" / "console" / "src"
 sys.path.insert(0, str(CONSOLE_SRC))
 
-import oce_console  # noqa: E402
 from oce_console import drill, session_store  # noqa: E402
 from oce_console.drill import (  # noqa: E402
     MAX_PLAYBOOK_STEPS,

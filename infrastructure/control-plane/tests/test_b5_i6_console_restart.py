@@ -131,7 +131,6 @@ class TestRestartIdentity:
 
         # Pre-restart: one governed job exists (the record references it).
         grant1 = plane.authority.issue_grant(actor_id=ACTOR, action="submit_job", target="default")
-        read1 = plane.authority.issue_grant(actor_id=ACTOR, action="read", target="default")
         resp = plane.api.submit_job(grant_id=grant1.grant_id, actor_id=ACTOR,
                                     job_type=JOB_TYPE, payload={"value": "pre-restart"})
         assert resp.ok, resp
@@ -145,7 +144,6 @@ class TestRestartIdentity:
                           sort_keys=True) == json.dumps(record, sort_keys=True)
         # The stale job read fails closed against the fresh engine.
         read2 = plane2.authority.issue_grant(actor_id=ACTOR, action="read", target="default")
-        import contextlib
         import threading
         import uvicorn
         from oce_control.http_api import create_app
