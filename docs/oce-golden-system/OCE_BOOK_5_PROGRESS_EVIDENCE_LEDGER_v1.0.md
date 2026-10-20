@@ -1218,3 +1218,14 @@ The exact E2E harness (`stack.py`, `console_op.py`, `driver.py`) is **not in the
 ### 17.9 Locks and accounting
 
 Cloud mutations 0; external hosting none; external network zero (socket-audited); recurring cost `$0`; `capital.authority = none`; broker/execution none; LLM authority none; Freebuff untouched; canonical state engine-owned. `MERGE_AUTHORIZED=false`; PR #16 stays draft and unmerged; no self-ratification. **B5-I7–I9 remain `LOCKED`**; charter increment I-7 (web view) remains operator-directable; the next stage requires a fresh `AUTHORIZED_STAGE=B5-I7` after operator review of this evidence.
+
+### 17.10 Ratification (B5-I6-RATIFY)
+
+**Ratification head:** c6fa9c62708d2e2800edd1a4b86f8c61cbee11e2 (current evidence head)
+**PR:** #16 OPEN, draft, MERGEABLE, base main
+**CI:** implementation 39470127205 (SUCCESS), evidence 39481136014 (SUCCESS)
+**Disposition:** B5_I6 = OPERATOR_ACCEPTED (2026-10-20)
+**Locks:** B5-I7–I9 remain LOCKED. No B5-I7 work begun. capital.authority = none. Recurring cost $0.
+**Manifest verification:** hash+size verification performed on CI artifacts (7/7, sizes present). 
+**Base/head regression:** disk space constrained preventing clean full worktree comparison; substituted by authoritative CI evidence (27/27, no failures). 
+**E2E classification:** B (witnessed, non-reproducible). All load-bearing claims map to committed CI nodes.

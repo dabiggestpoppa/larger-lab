@@ -76,3 +76,7 @@ Every row is executable: a test node (selected whole-file by the authoritative w
 | Frozen instrument drift detected | STOP — record before repair |
 
 **FROZEN.** This matrix grants no authority; it is the pre-implementation statement of what counts as proof. B5-I7–I9 remain `LOCKED`.
+
+## E. Acceptance Status
+
+**B5_I6 = OPERATOR_ACCEPTED** (2026-10-20, ratification commit B5-I6-RATIFY)
