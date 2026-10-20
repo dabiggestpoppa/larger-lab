@@ -115,6 +115,51 @@ class TestRestartIdentity:
         assert engine_after == engine_before
         assert plane.job_store.get_job(job_id).status == "pending"
 
+    def test_non_append_rewrite_refused_and_completion_is_terminal(self, tmp_path):
+        """Append-only + completion-terminal laws of the durable store (C4.S4).
+
+        A stored record may only GROW: any rewrite of a prior action (or a
+        shortened action list) is refused fail-closed. Completion requires a
+        report reference, and once complete the record is terminal — no save
+        and no consented resume can ever mutate it.
+        """
+        store = SessionStore(tmp_path / "append-sessions")
+        rec = SessionRecorder("append-1", _playbook())
+        rec.append_action("submit_representative_job", {"job_id": "j-a"})
+        rec.append_action("observe_leased")
+        stored = store.save(rec.to_record())
+
+        # A schema-valid rewrite of a PRIOR action is refused (prefix law).
+        import copy
+
+        rewrite = copy.deepcopy(stored)
+        rewrite["actions"][0]["step"] = "emit_report"
+        with pytest.raises(DrillRefusal) as not_append:
+            store.save(rewrite)
+        assert not_append.value.reason == "session_record_not_append_only"
+        # A shortened action list is refused (dropping history).
+        shorten = copy.deepcopy(stored)
+        shorten["actions"] = shorten["actions"][:1]
+        with pytest.raises(DrillRefusal):
+            store.save(shorten)
+        # Completion requires a non-empty report reference.
+        with pytest.raises(DrillRefusal) as no_ref:
+            store.save(stored, complete=True)
+        assert no_ref.value.reason == "completion_requires_report_ref"
+        # With a report reference the record completes, and is then TERMINAL.
+        rec.set_report_ref("append-report")
+        completed = store.save(rec.to_record(), complete=True)
+        assert completed["status"] == "complete"
+        with pytest.raises(DrillRefusal) as after_complete:
+            store.save(rec.to_record())
+        assert after_complete.value.reason == "session_already_complete"
+        with pytest.raises(DrillRefusal) as resume_complete:
+            store.resume("append-1", consent=True)
+        assert resume_complete.value.reason == "session_already_complete"
+        # The durable file on disk is byte-identical to the completed save.
+        assert json.loads(store.path_for("append-1").read_text(encoding="utf-8")) == \
+            completed
+
     def test_engine_restart_leaves_console_state_untouched_and_reads_fail_closed(
             self, plane, clock, tmp_path):
         """Engine restart cannot resurrect console state; stale reads refuse.
