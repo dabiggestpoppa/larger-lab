@@ -21,6 +21,20 @@ this suite as I06E1.  Scope rows
 ``no_i05_test_diff_vs_base`` and ``i05_scope_audit_unchanged_allowlist_displays_closed``
 prove no pre-existing test file was touched to accommodate it.
 
+DISCLOSURE -- B5-I08 AMENDMENT (operator-authorized; full record in
+``BLOC_05_I08_IMPLEMENTATION_EVIDENCE.md`` + ledger section 175): the I08E1
+implementation pass is authorized to add ``normalization/common/``
+(bloc_05/03 s21) and to extend the I01/I05 scope audits' allowlists on the
+I02/I04A/I05 precedent -- which is exactly the cascade section 12 names, since
+the amended I05 audit test changes its own SHA-256 inventory entry and forces
+``bloc_05_time_validation.json`` to be regenerated.  Four scope rows
+(``no_production_source_diff_vs_base``, ``no_i05_test_diff_vs_base``,
+``i05_scope_audit_unchanged_allowlist_displays_closed``,
+``prior_checkpoint_evidence_unchanged``) and this suite's two corresponding
+tests were therefore amended from ABSOLUTE emptiness to "nothing BUT that
+disclosed delta", with the disclosed bytes pinned by SHA-256.  Every other
+measurement in this suite is unchanged.
+
 The I06E1 directive (sections 03-08) requires the consolidated replay-safety
 evidence artifact to exist, to exercise the ACCEPTED I05 production primitives
 through deterministic synthetic fixtures, to classify every refusal exactly,
@@ -38,10 +52,12 @@ Laws asserted here:
 * the producer IMPORTS the I05 primitives and defines no engine of its own
   (no duplicate availability/replay implementation, section 00/M2);
 * the I05 confidence policy and provider registry are untouched (Option B);
-* the scope adds no production module and no config change;
+* the scope adds no production module beyond the disclosed B5-I08
+  ``normalization/common/`` tree and no config change;
 * the producer is tracked, deterministic, clock-free, and its mandatory
   failures exit nonzero;
-* prior checkpoint evidence bytes are unchanged.
+* prior checkpoint evidence bytes are unchanged except the one disclosed
+  B5-I08 regeneration, which is pinned by SHA-256.
 
 OFFLINE.  No network, no wall clock.  The generator is invoked exactly as the
 project convention prescribes (from ``quant-lab`` with ``PYTHONIOENCODING=utf-8``).
@@ -88,6 +104,10 @@ SEMANTICS_CONFIG = (
 #: The I06E1 required starting HEAD -- the baseline every noninterference
 #: predicate is measured against.
 I06_BASE_HEAD = "32a89743656adb638cdaf688b62be505202f1876"
+
+#: DISCLOSED B5-I08 delta (operator-authorized): the single production
+#: directory I08E1 is allowed to add under ``quant-lab/src``.
+I08_COMMON_PREFIX = "quant-lab/src/crypto_sensor_fabric/normalization/common"
 
 #: The fourteen frozen cases (I06E1 section 04 / I06D1 package section 4),
 #: in frozen order.
@@ -285,10 +305,38 @@ def test_producer_imports_production_primitives_and_defines_no_engine() -> None:
 
 
 def test_the_scope_adds_no_production_module_and_no_config_change() -> None:
-    status = _git("status", "--porcelain", "--", "quant-lab/src")
-    assert status.strip() == "", f"src/ changed outside authority: {status!r}"
-    diff = _git("diff", I06_BASE_HEAD, "--", "quant-lab/src")
-    assert diff == "", "production source differs from the I06 base commit"
+    """Disclosed B5-I08 delta only: ``quant-lab/src`` carries nothing but the
+    operator-authorized ``normalization/common/`` tree (bloc_05/03 s21).
+
+    The allowance is a prefix match on that one directory, so every other
+    production path -- untracked, staged or committed -- must still be
+    byte-identical to the I06 base, exactly as this test has always required.
+    """
+
+    def _status_paths() -> list[str]:
+        """Porcelain lines are two status columns, one space, the path."""
+        out = _git("status", "--porcelain", "--", "quant-lab/src")
+        return sorted(line[3:] for line in out.splitlines() if line.strip())
+
+    def _diff_paths() -> list[str]:
+        """Only the ``diff --git a/<path> b/<path>`` headers name paths."""
+        diff = _git("diff", I06_BASE_HEAD, "--", "quant-lab/src")
+        return sorted(
+            line.rsplit(" b/", 1)[1]
+            for line in diff.splitlines()
+            if line.startswith("diff --git ")
+        )
+
+    offending_status = [
+        path for path in _status_paths() if not path.startswith(I08_COMMON_PREFIX)
+    ]
+    assert offending_status == [], f"src/ changed outside authority: {offending_status}"
+    offending_diff = [
+        path for path in _diff_paths() if not path.startswith(I08_COMMON_PREFIX)
+    ]
+    assert offending_diff == [], (
+        f"production source differs from the I06 base: {offending_diff}"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -344,6 +392,14 @@ def test_no_latency_policy_was_added_to_the_accepted_ladder() -> None:
 # ---------------------------------------------------------------------------
 
 
+#: DISCLOSED B5-I08: the amended I05 audit test changes its own entry in the
+#: I05 producer's SHA-256 inventory, so this sealed artifact is regenerated to
+#: the pinned bytes below; the other four artifacts stay absolutely sealed.
+I08_TIME_VALIDATION_SHA256 = (
+    "78d3f2a091a9dc66775c8b4bd767e12807a406ea009f9f9396babecc6eb4179f"
+)
+
+
 def test_prior_checkpoint_evidence_bytes_are_unchanged() -> None:
     for name in (
         "bloc_05_time_validation.json",
@@ -352,6 +408,14 @@ def test_prior_checkpoint_evidence_bytes_are_unchanged() -> None:
         "BLOC_05_I06_READINESS_ASSESSMENT.md",
         "BLOC_05_I06D1_DECISION_PACKAGE.md",
     ):
+        if name == "bloc_05_time_validation.json":
+            measured = hashlib.sha256(
+                (_EVIDENCE / name).read_bytes()
+            ).hexdigest()
+            assert measured == I08_TIME_VALIDATION_SHA256, (
+                f"{name} left its disclosed B5-I08 state: {measured}"
+            )
+            continue
         diff = _git(
             "diff", I06_BASE_HEAD, "--",
             f"quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/{name}",

@@ -117,7 +117,11 @@ def test_time_package_is_exactly_the_frozen_seven_modules() -> None:
 @pytest.mark.parametrize(
     "forbidden",
     [
-        "common",
+        # "common" was operator-authorized at B5-I08 (SENSOR-B5-I08E1
+        # directive, bloc_05/03 §21: normalization/common/ is required I08
+        # surface) -- disclosed removal on the same precedent by which the
+        # B5-I01 audit's allowlist grew "identity" (I02), "terms" (I04A)
+        # and "time" (I05).  Every other subpackage stays forbidden.
         "sensors",
         "lineage",
         "duplicates",
@@ -295,6 +299,13 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
     Three custody views are audited separately because they answer different
     questions:
 
+    DISCLOSED B5-I08 EXTENSION (SENSOR-B5-I08E1 directive): the staged-view
+    allowlist adds the two paths the I08E1 directive authorizes staging --
+    ``normalization/common/`` (bloc_05/03 §21 required surface) and the
+    ``test_b5_i08_`` suites -- on the exact precedent by which this same
+    list already grew ``normalization/time/`` and ``test_b5_i05_`` at I05.
+    No other prefix is touched.
+
     * STAGED (index vs the I05 base) is what a commit would ship, so it must
       fall inside the I05-authorized prefixes, plus exactly one disclosed
       exception: the mechanically republished I11R2 governance audit
@@ -308,7 +319,9 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
     """
     allowed_prefixes = (
         "src/crypto_sensor_fabric/normalization/time/",
+        "src/crypto_sensor_fabric/normalization/common/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i08",
         "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
         "config/crypto_sensor_fabric/provider_time_semantics.yaml",
         "config/crypto_sensor_fabric/revision_policies.yaml",

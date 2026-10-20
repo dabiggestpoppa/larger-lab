@@ -235,7 +235,7 @@
   "sha256_inventory": {
     "quant-lab/config/crypto_sensor_fabric/provider_time_semantics.yaml": "17b3fe5e15966d8c159f9f810b6f4699af809460cbcab46863833e85507ad95f",
     "quant-lab/config/crypto_sensor_fabric/revision_policies.yaml": "2a25cf9edcefe254fbc1bee1b52b4b73b52c28fc5c7a87216de61f03162e4960",
-    "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i06_replay_safety.py": "822fc997dc833e380434fe8f91b578bc164c9ed9e0cc680cdf71b41fe6118086",
+    "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i06_replay_safety.py": "b5b8d40b9f629d03d8cccbde64c884b06f2532c880fed7a979d9b97dfcf1ea46",
     "quant-lab/src/crypto_sensor_fabric/normalization/time/__init__.py": "e60957a70bde9dbe654673fa52a01bf2335439ec22f13df11cb262e72b94d219",
     "quant-lab/src/crypto_sensor_fabric/normalization/time/availability.py": "ba8a09d9d35e02ec76328700e556e3ce1ae130bd51002ccdbf2db35335824e53",
     "quant-lab/src/crypto_sensor_fabric/normalization/time/enums.py": "5876a932ca4518fca5292dd74cf2eead5fed1dff83199de5622bee92cb944858",
@@ -244,7 +244,7 @@
     "quant-lab/src/crypto_sensor_fabric/normalization/time/replay_gate.py": "79aa9bd9a98fc76d4666689f71ea4d47a69d75f3a05036b7ccc278a269a3a936",
     "quant-lab/src/crypto_sensor_fabric/normalization/time/revision_policy.py": "0f6033d8c404220b0c77f62e92de1f68f3ed975dc5bb240095f6ec539d08299c",
     "quant-lab/src/crypto_sensor_fabric/normalization/time/semantics_registry.py": "78d1136205b627c0c79477c4539c23b47ec39bfcccfefd54f75e6dffa670b5d0",
-    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py": "09d5cec93d0222ca4f06bd1a65532c479941ebac57c57aed5ee28b72aa826e34"
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py": "6f9e52a757228150bff3d23b7a7e1b2ff4d320e096b1e3520bff367737f842a8"
   },
   "summary": {
     "fail": 0,

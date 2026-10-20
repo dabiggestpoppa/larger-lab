@@ -1228,7 +1228,7 @@
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_intervals.py": "0c891caed23326e8696600d0e66deabac38fc8e6a16b62884990a900b4413eeb",
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_replay_gate.py": "c84de74d8c61c852f9667d1bfe18c73188b32dbcf8f629b61b56cb17ddb91288",
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_revision_policy.py": "3093384aaa3dc9100c8a6b10e757d25088b8055644a59e00d1282a9c8d85cfd8",
-    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "91a6119a8775b01b05865c72da2d2ea044519d720bd4eb6374f9eb805c027f1f",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "0e8544feeb26c8a1c369004a0bac7c91dd1c85bf3561250f8d70262d9f0477e6",
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_semantics_registry.py": "8df0e0f09051350e7829f138ee47e4d54b505dcddb86cea78bc616fb6fe950c7",
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_time_models.py": "0ef6f9ae7b1487ac59f9a220e1796cf85f028a39e3ee7ed02086b5679442cc35"
   },

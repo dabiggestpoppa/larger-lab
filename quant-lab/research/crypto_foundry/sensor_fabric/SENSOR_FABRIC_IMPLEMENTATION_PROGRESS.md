@@ -7204,3 +7204,143 @@ recommended_next = **OPERATOR: (1) ISSUE THE SENSOR-B5-I08 IMPLEMENTATION
 DIRECTIVE (common units / numeric / stablecoin framework; settle I08-Q1/Q2 in
 it), (2) RULE ON S10 / M1 / M3-M4 WHEN CONVENIENT -- none blocks I08 START**.
 HARD STOP after push and report.
+
+---
+
+## 175 - SENSOR-B5-I08E1: COMMON UNITS / NUMERIC / STABLECOIN CONVERSION FRAMEWORK (IMPLEMENTATION PASS, PENDING OPERATOR REVIEW)
+
+Date: 2026-10-20. Directive SENSOR-B5-I08E1 -- prospective authorization to
+execute the frozen I08 checkpoint (06 §19 title: "common units / numeric /
+stablecoin conversion framework"), settling the two open items §5.3 of the E0
+acceptance left for this directive: **I08-Q1** = the §21 eight-module split
+(I08 owns `common/{units,numeric,conversion}.py` + `__init__`; I09 keeps
+`methodologies.py` / `semantic_registry.py`; `envelope.py` stays unexported
+pending I09 methodology identity; `comparability.py` / `missingness.py` are
+out of I08 scope) and **I08-Q2** = evidence-row design (06 §17 frozen name
+`bloc_05_unit_validation.json`, `extensions` merge) plus 06 §18 suite naming.
+I08-Q3 (S10 / M1 / M3-M4 / M-I19) remains with its owners, unchanged.
+Start head `88373c01c` (I07E0 head, equal to remote; tracked tree clean apart
+from the three pre-existing untracked scratch items). Authority is I08 ONLY;
+I09+ remain unauthorized; the eight program gates are untouched by this
+record.
+
+### 1. Delivered surface (bloc_05/03 §21 as split by I08-Q1)
+
+Four modules in `src/crypto_sensor_fabric/normalization/common/`:
+`units.py` (the frozen 13-member `CanonicalQuantityUnit` vocabulary and
+`QuantityUnitIdentity`), `numeric.py` (the §3 precision policy -- precision
+preserved, widening measured, no rounding helper exists), `conversion.py`
+(§9/§10 stablecoin→fiat and cross-currency conversion over caller-supplied PIT
+rate evidence) and the minimal `__init__.py`. Two new suites add **28** tests:
+`test_b5_i08_units.py` (U08-01..U08-18) and `test_b5_i08_scope_audit.py`
+(U08-19/U08-20). Tracked producer
+`research/crypto_foundry/sensor_fabric/scripts/b5_i08_units.py` (738 lines)
+extends `bloc_05_unit_validation.json` from 35 to **55 rows** (20 new
+`U08-01..U08-20` rows; the I04B base rows are SHA-256-pinned at
+`5b17397cf7b47dbe…` inside the producer and abort before any write on drift).
+Artifact SHA-256 `260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4`;
+two invocations byte-identical, `--check` exits 0 (U08-20). The I01 top-level
+normalization API stays exactly its 24 ratified symbols, and no I02/I04/I05
+source file was modified (proved by `test_terms_time_identity_packages_are_untouched_by_i08`).
+
+### 2. Frozen laws exercised
+
+§4 asset identity (asset-required units refuse to exist bare; USD/USDT/USDC
+refuse a second identity -- stablecoin ≠ USD, S22 inv.3); §3 precision (no
+rounding, float refused at the `Decimal` boundary, widening measured not
+mutated); §9 native truth (`native_value`/`native_unit` preserved verbatim,
+USD equivalent optional and never overwriting); 06 §12 depeg fixture (1000
+USDT at 0.97 stays 1000 USDT native, 970 USD only under a registered PIT
+conversion -- no permanent 1:1); §10/06 §12 replay law (both rate clocks must
+be ≤ the caller's cutoff, no future rate for an old record, no silent leg
+substitution); §14/S22 inv.5 (unavailable conversion is NULL + the frozen
+`STABLECOIN_CONVERSION_UNAVAILABLE` flag, never zero, never guessed); S17/S22
+inv.7 (lineage + `B5_I08_UNITS_V1` methodology on every derived value).
+Contract-denominated natives are refused with `ValueError` so I04B's
+linear/inverse surface keeps its dimensional authority -- no duplicate engine.
+
+### 3. Measured verification (this tree, offline; exit codes captured directly)
+
+RED-first: the two U08 suites were written before any implementation existed
+and the first run exited **2** with
+`ModuleNotFoundError: crypto_sensor_fabric.normalization.common`. After
+implementation: U08 **28 passed** exit 0; I06 suite **24 passed** exit 0 (the
+exact sealed baseline); I05 sealed nine + I01 **521 passed** exit 0;
+governance binding + I11R2 evidence + job-state ledger readers **40 passed**
+exit 0; normalization whole **849 passed** exit 0; I06 producer 14/14 RS rows
++ 8/8 scope rows exit 0; I08 producer `--check` exit 0. Package-wide
+`pytest tests/crypto_sensor_fabric -q` was run to completion in this session
+with its exit code recorded in the final report; the canonical full suite is
+ratification-side work (§168/§172 precedent).
+
+### 4. Disclosed custody amendment (operator ruling: "Amend I06 rows + disclose")
+
+The I06 suite measures **absolute emptiness against the I06 base**
+`32a897436` with no allowance mechanism, so three of its rows and two of its
+tests structurally conflict with work this directive itself authorizes:
+(a) `no_production_source_diff_vs_base` + its status test forbid ANY path
+under `quant-lab/src` (it failed on the untracked `common/` directory alone);
+(b) `no_i05_test_diff_vs_base` / `i05_scope_audit_unchanged_allowlist_displays_closed`
+require the I01/I05 audits byte-identical while §5's disclosed allowlist
+extension must edit both; (c) `prior_checkpoint_evidence_unchanged` requires
+`bloc_05_time_validation.json` byte-identical while that extension forces its
+regeneration (the I05 producer hashes `test_b5_i05_scope_audit.py`; the I05
+evidence suite independently demands byte-identical regeneration). Reverting
+the audit extensions only moves the failure into the I01/I05 suites -- no
+green path exists that does not touch sealed I06 material. The operator ruled:
+amend the I06 custody rows to permit **exactly the disclosed delta**,
+regenerate, and disclose. Amendment inventory (full detail in
+`BLOC_05_I08_IMPLEMENTATION_EVIDENCE.md` §6):
+
+* `scripts/b5_i06_replay_safety.py` -- four scope rows re-measured from
+  *absolute* to *"nothing BUT the disclosed delta"* (src may name only
+  `normalization/common/`; changed sealed tests must equal their pinned
+  disclosed bytes; the regenerated artifact pinned), other four rows
+  untouched and still absolute; new SHA-256 `b5b8d40b9f629d03…` (was
+  `822fc997dc833e38…`).
+* `test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py` -- the two
+  matching tests re-scoped + a module-level DISCLOSURE paragraph, every other
+  measurement unchanged; new SHA-256 `6f9e52a757228150…` (was
+  `09d5cec93d0222ca…`).
+* regenerated artifacts: `bloc_05_replay_safety_validation.json`
+  `c7bfc59b93432903…` (was `9d3b93aa4321d8d2…`), `BLOC_05_I06_SCOPE_AUDIT.json`
+  `12f2392e6fd053d9…` (was `14a61f2ed4ccbe7c…`, still 8 rows / 8 pass),
+  `bloc_05_time_validation.json` `78d3f2a091a9dc66…` (was
+  `8e8a9da18dc2e622…`, a one-line inventory change).
+* **superseded records are NOT rewritten** (append-only ledger, sealed
+  ratifications): the four digests in the I06 implementation evidence
+  (L103/105/107/109), the I06 ratification §8 (L264–267), the I06
+  scope/noninterference audit (L4), ledger §171 (L6671–6677) / §172
+  (L6860–6862), and the I05 ratification C20/§10 (L87/L339; ledger L6392,
+  L6477) now record **checkpoint-time** values superseded by the above.
+  Measured: no `.py` test verifies those tables against the tree.
+* mechanical I11R2 republish (directive §07 mechanism): staged +7 tracked
+  `.py` (4 `common/` modules + 1 producer + 2 suites), so
+  `python_files_scanned` **1065 → 1072** -- one line, still exactly one
+  removed + one added line against the I05 base.
+
+### 5. Custody and governance (no self-ratification)
+
+Staged set: **16 paths**, all inside the I05-authorized prefixes plus the
+disclosed I11R2 count exception (4 `common/` modules, 2 new U08 suites, the 2
+extended audits, the amended I06 test + producer, the I08 producer, 4
+evidence artifacts, the I11R2 count line). Protected diffs measured EMPTY
+(staged and worktree) against `88373c01c` for the frozen `bloc_05/` plan,
+`config/`, `src/.../normalization/{time,terms,identity}`, `normalization/{__init__,models,enums}`
+and the sealed I01/I04 tests; and against `32a897436` for `time/`, `config/`
+and the plan. Untracked and deliberately not staged: `.bu_tmp/`,
+`BLOC_05_I06_AVAILABILITY_CONFIDENCE_SPIKE.md`, `b5_i03_redteam_results.json`
+(pre-existing leftovers, each already under an I05-authorized prefix, which is
+why the untracked audit passes). Disposition: **B5-I08 =
+IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW** (not ratified; I08 did not
+ratify itself). B5-I01..I07 = OPERATOR_ACCEPTED (unchanged). BLOC_05 =
+**INCOMPLETE** (I09..I23 remain). All 8 program gates (IDENTITY, TIME,
+SEMANTIC, UNIT, LINEAGE, DUPLICATE_REVISION, REPLAY_SAFETY, GOLDEN_T0_T1) =
+**NOT_YET_EARNED**; UNIT_GATE was not claimed (06 §21 owns it).
+next_checkpoint_authorized = **FALSE**; B5-I09+ = UNAUTHORIZED; BLOC_06 =
+UNAUTHORIZED; RESEARCH = FROZEN; MAIN_DIVERGENCE_STATUS unchanged
+(EXTERNAL / UNRECONCILED / NON_BLOCKING_FOR_BLOC_5). No status value was
+invented and no gate was promoted. recommended_next = **OPERATOR REVIEW OF
+THE I08E1 IMPLEMENTATION -- IN PARTICULAR §4, THE DISCLOSED I06 CUSTODY
+AMENDMENT (a single self-contained revert if rejected), THEN AN I09
+DIRECTIVE DECISION IF DESIRED**. HARD STOP after push and report.

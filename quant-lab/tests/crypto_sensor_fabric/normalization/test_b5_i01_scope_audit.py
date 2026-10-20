@@ -74,9 +74,12 @@ def test_only_authorized_subpackages_exist() -> None:
     adds ``time/`` per bloc_05/02 §17, which freezes
     ``normalization/time/`` as required I05 surface -- the same disclosed
     extension on the same precedent, and the I05 directive names the seven
-    modules explicitly.  Every other subpackage remains forbidden at this
-    layer."""
-    allowed = {"identity", "terms", "time"}
+    modules explicitly.  B5-I08 (operator-authorized) adds ``common/`` per
+    bloc_05/03 §21, which freezes ``normalization/common/`` as required I08
+    surface -- the same disclosed extension on the same precedent, with the
+    I08E1 directive naming the scope.  Every other subpackage remains
+    forbidden at this layer."""
+    allowed = {"identity", "terms", "time", "common"}
     present = {
         entry.name
         for entry in PACKAGE.iterdir()
@@ -93,14 +96,16 @@ def test_only_authorized_subpackages_exist() -> None:
         # and is now the home of the identity subpackage; "terms" was
         # operator-authorized at B5-I04A and is the home of the terms
         # subpackage; "time" was operator-authorized at B5-I05
-        # (SENSOR-B5-I05 directive) and is the home of the time subpackage.
-        # The DIRECTORY entries for those three are therefore removed above
+        # (SENSOR-B5-I05 directive) and is the home of the time subpackage;
+        # "common" was operator-authorized at B5-I08 (SENSOR-B5-I08E1
+        # directive, bloc_05/03 §21) and is the home of the common subpackage.
+        # The DIRECTORY entries for those four are therefore removed above
         # (they are authorized subpackages now), while their MODULE forms
         # stay forbidden here: a ``time.py`` beside the package would shadow
         # the authorized ``time/`` subpackage.
         "time.py",
         "sensors",
-        "common",
+        "common.py",
         # named explicitly by the B5-I01 directive
         "registry.py",
         "resolver.py",
