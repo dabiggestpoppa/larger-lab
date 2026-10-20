@@ -293,9 +293,15 @@ class TestEngineOwnedRecovery:
         assert out["final_status"] == "succeeded"
         # Structural closure: the console's drill and session-store modules
         # contain no engine verb — they cannot enact recovery even by accident.
-        engine_verbs = (".transition(", "recover_abandoned(", "claim_work(",
+        # Adversarially hardened (X3): `recover_abandoned` (no paren) so BOTH
+        # the bare form and the engine's real `recover_abandoned_leases(` are
+        # caught — the prior `recover_abandoned(` entry could never match the
+        # actual method name and a console-owned lease recovery would have
+        # slipped through the structural closure.
+        engine_verbs = (".transition(", "recover_abandoned", "claim_work(",
                         "complete_job(", "submit_result(", "requeue(",
-                        "admit_worker(", "verify_no_duplicate_effects(")
+                        "admit_worker(", "verify_no_duplicate_effects(",
+                        ".lease_recovery", ".scheduler.run")
         for module in (drill, session_store):
             src = inspect.getsource(module)
             for verb in engine_verbs:
