@@ -2,7 +2,7 @@
 
 **Document ID:** OCE-B5-I6-GAP-SCOPE-001
 **Version:** 1.0 — FROZEN at P0 under `AUTHORIZED_STAGE=B5-I6` (before any implementation result exists)
-**Authorized base (exact merged main):** `6e10a326f0e1119315448d8e5740a37ec25ad4a0` (merge of PR #15, the B5-I5 ratification head as second parent)
+**Authorized base (exact merged main):** `6e10a326f0eb70affca8f1f627481a52d7062aac` (merge of PR #15, the B5-I5 ratification head `2b2d5abc42679df8dd1b9ad32550353aff2589cc` as second parent) — *(corrected at rung X2: P0 recorded a fabricated, non-resolving SHA with the same 11-char prefix; see `OCE_B5_I6_SCOPE_CONTRACT_AMENDMENT_A1_v1.0.md` — base identity unchanged, git-verified)*
 **Branch:** `oce-book-5-i6` (fresh worktree from the exact base above)
 **Governing charter:** `OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md` (`OPERATOR_RATIFIED — FROZEN`)
 **Governing plan:** `OCE_BLOCK_05_REFERENCE_APPLICATION_FACTORY_PLAN_v1.0.md` §7

@@ -6,7 +6,8 @@
     "registry_file": "docs/oce-golden-system/OCE_B5_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json",
     "law": "addendum-only; the frozen B5-I3 registry has a 0-line diff in this increment"
   },
-  "base_sha": "6e10a326f0e1119315448d8e5740a37ec25ad4a0",
+  "base_sha": "6e10a326f0eb70affca8f1f627481a52d7062aac",
+  "base_sha_correction": "P0 recorded a fabricated non-resolving SHA (6e10a326f0e1119315448d8e5740a37ec25ad4a0); corrected at rung X2 to the git-verified PR #15 merge == origin/main == P0's first parent. See OCE_B5_I6_SCOPE_CONTRACT_AMENDMENT_A1_v1.0.md. Scope unchanged.",
   "authorized_stage": "B5-I6",
   "charter_increment": "I-6 completion (C4 recovery-drill completion + observability) + plan C4.S1-S4; I-7 optional, NOT operator-directed",
   "planned_nodes_executed_verbatim": [
