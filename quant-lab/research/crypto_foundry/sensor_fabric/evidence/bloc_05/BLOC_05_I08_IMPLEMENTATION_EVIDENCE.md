@@ -187,7 +187,7 @@ recorded count equals the count `git ls-files '*.py'` returns from the repositor
 | I06 producer (amended) | `python research/.../scripts/b5_i06_replay_safety.py` | 0 | 14/14 RS rows, 8/8 scope rows |
 | Governance binding + I11R2 evidence + job-state ledger | 3 storage files | 0 | **40 passed** |
 | Normalization (whole) | `pytest tests/crypto_sensor_fabric/normalization -q` | 0 | **849 passed** |
-| Whole package | `pytest tests/crypto_sensor_fabric -q` | see §10 | see §10 |
+| Whole package | `pytest tests/crypto_sensor_fabric -q` | 0 | **4247 passed, 14 skipped** (1213.24s) |
 
 RED-first record: the initial U08 run exited **2** (`ModuleNotFoundError ... common`) before any
 implementation existed.
@@ -196,9 +196,11 @@ implementation existed.
 
 ## 9. Custody (measured against both bases)
 
-Staged set — 16 paths, all inside the I05-authorized prefixes plus the disclosed I11R2 exception:
+Staged set — **18 paths** (the count `git diff --cached --name-only` returned at commit
+`b8f80669f`), all inside the I05-authorized prefixes plus the disclosed I11R2 exception:
 4 `common/` modules, 2 new U08 suites, the 2 extended audits, the amended I06 test, the amended
-I06 producer, the I08 producer, 4 regenerated/extended evidence artifacts, the I11R2 count line.
+I06 producer, the I08 producer, 4 regenerated/extended evidence artifacts, the I11R2 count line,
+this evidence document and the progress ledger §175.
 
 Protected diffs (staged **and** worktree, vs `88373c01c`), all **empty (0 paths)**:
 

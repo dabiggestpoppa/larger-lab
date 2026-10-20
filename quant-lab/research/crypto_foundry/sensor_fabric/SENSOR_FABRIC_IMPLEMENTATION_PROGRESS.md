@@ -7269,9 +7269,9 @@ exact sealed baseline); I05 sealed nine + I01 **521 passed** exit 0;
 governance binding + I11R2 evidence + job-state ledger readers **40 passed**
 exit 0; normalization whole **849 passed** exit 0; I06 producer 14/14 RS rows
 + 8/8 scope rows exit 0; I08 producer `--check` exit 0. Package-wide
-`pytest tests/crypto_sensor_fabric -q` was run to completion in this session
-with its exit code recorded in the final report; the canonical full suite is
-ratification-side work (§168/§172 precedent).
+`pytest tests/crypto_sensor_fabric -q`: **4247 passed / 14 skipped / 0
+failed**, exit 0, 1213.24s; the canonical full suite is ratification-side
+work (§168/§172 precedent).
 
 ### 4. Disclosed custody amendment (operator ruling: "Amend I06 rows + disclose")
 
@@ -7321,10 +7321,11 @@ regenerate, and disclose. Amendment inventory (full detail in
 
 ### 5. Custody and governance (no self-ratification)
 
-Staged set: **16 paths**, all inside the I05-authorized prefixes plus the
-disclosed I11R2 count exception (4 `common/` modules, 2 new U08 suites, the 2
-extended audits, the amended I06 test + producer, the I08 producer, 4
-evidence artifacts, the I11R2 count line). Protected diffs measured EMPTY
+Staged set: **18 paths** (measured `git diff --cached --name-only` at commit
+`b8f80669f`), all inside the I05-authorized prefixes plus the disclosed
+I11R2 count exception (4 `common/` modules, 2 new U08 suites, the 2 extended
+audits, the amended I06 test + producer, the I08 producer, 4 evidence
+artifacts, the I11R2 count line, the I08 evidence document, this ledger §175). Protected diffs measured EMPTY
 (staged and worktree) against `88373c01c` for the frozen `bloc_05/` plan,
 `config/`, `src/.../normalization/{time,terms,identity}`, `normalization/{__init__,models,enums}`
 and the sealed I01/I04 tests; and against `32a897436` for `time/`, `config/`
