@@ -1,0 +1,74 @@
+{
+  "document_id": "OCE-B5-I6-ADDENDUM-001",
+  "version": "1.0",
+  "extends": {
+    "registry_id": "OCE-B5-I3-REGISTRY-001",
+    "registry_file": "docs/oce-golden-system/OCE_B5_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+    "law": "addendum-only; the frozen B5-I3 registry has a 0-line diff in this increment"
+  },
+  "base_sha": "6e10a326f0eb70affca8f1f627481a52d7062aac",
+  "base_sha_correction": "P0 recorded a fabricated non-resolving SHA (6e10a326f0e1119315448d8e5740a37ec25ad4a0); corrected at rung X2 to the git-verified PR #15 merge == origin/main == P0's first parent. See OCE_B5_I6_SCOPE_CONTRACT_AMENDMENT_A1_v1.0.md. Scope unchanged.",
+  "authorized_stage": "B5-I6",
+  "charter_increment": "I-6 completion (C4 recovery-drill completion + observability) + plan C4.S1-S4; I-7 optional, NOT operator-directed",
+  "planned_nodes_executed_verbatim": [
+    {"id": "G5", "owner": "I-6", "node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestFailClosed::test_unsupported_drill_operation_refused"},
+    {"id": "G6", "owner": "I-6", "node": "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_restart_preserves_session_record"},
+    {"id": "G8", "owner": "I-6", "node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestEngineOwnedRecovery::test_console_reports_recovery_without_enacting"},
+    {"id": "G15", "owner": "I-6", "node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestAdversarialControls::test_bypassed_authority_detected"},
+    {"id": "S-3", "owner": "I-6", "node": "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillReport::test_s3_lease_requeue_completion_no_duplicate_effect"},
+    {"id": "S-4", "owner": "I-6", "node": "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_s4_denial_rendered_verbatim_no_silent_retry"}
+  ],
+  "discharges": [
+    {
+      "id": "F-4",
+      "frozen_planned_node": "infrastructure/control-plane/tests/test_b5_i5_drills.py::TestConsoleCrash::test_session_record_marked_partial_on_crash",
+      "executed_node": "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestConsoleCrash::test_session_record_marked_partial_on_crash",
+      "supersession": "file-prefix only: test_b5_i5_drills.py -> test_b5_i6_console_restart.py because B5-I5 never created test_b5_i5_drills.py (its drill work landed in test_b5_i5_timeline.py) and a test_b5_i5_*.py filename would collide with the B5-I5 workflow step's orphan-detection glob. Class and function names identical to the frozen planned node. No assertion or coverage weakened.",
+      "owner": "I-5",
+      "reason": "The console-half crash row stayed unexecuted after B5-I5 (its addendum recorded only the S-2/F-3 supersessions); nothing deferred may become permanently unowned (B5-I3 contract section 3.2), so B5-I6 executes it under the disclosed file-prefix supersession."
+    }
+  ],
+  "new_nodes_with_frozen_owners": [
+    {"id": "F-6", "owner": "I-6 (consent half; construction plan stage I-6)", "nodes": [
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestConsentReplay::test_replay_without_consent_refused_before_actions",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestConsentReplay::test_consented_replay_is_idempotent_and_no_duplicate_effect"
+    ]}
+  ],
+  "already_satisfied": {
+    "b5_i4": ["S-1", "G7", "F-1", "F-5", "G3"],
+    "b5_i5": ["S-2", "F-3", "G4", "G9"],
+    "b5_i2_b5_i3": "all remaining non-deferred registry entries execute in their bound B5-I2/I3 surfaces (re-verified green under Gate G14)"
+  },
+  "c4_nodes": [
+    {"area": "C4.S1 deployment", "nodes": [
+      "test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_manifest_is_deterministic_byte_identical",
+      "test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_manifest_covers_declared_install_set_and_rollback",
+      "test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_tampered_install_file_fails_verification",
+      "test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_clean_install_dry_run_verifies_and_imports"
+    ]},
+    {"area": "C4.S2 observability", "nodes": [
+      "test_b5_i6_deploy_pkg.py::TestObservability::test_stack_failure_detected_fail_closed",
+      "test_b5_i6_deploy_pkg.py::TestObservability::test_operator_traces_governed_operation_in_audit_surface"
+    ]},
+    {"area": "C4.S3 failure injection", "nodes": [
+      "test_b5_i6_deploy_pkg.py::TestChaosMatrix::test_process_and_dependency_injections_fail_closed",
+      "test_b5_i6_deploy_pkg.py::TestChaosMatrix::test_partial_write_and_timeout_injections_fail_closed"
+    ]},
+    {"area": "C4.S4 recovery objectives", "nodes": [
+      "test_b5_i6_deploy_pkg.py::TestRestoreObjectives::test_restore_drill_meets_rpo_and_rto_objectives"
+    ]},
+    {"area": "G6/F-4 support + engine restart refusal", "nodes": [
+      "test_b5_i6_console_restart.py::TestRestartIdentity::test_engine_restart_leaves_console_state_untouched_and_reads_fail_closed"
+    ]},
+    {"area": "S-4 supports", "nodes": [
+      "test_b5_i6_fail_closed.py::TestDenialRendering::test_missing_identity_renders_unverifiable_never_ok",
+      "test_b5_i6_fail_closed.py::TestDenialRendering::test_denied_authority_never_completes_a_drill"
+    ]}
+  ],
+  "deferred_to_future_owner": [
+    {"id": "I-7", "owner": "B5-I6-later / operator-directable", "reason": "Optional loopback web view; charter section 12 row I-7 is conditional on explicit operator direction and the B5-I6 authorization does not direct it. Registry entries G1/G2 stay owner I-7; no test_b5_i7_web_view.py exists."},
+    {"id": "C4.S5-change-cycle", "owner": "B5-I7", "reason": "Plan section 7 row B5-I7 = 'C4 change cycle plus C5 measurements/learning'; ledger section 16.4 assigns change-cycle scope to B5-I7. Ledger section 15.3's mention of the change cycle among B5-I6 deferrals is a summary imprecision (gap contract section 10 item a)."},
+    {"id": "C5-factory-evaluation", "owner": "B5-I7", "reason": "Chapter 5 (time/effort, reuse, usability G16, learning, factory corrections) is plan section 7 row B5-I7."}
+  ],
+  "inapplicable": []
+}
