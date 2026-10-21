@@ -1,0 +1,87 @@
+{
+  "base_sha": "6e10a326f0eb70affca8f1f627481a52d7062aac",
+  "head_sha": "335862bc4059ac0e0074d724bec8f630dfd3b79c",
+  "base": {
+    "nodes": [],
+    "junit": {
+      "tests": 0,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "count": 0
+  },
+  "head": {
+    "nodes": [
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestFailClosed::test_unsupported_drill_operation_refused",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestEngineOwnedRecovery::test_console_reports_recovery_without_enacting",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestEngineOwnedRecovery::test_console_modules_contain_no_engine_verbs",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillReport::test_s3_lease_requeue_completion_no_duplicate_effect",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestConsentReplay::test_replay_without_consent_refused_before_actions",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestConsentReplay::test_consented_replay_is_idempotent_and_no_duplicate_effect",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillSessionDurability::test_drill_session_survives_console_restart_midway",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillSessionDurability::test_report_binds_to_engine_identity",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestAdversarialControls::test_bypassed_authority_detected",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_restart_preserves_session_record",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_non_append_rewrite_refused_and_completion_is_terminal",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_engine_restart_leaves_console_state_untouched_and_reads_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestConsoleCrash::test_session_record_marked_partial_on_crash",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestClientOnlyClosure::test_session_store_imports_no_store_and_is_stdlib_only",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_s4_denial_rendered_verbatim_no_silent_retry",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_missing_identity_renders_unverifiable_never_ok",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_denied_authority_never_completes_a_drill",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_transport_failure_is_never_rendered_success",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_manifest_is_deterministic_byte_identical",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_manifest_covers_declared_install_set_and_rollback",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_tampered_install_file_fails_verification",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_clean_install_dry_run_verifies_and_imports",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestObservability::test_stack_failure_detected_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestObservability::test_operator_traces_governed_operation_in_audit_surface",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestChaosMatrix::test_process_and_dependency_injections_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestChaosMatrix::test_partial_write_and_timeout_injections_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestRestoreObjectives::test_restore_drill_meets_rpo_and_rto_objectives"
+    ],
+    "junit": {
+      "tests": 27,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "count": 27
+  },
+  "delta": {
+    "only_base": [],
+    "only_head": [
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestClientOnlyClosure::test_session_store_imports_no_store_and_is_stdlib_only",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestConsoleCrash::test_session_record_marked_partial_on_crash",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_engine_restart_leaves_console_state_untouched_and_reads_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_non_append_rewrite_refused_and_completion_is_terminal",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py::TestRestartIdentity::test_restart_preserves_session_record",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestChaosMatrix::test_partial_write_and_timeout_injections_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestChaosMatrix::test_process_and_dependency_injections_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestObservability::test_operator_traces_governed_operation_in_audit_surface",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestObservability::test_stack_failure_detected_fail_closed",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_clean_install_dry_run_verifies_and_imports",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_manifest_covers_declared_install_set_and_rollback",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_manifest_is_deterministic_byte_identical",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestReleaseManifest::test_tampered_install_file_fails_verification",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py::TestRestoreObjectives::test_restore_drill_meets_rpo_and_rto_objectives",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_denied_authority_never_completes_a_drill",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_missing_identity_renders_unverifiable_never_ok",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_s4_denial_rendered_verbatim_no_silent_retry",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py::TestDenialRendering::test_transport_failure_is_never_rendered_success",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestAdversarialControls::test_bypassed_authority_detected",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestConsentReplay::test_consented_replay_is_idempotent_and_no_duplicate_effect",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestConsentReplay::test_replay_without_consent_refused_before_actions",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillReport::test_s3_lease_requeue_completion_no_duplicate_effect",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillSessionDurability::test_drill_session_survives_console_restart_midway",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestDrillSessionDurability::test_report_binds_to_engine_identity",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestEngineOwnedRecovery::test_console_modules_contain_no_engine_verbs",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestEngineOwnedRecovery::test_console_reports_recovery_without_enacting",
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestFailClosed::test_unsupported_drill_operation_refused"
+    ],
+    "common": [],
+    "base_present": false,
+    "head_present": true
+  }
+}

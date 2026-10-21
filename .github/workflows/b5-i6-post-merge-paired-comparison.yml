@@ -1,0 +1,135 @@
+name: B5-I6 Post-Merge Paired Base/Head Comparison
+
+on:
+  push:
+    branches:
+      - oce-book-5-i6-post-merge-closure
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paired-comparison:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    env:
+      BASE_SHA: 6e10a326f0eb70affca8f1f627481a52d7062aac
+      HEAD_SHA: 335862bc4059ac0e0074d724bec8f630dfd3b79c
+      CONTRACT_PATH: docs/oce-golden-system/OCE_B5_I6_POST_MERGE_PAIRED_COMPARISON_CONTRACT_v1.0.json
+      GIT_LFS_SKIP_SMUDGE: 1
+    steps:
+      - name: Checkout corrective branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: false
+          ref: oce-book-5-i6-post-merge-closure
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Verify contract
+        run: |
+          set -euo pipefail
+          python3 << 'PY'
+          import json, os
+          c = json.load(open(os.environ['CONTRACT_PATH']))
+          assert c['base_sha'] == os.environ['BASE_SHA']
+          assert c['head_sha'] == os.environ['HEAD_SHA']
+          print('contract-ok')
+          PY
+
+      - name: Execute BASE_SHA in clean isolated checkout
+        run: |
+          set -euo pipefail
+          WORK=/tmp/b5i6-base
+          rm -rf $WORK
+          git clone --no-hardlinks file://$(pwd) $WORK
+          cd $WORK
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $BASE_SHA || true
+          python -m pip install --upgrade pip || true
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt || pip install -r infrastructure/control-plane/requirements-ci.txt 2>&1 | tail -5 || true
+          mkdir -p /tmp/b5i6-artifacts
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q 2>&1 | tee /tmp/b5i6-artifacts/b5-i6-paired-collect-base.txt || true
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short --junitxml=/tmp/b5i6-artifacts/b5-i6-paired-junit-base.xml 2>&1 | tee /tmp/b5i6-artifacts/b5-i6-paired-pytest-base.txt || true
+          echo "BASE_EXIT:$?" > /tmp/b5i6-artifacts/b5-i6-paired-exit-base.txt
+          python3 -c "import json,subprocess,os; meta={'sha':os.environ['BASE_SHA'],'tree':subprocess.check_output(['git','-C','/tmp/b5i6-base','rev-parse','HEAD^{tree}']).decode().strip(),'runner':'ubuntu-24.04','python':'3.12'}; json.dump(meta,open('/tmp/b5i6-artifacts/b5-i6-paired-meta-base.json','w'))" 2>&1 || true
+          cd /tmp
+          rm -rf $WORK
+          echo "base-cleanup-done"
+
+      - name: Execute HEAD_SHA in clean isolated checkout
+        run: |
+          set -euo pipefail
+          WORK=/tmp/b5i6-head
+          rm -rf $WORK
+          git clone --no-hardlinks file://$(pwd) $WORK
+          cd $WORK
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $HEAD_SHA
+          python -m pip install --upgrade pip
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
+          mkdir -p /tmp/b5i6-artifacts
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q | tee /tmp/b5i6-artifacts/b5-i6-paired-collect-head.txt
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short --junitxml=/tmp/b5i6-artifacts/b5-i6-paired-junit-head.xml | tee /tmp/b5i6-artifacts/b5-i6-paired-pytest-head.txt
+          echo "HEAD_EXIT:$?" > /tmp/b5i6-artifacts/b5-i6-paired-exit-head.txt
+          python3 -c "import json,subprocess,os; meta={'sha':os.environ['HEAD_SHA'],'tree':subprocess.check_output(['git','-C','/tmp/b5i6-head','rev-parse','HEAD^{tree}']).decode().strip(),'runner':'ubuntu-24.04','python':'3.12'}; json.dump(meta,open('/tmp/b5i6-artifacts/b5-i6-paired-meta-head.json','w'))"
+          cd /tmp
+          rm -rf $WORK
+          echo "head-cleanup-done"
+
+      - name: Compare paired results
+        run: |
+          set -euo pipefail
+          python3 << 'PY'
+          import json, xml.etree.ElementTree as ET
+          from pathlib import Path
+          art = Path('/tmp/b5i6-artifacts')
+          base_sha = '6e10a326f0eb70affca8f1f627481a52d7062aac'
+          head_sha = '335862bc4059ac0e0074d724bec8f630dfd3b79c'
+          def parse_collect(p):
+              if not p.exists(): return []
+              txt = p.read_text()
+              nodes = []
+              for ln in txt.splitlines():
+                  ln = ln.strip()
+                  for tf in ['infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py','infrastructure/control-plane/tests/test_b5_i6_console_restart.py','infrastructure/control-plane/tests/test_b5_i6_fail_closed.py','infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py']:
+                      if tf + '::' in ln:
+                          nodes.append(ln[ln.index(tf):]); break
+              return nodes
+          def parse_junit(p):
+              if not p.exists(): return {'tests':0,'failures':0,'errors':0,'skipped':0}
+              root = ET.parse(p).getroot()
+              suites = list(root.iter('testsuite'))
+              return {k: sum(int(s.get(k) or 0) for s in suites) for k in ('tests','failures','errors','skipped')}
+          base_nodes = parse_collect(art/'b5-i6-paired-collect-base.txt')
+          head_nodes = parse_collect(art/'b5-i6-paired-collect-head.txt')
+          base_j = parse_junit(art/'b5-i6-paired-junit-base.xml')
+          head_j = parse_junit(art/'b5-i6-paired-junit-head.xml')
+          report = {'base_sha':base_sha,'head_sha':head_sha,'base':{'nodes':base_nodes,'junit':base_j,'count':len(base_nodes)},'head':{'nodes':head_nodes,'junit':head_j,'count':len(head_nodes)},'delta':{'only_base':sorted(set(base_nodes)-set(head_nodes)),'only_head':sorted(set(head_nodes)-set(base_nodes)),'common':sorted(set(base_nodes)&set(head_nodes)),'base_present':len(base_nodes)>0,'head_present':len(head_nodes)>0}}
+          (art/'b5-i6-paired-comparison-report.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report['delta']))
+          problems=[]
+          if len(head_nodes) < 23: problems.append('head_floor_not_met')
+          if head_j['skipped']!=0: problems.append('head_skips_present')
+          if head_j['failures']!=0 or head_j['errors']!=0: problems.append('head_failures_or_errors')
+          if len(base_nodes) == 0 and len(head_nodes) > 0:
+              print('NEW_TESTS_AT_HEAD_ONLY')
+          elif set(base_nodes) != set(head_nodes):
+              problems.append('node_sets_differ')
+          if problems:
+              print('PROBLEMS:'+str(problems)); raise SystemExit(1)
+          print('PAIRED_COMPARISON_OK')
+          PY
+
+      - name: Upload paired comparison artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: b5-i6-paired-comparison
+          path: |
+            /tmp/b5i6-artifacts/*.txt
+            /tmp/b5i6-artifacts/*.xml
+            /tmp/b5i6-artifacts/*.json
+          if-no-files-found: error

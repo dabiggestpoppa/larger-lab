@@ -1,0 +1,85 @@
+{
+  "document_id": "OCE-B5-I6-POST-MERGE-PAIRED-COMPARISON-CONTRACT-001",
+  "version": "1.0",
+  "status": "FROZEN",
+  "purpose": "Clean paired base/head regression comparison for B5-I6 to close missing proof",
+  "base_sha": "6e10a326f0eb70affca8f1f627481a52d7062aac",
+  "head_sha": "335862bc4059ac0e0074d724bec8f630dfd3b79c",
+  "merge_commit_sha": "992d6b0ca369891320045bfddbd654c319cccfc7",
+  "comparison_type": "paired_base_head_direct",
+  "must_not_compare": ["merge_vs_head"],
+  "runner_image": "ubuntu-24.04",
+  "environment_identity": {
+    "os": "ubuntu-24.04",
+    "python_version": "3.12",
+    "pip_version_source": "requirements-ci.lock.txt"
+  },
+  "dependency_lock_identity": {
+    "file": "infrastructure/control-plane/requirements-ci.lock.txt",
+    "install_method": "pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt"
+  },
+  "test_selection": {
+    "selection_mode": "whole-file",
+    "files": [
+      "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py",
+      "infrastructure/control-plane/tests/test_b5_i6_console_restart.py",
+      "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py",
+      "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py"
+    ],
+    "floor": 23,
+    "forbid_skips": true,
+    "orphan_detection": true
+  },
+  "commands": {
+    "setup": [
+      "python -m pip install --upgrade pip",
+      "pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt"
+    ],
+    "collect": "python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q",
+    "execute": "python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short"
+  },
+  "timeouts": {
+    "per_command_seconds": 600,
+    "job_timeout_minutes": 60
+  },
+  "expected_result_files": [
+    "b5-i6-paired-collect-{sha}.txt",
+    "b5-i6-paired-pytest-{sha}.txt",
+    "b5-i6-paired-junit-{sha}.xml",
+    "b5-i6-paired-meta-{sha}.json"
+  ],
+  "comparison_fields": [
+    "collected_count",
+    "executed_total",
+    "passed",
+    "failed",
+    "errors",
+    "skipped",
+    "node_ids",
+    "duplicate_node_ids",
+    "b5_i6_node_totals",
+    "exit_code"
+  ],
+  "rules": {
+    "fail_closed": true,
+    "no_cache_reuse_between_shas": true,
+    "clean_checkout_per_sha": true,
+    "derive_totals_from_executions": true,
+    "no_silent_test_dropping": true,
+    "refusal_conditions": [
+      "sha_mismatch",
+      "tree_mismatch",
+      "setup_differs",
+      "collection_fails",
+      "result_files_missing_or_malformed",
+      "node_id_duplicates",
+      "test_selection_differs_without_committed_change",
+      "skips_increase_unexpectedly",
+      "failures_errors_regress",
+      "b5_i6_tests_absent",
+      "manifest_unverifiable",
+      "cleanup_incomplete"
+    ]
+  },
+  "notes": "This is a fresh clean paired comparison executed in isolated environments to satisfy the omitted mandatory base/head regression comparison."
+}
