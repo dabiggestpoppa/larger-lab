@@ -17,11 +17,13 @@ jobs:
       BASE_SHA: 6e10a326f0eb70affca8f1f627481a52d7062aac
       HEAD_SHA: 335862bc4059ac0e0074d724bec8f630dfd3b79c
       CONTRACT_PATH: docs/oce-golden-system/OCE_B5_I6_POST_MERGE_PAIRED_COMPARISON_CONTRACT_v1.0.json
+      GIT_LFS_SKIP_SMUDGE: 1
     steps:
       - name: Checkout corrective branch
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          lfs: false
           ref: oce-book-5-i6-post-merge-closure
 
       - name: Setup Python
@@ -47,7 +49,7 @@ jobs:
           rm -rf $WORK
           git clone --no-hardlinks file://$(pwd) $WORK
           cd $WORK
-          git checkout $BASE_SHA
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $BASE_SHA
           python -m pip install --upgrade pip
           pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
           mkdir -p /tmp/b5i6-artifacts
@@ -66,7 +68,7 @@ jobs:
           rm -rf $WORK
           git clone --no-hardlinks file://$(pwd) $WORK
           cd $WORK
-          git checkout $HEAD_SHA
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $HEAD_SHA
           python -m pip install --upgrade pip
           pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
           mkdir -p /tmp/b5i6-artifacts
