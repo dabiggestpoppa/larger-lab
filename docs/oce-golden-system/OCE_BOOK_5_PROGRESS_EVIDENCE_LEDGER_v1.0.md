@@ -1229,3 +1229,32 @@ Cloud mutations 0; external hosting none; external network zero (socket-audited)
 **Manifest verification:** hash+size verification performed on CI artifacts (7/7, sizes present). 
 **Base/head regression:** disk space constrained preventing clean full worktree comparison; substituted by authoritative CI evidence (27/27, no failures). 
 **E2E classification:** B (witnessed, non-reproducible). All load-bearing claims map to committed CI nodes.
+
+
+### 17.11 Post-merge closure — omitted base/head paired comparison (append-only; 2026-10-21)
+
+**Disposition:** `BLOCKED_B5_I6_POST_MERGE_PROOF` corrected to **proof closure in progress/completed** via fresh clean environment. `B5_I6_POST_MERGE_GOVERNANCE_EXCEPTION_RECORDED` is **not** operator-authorized and is **not** accepted; the intended outcome is proof closure, not exception acceptance.
+
+**Reality lock (reverified):**
+- PR #16 **MERGED** (merge commit `992d6b0ca369891320045bfddbd654c319cccfc7`), parents `[6e10a326f0eb70affca8f1f627481a52d7062aac, 335862bc4059ac0e0074d724bec8f630dfd3b79c]`, merge tree `3a11bfb8caee6a2a51275ae0cf8a3069967c45d3` == ratification head tree.
+- `origin/main` contains the merge commit. Branch `oce-book-5-i6` retained at `335862bc4`. Tracked worktree clean at closure start.
+- B5-I7–I9 remain **LOCKED**. No B5-I7 artifacts exist.
+
+**Governance defect (audit):**
+- Original ratification claimed/relied on CI substitution for the mandatory clean base/head regression comparison. Local disk exhaustion (∼1.7GB free) blocked creating two clean worktrees on the merge machine; no safely removable large artifacts identified. Ordinary CI did **not** satisfy the omitted paired-comparison requirement. The premature “all gates passed” framing was procedurally overbroad. Corrections are append-only; history not rewritten.
+
+**Clean paired comparison (fresh isolated environment):**
+- Corrective branch: `oce-book-5-i6-post-merge-closure` (from `origin/main`), PR #17 opened.
+- Contract (frozen): `docs/oce-golden-system/OCE_B5_I6_POST_MERGE_PAIRED_COMPARISON_CONTRACT_v1.0.json` (base `6e10a326f…`, head `335862bc4…`, identical setup/deps/commands, fail-closed).
+- Workflow: `.github/workflows/b5-i6-post-merge-paired-comparison.yml` executed in fresh isolated checkouts per SHA (LFS skipped, no cache reuse), sequential clean execution, artifacts uploaded.
+- Run (push): `39606675718` (`B5-I6 Post-Merge Paired Base/Head Comparison`), **completed | success**. Artifacts downloaded to `artifacts/b5-i6-paired-comparison/`.
+
+**Parsed results (from artifacts):**
+- Base (`6e10a326f…`): B5-I6 tests **absent** (collect 0 nodes, junit 0/0/0/0). Consistent with pre-merge state.
+- Head (`335862bc4…`): **27/27** B5-I6 tests collected/executed; junit **27 tests, 0 failures, 0 errors, 0 skipped**. Floor 23 met. No duplicates. All four B5-I6 files selected whole-file.
+- Delta: 27 tests added at head only (`only_head` = full set), `only_base` empty. Node sets differ by addition (expected). Comparator reported **PAIRED_COMPARISON_OK** with **NEW_TESTS_AT_HEAD_ONLY**; fail-closed checks for head passed (floor/met, no skips/failures/errors).
+- Cleanup: per-SHA checkouts removed after artifact capture (recorded in workflow steps).
+
+**Closure assessment:** The omitted mandatory paired comparison has been executed in a clean reproducible environment with identical contract/commands/setup. Head-side B5-I6 gates pass (27/27, 0/0/0). Base-side absence is expected (tests introduced in PR). Procedural defect recorded truthfully; proof closure restored via this corrective mechanism.
+
+**Locks unchanged:** B5-I7–I9 remain LOCKED. No production behavior changes. No history rewrite.
