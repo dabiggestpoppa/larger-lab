@@ -295,7 +295,7 @@ compared old-vs-new, line by line, and classified.
 | `bloc_05_time_validation.json` | inventory line `test_b5_i05_scope_audit.py → 91a6119a…` | `→ 0e8544fe…` | **exactly one** line changed: the I05 producer hashes the I05 audit test, which the disclosed allowlist extension had to amend | **YES** | the artifact's other 85 rows and its 86-row summary are unchanged; the row that changed is a *hash of the file the directive authorizes changing* | **NO** | ACCEPT |
 | `bloc_05_replay_safety_validation.json` | inventory lines for the I06 producer and the I06 suite | their two hashes updated (`822fc997…→b5b8d40b…`, `09d5cec9…→6f9e52a7…`) | the two files the amendment itself changed | **YES** | the 14 RS rows and their dispositions are unchanged; the inventory is self-consistent with the tree | **NO** | ACCEPT |
 | `BLOC_05_I06_SCOPE_AUDIT.json` | 8 rows, 8 pass, absolute clauses | 8 rows, 8 pass; the four amended rows carry the disclosed clause + detail text | the same amendment, republished | **YES** | row count and row ids are unchanged; the four untouched rows are byte-identical | **NO** | ACCEPT |
-| `BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` | `"python_files_scanned": 1065` | `1072` | the mechanical republish: staging 7 new tracked `.py` files changes the repo-wide count | **YES** | exactly one removed + one added line, both `python_files_scanned`; the recorded value equals `git ls-files '*.py' | wc -l` = **1072** (re-measured) | **NO** | ACCEPT |
+| `BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` | `"python_files_scanned": 1065` | `1072` | the mechanical republish: staging 7 new tracked `.py` files changes the repo-wide count | **YES** | exactly one removed + one added line, both `python_files_scanned`; the recorded value equals `git ls-files '*.py' \| wc -l` = **1072** (re-measured) | **NO** | ACCEPT |
 
 **The decisive classification:** every change is either (a) an allowlist
 recognizing a legitimate new checkpoint, (b) an evidence inventory reflecting
@@ -457,7 +457,7 @@ with the exit code captured directly. `PYTHONIOENCODING=utf-8`, cwd
 | I08 producer `--check` (second invocation) | — | **byte-identical stdout** | 0 |
 | I06 producer (amended) | 14 RS + 8 scope | **14 rows/14 pass + 8 rows/8 pass** | 0 |
 | I05 producer | 86 rows | **86 rows/86 pass + 7 scope rows/7 pass** | 0 |
-| I11R2 tracked-Python inventory | 1072 | **`git ls-files '*.py' | wc -l` = 1072 == recorded** | 0 |
+| I11R2 tracked-Python inventory | 1072 | **`git ls-files '*.py' \| wc -l` = 1072 == recorded** | 0 |
 | Frozen plan blobs | unchanged | **7/7 SAME vs `origin/agent/crypto-sensor-fabric-plan`** | 0 |
 
 **Producer side-effect discipline.** Running the I05/I06 producers against the
