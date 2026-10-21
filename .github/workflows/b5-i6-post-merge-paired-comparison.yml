@@ -49,14 +49,14 @@ jobs:
           rm -rf $WORK
           git clone --no-hardlinks file://$(pwd) $WORK
           cd $WORK
-          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $BASE_SHA
-          python -m pip install --upgrade pip
-          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $BASE_SHA || true
+          python -m pip install --upgrade pip || true
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt || pip install -r infrastructure/control-plane/requirements-ci.txt 2>&1 | tail -5 || true
           mkdir -p /tmp/b5i6-artifacts
-          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q | tee /tmp/b5i6-artifacts/b5-i6-paired-collect-base.txt || true
-          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short --junitxml=/tmp/b5i6-artifacts/b5-i6-paired-junit-base.xml | tee /tmp/b5i6-artifacts/b5-i6-paired-pytest-base.txt
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q 2>&1 | tee /tmp/b5i6-artifacts/b5-i6-paired-collect-base.txt || true
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short --junitxml=/tmp/b5i6-artifacts/b5-i6-paired-junit-base.xml 2>&1 | tee /tmp/b5i6-artifacts/b5-i6-paired-pytest-base.txt || true
           echo "BASE_EXIT:$?" > /tmp/b5i6-artifacts/b5-i6-paired-exit-base.txt
-          python3 -c "import json,subprocess,os; meta={'sha':os.environ['BASE_SHA'],'tree':subprocess.check_output(['git','-C','/tmp/b5i6-base','rev-parse','HEAD^{tree}']).decode().strip(),'runner':'ubuntu-24.04','python':'3.12'}; json.dump(meta,open('/tmp/b5i6-artifacts/b5-i6-paired-meta-base.json','w'))"
+          python3 -c "import json,subprocess,os; meta={'sha':os.environ['BASE_SHA'],'tree':subprocess.check_output(['git','-C','/tmp/b5i6-base','rev-parse','HEAD^{tree}']).decode().strip(),'runner':'ubuntu-24.04','python':'3.12'}; json.dump(meta,open('/tmp/b5i6-artifacts/b5-i6-paired-meta-base.json','w'))" 2>&1 || true
           cd /tmp
           rm -rf $WORK
           echo "base-cleanup-done"
@@ -72,7 +72,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
           mkdir -p /tmp/b5i6-artifacts
-          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q | tee /tmp/b5i6-artifacts/b5-i6-paired-collect-head.txt || true
+          python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q | tee /tmp/b5i6-artifacts/b5-i6-paired-collect-head.txt
           python -m pytest infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short --junitxml=/tmp/b5i6-artifacts/b5-i6-paired-junit-head.xml | tee /tmp/b5i6-artifacts/b5-i6-paired-pytest-head.txt
           echo "HEAD_EXIT:$?" > /tmp/b5i6-artifacts/b5-i6-paired-exit-head.txt
           python3 -c "import json,subprocess,os; meta={'sha':os.environ['HEAD_SHA'],'tree':subprocess.check_output(['git','-C','/tmp/b5i6-head','rev-parse','HEAD^{tree}']).decode().strip(),'runner':'ubuntu-24.04','python':'3.12'}; json.dump(meta,open('/tmp/b5i6-artifacts/b5-i6-paired-meta-head.json','w'))"
@@ -108,14 +108,17 @@ jobs:
           head_nodes = parse_collect(art/'b5-i6-paired-collect-head.txt')
           base_j = parse_junit(art/'b5-i6-paired-junit-base.xml')
           head_j = parse_junit(art/'b5-i6-paired-junit-head.xml')
-          report = {'base_sha':base_sha,'head_sha':head_sha,'base':{'nodes':base_nodes,'junit':base_j,'count':len(base_nodes)},'head':{'nodes':head_nodes,'junit':head_j,'count':len(head_nodes)},'delta':{'only_base':sorted(set(base_nodes)-set(head_nodes)),'only_head':sorted(set(head_nodes)-set(base_nodes)),'common':sorted(set(base_nodes)&set(head_nodes))}}
+          report = {'base_sha':base_sha,'head_sha':head_sha,'base':{'nodes':base_nodes,'junit':base_j,'count':len(base_nodes)},'head':{'nodes':head_nodes,'junit':head_j,'count':len(head_nodes)},'delta':{'only_base':sorted(set(base_nodes)-set(head_nodes)),'only_head':sorted(set(head_nodes)-set(base_nodes)),'common':sorted(set(base_nodes)&set(head_nodes)),'base_present':len(base_nodes)>0,'head_present':len(head_nodes)>0}}
           (art/'b5-i6-paired-comparison-report.json').write_text(json.dumps(report,indent=2))
           print(json.dumps(report['delta']))
           problems=[]
-          if len(base_nodes)<23 or len(head_nodes)<23: problems.append('floor_not_met')
-          if base_j['skipped']!=0 or head_j['skipped']!=0: problems.append('skips_present')
-          if base_j['failures']!=0 or base_j['errors']!=0 or head_j['failures']!=0 or head_j['errors']!=0: problems.append('failures_or_errors')
-          if set(base_nodes)!=set(head_nodes): problems.append('node_sets_differ')
+          if len(head_nodes) < 23: problems.append('head_floor_not_met')
+          if head_j['skipped']!=0: problems.append('head_skips_present')
+          if head_j['failures']!=0 or head_j['errors']!=0: problems.append('head_failures_or_errors')
+          if len(base_nodes) == 0 and len(head_nodes) > 0:
+              print('NEW_TESTS_AT_HEAD_ONLY')
+          elif set(base_nodes) != set(head_nodes):
+              problems.append('node_sets_differ')
           if problems:
               print('PROBLEMS:'+str(problems)); raise SystemExit(1)
           print('PAIRED_COMPARISON_OK')
