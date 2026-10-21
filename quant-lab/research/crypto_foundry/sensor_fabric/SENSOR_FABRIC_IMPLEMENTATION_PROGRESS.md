@@ -7345,3 +7345,167 @@ invented and no gate was promoted. recommended_next = **OPERATOR REVIEW OF
 THE I08E1 IMPLEMENTATION -- IN PARTICULAR §4, THE DISCLOSED I06 CUSTODY
 AMENDMENT (a single self-contained revert if rejected), THEN AN I09
 DIRECTIVE DECISION IF DESIRED**. HARD STOP after push and report.
+
+## 176 - SENSOR-B5-I08R1: I08 OPERATOR RATIFICATION (COMPLETE CHECKPOINT) + I09 READINESS RECONSTRUCTION (READ-ONLY)
+
+Date: 2026-10-20. Directive SENSOR-B5-I08R1. Start head
+`03522870d40b839a2eac28eff7841bfb161e05f3` (= required = remote after fetch;
+tracked tree clean apart from the three pre-existing untracked scratch paths,
+never staged; single-parent chain, 0 merges; all seven bloc_05 plan blobs
+re-measured identical to frozen plan branch `4bb677f9e`). Deliverables:
+`BLOC_05_I08_OPERATOR_RATIFICATION.md` + `BLOC_05_I09_READINESS_ASSESSMENT.md` +
+this append-only entry. Sealed I01..I08 bytes, tests, configs, frozen plan and
+pre-existing evidence UNTOUCHED; **zero production code written**; no I09
+implementation; no gate promoted.
+
+### 1. Custody re-measured in the ratification session
+
+```text
+LOCAL_HEAD  = 03522870d40b839a2eac28eff7841bfb161e05f3
+REMOTE_HEAD = 03522870d40b839a2eac28eff7841bfb161e05f3   (ls-remote, equal)
+PLAN_BRANCH = origin/agent/crypto-sensor-fabric-plan = 4bb677f9e0266f4dc48405181696019f359ae49f
+BLOC_05 PLAN BLOBS = 7/7 SAME vs the pinned plan branch
+TRACKED TREE = CLEAN  (3 pre-existing untracked scratch paths, never staged)
+`git ls-files '*.py' | wc -l` = 1072 == the recorded I11R2 count
+```
+
+Two-commit linear fast-forward over `88373c01c`: `b8f80669f` (I08E1
+implementation, 18 paths) then `03522870d` (I08E1 evidence + count record, 2
+doc paths). No amend, rebase, reset, squash, merge, cherry-pick or force-push
+anywhere in the chain.
+
+### 2. Independent ratification result (24/24 gates PASS)
+
+The ratification did **not** reuse the I08 producer's fixtures. 12 audit probes
+and 8 hand-built counterexamples were written against the production functions
+in the ratification session; 22 frozen obligations were independently
+reconstructed into a contract matrix; 10 mandated + 3 extra adversarial custody
+probes were executed and the worktree restored empty; every recorded pre-I08
+digest was recomputed from the historical git commits (not from the tree).
+Gate matrix `R08-01..R08-24` -- all 24 individually satisfied (clause, probe,
+observed result and evidence reference per row), including: frozen-authority
+integrity (7/7), I04B non-duplication (`terms/` diff EMPTY, no `..terms`
+import), stablecoin non-equivalence (no permanent 1:1; absent rate => NULL +
+`STABLECOIN_CONVERSION_UNAVAILABLE`), PIT conversion integrity (both rate
+clocks <= cutoff), evidence reproducibility (two `--check` runs byte-identical;
+exit 4 on pin drift with no write; exit 1 on non-PASS), historical SHA
+continuity, unauthorized-change detection (13/13) and program-level gate
+integrity (all 8 gates `NOT_YET_EARNED`; `UNIT_GATE` not claimed).
+
+**Suites re-executed in this session** (cwd `quant-lab`, `PYTHONIOENCODING=utf-8`,
+`pytest -q -p no:cacheprovider`, exit codes captured directly): U08 focused
+**28 passed** exit 0; I06 replay-safety (amended) **24 passed** exit 0; I05
+sealed nine + I01 **521 passed** exit 0; normalization whole **849 passed** exit
+0; governance binding + I11R2 evidence + job-state ledger **40 passed** exit 0;
+I08 producer `--check` **55 rows, exit 0**, two invocations byte-identical; I06
+producer **14/14 RS rows + 8/8 scope rows** exit 0; I05 producer **86 rows/86
+pass + 7 scope rows/7 pass** exit 0.
+
+**Disclosed limitation:** the whole-package `pytest tests/crypto_sensor_fabric -q`
+run (4,247 passed / 14 skipped) was **not** re-executed, per the directive's
+governance-only scope. The agent's run is traceable to identical implementation
+bytes -- the second commit changed only the evidence document and the ledger --
+so no discrepancy required a wider test. This is recorded as a limitation, not
+as a pass.
+
+### 3. Four factual corrections made to the ratification during the session
+
+The ratification draft was wrong on four mechanically-checkable points; each
+was re-measured and the document corrected before it was signed. Recording them
+here because the corrections are the substance of the audit, not decoration:
+
+1. **The upstream registry modules exist and are consumed.** A draft claimed
+   `methodology_registry.yaml` and `semantic_equivalence.yaml` had "no Python
+   consumer". Measured false: `src/crypto_sensor_fabric/registry/methodology_registry.py`
+   (`MethodologyEntry`/`MethodologyRegistry`/`load_methodology_registry`/
+   `require_methodology_id`) and `src/crypto_sensor_fabric/registry/semantic_equivalence.py`
+   (`EquivalenceMapping`/`SemanticEquivalenceRegistry`/
+   `load_semantic_equivalence`/`is_poolable`) -- both added by `8b2162a11`
+   ("SENSOR-B1-04: add semantic equivalence and methodology contracts") -- load
+   those configs and are exercised by `tests/crypto_sensor_fabric/registry/`
+   (`test_methodology_registry.py`, `test_semantic_equivalence.py`,
+   `test_provider_semantics.py`). I09 is therefore a **reconciliation with a
+   live registry**, not a greenfield module. The §16 / §11 object shapes
+   (`formula_or_algorithm`, `required_inputs`, `output_units`,
+   `PIT_requirements`, `known_limitations`, `introduced_at`/`deprecated_at`;
+   `native_definition`, `blocking_assumptions`, `known_limitations`) are still
+   unbuilt, so I09 ownership stands.
+2. **The operative missingness vocabulary is 05 §12's thirteen members**, not
+   03 §14's ten-item illustrative list. `MissingnessReason`
+   (`normalization/enums.py:115-144`) matches 05 §12 exactly (0 missing / 0
+   extra). 03 §14's `SEMANTICS_UNVERIFIED` is a **quality flag** under 05 §11,
+   not a missingness reason -- a fork an implementer would easily create by
+   transcribing 03 §14 literally.
+3. **The envelope's "delivered already" list named four fields that do not
+   exist.** AST extraction of `T1BaseEnvelope` (27 direct fields; 59 after
+   flattening `ObservationTimeEnvelope` / `T1VersionContext` / `T1LineageRef` /
+   `T1Quality`) against 03 §2's 24 frozen names: **18 carried, 6 not**. The
+   draft's delivered list included `economic_contract_id`, `canonical_asset_id`,
+   `raw_lineage_refs` and `replay_eligibility` -- none of which is a field on
+   `T1BaseEnvelope`. `economic_contract_id` and `canonical_asset_id` are
+   *returned* by I02's resolver (`normalization/identity/resolver.py:646-647`)
+   and `replay_eligibility` is *computed* by I06
+   (`normalization/time/replay_gate.py:115`); the raw-provenance ref lists live
+   in `T1LineageRef`. The composite is blocked on **four** stages -- I02, I06,
+   I09, I19 -- exactly as the ratified I01 type-scope matrix records; I09 owns
+   two of the six.
+4. **The methodology registry holds 9 ids, not 8** (all `status: PROVISIONAL`);
+   the semantic-equivalence config holds 6 mappings across 5 distinct
+   providers, every one `evidence_reference: BLOC2_PROBE_PENDING`.
+
+### 4. Carried limitations (accepted, not converted into closures)
+
+Seven limitations are carried by the ratification and none is waived: **L1**
+derived precision depends on the ambient `decimal` context (can only lose
+precision, never fabricate it); **L2** asset identity does not reach the
+conversion boundary (`_leg_matches` compares the leg against the *unit token*,
+so a literal `OTHER_QUOTE` leg is accepted while a real asset leg is refused);
+**L3** the result model still coerces a float `native_value` (the function
+boundary refuses it, the model does not); **L4** `B5_I08_UNITS_V1` is not in the
+methodology registry -- measured: 9 ids, and `require_methodology_id` **fails
+closed** with `KeyError`, which is correct behaviour, but the divergence must
+be reconciled at I09; **L5** `_require_utc_aware` enforces *aware*, not *UTC*;
+**L6** the amended I06 row's prefix allowance has no path separator (the four
+sibling names are caught by other audits, so no unauthorized change was found
+to be invisible); **L7** the historical/current hash distinction is carried in
+prose, not in a machine-readable artifact.
+
+### 5. I09 readiness reconstruction (read-only, no authority granted)
+
+`BLOC_05_I09_READINESS_ASSESSMENT.md` reconstructs the frozen I09 checkpoint's
+true scope from authoritative clauses at the ratified head. Frozen title
+(06 §19 / 07 §10): *methodology + semantic-equivalence registries*. Module
+adjudication over 03 §21's eight `common/` modules: `numeric.py`, `units.py`,
+`conversion.py` = I08-owned; `methodologies.py`, `semantic_registry.py` =
+**I09_OWNED**; `envelope.py` = I09 partial release (I09 owns 2 of the 6
+outstanding 03 §2 fields); `missingness.py` = **SATISFIED_UPSTREAM** (re-export
+only, never fork); `comparability.py` = **REQUIRES_OPERATOR_DECISION** (I09 vs
+I19 vs I21 -- the frozen documents do not name its owner, and 03 §18's
+condition 8 is inseparable from I09's equivalence classes). I09 is separable
+into **I09-a** (the registries, implementable offline with no provider facts)
+and **I09-b** (provider semantic evidence, which requires probes that do not
+exist in the repo; 06 §17's `bloc_05_semantic_validation.json` is the only §17
+artifact still unproduced). **Eight operator rulings are requested** (the
+fate of the two live PROVISIONAL registries; the stablecoin methodology id;
+the `comparability.py` owner; whether `envelope.py` ships at I09; whether one
+directive may carry both halves; which providers first; whether pending
+evidence references may be promoted; whether L1/L2/L3 are repaired in I09 or
+separately).
+
+### 6. Custody and governance (no self-ratification)
+
+Staged set: this entry + the two new evidence documents. Protected diffs
+measured EMPTY against `03522870d` for `src/`, `tests/`, `config/` and the
+frozen `bloc_05/` plan. Untracked and deliberately not staged: `.bu_tmp/`,
+`BLOC_05_I06_AVAILABILITY_CONFIDENCE_SPIKE.md`, `b5_i03_redteam_results.json`
+(pre-existing leftovers, never touched). Disposition: **B5-I08 =
+OPERATOR_ACCEPTED** (this directive ratifies the checkpoint; I08 did not
+ratify itself). B5-I01..B5-I08 = OPERATOR_ACCEPTED. BLOC_05 = **INCOMPLETE**
+(I09..I23 remain). All 8 program gates (IDENTITY, TIME, SEMANTIC, UNIT,
+LINEAGE, DUPLICATE_REVISION, REPLAY_SAFETY, GOLDEN_T0_T1) = **NOT_YET_EARNED**;
+UNIT_GATE was not claimed (06 §21 owns it). B5-I09 = **NOT_IMPLEMENTED**;
+next_checkpoint_authorized = **FALSE**; B5-I09+ = UNAUTHORIZED; BLOC_06 =
+UNAUTHORIZED; RESEARCH = FROZEN; MAIN_DIVERGENCE_STATUS unchanged (EXTERNAL /
+UNRECONCILED / NON_BLOCKING_FOR_BLOC_5). No status value was invented and no
+gate was promoted. recommended_next = **OPERATOR RULINGS ON THE EIGHT I09
+QUESTIONS (I09 §9), THEN AN I09 DIRECTIVE**. HARD STOP after push and report.
