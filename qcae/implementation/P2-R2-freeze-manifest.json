@@ -1,0 +1,304 @@
+{
+  "phase": "P2-R2 \u2014 Governance-Wiring Repair (superseding)",
+  "supersedes": {
+    "original_freeze_artifact": "qcae/implementation/P2-freeze-manifest.json",
+    "original_freeze_commit": "4cca8729",
+    "original_freeze_digest": "sha256:0c2c7a1df104a58c70c528f99ffeb59c4560124e9d021a75709a0a4b47b272f1",
+    "r1_freeze_artifact": "qcae/implementation/P2-R1-freeze-manifest.json",
+    "r1_freeze_digest": "sha256:2329eea9e9ef14338c5c1484ff726623392a5814488c9c78ae1f24d166d40410",
+    "relationship": "superseding repair manifest; the original P2 freeze and the P2-R1 repair manifest are preserved unchanged as historical truth"
+  },
+  "operator_review_trigger": "Operator review of P2-R1 head a8b20a6c: governance components were built but not bound into the execution path \u2014 public authority_ok bypass, REQUIRE_APPROVAL not operational on the normal path, caller-modeled recovery re-evaluation, private engine boundary leaks, no durable CLI job submission; P3 NOT authorized",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "branch": "qcae-capability-acquisition-engine",
+  "head_commit": "4395aaa89720e4014374a0de1b3ad1ee9f06f365",
+  "tested_commit": "4395aaa89720e4014374a0de1b3ad1ee9f06f365",
+  "phase_commits": {
+    "original_p2_build": [
+      "ab0098c5",
+      "52be767f",
+      "534f7864",
+      "766efa0d",
+      "cb047e4a",
+      "e1936d06",
+      "fbe93cef",
+      "21bc4466",
+      "0603b882",
+      "38e6ca66",
+      "c531e12f",
+      "49f6fdbc",
+      "61488273",
+      "afdbaa84",
+      "8022b61d",
+      "4cca8729"
+    ],
+    "p2_r1_structural_repairs": [
+      "425ac5f6",
+      "3b5aaed0",
+      "bfead6f6",
+      "acf31b6f",
+      "cb1cede4",
+      "6ea6dcef",
+      "ac0dd3c2",
+      "ea493b8e",
+      "a8b20a6c"
+    ],
+    "p2_r2_governance_wiring": [
+      "30cebe27",
+      "407b7de9",
+      "7f6bccb7",
+      "e93f41dd",
+      "3a7783ea",
+      "4b88cbd7",
+      "f1e02304",
+      "8e8b9431"
+    ]
+  },
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0006-persistence-architecture.md",
+    "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md",
+    "qcae/implementation/decisions/ADR-0008-p2-runtime-state-vocabulary.md",
+    "qcae/implementation/decisions/ADR-0009-policy-vs-authority-vocabularies.md"
+  ],
+  "prior_freeze_refs": [
+    "qcae/implementation/P1-R1-freeze-manifest.json",
+    "qcae/implementation/P2-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R1-freeze-manifest.json (historical, superseded by this manifest)"
+  ],
+  "repairs": {
+    "c01_authority_gate_in_execution_path": {
+      "defect": "execute_step exposed a public authority_ok=True caller bypass; AuthorityProvider was never consulted on the normal execution path",
+      "repair": "StepAuthorityGate port + typed StepAuthorityVerdict binding principal/action/resource/scope/requirement; engine evaluates the CURRENT gate inside execute_step; no gate configured fails closed; DENY -> POLICY_DENIED, REQUIRE_APPROVAL -> durable request + WAITING_POLICY; verdict step/principal replay guards; composition root wires PolicyStepAuthorityGate + ApprovalRegistrySink with a registered runtime worker principal; policy engine action matcher honors prefix rules",
+      "tests": "qcae/tests/unit/test_p2r2_c01_authority_gate.py"
+    },
+    "c02_approval_execution_round_trip": {
+      "defect": "REQUIRE_APPROVAL blocked nothing durable: no request artifact, no verified grant release path",
+      "repair": "exact-bound AuthorityRequest with explicit 24h window; service.release_granted_step verifies the GRANT against the request (action/resource/scope/budget, not expired) before engine release; single-use grant key; laundering rejected at registry write AND re-checked service-side",
+      "tests": "qcae/tests/unit/test_p2r2_c02_approval_round_trip.py"
+    },
+    "c03_recovery_authority_reevaluation": {
+      "defect": "recovery re-evaluation was modeled by a caller flag",
+      "repair": "resumed execution evaluates the live gate, so policy changes during a crash window change resumed outcomes; committed execution records and terminal steps untouched",
+      "tests": "qcae/tests/unit/test_p2r2_c03_recovery_authority.py"
+    },
+    "c04_canonical_submission": {
+      "defect": "no QcaeApp.job_submit; CLI could not durably submit",
+      "repair": "versioned JobSubmission envelope validated canonically before persistence (nothing persists on malformed input); deterministic identity; atomic engine path; thin CLI `job submit` durable across process close",
+      "tests": "qcae/tests/unit/test_p2r2_c04_submission.py"
+    },
+    "c05_boundary_leaks_removed": {
+      "defect": "QcaeApp used service._engine; RuntimeService.identity inspected engine._workers",
+      "repair": "public engine.registered_worker_types(); service mark_running/require_identity/authority_decide surfaces; TestInterfaceBoundary architecture guard (self-verified)",
+      "tests": "qcae/tests/architecture/test_p0_dependency_guards.py::TestInterfaceBoundary"
+    },
+    "c06_authority_budget_secrets_integration": {
+      "defect": "cross-layer laws were neither stated nor proven",
+      "repair": "authority cannot widen budget (approval_ref-only increases; no engine widening path); action permission does not imply secret permission; constrained grants stay constrained across retries and are visible in the event trail",
+      "tests": "qcae/tests/unit/test_p2r2_c06_integration.py"
+    }
+  },
+  "persistence": {
+    "engine": "SQLite (stdlib sqlite3)",
+    "metadata_schema_version": 4,
+    "artifact_hash_algorithm": "sha256",
+    "migration_v3_to_v4": {
+      "migration_id": "P2-0004-runtime-governance-tables",
+      "evidence": "qcae/tests/unit/test_p2_migration_backup.py::TestMigrationV3ToV4"
+    }
+  },
+  "vocabularies": {
+    "job_states": [
+      "CREATED",
+      "QUEUED",
+      "RUNNING",
+      "WAITING",
+      "WAITING_APPROVAL",
+      "RETRY_PENDING",
+      "SUCCEEDED",
+      "FAILED",
+      "CANCELLED",
+      "BLOCKED"
+    ],
+    "step_states": [
+      "PENDING",
+      "READY",
+      "RUNNING",
+      "WAITING_POLICY",
+      "WAITING_INPUT",
+      "RETRY_SCHEDULED",
+      "SUCCEEDED",
+      "PARTIAL",
+      "FAILED",
+      "CANCELLED",
+      "STALE"
+    ],
+    "failure_classes": [
+      "TRANSIENT",
+      "PERMANENT",
+      "POLICY_DENIED",
+      "APPROVAL_REQUIRED",
+      "BUDGET_EXHAUSTED",
+      "INVALID_INPUT",
+      "DEPENDENCY_FAILED",
+      "UNKNOWN"
+    ],
+    "execution_states": [
+      "RESERVED",
+      "EXECUTING",
+      "COMMITTED",
+      "FAILED",
+      "ABANDONED"
+    ],
+    "replay_safety_classes": [
+      "REPLAY_SAFE",
+      "IDEMPOTENCY_AWARE",
+      "NON_REPLAY_SAFE"
+    ],
+    "step_authority_decisions": [
+      "ALLOW",
+      "DENY",
+      "REQUIRE_APPROVAL",
+      "ALLOW_WITH_CONSTRAINTS"
+    ],
+    "policy_decisions": [
+      "ALLOW",
+      "DENY",
+      "REQUIRE_APPROVAL",
+      "ALLOW_WITH_CONSTRAINTS"
+    ],
+    "authority_outcomes": [
+      "GRANT",
+      "DENY",
+      "REQUEST_MORE_EVIDENCE"
+    ],
+    "approval_states": [
+      "PENDING",
+      "GRANTED",
+      "DENIED",
+      "EXPIRED"
+    ],
+    "worker_result_status": [
+      "SUCCESS",
+      "PARTIAL",
+      "FAILED",
+      "BLOCKED_POLICY",
+      "BLOCKED_INPUT",
+      "INCONCLUSIVE",
+      "RETRYABLE",
+      "CANCELLED"
+    ],
+    "budget_states": [
+      "ACTIVE",
+      "EXHAUSTED",
+      "EXCEEDED"
+    ],
+    "budget_dimensions": [
+      "attempts",
+      "tool_calls",
+      "network_requests",
+      "sandbox_executions",
+      "wall_clock_seconds",
+      "artifact_bytes",
+      "cost_units"
+    ]
+  },
+  "queue_lease_semantics": {
+    "claim": "atomic, eligibility-scoped inside the claim; guarded upsert; one active owner per step; empty eligibility creates no claim rows",
+    "ack": "token-guarded; owner-only; single ack",
+    "recovery": "expired/unacked claims reclaimed on restart",
+    "priority": "not_before ASC; priority never bypasses policy state"
+  },
+  "event_semantics": {
+    "identity": "store-allocated, collision-safe, unique-index guarded",
+    "order": "durable monotonic event_seq; append-only; never rewritten",
+    "emitter_access": "orchestrator knows no _conn/table names (guard enforced)",
+    "authority_payload": "STEP_STARTED carries the typed authority decision"
+  },
+  "secret_provider_semantics": {
+    "handles_not_values": true,
+    "audit_records_values": false,
+    "production_class_denied_by_default": true,
+    "redaction": "centralized Redactor on failure paths"
+  },
+  "a001_compliance": {
+    "research_mesh_boundary": "no Research Mesh implementation in qcae/core or runtime (guard-enforced)",
+    "external_registry_ownership": "external owner domains preserved; refs are references, not authority",
+    "economic_experience": "no runtime/marketplace authority granted by economic records",
+    "fallback_research_budget": "A-001 fallback research cannot grow runtime authority"
+  },
+  "cli_commands": [
+    "job list",
+    "job submit",
+    "job status",
+    "job events",
+    "job run",
+    "job resume",
+    "job cancel",
+    "approval list",
+    "approval decide",
+    "recover",
+    "identity"
+  ],
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "qcae/tests",
+    "-q"
+  ],
+  "test_results": {
+    "collected": 1000,
+    "passed": 1000,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 7.17,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-17T03:33:20.274103+00:00",
+    "tested_commit": "4395aaa89720e4014374a0de1b3ad1ee9f06f365"
+  },
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "migration_evidence": {
+    "test": "test_p2_migration_backup.py::TestMigrationV3ToV4",
+    "result": "v3 migrates to v4; P1 registry rows preserved; runtime/governance tables additive"
+  },
+  "crash_recovery_evidence": {
+    "tests": [
+      "test_p2_recovery.py::TestCrashRecovery",
+      "test_p2_c07r2_execution_semantics.py (crash windows A-G)",
+      "test_p2r2_c03_recovery_authority.py"
+    ],
+    "result": "completed steps never repeated; expired leases recovered; NON_REPLAY_SAFE ambiguity escalated; resumed execution re-evaluates the live gate (policy changes during crash windows change outcomes)"
+  },
+  "backup_restore_evidence": {
+    "test": "test_p2_migration_backup.py::TestBackupRestoreRuntime",
+    "result": "jobs/steps/checkpoints/budgets/approvals restored exactly; stale leases recoverable"
+  },
+  "architecture_guard_evidence": {
+    "core_stdlib_only": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "engine_confined_to_infrastructure": "governance/interfaces use ports only",
+    "runtime_store_boundary": "TestRuntimeStoreBoundary forbids ._conn/table knowledge in orchestration",
+    "interface_boundary": "TestInterfaceBoundary forbids private-state reach-ins (P2-R2-C05)",
+    "oce_absent": "runtime identity reports OCE_ABSENT; no OCE import anywhere in qcae/"
+  },
+  "known_external_failures": [
+    "tests/forge/phase_00/test_extension_docs.py: 2 pre-existing failures external to qcae/ (documented since P1; unchanged)"
+  ],
+  "deferred_items": [
+    "heartbeat-based lease liveness (single-process P2 model uses restart-based recovery)",
+    "HTTP API surface (QcaeApp is the stable boundary; thin adapters later)",
+    "OCE governance migration (P12; provider seam in place)"
+  ],
+  "blockers": [],
+  "generated_at": "2026-09-17T03:33:20Z"
+}

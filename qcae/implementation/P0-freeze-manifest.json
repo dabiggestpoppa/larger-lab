@@ -1,0 +1,340 @@
+{
+  "manifest_version": 1,
+  "phase": "P0",
+  "canon_version": "0.1",
+  "qcae_version": "0.1.0",
+  "generated_at": "2026-09-12T15:15:32.173056+00:00",
+  "head_commit": "7ad5277c7248dbd725283979447c0b8a6a9a664b",
+  "branch": "qcae-capability-acquisition-engine",
+  "phase_commits": [
+    {
+      "sha": "7ad5277c",
+      "subject": "P0-T01: add architecture dependency guards with self-verifying scanner"
+    },
+    {
+      "sha": "102c3c5c",
+      "subject": "P0-C07: add AcquisitionDecision, authority request/decision interfaces, and Job/Step contracts"
+    },
+    {
+      "sha": "9acd4d2f",
+      "subject": "P0-C06: add Relationship graph model with controlled vocabulary and EvidenceRef"
+    },
+    {
+      "sha": "7451466e",
+      "subject": "P0-C05: add CapabilityAtom, CompositeCapability and Candidate with composition guards"
+    },
+    {
+      "sha": "450308eb",
+      "subject": "P0-C04: add CapabilityContract domain with canon 1.1 field set and versioning"
+    },
+    {
+      "sha": "42a94352",
+      "subject": "P0-C03: enforce lifecycle transition guards with waiver evidence and adversarial tests"
+    },
+    {
+      "sha": "22cc49ba",
+      "subject": "P0-C02: add error taxonomy and schema-versioned serialization base with fail-closed tests"
+    },
+    {
+      "sha": "64b31511",
+      "subject": "P0-C01: create Book V package skeleton with pytest wiring and topology test"
+    },
+    {
+      "sha": "e1fda033",
+      "subject": "P0-I0: add implementation progress ledger and ADR-0001/0002"
+    }
+  ],
+  "schema_snapshots": [
+    {
+      "object_type": "CapabilityContract",
+      "schema_version": 1,
+      "fields": [
+        "capability_id",
+        "contract_version",
+        "request_id",
+        "title",
+        "problem_statement",
+        "intent",
+        "required_behaviors",
+        "optional_behaviors",
+        "explicit_non_goals",
+        "inputs",
+        "outputs",
+        "acceptance_tests",
+        "required_evidence_classes",
+        "forbidden_conditions",
+        "preferred_acquisition_forms",
+        "forbidden_acquisition_forms",
+        "performance_requirements",
+        "precision_requirements",
+        "latency_requirements",
+        "throughput_requirements",
+        "runtime_constraints",
+        "platform_constraints",
+        "language_constraints",
+        "integration_constraints",
+        "license_constraints",
+        "cost_constraints",
+        "maintenance_constraints",
+        "security_class",
+        "data_classification",
+        "network_policy",
+        "secret_policy",
+        "quant_domain",
+        "cerebus_relevance",
+        "owner",
+        "created_at",
+        "supersedes_contract"
+      ]
+    },
+    {
+      "object_type": "CapabilityAtom",
+      "schema_version": 1,
+      "fields": [
+        "atom_id",
+        "atom_version",
+        "name",
+        "atom_type",
+        "description",
+        "parent_capabilities",
+        "inputs",
+        "outputs",
+        "state",
+        "acceptance_conditions",
+        "implementation_candidates",
+        "dependencies",
+        "coupling",
+        "security_class",
+        "domain",
+        "provenance",
+        "status"
+      ]
+    },
+    {
+      "object_type": "CompositionMember",
+      "schema_version": 1,
+      "fields": [
+        "atom_id",
+        "role"
+      ]
+    },
+    {
+      "object_type": "Candidate",
+      "schema_version": 1,
+      "fields": [
+        "candidate_id",
+        "name",
+        "source_kind",
+        "source_ref",
+        "revision",
+        "claims_atoms",
+        "claim_verification",
+        "discovered_via",
+        "notes"
+      ]
+    },
+    {
+      "object_type": "EntityRef",
+      "schema_version": 1,
+      "fields": [
+        "entity_type",
+        "entity_id"
+      ]
+    },
+    {
+      "object_type": "Relationship",
+      "schema_version": 1,
+      "fields": [
+        "source",
+        "relation",
+        "target",
+        "verification",
+        "source_revision",
+        "target_revision",
+        "evidence_digests",
+        "asserted_by",
+        "asserted_at"
+      ]
+    },
+    {
+      "object_type": "EvidenceRef",
+      "schema_version": 1,
+      "fields": [
+        "artifact_digest",
+        "evidence_class",
+        "subject_id",
+        "revision",
+        "locator",
+        "collected_at",
+        "collected_by"
+      ]
+    },
+    {
+      "object_type": "TransitionWaiver",
+      "schema_version": 1,
+      "fields": [
+        "waived_gate",
+        "justification",
+        "policy_ref",
+        "authority_id",
+        "decided_at"
+      ]
+    },
+    {
+      "object_type": "AcquisitionDecision",
+      "schema_version": 1,
+      "fields": [
+        "decision_id",
+        "capability_scope",
+        "candidate_ref",
+        "form",
+        "outcome",
+        "rationale",
+        "rejection_reason",
+        "evidence_digests",
+        "authority_decision_ref",
+        "deferred_pending",
+        "decided_by",
+        "decided_at",
+        "supersedes_decision"
+      ]
+    },
+    {
+      "object_type": "AuthorityRequest",
+      "schema_version": 1,
+      "fields": [
+        "request_id",
+        "action",
+        "subject_id",
+        "justification",
+        "requested_by",
+        "context"
+      ]
+    },
+    {
+      "object_type": "AuthorityDecision",
+      "schema_version": 1,
+      "fields": [
+        "decision_id",
+        "request_ref",
+        "action",
+        "outcome",
+        "decided_by",
+        "decided_at",
+        "reason"
+      ]
+    },
+    {
+      "object_type": "Step",
+      "schema_version": 1,
+      "fields": [
+        "step_id",
+        "step_kind",
+        "status",
+        "evidence_digests",
+        "error"
+      ]
+    },
+    {
+      "object_type": "Job",
+      "schema_version": 1,
+      "fields": [
+        "job_id",
+        "deterministic_id",
+        "job_kind",
+        "subject_ref",
+        "status",
+        "steps",
+        "worker_role",
+        "context_packet_ref",
+        "created_by",
+        "created_at"
+      ]
+    }
+  ],
+  "schema_snapshot_digest": "c567f2277d6f57c0b0416f37237b7c706174c0f10d74fafc5646d0cad17db813",
+  "lifecycle": {
+    "states": [
+      "REQUESTED",
+      "DECOMPOSED",
+      "DISCOVERING",
+      "CANDIDATE",
+      "TRIAGED",
+      "CODE_VERIFIED",
+      "SANDBOX_VERIFIED",
+      "DEMO_VERIFIED",
+      "DOMAIN_VERIFIED",
+      "INTEGRATION_VERIFIED",
+      "ACQUISITION_CANDIDATE",
+      "APPROVED",
+      "REJECTED",
+      "DEFERRED",
+      "MONITORED",
+      "REVIEW_REQUIRED",
+      "SUPERSEDED",
+      "RETIRED"
+    ],
+    "evidence_gate_order": [
+      "REQUESTED",
+      "DECOMPOSED",
+      "DISCOVERING",
+      "CANDIDATE",
+      "TRIAGED",
+      "CODE_VERIFIED",
+      "SANDBOX_VERIFIED",
+      "DEMO_VERIFIED",
+      "DOMAIN_VERIFIED",
+      "INTEGRATION_VERIFIED",
+      "ACQUISITION_CANDIDATE"
+    ],
+    "waivable_gates": [
+      "DOMAIN_VERIFIED"
+    ],
+    "terminal_states": [
+      "REJECTED",
+      "RETIRED",
+      "SUPERSEDED"
+    ]
+  },
+  "tests": {
+    "total": 270,
+    "passed": 270,
+    "failed": 0,
+    "skipped": 0,
+    "suite_command": "python -m pytest qcae/tests -q",
+    "architecture_guards": 15,
+    "unit": 255
+  },
+  "known_failures_outside_qcae": [
+    "tests/forge/phase_00/test_extension_docs.py (2 pre-existing failures on this branch, unrelated to QCAE; present before P0 work)"
+  ],
+  "deferred_items": [
+    {
+      "item": "AtomStatus values are a P0 derivation (canon 1.2.22 leaves status unvalued)",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P5 capability forensics"
+    },
+    {
+      "item": "Job/Step status vocabularies are minimal identity contracts; queue/lease semantics arrive at P2",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P2 job runtime"
+    }
+  ],
+  "blockers": [],
+  "evidence_refs": {
+    "progress_ledger": "qcae/QCAE_IMPLEMENTATION_PROGRESS.md",
+    "adrs": [
+      "qcae/implementation/decisions/ADR-0001-core-domain-representation.md",
+      "qcae/implementation/decisions/ADR-0002-package-layout-and-test-wiring.md"
+    ],
+    "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "lifecycle_tests": "qcae/tests/unit/test_p0_lifecycle.py",
+    "serialization_tests": "qcae/tests/unit/test_p0_serialization.py",
+    "contract_tests": "qcae/tests/unit/test_p0_contract.py",
+    "capability_tests": "qcae/tests/unit/test_p0_capabilities.py",
+    "relationship_tests": "qcae/tests/unit/test_p0_relationships.py",
+    "decision_job_tests": "qcae/tests/unit/test_p0_decisions_jobs.py"
+  }
+}

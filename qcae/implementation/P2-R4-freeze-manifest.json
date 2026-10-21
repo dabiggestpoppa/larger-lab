@@ -1,0 +1,244 @@
+{
+  "phase": "P2-R4 \u2014 True Crash Durability + Durable Approval + Scheduling Closure (superseding)",
+  "supersedes": {
+    "original_freeze_artifact": "qcae/implementation/P2-freeze-manifest.json",
+    "original_freeze_commit": "4cca8729",
+    "original_freeze_digest": "sha256:0c2c7a1df104a58c70c528f99ffeb59c4560124e9d021a75709a0a4b47b272f1",
+    "r1_freeze_artifact": "qcae/implementation/P2-R1-freeze-manifest.json",
+    "r1_freeze_digest": "sha256:2329eea9e9ef14338c5c1484ff726623392a5814488c9c78ae1f24d166d40410",
+    "r2_freeze_artifact": "qcae/implementation/P2-R2-freeze-manifest.json",
+    "r2_freeze_digest": "sha256:b637fea164101509e3e63da369ede72934cef416146f4947e349e2cfbb58d2b8",
+    "r3_freeze_artifact": "qcae/implementation/P2-R3-freeze-manifest.json",
+    "r3_freeze_digest": "sha256:c4f5119bc9ab8f3209bc8bdaf3a17056da55d8886997c47e390cb060ff1a6d8c",
+    "r3_acceptance_artifact": "qcae/implementation/P2-R3-operator-acceptance.json",
+    "r3_acceptance_digest": "sha256:32ef3382517c9eb6e346e586b391d37108e6aada7ae7664bbb765a7c1914e0e4",
+    "relationship": "superseding repair manifest; the original P2 freeze and the P2-R1/P2-R2/P2-R3 repair manifests are preserved unchanged as historical truth"
+  },
+  "operator_review_trigger": "Operator review of P2-R3 head 1d07e7d5: internal subsystems passed but true process-kill durability was unproven \u2014 runtime writes accumulated in one open transaction spanning worker.execute (F), approval authority lived in the ephemeral _granted_keys set (G), COMMITTED reconstruction could strand RUNNING state or regress terminal truth (H), job-level not_before was persisted but never enforced (I), and acceptance Journey E tested denial instead of the durable grant journey (J)",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "branch": "qcae-capability-acquisition-engine",
+  "head_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d",
+  "tested_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d",
+  "phase_commits": {
+    "original_p2_build": [
+      "ab0098c5",
+      "52be767f",
+      "534f7864",
+      "766efa0d",
+      "cb047e4a",
+      "e1936d06",
+      "fbe93cef",
+      "21bc4466",
+      "0603b882",
+      "38e6ca66",
+      "c531e12f",
+      "49f6fdbc",
+      "61488273",
+      "afdbaa84",
+      "8022b61d",
+      "4cca8729"
+    ],
+    "p2_r1_structural_repairs": [
+      "425ac5f6",
+      "3b5aaed0",
+      "bfead6f6",
+      "acf31b6f",
+      "cb1cede4",
+      "6ea6dcef",
+      "ac0dd3c2",
+      "ea493b8e",
+      "a8b20a6c"
+    ],
+    "p2_r2_governance_wiring": [
+      "30cebe27",
+      "407b7de9",
+      "7f6bccb7",
+      "e93f41dd",
+      "3a7783ea",
+      "4b88cbd7",
+      "f1e02304",
+      "8e8b9431",
+      "4395aaa8",
+      "a11d380a"
+    ],
+    "p2_r3_operator_loop_closure": [
+      "07626a08",
+      "7ac5b80f",
+      "66abe540",
+      "50256c6b",
+      "f3ceec59",
+      "c7fa5744",
+      "205b7b46",
+      "6f0218c0",
+      "1d07e7d5"
+    ],
+    "p2_r4_crash_durability": [
+      "76494452",
+      "5bc38d18",
+      "1e04778d",
+      "081f20c8",
+      "b283a63e",
+      "467c6714",
+      "f2fc7757"
+    ]
+  },
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0006-persistence-architecture.md",
+    "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md",
+    "qcae/implementation/decisions/ADR-0008-p2-runtime-state-vocabulary.md",
+    "qcae/implementation/decisions/ADR-0009-policy-vs-authority-vocabularies.md"
+  ],
+  "prior_freeze_refs": [
+    "qcae/implementation/P1-R1-freeze-manifest.json",
+    "qcae/implementation/P2-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R1-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R2-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R3-freeze-manifest.json (historical, superseded by this manifest)"
+  ],
+  "repairs": {
+    "c01_durable_crash_boundaries": {
+      "finding": "F \u2014 runtime writes accumulated in one open transaction spanning worker.execute; abrupt death lost all state since the last explicit commit; acceptance tests called conn.commit() and labeled it process death",
+      "repair": "SqliteRuntimeStore.flush() is the explicit semantic durability boundary: the engine flushes after lease/RUNNING/attempt/admission (window A), before worker.execute so no DB write transaction spans external work (windows B/C), and after post-effect writes (windows D-I). No global autocommit change; multi-row atomicity groups keep transaction()",
+      "tests": [
+        "qcae/tests/unit/test_p2r4_c01_c02_durability.py",
+        "qcae/tests/acceptance/test_p2_process_crash.py"
+      ]
+    },
+    "c02_committed_reconstruction_and_refresh_law": {
+      "finding": "H \u2014 _complete early-returned on the legacy completion marker (marker could strand canonical RUNNING state); recover_job wrote its stale job snapshot over newer terminal truth",
+      "repair": "_complete reconstructs canonical step/job truth from the COMMITTED record whether or not the marker exists (marker is evidence, never state); recover_job RELOADS job AND steps after reconciliation and only applies the recovery transition to a non-terminal job; recover_job also finalizes an all-steps-done job (window H, idempotent, JOB_SUCCEEDED exactly once) and flushes",
+      "tests": "qcae/tests/unit/test_p2r4_c01_c02_durability.py"
+    },
+    "c03_durable_single_use_grants": {
+      "finding": "G \u2014 approval authority was engine._granted_keys (in-memory, never consumed, vanished on restart, inherited indefinitely in-process)",
+      "repair": "grants live in the durable approval registry; execution admission verifies the grant against the step's recorded authority request and consumes it atomically (unique decision_ref index = one use row per grant, single execution admission); consumption survives restart and cannot be replayed; expired/denied/wrong-principal grants admit nothing; authority-request ids are a semantics digest + uniqueness suffix (no restart-reset counter)",
+      "tests": [
+        "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+        "qcae/tests/acceptance/test_p2_grant_journey.py"
+      ]
+    },
+    "c04_effective_not_before_scheduling_truth": {
+      "finding": "I \u2014 JobSubmission.not_before persisted on runtime_job but ready_steps overwrote the step schedule with the clock; future-dated jobs became claimable immediately",
+      "repair": "one scheduling truth: effective_not_before = max(job.not_before, step.not_before), enforced atomically in claim-selection SQL (LEFT JOIN + COALESCE, bare-queue safe); ready_steps no longer overwrites schedules; availability probes use the same rule; recovery/retry keep schedule floors; priority cannot bypass; CLI --not-before demonstrated",
+      "tests": "qcae/tests/unit/test_p2r4_c04_scheduling.py"
+    },
+    "a02_durable_grant_journey": {
+      "finding": "J \u2014 acceptance Journey E was named grant but tested denial; the durable grant path had no surface journey",
+      "repair": "real grant journey at the operator surface: REQUIRE_APPROVAL -> durable request -> GRANTED -> restart -> grant still discoverable and releases -> executes once -> consumed -> step/job SUCCEEDED -> restart preserves terminal truth -> replay decision refused; the denial journey (original E) is preserved unchanged",
+      "tests": "qcae/tests/acceptance/test_p2_grant_journey.py"
+    }
+  },
+  "persistence": {
+    "engine": "SQLite (stdlib sqlite3)",
+    "metadata_schema_version": 4,
+    "artifact_hash_algorithm": "sha256",
+    "durability_boundaries": "explicit flush() at pre-effect and post-effect semantic boundaries; BEGIN IMMEDIATE transactions for multi-row groups; no write transaction spans worker execution",
+    "governance_approval_use_table": "governance_approval_use(use_id PK, decision_ref UNIQUE, step_id, used_at) \u2014 single-use consumption law"
+  },
+  "observed_acceptance_evidence": {
+    "operator_loop_artifact": "qcae/implementation/P2-R4-operator-acceptance.json",
+    "process_crash_artifact": "qcae/implementation/P2-R4-process-crash-evidence.json",
+    "summary": {
+      "operator_loop_journeys": 5,
+      "grant_journeys": 2,
+      "crash_windows_observed": 7,
+      "all_acceptance_suites_passed": true
+    }
+  },
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ]
+  ],
+  "test_results": {
+    "collected": 1108,
+    "passed": 1108,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 32.65,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-18T18:09:44.723399+00:00",
+    "tested_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d"
+  },
+  "acceptance_suite_results": {
+    "collected": 14,
+    "passed": 14,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 7.1,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-18T18:09:52.816572+00:00",
+    "tested_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d"
+  },
+  "process_crash_suite_results": {
+    "collected": 14,
+    "passed": 14,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 7.1,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-18T18:09:52.816572+00:00",
+    "tested_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d"
+  },
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "architecture_guard_evidence": {
+    "core_stdlib_only": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "no_write_transaction_spans_worker_execution": true,
+    "grant_authority_durable_not_memory": true,
+    "scheduling_truth_single_law": "effective_not_before = max(job, step)",
+    "oce_absent": "runtime reports OCE_ABSENT; no OCE import in qcae/"
+  },
+  "known_external_failures": [
+    "tests/forge/phase_00/test_extension_docs.py: 2 pre-existing failures external to qcae/ (documented since P1; unchanged)"
+  ],
+  "deferred_design_debt": {
+    "classification": "MINOR / DESIGN_DEBT_PARKED",
+    "items": [
+      "OrchestratorEngine decomposition (further grown by R4 repairs)",
+      "QcaeApp vs LocalRuntimeService facade consolidation",
+      "freeze-generator parameterization/deduplication across phases",
+      "Permissive/FailClosed test gates moved out of the production module"
+    ],
+    "trigger": "P10 Agent Orchestration preparation, or earlier only if P3-P5 provide evidence it is needed"
+  },
+  "blockers": [],
+  "generated_at": "2026-09-18T18:09:52Z"
+}

@@ -1,0 +1,818 @@
+"""Assemble the Block 2 terminal artifact from the pieces a run produced — canon 2.7.15.
+
+``DiscoveryReport`` is the phase's terminal artifact, and the ranking layer's
+output is investigation order rather than a verdict (2.7.4, 2.7.16 invariant 1).
+This module is what actually produces that artifact: it takes the pieces a caller
+holds — the plan, the internal baseline record, the adapter outcomes that ran, and
+the ranking pass — and returns the assembled report.
+
+It is a pure function of records. It performs **no discovery and no egress**: no
+adapter is touched, no transport is imported, and nothing here can start a search.
+Evidence flows one way, from the pieces into the artifact.
+
+Two rules govern what it does with each piece:
+
+- **Derive only what the pieces make factual.** Counters, the budget verdict, the
+  partial-search notes, the negative findings and the remaining uncertainties are
+  read off the plan, the baseline, the outcomes and the metrics. Judgements that
+  are not in the records — that the non-dominated set is sufficient, that a
+  contract amendment is required — are *declared* by the caller and passed
+  through, never inferred. A condition the plan never declared still cannot
+  justify a stop, because ``stop_recommendation`` owns that law (2.1.9).
+- **Fail closed instead of dropping a piece.** A discovered candidate the ranking
+  never saw, a baseline belonging to another plan or atom scope, a search that
+  reached a source the plan never allocated, an unlabelled partial search, and a
+  sufficiency declaration with no candidate set to be sufficient are refused
+  rather than assembled into a report that quietly omits them. A contradiction
+  the artifact cannot refuse — search that ran for atoms the baseline had already
+  satisfied internally — is *disclosed* in its notes instead.
+
+Owned elsewhere, deliberately not reimplemented here: canonical identity and merge
+(``planning.canonical``), family identity (``planning.families``), the counting
+rule (``planning.saturation``) and the report's own laws (``core.discovery.report``).
+"""
+
+from __future__ import annotations
+
+import re
+
+from typing import List, Optional, Sequence, Tuple
+
+from qcae.core.discovery.candidate import CanonicalCandidate
+from qcae.core.discovery.lead import FAILURE_STATUSES
+from qcae.core.discovery.plan import (
+    DiscoveryPlan,
+    SaturationMetrics,
+)
+from qcae.core.discovery.vocabulary import SourceClass
+from qcae.core.discovery.report import (
+    DiscoveryReport,
+    NegativeObservation,
+    PrefilterDecision,
+    StopCondition,
+    StopConditionAssessment,
+    make_discovery_report,
+)
+from qcae.core.errors import QcaeValidationError
+from qcae.core.ports.discovery import (
+    AdapterOutcome,
+    AdapterStatus,
+    ExecutedDiscoveryQuery,
+)
+
+from qcae.discovery.internal.baseline import InternalBaselineRecord
+from qcae.discovery.planning.canonical import (
+    merge_canonical_candidates,
+    merge_leads,
+)
+from qcae.discovery.planning.families import family_identity_for
+from qcae.discovery.planning.ranking import RankingResult
+from qcae.discovery.planning.saturation import (
+    stop_recommendation,
+    update_saturation,
+)
+
+__all__ = [
+    "assemble_discovery_report",
+    "assert_external_execution_authorized",
+]
+
+
+def assert_external_execution_authorized(baseline, atom_ids) -> None:
+    """The pre-adapter-call egress gate (canon 2.6.5/2.6.8; P3-R4C2).
+
+    A runner calls this BEFORE issuing any external query: a fully satisfied
+    internal baseline assigns no atom to external search, so no external query
+    may run for that plan at all, and a partially satisfied baseline narrows
+    the external request to its uncovered atoms — re-searching an internally
+    covered atom externally is wasted burden the baseline already foreclosed.
+    Blocking here is fail-closed egress authority; the report, by contrast,
+    can only tell the truth about what already ran.
+    """
+    requested = tuple(atom_ids)
+    if not requested:
+        return
+    if not baseline.external_target_atoms:
+        raise QcaeValidationError(
+            f"the internal baseline assigns no atom to external search, so external "
+            f"queries for {list(requested)} are unauthorized (canon 2.6.5/2.6.8: a "
+            "fully satisfied baseline blocks external execution before the adapter "
+            "call)"
+        )
+    covered = set(baseline.covered_atoms)
+    unauthorized = tuple(sorted(set(requested) & covered))
+    if unauthorized:
+        raise QcaeValidationError(
+            f"the internal baseline already covers {list(unauthorized)}: external "
+            "queries for internally covered atom(s) are unauthorized (canon 2.6.8 "
+            "partial reuse narrows the external request to the uncovered atoms)"
+        )
+
+
+def _require_outcomes_bound_to_plan(
+    outcomes: Sequence[AdapterOutcome], plan: DiscoveryPlan
+) -> Tuple[Tuple[ExecutedDiscoveryQuery, ...], set, dict]:
+    """Every outcome binds to exactly one executed query of *this* plan (canon
+    2.1.4/2.1.17 invariant 4).
+
+    A binding is refused unless the record proves, field by field, that the
+    query belonged to this plan, targeted an externally authorized atom, came
+    from a declared family, used an enabled allocated source with the expected
+    adapter, stayed inside the declared tier/result envelope, and that every
+    returned lead's lineage is that record's lineage. NO_RESULTS and every
+    failure status keep full query lineage — provenance is not a function of
+    whether anything was found. A duplicate binding (two outcomes, one record)
+    is refused: a record is single-use evidence.
+    """
+    allocated = {
+        allocation.source_class: allocation
+        for allocation in plan.source_allocations if allocation.enabled
+    }
+    family_ids = {family.family_id for family in plan.query_families}
+    family_sources: dict = {}
+    for family in plan.query_families:
+        for source_class in family.source_classes:
+            family_sources.setdefault(family.family_id, set()).add(source_class)
+    planned_query_ids = set(plan.query_ids)
+    bound: List[ExecutedDiscoveryQuery] = []
+    seen_query_ids: set = set()
+    executed_atoms: set = set()
+    records_by_outcome: dict = {}
+    for outcome in outcomes:
+        record = outcome.execution_record
+        if record is None:
+            raise QcaeValidationError(
+                f"outcome {outcome.query_id!r} from {outcome.adapter_id!r} carries no "
+                "execution record: every outcome binds to exactly one executed query "
+                "of this plan, so an unattributed boolean payload is not reportable "
+                "evidence (canon 2.1.4/2.1.17 invariant 4)"
+            )
+        # Repeated executions of one planned query carry an ordinal suffix
+        # (-exec2, -exec3, ...): single-use law binds the full record identity,
+        # while plan authorization compares the base planned identity.
+        base_query_id = re.sub(r"-exec\d+$", "", record.query_id)
+        if record.query_id in seen_query_ids:
+            raise QcaeValidationError(
+                f"execution record {record.query_id!r} bound by more than one outcome: "
+                "a record is single-use evidence; a repeated execution carries its "
+                "own ordinal suffix (canon 2.1.4)"
+            )
+        seen_query_ids.add(record.query_id)
+        if record.outcome_id and record.outcome_id != outcome.query_id:
+            raise QcaeValidationError(
+                f"execution record {record.query_id!r} names outcome "
+                f"{record.outcome_id!r}, but was bound to {outcome.query_id!r}"
+            )
+        if record.discovery_plan_id != plan.discovery_plan_id:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} was executed for plan "
+                f"{record.discovery_plan_id!r}, not this plan {plan.discovery_plan_id!r}"
+            )
+        if (
+            record.contract_id != plan.contract_id
+            or record.contract_version != plan.contract_version
+        ):
+            raise QcaeValidationError(
+                f"query {record.query_id!r} was executed under contract "
+                f"{record.contract_id!r}v{record.contract_version}, not this plan's "
+                f"{plan.contract_id!r}v{plan.contract_version}"
+            )
+        if record.family_id not in family_ids:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} claims family {record.family_id!r}, which "
+                "the plan never declared"
+            )
+        family_record = next(
+            f for f in plan.query_families if f.family_id == record.family_id
+        )
+        if record.concrete_query not in family_record.terms:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} ran a concrete query the plan's family "
+                f"{record.family_id!r} never declared: {record.concrete_query!r} "
+                "(canon 2.1.3/2.1.15: the plan owns what may be searched)"
+            )
+        if base_query_id not in planned_query_ids:
+            raise QcaeValidationError(
+                f"query {base_query_id!r} was never planned: outcomes may only bind "
+                "to queries the plan authorized (canon 2.1.3/2.1.15)"
+            )
+        if record.atom_id not in plan.atom_ids:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} targets atom {record.atom_id!r}, outside "
+                "the plan's authorized scope"
+            )
+        allocation = allocated.get(record.source_class)
+        if allocation is None:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} used source class "
+                f"{record.source_class.value}, which has no enabled allocation in this plan"
+            )
+        if record.source_class not in family_sources.get(record.family_id, set()):
+            raise QcaeValidationError(
+                f"query {record.query_id!r} pairs family {record.family_id!r} with "
+                f"source class {record.source_class.value}, which that family never declared"
+            )
+        if record.max_tier > allocation.max_tier:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} ran at tier {record.max_tier.name}, above "
+                f"the allocation's {allocation.max_tier.name}"
+            )
+        if record.result_limit > plan.budget.max_results_inspected:
+            raise QcaeValidationError(
+                f"query {record.query_id!r} declares result_limit "
+                f"{record.result_limit} above the plan's envelope"
+            )
+        for lead in outcome.leads:
+            lineage = lead.query_lineage
+            for field_name, expected, actual in (
+                ("atom", record.atom_id, lineage.atom_id),
+                ("family", record.family_id, lineage.family_id),
+                ("adapter", record.adapter_id, lineage.adapter_id),
+                ("source class", record.source_class, lineage.source_class),
+            ):
+                if str(actual) != str(expected):
+                    raise QcaeValidationError(
+                        f"lead {lead.lead_id!r} lineage {field_name} {actual!r} disagrees "
+                        f"with the execution record of query {record.query_id!r} "
+                        f"({expected!r}); a lead belongs to the query that found it"
+                    )
+        # The executed scope is the *external* execution footprint: the registry
+        # class is the internal side (canon 2.6), whose coverage the baseline
+        # already states, so only non-internal queries narrow or extend it.
+        if record.source_class is not SourceClass.INTERNAL_REGISTRY_CODE:
+            executed_atoms.add(record.atom_id)
+        records_by_outcome[id(outcome)] = record
+        bound.append(record)
+    return tuple(bound), executed_atoms, records_by_outcome
+
+
+
+
+
+def assemble_discovery_report(
+    *,
+    report_id: str,
+    plan: DiscoveryPlan,
+    baseline: InternalBaselineRecord,
+    ranking: RankingResult,
+    outcomes: Sequence[AdapterOutcome] = (),
+    previous_report: Optional[DiscoveryReport] = None,
+    previous_metrics: Optional[SaturationMetrics] = None,
+    previously_known_candidates: Sequence[CanonicalCandidate] = (),
+    stop_assessments: Sequence[StopConditionAssessment] = (),
+    stop_rationale: str = "",
+    created_at: str = "",
+    created_by: str = "",
+) -> DiscoveryReport:
+    """Assemble one discovery pass into its terminal report (canon 2.7.15).
+
+    ``outcomes`` are the adapter results that ran; ``ranking`` is the pass over
+    the candidates those outcomes produced. No raw caller boolean reaches a STOP
+    recommendation (P3-R4-R1): budget exhaustion and negligible novelty are
+    derived from the typed accounting, and a judgement stop — sufficiency, a
+    class eliminated by hard constraints, contract ambiguity — arrives only as
+    its own attributable ``StopConditionAssessment``.
+
+    For a later pass, hand the previous artifact over as ``previous_report``: the
+    report carries both the counters and the canonical candidates they measured,
+    so novelty stays measured against what was known (2.1.10) with no bookkeeping
+    in the caller — which is the only reliable way to do it, since a caller whose
+    records are gone (a durable loop restarting from the artifact) cannot
+    reconstruct them. ``previous_metrics`` and ``previously_known_candidates``
+    remain available for a caller that holds the pieces itself; supplying them
+    alongside ``previous_report`` is refused, because the history has one owner.
+    A counters-only handoff is still *disclosed* in ``coverage_notes`` rather than
+    left to inflate the novelty the stop law reads.
+
+    The history is bound to the capability it measured: a report from another
+    contract, or another revision of it, is refused rather than counted as this
+    pass's past (canon 2.1.10); a re-cut plan for the *same* capability is
+    disclosed instead (``coverage_notes``).
+    """
+    _require_one_history_source(previous_report, previous_metrics,
+                               previously_known_candidates)
+    _require_history_is_for_this_capability(previous_report, plan)
+    if previous_report is not None:
+        previous_metrics = previous_report.saturation_metrics
+        previously_known_candidates = previous_report.known_candidates
+
+    _require_baseline_matches_plan(baseline, plan)
+
+    ran = tuple(outcomes)
+    for outcome in ran:
+        outcome.validate()
+    _require_sources_allocated(ran, plan)
+    _bound_records, executed_atom_set, records_by_outcome = (
+        _require_outcomes_bound_to_plan(ran, plan))
+    executed_scope = tuple(sorted(executed_atom_set))
+
+    # The ranking piece is the authority on canonical identity; the outcomes are
+    # checked against it so a discovered path cannot vanish between the two.
+    canonical_ids = tuple(sorted({
+        member for family in ranking.families for member in family.member_candidate_ids
+    }))
+    discovered = merge_leads([lead for outcome in ran for lead in outcome.leads])
+    _require_discovered_accounted_for(discovered, canonical_ids)
+    # What is known as of this pass: everything an earlier pass knew plus what this
+    # one found, aggregated by the canonical owner so one identity stays one
+    # record (2.1.12) — the set the next pass measures novelty against (2.1.10).
+    known_candidates = merge_canonical_candidates(
+        [*previously_known_candidates, *discovered])
+    _require_sufficiency_claim_has_a_set(
+        enough_non_dominated=any(
+            a.condition is StopCondition.NON_DOMINATED_SET_SUFFICIENT
+            for a in tuple(stop_assessments)
+        ),
+        canonical_ids=canonical_ids,
+        previously_known_candidates=previously_known_candidates,
+    )
+
+    negative_observations = _negative_observations(
+        ran, records_by_outcome,
+        observed_at=created_at or "1970-01-01T00:00:00Z",
+    )
+    metrics = update_saturation(
+        previous_metrics if previous_metrics is not None else SaturationMetrics(),
+        plan=plan,
+        outcomes=ran,
+        canonical_candidates=discovered,
+        previous_candidate_ids=[c.canonical_id for c in previously_known_candidates],
+        previous_family_ids=[
+            family_identity_for(c) for c in previously_known_candidates
+        ],
+        previous_covered_atoms=[
+            *baseline.covered_atoms,
+            *(atom for c in previously_known_candidates for atom in c.claims_atoms),
+        ],
+        # P3-R4C2: novelty only accrues inside the baseline-authorized external
+        # scope — an out-of-scope mention is not this plan's evidence.
+        novel_atom_scope=tuple(baseline.external_target_atoms),
+        negative_observation_ids=(o.observation_id for o in negative_observations),
+        previous_negative_observation_ids=(
+            o.observation_id for o in previous_report.negative_observations
+        ) if previous_report is not None else (),
+    )
+
+    verdict = stop_recommendation(
+        plan,
+        metrics,
+        assessments=tuple(stop_assessments),
+        assessed_at=created_at or "1970-01-01T00:00:00Z",
+        rationale=stop_rationale,
+    )
+
+    return make_discovery_report(
+        report_id=report_id,
+        discovery_plan_id=plan.discovery_plan_id,
+        contract_id=plan.contract_id,
+        contract_version=plan.contract_version,
+        atom_ids=tuple(plan.atom_ids),
+        requested_atom_ids=tuple(plan.atom_ids),
+        internally_covered_atom_ids=tuple(baseline.covered_atoms),
+        external_target_atom_ids=tuple(baseline.external_target_atoms),
+        actually_executed_atom_ids=executed_scope,
+        internal_baseline_ref=baseline.baseline_id,
+        sources_searched=_sources_searched(ran),
+        query_families_executed=_query_families_executed(ran),
+        canonical_candidate_ids=canonical_ids,
+        candidate_families=tuple(ranking.families),
+        escalation_queue=tuple(ranking.queue),
+        saturation_metrics=metrics,
+        stop_recommendation=verdict,
+        known_candidates=known_candidates,
+        coverage_notes=_coverage_notes(
+            plan, baseline, ran,
+            previous_metrics=previous_metrics,
+            previously_known_candidates=previously_known_candidates,
+            previous_report=previous_report,
+        ),
+        partial_search_notes=_partial_search_notes(ran),
+        prefilter_decisions=tuple(ranking.prefilter_decisions),
+        negative_observations=negative_observations,
+        negative_findings=_negative_findings(ran, baseline),
+        remaining_uncertainties=_remaining_uncertainties(baseline, ranking),
+        amendment_proposals=tuple(plan.amendment_proposals),
+        created_at=created_at,
+        created_by=created_by,
+        policy_version=ranking.policy_version,
+    )
+
+
+# -- fail-closed consistency laws -------------------------------------------
+
+
+def _require_one_history_source(
+    previous_report: Optional[DiscoveryReport],
+    previous_metrics: Optional[SaturationMetrics],
+    previously_known_candidates: Sequence[CanonicalCandidate],
+) -> None:
+    """One owner per piece of state: the artifact, or the records (canon 2.1.10).
+
+    Combining them would let one pass's counters meet another pass's candidates —
+    the arithmetic that inflated novelty in the first place — so it is refused
+    rather than resolved by precedence.
+    """
+    if previous_report is None:
+        return
+    conflicting = [
+        name
+        for name, supplied in (
+            ("previous_metrics", previous_metrics is not None),
+            ("previously_known_candidates", bool(previously_known_candidates)),
+        )
+        if supplied
+    ]
+    if conflicting:
+        raise QcaeValidationError(
+            f"previous_report was given together with {conflicting}: the pass history has "
+            "one owner (canon 2.1.10), so hand over either the previous artifact or the "
+            "explicit counters and candidates it carries, never both"
+        )
+
+
+def _require_history_is_for_this_capability(
+    previous_report: Optional[DiscoveryReport], plan: DiscoveryPlan
+) -> None:
+    """Canon 2.1.10: the history is this capability's past, or it is not a history.
+
+    The artifact states the identity it measured, so the binding needs nothing
+    carried: accepted silently, another capability's known candidates would enter
+    this pass's novelty accounting and its stop verdict.
+    """
+    if previous_report is None:
+        return
+    mismatches: List[str] = []
+    if previous_report.contract_id != plan.contract_id:
+        mismatches.append(
+            f"it measured contract {previous_report.contract_id!r}, this pass searches "
+            f"{plan.contract_id!r}"
+        )
+    if previous_report.contract_version != plan.contract_version:
+        mismatches.append(
+            f"it measured contract version {previous_report.contract_version!r}, this "
+            f"pass searches the plan's {plan.contract_version!r}"
+        )
+    if mismatches:
+        raise QcaeValidationError(
+            "the handed-over pass history belongs to a different capability: "
+            + "; ".join(mismatches)
+            + " (canon 2.1.10: novelty is measured against what was already known for "
+            "this capability, so another contract's known set would be counted as this "
+            "pass's past in new_candidates/new_atoms_covered and in the stop verdict)"
+        )
+
+
+def _require_baseline_matches_plan(
+    baseline: InternalBaselineRecord, plan: DiscoveryPlan
+) -> None:
+    """Canon 2.1.6: the baseline is this plan's internal comparison, or nothing."""
+    mismatches: List[str] = []
+    if baseline.contract_id != plan.contract_id:
+        mismatches.append(
+            f"contract {baseline.contract_id!r} is not the plan's {plan.contract_id!r}"
+        )
+    if baseline.contract_version != plan.contract_version:
+        mismatches.append(
+            f"contract version {baseline.contract_version!r} is not the plan's "
+            f"{plan.contract_version!r}"
+        )
+    if tuple(baseline.requested_atoms) != tuple(plan.atom_ids):
+        mismatches.append(
+            f"atom scope {list(baseline.requested_atoms)} is not the plan's "
+            f"{list(plan.atom_ids)}"
+        )
+    if mismatches:
+        raise QcaeValidationError(
+            "the internal baseline belongs to a different plan: "
+            + "; ".join(mismatches)
+            + " (canon 2.1.6: every external comparison has an explicit baseline "
+            "for this plan; a mismatched baseline would compare against the wrong "
+            "internal state)"
+        )
+
+
+def _require_sources_allocated(
+    outcomes: Sequence[AdapterOutcome], plan: DiscoveryPlan
+) -> None:
+    """The source portfolio is declared before the search (canon 2.1.5/2.1.7)."""
+    allocated = {allocation.source_class for allocation in plan.source_allocations}
+    unallocated = sorted(
+        {o.source_class for o in outcomes if o.counts_toward_saturation} - allocated,
+        key=lambda source: source.value,
+    )
+    if unallocated:
+        raise QcaeValidationError(
+            "search(es) reached source class(es) the plan never allocated: "
+            f"{[source.value for source in unallocated]} (canon 2.1.5/2.1.7: the plan "
+            "owns the source portfolio, so an unallocated search is not reportable "
+            "as this plan's work)"
+        )
+
+
+def _require_sufficiency_claim_has_a_set(
+    *,
+    enough_non_dominated: bool,
+    canonical_ids: Sequence[str],
+    previously_known_candidates: Sequence[CanonicalCandidate],
+) -> None:
+    """A sufficiency declaration must be about a set the artifact contains (2.1.9).
+
+    ``NON_DOMINATED_SET_SUFFICIENT`` is the caller's judgement, but a judgement
+    needs a subject: with no candidate from this pass and none seen by an earlier
+    one, the report would recommend stopping on the strength of a set it does not
+    contain. That is the one stop claim the artifact's own contents refute; every
+    other stop condition is read off the plan or the counters, which cannot
+    disagree with themselves. Candidates an earlier pass already saw are a real
+    set, so a later pass that adds nothing may still be the pass that judges the
+    accumulated set sufficient (2.1.10).
+    """
+    if enough_non_dominated and not canonical_ids and not previously_known_candidates:
+        raise QcaeValidationError(
+            "the non-dominated set is declared sufficient, but the report contains no "
+            "candidate set to be sufficient: this pass found no candidate and none was "
+            "known from an earlier pass (canon 2.1.9/2.7.15: a sufficiency claim must be "
+            "about a set the artifact actually contains)"
+        )
+
+
+def _require_discovered_accounted_for(
+    discovered: Sequence[CanonicalCandidate], canonical_ids: Sequence[str]
+) -> None:
+    """A discovered candidate the ranking never saw is a dropped piece (2.1.12)."""
+    known = set(canonical_ids)
+    missing = [
+        f"{candidate.canonical_locator} ({candidate.canonical_id})"
+        for candidate in discovered
+        if candidate.canonical_id not in known
+    ]
+    if missing:
+        raise QcaeValidationError(
+            f"{len(missing)} discovered candidate(s) are absent from the ranking pass "
+            f"and would be dropped from the report: {missing} (canon 2.1.12/2.7.15: "
+            "every path that found a candidate survives into the artifact)"
+        )
+
+
+# -- derivations -------------------------------------------------------------
+
+
+def _sources_searched(outcomes: Sequence[AdapterOutcome]) -> Tuple[SourceClass, ...]:
+    """The classes actually searched, by the adapter's own definition of 'ran'."""
+    return tuple(sorted(
+        {o.source_class for o in outcomes if o.counts_toward_saturation},
+        key=lambda source: source.value,
+    ))
+
+
+def _query_families_executed(outcomes: Sequence[AdapterOutcome]) -> Tuple[str, ...]:
+    """Families actually executed, from typed query-execution records.
+
+    Derived from the execution bindings, not from returned leads: an empty or
+    failed search is still a family the plan executed, and its lineage must
+    survive into the artifact (canon 2.1.17 invariant 4). This is the law that
+    makes the report self-verifying — planned/attempted/completed coverage is
+    read off records, so a later pass never needs hidden process memory.
+    """
+    return tuple(sorted({
+        record.family_id
+        for outcome in outcomes
+        for record in [outcome.execution_record]
+        if record is not None
+    }))
+
+
+def _coverage_notes(
+    plan: DiscoveryPlan,
+    baseline: InternalBaselineRecord,
+    outcomes: Sequence[AdapterOutcome],
+    *,
+    previous_metrics: Optional[SaturationMetrics] = None,
+    previously_known_candidates: Sequence[CanonicalCandidate] = (),
+    previous_report: Optional[DiscoveryReport] = None,
+) -> Tuple[str, ...]:
+    notes: List[str] = [
+        f"internal baseline {baseline.baseline_id}: coverage basis "
+        f"{baseline.coverage_basis}; classifications "
+        f"{[c.value for c in baseline.classifications] or 'none'}",
+    ]
+    requested = tuple(plan.atom_ids)
+    targets = tuple(baseline.external_target_atoms)
+    searched = tuple(o for o in outcomes if o.counts_toward_saturation)
+    if not targets and searched:
+        notes.append(
+            f"{len(searched)} external search(es) ran while the internal baseline assigns "
+            "no atom to external search (canon 2.6.5/2.6.8): every requested atom is "
+            "internally satisfied, so the searches were not required by the baseline. "
+            "The report records both facts rather than implying the effort was needed"
+        )
+    if targets and len(targets) < len(requested):
+        notes.append(
+            f"external search narrowed to {len(targets)} of {len(requested)} requested "
+            f"atom(s) by internal partial reuse (canon 2.6.8): {list(targets)}"
+        )
+    unattributed = [
+        o.query_id for o in outcomes if o.counts_toward_saturation and not o.leads
+    ]
+    if unattributed:
+        notes.append(
+            f"{len(unattributed)} executed search(es) returned no leads: "
+            f"{unattributed} (their families still count as executed through their "
+            "typed execution records)"
+        )
+    if baseline.sufficient_without_discovery and any(
+        o.counts_toward_saturation for o in outcomes
+    ):
+        notes.append(
+            "the internal baseline reports sufficient_without_discovery, yet external "
+            "search ran (canon 2.6.7): the report records both rather than choosing"
+        )
+    if _previous_knowledge_is_missing(previous_metrics, previously_known_candidates):
+        notes.append(
+            "counters carried forward from a previous pass without the candidates they "
+            "measured, so this pass's novelty is counted as if nothing were known before "
+            "and new_candidates/new_specifications/new_atoms_covered overstate it (canon "
+            "2.1.10: the terminal artifact carries the metrics, not the candidate "
+            "records, so pass the previously_known_candidates alongside them)"
+        )
+    # A plan is a search document, not the capability: it is re-cut between passes
+    # (amended contracts, refocused scope) while the counters keep reading candidate
+    # identity, family and claimed atoms — all the capability's. So a differing plan
+    # or atom scope is a re-cut search to disclose, not a mismatch to refuse (only a
+    # differing contract or revision is refused, by the law above).
+    recut = previous_report is not None and (
+        previous_report.discovery_plan_id != plan.discovery_plan_id
+        or tuple(previous_report.atom_ids) != tuple(plan.atom_ids)
+    )
+    if recut:
+        notes.append(
+            f"pass history {previous_report.report_id} was measured for a re-cut plan "
+            f"scope: plan {previous_report.discovery_plan_id!r} over "
+            f"{list(previous_report.atom_ids)} vs this pass's "
+            f"{plan.discovery_plan_id!r} over {list(plan.atom_ids)} — this capability's "
+            "accumulated knowledge still carries, so novelty stays measured against it "
+            "(canon 2.1.10)"
+        )
+    return tuple(notes)
+
+
+def _previous_knowledge_is_missing(
+    previous_metrics: Optional[SaturationMetrics],
+    previously_known_candidates: Sequence[CanonicalCandidate],
+) -> bool:
+    """Was a previous pass carried by its counters alone?
+
+    Only a real loss is disclosed: counters recording no candidate, atom or
+    specification carry no knowledge to measure against, so a first pass with an
+    empty history stays quiet. This is disclosed rather than refused because the
+    report is what a caller has to hand over — its counters travel, its candidate
+    records do not — so the metrics-only handoff is reachable by following the
+    artifact rather than by being careless.
+    """
+    if previous_metrics is None or previously_known_candidates:
+        return False
+    return bool(
+        previous_metrics.new_candidates
+        or previous_metrics.new_atoms_covered
+        or previous_metrics.new_specifications
+    )
+
+
+def _negative_observations(
+    outcomes: Sequence[AdapterOutcome],
+    records_by_outcome: dict,
+    *,
+    observed_at: str,
+) -> Tuple[NegativeObservation, ...]:
+    """Identity-deduplicated negative knowledge (P3-R4C4; canon 2.1.13).
+
+    Every NO_RESULTS and failed search yields an observation whose stable
+    identity derives from the safe applicable combination of query identity,
+    atom/family, source class, adapter, provider revision, status and bounded
+    query scope. Two materially identical searches deduplicate into one record
+    (with a raised ``observed_count``), so repeated failures and repeated empty
+    searches cannot inflate ``new_failure_information`` — the marginal-novelty
+    numerator the negligible-novelty stop law reads. NO_RESULTS stays distinct
+    from provider failure because status is part of the identity.
+    """
+    merged: dict = {}
+    for outcome in outcomes:
+        if outcome.status is not AdapterStatus.NO_RESULTS and outcome.status not in FAILURE_STATUSES:
+            continue
+        record = records_by_outcome.get(id(outcome))
+        if record is None:
+            raise QcaeValidationError(
+                f"outcome {outcome.query_id!r} carries no execution record; a "
+                "negative observation without query lineage cannot be deduplicated"
+            )
+        observation = NegativeObservation(
+            # Negative knowledge is about the *planned* query condition, so the
+            # identity uses the base query id with any execution ordinal
+            # (-exec2, #3) stripped: the same planned query repeated under new
+            # ordinals is one condition, not four.
+            query_id=re.sub(r"(-exec\d+|#\d+)$", "", record.query_id),
+            atom_id=record.atom_id,
+            family_id=record.family_id,
+            source_class=record.source_class,
+            adapter_id=record.adapter_id,
+            status=outcome.status,
+            discovery_plan_id=record.discovery_plan_id,
+            provider_revision=record.provider_revision,
+            bounded_query_scope=(
+                f"limit:{record.result_limit};tier:{record.max_tier.value}"),
+            evidence_refs=tuple(record.evidence_refs),
+            first_seen_at=observed_at,
+            last_seen_at=observed_at,
+        )
+        observation.validate()
+        existing = merged.get(observation.observation_id)
+        if existing is None:
+            merged[observation.observation_id] = observation
+        else:
+            # Same identity: the repeat advances the counters, it does not
+            # create new negative knowledge.
+            merged[observation.observation_id] = (
+                NegativeObservation.from_dict({
+                    **existing.to_dict(),
+                    "observed_count": existing.observed_count + 1,
+                }))
+    return tuple(sorted(merged.values(), key=lambda o: o.observation_id))
+
+
+def _partial_search_notes(outcomes: Sequence[AdapterOutcome]) -> Tuple[str, ...]:
+    """Partial searches stay labelled partial (canon 2.2.13).
+
+    What counts as partial is the port's own finding (``exhaustive``), not the
+    status label alone: a search that ran and qualified its completeness is
+    partial whether its status reads PARTIAL_RESULTS or reads OK because it
+    returned results from pages it did not finish. Its own completeness note is
+    carried, never summarized. A failure is not a partial search — it is a
+    negative finding.
+    """
+    return tuple(
+        f"{o.source_class.value} {o.query_id}: {o.completeness_note}"
+        for o in outcomes
+        if o.counts_toward_saturation
+        and not o.exhaustive
+        and o.completeness_note.strip()
+    )
+
+
+def _negative_findings(
+    outcomes: Sequence[AdapterOutcome], baseline: InternalBaselineRecord
+) -> Tuple[str, ...]:
+    """Completed-empty and failed searches, kept distinct (canon 2.1.13/2.2.15)."""
+    findings: List[str] = []
+    for outcome in outcomes:
+        if outcome.status == AdapterStatus.NO_RESULTS:
+            findings.append(
+                f"{outcome.source_class.value} {outcome.query_id}: NO_RESULTS — a "
+                "completed empty search, which is not a failure and not evidence of "
+                "absence (canon 2.1.13/2.2.15)"
+            )
+        elif outcome.status in FAILURE_STATUSES:
+            findings.append(
+                f"{outcome.source_class.value} {outcome.query_id}: {outcome.status.value}"
+                + (f" — {outcome.message}" if outcome.message else "")
+            )
+    findings.extend(
+        f"prior external rejection on record: {ref}"
+        for ref in baseline.prior_rejection_refs
+    )
+    return tuple(findings)
+
+
+def _remaining_uncertainties(
+    baseline: InternalBaselineRecord, ranking: RankingResult
+) -> Tuple[str, ...]:
+    """What the artifact does not settle, stated rather than implied."""
+    uncertainties: List[str] = []
+    if baseline.external_target_atoms:
+        uncertainties.append(
+            "atoms not resolved by internal knowledge and assigned to external search: "
+            f"{list(baseline.external_target_atoms)}"
+        )
+    if baseline.missing_atoms:
+        uncertainties.append(
+            "atoms with no internal implementation found: "
+            f"{list(baseline.missing_atoms)}"
+        )
+    if baseline.requires_revalidation:
+        uncertainties.append(
+            "evidence requires revalidation before reuse: "
+            f"{list(baseline.stale_evidence_refs)}"
+        )
+    if baseline.revision_change_refs:
+        uncertainties.append(
+            "candidate revisions changed since retrieval (ADR-0007): "
+            f"{list(baseline.revision_change_refs)}"
+        )
+    rejected = tuple(
+        entry.candidate_id
+        for entry in ranking.queue
+        if entry.prefilter_decision == PrefilterDecision.REJECT
+    )
+    if rejected:
+        uncertainties.append(
+            f"candidate(s) parked by hard prefilter, still uninvestigated: {list(rejected)}"
+        )
+    return tuple(uncertainties)

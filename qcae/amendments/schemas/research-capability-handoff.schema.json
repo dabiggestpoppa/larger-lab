@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "qcae://schemas/research-capability-handoff/v1.0",
+  "title": "ResearchCapabilityHandoff",
+  "type": "object",
+  "required": ["schema_version", "direction", "request_id", "mode", "gap_type", "status", "provenance"],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "direction": {"enum": ["QCAE_TO_RESEARCH_MESH", "RESEARCH_MESH_TO_QCAE"]},
+    "request_id": {"type": "string", "minLength": 1},
+    "origin_objective_id": {"type": ["string", "null"]},
+    "capability_gap_id": {"type": ["string", "null"]},
+    "mode": {"enum": ["INTERNAL_ACQUISITION", "QCAE_CAPABILITY_RESEARCH", "CLIENT_RESEARCH_SERVICE"]},
+    "gap_type": {"enum": ["KNOWLEDGE_GAP", "CAPABILITY_GAP", "MIXED_GAP"]},
+    "status": {"enum": ["REQUESTED", "IN_PROGRESS", "COMPLETED", "PARTIAL", "BLOCKED", "REFUSED"]},
+    "research_question": {"type": ["string", "null"]},
+    "capability_context": {"type": ["object", "null"], "additionalProperties": true},
+    "constraints": {
+      "type": ["object", "null"],
+      "properties": {
+        "deadline": {"type": ["string", "null"], "format": "date-time"},
+        "max_compute_cost_usd": {"type": ["number", "null"], "minimum": 0},
+        "max_tool_cost_usd": {"type": ["number", "null"], "minimum": 0},
+        "max_human_minutes": {"type": ["number", "null"], "minimum": 0},
+        "source_allowlist": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "source_denylist": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "data_rights": {"enum": ["PUBLIC", "LICENSED", "CLIENT_CONFIDENTIAL", "INTERNAL", "RESTRICTED", "UNKNOWN"]}
+      },
+      "additionalProperties": false
+    },
+    "required_outputs": {
+      "type": "array",
+      "items": {"enum": ["EVIDENCE_PACKAGE", "SYNTHESIS", "SPECIFICATION_INPUT", "ASSUMPTIONS", "CONTRADICTIONS", "TESTABLE_CLAIMS", "UNCERTAINTY", "PROVENANCE", "RECOMMENDED_NEXT_ACTION"]},
+      "uniqueItems": true
+    },
+    "result": {
+      "type": ["object", "null"],
+      "properties": {
+        "finding": {"type": ["string", "null"]},
+        "confidence": {"type": ["number", "null"], "minimum": 0, "maximum": 1},
+        "uncertainty": {"type": ["string", "null"]},
+        "assumptions": {"type": "array", "items": {"type": "string"}},
+        "contradictions": {"type": "array", "items": {"type": "string"}},
+        "testable_claims": {"type": "array", "items": {"type": "string"}},
+        "specification_inputs": {"type": "array", "items": {"type": "object", "additionalProperties": true}},
+        "recommended_next_action": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "fallback_class": {"enum": ["NONE", "LOCAL_FALLBACK_RESEARCH"]},
+    "provenance": {
+      "type": "object",
+      "required": ["created_at", "producer"],
+      "properties": {
+        "created_at": {"type": "string", "format": "date-time"},
+        "producer": {"type": "string", "minLength": 1},
+        "source_refs": {"type": "array", "items": {"type": "string"}},
+        "evidence_hashes": {"type": "array", "items": {"type": "string"}},
+        "parent_event_ids": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

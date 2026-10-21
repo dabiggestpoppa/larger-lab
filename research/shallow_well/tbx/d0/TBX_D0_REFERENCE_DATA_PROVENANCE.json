@@ -1,0 +1,48 @@
+{
+  "GBPAUD": {
+    "path": "C:\\Users\\wifik\\Desktop\\tbx-d01-seal\\quant-lab\\data\\GBPAUD_M5.csv",
+    "sha256": "6ca2b4824e80c4846b69f58a4e3d32fded722cf4d1b8435174f6fe696ebc697a",
+    "row_count": 277100,
+    "first_timestamp": "2022-01-03 00:00:00",
+    "last_timestamp": "2026-05-29 23:50:00",
+    "columns": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  "GBPNZD": {
+    "path": "C:\\Users\\wifik\\Desktop\\tbx-d01-seal\\quant-lab\\data\\GBPNZD_M5.csv",
+    "sha256": "1175f80e17bda87cc1eba4a49468fa41fea8f2b681719930cab008d9e6f07667",
+    "row_count": 277117,
+    "first_timestamp": "2022-01-03 00:00:00",
+    "last_timestamp": "2026-05-29 23:50:00",
+    "columns": [
+      "timestamp",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume"
+    ]
+  },
+  "AUDNZD": {
+    "path": "C:\\Users\\wifik\\Desktop\\tbx-d01-seal\\quant-lab\\data\\AUDNZD_PRO_M5.csv",
+    "sha256": "5a9bd85233ff8f179bd1a55b6e09639b46a4e7a91c6c573e0a5da310e7bd4dad",
+    "row_count": 279540,
+    "first_timestamp": "2015-10-11 20:00:00",
+    "last_timestamp": "2026-06-03 21:00:00",
+    "columns": [
+      "time",
+      "open",
+      "high",
+      "low",
+      "close",
+      "volume",
+      "spread"
+    ]
+  }
+}

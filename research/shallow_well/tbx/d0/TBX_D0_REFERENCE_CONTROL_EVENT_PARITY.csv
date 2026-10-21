@@ -1,0 +1,8 @@
+field,value
+expected_regression,405
+actual_count,405
+entry_ts_mismatches,0
+dir_mismatches,0
+exit_ts_mismatches,0
+exit_reason_mismatches,0
+total_mismatches,0

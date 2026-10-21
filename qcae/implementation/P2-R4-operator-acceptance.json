@@ -1,0 +1,74 @@
+{
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "evidence_kind": "observed (actual pytest runs, exit codes and counts captured)",
+  "tested_commit": "f2fc77572a3e83e6a44e5636f6e407b95c3c351d",
+  "recorded_at": "2026-09-18T18:09:52Z",
+  "operator_loop_suite": {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ],
+    "exit_code": 0,
+    "collected": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 7.1,
+    "source": "qcae/tests/acceptance/test_p2_operator_loop.py",
+    "journeys": {
+      "A_lifecycle_and_restart": "TestJourneyA_CompleteLifecycle",
+      "B_no_worker_safety": "TestJourneyB_NoWorkerSafety",
+      "C_active_lease_then_expired_recovery": "TestJourneyC_CrashRecovery",
+      "D_identity_fail_closed": "TestJourneyD_IdentityFailClosed",
+      "E_approval_round_trip_DENY": "TestJourneyE_ApprovalRoundTrip"
+    }
+  },
+  "grant_journey_suite": {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ],
+    "exit_code": 0,
+    "collected": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 7.1,
+    "source": "qcae/tests/acceptance/test_p2_grant_journey.py",
+    "journeys": {
+      "F_grant_durable_round_trip": "TestJourneyE_GrantDurableRoundTrip.test_grant_survives_restart_executes_consumes_terminal",
+      "G_grant_single_use_at_surface": "TestJourneyE_GrantDurableRoundTrip.test_consumed_grant_cannot_execute_second_step"
+    }
+  },
+  "process_crash_suite": {
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ],
+    "exit_code": 0,
+    "collected": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 7.1,
+    "source": "qcae/tests/acceptance/test_p2_process_crash.py",
+    "crash_windows": {
+      "A_lease_phase_truth_survives": true,
+      "B_reservation_durable_before_effect": true,
+      "C_executing_survives_abrupt_death": true,
+      "D_effect_before_commit_leaves_executing_truth": true,
+      "E_committed_result_survives_and_reconstructs": true,
+      "cross_process_recovery_completes_no_repeat": true,
+      "non_replay_safe_ambiguity_escalates": true
+    }
+  }
+}

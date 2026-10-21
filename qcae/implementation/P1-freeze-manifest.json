@@ -1,0 +1,399 @@
+{
+  "manifest_version": 1,
+  "phase": "P1",
+  "phase_title": "Evidence + Registry Spine",
+  "canon_version": "0.1",
+  "qcae_version": "0.1.0",
+  "generated_at": "2026-09-12T17:38:48.964533+00:00",
+  "head_commit": "ba9c3e35534b0f139ce6f2b5574eb463f938e3d3",
+  "branch": "qcae-capability-acquisition-engine",
+  "active_amendments": [
+    "A-001 (Research Mesh Boundary and Economic Experience v1.0)"
+  ],
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0006-persistence-engine.md"
+  ],
+  "persistence": {
+    "engine": "SQLite (Python stdlib sqlite3)",
+    "engine_version": "3.45.1",
+    "metadata_schema_version": 1,
+    "journal_mode": "WAL",
+    "transaction_model": "BEGIN IMMEDIATE unit-of-work, rollback on failure",
+    "artifact_store": {
+      "algorithm": "sha256",
+      "layout": "<root>/sha256/<2>/<2>/<full-digest>",
+      "integrity": "digest verified on every retrieval"
+    },
+    "analytics_snapshots": "deferred (Parquet/DuckDB) until a phase justifies"
+  },
+  "domain_schema_snapshots": [
+    {
+      "object_type": "EvidenceArtifact",
+      "schema_version": 1,
+      "fields": [
+        "evidence_id",
+        "subject_id",
+        "evidence_object_type",
+        "evidence_class",
+        "artifact_digest",
+        "producer",
+        "created_at",
+        "scope",
+        "freshness",
+        "revision",
+        "locator",
+        "collected_at",
+        "collected_by",
+        "summary",
+        "interpretation_status",
+        "valid_from",
+        "valid_until",
+        "stale_at",
+        "stale_reason",
+        "revalidation_triggers",
+        "data_classification",
+        "rights_status",
+        "external_owner_domain",
+        "superseded_by"
+      ]
+    },
+    {
+      "object_type": "ScopeDimensions",
+      "schema_version": 1,
+      "fields": [
+        "implementation_revision",
+        "contract_version",
+        "environment",
+        "platform",
+        "dataset",
+        "market_regime",
+        "instrument",
+        "timeframe",
+        "acquisition_form",
+        "policy_version",
+        "research_mesh_evidence_version",
+        "external_provider_revision"
+      ]
+    },
+    {
+      "object_type": "ReceiptEvidenceRef",
+      "schema_version": 1,
+      "fields": [
+        "evidence_id",
+        "evidence_class",
+        "artifact_digest",
+        "external_owner_domain"
+      ]
+    },
+    {
+      "object_type": "CapabilityReceipt",
+      "schema_version": 1,
+      "fields": [
+        "receipt_id",
+        "capability_id",
+        "atom_ids",
+        "contract_id",
+        "contract_version",
+        "implementation_id",
+        "acquisition_form",
+        "source_revision",
+        "integration_scope",
+        "owner",
+        "created_at",
+        "state",
+        "proof_refs",
+        "security_refs",
+        "legal_refs",
+        "quant_refs",
+        "limitations",
+        "assumptions",
+        "rollback_ref",
+        "authority_ref",
+        "revalidation_triggers",
+        "valid_until",
+        "supersedes_receipt",
+        "source_artifact_digests"
+      ]
+    },
+    {
+      "object_type": "ReconsiderationCondition",
+      "schema_version": 1,
+      "fields": [
+        "condition",
+        "detail"
+      ]
+    },
+    {
+      "object_type": "NegativeKnowledge",
+      "schema_version": 1,
+      "fields": [
+        "record_id",
+        "failure_type",
+        "subject_id",
+        "source_revision",
+        "contract_id",
+        "contract_version",
+        "acquisition_form",
+        "causal_detail",
+        "evidence_ids",
+        "reconsideration",
+        "scope_summary",
+        "created_at",
+        "owner",
+        "superseded_by",
+        "retry_allowed"
+      ]
+    },
+    {
+      "object_type": "PositiveKnowledge",
+      "schema_version": 1,
+      "fields": [
+        "record_id",
+        "statement",
+        "subject_id",
+        "evidence_ids",
+        "created_at",
+        "material",
+        "source_revision",
+        "contract_id",
+        "contract_version",
+        "known_limitation",
+        "superseded_by"
+      ]
+    }
+  ],
+  "domain_schema_snapshot_digest": "3eb0f1abd136819dbdae8324e8de11a97eff3527a51fe5ab2fde31382014ec66",
+  "vocabularies": {
+    "evidence_object_types": [
+      "SOURCE_ANCHOR",
+      "ARTIFACT",
+      "OBSERVATION",
+      "TEST_RESULT",
+      "BENCHMARK_RESULT",
+      "DATASET_RECORD",
+      "CLAIM",
+      "CONTRADICTION",
+      "DECISION",
+      "AUTHORITY_RECORD",
+      "UNCERTAINTY"
+    ],
+    "freshness_states": [
+      "CURRENT",
+      "STALE",
+      "REVALIDATION_REQUIRED",
+      "HISTORICAL_ONLY"
+    ],
+    "lineage_edge_types": [
+      "SUPPORTS",
+      "CONTRADICTS",
+      "DERIVED_FROM",
+      "SUPERSEDES",
+      "REPRODUCES",
+      "FAILS_TO_REPRODUCE",
+      "DEPENDS_ON",
+      "VALID_UNDER"
+    ],
+    "receipt_states": [
+      "ACTIVE",
+      "STALE",
+      "REVALIDATION_REQUIRED",
+      "SUPERSEDED",
+      "REVOKED",
+      "REJECTED"
+    ],
+    "negative_knowledge_types": [
+      "NOT_FOUND",
+      "NOT_CAPABLE",
+      "CONTRACT_FAILURE",
+      "BUILD_FAILURE",
+      "SECURITY_REJECTION",
+      "LICENSE_REJECTION",
+      "QUANT_INVALIDATION",
+      "PERFORMANCE_FAILURE",
+      "EXCESSIVE_BURDEN",
+      "DUPLICATE_CAPABILITY",
+      "ABANDONED_PATH"
+    ],
+    "external_registries": [
+      "RESEARCH_MESH",
+      "ECONOMIC_EXPERIENCE",
+      "INSTITUTIONAL_LEARNING"
+    ],
+    "external_lifecycle_roles": [
+      "OBSERVE",
+      "SUBMIT"
+    ]
+  },
+  "vocabulary_digest": "f331fab4d5656be066565219dc1a74dbf9d94dc4111902c65485733b565f3b26",
+  "registry_types": [
+    "EvidenceRepository",
+    "LifecycleLogRepository",
+    "LineageRepository",
+    "NegativeKnowledgeRepository",
+    "PositiveKnowledgeRepository",
+    "ReceiptRepository",
+    "RegistryQuery(decision-reuse)",
+    "ExternalRegistryRefRepository"
+  ],
+  "cross_registry_semantics": {
+    "owner_domains": [
+      "research-mesh:*",
+      "institution:*"
+    ],
+    "lifecycle_roles": [
+      "OBSERVE",
+      "SUBMIT"
+    ],
+    "owner_rewrite": "rejected (ownership laundering guard)",
+    "external_evidence_in_receipts": "supporting only; executable proof must be QCAE-owned"
+  },
+  "append_supersede_law": {
+    "update_statements_on_factual_tables": 0,
+    "enforcement_test": "test_store_contains_no_update_path (AST-based)",
+    "freshness_changes": "append-only freshness_log; current = latest entry"
+  },
+  "migration_evidence": {
+    "mechanism_proof": "v1->v2 TEST_V1_TO_V2 with ledger provenance",
+    "rollback_on_failure": "verified",
+    "backward_and_skip_refusal": "verified"
+  },
+  "backup_restore_evidence": {
+    "covers": [
+      "metadata db",
+      "raw artifacts",
+      "schema version",
+      "lineage"
+    ],
+    "verification": "manifest digests verified before restore declares success"
+  },
+  "test_command": "python -m pytest qcae/tests -q",
+  "test_results": null,
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "known_failures_outside_qcae": [
+    "tests/forge/phase_00/test_extension_docs.py (2 pre-existing failures on this branch, unrelated to QCAE; present before P0 work)"
+  ],
+  "phase_commits": [
+    {
+      "sha": "a53b401b",
+      "subject": "P1-I0: record persistence ADR-0006, freeze addendum for P0-A001 bookkeeping, remove vacuous assertion"
+    },
+    {
+      "sha": "d5e8882e",
+      "subject": "P1-C01: add evidence object model with type/strength separation, scope and freshness"
+    },
+    {
+      "sha": "6890f852",
+      "subject": "P1-C02: add content-addressed artifact store with integrity checks and atomic writes"
+    },
+    {
+      "sha": "93b7a1ea",
+      "subject": "P1-C03: add evidence persistence ports and SQLite metadata store with digest verification"
+    },
+    {
+      "sha": "090e7edc",
+      "subject": "P1-C03: scope sqlite3 denial to non-infrastructure layers with self-verifying engine-free guard"
+    },
+    {
+      "sha": "f113c396",
+      "subject": "P1-C03: drop stray sqlite3 import from store tests to satisfy engine scoping guard"
+    },
+    {
+      "sha": "01a31a69",
+      "subject": "P1-C04: persist provenance and lineage graph with contradiction preservation"
+    },
+    {
+      "sha": "3aaddeea",
+      "subject": "P1-C05: add Capability Receipt model with scope bounds and proof firewall"
+    },
+    {
+      "sha": "07475b2d",
+      "subject": "P1-C06: add positive and negative knowledge records with causal and reconsideration rules"
+    },
+    {
+      "sha": "e59632e7",
+      "subject": "P1-C07: add knowledge/receipt repositories and structured decision-reuse retrieval"
+    },
+    {
+      "sha": "a498a955",
+      "subject": "P1-C07: fix positive-knowledge helper double-add in retrieval tests"
+    },
+    {
+      "sha": "70c6b306",
+      "subject": "P1-C07: align retrieval test contract identifiers"
+    },
+    {
+      "sha": "e8cfb720",
+      "subject": "P1-C08: persist A-001 cross-registry references with owner-domain immutability"
+    },
+    {
+      "sha": "04983524",
+      "subject": "P1-C09: add unit-of-work transaction boundary with rollback and atomic evidence commit"
+    },
+    {
+      "sha": "55ba326d",
+      "subject": "P1-C10: add schema migration ledger with forward-only runner and v1-to-v2 mechanism proof"
+    },
+    {
+      "sha": "772ab794",
+      "subject": "P1-C11: add verified backup and restore across metadata, artifacts, and lineage"
+    },
+    {
+      "sha": "da69813d",
+      "subject": "P1-C11: drop stray sqlite3 import from backup tests to satisfy engine scoping guard"
+    },
+    {
+      "sha": "ba9c3e35",
+      "subject": "P1-T01: add adversarial integrity suite covering tampering, laundering, restart, and firewalls"
+    }
+  ],
+  "prior_freezes": [
+    "qcae/implementation/P0-freeze-manifest.json",
+    "qcae/implementation/P0-A001-freeze-manifest.json",
+    "qcae/implementation/P0-A001-freeze-addendum.json"
+  ],
+  "deferred_items": [
+    {
+      "item": "Semantic/vector retrieval (15.9) deferred; structured retrieval only",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "when discovery volume demands"
+    },
+    {
+      "item": "RepositoryRegistry tables deferred until P3/P4 produce repository objects",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P3 discovery vertical slice"
+    },
+    {
+      "item": "Analytics snapshots (Parquet/DuckDB) deferred per ADR-0006",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P9 quant validation"
+    },
+    {
+      "item": "SqliteRegistryQuery freshness lookup reaches into the lifecycle log connection; refactor to a port method when P2 jobs need it",
+      "severity": "MINOR",
+      "owner": "build-agent",
+      "trigger": "P2 job runtime"
+    }
+  ],
+  "blockers": [],
+  "evidence_refs": {
+    "progress_ledger": "qcae/QCAE_IMPLEMENTATION_PROGRESS.md",
+    "p1_tests": [
+      "qcae/tests/unit/test_p1_evidence_model.py",
+      "qcae/tests/unit/test_p1_artifact_store.py",
+      "qcae/tests/unit/test_p1_sqlite_store.py",
+      "qcae/tests/unit/test_p1_lineage.py",
+      "qcae/tests/unit/test_p1_receipt.py",
+      "qcae/tests/unit/test_p1_knowledge.py",
+      "qcae/tests/unit/test_p1_registry_retrieval.py",
+      "qcae/tests/unit/test_p1_cross_registry.py",
+      "qcae/tests/unit/test_p1_unit_of_work.py",
+      "qcae/tests/unit/test_p1_migrations.py",
+      "qcae/tests/unit/test_p1_backup_restore.py",
+      "qcae/tests/unit/test_p1_adversarial.py"
+    ],
+    "architecture_guards": "qcae/tests/architecture/test_p0_dependency_guards.py"
+  }
+}

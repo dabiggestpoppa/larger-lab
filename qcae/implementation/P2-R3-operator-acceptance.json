@@ -1,0 +1,44 @@
+{
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "source_suite": "qcae/tests/acceptance/test_p2_operator_loop.py",
+  "tested_commit": "6f0218c023657a5e97b11dc0c6a9951fa95d2bd1",
+  "recorded_at": "2026-09-17T20:02:49Z",
+  "journeys": {
+    "A_lifecycle_and_restart": {
+      "submit_result": "durable snapshot QUEUED; JOB_CREATED + JOB_QUEUED each exactly once",
+      "lifecycle_states": [
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED"
+      ],
+      "event_sequence_law": "first granted lease -> RUNNING; final success -> SUCCEEDED with exactly one JOB_SUCCEEDED; STEP_STARTED for s-1 exactly once across the restart",
+      "no_step_repeats_after_restart": true,
+      "test": "TestJourneyA_CompleteLifecycle"
+    },
+    "B_no_worker_safety": {
+      "result": "typed WORKER_UNAVAILABLE, CLI exit 3, structured stderr, no traceback",
+      "lease_mutation": "none",
+      "attempt_mutation": "none (attempt stays 0)",
+      "budget_mutation": "none",
+      "step_state_after": "READY",
+      "active_claims_after": 0,
+      "test": "TestJourneyB_NoWorkerSafety"
+    },
+    "C_active_lease_then_expired_recovery": {
+      "active_lease_protection": "recover before TTL: zero steps recovered, lease token and owner unchanged",
+      "expired_lease_recovery": "after TTL: claim released, step reconciled READY, re-claimable; job completes SUCCEEDED",
+      "committed_step_not_repeated": true,
+      "test": "TestJourneyC_CrashRecovery"
+    },
+    "D_identity_fail_closed": {
+      "result": "unregistered id-attacker refused before lease (exit 2, 'unknown identity', no traceback); zero claim rows",
+      "durable_truth": "policy/identity state unchanged by the refused request",
+      "test": "TestJourneyD_IdentityFailClosed"
+    },
+    "E_approval_round_trip": {
+      "result": "REQUIRE_APPROVAL -> durable request + WAITING_POLICY; operator DENY -> immutable denial, step stays WAITING_POLICY, worker never ran; APPROVAL_REQUESTED and APPROVAL_DENIED events present",
+      "worker_executions": 0,
+      "test": "TestJourneyE_ApprovalRoundTrip"
+    }
+  }
+}

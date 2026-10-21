@@ -1,0 +1,179 @@
+[
+  {
+    "triangle_id": "AUD_CAD_CHF",
+    "currencies": [
+      "AUD",
+      "CAD",
+      "CHF"
+    ],
+    "tags": [
+      "CAD_CENTERED",
+      "CARRY_SENSITIVE_CANDIDATE",
+      "CHF_CENTERED",
+      "COMMODITY_LINKED_CANDIDATE",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "SAFE_HAVEN_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 8
+  },
+  {
+    "triangle_id": "AUD_CAD_EUR",
+    "currencies": [
+      "AUD",
+      "CAD",
+      "EUR"
+    ],
+    "tags": [
+      "CAD_CENTERED",
+      "CARRY_SENSITIVE_CANDIDATE",
+      "COMMODITY_LINKED_CANDIDATE",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 6
+  },
+  {
+    "triangle_id": "AUD_CAD_GBP",
+    "currencies": [
+      "AUD",
+      "CAD",
+      "GBP"
+    ],
+    "tags": [
+      "CAD_CENTERED",
+      "CARRY_SENSITIVE_CANDIDATE",
+      "COMMODITY_LINKED_CANDIDATE",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 6
+  },
+  {
+    "triangle_id": "AUD_CAD_JPY",
+    "currencies": [
+      "AUD",
+      "CAD",
+      "JPY"
+    ],
+    "tags": [
+      "CAD_CENTERED",
+      "CARRY_SENSITIVE_CANDIDATE",
+      "COMMODITY_LINKED_CANDIDATE",
+      "JPY_CENTERED",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "SAFE_HAVEN_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 8
+  },
+  {
+    "triangle_id": "AUD_CAD_NZD",
+    "currencies": [
+      "AUD",
+      "CAD",
+      "NZD"
+    ],
+    "tags": [
+      "CAD_CENTERED",
+      "COMMODITY_LINKED_CANDIDATE",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "REGIONAL_OCEANIA_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 6
+  },
+  {
+    "triangle_id": "AUD_CAD_USD",
+    "currencies": [
+      "AUD",
+      "CAD",
+      "USD"
+    ],
+    "tags": [
+      "CAD_CENTERED",
+      "CARRY_SENSITIVE_CANDIDATE",
+      "COMMODITY_LINKED_CANDIDATE",
+      "USD_CENTERED"
+    ],
+    "tag_count": 4
+  },
+  {
+    "triangle_id": "AUD_CHF_EUR",
+    "currencies": [
+      "AUD",
+      "CHF",
+      "EUR"
+    ],
+    "tags": [
+      "CARRY_SENSITIVE_CANDIDATE",
+      "CHF_CENTERED",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "REGIONAL_EUROPE_CANDIDATE",
+      "SAFE_HAVEN_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 7
+  },
+  {
+    "triangle_id": "AUD_CHF_GBP",
+    "currencies": [
+      "AUD",
+      "CHF",
+      "GBP"
+    ],
+    "tags": [
+      "CARRY_SENSITIVE_CANDIDATE",
+      "CHF_CENTERED",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "REGIONAL_EUROPE_CANDIDATE",
+      "SAFE_HAVEN_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 7
+  },
+  {
+    "triangle_id": "AUD_CHF_JPY",
+    "currencies": [
+      "AUD",
+      "CHF",
+      "JPY"
+    ],
+    "tags": [
+      "CARRY_SENSITIVE_CANDIDATE",
+      "CHF_CENTERED",
+      "JPY_CENTERED",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "SAFE_HAVEN_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 7
+  },
+  {
+    "triangle_id": "AUD_CHF_NZD",
+    "currencies": [
+      "AUD",
+      "CHF",
+      "NZD"
+    ],
+    "tags": [
+      "CARRY_SENSITIVE_CANDIDATE",
+      "CHF_CENTERED",
+      "COMMODITY_LINKED_CANDIDATE",
+      "NON_USD_CROSS",
+      "PURE_ALGEBRAIC",
+      "REGIONAL_OCEANIA_CANDIDATE",
+      "SAFE_HAVEN_CANDIDATE",
+      "SESSION_SENSITIVE_CANDIDATE"
+    ],
+    "tag_count": 8
+  }
+]

@@ -1,0 +1,215 @@
+{
+  "phase": "P2 \u2014 Job Runtime + Local Governance",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "head_commit": "8022b61d4d541f6f6acadc2d16372d3acb813f64",
+  "tested_commit": "8022b61d4d541f6f6acadc2d16372d3acb813f64",
+  "phase_commits": [
+    "ab0098c5",
+    "52be767f",
+    "534f7864",
+    "766efa0d",
+    "cb047e4a",
+    "e1936d06",
+    "fbe93cef",
+    "21bc4466",
+    "0603b882",
+    "38e6ca66",
+    "c531e12f",
+    "49f6fdbc",
+    "61488273",
+    "afdbaa84"
+  ],
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0008-p2-runtime-state-vocabulary.md",
+    "qcae/implementation/decisions/ADR-0009-policy-vs-authority-vocabularies.md"
+  ],
+  "prior_freeze_refs": [
+    "qcae/implementation/P1-R1-freeze-manifest.json",
+    "qcae/implementation/P1-freeze-manifest.json (historical, superseded by P1-R1)"
+  ],
+  "persistence": {
+    "engine": "SQLite (stdlib sqlite3)",
+    "engine_version": "3.x (stdlib)",
+    "metadata_schema_version": 4,
+    "artifact_hash_algorithm": "sha256",
+    "migration_v3_to_v4": {
+      "migration_id": "P2-0004-runtime-governance-tables",
+      "evidence": "qcae/tests/unit/test_p2_migration_backup.py::TestMigrationV3ToV4"
+    }
+  },
+  "vocabularies": {
+    "job_states": [
+      "CREATED",
+      "QUEUED",
+      "RUNNING",
+      "WAITING",
+      "WAITING_APPROVAL",
+      "RETRY_PENDING",
+      "SUCCEEDED",
+      "FAILED",
+      "CANCELLED",
+      "BLOCKED"
+    ],
+    "step_states": [
+      "PENDING",
+      "READY",
+      "RUNNING",
+      "WAITING_POLICY",
+      "WAITING_INPUT",
+      "RETRY_SCHEDULED",
+      "SUCCEEDED",
+      "PARTIAL",
+      "FAILED",
+      "CANCELLED",
+      "STALE"
+    ],
+    "failure_classes": [
+      "TRANSIENT",
+      "PERMANENT",
+      "POLICY_DENIED",
+      "APPROVAL_REQUIRED",
+      "BUDGET_EXHAUSTED",
+      "INVALID_INPUT",
+      "DEPENDENCY_FAILED",
+      "UNKNOWN"
+    ],
+    "policy_decisions": [
+      "ALLOW",
+      "DENY",
+      "REQUIRE_APPROVAL",
+      "ALLOW_WITH_CONSTRAINTS"
+    ],
+    "authority_outcomes": [
+      "GRANT",
+      "DENY",
+      "REQUEST_MORE_EVIDENCE"
+    ],
+    "worker_result_status": [
+      "SUCCESS",
+      "PARTIAL",
+      "FAILED",
+      "BLOCKED_POLICY",
+      "BLOCKED_INPUT",
+      "INCONCLUSIVE",
+      "RETRYABLE",
+      "CANCELLED"
+    ],
+    "event_types": [
+      "JOB_CREATED",
+      "JOB_QUEUED",
+      "STEP_READY",
+      "STEP_LEASED",
+      "STEP_STARTED",
+      "CHECKPOINT_WRITTEN",
+      "STEP_SUCCEEDED",
+      "STEP_FAILED",
+      "RETRY_SCHEDULED",
+      "APPROVAL_REQUESTED",
+      "APPROVAL_GRANTED",
+      "APPROVAL_DENIED",
+      "JOB_SUCCEEDED",
+      "JOB_FAILED",
+      "JOB_CANCELLED"
+    ],
+    "budget_dimensions": [
+      "attempts",
+      "tool_calls",
+      "network_requests",
+      "sandbox_executions",
+      "wall_clock_seconds",
+      "artifact_bytes",
+      "cost_units"
+    ],
+    "escalation_triggers": [
+      "LEGAL_AMBIGUITY",
+      "SECURITY_AMBIGUITY",
+      "PRIVATE_DATA_EGRESS",
+      "PRODUCTION_CREDENTIAL_REQUEST",
+      "HARD_CONTRADICTION",
+      "MATERIAL_CONTRACT_CHANGE",
+      "FORK_VENDOR_COMMITMENT",
+      "PRODUCTION_AUTHORITY",
+      "CAPITAL_AUTHORITY",
+      "IRREVERSIBLE_ACTION",
+      "BUDGET_INCREASE"
+    ]
+  },
+  "queue_lease_semantics": {
+    "claim": "guarded upsert; only one active owner per step",
+    "ack": "token-guarded; owner-only; single ack",
+    "recovery": "expired/unacked claims reclaimed on restart",
+    "priority": "not_before ASC; priority never bypasses policy state"
+  },
+  "secret_provider_semantics": {
+    "handles_not_values": true,
+    "audit_records_values": false,
+    "production_class_denied_by_default": true,
+    "redaction": "centralized Redactor on failure paths"
+  },
+  "cli_commands": [
+    "job list",
+    "job status",
+    "job run",
+    "job resume",
+    "job cancel",
+    "approval list",
+    "identity"
+  ],
+  "test_command": [
+    "python",
+    "-m",
+    "pytest",
+    "qcae/tests",
+    "-q"
+  ],
+  "test_results": {
+    "collected": 861,
+    "passed": 861,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 5.98,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-09-13T16:28:45.750238+00:00",
+    "tested_commit": "8022b61d4d541f6f6acadc2d16372d3acb813f64"
+  },
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "migration_evidence": {
+    "test": "test_p2_migration_backup.py::TestMigrationV3ToV4",
+    "result": "v3 database migrates to v4; P1 registry rows preserved; runtime tables additive"
+  },
+  "crash_recovery_evidence": {
+    "test": "test_p2_recovery.py::TestCrashRecovery + test_p2_adversarial.py restart cases",
+    "result": "completed steps never repeated; expired leases recovered; authority rechecked"
+  },
+  "backup_restore_evidence": {
+    "test": "test_p2_migration_backup.py::TestBackupRestoreRuntime",
+    "result": "jobs/steps/checkpoints/budgets/approvals restored exactly; stale leases recoverable"
+  },
+  "architecture_guard_evidence": {
+    "core_stdlib_only": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "engine_confined_to_infrastructure": "governance/interfaces use ports only",
+    "oce_absent": "runtime identity reports OCE_ABSENT; no OCE import anywhere in qcae/"
+  },
+  "known_external_failures": [
+    "tests/forge/phase_00/test_extension_docs.py: 2 pre-existing failures external to qcae/ (documented since P1; unchanged)"
+  ],
+  "deferred_items": [
+    "heartbeat-based lease liveness (single-process P2 model uses restart-based recovery)",
+    "HTTP API surface (application service QcaeApp is the stable boundary; Book V 13.7 allows thin adapters later)",
+    "OCE governance migration (P12; provider seam already in place)"
+  ],
+  "blockers": [],
+  "operator_review_trigger": "P2 phase completion per operator directive; P3 NOT started",
+  "generated_at": "2026-09-13T16:28:45Z"
+}

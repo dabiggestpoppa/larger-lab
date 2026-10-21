@@ -1,0 +1,19 @@
+{
+  "checkpoint": "SW-TBX-D0-FX-TRIANGLE-UNIVERSE-AND-SCAN-CONTRACT",
+  "frozen_grid_version": "D0_FROZEN",
+  "total_hypotheses": 10080,
+  "rules": [
+    "freeze D1 parameter grid before D1",
+    "store ALL triangle/cell results",
+    "never delete failures",
+    "count number of hypotheses evaluated",
+    "no post-hoc silent threshold rescue",
+    "chronological development / confirmation later",
+    "one-use final holdout later",
+    "use BH-FDR or appropriate family correction for broad statistical claims",
+    "prefer broad parameter plateaus over isolated peaks",
+    "distinguish exploratory ranking from confirmed alpha"
+  ],
+  "family_correction": "BH-FDR",
+  "exploratory_vs_confirmed": true
+}
