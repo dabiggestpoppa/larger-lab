@@ -32,7 +32,13 @@ jobs:
       - name: Verify contract
         run: |
           set -euo pipefail
-          python3 -c "import json; c=json.load(open(process.env['CONTRACT_PATH'])); assert c['base_sha']==process.env['BASE_SHA']; assert c['head_sha']==process.env['HEAD_SHA']; print('contract-ok')"
+          python3 << 'PY'
+          import json, os
+          c = json.load(open(os.environ['CONTRACT_PATH']))
+          assert c['base_sha'] == os.environ['BASE_SHA']
+          assert c['head_sha'] == os.environ['HEAD_SHA']
+          print('contract-ok')
+          PY
 
       - name: Execute BASE_SHA in clean isolated checkout
         run: |
