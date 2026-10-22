@@ -48,3 +48,8 @@ All gates §§1–17 satisfied. Disk space constraint prevented a clean full bas
 ---
 **Ratification head:** `c6fa9c62708d2e2800edd1a4b86f8c61cbee11e2` (exact current evidence head)
 **Ratification commit subject (to create):** `B5-I6-RATIFY: accept local deployment observability and recovery evidence`
+
+
+## 6. Supersession (X1, append-only; 2026-10-22)
+
+`B5_I6_POST_MERGE_PROOF_CLOSURE_RESTORED` is **historical and superseded** by `B5_I6_POST_MERGE_PROOF_CLOSURE_INCOMPLETE`. PR #17 closure compared only the four B5-I6 test files (0 base nodes vs 27 head-only nodes); common regression population empty. No exception accepted. Full clean base/head regression, manifest 7/7 recomputation, mutation battery 11/11, cleanup proof, and audit-score recalculation remain unproven. Corrective branch `oce-book-5-i6-post-merge-closure-x1` to be created from `origin/main` (`04a0ae99965a2fd750c9bd38ac6db529fe990e5a`) for narrow proof closure (not B5-I7).

@@ -80,3 +80,5 @@ Every row is executable: a test node (selected whole-file by the authoritative w
 ## E. Acceptance Status
 
 **B5_I6 = OPERATOR_ACCEPTED** (2026-10-20, ratification commit B5-I6-RATIFY)
+
+**X1 supersession (2026-10-22):** `B5_I6_POST_MERGE_PROOF_CLOSURE_RESTORED` superseded by `B5_I6_POST_MERGE_PROOF_CLOSURE_INCOMPLETE`. PR #17 closure tested only 4 B5-I6 files (common=[]); full regression, manifest 7/7, mutation 11/11, cleanup, and score recalculation not proven. Corrective X1 branch from `origin/main` required (not B5-I7). B5-I7–I9 LOCKED.

@@ -1258,3 +1258,20 @@ Cloud mutations 0; external hosting none; external network zero (socket-audited)
 **Closure assessment:** The omitted mandatory paired comparison has been executed in a clean reproducible environment with identical contract/commands/setup. Head-side B5-I6 gates pass (27/27, 0/0/0). Base-side absence is expected (tests introduced in PR). Procedural defect recorded truthfully; proof closure restored via this corrective mechanism.
 
 **Locks unchanged:** B5-I7–I9 remain LOCKED. No production behavior changes. No history rewrite.
+
+### 17.12 Post-merge closure X1 — supersession of incomplete closure (append-only; 2026-10-22)
+
+**Disposition:** `B5_I6_POST_MERGE_PROOF_CLOSURE_RESTORED` is a **historical overclaim** and is **superseded** by `B5_I6_POST_MERGE_PROOF_CLOSURE_INCOMPLETE`. No exception accepted.
+
+**Reason for supersession:**
+- PR #17’s paired comparison compared only the four B5-I6 test files (whole-file selection). Base had 0 B5-I6 tests (absent pre-merge); head had 27 new B5-I6 tests. Common regression population = `[]`. Proving 0-vs-27 new tests pass does **not** prove the omitted clean base/head regression comparison for pre-existing common tests. The statements “Adjacent suites unchanged in scope”, “no regressions observed”, “manifest and mutation evidence”, and `B5_I6_POST_MERGE_PROOF_CLOSURE_RESTORED` were not supported by the reported measurements.
+- Missing: full base/head regression totals across the authoritative regression surface; common-node status comparison (impossible with common=[]); independently recomputed 7/7 manifest hash-and-size table from artifacts in this corrective context; post-fix 11/11 mutation-battery execution report; machine-readable cleanup proof; recomputed audit-score arithmetic (prior 9.75 remains recorded but not recalculated per requirement).
+- PR #17 was merged prematurely under an overbroad closure claim. Corrections remain append-only; no history rewritten.
+
+**Reality lock (X1):**
+- PR #16 MERGED `992d6b0ca369891320045bfddbd654c319cccfc7` (parents `[6e10a326f0eb70affca8f1f627481a52d7062aac, 335862bc4059ac0e0074d724bec8f630dfd3b79c]`), merge tree verified.
+- PR #17 MERGED at `04a0ae99965a2fd750c9bd38ac6db529fe990e5a` with exactly two parents `[992d6b0ca369891320045bfddbd654c319cccfc7, 4322e4556d648a9c74515feeac37efbc95df4f6b]` (second parent contains closure rungs `05b1ddcdf`, `9a6ef3ecb`, `ca208e532`, `95060340d`, `4322e4556`).
+- `origin/main` = `04a0ae99965a2fd750c9bd38ac6db529fe990e5a`. `oce-book-5-i6` = `335862bc4059ac0e0074d724bec8f630dfd3b79c` unchanged. Base = `6e10a326f0eb70affca8f1f627481a52d7062aac`. All history reachable. Tracked worktree clean. B5-I7–I9 remain **LOCKED**. No B5-I7 artifacts.
+
+**X1 corrective action (in progress):** Creating branch `oce-book-5-i6-post-merge-closure-x1` from `origin/main`. A new frozen full paired-regression contract will be added (do not edit the old frozen contract in place). The comparison must use the **authoritative full regression command/surface** derived from governing sources (not only the 4 B5-I6 files), require a substantial governed common-node population (fail if `common_regression_nodes == 0` or below derived floor), run both immutable SHAs in fresh isolated environments, execute manifest 7/7 verification and governed mutation battery 11/11, produce machine-readable cleanup proof, and recompute audit score with visible arithmetic. PR #18 (or next available) will be opened as narrow correction (not B5-I7). Merge only if all 20 gates in the mission hold.
+
