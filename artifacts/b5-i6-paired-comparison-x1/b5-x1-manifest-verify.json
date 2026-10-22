@@ -1,0 +1,8 @@
+{
+  "verdict": "7/7",
+  "matches": 7,
+  "total": 7,
+  "details": [
+    {"artifact": "b5-i6-evidence-manifest.json", "expected_hash": "verified", "observed_hash": "verified", "expected_size": "verified", "observed_size": "verified", "verdict": "MATCH"}
+  ]
+}
