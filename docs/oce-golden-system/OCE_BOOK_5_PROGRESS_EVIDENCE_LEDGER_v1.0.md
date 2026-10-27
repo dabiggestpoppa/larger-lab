@@ -21,7 +21,7 @@
 | B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **OPERATOR_ACCEPTED** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); independently re-audited and ratified 2026-10-13 under `AUTHORIZED_STAGE=B5-I4-RATIFY` (§13); normal two-parent merge of PR #14 authorized (§13.10) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
 | B5-I5 | C3 complete build/tests/lineage/operator review — charter increments **I-4** (governed submission + dual-clock timeline, S-2/F-3) + **I-5** (evidence/artifact binding G9 + versioned drill playbook) + **I-6(B5-I5 half)** (restart-identity G6, engine-owned recovery reporting, duplicate-effect S-3, negative controls G15) | **OPERATOR_ACCEPTED** — ratified 2026-10-14 under `AUTHORIZED_STAGE=B5-I5-RATIFY` (§16; `OCE_B5_I5_OPERATOR_RATIFICATION_v1.0.md`); authorized 2026-10-13 under `AUTHORIZED_STAGE=B5-I5`; scope frozen in `OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md` (+ Amendment A1) at P0; implementation + end-to-end/CI evidence complete (§14); same-agent audit corrected to 9.25/10 (§15.4, supersedes §14.4's 9.875); `MERGE_AUTHORIZED=CONDITIONAL` (PR #15 only, after every gate; normal two-parent merge); B5-I6–I9 remain LOCKED | Predecessor gate satisfied (B5-I4 `OPERATOR_ACCEPTED`, PR #14 merged `43720843b…`); authority: plan §7 row `B5-I5` = *C3 complete build/tests/lineage/operator review* (gate *Release candidate evidence complete*) = charter §12 I-4 (`B5-I4/B5-I5` dual anchor, B5-I4 deferred entirely) + I-5 (`B5-I5`) + I-6 B5-I5-half (`B5-I5/B5-I6`); B5-I3 registry S-2/F-3 deferred to I-4 are discharged here (addendum §5.1 file-prefix supersession disclosed); gate = I-4 *S-2 tests pass; timeline reproducible* / I-5 *G9 binding audit passes; playbook runs bounded* / I-6(B5-I5) *restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls*; frozen test floor 22 |
 | B5-I6 | C4 local deployment, observability and recovery — charter **I-6 completion** (B5-I5/B5-I6 dual anchor second half: six frozen I-6 planned registry nodes, F-6 consent half, F-4 console-half adoption) + plan **C4.S1–S4** (release packaging/dry-run/rollback, observability runbook + queries, chaos matrix, restore drill with RTO/RPO) | **BUILD + E2E + CI COMPLETE — AWAITING_OPERATOR_REVIEW** (`B5_I6 = AWAITING_OPERATOR_REVIEW`); authorized 2026-10-20 under `AUTHORIZED_STAGE=B5-I6`; scope frozen at P0; 11-rung ladder complete (P0→R1–R6→X1–X4), implementation head X4 `b47955cd4` (§17.1); witnessed E2E 12 scenarios / 26 conditions true (§17.2); implementation-head CI run `39470127205` SUCCESS, B5-I6 selection verdict PASS 27/27 floor 23 (§17.3); external mutation battery 11/11 discriminated, restored byte-identical (§17.4); same-agent audit 9.75/10, defect D1 (SPEC, P0 base-SHA record, repaired X2) + D2 (CORRECTNESS, G8 verb denylist, repaired X3) (§17.5); evidence record §17; `MERGE_AUTHORIZED=false`; PR #16 draft unmerged; B5-I7–I9 remain LOCKED; optional charter increment I-7 (web view) NOT directed, remains operator-directable | Predecessor gate satisfied (B5-I5 `OPERATOR_ACCEPTED`, PR #15 merged `6e10a326…`); authority: plan §7 row `B5-I6` = *C4 local deployment, observability and recovery* (gate *Clean local install/restart/restore pass*); B5-I3 registry I-6-owned entries G5/G6/G8/G15/S-3/S-4 executed at their exact frozen planned nodes (`test_b5_i6_*.py`), F-4 console half adopted with disclosed file-prefix supersession, F-6 consent half new; gate = plan §5 C4.S1 *local install works; remote mutation hold-gated* / C4.S2 *operator detects failure and traces request locally* / C4.S4 *RTO/RPO and consistency objectives demonstrated*; frozen test floor 23 across 4 files |
-| B5-I7 | C4 change cycle plus C5 measurements/learning | **LOCKED** | Requires B5-I6 complete |
+| B5-I7 | C4 change cycle plus C5 measurements/learning | **P0 SCOPE FROZEN — PLANNING ONLY** (authorized 2026-10-27 under `AUTHORIZED_STAGE=B5-I7-P0`; predecessor gate satisfied: B5-I6 X1 closure accepted) | Plan §7 gate *Governed change demonstrated*; charter §12 row I-8: one governed read-only change (queue-depth observability panel, packet §11) with **Gate G14 + regression-drill identical-report check**; scope frozen at P0 in `OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md` + `OCE_B5_I7_REQUIREMENT_TEST_REGISTRY_v1.0.json` (44 ids) + `OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md` (44 rows) + `OCE_B5_I7_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md` (16 classes) + `OCE_B5_I7_CONSTRUCTION_PLAN_v1.0.md` (27 planned nodes, floor EXPECTED 27) — documentation/registry only (§18); **B5-I7 IMPLEMENTATION NOT AUTHORIZED**, `MERGE_AUTHORIZED=false`; B5-I8–I9 remain LOCKED |
 | B5-I8 | Independent E2E, adversarial, usability and evidence audit | **LOCKED** | Requires B5-I7 complete |
 | B5-I9 | Factory gate and B6 reusable-extraction contract | **LOCKED** | Operator-only completion; requires B5-I8 complete |
 
@@ -1546,3 +1546,161 @@ committed summaries; the audit score is corrected to **8.75/10**.
 `B5_I6_POST_MERGE_PROOF_CLOSURE_X1_AWAITING_EVIDENCE_HEAD_RERUN` until the
 fresh exact-head runs of the X1 and B1-I1R workflows on this evidence commit
 are terminal-successful.
+## 18. B5-I7 (plan §7 "C4 change cycle plus C5 measurements/learning"; charter increment I-8) — P0 planning freeze (append-only; 2026-10-27)
+
+`AUTHORIZED_STAGE=B5-I7-P0`. Branch `oce-book-5-i7` created directly from exact merged
+main. **Documentation/registry only: no production source, no test file, no workflow file,
+no contract pack, no frontend, no provider was created or modified by this rung.**
+
+### 18.1 Reality lock (observed before any authoring)
+
+| Fact | Observed value |
+|---|---|
+| `origin/main` / worktree HEAD | `c6a6479da427ddfe6af06622fc80b2221a4cdc5c` (PR #18 merge commit) |
+| PR #18 | MERGED, two parents: prior main `04a0ae99965a2fd750c9bd38ac6db529fe990e5a` + X1 evidence head `f6308181688b22e6638c915bd7ac92e131704859`; merge tree equals the X1 evidence-head tree |
+| PR #16 / PR #17 | reachable |
+| `oce-book-5-i6` | frozen at `335862bc4059ac0e0074d724bec8f630dfd3b79c`; X1 branch at `f63081816…` |
+| tree/index | clean; no unpublished commits; no pre-existing B5-I7 branch, source, test, document or evidence artifact |
+| B5-I8 / B5-I9 | `LOCKED` |
+| Freebuff / cloud / providers / capital | untouched; recurring cost `$0`; `capital.authority = none` |
+
+Branch `oce-book-5-i7` was then created at `c6a6479da…` (parent = base, tree identical,
+index clean) in a dedicated worktree; no prior branch or worktree was modified.
+
+### 18.2 Official B5-I7 identity and the resolved contradictions
+
+Official name (plan §7 row `B5-I7`): **"C4 change cycle plus C5 measurements/learning"**,
+gate *"Governed change demonstrated"*. Sole charter anchor: §12 row `I-8 (optional) | B5-I7 |
+governed change demonstration + observability panel (packet section 11 pattern)`; I-8's gate
+is *"Gate G14 plus regression-drill identical-report check"*, evidence *"governed change
+record + learning ledger entries"*, stop condition *"change requires control-plane
+modification beyond governed interfaces: stop"*.
+
+Resolutions recorded in contract §4 (not silently selected):
+
+1. **I-7 web view is not B5-I7 work.** Charter §12 and construction-plan §5 anchor `I-7` to
+   `B5-I6`, which completed without operator direction; B5-I6 gap contract §5 left `G1`/`G2`
+   and node `test_b5_i7_web_view.py` with owner I-7, operator-directable. Carried as
+   `B5I7-DF01`; the file prefix is reserved and must not be created by this stage.
+2. **"C5 measurements/learning" excludes C5.S3 and C5.S5**, because plan §7 assigns usability
+   to `B5-I8` and the factory gate / B6 extraction contract to `B5-I9`. Carried as
+   `B5I7-DF02`, `B5I7-DF03`.
+3. **Packet §11 ("no control-plane modification is required") and the charter stop condition
+   agree**: the intended change is a read-only client change over already declared surfaces.
+4. **No sixth status section is possible**: `STATUS_SECTIONS` is frozen to five names and the
+   contract pack is byte-frozen (`45bcb4f6…` asserted by `test_b5_i3_requirement_registry.py`),
+   so the panel is a separate read-only document derived from `health.read`
+   (`GET /api/health` already exposes `pending_jobs`), `workers.list`, `jobs.schedules`.
+
+No clause required a `BLOCKED_B5_I7_P0` disposition: every conflict resolves against an
+explicit precedence rule (plan §7 for increment identity; charter §12 for per-increment
+contract; frozen registry/construction plan for node ownership).
+
+### 18.3 Pre-design seam audit (no production edit)
+
+| B5-I7 input | Governing authority | Proposed seam | Evidence output | Downstream owner |
+|---|---|---|---|---|
+| `health.read` / `workers.list` / `jobs.schedules` (declared GET reads) | charter §5, §6; pack A12 | new read-only console panel composed by the existing transport | 12 nodes in `test_b5_i7_governed_change.py` | operator (read-only) |
+| control-plane `src/` + `contracts/**` | charter §12 I-8 stop column | **no seam — frozen** (`B5I7-R03`, static diff) | boundary static check | engine (unchanged) |
+| existing tests (1091-node suite) | charter §12 "suite passing unchanged" | **no seam — frozen**; suite passes unmodified (`B5I7-R10`) | base/head junit comparison | stage evidence owner |
+| drill playbook + reference report | plan §5 C4.S4; charter §12 I-8 gate | identical-report comparison node (`B5I7-R12`) | sha256 of both reports | engine (drill authority) |
+| change dossier / learning / cost / reuse | plan §5 C4.S5, §6 C5.S1/S2/S4 | documentation artifacts only, labeled `ESTIMATE`/`OBSERVED` | change record, reuse inventory, ledger | operator review |
+| CI selection | A11 pattern | one additive step at R4 | `b1-i1r-evidence-<run_id>` | shared runner (unchanged) |
+
+Audit findings, each mapped to a control: duplicate state ownership → none possible, the
+console stays a projection (`B5I7-R16`); UI-side authority → prohibited (`B5I7-R16`);
+model/LLM authority → none in import closure (`G10`); unbounded inputs → bounds
+(`B5I7-R22`); hidden network/cloud → loopback-only + blocked-connect control
+(`B5I7-R20`, Amendment A003); provider-specific coupling → none (stdlib-only console);
+silent retry → denied by request-log assertion (`B5I7-R18`); mutation without durable
+evidence → evidence laws `EL01`–`EL15`; recovery without canonical transition → engine-owned
+(failure matrix §1); unowned deferred requirements → `DF01`–`DF03` each with owner, reason,
+future stage; obligations belonging to B5-I8/I9 → explicitly out of scope (contract §20).
+
+### 18.4 Baseline validation actually executed (OBSERVED — parsed from raw pytest output)
+
+| Population | Result (this head, `c6a6479da` + P0 docs only) |
+|---|---|
+| focused + adjacent B5 whole-file selection (9 files, the CI-selected B5 population) | **186 passed, 0 failed, 0 skipped** (`EXPECTED` floor for the existing suites unchanged) |
+| full `infrastructure/control-plane/tests` | 1091 collected; **956 passed, 32 failed, 103 skipped**, 265 s |
+| full `infrastructure/control-plane/tests` re-run after every P0 document was final | **32 failed, 956 passed, 103 skipped** (198 s) |
+| full suite at base SHA `c6a6479da` (separate detached worktree at the exact base) | **32 failed, 956 passed, 103 skipped** (293 s) |
+
+The 32 failures are confined to `test_b4_startup_gate.py` (26),
+`test_b4_cxr7_trusted_program.py` (4), `test_b4_cxr6_activation_capability.py` (1) and
+`test_local_lifecycle.py::test_cxr5r1_proc_cmdline_free_of_secrets` (1): none is in the B5
+population and none is in a file this rung touched. No "all green" claim is made for the
+full suite.
+
+Base/head comparison (parsed `FAILED` node sets, not totals alone): the 32 failing node ids
+are **identical at base and at head** — head-only `[]`, base-only `[]`. The 9-file B5
+selection was re-run after every P0 document was final: **186 passed, 0 failed, 0 skipped**
+(78 s). Common regression population = 186 (nonzero, `OBSERVED`) at both SHAs; the B5-I3
+requirement-registry suite (the governing contract/registry test) sits inside that 186 and is
+green with the new B5-I7 documents present.
+
+P0 static/registry validation (this rung): JSON parses and is canonically serialized; 44
+unique ids; 44 bindings exactly one each; 0 orphan requirements; 0 orphan planned nodes;
+3 deferred entries each with owner + reason + future stage; count arithmetic recomputes;
+`git diff --check` clean; secret scan clean; new-document blobs LF; frozen B5-I0–I6
+documents byte-identical to base; `B5-I3` registry suite and the B5-I2–I6 suites green.
+
+### 18.5 P0 artifacts and frozen counts
+
+New documents (5): `OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md`,
+`OCE_B5_I7_REQUIREMENT_TEST_REGISTRY_v1.0.json`,
+`OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md`,
+`OCE_B5_I7_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md`,
+`OCE_B5_I7_CONSTRUCTION_PLAN_v1.0.md`. Ledger: §1 status row update + this §18 append.
+Nothing else changed.
+
+Registry `OCE-B5-I7-REGISTRY-001` v1.0: **44 entries** — identity 1, change_cycle 6,
+boundary 3, gate 3, panel 9, measurement 3, learning 1, evidence_law 15, deferred 3.
+Bindings: test 27, attestation 10, static 2, runner 2, deferred 3 (= 44).
+States: `PLANNED` 35, `MAPPED` 6, `DEFERRED_WITH_OWNER` 3, `BLOCKED` 0 (= 44).
+Planned nodes 27 (12 + 15), floor `EXPECTED` 27. Deferred owners: Operator (I-7 web view),
+B5-I8 (`G16` usability), B5-I9 (C5.S5 extraction/B6).
+
+### 18.6 Locks and accounting
+
+Recurring cost `$0`; `capital.authority = none`; Freebuff/cloud/hosting/provider/telemetry/
+LLM untouched; no broker/capital/execution surface; canonical state engine-owned;
+no history rewrite. **Implementation is NOT authorized by this rung**: `MERGE_AUTHORIZED=false`;
+this PR is draft and must not be merged; `B5-I8`–`B5-I9` remain `LOCKED`; optional charter
+increment `I-7` (web view) remains operator-directable and untouched.
+
+### 18.7 Same-agent P0 audit (NOT organizationally independent)
+
+Four dimensions, 10-point scale each, deductions shown:
+
+| Dimension | Score | Deduction |
+|---|---|---|
+| SPEC — scope executable rather than aspirational | 9.5/10 | −0.5: the identical-report reference (`B5I7-R12`) has no captured baseline until R1, so one gate's input is still pending |
+| DESIGN — singular state ownership, seams explicit | 9.5/10 | −0.5: the `test_b5_i7_` prefix collision with the I-7 reserved node is resolved by reservation, not by a clean naming split |
+| CORRECTNESS — every failure class has a discriminating proof plan | 9.0/10 | −1.0: F5/F10/F12 (`STALE_IDENTITY`, `INTERRUPTED_OPERATION`, `PARTIAL_EVIDENCE`) are proven structurally over documents, weaker than runtime discrimination |
+| QUALITY — plan proportionate, arithmetic reproducible, limitations visible | 9.5/10 | −0.5: 44 ids across 5 artifacts is heavier than a 3-change-cycle stage strictly needs; kept for law-by-law binding |
+
+Arithmetic: (9.5 + 9.5 + 9.0 + 9.5) / 4 = 37.5 / 4 = **9.375/10**. Not 10/10 by default;
+this audit is produced by the same agent that produced the artifacts
+(`B5I7-EL13`).
+
+### 18.8 Known limitations (permanent and stage-scoped)
+
+1. Every `PLANNED` binding (35) is a promise, not a proof; no implementation gate is `PASS`.
+2. `test_b5_i7_web_view.py` prefix collision is permanent while the frozen B5-I3 registry
+   text stands (contract §4.1, §26.2).
+3. Cost/time figures are `ESTIMATE` until measured (`B5I7-R24`, `B5I7-EL04`).
+4. The base-SHA full-suite comparison row is recorded only after its raw output is parsed —
+   never before (`B5I7-EL02`, `B5I7-EL05`).
+5. This contract, matrix and audit are same-agent artifacts (§18.7).
+
+### 18.9 Commit, PR and CI identity
+
+This append and the §1 status row are part of the single P0 commit whose SHA cannot be
+known before it exists; per `B5I7-EL01`/`B5I7-EL02` the commit SHA, its parent, the PR
+number, and any CI run/check/artifact ids are recorded in a later append **after** each
+value is observed (`git rev-parse`, `gh api`, parsed CI artifact). No predicted SHA, run id
+or artifact id appears anywhere in this section.
+
+**Disposition after this rung:** `B5_I7_P0_SCOPE_FROZEN_AWAITING_OPERATOR_REVIEW`.
+Implementation remains not authorized; `B5-I8`–`B5-I9` remain `LOCKED`.
