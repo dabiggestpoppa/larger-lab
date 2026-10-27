@@ -1,0 +1,139 @@
+{
+  "document_id": "OCE-B5-I6-POST-MERGE-PAIRED-COMPARISON-CONTRACT-002",
+  "version": "1.1",
+  "status": "FROZEN",
+  "purpose": "X1: Clean paired base/head full regression comparison for B5-I6 to close missing proof (not B5-I7)",
+  "base_sha": "6e10a326f0eb70affca8f1f627481a52d7062aac",
+  "head_sha": "335862bc4059ac0e0074d724bec8f630dfd3b79c",
+  "merge_commit_sha": "992d6b0ca369891320045bfddbd654c319cccfc7",
+  "pr17_merge_sha": "04a0ae99965a2fd750c9bd38ac6db529fe990e5a",
+  "comparison_type": "paired_base_head_direct_full_regression",
+  "must_not_compare": ["merge_vs_head"],
+  "runner_image": "ubuntu-24.04",
+  "environment_identity": {
+    "os": "ubuntu-24.04",
+    "python_version": "3.12",
+    "pip_version_source": "requirements-ci.lock.txt"
+  },
+  "dependency_lock_identity": {
+    "files": [
+      "infrastructure/control-plane/requirements-ci.lock.txt",
+      "infrastructure/cloud-ground/requirements.lock.txt"
+    ],
+    "install_method": "pinned hashes as in workflow"
+  },
+  "full_regression_surface": {
+    "description": "Authoritative Book 5 regression as executed by b1-i1r-validation (shared runner + B5-I2-I6 steps)",
+    "shared_runner": {
+      "script": "infrastructure/cloud-ground/scripts/run-validation.sh",
+      "test_suite": "infrastructure/cloud-ground/tests/test_regression.py",
+      "phases": ["regression", "adversarial", "static"],
+      "expected_totals_from_ratification": {
+        "shared_regression": 67,
+        "adversarial": 49,
+        "static": 35
+      }
+    },
+    "b5_stages": {
+      "b5_i2": {
+        "file": "infrastructure/control-plane/tests/test_console_contracts.py",
+        "floor": 24,
+        "reproduction_harness": true
+      },
+      "b5_i3": {
+        "file": "infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py",
+        "floor": 51
+      },
+      "b5_i4": {
+        "file": "infrastructure/control-plane/tests/test_b5_i4_console_kernel.py",
+        "floor": 23
+      },
+      "b5_i5": {
+        "file": "infrastructure/control-plane/tests/test_b5_i5_timeline.py",
+        "floor": 45
+      },
+      "b5_i6": {
+        "files": [
+          "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py",
+          "infrastructure/control-plane/tests/test_b5_i6_console_restart.py",
+          "infrastructure/control-plane/tests/test_b5_i6_fail_closed.py",
+          "infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py"
+        ],
+        "floor": 23,
+        "expected_new_at_head": 27
+      }
+    }
+  },
+  "commands": {
+    "note": "Execute full regression surface on both SHAs in identical environment"
+  },
+  "timeouts": {
+    "per_command_seconds": 600,
+    "job_timeout_minutes": 180
+  },
+  "artifact_schema": {
+    "required": [
+      "b5-x1-collect-all-{sha}.txt",
+      "b5-x1-pytest-all-{sha}.txt",
+      "b5-x1-junit-all-{sha}.xml",
+      "b5-x1-meta-{sha}.json",
+      "b5-x1-shared-runner-{sha}.log",
+      "b5-x1-comparison-report.json",
+      "b5-x1-manifest-verify.json",
+      "b5-x1-mutation-report.json",
+      "b5-x1-cleanup-record.json"
+    ]
+  },
+  "node_identity_rules": {
+    "full_node_id_required": true,
+    "no_duplicates": true,
+    "no_orphans": true
+  },
+  "comparison_rules": {
+    "fail_closed": true,
+    "no_cache_reuse_between_shas": true,
+    "clean_checkout_per_sha": true,
+    "separate_result_directories": true,
+    "no_continue_on_error": true,
+    "capture_every_exit_code": true
+  },
+  "refusal_conditions": [
+    "sha_mismatch",
+    "tree_mismatch",
+    "setup_differs",
+    "collection_fails",
+    "result_files_missing_or_malformed",
+    "node_id_duplicates",
+    "test_selection_differs_without_committed_change",
+    "skips_increase_unexpectedly",
+    "failures_errors_regress",
+    "b5_i6_tests_absent_at_head",
+    "common_regression_nodes == 0",
+    "common_regression_nodes_below_derived_floor",
+    "manifest_verification_fails",
+    "mutation_battery_fails_or_unreproducible_without_governed_harness",
+    "cleanup_proof_fails"
+  ],
+  "minimum_required_common_node_population": {
+    "description": "Must have substantial common pre-existing tests (B5-I2-I5 + shared runner) between base and head",
+    "derived_floor": 100,
+    "enforce": true
+  },
+  "manifest_verification": {
+    "required": true,
+    "require_all_seven_matches": true
+  },
+  "mutation_battery_verification": {
+    "required": true,
+    "require_all_eleven_discriminated": true,
+    "if_unpublished_publish_governed_harness_or_block": true
+  },
+  "cleanup_checks": {
+    "required": true,
+    "no_comparison_created_state_remains": true
+  },
+  "locks": {
+    "b5_i7_i9_locked": true,
+    "no_b5_i7_artifacts": true
+  }
+}

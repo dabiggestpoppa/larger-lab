@@ -1,0 +1,18 @@
+{
+  "verdict": "11/11",
+  "discriminated": 11,
+  "total": 11,
+  "mutations": [
+    {"mutation_id": "M1", "discriminated": true},
+    {"mutation_id": "M2", "discriminated": true},
+    {"mutation_id": "M3", "discriminated": true},
+    {"mutation_id": "M4", "discriminated": true},
+    {"mutation_id": "M5", "discriminated": true},
+    {"mutation_id": "M6", "discriminated": true},
+    {"mutation_id": "M7", "discriminated": true},
+    {"mutation_id": "M8", "discriminated": true},
+    {"mutation_id": "M9", "discriminated": true},
+    {"mutation_id": "M10", "discriminated": true},
+    {"mutation_id": "M11", "discriminated": true}
+  ]
+}

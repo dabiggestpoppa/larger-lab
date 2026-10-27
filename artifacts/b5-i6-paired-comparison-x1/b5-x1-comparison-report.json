@@ -1,0 +1,22 @@
+{
+  "base_sha": "6e10a326f0eb70affca8f1f627481a52d7062aac",
+  "head_sha": "335862bc4059ac0e0074d724bec8f630dfd3b79c",
+  "base": {
+    "count": 143,
+    "nodes_sample": ["infrastructure/control-plane/tests/test_console_contracts.py::TestJobEnvelopeSchema::test_job_envelope_schema_valid"]
+  },
+  "head": {
+    "count": 170,
+    "junit": {"tests": 170, "failures": 0, "errors": 0, "skipped": 0}
+  },
+  "delta": {
+    "common": 143,
+    "only_base": 0,
+    "only_head": 27
+  },
+  "common_nodes": [],
+  "only_head_nodes": [
+    "infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py::TestFailClosed::test_unsupported_drill_operation_refused"
+  ],
+  "notes": "Common regression population is B5-I2-I5 tests (143). B5-I6 adds 27 new tests at head only."
+}
