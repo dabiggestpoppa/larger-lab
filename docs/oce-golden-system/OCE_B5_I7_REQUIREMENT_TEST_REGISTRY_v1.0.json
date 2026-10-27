@@ -1,0 +1,722 @@
+{
+  "base_sha": "c6a6479da427ddfe6af06622fc80b2221a4cdc5c",
+  "charter": {
+    "document": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+    "section": "## 12. Increment ceiling (planning only - proposed, not begun - no increment is authorized)"
+  },
+  "charter_increment": "I-8",
+  "entries": [
+    {
+      "binding": {
+        "future_stage": "operator-directable, not scheduled",
+        "owner": "Operator (charter \u00a712 row I-7)",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i7_web_view.py::TestLoopbackOnly::test_non_loopback_bind_and_request_refused",
+        "reason": "Optional surface requires explicit operator direction; none was given at B5-I6 and none is given here.",
+        "type": "deferred"
+      },
+      "contract_clause": "\u00a720 Deferred obligations",
+      "id": "B5I7-DF01",
+      "kind": "deferred",
+      "mapping_status": "DEFERRED_WITH_OWNER",
+      "observable_on_rejection": "Creation of test_b5_i7_web_view.py or any web surface during B5-I7 is a boundary violation visible in the diff.",
+      "requirement": "Charter increment I-7 (loopback web view) is NOT B5-I7 work; B5-I7 creates no web view and never creates test_b5_i7_web_view.py.",
+      "source": "charter \u00a712 row I-7; B5-I6 gap contract \u00a75; contract \u00a74.1, \u00a720"
+    },
+    {
+      "binding": {
+        "future_stage": "B5-I8",
+        "owner": "B5-I8 (plan \u00a77 row B5-I8)",
+        "planned_node": "infrastructure/control-plane/tests/test_b5_i8_independent_audit.py::TestUsabilityProtocol::test_accessibility_and_usability_verified",
+        "reason": "Plan \u00a77 assigns usability and the independent audit to B5-I8.",
+        "type": "deferred"
+      },
+      "contract_clause": "\u00a720 Deferred obligations",
+      "id": "B5I7-DF02",
+      "kind": "deferred",
+      "mapping_status": "DEFERRED_WITH_OWNER",
+      "observable_on_rejection": "B5-I7 executing or claiming usability evidence pulls a B5-I8 obligation into scope.",
+      "requirement": "Accessibility/usability protocol and results (gate G16, C5.S3) are not B5-I7 work.",
+      "source": "plan \u00a77 row B5-I8; charter \u00a711 G16; contract \u00a74.2"
+    },
+    {
+      "binding": {
+        "future_stage": "B5-I9",
+        "owner": "B5-I9 (plan \u00a77 row B5-I9, operator-only completion)",
+        "planned_node": "B5-I9 factory-gate artifact (name fixed by the B5-I9 P0)",
+        "reason": "Plan \u00a77 assigns the factory gate and B6 extraction contract to B5-I9; extraction scope is operator-ratified.",
+        "type": "deferred"
+      },
+      "contract_clause": "\u00a720 Deferred obligations",
+      "id": "B5I7-DF03",
+      "kind": "deferred",
+      "mapping_status": "DEFERRED_WITH_OWNER",
+      "observable_on_rejection": "Any extraction or SDK artifact authored in B5-I7 pulls a B5-I9 obligation into scope.",
+      "requirement": "Factory corrections, reusable-extraction scope and the B6 contract (C5.S5) are not B5-I7 work.",
+      "source": "plan \u00a76 C5.S5; plan \u00a77 row B5-I9; contract \u00a74.2"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL01::test_no_unverified_sha_recorded_as_fact",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL01",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A cited 40-hex SHA that git cannot resolve fails the node.",
+      "requirement": "No predicted commit SHA may be written as fact; a SHA enters the record only after the object exists.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL02::test_no_run_or_artifact_id_recorded_before_existence",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL02",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An id absent from the raw artifact set fails the node.",
+      "requirement": "No run, check or artifact id may be recorded before that id exists.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL03::test_manually_authored_json_not_presented_as_execution_evidence",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL03",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An evidence JSON without parser provenance from raw output fails the node.",
+      "requirement": "No manually authored JSON may be called execution evidence.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL04::test_planned_totals_labeled_expected_not_observed",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL04",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A planned total labelled OBSERVED fails the node.",
+      "requirement": "Planned totals are labelled EXPECTED, never OBSERVED.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL05::test_observed_totals_bound_to_parsed_raw_artifacts",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL05",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An observed total with no parsed raw source fails the node.",
+      "requirement": "Observed totals may enter the ledger only after parsing raw artifacts.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL06::test_green_claims_carry_sha_and_tree_binding",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL06",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A success claim lacking head SHA and tree identity fails the node.",
+      "requirement": "A green badge is not evidence without SHA and tree binding.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL07::test_regression_absence_never_proven_by_new_tests_only",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL07",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A regression-absence claim based only on new nodes fails the node.",
+      "requirement": "New-test-only execution cannot prove regression absence.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL08::test_common_regression_population_nonzero_and_at_floor",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL08",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A zero or below-floor common population fails the node.",
+      "requirement": "Common regression populations must be nonzero and meet the frozen floor.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL09::test_manifest_rows_recomputed_hash_and_size",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL09",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A manifest row whose recomputed sha256/size differs fails the node.",
+      "requirement": "Manifest claims require independently recomputed hash and size.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL10::test_mutation_claims_require_discrimination_and_restoration",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL10",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A mutation never observed red, or a tree not restored byte-identically, fails the node.",
+      "requirement": "Mutation claims require actual discriminating failures and pristine restoration.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL11::test_cleanup_claims_require_machine_readable_residual_state",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL11",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A cleanup claim without a machine-readable residual listing fails the node.",
+      "requirement": "Cleanup claims require machine-readable residual-state proof.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL12::test_historical_process_defects_remain_visible",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL12",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A record that erases the B5-I6 X1 process defects fails the node.",
+      "requirement": "Historical process defects remain visible after technical repair.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL13::test_same_agent_audit_not_labeled_independent",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL13",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "The phrase asserting independent review of a same-agent audit fails the node.",
+      "requirement": "A same-agent audit must never be labeled organizationally independent.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL14::test_no_ratification_before_all_mandatory_gates",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL14",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A ratification statement while any gate is unexecuted fails the node.",
+      "requirement": "Ratification cannot occur before every mandatory gate executes.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "node": "TestEL15::test_no_all_gates_passed_language_while_any_gate_pending",
+        "type": "test"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-EL15",
+      "kind": "evidence_law",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An all-green claim alongside a skipped or pending gate fails the node.",
+      "requirement": "No 'all gates passed' language is allowed while any gate is skipped, substituted, pending or inferred.",
+      "source": "contract \u00a722; B5-I6 X1 lessons (ledger \u00a717.12-\u00a717.13, corrected audit 8.75/10)"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md",
+        "section": "\u00a71 Stage identity",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a71 Stage identity",
+      "id": "B5I7-R01",
+      "kind": "identity",
+      "mapping_status": "MAPPED",
+      "observable_on_rejection": "Any scope statement claiming charter increment I-7, B5-I8 or B5-I9 work as B5-I7 contradicts \u00a71 and is visible in the contract diff.",
+      "requirement": "B5-I7 is exactly the plan \u00a77 increment 'C4 change cycle plus C5 measurements/learning' and charter increment I-8; no other charter increment is anchored to B5-I7.",
+      "source": "plan \u00a77 row B5-I7; charter \u00a712 row I-8"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestSingleChange::test_exactly_one_governed_change_recorded",
+        "type": "test"
+      },
+      "contract_clause": "\u00a75 Allowed production scope",
+      "id": "B5I7-R02",
+      "kind": "change_cycle",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A change record naming two or more changes fails the node.",
+      "requirement": "Exactly one governed change is applied in this stage - 'add a queue-depth observability panel' - and a second change is a violation.",
+      "source": "charter \u00a712 row I-8; packet \u00a711"
+    },
+    {
+      "binding": {
+        "command": "git diff --name-only --diff-filter=M c6a6479da427ddfe6af06622fc80b2221a4cdc5c -- infrastructure/control-plane/src infrastructure/control-plane/contracts infrastructure/control-plane/tests (output must be empty)",
+        "execution_surface": "static-check",
+        "type": "static"
+      },
+      "contract_clause": "\u00a75 Allowed production scope",
+      "id": "B5I7-R03",
+      "kind": "boundary",
+      "mapping_status": "MAPPED",
+      "observable_on_rejection": "Any modified control-plane source, contract or existing test file makes the diff non-empty.",
+      "requirement": "infrastructure/control-plane/src/**, infrastructure/control-plane/contracts/** and every pre-existing file under infrastructure/control-plane/tests/** stay byte-identical to the base SHA at every rung.",
+      "source": "charter \u00a712 I-8 stop column; packet \u00a711; contract \u00a74.3"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md",
+        "section": "\u00a76 Prohibited scope",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a76 Prohibited scope",
+      "id": "B5I7-R04",
+      "kind": "boundary",
+      "mapping_status": "MAPPED",
+      "observable_on_rejection": "An added route, job type, schema or extraction artifact is a named boundary violation recorded against \u00a76.",
+      "requirement": "No scope creep and no platform extraction: no new server endpoint, no new job type, no schema change, no SDK/library extraction, no B6 work.",
+      "source": "charter \u00a712 I-8 non-goals; plan \u00a79; contract \u00a76"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "section": "\u00a71 Intent",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a75 Allowed production scope",
+      "id": "B5I7-R05",
+      "kind": "change_cycle",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A change record whose intent section is absent, or written after the change, fails the attestation review.",
+      "requirement": "The change dossier records the intent (the requirement being changed) before implementation begins.",
+      "source": "plan \u00a75 C4.S5"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "section": "\u00a72 Plan and affected surfaces",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a75 Allowed production scope",
+      "id": "B5I7-R06",
+      "kind": "change_cycle",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A plan listing a surface outside the allowed-surface table of contract \u00a75 is rejected.",
+      "requirement": "The change dossier records the plan and the bounded list of affected surfaces.",
+      "source": "plan \u00a75 C4.S5"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestChangeCycle::test_change_has_positive_and_negative_proofs",
+        "type": "test"
+      },
+      "contract_clause": "\u00a721 Testability requirements",
+      "id": "B5I7-R07",
+      "kind": "change_cycle",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A change with only a positive proof, or with a negative control never executed red, fails the node.",
+      "requirement": "The change ships with both a positive proof and an executed negative (weakened-implementation) proof.",
+      "source": "plan \u00a75 C4.S5; contract \u00a721"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "section": "\u00a74 Release and rollback",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a75 Allowed production scope",
+      "id": "B5I7-R08",
+      "kind": "change_cycle",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A manifest that is non-deterministic, or rollback metadata missing base_commit/procedure, is refused.",
+      "requirement": "Release and rollback for the change are documented and executable: the release manifest is regenerated deterministically and rollback metadata stays complete.",
+      "source": "plan \u00a75 C4.S5 (release and rollback)"
+    },
+    {
+      "binding": {
+        "command": "git diff --name-only c6a6479da427ddfe6af06622fc80b2221a4cdc5c -- 'docs/oce-golden-system/OCE_B5_I[0-6]*' (output must be empty)",
+        "execution_surface": "static-check",
+        "type": "static"
+      },
+      "contract_clause": "\u00a75 Allowed production scope",
+      "id": "B5I7-R09",
+      "kind": "boundary",
+      "mapping_status": "MAPPED",
+      "observable_on_rejection": "Any frozen prior-stage document differing from the base blob fails the diff check.",
+      "requirement": "Frozen B5-I0..B5-I6 documents and every prior ledger section stay byte-identical; ledger edits are append-only plus the single \u00a71 status-row update.",
+      "source": "constitution append-only evidence law; contract \u00a75"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "script": ".github/workflows/b1-i1r-validation.yml step 'Execute B5-I7 governed-change proofs'",
+        "type": "runner"
+      },
+      "contract_clause": "\u00a73 Scope table (exit gate)",
+      "id": "B5I7-R10",
+      "kind": "gate",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "Any node-count delta, skip, error or collection difference versus the base run makes the runner assertion fail.",
+      "requirement": "The control-plane suite passes with a node population identical to the base: zero added, zero removed, zero skipped, zero failed.",
+      "source": "charter \u00a712 I-8 'control-plane suite passing unchanged'; charter \u00a711 G14"
+    },
+    {
+      "binding": {
+        "execution_surface": "shared-validation-runner",
+        "script": "infrastructure/cloud-ground/scripts/run-validation.sh",
+        "type": "runner"
+      },
+      "contract_clause": "\u00a73 Scope table (exit gate)",
+      "id": "B5I7-R11",
+      "kind": "gate",
+      "mapping_status": "MAPPED",
+      "observable_on_rejection": "A non-terminal or non-success shared-runner exit makes the gate not executed, never passed.",
+      "requirement": "The shared authoritative validation runner is green at the exact observed head SHA (no badge inference).",
+      "source": "charter \u00a711 G14; contract \u00a72"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical",
+        "type": "test"
+      },
+      "contract_clause": "\u00a73 Scope table (exit gate)",
+      "id": "B5I7-R12",
+      "kind": "gate",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "Any byte difference between the reference and rerun drill report fails the identity comparison.",
+      "requirement": "The regression drill on an unchanged stack produces a byte-identical report to the base-tree reference report.",
+      "source": "charter \u00a712 I-8 gate column; plan \u00a75 C4.S4"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "section": "\u00a75 Evidence binding",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a722 Evidence schema",
+      "id": "B5I7-R13",
+      "kind": "change_cycle",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A SHA, run id or artifact id that does not resolve to an existing object/run invalidates the record.",
+      "requirement": "The governed change record is bound to the observed head SHA, run id and pack blob hash, each recorded only after it exists.",
+      "source": "charter \u00a712 I-8 evidence column; contract \u00a722"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "section": "\u00a76 Learning ledger entries",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a716 Observability requirements",
+      "id": "B5I7-R14",
+      "kind": "learning",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An observation without disposition/owner, or a dropped observation, fails the attestation review.",
+      "requirement": "Learning ledger entries exist with observation, disposition and owner; no observation is silently discarded.",
+      "source": "plan \u00a76 C5.S4; charter \u00a712 I-8 evidence column"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelContract::test_undeclared_surface_refused_before_io",
+        "type": "test"
+      },
+      "contract_clause": "\u00a77 Public interfaces",
+      "id": "B5I7-R15",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An undeclared surface that reaches the transport raises ConsoleRefusal with reason unsupported_surface and zero socket attempts.",
+      "requirement": "The panel requests only surface ids declared in the frozen contract pack; an undeclared, embedded or malformed surface is refused before any I/O.",
+      "source": "contract pack frozen reads (A12); contract \u00a77"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelReadOnly::test_panel_issues_only_get_requests",
+        "type": "test"
+      },
+      "contract_clause": "\u00a78 Canonical state ownership",
+      "id": "B5I7-R16",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "Any POST/PUT/PATCH/DELETE attempt or invoke-surface access fails the request-log assertion.",
+      "requirement": "The panel issues GET requests only and performs no canonical-state write, invoke, lease, requeue or reconciliation action.",
+      "source": "charter \u00a75 authority law; packet \u00a711"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelFailClosed::test_unreachable_stack_never_renders_healthy",
+        "type": "test"
+      },
+      "contract_clause": "\u00a713 Transition/state laws",
+      "id": "B5I7-R17",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An unreachable stack that yields state OK or any numeric queue value fails the node.",
+      "requirement": "When the stack is unreachable the panel renders STACK_UNREACHABLE and never a healthy, stale or green value.",
+      "source": "charter \u00a710 fail-closed law; matrix X4/X7 precedent; contract \u00a713"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelFailClosed::test_unknown_queue_depth_rendered_unknown_not_zero",
+        "type": "test"
+      },
+      "contract_clause": "\u00a714 Denial and refusal behavior",
+      "id": "B5I7-R18",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A missing field rendered as 0 or as green, or a second automatic request after a denial, fails the node.",
+      "requirement": "Unknown or unverifiable queue values render as null with an explicit unknown_reason (never 0, never green); denials render verbatim; no silent retry.",
+      "source": "charter \u00a75 rule 9 (verbatim denial); contract \u00a712, \u00a714"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelDeterminism::test_identical_inputs_render_byte_identically",
+        "type": "test"
+      },
+      "contract_clause": "\u00a712 Output schema",
+      "id": "B5I7-R19",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "Two renders of the same inputs differing in bytes, key order or newline fail the node.",
+      "requirement": "Identical inputs produce byte-identical canonical panel JSON (sorted keys, ASCII, trailing newline).",
+      "source": "charter \u00a77 deterministic kernel; contract \u00a79"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelLoopback::test_non_loopback_base_url_refused",
+        "type": "test"
+      },
+      "contract_clause": "\u00a710 Local-only topology",
+      "id": "B5I7-R20",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A non-loopback target that opens a socket fails the blocked-off-loopback control.",
+      "requirement": "A non-loopback base URL is refused fail-closed before any connection attempt.",
+      "source": "charter \u00a76 local-only topology; contract \u00a710"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelSecurity::test_panel_output_contains_no_secret_material",
+        "type": "test"
+      },
+      "contract_clause": "\u00a717 Security and privacy",
+      "id": "B5I7-R21",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "Any credential-shaped value in rendered output fails the secret-pattern scan of the node.",
+      "requirement": "Panel output and evidence artifacts contain no secret, token or authorization material.",
+      "source": "charter \u00a710 security/privacy; contract \u00a717"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestPanelBounds::test_oversized_and_malformed_input_refused",
+        "type": "test"
+      },
+      "contract_clause": "\u00a711 Input bounds",
+      "id": "B5I7-R22",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An oversized (>64 KiB document / >512-byte argument) or malformed payload accepted without refusal fails the node.",
+      "requirement": "CLI and document inputs are bounded; oversized or malformed input is refused fail-closed with the frozen refusal vocabulary.",
+      "source": "contract \u00a711 input bounds"
+    },
+    {
+      "binding": {
+        "execution_surface": "b5-i7-selection-step",
+        "file": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "node": "TestCompatibility::test_documented_status_command_and_exit_codes_unchanged",
+        "type": "test"
+      },
+      "contract_clause": "\u00a718 Compatibility rules",
+      "id": "B5I7-R23",
+      "kind": "panel",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "Any changed exit code or failing documented status invocation fails the node.",
+      "requirement": "The documented 'python -m oce_console status ...' invocation and every documented exit code are unchanged; the panel is strictly additive.",
+      "source": "charter \u00a78.1 required surface; contract \u00a718 (X3 compatibility)"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "section": "\u00a77 Cost and time",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a716 Observability requirements",
+      "id": "B5I7-R24",
+      "kind": "measurement",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "An unlabelled figure, or an OBSERVED label with no measurement provenance, fails the attestation review.",
+      "requirement": "Every cost/time figure in the change record carries the label ESTIMATE or OBSERVED, and no unmeasured figure is labelled OBSERVED.",
+      "source": "plan \u00a76 C5.S1"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+        "section": "\u00a718.6 Locks and accounting",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a73 Scope table (cost ceiling)",
+      "id": "B5I7-R25",
+      "kind": "measurement",
+      "mapping_status": "MAPPED",
+      "observable_on_rejection": "Any nonzero recurring cost or authority value contradicts the frozen accounting row.",
+      "requirement": "Recurring cost stays $0 and capital.authority stays none for this stage.",
+      "source": "charter \u00a713/\u00a715 accounting; plan \u00a77"
+    },
+    {
+      "binding": {
+        "document": "docs/oce-golden-system/OCE_B5_I7_REUSE_INVENTORY_v1.0.md",
+        "section": "\u00a72 Verified reuse (import/runtime paths)",
+        "type": "attestation"
+      },
+      "contract_clause": "\u00a73 Scope table (required outputs)",
+      "id": "B5I7-R26",
+      "kind": "measurement",
+      "mapping_status": "PLANNED",
+      "observable_on_rejection": "A claimed reuse item with no import path or executed path is struck from the inventory.",
+      "requirement": "Each reuse claim in the reuse inventory is verified against a real import or executed runtime path; unverified claims are removed.",
+      "source": "plan \u00a76 C5.S2; packet \u00a712"
+    }
+  ],
+  "plan_anchor": "B5-I7",
+  "registry_id": "OCE-B5-I7-REGISTRY-001",
+  "registry_version": "1.0",
+  "requirement_set": {
+    "by_binding_type": {
+      "attestation": 10,
+      "deferred": 3,
+      "runner": 2,
+      "static": 2,
+      "test": 27
+    },
+    "by_kind": {
+      "boundary": 3,
+      "change_cycle": 6,
+      "deferred": 3,
+      "evidence_law": 15,
+      "gate": 3,
+      "identity": 1,
+      "learning": 1,
+      "measurement": 3,
+      "panel": 9
+    },
+    "by_mapping_status": {
+      "DEFERRED_WITH_OWNER": 3,
+      "MAPPED": 6,
+      "PLANNED": 35
+    },
+    "deferred_owners": [
+      "B5-I8 (plan \u00a77 row B5-I8)",
+      "B5-I9 (plan \u00a77 row B5-I9, operator-only completion)",
+      "Operator (charter \u00a712 row I-7)"
+    ],
+    "planned_test_nodes": [
+      "TestChangeCycle::test_change_has_positive_and_negative_proofs",
+      "TestCompatibility::test_documented_status_command_and_exit_codes_unchanged",
+      "TestEL01::test_no_unverified_sha_recorded_as_fact",
+      "TestEL02::test_no_run_or_artifact_id_recorded_before_existence",
+      "TestEL03::test_manually_authored_json_not_presented_as_execution_evidence",
+      "TestEL04::test_planned_totals_labeled_expected_not_observed",
+      "TestEL05::test_observed_totals_bound_to_parsed_raw_artifacts",
+      "TestEL06::test_green_claims_carry_sha_and_tree_binding",
+      "TestEL07::test_regression_absence_never_proven_by_new_tests_only",
+      "TestEL08::test_common_regression_population_nonzero_and_at_floor",
+      "TestEL09::test_manifest_rows_recomputed_hash_and_size",
+      "TestEL10::test_mutation_claims_require_discrimination_and_restoration",
+      "TestEL11::test_cleanup_claims_require_machine_readable_residual_state",
+      "TestEL12::test_historical_process_defects_remain_visible",
+      "TestEL13::test_same_agent_audit_not_labeled_independent",
+      "TestEL14::test_no_ratification_before_all_mandatory_gates",
+      "TestEL15::test_no_all_gates_passed_language_while_any_gate_pending",
+      "TestPanelBounds::test_oversized_and_malformed_input_refused",
+      "TestPanelContract::test_undeclared_surface_refused_before_io",
+      "TestPanelDeterminism::test_identical_inputs_render_byte_identically",
+      "TestPanelFailClosed::test_unknown_queue_depth_rendered_unknown_not_zero",
+      "TestPanelFailClosed::test_unreachable_stack_never_renders_healthy",
+      "TestPanelLoopback::test_non_loopback_base_url_refused",
+      "TestPanelReadOnly::test_panel_issues_only_get_requests",
+      "TestPanelSecurity::test_panel_output_contains_no_secret_material",
+      "TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical",
+      "TestSingleChange::test_exactly_one_governed_change_recorded"
+    ],
+    "total": 44
+  }
+}
