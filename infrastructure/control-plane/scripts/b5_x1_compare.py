@@ -254,23 +254,39 @@ def parse_shared(art: Path, role: str, expect_sha: str, expect_tree: str,
         probs.add(f"shared/{role}: registered {len(nodes)} != "
                   f"{SHARED_EXPECTED['registered']} (contract)")
 
-    # statuses from the runner's own regression output
+    # Statuses, derived ONLY from raw runner evidence ──────────────────────
+    #
+    # test_regression.py executes ALL_TESTS in registry order: each test
+    # prints exactly one unindented terminal line ("PASS: <its own message>"
+    # on success, "FAIL: <registry display>: <error>" on exception), and the
+    # summary block reports Total = passed + failed counters.
+    #
+    # The PASS message is the TEST's own wording, not the registry display
+    # (34 of 67 displays are paraphrases, e.g. display "RUN_ID consistency
+    # across artifacts" prints "RUN_ID consistency across all artifacts"),
+    # so PASS messages can never be name-matched to registry entries. Node
+    # status is therefore attributed from the runner's counters plus the
+    # exact registry display carried by FAIL lines, and every line is
+    # cross-checked by COUNT so a test printing zero or two terminal lines,
+    # a counter/line disagreement, an unregistered FAIL name or out-of-order
+    # FAIL lines all fail the gate instead of silently mis-attributing.
     status: dict[str, str] = {}
     regr = ev / "regression-output.txt"
     totals = {"total": None, "pass": None, "fail": None}
+    pass_lines: list[str] = []
+    fail_names: list[str] = []
+    orphan_line_names: list[str] = []
+    reconciled = False
     if not regr.is_file():
         probs.add(f"shared/{role}: regression-output.txt missing")
     else:
         text = regr.read_text(encoding="utf-8", errors="replace")
-        for line in text.splitlines():
-            if line.startswith("PASS: ") and line[6:].strip():
-                disp = line[6:].strip()
-                if disp in status:
-                    probs.add(f"shared/{role}: duplicate PASS line for {disp!r}")
-                status[disp] = "PASS"
-            elif line.startswith("FAIL: "):
-                disp = line[6:].split(":")[0].strip()
-                status[disp] = "FAIL"
+        # NOTE: startswith on the RAW line — the indented summary block
+        # ("  PASS:   67") and the indented "Failures:" replay are not
+        # terminal test lines and must not be counted.
+        pass_lines = [l[6:] for l in text.splitlines() if l.startswith("PASS: ")]
+        fail_names = [l[6:].split(":", 1)[0].strip()
+                      for l in text.splitlines() if l.startswith("FAIL: ")]
         m_t = re.search(r"^\s+Total:\s+(\d+)", text, re.M)
         m_p = re.search(r"^\s+PASS:\s+(\d+)", text, re.M)
         m_f = re.search(r"^\s+FAIL:\s+(\d+)", text, re.M)
@@ -279,6 +295,36 @@ def parse_shared(art: Path, role: str, expect_sha: str, expect_tree: str,
                   "fail": int(m_f.group(1)) if m_f else None}
         if None in totals.values():
             probs.add(f"shared/{role}: regression summary block unparsable")
+        else:
+            if totals["pass"] != len(pass_lines):
+                probs.add(f"shared/{role}: PASS counter {totals['pass']} != "
+                          f"{len(pass_lines)} PASS lines")
+            if totals["fail"] != len(fail_names):
+                probs.add(f"shared/{role}: FAIL counter {totals['fail']} != "
+                          f"{len(fail_names)} FAIL lines")
+            if len(set(fail_names)) != len(fail_names):
+                probs.add(f"shared/{role}: duplicate FAIL lines: {fail_names}")
+            orphan_line_names = [n for n in fail_names if n not in registry]
+            if orphan_line_names:
+                probs.add(f"shared/{role}: FAIL lines naming unregistered displays: "
+                          f"{orphan_line_names}")
+            order = [list(registry).index(n) for n in fail_names if n in registry]
+            if order != sorted(order):
+                probs.add(f"shared/{role}: FAIL lines are not in registry execution "
+                          f"order: {fail_names}")
+            reconciled = (
+                totals["total"] == len(registry)
+                and totals["pass"] + totals["fail"] == len(registry)
+                and totals["pass"] == len(pass_lines)
+                and totals["fail"] == len(fail_names)
+                and not orphan_line_names)
+            if not reconciled:
+                probs.add(f"shared/{role}: runner counters do not account for every "
+                          f"registered node: {totals} vs {len(registry)} registered, "
+                          f"{len(pass_lines)} PASS lines, {len(fail_names)} FAIL lines")
+        if reconciled:
+            for display in registry:
+                status[display] = "FAIL" if display in fail_names else "PASS"
     unaccounted = [d for d in registry if d not in status]
     if unaccounted:
         probs.add(f"shared/{role}: registry displays without status: {unaccounted[:5]}")
@@ -295,7 +341,15 @@ def parse_shared(art: Path, role: str, expect_sha: str, expect_tree: str,
     out["skipped"] = 0
     out["duplicate_full_node_ids"] = len(nodes) - len(set(nodes))
     out["orphan_files"] = 0
-    out["orphan_nodes"] = len(unaccounted)
+    out["orphan_nodes"] = len(unaccounted) + len(orphan_line_names)
+    out["status_derivation"] = (
+        "runner counters (Total/PASS/FAIL) reconciled against line counts and "
+        "registry size; FAIL nodes taken from exact registry display names in "
+        "FAIL lines; PASS messages are test-authored and deliberately not "
+        "name-matched to displays")
+    out["pass_line_count"] = len(pass_lines)
+    out["fail_line_count"] = len(fail_names)
+    out["counters_reconciled"] = reconciled
     if None in totals.values() or totals["total"] != len(nodes) \
             or totals["pass"] != len(nodes) or totals["fail"] != 0:
         probs.add(f"shared/{role}: regression totals not green/consistent: {totals}")
@@ -594,12 +648,16 @@ def main(argv: list[str]) -> int:
         "base": {k: shared_base.get(k) for k in
                  ("collected", "executed", "passed", "failed", "errors", "skipped",
                   "duplicate_full_node_ids", "orphan_files", "orphan_nodes",
-                  "totals", "static", "adversarial", "stage",
+                  "totals", "status_derivation", "pass_line_count",
+                  "fail_line_count", "counters_reconciled",
+                  "static", "adversarial", "stage",
                   "runner_worktree_cleanup", "runner_log_bytes")},
         "head": {k: shared_head.get(k) for k in
                  ("collected", "executed", "passed", "failed", "errors", "skipped",
                   "duplicate_full_node_ids", "orphan_files", "orphan_nodes",
-                  "totals", "static", "adversarial", "stage",
+                  "totals", "status_derivation", "pass_line_count",
+                  "fail_line_count", "counters_reconciled",
+                  "static", "adversarial", "stage",
                   "runner_worktree_cleanup", "runner_log_bytes")},
         "common_full_node_ids": shared_delta["common"],
         "base_only": shared_delta["only_base"],
