@@ -7763,3 +7763,127 @@ recommended_next = **operator review of SENSOR-B5-I09E1 (ratify or reject,
 especially §7's disclosed pin amendment and §8's Q2 fail-closed ruling), the
 eight outstanding I09 questions, and an I09-b directive only if first-party
 provider documentation exists.** HARD STOP after push and report.
+
+---
+
+## 179 - SENSOR-B5-I09R1: I09 OPERATOR RATIFICATION + I10 READINESS (GOVERNANCE ONLY)
+
+Date: 2026-10-27. Directive SENSOR-B5-I09R1. Audited head
+`96e0ded3cebef0d44f661d55fc6bcad86e96e0ea` (I09E1), resolved against the
+remote build branch `refs/heads/agent/crypto-sensor-fabric-build` before any
+work: LOCAL == REMOTE, tracked tree clean. Parent / custody baseline
+`1f7a0fa6ab55b022ce3a9900717b6d3c657cc477` (I08R1). This entry is append-only:
+no prior ledger byte changed. Disclosure: an initial `git ls-remote` was run
+against `origin/master` (`6769ad31a`, an unrelated TB-P7 lineage) and was
+rejected as the wrong reference before any conclusion was drawn from it.
+
+### 1. What this directive did (VERIFY -> AUDIT -> ADJUDICATE -> RATIFY -> PREPARE)
+
+Two independent, non-producer probes were written for this directive and run
+against the audited tree (`.bu_tmp/`, untracked, never staged):
+`i09r1_custody_audit.py` (C1-C7) and `i09r1_semantic_audit.py` (S1-S13).
+
+* **AUDIT 1 -- historical custody amendments (C1-C7):** all eight pre-existing
+  files I09E1 amended were re-derived from git objects and classified; every
+  predecessor pin and every current pin re-measured. Rows walked structurally:
+  **0 rows lost, 0 keys removed, 0 `pass: true -> false` flips**; the only
+  value changes are 1 counter, 7 clause/detail narrations and 3 inventory
+  lines. The U08-20 assertion change (`--check == 0` -> `in (0, 1)` + the
+  ratified digest pin) is the single genuinely weakened assertion and is
+  ACCEPTED as disclosed and lawful (ratification section 3.2), recorded as L8.
+* **AUDIT 2 -- semantic + comparability red team (S1-S13):** **33/33**, one
+  negative case per 03 section 18 condition with typed causes, F14
+  versioning, fail-closed lookup, no default synthesis, 03 section 13
+  confidence/evidence coherence, condition 8 delegating to the ratified
+  `is_poolable`, 07 F24 (no value slot on `ComparabilityDecision`), Q4 envelope
+  absence. No provider evidence fabricated; no registry byte written.
+* **ADJUDICATE:** full-package regression re-executed at the audited head
+  (BOOK 11 below), I09-a vs I09-b boundary ruled, cross-family
+  `B5_I08_UNITS_V1` ruling upheld.
+
+### 2. BOOK 11 -- regression, type check, determinism (re-executed)
+
+```text
+COMMAND   = python -m pytest -q   (cwd = worktree root; system Python 3.11.9)
+RESULT    = 4293 passed, 14 skipped in 1432.55s (0:23:52)  EXIT 0
+BASELINE  = 4247 passed / 14 skipped  (section 177)
+DELTA     = +46 = exactly the two I09 suites (37 SEM + 9 SEM-A); skips 14
+TYPECHECK = mypy --follow-imports=silent --ignore-missing-imports on the four
+            I09 modules -> "Success: no issues found in 4 source files", exit 0
+PRODUCERS = I06 producer exit 0 (14/14 RS + 8/8 scope) and I05 producer exit 0
+            (86/86 + 7/7), both regenerating their committed artifacts
+            BYTE-IDENTICALLY; I09 `--check` exit 0 (pin `0c844947...`);
+            I08 `--check` exit 1 = the disclosed post-I09 pre-write refusal (L8)
+SIDE EFX = the whole-package run dirtied exactly 11 committed bloc_04
+            artifacts -- the historical section 176/177 record (7 CRLF-only +
+            4 volatile-measurement rewrites); all restored with
+            `git checkout -- evidence/bloc_04/`, NONE staged; protected diffs
+            rechecked EMPTY vs `1f7a0fa6a`
+CUSTODY  = probe C 9/10 (the single FAIL is F1, closed by the ratification's
+            pin table); probes S 33/33; final tree = 3 pre-existing untracked
+            scratch paths only
+```
+
+### 3. Dispositions (ratification gate matrix R09-01..R09-20, all PASS)
+
+`B5-I09a = OPERATOR_ACCEPTED` (registries + the library-level 03 section 18
+gate; conditional on findings L8-L11, none of which blocks the registries).
+`B5-I09b = DEFERRED / UNAUTHORIZED` (no first-party provider evidence exists
+in-repo; 03 section 13 forbids synthesis; `provider_semantics/` absent; 6/6
+planning mappings stay `BLOC2_PROBE_PENDING` -> `AMBIGUOUS`).
+`B5-I09 = PARTIALLY ACCEPTED`. `B5-I01..I08 = OPERATOR_ACCEPTED` unchanged.
+`BLOC_05 = INCOMPLETE`. Gates: `IDENTITY/TIME/SEMANTIC/UNIT/LINEAGE/
+DUPLICATE_REVISION/REPLAY_SAFETY/GOLDEN_T0_T1` all `NOT_YET_EARNED` -- none
+promoted, 06 section 21 owns them.
+
+Rulings recorded: (a) **cross-family `B5_I08_UNITS_V1`** stays
+`UNRESOLVED_FAIL_CLOSED` -- registering it under one family misstates it,
+under all eight the F14 duplicate law refuses, extending the frozen
+`SensorFamily` vocabulary is outside I09 authority, renaming would rewrite
+ratified I08 lineage evidence; the live `METHODOLOGY_VERSION` stamp in
+`common/conversion.py` therefore remains a known unresolved citation until the
+operator rules a lawful representation (ratification section 6).
+(b) **`comparability.py` owner = I09** (readiness section 9 question 3 closed:
+the I09E1 directive Q3 assigned the gate to I09 and it is validated here).
+(c) **the two regenerated artifact digests missing from the I09 evidence
+section 7 cross-reference** ("see section 10") are pinned in the ratification
+section 3: `bloc_05_replay_safety_validation.json` =
+`1810bc190b0139e7db180f69642ea46893cc834f8b5d5d341a660c9fb48aa607`,
+`BLOC_05_I06_SCOPE_AUDIT.json` =
+`3c8418097386cc477b6548c948825ae280f403d2b6dd861548223fdd561fc749` (F1/L9);
+the submitted I09 evidence file was left byte-untouched.
+
+### 4. I10 readiness (read-only reconstruction)
+
+`BLOC_05_I10_READINESS_ASSESSMENT.md`: `B5-I10 = NOT_IMPLEMENTED`,
+`AUTHORITY = NONE`, `READINESS = SCOPE-READY WITH SIX OPEN RULINGS`
+(side-map config ownership; evidence route fixture-backed vs provisional-scoped
+under 03 section 13; envelope carrier = `T1BaseEnvelope`; provider subset;
+T10-07 duplicate-collapse boundary with I17; `B5_I08_UNITS_V1` citation).
+Measured: no `normalization/sensors/`, no trade tests, no
+`provider_semantics/`; the Binance side-map identity
+`AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1` IS registered by I09-a, and the
+operator-frozen fixture `binance_is_buyer_maker_semantics.json` (SENSOR-B1-R01,
+`PROVISIONAL`) already exists as the semantic contract. No I10 code, config or
+test was written.
+
+### 5. Custody of this commit
+
+```text
+STAGED SET  = 3 paths (the I09 ratification, the I10 readiness assessment,
+              this ledger entry) -- governance only, linear, reviewable
+UNTRACKED   = the same 3 pre-existing scratch paths, never staged
+PROTECTED   = EMPTY (frozen plan, both Bloc 1 YAMLs, registry/, identity/,
+              terms/, time/, models.py, enums.py, normalization/__init__.py,
+              bloc_05_unit_validation.json, I08 ratification, I09 readiness)
+GATES       = eight NOT_YET_EARNED (nothing promoted)
+```
+
+recommended_next = **operator: (1) issue the I10 implementation directive,
+ruling the six readiness questions -- especially the evidence route (fixture-
+backed vs provisional-scoped) and whether I10 may create
+`config/crypto_sensor_fabric/provider_semantics/`; (2) rule the lawful
+`sensor_family` representation for cross-family unit methodologies so
+`B5_I08_UNITS_V1` can be registered without invention; (3) authorize I09-b
+only when first-party provider documentation exists.** HARD STOP after push
+and report.
