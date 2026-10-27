@@ -927,9 +927,54 @@ I08_DISCLOSED_EVIDENCE_SHA256 = {
     ),
 }
 
+# ---------------------------------------------------------------------------
+# DISCLOSED B5-I09 EXTENSION (operator-authorized; full disclosure in
+# ``BLOC_05_I09_IMPLEMENTATION_EVIDENCE.md`` + ledger section 178)
+# ---------------------------------------------------------------------------
+#
+# The I09E1 implementation pass adds the three remaining bloc_05/03 section
+# 21 modules to ``normalization/common/`` (the I06 source row's ``common/``
+# prefix already admits them), extends the I05 audit's staged allowlist by the
+# ``test_b5_i09`` suites and grows the I08 audit's frozen module set from four
+# to seven -- both on the established I02/I04A/I05/I08 precedent.  The same
+# cascade follows: the amended I05 audit re-enters the I05 producer's
+# inventory, so ``bloc_05_time_validation.json`` is regenerated (one
+# inventory line per amended file) and the two amended audits plus that
+# artifact are re-pinned below.  The I08 pins above are kept as the historical
+# record; where a path appears in both maps, the I09 pin is the operative one.
+I09_DISCLOSED_SHA256 = {
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": (
+        "5e8b89d442dfd792f1a020ece78cc6ddc19f9733aea57ac2d8d40df1500a1bab"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
+        "5b70c012ed965c2a99c7c44953cdd121598edb2135b1206585e1c219c5ebda20"
+    ),
+}
+
+I09_DISCLOSED_EVIDENCE_SHA256 = {
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
+    "bloc_05_time_validation.json": (
+        "b3b8843c0092c7b373964cfd6b6f67a266fbecb52537197183e7566c6426570c"
+    ),
+}
+
+#: The operative disclosed pins: I09 supersedes I08 wherever a path appears in
+#: both maps; the I08-only entries (the untouched I01 audit) stay operative.
+CURRENT_DISCLOSED_SHA256 = {
+    **I08_DISCLOSED_SHA256,
+    **I09_DISCLOSED_SHA256,
+}
+CURRENT_DISCLOSED_EVIDENCE_SHA256 = {
+    **I08_DISCLOSED_EVIDENCE_SHA256,
+    **I09_DISCLOSED_EVIDENCE_SHA256,
+}
+
 #: The exact test paths row ``no_i05_test_diff_vs_base`` has always measured.
 I06_SEALED_TEST_PATHS = (
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+    # DISCLOSED B5-I09: the I08 scope audit joins the measured set because the
+    # I09E1 pass amends its frozen module set (a stronger, not weaker, row).
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
     *[
         "quant-lab/tests/crypto_sensor_fabric/normalization/" + name
         for name in (
@@ -985,10 +1030,14 @@ def _src_delta_is_disclosed() -> bool:
 
 
 def _sealed_test_delta_is_disclosed() -> bool:
-    """No sealed test changed, or it changed to its disclosed I08 bytes."""
+    """No sealed test changed, or it changed to its current disclosed bytes.
+
+    Disclosed at I08 (two audits) and re-pinned at I09 (both audits amended
+    again on the same precedent, plus the I08 audit newly measured here).
+    """
     changed = _changed_paths(*I06_SEALED_TEST_PATHS)
-    return set(changed) <= set(I08_DISCLOSED_SHA256) and all(
-        _sha256_path(path) == I08_DISCLOSED_SHA256[path] for path in changed
+    return set(changed) <= set(CURRENT_DISCLOSED_SHA256) and all(
+        _sha256_path(path) == CURRENT_DISCLOSED_SHA256[path] for path in changed
     )
 
 
@@ -999,12 +1048,12 @@ def _i05_scope_audit_state_is_disclosed() -> bool:
     )
     if not _changed_paths(path):
         return True  # byte-identical to base: the original I06E1 state
-    return _sha256_path(path) == I08_DISCLOSED_SHA256[path]
+    return _sha256_path(path) == CURRENT_DISCLOSED_SHA256[path]
 
 
 def _sealed_evidence_state_is_disclosed() -> bool:
     for path in I06_SEALED_EVIDENCE_PATHS:
-        pinned = I08_DISCLOSED_EVIDENCE_SHA256.get(path)
+        pinned = CURRENT_DISCLOSED_EVIDENCE_SHA256.get(path)
         if pinned is not None:
             if _sha256_path(path) != pinned:
                 return False
@@ -1020,6 +1069,13 @@ def build_scope_payload() -> dict:
     "nothing BUT the disclosed I08 delta" instead of an absolute empty diff,
     because the I08E1 implementation pass is itself authorized to add
     ``normalization/common/`` and to extend the I01/I05 scope audits.
+
+    Amended at B5-I09 (operator-authorized, disclosed): the same three rows
+    re-pin to the I09-extended bytes (the I09E1 pass adds the three remaining
+    §21 modules under the same ``common/`` prefix and amends both audits once
+    more), and the sealed-test row now also measures the I08 audit.  No row is
+    weakened: every path outside the disclosed delta keeps its absolute
+    measurement.
     """
 
     def clean(*pathspecs: str) -> bool:
@@ -1034,7 +1090,7 @@ def build_scope_payload() -> dict:
             ),
             "detail": (
                 "git status + git diff 32a897436 -- quant-lab/src name only "
-                "normalization/common/ paths (bloc_05/03 s21 required I08 "
+                "normalization/common/ paths (bloc_05/03 s21 required I08+I09 "
                 "surface); every other production path is byte-identical to base"
             ),
             "pass": _src_delta_is_disclosed(),
@@ -1043,12 +1099,13 @@ def build_scope_payload() -> dict:
             "row_id": "no_i05_test_diff_vs_base",
             "clause": (
                 "I06E1 s12 (forbidden: editing I01-I05 tests) + DISCLOSED "
-                "B5-I08 scope-audit allowlist extension"
+                "B5-I08/B5-I09 scope-audit allowlist extension"
             ),
             "detail": (
-                "git diff 32a897436 -- tests .../test_b5_i05_*.py + i01 scope "
-                "audit names only the two audits the I08E1 directive extends, "
-                "and each changed one equals its disclosed SHA-256"
+                "git diff 32a897436 -- the sealed I01/I05/I08 audit tests names "
+                "only the audits the I08E1 and I09E1 directives extend, and each "
+                "changed one equals its current disclosed SHA-256 (I09 pins "
+                "supersede I08 pins for the twice-amended files)"
             ),
             "pass": _sealed_test_delta_is_disclosed(),
         },
@@ -1056,13 +1113,14 @@ def build_scope_payload() -> dict:
             "row_id": "i05_scope_audit_unchanged_allowlist_displays_closed",
             "clause": (
                 "I06E1 s12 + disclosure (naming, not allowlist, carries I06 "
-                "tests) + DISCLOSED B5-I08 allowlist extension"
+                "tests) + DISCLOSED B5-I08/B5-I09 allowlist extension"
             ),
             "detail": (
                 "test_b5_i05_scope_audit.py is either byte-identical to base or "
-                "equal to its disclosed B5-I08-extended SHA-256: the I06 suite is "
-                "named under the existing authorized test prefix, and the only later "
-                "edit is the operator-authorized I08 allowlist extension"
+                "equal to its current disclosed SHA-256: the I06 suite is named "
+                "under the existing authorized test prefix, and the only later "
+                "edits are the operator-authorized I08 and I09 allowlist "
+                "extensions"
             ),
             "pass": _i05_scope_audit_state_is_disclosed(),
         },
@@ -1070,13 +1128,13 @@ def build_scope_payload() -> dict:
             "row_id": "prior_checkpoint_evidence_unchanged",
             "clause": (
                 "I06E1 s12 (forbidden: editing prior evidence) + DISCLOSED "
-                "B5-I08 regeneration of the inventory-carrying I05 artifact"
+                "B5-I08/B5-I09 regeneration of the inventory-carrying I05 artifact"
             ),
             "detail": (
                 "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is "
                 "empty except bloc_05_time_validation.json, which equals its "
-                "disclosed post-extension SHA-256 (its inventory carries the "
-                "amended I05 audit test hash)"
+                "current disclosed post-extension SHA-256 (its inventory carries "
+                "the amended I05 and I08 audit test hashes)"
             ),
             "pass": _sealed_evidence_state_is_disclosed(),
         },

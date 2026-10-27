@@ -35,6 +35,20 @@ tests were therefore amended from ABSOLUTE emptiness to "nothing BUT that
 disclosed delta", with the disclosed bytes pinned by SHA-256.  Every other
 measurement in this suite is unchanged.
 
+DISCLOSURE -- B5-I09 AMENDMENT (operator-authorized; full record in
+``BLOC_05_I09_IMPLEMENTATION_EVIDENCE.md`` + ledger section 178): the I09E1
+implementation pass adds the three remaining bloc_05/03 s21 modules to
+``normalization/common/`` (06 s19 titles I09 the methodology +
+semantic-equivalence registries), extends the I05 audit's staged allowlist by
+exactly the ``test_b5_i09`` suites and the I08 audit's frozen module set from
+four to seven -- both on the same I02/I04A/I05/I08 precedent.  The same
+cascade follows: the amended audits re-enter the I05 producer's inventory,
+``bloc_05_time_validation.json`` is regenerated (one inventory line per
+amended file), and this suite's operative pin is re-measured to the new bytes
+(the superseded I08 value is kept above as the historical record).  The I06
+producer's disclosed-delta rows pin the I09 bytes the same way they pinned the
+I08 bytes; every other measurement in this suite remains unchanged.
+
 The I06E1 directive (sections 03-08) requires the consolidated replay-safety
 evidence artifact to exist, to exercise the ACCEPTED I05 production primitives
 through deterministic synthetic fixtures, to classify every refusal exactly,
@@ -395,8 +409,21 @@ def test_no_latency_policy_was_added_to_the_accepted_ladder() -> None:
 #: DISCLOSED B5-I08: the amended I05 audit test changes its own entry in the
 #: I05 producer's SHA-256 inventory, so this sealed artifact is regenerated to
 #: the pinned bytes below; the other four artifacts stay absolutely sealed.
+#: The recorded value was the I08-regenerated state.
 I08_TIME_VALIDATION_SHA256 = (
     "78d3f2a091a9dc66775c8b4bd767e12807a406ea009f9f9396babecc6eb4179f"
+)
+
+#: DISCLOSED B5-I09 (SENSOR-B5-I09E1 directive; full record in
+#: ``BLOC_05_I09_IMPLEMENTATION_EVIDENCE.md`` + ledger section 178): the I09E1
+#: implementation pass amends the I05 audit's staged allowlist once more (the
+#: ``test_b5_i09`` suites, on the same precedent) and the I08 audit's frozen
+#: module set (seven §21 modules instead of four).  Both changes re-enter the
+#: I05 producer's inventory, so this artifact is regenerated again -- one
+#: inventory line each -- exactly as the I08 cascade did.  The I08 value above
+#: is kept for the historical record; the operative pin is this one.
+I09_TIME_VALIDATION_SHA256 = (
+    "b3b8843c0092c7b373964cfd6b6f67a266fbecb52537197183e7566c6426570c"
 )
 
 
@@ -412,8 +439,8 @@ def test_prior_checkpoint_evidence_bytes_are_unchanged() -> None:
             measured = hashlib.sha256(
                 (_EVIDENCE / name).read_bytes()
             ).hexdigest()
-            assert measured == I08_TIME_VALIDATION_SHA256, (
-                f"{name} left its disclosed B5-I08 state: {measured}"
+            assert measured == I09_TIME_VALIDATION_SHA256, (
+                f"{name} left its disclosed B5-I09 state: {measured}"
             )
             continue
         diff = _git(

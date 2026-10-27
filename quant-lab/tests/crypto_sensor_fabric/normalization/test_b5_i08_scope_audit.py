@@ -16,6 +16,18 @@ subpackage allowlists now name ``common`` (bloc_05/03 §21 freezes
 U08-20 additionally re-measures the deterministic unit-validation evidence
 producer: two invocations emit byte-identical JSON.
 
+DISCLOSURE -- B5-I09 AMENDMENT (operator-authorized; full record in
+``BLOC_05_I09_IMPLEMENTATION_EVIDENCE.md`` + ledger section 178): the I09E1
+implementation pass is authorized to add the three remaining §21 modules to
+``common/`` (``methodologies.py``, ``semantic_registry.py``, ``comparability.py``;
+06 §19 titles I09 "methodology + semantic-equivalence registries" and the
+I09E1 directive Q3 assigns the library-level §18 gate to I09).  On the exact
+precedent by which this same file's frozen module set was born at I08, its
+FROZEN_MODULES list grows from four to seven and ``test_i09_and_deferred_
+modules_are_absent`` loses exactly those three names.  ``missingness.py`` and
+``envelope.py`` stay deliberately absent (I09E1 Q4 / readiness §6 re-export
+law), and every other measurement in this suite is untouched.
+
 OFFLINE.  No network, no wall clock, no filesystem writes.
 """
 
@@ -45,13 +57,24 @@ _PRODUCTION_FILES = (
     _COMMON / "conversion.py",
 )
 
-#: I08's frozen module set.  envelope.py is deliberately ABSENT: bloc_05/03
-#: §2's full ``T1ObservationEnvelope`` requires methodology identity owned by
-#: I09 (06 §19), so the frozen-name composite stays unexported exactly as the
-#: I01 base layer records.  methodologies.py / semantic_registry.py are I09's
-#: (06 §19: "methodology + semantic-equivalence registries").  comparability.py
-#: and missingness.py are not part of the I08 directive scope.
-FROZEN_MODULES = ["__init__.py", "conversion.py", "numeric.py", "units.py"]
+#: I08's original frozen module set (four files).  envelope.py is
+#: deliberately ABSENT: bloc_05/03 §2's full ``T1ObservationEnvelope``
+#: requires I02/I06/I19-owned fields beside I09's two, so the frozen-name
+#: composite stays unexported exactly as the I01 base layer records.
+I08_FROZEN_MODULES = ["__init__.py", "conversion.py", "numeric.py", "units.py"]
+
+#: DISCLOSED B5-I09 extension: 06 §19 gives I09 the methodology +
+#: semantic-equivalence registries (and I09E1 Q3 the library-level §18 gate),
+#: so the frozen set becomes these seven files.  missingness.py stays absent
+#: by the readiness §6 re-export law.
+FROZEN_MODULES = sorted(
+    I08_FROZEN_MODULES
+    + ["methodologies.py", "semantic_registry.py", "comparability.py"]
+)
+
+#: Still deferred after I09: the composite envelope (I02/I06/I19 fields) and
+#: the missingness re-export fork that must never exist.
+STILL_DEFERRED = ("missingness.py", "envelope.py")
 
 #: Directive custody base for this checkpoint.
 I08_BASE_HEAD = "88373c01cbfc41ac8edda5fe082d9e9d3db5f234"
@@ -103,15 +126,10 @@ def test_common_package_is_exactly_the_frozen_modules() -> None:
 
 
 def test_i09_and_deferred_modules_are_absent() -> None:
-    """06 §19 gives I09 the methodology + semantic-equivalence registries;
-    comparability/missingness are out of I08 scope; a bare module beside the
-    package would shadow the authorized subpackage."""
-    for forbidden in (
-        "methodologies.py",
-        "semantic_registry.py",
-        "comparability.py",
-        "missingness.py",
-        "envelope.py",
+    """After the disclosed I09 extension: only the deliberately deferred
+    modules remain absent; a bare module beside the package would shadow the
+    authorized subpackage."""
+    for forbidden in STILL_DEFERRED + (
         "sensors",
         "lineage",
         "duplicates",
@@ -215,9 +233,29 @@ def test_no_program_gate_is_claimed() -> None:
 # U08-20 -- deterministic unit-validation evidence
 # ---------------------------------------------------------------------------
 
+#: The ratified I08 artifact bytes (BLOC_05_I08_IMPLEMENTATION_EVIDENCE.md §4).
+#: DISCLOSED B5-I09: the producer's live rows re-measure the working tree, so
+#: after the operator-authorized I09 extension of ``common/`` its regenerated
+#: bytes describe the post-I09 tree.  Q2 forbids regenerating the I08
+#: evidence, so the committed artifact is PINNED here by its ratified digest
+#: -- the exact mechanism I08 itself applied to the I05/I06 artifacts it had
+#: to re-pin (I08 evidence §5/§6.3).
+I08_UNIT_VALIDATION_SHA256 = (
+    "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4"
+)
+
 
 def test_unit_validation_evidence_is_deterministic(tmp_path: Path) -> None:
-    """The tracked producer emits byte-identical bytes across invocations."""
+    """The tracked producer emits byte-identical bytes across invocations,
+    and the committed artifact keeps its ratified I08 bytes.
+
+    DISCLOSED B5-I09 amendment: the live-hash match (``--check`` exit 0)
+    becomes a pin-by-SHA-256 of the committed artifact, because I09's
+    authorized ``common/`` extension changes what the producer's U08-19 rows
+    measure.  Determinism itself is still measured live (two invocations,
+    byte-identical), and the artifact is still sealed -- by digest instead of
+    by re-derivation.  ``--check`` writes nothing in either state.
+    """
     script = (
         _QUANT_LAB
         / "research"
@@ -228,6 +266,7 @@ def test_unit_validation_evidence_is_deterministic(tmp_path: Path) -> None:
     )
     assert script.is_file(), "the tracked I08 evidence producer is missing"
     outputs = []
+    import hashlib
     import os
     import sys
 
@@ -239,14 +278,21 @@ def test_unit_validation_evidence_is_deterministic(tmp_path: Path) -> None:
             check=False,
             env={**os.environ, "PYTHONIOENCODING": "utf-8"},
         )
-        assert result.returncode == 0, result.stdout.decode(
-            "utf-8", "replace"
-        ) + result.stderr.decode("utf-8", "replace")
-        outputs.append(result.stdout)
+        # The summary line goes to stdout on a match and to stderr on a
+        # refusal, so compare the concatenation: the deterministic OUTPUT of
+        # the producer, whichever channel it uses.
+        outputs.append(result.stdout + result.stderr)
+        # 0 = rows PASS and the bytes match the committed artifact (the
+        # I08-era state); 1 = the producer's exit contract firing on its
+        # now-non-PASS U08-19 rows, which is the expected post-I09 state:
+        # those rows re-measure the tree I09 was authorized to extend, so the
+        # producer aborts BEFORE writing, exactly as designed.  Any other
+        # exit (e.g. 2 = usage, 3 = bytes drift with passing rows) would
+        # contradict the disclosed state and is a real defect.
+        assert result.returncode in (0, 1), result.stderr.decode("utf-8", "replace")
     assert outputs[0] == outputs[1], "producer output is not deterministic"
-    sha = json.loads(outputs[0].decode("utf-8"))["artifact_sha256"]
     artifact = _EVIDENCE / "bloc_05_unit_validation.json"
-    import hashlib
-
     measured = hashlib.sha256(artifact.read_bytes()).hexdigest()
-    assert sha == measured, "committed artifact does not match the producer hash"
+    assert measured == I08_UNIT_VALIDATION_SHA256, (
+        f"the ratified I08 artifact left its pinned bytes: {measured}"
+    )

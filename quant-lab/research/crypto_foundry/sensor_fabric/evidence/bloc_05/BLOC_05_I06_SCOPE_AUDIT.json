@@ -4,25 +4,25 @@
   "rows": [
     {
       "clause": "I06E1 s12 (forbidden: editing sealed I01-I05 production) + DISCLOSED B5-I08 extension (operator-authorized)",
-      "detail": "git status + git diff 32a897436 -- quant-lab/src name only normalization/common/ paths (bloc_05/03 s21 required I08 surface); every other production path is byte-identical to base",
+      "detail": "git status + git diff 32a897436 -- quant-lab/src name only normalization/common/ paths (bloc_05/03 s21 required I08+I09 surface); every other production path is byte-identical to base",
       "pass": true,
       "row_id": "no_production_source_diff_vs_base"
     },
     {
-      "clause": "I06E1 s12 (forbidden: editing I01-I05 tests) + DISCLOSED B5-I08 scope-audit allowlist extension",
-      "detail": "git diff 32a897436 -- tests .../test_b5_i05_*.py + i01 scope audit names only the two audits the I08E1 directive extends, and each changed one equals its disclosed SHA-256",
+      "clause": "I06E1 s12 (forbidden: editing I01-I05 tests) + DISCLOSED B5-I08/B5-I09 scope-audit allowlist extension",
+      "detail": "git diff 32a897436 -- the sealed I01/I05/I08 audit tests names only the audits the I08E1 and I09E1 directives extend, and each changed one equals its current disclosed SHA-256 (I09 pins supersede I08 pins for the twice-amended files)",
       "pass": true,
       "row_id": "no_i05_test_diff_vs_base"
     },
     {
-      "clause": "I06E1 s12 + disclosure (naming, not allowlist, carries I06 tests) + DISCLOSED B5-I08 allowlist extension",
-      "detail": "test_b5_i05_scope_audit.py is either byte-identical to base or equal to its disclosed B5-I08-extended SHA-256: the I06 suite is named under the existing authorized test prefix, and the only later edit is the operator-authorized I08 allowlist extension",
+      "clause": "I06E1 s12 + disclosure (naming, not allowlist, carries I06 tests) + DISCLOSED B5-I08/B5-I09 allowlist extension",
+      "detail": "test_b5_i05_scope_audit.py is either byte-identical to base or equal to its current disclosed SHA-256: the I06 suite is named under the existing authorized test prefix, and the only later edits are the operator-authorized I08 and I09 allowlist extensions",
       "pass": true,
       "row_id": "i05_scope_audit_unchanged_allowlist_displays_closed"
     },
     {
-      "clause": "I06E1 s12 (forbidden: editing prior evidence) + DISCLOSED B5-I08 regeneration of the inventory-carrying I05 artifact",
-      "detail": "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is empty except bloc_05_time_validation.json, which equals its disclosed post-extension SHA-256 (its inventory carries the amended I05 audit test hash)",
+      "clause": "I06E1 s12 (forbidden: editing prior evidence) + DISCLOSED B5-I08/B5-I09 regeneration of the inventory-carrying I05 artifact",
+      "detail": "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is empty except bloc_05_time_validation.json, which equals its current disclosed post-extension SHA-256 (its inventory carries the amended I05 and I08 audit test hashes)",
       "pass": true,
       "row_id": "prior_checkpoint_evidence_unchanged"
     },

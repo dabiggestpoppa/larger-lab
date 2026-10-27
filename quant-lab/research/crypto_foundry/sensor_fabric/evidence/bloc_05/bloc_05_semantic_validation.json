@@ -1,0 +1,496 @@
+{
+  "artifact": "bloc_05_semantic_validation",
+  "checkpoint": "SENSOR-B5-I09",
+  "extensions": [
+    {
+      "case_series": "SEM-01..SEM-36 (SEM-26/35 test-owned) + SEM-A01",
+      "checkpoint": "SENSOR-B5-I09E1",
+      "generator": "research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py",
+      "note": "first production: no prior rows of this frozen-name artifact exist, so a later checkpoint extending it must pin these rows by SHA-256 (the I08 extensions convention)",
+      "rows_added": 35
+    }
+  ],
+  "generator": "PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py",
+  "projected_methodologies": [
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "OI_CONTRACTS_TO_USD_V1",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "upstream_status_carried": true,
+      "version": "1"
+    },
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "OI_USD_NATIVE_PASSTHROUGH_V1",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "upstream_status_carried": true,
+      "version": "1"
+    },
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "FUNDING_NATIVE_TO_8H_EQUIV_V1",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "upstream_status_carried": true,
+      "version": "1"
+    },
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "LIQ_USD_NATIVE_PROVIDER_V1",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "upstream_status_carried": true,
+      "version": "1"
+    },
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1",
+      "sensor_family": "MECHANICAL_TRADE",
+      "upstream_status_carried": true,
+      "version": "1"
+    },
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "DERIBIT_TRADE_LIQ_TAG_V1",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "upstream_status_carried": true,
+      "version": "1"
+    },
+    {
+      "description_preserved": true,
+      "introduced_at": "8b2162a1184bdd885b09f5a0efaae4adeb4f7c9a",
+      "methodology_id": "PROVIDER_ANALYTICS_PASSTHROUGH_V1",
+      "sensor_family": "MECHANICAL_BOOK_METRIC",
+      "upstream_status_carried": true,
+      "version": "1"
+    }
+  ],
+  "rows": [
+    {
+      "acceptance_clause": "bloc_05/03 S16; bloc_05/07 S4/F14",
+      "case_id": "SEM-01",
+      "disposition": "PASS",
+      "expected_result": "exactly the eleven frozen \u00a716 field names, in order; immutable; extra refused",
+      "forbidden_result": "a twelfth field, or mutation after construction",
+      "input_condition": "a fully evidenced synthetic NormalizationMethodology",
+      "observed_result": "fields=['methodology_id', 'version', 'sensor_family', 'description', 'formula_or_algorithm', 'required_inputs', 'output_units', 'PIT_requirements', 'known_limitations', 'introduced_at', 'deprecated_at']",
+      "probe": "construct the frozen object and enumerate its field order",
+      "test_ref": "test_sem01_methodology_frozen_field_set_and_immutability"
+    },
+    {
+      "acceptance_clause": "bloc_05/07 F14",
+      "case_id": "SEM-02",
+      "disposition": "PASS",
+      "expected_result": "both versions resolvable, the historical row preserved; the duplicate refused",
+      "forbidden_result": "a silent overwrite under the same identity",
+      "input_condition": "one original row plus one version-bumped row, then a duplicated identity",
+      "observed_result": "v1_resolvable=True; v2_resolvable=True; duplicate_refused=True (ValidationError: 1 validation error for NormalizationMethodologyRegistry)",
+      "probe": "resolve by version; attempt a duplicate (id, version) registration",
+      "test_ref": "test_sem02_f14_versioning_law"
+    },
+    {
+      "acceptance_clause": "bloc_05/06 S1 G9; bloc_05/03 S22 inv.8",
+      "case_id": "SEM-03",
+      "disposition": "PASS",
+      "expected_result": "resolve -> None; require -> UnknownNormalizationMethodology; no default",
+      "forbidden_result": "a synthesized or guessed methodology row",
+      "input_condition": "an empty methodology registry",
+      "observed_result": "resolve_is_none=True; require_refused=True (UnknownNormalizationMethodology: methodology_id 'NOT_REGISTERED' version '1' is not registered; the methodology is unknown, so it is refused (bloc_05/06 ); version_token='1.0'",
+      "probe": "resolve an unknown id, then require it",
+      "test_ref": "test_sem03_typed_refusal_never_a_default"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S11+S12+S13; bloc_05/07 S4",
+      "case_id": "SEM-04",
+      "disposition": "PASS",
+      "expected_result": "all eight \u00a711 names plus the nine \u00a712/\u00a713 record attributes present; extra refused",
+      "forbidden_result": "a mapping missing blocking_assumptions or known_limitations",
+      "input_condition": "a fully stated synthetic ProviderSemanticMapping",
+      "observed_result": "frozen_names_present=True; record_names_present=True; field_count=20",
+      "probe": "construct the frozen object and enumerate its fields",
+      "test_ref": "test_sem04_mapping_frozen_field_set_and_immutability"
+    },
+    {
+      "acceptance_clause": "bloc_01/02 B1-T41/T43; readiness S10 stop 1",
+      "case_id": "SEM-05",
+      "disposition": "PASS",
+      "expected_result": "each is refused at construction",
+      "forbidden_result": "an admissible mapping with no blocking assumptions",
+      "input_condition": "mappings violating T41, T43, or carrying no blocking assumptions",
+      "observed_result": "t41_refused=True; t43_refused=True; stop1_refused=True",
+      "probe": "construct each violating mapping",
+      "test_ref": "test_sem05_bloc1_laws_re_enforced_and_missing_assumptions_refused"
+    },
+    {
+      "acceptance_clause": "bloc_05/06 S1 G8; bloc_05/03 S11",
+      "case_id": "SEM-06",
+      "disposition": "PASS",
+      "expected_result": "byte-identical YAML regardless of input order; parse(serialize(x)) == x",
+      "forbidden_result": "an order-dependent serialization",
+      "input_condition": "the same two mappings in two input orders",
+      "observed_result": "order_independent=True; round_trip=True",
+      "probe": "serialize both registries and round-trip one",
+      "test_ref": "test_sem06_mapping_serialization_is_deterministic"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S12; I05 registry idiom",
+      "case_id": "SEM-07",
+      "disposition": "PASS",
+      "expected_result": "duplicate refused; registry canonically ordered",
+      "forbidden_result": "two rows with one lookup key",
+      "input_condition": "a duplicated (provider, sensor, field) row, and two orders of the same set",
+      "observed_result": "duplicate_refused=True (ValidationError: 1 validation error for ProviderSemanticRegistry); canonical_order=True",
+      "probe": "validate the duplicate; compare registry order to sorted order",
+      "test_ref": "test_sem07_registry_duplicate_key_refused_and_order_is_canonical"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S12; BOOK 00 Q6; readiness S10 stop 7",
+      "case_id": "SEM-08",
+      "disposition": "PASS",
+      "expected_result": "typed UnknownProviderSemanticMapping; construction refused",
+      "forbidden_result": "a default mapping or an accepted unknown provider",
+      "input_condition": "an unknown field lookup and an invented provider token",
+      "observed_result": "unknown_field_refused=True (UnknownProviderSemanticMapping: no declared semantic mapping for provider='BINANCE_USDM' provider_field='not_a_field' sensor_family='MECHANICAL_OPEN_INT); invented_provider_refused=True (ValidationError: 1 validation error for ProviderSemanticMapping)",
+      "probe": "require the unknown mapping; construct a mapping for a non-schema provider",
+      "test_ref": "test_sem08_unknown_provider_field_and_mapping_fail_closed"
+    },
+    {
+      "acceptance_clause": "bloc_01/02 S13; readiness S10 stop 7",
+      "case_id": "SEM-09",
+      "disposition": "PASS",
+      "expected_result": "None: a matching field name never establishes comparability",
+      "forbidden_result": "a mapping borrowed from the other family",
+      "input_condition": "a registered (provider, field) row looked up under another sensor family",
+      "observed_result": "resolve_cross_family_is_none=True",
+      "probe": "resolve the same field NAME under MECHANICAL_FUNDING",
+      "test_ref": "test_sem09_no_default_synthesis_from_a_similar_row"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S13",
+      "case_id": "SEM-10",
+      "disposition": "PASS",
+      "expected_result": "exactly the five frozen members in document order; AMBIGUOUS blocks",
+      "forbidden_result": "a sixth confidence, or AMBIGUOUS admitted to critical T1 use",
+      "input_condition": "the SemanticConfidence enum",
+      "observed_result": "ladder=['VERIFIED_FIRST_PARTY', 'VERIFIED_SECONDARY', 'RECONSTRUCTED_FROM_FIRST_PARTY_FIELDS', 'COMMUNITY_DOCUMENTED', 'AMBIGUOUS']; ambiguous_blocks=True",
+      "probe": "enumerate members; test admits_critical_t1_use on each",
+      "test_ref": "test_sem10_confidence_ladder_is_frozen_and_ambiguous_blocks"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S13; BOOK 00 Q7",
+      "case_id": "SEM-11",
+      "disposition": "PASS",
+      "expected_result": "community is not first-party grade; the promotion is refused",
+      "forbidden_result": "a provisional mapping promoted by a registry edit",
+      "input_condition": "a community-documented confidence, and a VERIFIED_FIRST_PARTY claim still pointing at BLOC2_PROBE_PENDING evidence",
+      "observed_result": "community_first_party=False; pending_upgrade_refused=True (ValidationError: 1 validation error for ProviderSemanticMapping)",
+      "probe": "ask is_first_party_grade; attempt the promotion",
+      "test_ref": "test_sem11_community_evidence_never_masquerades_as_first_party"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S11; bloc_01/02 B1-T42",
+      "case_id": "SEM-12",
+      "disposition": "PASS",
+      "expected_result": "exactly the four frozen classes; NOT_COMPARABLE and CORROBORATION_ONLY never pool",
+      "forbidden_result": "a fifth class, or a pooling of a refusal class",
+      "input_condition": "the SemanticEquivalence enum and the upstream is_poolable law",
+      "observed_result": "classes=['EXACT_EQUIVALENT', 'NORMALIZABLE_COMPARABLE', 'CORROBORATION_ONLY', 'NOT_COMPARABLE']; poolable=[True, True, False, False]",
+      "probe": "enumerate members; pool-test each class",
+      "test_ref": "test_sem12_equivalence_vocabulary_integrity_and_refusal"
+    },
+    {
+      "acceptance_clause": "bloc_05/05 S12 (operative); bloc_05/03 S14",
+      "case_id": "SEM-13",
+      "disposition": "PASS",
+      "expected_result": "0 missing / 0 extra; SEMANTICS_UNVERIFIED is a quality flag, not a reason",
+      "forbidden_result": "a second, forked missingness vocabulary",
+      "input_condition": "the ratified I01 MissingnessReason enum",
+      "observed_result": "set_difference_missing=[]; set_difference_extra=[]; flag_not_reason=True",
+      "probe": "set-difference against 05 \u00a712's thirteen members; check SEMANTICS_UNVERIFIED",
+      "test_ref": "test_sem13_missingness_vocabulary_is_reused_not_forked"
+    },
+    {
+      "acceptance_clause": "readiness S6; bloc_05/05 S12",
+      "case_id": "SEM-14",
+      "disposition": "PASS",
+      "expected_result": "IDENTITY_BLOCKED and SEMANTICS_BLOCKED respectively, never a generic bool",
+      "forbidden_result": "a refusal with no typed cause",
+      "input_condition": "a comparison refused for unresolved identity, and one refused for a blocking SEMANTICS_UNVERIFIED flag",
+      "observed_result": "identity_cause='IDENTITY_BLOCKED'; semantics_cause='SEMANTICS_BLOCKED'",
+      "probe": "evaluate both; read the typed missingness_reason",
+      "test_ref": "test_sem14_a_refusal_carries_a_typed_missingness_cause"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-15",
+      "disposition": "PASS",
+      "expected_result": "SENSOR_FAMILY_SAME refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['SENSOR_FAMILY_SAME']; cause='SEMANTICS_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem15_condition_1_sensor_family_must_match"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-16",
+      "disposition": "PASS",
+      "expected_result": "ECONOMIC_DEFINITION_COMPATIBLE refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['ECONOMIC_DEFINITION_COMPATIBLE']; cause='SEMANTICS_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem16_condition_2_same_canonical_quantity_and_stated_definitions"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-17",
+      "disposition": "PASS",
+      "expected_result": "INTERVAL_SEMANTICS_COMPATIBLE refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['INTERVAL_SEMANTICS_COMPATIBLE']; cause='SEMANTICS_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem17_condition_3_interval_semantics_must_be_compatible"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-18",
+      "disposition": "PASS",
+      "expected_result": "UNITS_COMPATIBLE_AFTER_EXPLICIT_CONVERSION refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['UNITS_COMPATIBLE_AFTER_EXPLICIT_CONVERSION']; cause='CONVERSION_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem18_condition_4_units_need_an_explicit_registered_conversion"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-19",
+      "disposition": "PASS",
+      "expected_result": "VENUE_SCOPE_KNOWN refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['VENUE_SCOPE_KNOWN']; cause='SEMANTICS_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem19_condition_5_venue_scope_must_be_declared"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-20",
+      "disposition": "PASS",
+      "expected_result": "IDENTITY_RESOLVED refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['IDENTITY_RESOLVED']; cause='IDENTITY_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem20_condition_6_identity_must_be_resolved"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-21",
+      "disposition": "PASS",
+      "expected_result": "NO_BLOCKING_QUALITY_FLAGS refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['NO_BLOCKING_QUALITY_FLAGS']; cause='QUARANTINED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem21_condition_7_blocking_quality_flags_refuse"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18 (one condition)",
+      "case_id": "SEM-22",
+      "disposition": "PASS",
+      "expected_result": "EQUIVALENCE_CLASS_PERMITS_COMPARISON refused; not admitted; typed cause present",
+      "forbidden_result": "an admitted comparison with one dimension unsupported",
+      "input_condition": "two declared sides differing in exactly one required dimension",
+      "observed_result": "refused=['EQUIVALENCE_CLASS_PERMITS_COMPARISON']; cause='SEMANTICS_BLOCKED'",
+      "probe": "evaluate the eight-condition gate",
+      "test_ref": "test_sem22_condition_8_equivalence_class_must_permit"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18",
+      "case_id": "SEM-23",
+      "disposition": "PASS",
+      "expected_result": "admitted; eight satisfied verdicts in frozen order; no missingness cause",
+      "forbidden_result": "a refusal or a partial verdict list",
+      "input_condition": "two sides declaring every required fact compatibly",
+      "observed_result": "admitted=True; verdicts=8; order=True",
+      "probe": "evaluate the gate",
+      "test_ref": "test_sem23_all_eight_conditions_satisfied_admits"
+    },
+    {
+      "acceptance_clause": "bloc_05/06 S1 G9; readiness S10 stop 8",
+      "case_id": "SEM-24",
+      "disposition": "PASS",
+      "expected_result": "refused without raising; every verdict carries a reason",
+      "forbidden_result": "an exception, or an admitted comparison over unknown facts",
+      "input_condition": "one side declaring no facts at all",
+      "observed_result": "admitted=False; refused_count=7; all_reasons=True",
+      "probe": "evaluate the gate over the empty side",
+      "test_ref": "test_sem24_missing_facts_fail_closed_without_raising"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S2/S17/S22 inv.7; BOOK 00 Q4",
+      "case_id": "SEM-25",
+      "disposition": "PASS",
+      "expected_result": "the two I09-owned fields typed; the frozen composite name still unexported; the top-level API still 24 symbols",
+      "forbidden_result": "a released T1ObservationEnvelope, or a fabricated I02/I06/I19 field",
+      "input_condition": "a methodology row converted to an envelope reference, and the registry generation token",
+      "observed_result": "ref=SYNTHETIC_LINEAR_OI_USD_V1@1; version_token='2026.10-i09'; top_level=24; envelope_exported=False",
+      "probe": "build MethodologyRef; read the top-level API",
+      "test_ref": "test_sem25_methodology_ref_and_registry_version_token_without_envelope"
+    },
+    {
+      "acceptance_clause": "bloc_05/07 F24; bloc_05/03 S20",
+      "case_id": "SEM-27",
+      "disposition": "PASS",
+      "expected_result": "admitted as comparable; no value/merged/pooled field exists on the model",
+      "forbidden_result": "a synthesized cross-venue value or consensus",
+      "input_condition": "two comparable sides from different venues",
+      "observed_result": "admitted=True; venue_scope_facts=none",
+      "probe": "evaluate the gate; enumerate the decision model's fields",
+      "test_ref": "test_sem27_cross_venue_comparison_is_a_decision_never_a_synthesis"
+    },
+    {
+      "acceptance_clause": "bloc_05/07 F16; bloc_05/03 S19",
+      "case_id": "SEM-28",
+      "disposition": "PASS",
+      "expected_result": "storable as evidence; refused for cross-provider canonical use",
+      "forbidden_result": "a promotion of provider-native analytics to Fabric-defined truth",
+      "input_condition": "a Deribit-style CORROBORATION_ONLY provider-native analytic",
+      "observed_result": "pooled=False; critical_use=False",
+      "probe": "store it; ask is_poolable and admits_critical_t1_use",
+      "test_ref": "test_sem28_provider_native_analytics_stay_evidence"
+    },
+    {
+      "acceptance_clause": "BOOK 00 Q1; readiness \u00a73",
+      "case_id": "SEM-29",
+      "disposition": "PASS",
+      "expected_result": "nine methodology ids, six mappings, every mapping pending, every methodology_id resolvable upstream",
+      "forbidden_result": "a config edit, a promoted evidence reference, or a dangling id",
+      "input_condition": "the live Bloc 1 configs read as text",
+      "observed_result": "methodologies=9; mappings=6; all_pending=True; ids_resolve=True",
+      "probe": "load both registries; count ids/mappings; check pending evidence",
+      "test_ref": "test_sem29_live_configs_are_intact_and_projection_ready"
+    },
+    {
+      "acceptance_clause": "BOOK 00 Q1+Q7; bloc_05/03 S11/S13",
+      "case_id": "SEM-30",
+      "disposition": "PASS",
+      "expected_result": "class, methodology_id, evidence_reference, version and field identity preserved; confidence stays AMBIGUOUS",
+      "forbidden_result": "an upgrade of class, confidence or evidence",
+      "input_condition": "each of the six live planning mappings",
+      "observed_result": "projected=GATE_FUTURES:long_liq_usd=True; GATE_FUTURES:short_liq_usd=True; DERIBIT:trade.liquidation=True; BINANCE_USDM:isBuyerMaker=True; BYBIT_LINEAR:open_interest=True; KRAKEN_FUTURES:funding_rate=True",
+      "probe": "project it into the frozen shape and compare identity fields",
+      "test_ref": "test_sem30_projected_mappings_stay_ambiguous_and_pending"
+    },
+    {
+      "acceptance_clause": "BOOK 00 Q6; readiness \u00a710 stop 7",
+      "case_id": "SEM-31",
+      "disposition": "PASS",
+      "expected_result": "typed refusal naming the provider; the absence is recorded, not filled",
+      "forbidden_result": "a synthesized Gate mapping",
+      "input_condition": "an empty provider semantic registry",
+      "observed_result": "refused=True (UnknownProviderSemanticMapping: no declared semantic mapping for provider='GATE_FUTURES' provider_field='long_liq_usd' sensor_family='MECHANICAL_LIQUIDA)",
+      "probe": "require the Gate liquidation mapping",
+      "test_ref": "test_sem31_empty_registry_resolves_nothing_and_names_the_missing_cause"
+    },
+    {
+      "acceptance_clause": "BOOK 00 Q1 (no in-place meaning change)",
+      "case_id": "SEM-32",
+      "disposition": "PASS",
+      "expected_result": "empty: registry modules and both YAMLs byte-identical",
+      "forbidden_result": "any edit to a live Bloc 1 module or config",
+      "input_condition": "git diff of the Bloc 1 registry surface against the I09 base",
+      "observed_result": "diff_empty=True",
+      "probe": "name the changed paths",
+      "test_ref": "test_sem32_bloc1_registry_surfaces_are_untouched"
+    },
+    {
+      "acceptance_clause": "BOOK 00 Q6; bloc_05/06 \u00a75",
+      "case_id": "SEM-33",
+      "disposition": "PASS",
+      "expected_result": "eight providers; every token accepted by the frozen schema; the tuple reused, not forked",
+      "forbidden_result": "a second provider vocabulary inside normalization",
+      "input_condition": "the live PROVIDER_IDS tuple",
+      "observed_result": "providers=8; all_accepted=True; ids=['KRAKEN_FUTURES', 'GATE_FUTURES', 'BINANCE_USDM', 'BYBIT_LINEAR', 'OKX_SWAP', 'DERIBIT', 'COINALYZE', 'BITFINEX_COMMUNITY_ARCHIVE']",
+      "probe": "construct one mapping per provider token",
+      "test_ref": "test_sem33_the_eight_provider_schema_is_the_live_provider_set"
+    },
+    {
+      "acceptance_clause": "BOOK 00 Q2; readiness \u00a710 stop 9",
+      "case_id": "SEM-34",
+      "disposition": "PASS",
+      "expected_result": "the nine Bloc 1 ids only; no B5_I08_UNITS_V1 row; no STABLECOIN_USD_PIT_V1 alias",
+      "forbidden_result": "an invented methodology row or alias in committed config",
+      "input_condition": "the live methodology config after I09",
+      "observed_result": "ids=['AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1', 'CVD_SIGNED_NOTIONAL_V1', 'DEPTH_BPS_RECONSTRUCTION_V1', 'DERIBIT_TRADE_LIQ_TAG_V1', 'FUNDING_NATIVE_TO_8H_EQUIV_V1', 'LIQ_USD_NATIVE_PROVIDER_V1', 'OI_CONTRACTS_TO_USD_V1', 'OI_USD_NATIVE_PASSTHROUGH_V1', 'PROVIDER_ANALYTICS_PASSTHROUGH_V1']",
+      "probe": "list its ids; probe for invented aliases",
+      "test_ref": "test_sem34_no_methodology_row_is_invented_for_the_unresolved_ids"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S18",
+      "case_id": "SEM-36",
+      "disposition": "PASS",
+      "expected_result": "the eight conditions in frozen document order; verdicts in that order",
+      "forbidden_result": "a reordered or renamed condition",
+      "input_condition": "the ComparabilityCondition enum",
+      "observed_result": "conditions=['SENSOR_FAMILY_SAME', 'ECONOMIC_DEFINITION_COMPATIBLE', 'INTERVAL_SEMANTICS_COMPATIBLE', 'UNITS_COMPATIBLE_AFTER_EXPLICIT_CONVERSION', 'VENUE_SCOPE_KNOWN', 'IDENTITY_RESOLVED', 'NO_BLOCKING_QUALITY_FLAGS', 'EQUIVALENCE_CLASS_PERMITS_COMPARISON']; verdict_order=True",
+      "probe": "enumerate members; evaluate a passing comparison",
+      "test_ref": "test_sem36_condition_order_and_names_are_frozen"
+    },
+    {
+      "acceptance_clause": "bloc_05/03 S21 (I08+I09 split); bloc_05/06 S19",
+      "case_id": "SEM-A01",
+      "disposition": "PASS",
+      "expected_result": "exactly the seven frozen modules; envelope.py and missingness.py absent",
+      "forbidden_result": "an eighth module, or a shipped frozen-name composite",
+      "input_condition": "the common/ package on disk",
+      "observed_result": "modules=['__init__.py', 'comparability.py', 'conversion.py', 'methodologies.py', 'numeric.py', 'semantic_registry.py', 'units.py']",
+      "probe": "enumerate its .py files",
+      "test_ref": "test_sem_a01_common_package_is_exactly_the_frozen_modules"
+    }
+  ],
+  "sha256_inventory": {
+    "research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py": "449ee7a9632d82359c799ba37c6ca9efb17e33f0dc988d75b42345fbf57f2d93",
+    "src/crypto_sensor_fabric/normalization/common/__init__.py": "a31c1d97e033b9d28a5652463471d07096d2f5a2afa1fac186b46f5543d16c5e",
+    "src/crypto_sensor_fabric/normalization/common/comparability.py": "76416ea050b0dab5500a146189daa11bedd5f341aa051dbf254d11f16acd4130",
+    "src/crypto_sensor_fabric/normalization/common/methodologies.py": "2f3ec79da6493d9a06ab4e3ae201b3dcf8f527ced80d6afc32231fc7d2100814",
+    "src/crypto_sensor_fabric/normalization/common/semantic_registry.py": "40115411fb47e8c66a083a8e4c65ce402beff5feb054266c6a68d4636ae59f38",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": "478b9f39f4e9a4b0b6bcda04bb134227a29bc753cbe7f7ad74980e072cc2a504",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "5e8b89d442dfd792f1a020ece78cc6ddc19f9733aea57ac2d8d40df1500a1bab",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "5b70c012ed965c2a99c7c44953cdd121598edb2135b1206585e1c219c5ebda20",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": "5eab5a70a0a60ac1470c3dbe89fd4f440fecb4e9194077b5ef679f8706ee2024",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py": "9a361fac770e3932de5235d3d0fc0b8e49ed3ce2b01f2896244ceb2c180e4543"
+  },
+  "summary": {
+    "fail": 0,
+    "pass": 35,
+    "rows": 35
+  },
+  "unresolved": [
+    {
+      "classification": "UNRESOLVED_FAIL_CLOSED",
+      "methodology_id": "B5_I08_UNITS_V1",
+      "reason": "sensor_family cannot be established from accepted evidence: the I08 stablecoin/fiat + cross-currency converter is cross-cutting (any quote-denominated field) and the frozen SensorFamily vocabulary has no family-agnostic member.  Registering it under one family would misstate it; under all eight would mint duplicate (methodology_id, version) rows which the F14 duplicate law refuses; adding a COMMON member would amend a frozen Bloc 1 vocabulary outside I09 authority (BOOK 00 Q2 fail-closed branch).  The identifier itself is preserved and no I08 evidence is regenerated.",
+      "recommendation": "an operator ruling that unit-level cross-family methodologies either declare an explicit family set or receive a lawful sensor_family extension, after which a future checkpoint can register this entry without invention"
+    },
+    {
+      "classification": "UNRESOLVED_FAIL_CLOSED",
+      "methodology_id": "DEPTH_BPS_RECONSTRUCTION_V1",
+      "reason": "formula_or_algorithm cannot be established from accepted evidence: the Bloc 1 description states WHAT the reconstruction produces (depth-at-bps bands, spread metrics) but not the band levels, interpolation rule or aggregation math; the implementing formula is not named by any registry row (readiness \u00a710 stop 9: the only way to satisfy the frozen field would be to invent it)",
+      "recommendation": "register this entry from the Bloc 4 book-metric implementation once its exact band algorithm is documented as accepted evidence"
+    },
+    {
+      "classification": "OUT_OF_T1_SCOPE",
+      "methodology_id": "CVD_SIGNED_NOTIONAL_V1",
+      "reason": "the live registry declares owner_layer = T2, and bloc_05/03 \u00a720 forbids T1 normalization from computing research features such as CVD; a T2-owned methodology is outside the T1 normalization registry's scope at I09 (a scope boundary, not a missing attribute)",
+      "recommendation": "register T2 methodologies in a T2-owned registry surface when the Bloc 9 feature layer is authorized"
+    }
+  ]
+}

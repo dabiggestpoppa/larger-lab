@@ -7652,3 +7652,114 @@ are **not** rewritten here -- recorded, not fixed.
 
 recommended_next = **OPERATOR RULINGS ON THE EIGHT I09 QUESTIONS (I09 §9),
 THEN AN I09 DIRECTIVE**. HARD STOP after push and report.
+
+## 178 - SENSOR-B5-I09E1: METHODOLOGY & SEMANTIC-EQUIVALENCE REGISTRY IMPLEMENTATION (IMPLEMENTATION PASS, PENDING OPERATOR REVIEW)
+
+Date: 2026-10-27. Directive SENSOR-B5-I09E1. Start head
+`1f7a0fa6ab55b022ce3a9900717b6d3c657cc477` (the required starting SHA,
+resolved against the remote before any change; LOCAL = REMOTE, tracked tree
+clean, frozen plan 7/7 blobs identical). This entry is append-only: no prior
+ledger byte changed in this directive. The BOOK 01 ledger-integrity check
+found §176 amended between `0c454dac4` (which introduced it) and HEAD by
+`1f7a0fa6a` itself — 4 lines removed, 39 added, `81cfe9e8…65e2` ->
+`5bcf224c…4738` — by the same I08R1 directive that wrote the section, to
+close §176's own disclosed limitation, with the closure separately recorded in
+`BLOC_05_I08_OPERATOR_RATIFICATION.md` §12.1. Disposition: **NOT A
+GOVERNANCE VIOLATION** (no claim, disposition or hash weakened; original bytes
+recoverable from `0c454dac4`); the full record lives in
+`BLOC_05_I09_IMPLEMENTATION_EVIDENCE.md` §1.2 and in this section. No
+historical section was restored, normalized or rewritten.
+
+### 1. What was implemented (I09-a, bounded)
+
+Four new `normalization/common/` modules (`methodologies.py`,
+`semantic_registry.py`, `comparability.py`, `__init__.py`) implementing the
+frozen `NormalizationMethodology` / `ProviderSemanticMapping` shapes, the
+versioning law, the semantic-equivalence law and the library-level
+eight-condition comparability gate — as adapters over the untouched Bloc 1
+registries and their two live YAMLs (text-in/text-out; zero bytes changed in
+`registry/` or `config/`). Plus the deterministic evidence producer
+`scripts/b5_i09_semantics.py`, the frozen artifact
+`bloc_05_semantic_validation.json` (35 rows, 35 pass, 3 fail-closed
+unresolved), two RED-first suites (46 tests), the disclosed scope-audit
+allowlist extension and its pin cascade, and the mechanical I11R2 test-count
+line. Q2 ruled `B5_I08_UNITS_V1` UNRESOLVED (fail-closed); the six
+`BLOC2_PROBE_PENDING` mappings stay AMBIGUOUS; I09-b remains DEFERRED.
+
+### 2. Full regression provenance (BOOK 11)
+
+```text
+COMMAND   = python -m pytest -q          (cwd = worktree root; system Python
+                                            3.11.9, the §177 convention)
+RESULT    = 4293 passed, 14 skipped in 1121.77s (0:18:41)
+            FAILURES 0   ERRORS 0   EXIT 0
+BASELINE  = 4247 passed / 14 skipped    (§177, two independent runs)
+DELTA     = +46 = exactly the two new I09 suites (46 measured standalone in
+            5.77s); skips unchanged at 14 (pre-existing platform-conditional)
+```
+
+Interpreter note (disclosed): two earlier runs in this session used the
+project venv (Python 3.12.13, psycopg installed) and reported
+`4300 passed / 30 skipped` — 23 extra collected tests inside the
+psycopg-gated storage modules (16 DSN-gated skips, 7 passes) plus the same
++46. The authoritative number is the system-Python run above because it
+reproduces the §177 baseline composition exactly (4261 collected = 4247 + 14).
+
+Type check: `mypy --follow-imports=silent` on the four new modules ->
+`Success: no issues found in 4 source files` (exit 0); the 11 reported errors
+live only in files byte-identical to base (`providers/*`,
+`common/numeric.py`). Producer `--check` exits 0 against the pinned artifact
+SHA-256 `0c844947bfca29c67e540abda52e72ec047966dab3af1ad28c4f9b506fce7636`.
+
+### 3. Test-side-effect disposition (BOOK 11)
+
+A whole-package run writes into the committed `bloc_04` evidence tree — the
+live, pre-existing property recorded in §176/§177. Classified against that
+historical record:
+
+- The two venv (3.12) runs dirtied **24** bloc_04 JSONs: the historical 11
+  plus 13 more (the I15R2/I16 family) whose embedded
+  `platform.python_version()` field recorded `3.12.13` instead of the
+  committed `3.11.9` — environment-field echoes, not content changes.
+- After the system (3.11.9) run those 13 self-restored to committed bytes,
+  leaving exactly **11** dirty files — the historical record itself:
+  7 CRLF-only rewrites (content byte-identical after CR normalisation,
+  allowlisted by `I04_CRLF_CHURN_ALLOWLIST`) and 4 volatile-measurement
+  rewrites: `BLOC_04_I15R1_TOCTOU_MATRIX.json` `refusal` `NotADirectoryError`
+  -> `UnsafeObjectKey`; `BLOC_04_I15_MANIFEST_SCAN_MATRIX.json`
+  `build_seconds_informational` + `scan_peak_memory_bytes`;
+  `BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json` `peak_python_memory_bytes` x2;
+  `BLOC_04_I15_SECRET_SAFETY_MATRIX.json` `files_scanned` x3.
+- All 11 restored with `git checkout -- evidence/bloc_04/`. **None was ever
+  staged.** Protected diffs rechecked EMPTY vs `1f7a0fa6a`: frozen plan,
+  both Bloc 1 YAMLs, `registry/`, `identity/`, `terms/`, `time/`,
+  `models.py`, `enums.py`, `normalization/__init__.py`, the ratified
+  `bloc_05_unit_validation.json`, `BLOC_05_I08_OPERATOR_RATIFICATION.md`,
+  `BLOC_05_I09_READINESS_ASSESSMENT.md`.
+
+### 4. Custody after the run
+
+```text
+STAGED SET  = 18 paths (the I09 source, suites, producer, evidence and this
+              entry) -- linear, reviewable, one commit
+UNTRACKED   = the same 3 pre-existing scratch paths, never staged
+FROZEN PLAN = UNCHANGED (7/7 blobs)
+PROTECTED   = EMPTY
+GATES       = eight NOT_YET_EARNED (nothing promoted; 06 §21 owns them)
+```
+
+### 5. Status
+
+`B5-I09a = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW` (explanatory
+substage label: the frozen checkpoint additionally requires I09-b real-provider
+semantic evidence, which stays DEFERRED and unauthorized, so full I09
+acceptance is NOT claimed). `B5-I01..I08 = OPERATOR_ACCEPTED` unchanged;
+`BLOC_05 = INCOMPLETE`; `IDENTITY/TIME/SEMANTIC/UNIT/LINEAGE/
+DUPLICATE_REVISION/REPLAY_SAFETY/GOLDEN_T0_T1` all `NOT_YET_EARNED`;
+`next_checkpoint_authorized = FALSE`; `B5-I10+ = UNAUTHORIZED`;
+`BLOC_06 = UNAUTHORIZED`; `RESEARCH = FROZEN`.
+
+recommended_next = **operator review of SENSOR-B5-I09E1 (ratify or reject,
+especially §7's disclosed pin amendment and §8's Q2 fail-closed ruling), the
+eight outstanding I09 questions, and an I09-b directive only if first-party
+provider documentation exists.** HARD STOP after push and report.

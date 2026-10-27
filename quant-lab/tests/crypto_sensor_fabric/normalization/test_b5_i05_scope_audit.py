@@ -306,6 +306,15 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
     list already grew ``normalization/time/`` and ``test_b5_i05_`` at I05.
     No other prefix is touched.
 
+    DISCLOSED B5-I09 EXTENSION (SENSOR-B5-I09E1 directive; full record in
+    ``BLOC_05_I09_IMPLEMENTATION_EVIDENCE.md`` + ledger section 178): the
+    staged-view allowlist adds exactly one prefix, the ``test_b5_i09`` suites,
+    on the same precedent by which it grew ``test_b5_i02_``/``test_b5_i04_``/
+    ``test_b5_i05_``/``test_b5_i08``.  The ``normalization/common/`` prefix
+    already covers I09's three new modules and the ``research/.../scripts/``
+    and ``research/.../evidence/bloc_05/`` prefixes already cover the I09
+    producer and its artifact.  No other prefix is touched.
+
     * STAGED (index vs the I05 base) is what a commit would ship, so it must
       fall inside the I05-authorized prefixes, plus exactly one disclosed
       exception: the mechanically republished I11R2 governance audit
@@ -322,6 +331,7 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
         "src/crypto_sensor_fabric/normalization/common/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i08",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09",
         "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
         "config/crypto_sensor_fabric/provider_time_semantics.yaml",
         "config/crypto_sensor_fabric/revision_policies.yaml",
