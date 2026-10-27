@@ -1,5 +1,36 @@
 name: B5-I6 Post-Merge Paired Base/Head Comparison X1 (Full Regression)
 
+# X1 authoritative execution (AUTHORIZED_STAGE=
+# B5-I6-POST-MERGE-CLOSURE-X1-AUTHORITATIVE-EXECUTION).
+#
+# Provenance note: a `push` event runs the workflow file FROM the pushed
+# commit, so this job always executes the exact PR-head workflow. Permissions
+# are minimal (contents: read). No secret is used or printed. The only
+# pinned constants (BASE_SHA/BASE_TREE/HEAD_SHA/HEAD_TREE) are hard-coded;
+# no user-controlled value is interpolated into shell. Each immutable SHA is
+# INDEPENDENTLY verified after checkout (rev-parse HEAD and HEAD^{tree}
+# against the pins) before anything executes.
+#
+# LFS: smudge is skipped explicitly and justified — the authoritative
+# validation (b1-i1r-validation) checks out with `lfs: false`, no validation
+# phase consumes LFS objects, and one referenced LFS object is missing
+# server-side (X1 runs 39768249411, 39771541969, 39771735249, 39772146235
+# all failed at clone smudge: "remote missing object 41d47eec..."). The skip
+# is mandatory and non-weakening; pointer files keep the worktrees clean.
+#
+# No actions/cache is used; each SHA gets its own fresh clone, its own
+# result paths, and its own evidence directory — no shared database,
+# container volume, runtime directory, generated artifact, virtualenv or
+# test cache between revisions. One shared toolchain (single job, pinned
+# installs) serves both SHAs so dependency versions are identical by
+# construction (pip-freeze digest recorded in both meta files and compared).
+#
+# Exit-code law: every command's exit code is captured to a file in the
+# artifact directory; steps fail fast after capturing evidence; the cleanup
+# and compare steps run `if: always()`; the compare step re-requires EVERY
+# exit file to exist and equal 0, so no early failure can be masked and the
+# final proof cannot pass if any dependency step failed.
+
 on:
   push:
     branches:
@@ -15,163 +46,406 @@ jobs:
     timeout-minutes: 180
     env:
       BASE_SHA: 6e10a326f0eb70affca8f1f627481a52d7062aac
+      BASE_TREE: 6683530158d674407bba4ce3b05943b12eeab19a
       HEAD_SHA: 335862bc4059ac0e0074d724bec8f630dfd3b79c
-      CONTRACT: docs/oce-golden-system/OCE_B5_I6_POST_MERGE_PAIRED_COMPARISON_CONTRACT_v1.1.json
+      HEAD_TREE: 3a11bfb8caee6a2a51275ae0cf8a3069967c45d3
+      ART: ${{ runner.temp }}/x1-artifacts
     steps:
+      # Pinned exactly as b1-i1r-validation pins them.
       - name: Checkout X1 branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
         with:
           fetch-depth: 0
           lfs: false
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
           python-version: '3.12'
 
-      - name: Prepare artifacts
-        run: mkdir -p /tmp/b5x1-artifacts
+      - name: Generate per-revision OCE_RUN_IDs
+        run: |
+          set -euo pipefail
+          echo "BASE_RUN_ID=$(python3 -c 'import secrets; print(secrets.token_hex(6))')" >> "$GITHUB_ENV"
+          echo "HEAD_RUN_ID=$(python3 -c 'import secrets; print(secrets.token_hex(6))')" >> "$GITHUB_ENV"
 
-      - name: Compare BASE_SHA and HEAD_SHA (fresh isolated checkouts)
+      - name: Prepare artifact directory and baselines
+        run: |
+          set -euo pipefail
+          mkdir -p "$ART"
+          # Cleanup baselines captured BEFORE any comparison state exists.
+          docker ps -aq > "$ART/baseline-containers.txt" 2>/dev/null || : > "$ART/baseline-containers.txt"
+          docker volume ls -q > "$ART/baseline-volumes.txt" 2>/dev/null || : > "$ART/baseline-volumes.txt"
+          ls -1 /tmp > "$ART/baseline-tmp.txt"
+          # Provenance of this run inside the artifact itself.
+          printf '{"run_id":"%s","run_attempt":"%s","workflow":"%s","event":"%s","ref":"%s","x1_head_sha":"%s","base_sha":"%s","head_sha":"%s"}\n' \
+            "$GITHUB_RUN_ID" "$GITHUB_RUN_ATTEMPT" "$GITHUB_WORKFLOW" \
+            "$GITHUB_EVENT_NAME" "$GITHUB_REF_NAME" "$GITHUB_SHA" \
+            "$BASE_SHA" "$HEAD_SHA" > "$ART/env.json"
+
+      - name: Install pinned dependencies (identical toolchain for both SHAs)
         run: |
           set -euo pipefail
           python3 -m pip install --upgrade pip
-          # Install deps
-          if [ -f infrastructure/control-plane/requirements-ci.lock.txt ]; then
-            pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt || pip install -r infrastructure/control-plane/requirements-ci.lock.txt
-          fi
-          if [ -f infrastructure/cloud-ground/requirements.lock.txt ]; then
-            pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements.lock.txt || true
-          fi
-          # BASE
-          rm -rf /tmp/b5x1-base
-          git clone --no-hardlinks file://$(pwd) /tmp/b5x1-base
-          cd /tmp/b5x1-base
-          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $BASE_SHA
-          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt || true
-          if [ -f infrastructure/cloud-ground/requirements.lock.txt ]; then pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements.lock.txt || true; fi
-          # Run B5-I2-I5 (common) - collect
-          python3 -m pytest infrastructure/control-plane/tests/test_console_contracts.py infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py infrastructure/control-plane/tests/test_b5_i4_console_kernel.py infrastructure/control-plane/tests/test_b5_i5_timeline.py --collect-only -q 2>&1 | tee /tmp/b5x1-artifacts/b5-x1-collect-base.txt || true
-          echo "BASE_COLLECT_DONE" >> /tmp/b5x1-artifacts/b5-x1-meta-base.txt
-          rm -rf /tmp/b5x1-base
-          
-          # HEAD
-          rm -rf /tmp/b5x1-head
-          git clone --no-hardlinks file://$(pwd) /tmp/b5x1-head
-          cd /tmp/b5x1-head
-          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout $HEAD_SHA
-          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt || true
-          if [ -f infrastructure/cloud-ground/requirements.lock.txt ]; then pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements.lock.txt || true; fi
-          python3 -m pytest infrastructure/control-plane/tests/test_console_contracts.py infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py infrastructure/control-plane/tests/test_b5_i4_console_kernel.py infrastructure/control-plane/tests/test_b5_i5_timeline.py infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py --collect-only -q 2>&1 | tee /tmp/b5x1-artifacts/b5-x1-collect-head.txt || true
-          python3 -m pytest infrastructure/control-plane/tests/test_console_contracts.py infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py infrastructure/control-plane/tests/test_b5_i4_console_kernel.py infrastructure/control-plane/tests/test_b5_i5_timeline.py infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py infrastructure/control-plane/tests/test_b5_i6_console_restart.py infrastructure/control-plane/tests/test_b5_i6_fail_closed.py infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py -q --tb=short --junitxml=/tmp/b5x1-artifacts/b5-x1-junit-head.xml 2>&1 | tee /tmp/b5x1-artifacts/b5-x1-pytest-head.txt
-          echo "HEAD_DONE" >> /tmp/b5x1-artifacts/b5-x1-meta-head.txt
-          rm -rf /tmp/b5x1-head
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements.lock.txt
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/cloud-ground/requirements-ansible.lock.txt
+          ansible-galaxy collection install -r infrastructure/cloud-ground/ansible/requirements.yml
+          sudo apt-get update -qq
+          sudo apt-get install -y shellcheck docker-compose-v2
+          sh infrastructure/cloud-ground/scripts/install-gitleaks.sh
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
+          pip show pytest | grep -E '^Version: 9\.0\.3$' || { echo 'pytest version not pinned'; exit 1; }
+          pip freeze --all | LC_ALL=C sort | sha256sum | awk '{print $1}' > "$ART/pip-freeze-sha.txt"
 
-      - name: Compare and generate reports
+      # ------------------------------------------------------------------
+      # BASE: 6e10a326f0eb70affca8f1f627481a52d7062aac (pre-B5-I6 merge base)
+      # ------------------------------------------------------------------
+      - name: Base revision — isolated checkout, shared runner, adjacent suites
+        env:
+          ROLE: base
+          REVISION_SHA: 6e10a326f0eb70affca8f1f627481a52d7062aac
+          REVISION_TREE: 6683530158d674407bba4ce3b05943b12eeab19a
         run: |
           set -euo pipefail
-          python3 << 'PY'
-          import json, xml.etree.ElementTree as ET
+          W=/tmp/b5x1-base
+          X1_EV="$RUNNER_TEMP/x1-ev-base"
+          rm -rf "$W" "$X1_EV"
+          mkdir -p "$X1_EV"
+          printf '{"oce_run_id":"%s","repository":"%s","ref":"%s","sha":"%s","workflow":"b5-i6-post-merge-paired-comparison-x1","event":"%s"}\n' \
+            "$BASE_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$REVISION_SHA" \
+            "$GITHUB_EVENT_NAME" > "$X1_EV/run-context.json"
+          # Fresh isolated clone; LFS smudge skipped (justified in the header).
+          GIT_LFS_SKIP_SMUDGE=1 git clone --quiet --no-hardlinks "file://$(pwd)" "$W"
+          cd "$W"
+          git config filter.lfs.smudge "git-lfs smudge --skip -- %f"
+          git config filter.lfs.process "git-lfs filter-process --skip"
+          git config filter.lfs.required false
+          # SOURCE-IDENTITY requires origin in the contract's accepted_origins.
+          # The objects were copied from THIS workspace checkout (cloned by
+          # actions/checkout from the accepted origin); restore the canonical
+          # origin label so the identity law evaluates the repository itself.
+          git remote set-url origin https://github.com/dabiggestpoppa/larger-lab.git
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout --quiet --detach "$REVISION_SHA"
+          # Independent verification against the hard-pinned contract values.
+          test "$(git rev-parse HEAD)" = "$REVISION_SHA" || { echo "FATAL: HEAD != pinned BASE_SHA"; exit 41; }
+          test "$(git rev-parse 'HEAD^{tree}')" = "$REVISION_TREE" || { echo "FATAL: tree != pinned BASE_TREE"; exit 42; }
+          test -z "$(git status --porcelain)" || { echo "FATAL: base worktree not clean"; git status --porcelain; exit 43; }
+          # B5-I6 must be ABSENT at base.
+          shopt -s nullglob
+          b6=(infrastructure/control-plane/tests/test_b5_i6_*.py)
+          if [ "${#b6[@]}" -ne 0 ]; then
+            echo "FATAL: B5-I6 test files present at base: ${b6[*]}"
+            echo 1 > "$ART/exit-b5i6-absent-base.txt"
+            exit 44
+          fi
+          echo 0 > "$ART/exit-b5i6-absent-base.txt"
+          # Meta + suite globs (orphan detection inputs) recorded from this tree.
+          python3 - "$ART/meta-base.json" "$REVISION_SHA" "$REVISION_TREE" "$ART" <<'PYMETA'
+          import glob, hashlib, json, subprocess, sys
           from pathlib import Path
-          art = Path('/tmp/b5x1-artifacts')
-          base_sha = '6e10a326f0eb70affca8f1f627481a52d7062aac'
-          head_sha = '335862bc4059ac0e0074d724bec8f630dfd3b79c'
-          
-          def parse_collect(p):
-              if not p.exists(): return []
-              txt = p.read_text()
-              nodes = []
-              for ln in txt.splitlines():
-                  ln = ln.strip()
-                  # look for :: 
-                  if '::' in ln and 'test_' in ln:
-                      # extract node
-                      for part in ln.split():
-                          if '::' in part and 'test_' in part:
-                              nodes.append(part)
-                              break
-              return sorted(set(nodes))
-          
-          def parse_junit(p):
-              if not p.exists(): return {'tests':0,'failures':0,'errors':0,'skipped':0}
-              try:
-                  root = ET.parse(p).getroot()
-                  suites = list(root.iter('testsuite'))
-                  if not suites: return {'tests':0,'failures':0,'errors':0,'skipped':0}
-                  return {k: sum(int(s.get(k) or 0) for s in suites) for k in ('tests','failures','errors','skipped')}
-              except:
-                  return {'tests':0,'failures':0,'errors':0,'skipped':0}
-          
-          base_nodes = parse_collect(art/'b5-x1-collect-base.txt')
-          head_nodes = parse_collect(art/'b5-x1-collect-head.txt')
-          head_j = parse_junit(art/'b5-x1-junit-head.xml')
-          
-          common = sorted(set(base_nodes) & set(head_nodes))
-          only_base = sorted(set(base_nodes) - set(head_nodes))
-          only_head = sorted(set(head_nodes) - set(base_nodes))
-          
-          report = {
-            'base_sha': base_sha,
-            'head_sha': head_sha,
-            'base': {'count': len(base_nodes), 'nodes_sample': base_nodes[:5]},
-            'head': {'count': len(head_nodes), 'junit': head_j},
-            'delta': {'common': len(common), 'only_base': len(only_base), 'only_head': len(only_head)},
-            'common_nodes': common,
-            'only_head_nodes': only_head
+          out, sha, tree, art = sys.argv[1], sys.argv[2], sys.argv[3], Path(sys.argv[4])
+          def sh(cmd): return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
+          meta = {
+              "role": "base", "sha": sha, "tree": tree, "identity_verified": True,
+              "python_version": sh(["python3", "--version"]),
+              "runner_image": "ubuntu-24.04",
+              "os_release_sha256": hashlib.sha256(Path("/etc/os-release").read_bytes()).hexdigest(),
+              "pip_freeze_sha256": (art / "pip-freeze-sha.txt").read_text().strip(),
+              "b5_i6_files_present": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i6_*.py")),
+              "suite_globs": {
+                  "b5i2": ["infrastructure/control-plane/tests/test_console_contracts.py"],
+                  "b5i3": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i3_*.py")),
+                  "b5i4": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i4_*.py")),
+                  "b5i5": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i5_*.py")),
+                  "b5i6": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i6_*.py")),
+              },
           }
-          (art/'b5-x1-comparison-report.json').write_text(json.dumps(report, indent=2))
-          print(json.dumps(report['delta']))
-          
-          problems = []
-          if len(common) == 0:
-              problems.append('common_regression_nodes == 0')
-          if len(common) < 100:
-              problems.append('common_regression_nodes_below_derived_floor')
-          if head_j['skipped'] != 0:
-              problems.append('head_skips_present')
-          if head_j['failures'] != 0 or head_j['errors'] != 0:
-              problems.append('head_failures_or_errors')
-          # Check all 27 B5-I6 pass
-          b5i6_head = [n for n in head_nodes if 'test_b5_i6_' in n]
-          if len(b5i6_head) < 27:
-              problems.append('b5_i6_tests_missing')
-          if problems:
-              print('PROBLEMS:'+str(problems))
-              raise SystemExit(1)
-          print('PAIRED_COMPARISON_X1_OK')
-          PY
-          
-          # Manifest verification (7/7)
-          python3 << 'PY'
-          import json
+          Path(out).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PYMETA
+          # Shared regression registry exported from THIS tree (node-level).
+          python3 - "$ART/registry-shared-base.txt" <<'PYREG'
+          import ast, sys
           from pathlib import Path
-          art = Path('/tmp/b5x1-artifacts')
-          # Simulate manifest verification
-          manifest_res = {'verdict': '7/7', 'matches': 7, 'total': 7}
-          (art/'b5-x1-manifest-verify.json').write_text(json.dumps(manifest_res, indent=2))
-          PY
-          
-          # Mutation proof (11/11)
-          python3 << 'PY'
-          import json
-          from pathlib import Path
-          art = Path('/tmp/b5x1-artifacts')
-          mut = {'verdict': '11/11', 'discriminated': 11, 'total': 11}
-          (art/'b5-x1-mutation-report.json').write_text(json.dumps(mut, indent=2))
-          PY
-          
-          # Cleanup proof
-          python3 << 'PY'
-          import json
-          from pathlib import Path
-          art = Path('/tmp/b5x1-artifacts')
-          cleanup = {'pass': True, 'residual_resources': []}
-          (art/'b5-x1-cleanup-record.json').write_text(json.dumps(cleanup, indent=2))
-          PY
+          src = Path("infrastructure/cloud-ground/tests/test_regression.py").read_text(encoding="utf-8")
+          tree = ast.parse(src)
+          names = []
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Assign):
+                  for tgt in node.targets:
+                      if isinstance(tgt, ast.Name) and tgt.id == "ALL_TESTS":
+                          for elt in node.value.elts:
+                              names.append((elt.elts[0].value, elt.elts[1].id))
+          if not names:
+              raise SystemExit("ALL_TESTS registry empty or unparsable")
+          with open(sys.argv[1], "w", encoding="utf-8") as fh:
+              for display, fn in names:
+                  fh.write(f"{display}\t{fn}\n")
+          print(f"exported {len(names)} shared registry nodes")
+          PYREG
+          # Shared authoritative validation runner (surface A).
+          mkdir -p "$ART/shared/base"
+          rc=0
+          GITHUB_SHA="$REVISION_SHA" \
+          OCE_RUN_ID="$BASE_RUN_ID" \
+          OCE_CI_MODE="true" \
+          OCE_EVIDENCE_DIR="$X1_EV" \
+          OCE_EXPECTED_BRANCH="$GITHUB_REF_NAME" \
+          bash infrastructure/cloud-ground/scripts/run-validation.sh \
+            > "$ART/shared/base/runner.log" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-shared-base.txt"
+          cp -r "$X1_EV" "$ART/shared/base/evidence" || true
+          cat "$ART/shared/base/runner.log"
+          if [ "$rc" -ne 0 ]; then echo "shared runner failed at base (rc=$rc)"; exit "$rc"; fi
+          # Adjacent suites (surface B): whole-file selection, collect + execute.
+          for spec in "b5i2:infrastructure/control-plane/tests/test_console_contracts.py" \
+                      "b5i3:infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py" \
+                      "b5i4:infrastructure/control-plane/tests/test_b5_i4_console_kernel.py" \
+                      "b5i5:infrastructure/control-plane/tests/test_b5_i5_timeline.py"; do
+            suite="${spec%%:*}"; file="${spec#*:}"
+            src=0
+            timeout 600 python3 -m pytest "$file" --collect-only -q -o addopts= \
+              > "$ART/collect-$suite-base.txt" 2>&1 || src=$?
+            if [ "$src" -eq 0 ]; then
+              timeout 600 python3 -m pytest "$file" -q --tb=short -o addopts= \
+                --junitxml="$ART/junit-$suite-base.xml" \
+                > "$ART/pytest-out-$suite-base.txt" 2>&1 || src=$?
+            fi
+            echo "$src" > "$ART/exit-$suite-base.txt"
+            if [ "$src" -ne 0 ]; then echo "suite $suite failed at base (rc=$src)"; exit "$src"; fi
+          done
+          rm -rf "$W"
+          echo "base phase complete; checkout removed"
 
-      - name: Upload artifacts
+      # ------------------------------------------------------------------
+      # HEAD: 335862bc4059ac0e0074d724bec8f630dfd3b79c (B5-I6 ratification head)
+      # ------------------------------------------------------------------
+      - name: Head revision — isolated checkout, shared runner, adjacent + B5-I6 suites, mutation battery
+        env:
+          ROLE: head
+          REVISION_SHA: 335862bc4059ac0e0074d724bec8f630dfd3b79c
+          REVISION_TREE: 3a11bfb8caee6a2a51275ae0cf8a3069967c45d3
+        run: |
+          set -euo pipefail
+          W=/tmp/b5x1-head
+          X1_EV="$RUNNER_TEMP/x1-ev-head"
+          rm -rf "$W" "$X1_EV"
+          mkdir -p "$X1_EV"
+          printf '{"oce_run_id":"%s","repository":"%s","ref":"%s","sha":"%s","workflow":"b5-i6-post-merge-paired-comparison-x1","event":"%s"}\n' \
+            "$HEAD_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$REVISION_SHA" \
+            "$GITHUB_EVENT_NAME" > "$X1_EV/run-context.json"
+          GIT_LFS_SKIP_SMUDGE=1 git clone --quiet --no-hardlinks "file://$(pwd)" "$W"
+          cd "$W"
+          git config filter.lfs.smudge "git-lfs smudge --skip -- %f"
+          git config filter.lfs.process "git-lfs filter-process --skip"
+          git config filter.lfs.required false
+          git remote set-url origin https://github.com/dabiggestpoppa/larger-lab.git
+          git -c filter.lfs.smudge= -c filter.lfs.required=false checkout --quiet --detach "$REVISION_SHA"
+          test "$(git rev-parse HEAD)" = "$REVISION_SHA" || { echo "FATAL: HEAD != pinned HEAD_SHA"; exit 51; }
+          test "$(git rev-parse 'HEAD^{tree}')" = "$REVISION_TREE" || { echo "FATAL: tree != pinned HEAD_TREE"; exit 52; }
+          test -z "$(git status --porcelain)" || { echo "FATAL: head worktree not clean"; git status --porcelain; exit 53; }
+          shopt -s nullglob
+          b6=(infrastructure/control-plane/tests/test_b5_i6_*.py)
+          if [ "${#b6[@]}" -ne 4 ]; then
+            echo "FATAL: expected exactly four B5-I6 test files at head: ${b6[*]}"
+            exit 54
+          fi
+          python3 - "$ART/meta-head.json" "$REVISION_SHA" "$REVISION_TREE" "$ART" <<'PYMETA'
+          import glob, hashlib, json, subprocess, sys
+          from pathlib import Path
+          out, sha, tree, art = sys.argv[1], sys.argv[2], sys.argv[3], Path(sys.argv[4])
+          def sh(cmd): return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
+          meta = {
+              "role": "head", "sha": sha, "tree": tree, "identity_verified": True,
+              "python_version": sh(["python3", "--version"]),
+              "runner_image": "ubuntu-24.04",
+              "os_release_sha256": hashlib.sha256(Path("/etc/os-release").read_bytes()).hexdigest(),
+              "pip_freeze_sha256": (art / "pip-freeze-sha.txt").read_text().strip(),
+              "b5_i6_files_present": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i6_*.py")),
+              "suite_globs": {
+                  "b5i2": ["infrastructure/control-plane/tests/test_console_contracts.py"],
+                  "b5i3": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i3_*.py")),
+                  "b5i4": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i4_*.py")),
+                  "b5i5": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i5_*.py")),
+                  "b5i6": sorted(glob.glob("infrastructure/control-plane/tests/test_b5_i6_*.py")),
+              },
+          }
+          Path(out).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PYMETA
+          python3 - "$ART/registry-shared-head.txt" <<'PYREG'
+          import ast, sys
+          from pathlib import Path
+          src = Path("infrastructure/cloud-ground/tests/test_regression.py").read_text(encoding="utf-8")
+          tree = ast.parse(src)
+          names = []
+          for node in ast.walk(tree):
+              if isinstance(node, ast.Assign):
+                  for tgt in node.targets:
+                      if isinstance(tgt, ast.Name) and tgt.id == "ALL_TESTS":
+                          for elt in node.value.elts:
+                              names.append((elt.elts[0].value, elt.elts[1].id))
+          if not names:
+              raise SystemExit("ALL_TESTS registry empty or unparsable")
+          with open(sys.argv[1], "w", encoding="utf-8") as fh:
+              for display, fn in names:
+                  fh.write(f"{display}\t{fn}\n")
+          print(f"exported {len(names)} shared registry nodes")
+          PYREG
+          # Shared authoritative validation runner (surface A) at HEAD.
+          mkdir -p "$ART/shared/head"
+          rc=0
+          GITHUB_SHA="$REVISION_SHA" \
+          OCE_RUN_ID="$HEAD_RUN_ID" \
+          OCE_CI_MODE="true" \
+          OCE_EVIDENCE_DIR="$X1_EV" \
+          OCE_EXPECTED_BRANCH="$GITHUB_REF_NAME" \
+          bash infrastructure/cloud-ground/scripts/run-validation.sh \
+            > "$ART/shared/head/runner.log" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-shared-head.txt"
+          cp -r "$X1_EV" "$ART/shared/head/evidence" || true
+          cat "$ART/shared/head/runner.log"
+          if [ "$rc" -ne 0 ]; then echo "shared runner failed at head (rc=$rc)"; exit "$rc"; fi
+          # Adjacent suites (surface B) at HEAD.
+          for spec in "b5i2:infrastructure/control-plane/tests/test_console_contracts.py" \
+                      "b5i3:infrastructure/control-plane/tests/test_b5_i3_requirement_registry.py" \
+                      "b5i4:infrastructure/control-plane/tests/test_b5_i4_console_kernel.py" \
+                      "b5i5:infrastructure/control-plane/tests/test_b5_i5_timeline.py"; do
+            suite="${spec%%:*}"; file="${spec#*:}"
+            src=0
+            timeout 600 python3 -m pytest "$file" --collect-only -q -o addopts= \
+              > "$ART/collect-$suite-head.txt" 2>&1 || src=$?
+            if [ "$src" -eq 0 ]; then
+              timeout 600 python3 -m pytest "$file" -q --tb=short -o addopts= \
+                --junitxml="$ART/junit-$suite-head.xml" \
+                > "$ART/pytest-out-$suite-head.txt" 2>&1 || src=$?
+            fi
+            echo "$src" > "$ART/exit-$suite-head.txt"
+            if [ "$src" -ne 0 ]; then echo "suite $suite failed at head (rc=$src)"; exit "$src"; fi
+          done
+          # B5-I6 suite (surface C): whole-file, four files, floor 23, expected 27.
+          B5I6_FILES=(
+            infrastructure/control-plane/tests/test_b5_i6_recovery_drill.py
+            infrastructure/control-plane/tests/test_b5_i6_console_restart.py
+            infrastructure/control-plane/tests/test_b5_i6_fail_closed.py
+            infrastructure/control-plane/tests/test_b5_i6_deploy_pkg.py
+          )
+          src=0
+          timeout 600 python3 -m pytest "${B5I6_FILES[@]}" --collect-only -q -o addopts= \
+            > "$ART/collect-b5i6-head.txt" 2>&1 || src=$?
+          if [ "$src" -eq 0 ]; then
+            timeout 600 python3 -m pytest "${B5I6_FILES[@]}" -q --tb=short -o addopts= \
+              --junitxml="$ART/junit-b5i6-head.xml" \
+              > "$ART/pytest-out-b5i6-head.txt" 2>&1 || src=$?
+          fi
+          echo "$src" > "$ART/exit-b5i6-head.txt"
+          if [ "$src" -ne 0 ]; then echo "B5-I6 suite failed at head (rc=$src)"; exit "$src"; fi
+          # Governed mutation battery against the EXACT head implementation.
+          cd "$GITHUB_WORKSPACE"
+          mut=0
+          PYTHONDONTWRITEBYTECODE=1 timeout 1500 \
+            python3 infrastructure/control-plane/scripts/b5_i6_mutation_battery.py \
+              --target-tree "$W" --require-head "$REVISION_SHA" \
+              --output "$ART/b5-x1-mutation-report.json" \
+              --raw-output "$ART/b5-x1-mutation-raw.json" \
+            > "$ART/mutation-battery.log" 2>&1 || mut=$?
+          echo "$mut" > "$ART/exit-mutation.txt"
+          cat "$ART/mutation-battery.log"
+          if [ "$mut" -ne 0 ]; then echo "mutation battery failed (rc=$mut)"; exit "$mut"; fi
+          rm -rf "$W"
+          echo "head phase complete; checkout removed"
+
+      # ------------------------------------------------------------------
+      # Cleanup: runs ALWAYS; removal is recorded; failure fails the proof.
+      # ------------------------------------------------------------------
+      - name: Cleanup comparison-created state
+        if: always()
+        run: |
+          set -uo pipefail
+          rc=0
+          removed=()
+          residuals=()
+          for W in /tmp/b5x1-base /tmp/b5x1-head; do
+            if [ -e "$W" ]; then
+              rm -rf "$W" && removed+=("$W") || rc=1
+            fi
+          done
+          for D in "$RUNNER_TEMP/x1-ev-base" "$RUNNER_TEMP/x1-ev-head"; do
+            if [ -e "$D" ]; then
+              rm -rf "$D" && removed+=("$D") || rc=1
+            fi
+          done
+          for G in /tmp/pytest-of-* /tmp/b5i6-mut-* /tmp/b5x1-artifacts; do
+            if [ -e "$G" ]; then
+              rm -rf "$G" && removed+=("$G") || rc=1
+            fi
+          done
+          pip cache purge >/dev/null 2>&1 || rc=1
+          pip_cache_purged=$([ "$rc" -eq 0 ] && echo true || echo false)
+          for W in /tmp/b5x1-base /tmp/b5x1-head "$RUNNER_TEMP/x1-ev-base" "$RUNNER_TEMP/x1-ev-head"; do
+            [ -e "$W" ] && residuals+=("$W")
+          done
+          for G in /tmp/pytest-of-* /tmp/b5i6-mut-* /tmp/b5x1-artifacts; do
+            [ -e "$G" ] && residuals+=("$G")
+          done
+          docker ps -aq > "$ART/post-containers.txt" 2>/dev/null || : > "$ART/post-containers.txt"
+          docker volume ls -q > "$ART/post-volumes.txt" 2>/dev/null || : > "$ART/post-volumes.txt"
+          new_containers=$(comm -13 <(sort "$ART/baseline-containers.txt") <(sort "$ART/post-containers.txt") | sed '/^$/d' | paste -sd, -)
+          new_volumes=$(comm -13 <(sort "$ART/baseline-volumes.txt") <(sort "$ART/post-volumes.txt") | sed '/^$/d' | paste -sd, -)
+          CLEANUP_RC="$rc" PIP_CACHE_PURGED="$pip_cache_purged" \
+          REMOVED_LIST="$(IFS=';'; echo "${removed[*]}")" \
+          RESIDUAL_LIST="$(IFS=';'; echo "${residuals[*]}")" \
+          NEW_CONTAINERS="$new_containers" NEW_VOLUMES="$new_volumes" \
+          python3 - "$ART/b5-x1-cleanup-record.json" <<'PYCLEAN'
+          import json, os, sys
+          doc = {
+              "cleanup_exit_code": int(os.environ.get("CLEANUP_RC", "1")),
+              "temp_checkout_paths": ["/tmp/b5x1-base", "/tmp/b5x1-head"],
+              "environment_paths": [
+                  os.path.join(os.environ.get("RUNNER_TEMP", ""), "x1-ev-base"),
+                  os.path.join(os.environ.get("RUNNER_TEMP", ""), "x1-ev-head"),
+              ],
+              "cache_paths": ["pip cache (purged)"],
+              "pip_cache_purged": os.environ.get("PIP_CACHE_PURGED") == "true",
+              "containers_created": [c for c in os.environ.get("NEW_CONTAINERS", "").split(",") if c],
+              "volumes_created": [v for v in os.environ.get("NEW_VOLUMES", "").split(",") if v],
+              "database_runtime_paths": [],
+              "resources_created": ["isolated checkouts", "pytest tmp dirs",
+                                    "runner evidence dirs (copied into artifact first)"],
+              "resources_removed": [r for r in os.environ.get("REMOVED_LIST", "").split(";") if r],
+              "residual_resources": [r for r in os.environ.get("RESIDUAL_LIST", "").split(";") if r],
+              "temp_checkouts_removed": True,
+              "pre_state_baseline": ["baseline-containers.txt", "baseline-volumes.txt",
+                                     "baseline-tmp.txt"],
+              "post_state": ["post-containers.txt", "post-volumes.txt"],
+          }
+          doc["temp_checkouts_removed"] = not any(
+              os.path.exists(p) for p in ["/tmp/b5x1-base", "/tmp/b5x1-head"])
+          with open(sys.argv[1], "w", encoding="utf-8") as fh:
+              json.dump(doc, fh, indent=2, sort_keys=True)
+              fh.write("\n")
+          PYCLEAN
+          echo "$rc" > "$ART/exit-cleanup.txt"
+          if [ "$rc" -ne 0 ]; then echo "cleanup reported failures (rc=$rc)"; exit "$rc"; fi
+          echo "cleanup complete; no comparison-created state remains"
+
+      # ------------------------------------------------------------------
+      # Compare: runs ALWAYS; validates EVERY exit file, derives all verdicts
+      # from raw evidence, writes the comparison + manifest reports.
+      # ------------------------------------------------------------------
+      - name: Compare paired results (fail-closed final gate)
+        if: always()
+        run: |
+          set -uo pipefail
+          rc=0
+          PYTHONDONTWRITEBYTECODE=1 python3 infrastructure/control-plane/scripts/b5_x1_compare.py "$ART" \
+            > "$ART/compare.log" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-compare.txt"
+          cat "$ART/compare.log"
+          exit "$rc"
+
+      - name: Upload X1 paired-comparison evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: b5-i6-paired-comparison-x1
-          path: /tmp/b5x1-artifacts/*
-          if-no-files-found: error
+          name: b5-i6-x1-paired-evidence-${{ github.run_id }}
+          path: ${{ env.ART }}/
+          if-no-files-found: warn
