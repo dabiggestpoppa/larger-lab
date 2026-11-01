@@ -7887,3 +7887,148 @@ backed vs provisional-scoped) and whether I10 may create
 `B5_I08_UNITS_V1` can be registered without invention; (3) authorize I09-b
 only when first-party provider documentation exists.** HARD STOP after push
 and report.
+
+---
+
+## 180 - SENSOR-B5-I10D1: TRADE NORMALIZER CONTRACT RESOLUTION (GOVERNANCE ONLY)
+
+Date: 2026-11-01. Directive SENSOR-B5-I10D1. Audited head
+`d9f0e60527388b07bb04240783b6411242d78785` == the directive-required starting
+HEAD, resolved against `refs/heads/agent/crypto-sensor-fabric-build` before any
+work: LOCAL == REMOTE, tracked tree clean (3 pre-existing untracked scratch
+paths, never staged), frozen planning head `4bb677f9e0266f4dc48405181696019f359ae49f`
+an ancestor of HEAD, and the seven frozen `bloc_05/0*.md` documents **7/7
+blob-identical** to the planning head. Parent / custody baseline = the same
+`d9f0e6052` (I09R1). This entry is append-only: no prior ledger byte changed.
+Authorized change: **two paths only** -- this section and the new
+`evidence/bloc_05/BLOC_05_I10D1_DECISION_PACKAGE.md`. No production module,
+test, config file or prior evidence artifact was created, modified or
+regenerated.
+
+### 1. What this directive did (VERIFY -> RECONSTRUCT -> ADJUDICATE -> SPECIFY -> RECORD)
+
+Frozen interfaces read from source, not from any report: `models.py`
+(`T1BaseEnvelope` + its validators), `normalization/enums.py`,
+`contracts/enums.py`, `schemas/trade.py` (incl. the sealed **B1-T10** side
+rule), `normalization/common/{semantic_registry,methodologies,comparability}.py`,
+`terms/conversion.py`, `registry/methodology_registry.py`,
+`providers/binance/probe.py`, the five scope audits and four producers.
+
+* **Q1 config ownership** -- 03 s12 / 06 s18 put *provider field semantics* in
+  `config/.../provider_semantics/`, not the mapping algorithm; the adapter may
+  live in the I10-owned `normalization/sensors/` namespace. One authority chain
+  (`project_planning_mapping` -> `resolve` -> `admits_critical_t1_use`), no
+  second registry, no methodology minting, no config file created.
+* **Q2 evidence route** -- provisional-scoped + evidence-first adopted.
+  Measured `grep -rn isBuyerMaker evidence/bloc_02 evidence/bloc_03` = **0 hits**;
+  both registry rows `PROVISIONAL` / `BLOC2_PROBE_PENDING`; the frozen fixture is
+  `status: PROVISIONAL`; the probe payload carries no captured-response
+  provenance. Two layers: BEHAVIORALLY_IMPLEMENTED earnable at I10;
+  PROVIDER_SEMANTICALLY_VERIFIED not earnable (I09-b deferred) -> canonical
+  `aggressor_side` stays `UNKNOWN` under B1-T10, computed side carried in a
+  flagged provisional slot (`AMBIGUOUS` + `SEMANTICS_UNVERIFIED`, row
+  `NATIVE_ONLY`). Bloc 3's `KNOWN_FAILURES.md:58` synthetic-fixture error is
+  cited as the reason fixture arithmetic is never promoted to provider fact.
+* **Q3 T1 carrier** -- 21-row field matrix: every mandatory I10 field is
+  representable on `T1BaseEnvelope` + the sensor record, **no STOP**;
+  composite-owned gaps recorded (`economic_contract_id`, `canonical_asset_id`,
+  record-level methodology fields, `replay_eligibility`); `trade_flags` cannot
+  ride on `NativeQuantity` (Decimal-only) -> sensor-record field.
+* **Q4 coverage** -- Binance USD-M + neutral refusal slice, four contracts,
+  eight-provider program scope preserved.
+* **Q5 duplicates** -- I10 = identity + lineage input, I17 = collapse; five
+  operator-proposed non-erasure tests; T10-07 collapse stays UNEARNED.
+* **Q6 cross-family** -- `SensorFamily` = 8 members (no currency member);
+  `require_methodology_id` RESOLVES `AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1` and
+  REFUSES `B5_I04B_CONVERSION_V1`, `B5_I08_UNITS_V1`, `STABLECOIN_USD_PIT_V1`;
+  the I09 frozen parser refuses the Bloc 1 YAML shape (dict vs tuple). Branch
+  separation: I04B serves `quantity_base` / `notional_quote` / inverse quote
+  steps (honestly family-assignable); I08 `B5_I08_UNITS_V1` blocks
+  `notional_usd` for stablecoin-quoted trades with native values retained, no alias.
+
+### 2. BOOK I10D1 -- measured
+
+```text
+CUSTODY   = LOCAL == REMOTE == d9f0e60527388b07bb04240783b6411242d78785;
+            ancestry OK; frozen plan 7/7 MATCH; tracked tree clean
+REGISTRY  = 9 Bloc 1 ids; AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1 RESOLVED
+            (PROVISIONAL); B5_I04B / B5_I08 / STABLECOIN_USD_PIT all KeyError
+            (fail-closed); I09 frozen parser rejects the Bloc 1 shape (dict vs
+            tuple); SensorFamily = 8 members
+L8/U08-19 = `b5_i08_units.py --check` -> EXIT 1,
+            {"cases": ["U08-19"], "error": "non_pass_dispositions"}; live
+            conjuncts: modules 7 != 4, i09_modules_absent False,
+            top_level_symbols 24 (still True); artifact sha256 == the ratified
+            pin 260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4;
+            artifact = 55/55 PASS, checkpoint SENSOR-B5-I08E1, base rows pin
+            5b17397c...; `git ls-tree 03522870d .../normalization/common/` =
+            exactly the 4 frozen modules -> historically reproducible
+ROOT CAUSE= U08-19 measures the LIVE directory and the artifact records no
+            `source_ref`, so a lawful I09 extension is indistinguishable from
+            an unauthorized one
+U08-20    = (0,1) kept determinism + digest sealing but dropped re-derivation
+            AND the discrimination between the known authorized refusal and any
+            other row failure; the latter is closable at zero sealed cost by
+            asserting the exact non-PASS case set the producer already prints
+RESTORE   = H1 external historical harness (materialize the recorded ref in a
+            detached worktree, run the sealed producer there, assert exit 0 +
+            byte equality) -- PROPOSED only, no sealed byte touched;
+            H2 in-producer `--source-ref`; H3 remediation checkpoint
+            SENSOR-B5-I08R2 if H2 / artifact `source_ref` / case-set assertion
+            are wanted. Refused: relaxing the historical proof
+BLAST RADIUS (future I10 implementation, package 9.5): 7 disclosed test
+            amendments (I01 allowlist + `sensors` param, I05 `sensors` param +
+            staged prefixes, I08 `sensors` param, I06 pin re-pin, governance
+            republish); 1 sealed producer prefix amendment
+            (`b5_i06_replay_safety.py::_src_delta_is_disclosed` admits only
+            `common/`, so `sensors/` would fail it); regenerated
+            `bloc_05_time_validation.json` + successor pins; mechanical
+            `UPDATE_I11R2_EVIDENCE=1` republish of `python_files_scanned`
+            (live 1078). Never touched: `bloc_05_unit_validation.json`, all
+            ratifications, the frozen plan, 06 s17's eight artifacts
+REGRESSION = `python -m pytest -q` at this head with the new document staged
+            -> 4293 passed, 14 skipped in 1291.21s (0:21:31)  EXIT 0
+            (section 179 baseline 4293 passed / 14 skipped -- identical);
+            protected diff src+config+tests vs head = 0 files; the run dirtied
+            exactly the 11 known bloc_04 artifacts, all restored with
+            `git checkout -- evidence/bloc_04/`, none staged
+```
+
+### 3. Dispositions
+
+Verdict **`I10_PARTIALLY_READY`** (narrative only; no machine state, no gate
+promoted). READY: contract questions resolved, interfaces verified from source,
+neutral normalizer + Binance adapter + refusal path + T10-01..06/08
+implementable with deterministic fixtures and no config file. PARTIAL: (i) L2
+provider certification is I09-b's (DEFERRED), (ii) T10-07 collapse is I17's
+(UNAUTHORIZED), (iii) `notional_usd` for stablecoin quotes waits on a lawful
+`sensor_family` representation for `B5_I08_UNITS_V1`. Conflicts recorded, none
+overridden: **C-1** (04 s2.1 canonical side vs B1-T10 + 03 s13 trust rule),
+**C-2** (06 s18 planned `provider_semantics/` vs a no-config D1), **C-3**
+(sealed U08-19 asserted against the live tree vs historical truth -> H1;
+in-producer change deferred).
+
+State retained verbatim: `B5-I01..I08 = OPERATOR_ACCEPTED`,
+`B5-I09a = OPERATOR_ACCEPTED`, `B5-I09b = DEFERRED`,
+`B5-I09 = PARTIALLY ACCEPTED`, `B5-I10 = NOT IMPLEMENTED`,
+`BLOC_05 = INCOMPLETE`, eight gates `NOT_YET_EARNED`,
+`next_checkpoint_authorized = FALSE`, `B5-I11+ = UNAUTHORIZED`,
+`BLOC_06 = UNAUTHORIZED`, `RESEARCH = FROZEN`.
+
+### 4. Custody of this commit
+
+```text
+STAGED SET  = 2 paths (the I10D1 decision package, this ledger entry)
+UNTRACKED   = the same 3 pre-existing scratch paths, never staged
+PROTECTED   = EMPTY (src/, config/, tests/, frozen plan, every ratified
+              evidence artifact -- 0 changed files)
+GATES       = eight NOT_YET_EARNED (nothing promoted)
+```
+
+recommended_next = **operator: (1) issue `SENSOR-B5-I10E1` -- trade normalizer
++ Binance side maps, implementation pass -- quoting package section 9.5
+verbatim as its disclosed scope-audit / pin-cascade amendment plan; (2)
+authorize `SENSOR-B5-I08R2` if the historical-reproduction harness (H1) should
+be tracked and the U08-20 exact-case-set assertion closed; (3) rule the lawful
+`sensor_family` representation for `B5_I08_UNITS_V1`; (4) keep I09-b deferred
+until first-party provider documentation exists.** HARD STOP after push.
