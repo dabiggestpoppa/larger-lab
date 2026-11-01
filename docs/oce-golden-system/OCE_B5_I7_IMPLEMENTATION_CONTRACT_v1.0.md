@@ -141,7 +141,8 @@ job type, no schema change, no SDK/library extraction, nothing belonging to B6.
 
 **B5I7-R09** — Prior evidence is not corrupted: every `docs/oce-golden-system/OCE_B5_I0*`
 through `OCE_B5_I6*` artifact and every prior ledger section (§1–§17) remains
-byte-identical; ledger changes are append-only plus the single §1 status-row update.
+byte-identical; ledger changes are append-only plus status updates confined to the single
+§1 B5-I7 row.
 
 Allowed surfaces, enumerated exhaustively:
 
@@ -290,6 +291,18 @@ Evidence JSON validates against `infrastructure/control-plane/contracts/evidence
 manifest row, mutation claim, cleanup claim, audit label, or ratification statement may
 enter the record.
 
+**Drill-report identity canonicalization (governs `B5I7-R12`, frozen).** The base-tree
+reference report and the rerun report are compared after exactly this two-step
+canonicalization and nothing else: (a) the three run-scoped fields `session_id`,
+`binding.job_id` and `binding.evidence_refs` — which carry `secrets.token_hex` values that
+necessarily differ between two drills on an unchanged stack — are replaced by fixed
+sentinel constants written in the test; (b) every other byte of the serialized report must
+match. The mask list is **closed**: no fourth field may be masked without a contract
+amendment (charter §13), the sentinels must be constants (a sentinel that varies with the
+run fails the node), and any difference outside the three masked fields fails the
+comparison. Raw reports are always retained byte-for-byte alongside their canonicalized
+sha256 (`OCE_B5_I7_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md` §3.5).
+
 ## 23. Cleanup law
 
 Every rung that mutates working state (mutation battery, negative-control executions,
@@ -334,18 +347,18 @@ in the registry exactly once and is bound to exactly one execution surface.
 | `B5I7-EL13` | evidence_law | A same-agent audit must never be labeled organizationally independent. | `test` | §22 Evidence schema |
 | `B5I7-EL14` | evidence_law | Ratification cannot occur before every mandatory gate executes. | `test` | §22 Evidence schema |
 | `B5I7-EL15` | evidence_law | No 'all gates passed' language is allowed while any gate is skipped, substituted, pending or inferred. | `test` | §22 Evidence schema |
-| `B5I7-R01` | identity | B5-I7 is exactly the plan §7 increment 'C4 change cycle plus C5 measurements/learning' and charter increment I-8; no other charter increment is anchor... | `attestation` | §1 Stage identity |
+| `B5I7-R01` | identity | B5-I7 is exactly the plan §7 increment 'C4 change cycle plus C5 measurements/learning' and charter increment I-8; no other charter increment is anchored to B5-I7. | `attestation` | §1 Stage identity |
 | `B5I7-R02` | change_cycle | Exactly one governed change is applied in this stage - 'add a queue-depth observability panel' - and a second change is a violation. | `test` | §5 Allowed production scope |
-| `B5I7-R03` | boundary | infrastructure/control-plane/src/**, infrastructure/control-plane/contracts/** and every pre-existing file under infrastructure/control-plane/tests/**... | `static` | §5 Allowed production scope |
+| `B5I7-R03` | boundary | infrastructure/control-plane/src/**, infrastructure/control-plane/contracts/** and every pre-existing file under infrastructure/control-plane/tests/** stay byte-identical to the base SHA at every rung. | `static` | §5 Allowed production scope |
 | `B5I7-R04` | boundary | No scope creep and no platform extraction: no new server endpoint, no new job type, no schema change, no SDK/library extraction, no B6 work. | `attestation` | §6 Prohibited scope |
 | `B5I7-R05` | change_cycle | The change dossier records the intent (the requirement being changed) before implementation begins. | `attestation` | §5 Allowed production scope |
 | `B5I7-R06` | change_cycle | The change dossier records the plan and the bounded list of affected surfaces. | `attestation` | §5 Allowed production scope |
 | `B5I7-R07` | change_cycle | The change ships with both a positive proof and an executed negative (weakened-implementation) proof. | `test` | §21 Testability requirements |
-| `B5I7-R08` | change_cycle | Release and rollback for the change are documented and executable: the release manifest is regenerated deterministically and rollback metadata stays c... | `attestation` | §5 Allowed production scope |
-| `B5I7-R09` | boundary | Frozen B5-I0..B5-I6 documents and every prior ledger section stay byte-identical; ledger edits are append-only plus the single §1 status-row update. | `static` | §5 Allowed production scope |
+| `B5I7-R08` | change_cycle | Release and rollback for the change are documented and executable: the release manifest is regenerated deterministically and rollback metadata stays complete. | `attestation` | §5 Allowed production scope |
+| `B5I7-R09` | boundary | Frozen B5-I0..B5-I6 documents and every prior ledger section stay byte-identical; ledger edits are append-only plus status updates confined to the single §1 B5-I7 row. | `static` | §5 Allowed production scope |
 | `B5I7-R10` | gate | The control-plane suite passes with a node population identical to the base: zero added, zero removed, zero skipped, zero failed. | `runner` | §3 Scope table (exit gate) |
 | `B5I7-R11` | gate | The shared authoritative validation runner is green at the exact observed head SHA (no badge inference). | `runner` | §3 Scope table (exit gate) |
-| `B5I7-R12` | gate | The regression drill on an unchanged stack produces a byte-identical report to the base-tree reference report. | `test` | §3 Scope table (exit gate) |
+| `B5I7-R12` | gate | The regression drill on an unchanged stack produces a report byte-identical to the base-tree reference report after the frozen canonicalization: exactly the run-scoped fields session_id, binding.job_id and binding.evidence_refs are masked with fixed sentinels, and every other field must match byte-for-byte. | `test` | §3 Scope table (exit gate); §22 Evidence schema (drill-report canonicalization) |
 | `B5I7-R13` | change_cycle | The governed change record is bound to the observed head SHA, run id and pack blob hash, each recorded only after it exists. | `attestation` | §22 Evidence schema |
 | `B5I7-R14` | learning | Learning ledger entries exist with observation, disposition and owner; no observation is silently discarded. | `attestation` | §16 Observability requirements |
 | `B5I7-R15` | panel | The panel requests only surface ids declared in the frozen contract pack; an undeclared, embedded or malformed surface is refused before any I/O. | `test` | §7 Public interfaces |

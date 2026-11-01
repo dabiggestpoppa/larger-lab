@@ -91,7 +91,7 @@ raw pytest output.
 
 | Check | Command | Expectation |
 |---|---|---|
-| boundary (control-plane untouched) | `git diff --name-only --diff-filter=M <base> -- infrastructure/control-plane/src infrastructure/control-plane/contracts infrastructure/control-plane/tests` | empty |
+| boundary (control-plane untouched) | `git diff --name-only --no-renames --diff-filter=MDT <base> -- infrastructure/control-plane/src infrastructure/control-plane/contracts infrastructure/control-plane/tests` | empty |
 | boundary (frozen docs untouched) | `git diff --name-only <base> -- 'docs/oce-golden-system/OCE_B5_I[0-6]*'` | empty |
 | whitespace | `git diff --check` | no output |
 | secrets | gitleaks (installed by `sh infrastructure/cloud-ground/scripts/install-gitleaks.sh`) or equivalent pattern scan | no finding |
@@ -133,7 +133,10 @@ run of a different head is prohibited (`B5I7-EL06`).
 Run the identical selection at base and head; compare parsed junit counters and node-id sets
 (B5-I6 `b5_x1_compare.py` pattern; planned `b5_i7_compare.py` at R4). Deltas must be exactly
 the 27 new nodes — every other node identical in id and status. Any other delta is a
-regression and stops the stage.
+regression and stops the stage. The drill-report identity check (`B5I7-R12`) uses the
+frozen canonicalization law of contract §22: mask exactly `session_id`, `binding.job_id`
+and `binding.evidence_refs` with fixed sentinels, compare every other byte, keep the raw
+reports.
 
 **4.12 Duplicate/orphan detection.**
 Zero duplicate node ids within the step; orphan rule: every `test_b5_i7_*.py` present in
@@ -238,7 +241,10 @@ claim of "all green" is made for the full suite (`B5I7-EL15`).
 | R4 | `B5I7-R10`, `B5I7-R11` (plus static checks §4.5 re-run at head) |
 | EVIDENCE | `B5I7-R13`, `B5I7-R14`, `B5I7-R24`, `B5I7-R25`, `B5I7-R26` |
 
-Every one of the 44 ids appears in exactly one primary rung; no id is unassigned.
+Every one of the 44 ids appears in at least one rung; no id is unassigned. One id
+(`B5I7-R12`) legitimately spans two rungs — R1 captures the reference report, R3 executes
+the identity comparison — and appears in no third rung; every other id appears in exactly
+one primary rung.
 
 ---
 

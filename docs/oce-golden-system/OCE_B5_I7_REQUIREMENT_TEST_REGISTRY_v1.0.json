@@ -310,7 +310,7 @@
     },
     {
       "binding": {
-        "command": "git diff --name-only --diff-filter=M c6a6479da427ddfe6af06622fc80b2221a4cdc5c -- infrastructure/control-plane/src infrastructure/control-plane/contracts infrastructure/control-plane/tests (output must be empty)",
+        "command": "git diff --name-only --no-renames --diff-filter=MDT c6a6479da427ddfe6af06622fc80b2221a4cdc5c -- infrastructure/control-plane/src infrastructure/control-plane/contracts infrastructure/control-plane/tests (output must be empty)",
         "execution_surface": "static-check",
         "type": "static"
       },
@@ -318,7 +318,7 @@
       "id": "B5I7-R03",
       "kind": "boundary",
       "mapping_status": "MAPPED",
-      "observable_on_rejection": "Any modified control-plane source, contract or existing test file makes the diff non-empty.",
+      "observable_on_rejection": "Any modified, deleted, renamed or type-changed control-plane source, contract or existing test file makes the diff non-empty.",
       "requirement": "infrastructure/control-plane/src/**, infrastructure/control-plane/contracts/** and every pre-existing file under infrastructure/control-plane/tests/** stay byte-identical to the base SHA at every rung.",
       "source": "charter \u00a712 I-8 stop column; packet \u00a711; contract \u00a74.3"
     },
@@ -404,7 +404,7 @@
       "kind": "boundary",
       "mapping_status": "MAPPED",
       "observable_on_rejection": "Any frozen prior-stage document differing from the base blob fails the diff check.",
-      "requirement": "Frozen B5-I0..B5-I6 documents and every prior ledger section stay byte-identical; ledger edits are append-only plus the single \u00a71 status-row update.",
+      "requirement": "Frozen B5-I0..B5-I6 documents and every prior ledger section stay byte-identical; ledger edits are append-only plus status updates confined to the single \u00a71 B5-I7 row.",
       "source": "constitution append-only evidence law; contract \u00a75"
     },
     {
@@ -442,12 +442,12 @@
         "node": "TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical",
         "type": "test"
       },
-      "contract_clause": "\u00a73 Scope table (exit gate)",
+      "contract_clause": "\u00a73 Scope table (exit gate); \u00a722 Evidence schema (drill-report canonicalization)",
       "id": "B5I7-R12",
       "kind": "gate",
       "mapping_status": "PLANNED",
-      "observable_on_rejection": "Any byte difference between the reference and rerun drill report fails the identity comparison.",
-      "requirement": "The regression drill on an unchanged stack produces a byte-identical report to the base-tree reference report.",
+      "observable_on_rejection": "Any byte difference outside the three masked run-scoped fields between the reference and rerun drill report fails the identity comparison; any difference inside a masked field also fails (the sentinel must be constant).",
+      "requirement": "The regression drill on an unchanged stack produces a report byte-identical to the base-tree reference report after the frozen canonicalization: exactly the run-scoped fields session_id, binding.job_id and binding.evidence_refs are masked with fixed sentinels, and every other field must match byte-for-byte.",
       "source": "charter \u00a712 I-8 gate column; plan \u00a75 C4.S4"
     },
     {

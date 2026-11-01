@@ -48,7 +48,7 @@ Ownership rules (frozen by charter §5/§9 and carried unchanged):
 | F10 | `INTERRUPTED_OPERATION` | rung aborted mid-run, partial JSON/junit left behind | `B5I7-EL11` / `TestEL11::test_cleanup_claims_require_machine_readable_residual_state` | artifact marked partial and excluded from claims; cleanup listing shows residuals | rung owner | **yes — STOP-7** if cited as evidence |
 | F11 | `REPLAY` | re-submitting a governed operation, re-using an old run id | `B5I7-EL02`, `B5I7-R16` / `TestEL02::test_no_run_or_artifact_id_recorded_before_existence` | duplicate id rejected or refusal; no second write attempt | engine | no |
 | F12 | `PARTIAL_EVIDENCE` | totals without parsed raw source; hand-written JSON | `B5I7-EL03`, `B5I7-EL05` / corresponding `TestEL*` nodes | claim discarded; JSON without parser provenance fails the node | stage evidence owner | **yes — STOP-7** |
-| F13 | `RECOVERY_DISAGREEMENT` | drill report differs between runs on an unchanged stack | `B5I7-R12` / `TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical` | byte-difference fails identity comparison; drill not accepted | engine (drill authority) | **yes** until explained |
+| F13 | `RECOVERY_DISAGREEMENT` | drill report differs between runs on an unchanged stack | `B5I7-R12` / `TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical` | a byte difference outside the three masked run-scoped fields (or a non-constant masked sentinel) fails the identity comparison; drill not accepted | engine (drill authority) | **yes** until explained |
 | F14 | `UNVERIFIABLE_OUTPUT` | queue depth unknown, unverifiable gap, evidence id unresolvable | `B5I7-R18`, `B5I7-EL01` / `TestPanelFailClosed::test_unknown_queue_depth_rendered_unknown_not_zero`, `TestEL01` | `null` + `unknown_reason`, **never** `0`/green; unresolvable SHA fails the node | console | no |
 | F15 | `SCOPE_ESCALATION` | pressure to add endpoint, pack entry, web view, B5-I8/I9 work | `B5I7-R04`, `B5I7-DF01..DF03`, stops `STOP-1/3/6` | scope claim contradicts contract §6/§20 and is recorded as escalation | operator | **yes — STOP-6** |
 | F16 | `EVIDENCE_FRAUD` | predicted SHA, pre-recorded run id, badge-as-proof, "all gates passed" while pending | `B5I7-EL01`–`EL15` (15 nodes) | the specific `TestEL*` node turns red | stage evidence owner | **yes — STOP-5/7** |
@@ -84,8 +84,10 @@ The mutation battery is not satisfied: record the mutation as **not discriminate
 count it, and repair the *test*, never the *claim* (`B5I7-EL10`).
 
 **3.5 Recovery-disagreement protocol (F13).**
-Both reports are kept byte-for-byte; sha256 of each is recorded; the discrepancy is
-diagnosed against stack identity (PID/port/SHAs) before any rerun is accepted. Divergence
+Both raw reports are kept byte-for-byte; the canonicalized sha256 of each (contract §22:
+exactly `session_id`, `binding.job_id`, `binding.evidence_refs` masked with fixed
+sentinels) is recorded and compared; the discrepancy is diagnosed against stack identity
+(PID/port/SHAs) before any rerun is accepted. Divergence outside the closed 3-field mask
 without an identified stack-state difference halts the gate (`B5I7-R12`).
 
 **3.6 Rollback of the change itself.**
