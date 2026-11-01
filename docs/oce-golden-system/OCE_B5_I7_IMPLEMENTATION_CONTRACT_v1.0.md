@@ -3,14 +3,17 @@
 
 **Document ID:** OCE-B5-I7-CONTRACT-001
 **Version:** 1.0
-**Status:** **P0 FROZEN — PLANNING ONLY. IMPLEMENTATION NOT AUTHORIZED.**
-**Stage:** `AUTHORIZED_STAGE=B5-I7-P0`
+**Status:** **OPERATOR_RATIFIED — FROZEN** (P0 planning contract accepted 2026-11-01 under
+`AUTHORIZED_STAGE=B5-I7-P0-RATIFICATION`; P0 commit `b52fde4abc3b2a5b76edd2942cabe44418ca9811`,
+repair commit `242252a96d7d5995dbc5c1323f52116229ff2276`; registry frozen before implementation;
+**implementation NOT AUTHORIZED — requires a fresh operator `AUTHORIZED_STAGE`**)
+**Stage:** `AUTHORIZED_STAGE=B5-I7-P0` (superseded by ratification stage above)
 **Base SHA (observed):** `c6a6479da427ddfe6af06622fc80b2221a4cdc5c` (merged `main`, PR #18 merge commit)
 **Branch:** `oce-book-5-i7`
 **Governing plan gate:** *Governed change demonstrated* (Block 5 plan §7, row `B5-I7`)
 **Charter increment:** `I-8` (charter §12, the only increment row anchored to `B5-I7`)
-**`MERGE_AUTHORIZED` = `false`**
-**Recurring cost** `$0`; **`capital.authority = none`**
+**`MERGE_AUTHORIZED` = `true` FOR P0 PR #19 MERGE ONLY**; B5-I7 implementation remains NOT AUTHORIZED
+**Recurring cost** `$0`; **`capital.authority = none`**; `B5-I8`–`B5-I9` remain `LOCKED`
 
 ---
 

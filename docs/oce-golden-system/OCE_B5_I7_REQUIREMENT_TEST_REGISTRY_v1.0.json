@@ -657,6 +657,16 @@
     }
   ],
   "plan_anchor": "B5-I7",
+  "ratification": {
+    "audit_score": "8.75/10 same-agent (SPEC 9.5, DESIGN 9.0, CORRECTNESS 8.0, QUALITY 8.5; arithmetic in ledger §18.11.4)",
+    "date": "2026-11-01",
+    "implementation_authorized": false,
+    "p0_commit": "b52fde4abc3b2a5b76edd2942cabe44418ca9811",
+    "registry_frozen_before_implementation": true,
+    "repair_commit": "242252a96d7d5995dbc5c1323f52116229ff2276",
+    "stage": "OPERATOR_ACCEPTED",
+    "state": "OPERATOR_RATIFIED"
+  },
   "registry_id": "OCE-B5-I7-REGISTRY-001",
   "registry_version": "1.0",
   "requirement_set": {

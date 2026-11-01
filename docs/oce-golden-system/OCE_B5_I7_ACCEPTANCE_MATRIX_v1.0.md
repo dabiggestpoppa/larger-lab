@@ -3,12 +3,15 @@
 
 **Document ID:** OCE-B5-I7-ACCEPTANCE-001
 **Version:** 1.0
-**Status:** **P0 FROZEN — MAPPING ONLY. NO IMPLEMENTATION GATE IS `PASS`.**
+**Status:** **OPERATOR_RATIFIED — FROZEN. P0 PASS ONLY; NO IMPLEMENTATION GATE HAS PASSED.**
+(Accepted 2026-11-01 under `AUTHORIZED_STAGE=B5-I7-P0-RATIFICATION`; P0 commit
+`b52fde4abc3b2a5b76edd2942cabe44418ca9811`; repair commit
+`242252a96d7d5995dbc5c1323f52116229ff2276`; implementation still NOT AUTHORIZED.)
 **Stage:** `AUTHORIZED_STAGE=B5-I7-P0`
 **Base SHA (observed):** `c6a6479da427ddfe6af06622fc80b2221a4cdc5c`
 **Registry:** `OCE_B5_I7_REQUIREMENT_TEST_REGISTRY_v1.0.json` (`OCE-B5-I7-REGISTRY-001`, 44 entries)
 **Contract:** `OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md` (clause column = its section)
-**`MERGE_AUTHORIZED = false`** · recurring cost `$0` · `capital.authority = none`
+**`MERGE_AUTHORIZED = true` FOR P0 PR #19 MERGE ONLY** · recurring cost `$0` · `capital.authority = none` · `B5-I8`–`I9` `LOCKED`
 
 ## 0. Frozen counts (arithmetic, recomputable from the registry JSON)
 

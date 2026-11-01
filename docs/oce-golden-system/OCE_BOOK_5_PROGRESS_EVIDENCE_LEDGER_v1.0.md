@@ -21,7 +21,7 @@
 | B5-I4 | C3 deterministic kernel and first vertical slice — charter increment I-3: deterministic console read path (CLI status view over contract-validated reads; fail-closed `STACK_UNREACHABLE`) | **OPERATOR_ACCEPTED** — authorized 2026-10-11 under `AUTHORIZED_STAGE=B5-I4`; implementation + evidence complete (§12); independently re-audited and ratified 2026-10-13 under `AUTHORIZED_STAGE=B5-I4-RATIFY` (§13); normal two-parent merge of PR #14 authorized (§13.10) | Predecessor gate satisfied (B5-I3 `OPERATOR_ACCEPTED` with permanent governance exception, §11.11); scope frozen in `OCE_B5_I4_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I4_CONSTRUCTION_PLAN_v1.0.md` + `OCE_B5_I4_ACCEPTANCE_MATRIX_v1.0.md` + `OCE_B5_I4_FAILURE_AND_RECOVERY_MATRIX_v1.0.md` (P0, documentation only); I-4 (S-2/F-3 console halves) remains deferred to B5-I5 under its charter §12 dual anchor; gate = plan §7 *Local real path passes* / charter §12 I-3 *I-2 registry's S-1/G7 tests pass*; `B5_I5_THROUGH_B5_I9 = LOCKED` |
 | B5-I5 | C3 complete build/tests/lineage/operator review — charter increments **I-4** (governed submission + dual-clock timeline, S-2/F-3) + **I-5** (evidence/artifact binding G9 + versioned drill playbook) + **I-6(B5-I5 half)** (restart-identity G6, engine-owned recovery reporting, duplicate-effect S-3, negative controls G15) | **OPERATOR_ACCEPTED** — ratified 2026-10-14 under `AUTHORIZED_STAGE=B5-I5-RATIFY` (§16; `OCE_B5_I5_OPERATOR_RATIFICATION_v1.0.md`); authorized 2026-10-13 under `AUTHORIZED_STAGE=B5-I5`; scope frozen in `OCE_B5_I5_GAP_AND_SCOPE_CONTRACT_v1.0.md` + `OCE_B5_I5_ACCEPTANCE_MATRIX_v1.0.md` (+ Amendment A1) at P0; implementation + end-to-end/CI evidence complete (§14); same-agent audit corrected to 9.25/10 (§15.4, supersedes §14.4's 9.875); `MERGE_AUTHORIZED=CONDITIONAL` (PR #15 only, after every gate; normal two-parent merge); B5-I6–I9 remain LOCKED | Predecessor gate satisfied (B5-I4 `OPERATOR_ACCEPTED`, PR #14 merged `43720843b…`); authority: plan §7 row `B5-I5` = *C3 complete build/tests/lineage/operator review* (gate *Release candidate evidence complete*) = charter §12 I-4 (`B5-I4/B5-I5` dual anchor, B5-I4 deferred entirely) + I-5 (`B5-I5`) + I-6 B5-I5-half (`B5-I5/B5-I6`); B5-I3 registry S-2/F-3 deferred to I-4 are discharged here (addendum §5.1 file-prefix supersession disclosed); gate = I-4 *S-2 tests pass; timeline reproducible* / I-5 *G9 binding audit passes; playbook runs bounded* / I-6(B5-I5) *restart-identity, engine-owned recovery reporting, duplicate-effect check, negative controls*; frozen test floor 22 |
 | B5-I6 | C4 local deployment, observability and recovery — charter **I-6 completion** (B5-I5/B5-I6 dual anchor second half: six frozen I-6 planned registry nodes, F-6 consent half, F-4 console-half adoption) + plan **C4.S1–S4** (release packaging/dry-run/rollback, observability runbook + queries, chaos matrix, restore drill with RTO/RPO) | **BUILD + E2E + CI COMPLETE — AWAITING_OPERATOR_REVIEW** (`B5_I6 = AWAITING_OPERATOR_REVIEW`); authorized 2026-10-20 under `AUTHORIZED_STAGE=B5-I6`; scope frozen at P0; 11-rung ladder complete (P0→R1–R6→X1–X4), implementation head X4 `b47955cd4` (§17.1); witnessed E2E 12 scenarios / 26 conditions true (§17.2); implementation-head CI run `39470127205` SUCCESS, B5-I6 selection verdict PASS 27/27 floor 23 (§17.3); external mutation battery 11/11 discriminated, restored byte-identical (§17.4); same-agent audit 9.75/10, defect D1 (SPEC, P0 base-SHA record, repaired X2) + D2 (CORRECTNESS, G8 verb denylist, repaired X3) (§17.5); evidence record §17; `MERGE_AUTHORIZED=false`; PR #16 draft unmerged; B5-I7–I9 remain LOCKED; optional charter increment I-7 (web view) NOT directed, remains operator-directable | Predecessor gate satisfied (B5-I5 `OPERATOR_ACCEPTED`, PR #15 merged `6e10a326…`); authority: plan §7 row `B5-I6` = *C4 local deployment, observability and recovery* (gate *Clean local install/restart/restore pass*); B5-I3 registry I-6-owned entries G5/G6/G8/G15/S-3/S-4 executed at their exact frozen planned nodes (`test_b5_i6_*.py`), F-4 console half adopted with disclosed file-prefix supersession, F-6 consent half new; gate = plan §5 C4.S1 *local install works; remote mutation hold-gated* / C4.S2 *operator detects failure and traces request locally* / C4.S4 *RTO/RPO and consistency objectives demonstrated*; frozen test floor 23 across 4 files |
-| B5-I7 | C4 change cycle plus C5 measurements/learning | **P0 SCOPE FROZEN — PLANNING ONLY** (authorized 2026-10-27 under `AUTHORIZED_STAGE=B5-I7-P0`; predecessor gate satisfied: B5-I6 X1 closure accepted) | Plan §7 gate *Governed change demonstrated*; charter §12 row I-8: one governed read-only change (queue-depth observability panel, packet §11) with **Gate G14 + regression-drill identical-report check**; scope frozen at P0 in `OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md` + `OCE_B5_I7_REQUIREMENT_TEST_REGISTRY_v1.0.json` (44 ids) + `OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md` (44 rows) + `OCE_B5_I7_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md` (16 classes) + `OCE_B5_I7_CONSTRUCTION_PLAN_v1.0.md` (27 planned nodes, floor EXPECTED 27) — documentation/registry only (§18); **B5-I7 IMPLEMENTATION NOT AUTHORIZED**, `MERGE_AUTHORIZED=false`; B5-I8–I9 remain LOCKED |
+| B5-I7 | C4 change cycle plus C5 measurements/learning | **P0 OPERATOR_ACCEPTED — PLANNING FROZEN (RATIFIED)** (authorized 2026-10-27 under `AUTHORIZED_STAGE=B5-I7-P0`; P0 commit `b52fde4abc3b2a5b76edd2942cabe44418ca9811`, X1 repair commit `242252a96d7d5995dbc5c1323f52116229ff2276`; operator-ratified 2026-11-01 under `AUTHORIZED_STAGE=B5-I7-P0-RATIFICATION` — §18.11; predecessor gate satisfied: B5-I6 X1 closure accepted) | Plan §7 gate *Governed change demonstrated*; charter §12 row I-8: one governed read-only change (queue-depth observability panel, packet §11) with **Gate G14 + regression-drill identical-report check**; scope frozen at P0 in `OCE_B5_I7_IMPLEMENTATION_CONTRACT_v1.0.md` + `OCE_B5_I7_REQUIREMENT_TEST_REGISTRY_v1.0.json` (44 ids) + `OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md` (44 rows) + `OCE_B5_I7_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md` (16 classes) + `OCE_B5_I7_CONSTRUCTION_PLAN_v1.0.md` (27 planned nodes, floor EXPECTED 27) — documentation/registry only (§18); **B5-I7 IMPLEMENTATION NOT AUTHORIZED**, `MERGE_AUTHORIZED=true` FOR P0 PR #19 MERGE ONLY; B5-I8–I9 remain LOCKED |
 | B5-I8 | Independent E2E, adversarial, usability and evidence audit | **LOCKED** | Requires B5-I7 complete |
 | B5-I9 | Factory gate and B6 reusable-extraction contract | **LOCKED** | Operator-only completion; requires B5-I8 complete |
 
@@ -1703,4 +1703,80 @@ value is observed (`git rev-parse`, `gh api`, parsed CI artifact). No predicted 
 or artifact id appears anywhere in this section.
 
 **Disposition after this rung:** `B5_I7_P0_SCOPE_FROZEN_AWAITING_OPERATOR_REVIEW`.
+Implementation remains not authorized; `B5-I8`–`B5-I9` remain `LOCKED`.
+
+## 18.11 Operator ratification of B5-I7 P0 (append-only; 2026-11-01)
+
+**Stage:** `AUTHORIZED_STAGE=B5-I7-P0-RATIFICATION` — scope: independent audit, narrow
+repair if required, ratification, and merge of **B5-I7 P0 planning packet only**.
+Implementation was and remains outside this authority.
+
+### 18.11.1 Disposition
+
+| Field | Observed value |
+|---|---|
+| B5-I7 P0 | **`OPERATOR_ACCEPTED`** (2026-11-01) |
+| Planning contract | **`OPERATOR_RATIFIED — FROZEN`** (registry frozen before implementation) |
+| Acceptance matrix | P0 PASS only — **no implementation gate has passed** |
+| Production implementation | **NOT BEGUN**; requires a fresh operator `AUTHORIZED_STAGE` |
+| `B5-I8`–`B5-I9` | **`LOCKED`** |
+| Recurring cost / capital | `$0` / `capital.authority = none` |
+| Candidate/provider/cloud/LLM authority | none introduced |
+
+### 18.11.2 Audit verdict and defects repaired
+
+Independent same-agent re-audit (labelled same-agent per `B5I7-EL15`) found four
+material planning defects (`D1`–`D4`) in the P0 packet and one truthfulness defect
+(`D5`); all were repaired in a single X1 repair commit before ratification:
+
+| ID | Defect | Repair |
+|---|---|---|
+| D1 | Identical-report canonicalization law (`B5I7-R12`) named only drill-report fields, omitting timeline/evidence fields compared by the planned comparison | Canonicalization law extended to the full frozen comparison surface in contract, registry and construction plan |
+| D2 | `test_b5_i7_evidence_laws.py` node `test_el07_manifest_recomputation` lacked a concrete reproduction command + observable output for the runner | Command and observable output bound in registry/matrix/plan |
+| D3 | — (absorbed into D2 verification; no separate change) | — |
+| D4 | `B5I7-R09` (partial-read) refusal wording was vague about the observable denial | Exact observable refusal wording frozen |
+| D5 | Contract §25 claimed its citation block was verbatim while three rows were ellipsized | Full text substituted (no pipes present), header now truthful |
+
+Post-repair validation: full P0 validator re-run green (ID uniqueness 44/44,
+binding closure, state vocabulary, zero `PASS`, arithmetic, cross-references,
+diff-boundary, EOL, `git diff --check`, secret scan, planned-node uniqueness).
+
+### 18.11.3 Ratification record (observed values only)
+
+The following are recorded **after** observation (`git rev-parse`, `gh api`, parsed
+CI artifact) — never predicted (`B5I7-EL01`, `B5I7-EL02`):
+
+| Field | Observed value |
+|---|---|
+| P0 commit | `b52fde4abc3b2a5b76edd2942cabe44418ca9811` (parent `c6a6479da427ddfe6af06622fc80b2221a4cdc5c`) |
+| X1 repair commit | `242252a96d7d5995dbc5c1323f52116229ff2276` (parent `b52fde4ab…`) |
+| Ratification commit | (this commit — recorded by SHA in the PR body and post-merge in §18.12 after observation) |
+| P0 exact-head CI | run `40530347588` SUCCESS; artifact `12745913616` (parsed: manifest 7/7, cleanup PASS) |
+| Ratification exact-head CI | (recorded in §18.12 after terminal observation) |
+| Audit score | 8.75/10 (SPEC 9.5 / DESIGN 9.0 / CORRECTNESS 8.0 / QUALITY 8.5) — same-agent; arithmetic in §18.11.4 |
+| PR | #19 — title set to `OCE Block 5 B5-I7 P0 — RATIFIED C4 CHANGE CYCLE + C5 MEASUREMENTS/LEARNING PLAN`; marked ready; `MERGE_AUTHORIZED=true` **FOR P0 ONLY** |
+
+### 18.11.4 Audit score arithmetic (same-agent, deductions shown)
+
+**Supersedes §18.7's 9.375/10** (which remains visible per `B5I7-EL12`): the ratification-stage
+re-audit discovered defects D1–D5 that §18.7 did not, and §18.7 predates the X1 repair. This is
+the authoritative P0 ratification score.
+
+| Dimension | Score | Deductions |
+|---|---|---|
+| SPEC | 9.5 | −0.5: stage B5-I7 ↔ charter I-8 mapping is literal but cross-numbered, adding interpretation risk |
+| DESIGN | 9.0 | −1.0: reserved `test_b5_i7_web_view.py` prefix collision (D-class debt, documented, not repairable inside P0 without touching frozen B5-I3 history) |
+| CORRECTNESS | 8.0 | −1.0: `B5I7-EL05`/`EL10`/`EL11` remain attestation/static where runtime discrimination is only possible at implementation; D1–D4 defects existed in the first P0 draft |
+| QUALITY | 8.5 | −1.0: 44 requirements across five artifacts create cross-artifact drift risk (materialized once as D1); §25 ellipsis defect (D5) |
+| **Total** | **35/40 = 8.75/10** | |
+
+### 18.11.5 Limits of this ratification
+
+1. Ratification accepts the **planning packet only**; every `PLANNED` binding (35) remains a promise, not a proof.
+2. B5-I7 implementation requires a fresh operator `AUTHORIZED_STAGE`; no source, test or workflow may be written before it.
+3. `test_b5_i7_web_view.py` prefix collision persists while the frozen B5-I3 registry text stands (contract §4.1, §26.2).
+4. Cost/time figures remain `ESTIMATE` until measured (`B5I7-R24`, `B5I7-EL04`).
+5. The audit is same-agent (§18.7); organizational independence was never claimed (`B5I7-EL15`).
+
+**Disposition after this rung:** `B5_I7_P0_RATIFIED_MERGE_AUTHORIZED_P0_ONLY`.
 Implementation remains not authorized; `B5-I8`–`B5-I9` remain `LOCKED`.
