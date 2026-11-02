@@ -77,9 +77,12 @@ def test_only_authorized_subpackages_exist() -> None:
     modules explicitly.  B5-I08 (operator-authorized) adds ``common/`` per
     bloc_05/03 §21, which freezes ``normalization/common/`` as required I08
     surface -- the same disclosed extension on the same precedent, with the
-    I08E1 directive naming the scope.  Every other subpackage remains
-    forbidden at this layer."""
-    allowed = {"identity", "terms", "time", "common"}
+    I08E1 directive naming the scope.  B5-I10 (operator-authorized) adds
+    ``sensors`` per bloc_05/03 section 2 and bloc_05/06 section 18, which freeze
+    ``normalization/sensors/`` as the home of the sensor-specific normalizers --
+    the same disclosed extension on the same precedent, with the I10E1 directive
+    naming the scope.  Every other subpackage remains forbidden at this layer."""
+    allowed = {"identity", "terms", "time", "common", "sensors"}
     present = {
         entry.name
         for entry in PACKAGE.iterdir()
@@ -98,13 +101,14 @@ def test_only_authorized_subpackages_exist() -> None:
         # subpackage; "time" was operator-authorized at B5-I05
         # (SENSOR-B5-I05 directive) and is the home of the time subpackage;
         # "common" was operator-authorized at B5-I08 (SENSOR-B5-I08E1
-        # directive, bloc_05/03 §21) and is the home of the common subpackage.
-        # The DIRECTORY entries for those four are therefore removed above
-        # (they are authorized subpackages now), while their MODULE forms
-        # stay forbidden here: a ``time.py`` beside the package would shadow
-        # the authorized ``time/`` subpackage.
+        # directive, bloc_05/03 §21) and is the home of the common subpackage;
+        # "sensors" was operator-authorized at B5-I10 (SENSOR-B5-I10E1
+        # directive, bloc_05/03 §2 + bloc_05/06 §18) and is the home of the
+        # sensor normalizers.  The DIRECTORY entries for those five are
+        # therefore removed above (they are authorized subpackages now), while
+        # their MODULE forms stay forbidden here: a ``time.py`` beside the
+        # package would shadow the authorized ``time/`` subpackage.
         "time.py",
-        "sensors",
         "common.py",
         # named explicitly by the B5-I01 directive
         "registry.py",

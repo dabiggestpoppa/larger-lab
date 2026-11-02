@@ -73,7 +73,6 @@ def test_sem_a02_only_deliberately_absent_modules_remain_absent() -> None:
     for forbidden in (
         "envelope.py",
         "missingness.py",
-        "sensors",
         "lineage",
         "duplicates",
         "quality",

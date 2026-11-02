@@ -1,0 +1,44 @@
+{
+  "fixture_id": "i10_binance_aggtrades_side_cases",
+  "schema_note": "Deterministic synthetic fixture. Sorted keys, Decimal rendered as strings, no timestamps written at authoring time, no absolute paths.",
+  "provider": "BINANCE_USDM",
+  "venue": "BINANCE_USDM",
+  "canonical_sensor": "MECHANICAL_TRADE",
+  "canonical_field": "aggressor_side",
+  "native_field": "isBuyerMaker",
+  "methodology_id": "AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1",
+  "methodology_version": "1",
+  "provenance": {
+    "source": "operator-frozen",
+    "authoritative_for": [
+      "the frozen behavioural direction of the Binance isBuyerMaker -> aggressor_side rule (operator repair SENSOR-B1-R01; bloc_05/04 section 2.2; bloc_05/07 F17)",
+      "the Layer 1 (BEHAVIORALLY_IMPLEMENTED) expectation set this fixture asserts",
+      "the exact methodology identity the adapter must cite verbatim"
+    ],
+    "not_authoritative_for": [
+      "any captured provider payload: this is not a recorded Binance response",
+      "provider semantic verification (Layer 2 PROVIDER_SEMANTICALLY_VERIFIED): evidence_reference remains BLOC2_PROBE_PENDING and SemanticConfidence remains AMBIGUOUS",
+      "the canonical aggressor_side of a T1 row, which stays UNKNOWN while Layer 2 is unearned",
+      "any other venue's side convention"
+    ],
+    "provenance_class": "SYNTHETIC_TEST_PAYLOAD_DERIVED_FROM_OPERATOR_FROZEN_RULE"
+  },
+  "cases": [
+    {
+      "case_id": "T10-01",
+      "is_buyer_maker": true,
+      "economic_meaning": "buyer is maker; seller is taker/aggressor",
+      "expected_mapped_side": "SELL",
+      "layer_1_state": "BEHAVIORALLY_IMPLEMENTED",
+      "layer_2_state": "NOT_EARNED_EVIDENCE_REFERENCE_PENDING"
+    },
+    {
+      "case_id": "T10-02",
+      "is_buyer_maker": false,
+      "economic_meaning": "buyer is taker/aggressor",
+      "expected_mapped_side": "BUY",
+      "layer_1_state": "BEHAVIORALLY_IMPLEMENTED",
+      "layer_2_state": "NOT_EARNED_EVIDENCE_REFERENCE_PENDING"
+    }
+  ]
+}

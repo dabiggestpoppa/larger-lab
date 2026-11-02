@@ -121,7 +121,15 @@ I06_BASE_HEAD = "32a89743656adb638cdaf688b62be505202f1876"
 
 #: DISCLOSED B5-I08 delta (operator-authorized): the single production
 #: directory I08E1 is allowed to add under ``quant-lab/src``.
-I08_COMMON_PREFIX = "quant-lab/src/crypto_sensor_fabric/normalization/common"
+#: DISCLOSED B5-I10 (SENSOR-B5-I10E1 directive): the I10E1 pass adds
+#: ``normalization/sensors/`` (bloc_05/03 section 2 + bloc_05/06 section 18), so
+#: the disclosed src delta becomes a tuple of prefixes.  ``str.startswith``
+#: accepts a tuple, so every call site keeps measuring "nothing BUT the
+#: disclosed delta" against a wider but still closed set.
+I08_COMMON_PREFIX = (
+    "quant-lab/src/crypto_sensor_fabric/normalization/common",
+    "quant-lab/src/crypto_sensor_fabric/normalization/sensors",
+)
 
 #: The fourteen frozen cases (I06E1 section 04 / I06D1 package section 4),
 #: in frozen order.
@@ -426,6 +434,17 @@ I09_TIME_VALIDATION_SHA256 = (
     "b3b8843c0092c7b373964cfd6b6f67a266fbecb52537197183e7566c6426570c"
 )
 
+#: DISCLOSED B5-I10 (full record in ``BLOC_05_I10_IMPLEMENTATION_EVIDENCE.md``):
+#: the I10E1 pass amends the I05 audit's staged allowlist (the ``sensors/`` tree,
+#: the ``test_b5_i10`` suites and the ``fixtures/i10`` tree) and the I01/I08/I09
+#: audits' allowlist and deferred-module lists, so the I05 producer's inventory
+#: changes again and this artifact is regenerated -- one inventory line per
+#: amended file, exactly as the I08 and I09 cascades did.  The I08/I09 values
+#: above stay for the historical record; this is the operative pin.
+I10_TIME_VALIDATION_SHA256 = (
+    "f965c117f4c89b2da8692277d7d17f98fa2c5358943dd6a89f8d92e63a335c2c"
+)
+
 
 def test_prior_checkpoint_evidence_bytes_are_unchanged() -> None:
     for name in (
@@ -439,8 +458,8 @@ def test_prior_checkpoint_evidence_bytes_are_unchanged() -> None:
             measured = hashlib.sha256(
                 (_EVIDENCE / name).read_bytes()
             ).hexdigest()
-            assert measured == I09_TIME_VALIDATION_SHA256, (
-                f"{name} left its disclosed B5-I09 state: {measured}"
+            assert measured == I10_TIME_VALIDATION_SHA256, (
+                f"{name} left its disclosed B5-I10 state: {measured}"
             )
             continue
         diff = _git(

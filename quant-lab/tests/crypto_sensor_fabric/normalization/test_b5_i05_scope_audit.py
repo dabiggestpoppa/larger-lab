@@ -121,8 +121,10 @@ def test_time_package_is_exactly_the_frozen_seven_modules() -> None:
         # directive, bloc_05/03 §21: normalization/common/ is required I08
         # surface) -- disclosed removal on the same precedent by which the
         # B5-I01 audit's allowlist grew "identity" (I02), "terms" (I04A)
-        # and "time" (I05).  Every other subpackage stays forbidden.
-        "sensors",
+        # and "time" (I05).  "sensors" was operator-authorized at B5-I10
+        # (SENSOR-B5-I10E1 directive, bloc_05/03 §2 + bloc_05/06 §18) -- the
+        # same disclosed removal on the same precedent.  Every other subpackage
+        # stays forbidden.
         "lineage",
         "duplicates",
         "quality",
@@ -329,9 +331,12 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
     allowed_prefixes = (
         "src/crypto_sensor_fabric/normalization/time/",
         "src/crypto_sensor_fabric/normalization/common/",
+        "src/crypto_sensor_fabric/normalization/sensors/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i08",
         "tests/crypto_sensor_fabric/normalization/test_b5_i09",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i10",
+        "tests/crypto_sensor_fabric/fixtures/i10/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
         "config/crypto_sensor_fabric/provider_time_semantics.yaml",
         "config/crypto_sensor_fabric/revision_policies.yaml",

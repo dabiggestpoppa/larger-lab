@@ -909,7 +909,15 @@ def _git(*args: str) -> str:
 # admits only the ``common/`` tree, the test rows pin the exact disclosed
 # bytes of the two amended audits, and the evidence row pins the regenerated
 # artifact.  Every other path keeps its original absolute measurement.
-I08_DISCLOSED_SRC_PREFIX = "quant-lab/src/crypto_sensor_fabric/normalization/common"
+#: DISCLOSED B5-I10 EXTENSION (operator-authorized; full disclosure in
+#: ``BLOC_05_I10_IMPLEMENTATION_EVIDENCE.md``): the I10E1 pass adds
+#: ``normalization/sensors/`` (bloc_05/03 section 2 + bloc_05/06 section 18
+#: required sensor surface), so the disclosed src prefix set gains exactly that
+#: one tree.  No other path may appear under ``src``.
+DISCLOSED_SRC_PREFIXES = (
+    "quant-lab/src/crypto_sensor_fabric/normalization/common",
+    "quant-lab/src/crypto_sensor_fabric/normalization/sensors",
+)
 
 I08_DISCLOSED_SHA256 = {
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": (
@@ -947,7 +955,7 @@ I09_DISCLOSED_SHA256 = {
         "5e8b89d442dfd792f1a020ece78cc6ddc19f9733aea57ac2d8d40df1500a1bab"
     ),
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
-        "5b70c012ed965c2a99c7c44953cdd121598edb2135b1206585e1c219c5ebda20"
+        "806e8829cdd3bb7d6feedd79a4d256d5e3326e3a2bcc28260f03fac12d970a5b"
     ),
 }
 
@@ -958,15 +966,53 @@ I09_DISCLOSED_EVIDENCE_SHA256 = {
     ),
 }
 
-#: The operative disclosed pins: I09 supersedes I08 wherever a path appears in
-#: both maps; the I08-only entries (the untouched I01 audit) stay operative.
+# ---------------------------------------------------------------------------
+# DISCLOSED B5-I10 EXTENSION (operator-authorized; full disclosure in
+# ``BLOC_05_I10_IMPLEMENTATION_EVIDENCE.md``, enumerated in
+# ``BLOC_05_I10D1_DECISION_PACKAGE.md`` section 9.5)
+# ---------------------------------------------------------------------------
+#
+# The I10E1 pass adds ``normalization/sensors/`` (the src prefix above), extends
+# the I01/I05/I08/I09 scope audits' allowlists and deferred-module lists on the
+# established I02/I04A/I05/I08/I09 precedent, and regenerates the two
+# inventory-carrying artifacts whose pinned inputs those amended audits are: the
+# amended I05 audit re-enters the I05 producer's inventory and the amended I09
+# audit re-enters the I09 producer's inventory.  The I08/I09 pins above stay as
+# the historical record; where a path appears in several maps the highest
+# checkpoint's pin is operative.
+I10_DISCLOSED_SHA256 = {
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": (
+        "6a7a028071e0ba100a0b7078d144ff0ea5f44bf883a3ef5d973fd494010a56eb"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": (
+        "4e88f325a2f47bb1dd63df44625f3e900da7f976726dc4ec5eed4794a7a58877"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
+        "806e8829cdd3bb7d6feedd79a4d256d5e3326e3a2bcc28260f03fac12d970a5b"
+    ),
+}
+
+I10_DISCLOSED_EVIDENCE_SHA256 = {
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
+    "bloc_05_time_validation.json": (
+        "f965c117f4c89b2da8692277d7d17f98fa2c5358943dd6a89f8d92e63a335c2c"
+    ),
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
+    "bloc_05_semantic_validation.json": (
+        "2587e373f269692bb69ed809c153ce6d6efb354e08b48f6520c22cecf54ff50a"
+    ),
+}
+
+#: The operative disclosed pins: I10 supersedes I09/I08 per path.
 CURRENT_DISCLOSED_SHA256 = {
     **I08_DISCLOSED_SHA256,
     **I09_DISCLOSED_SHA256,
+    **I10_DISCLOSED_SHA256,
 }
 CURRENT_DISCLOSED_EVIDENCE_SHA256 = {
     **I08_DISCLOSED_EVIDENCE_SHA256,
     **I09_DISCLOSED_EVIDENCE_SHA256,
+    **I10_DISCLOSED_EVIDENCE_SHA256,
 }
 
 #: The exact test paths row ``no_i05_test_diff_vs_base`` has always measured.
@@ -1026,7 +1072,10 @@ def _sha256_path(relpath: str) -> str:
 def _src_delta_is_disclosed() -> bool:
     """Only the operator-authorized ``common/`` tree may appear under src."""
     paths = _changed_paths("quant-lab/src") + _status_paths("quant-lab/src")
-    return all(path.startswith(I08_DISCLOSED_SRC_PREFIX) for path in paths)
+    return all(
+        any(path.startswith(prefix) for prefix in DISCLOSED_SRC_PREFIXES)
+        for path in paths
+    )
 
 
 def _sealed_test_delta_is_disclosed() -> bool:

@@ -8032,3 +8032,31 @@ authorize `SENSOR-B5-I08R2` if the historical-reproduction harness (H1) should
 be tracked and the U08-20 exact-case-set assertion closed; (3) rule the lawful
 `sensor_family` representation for `B5_I08_UNITS_V1`; (4) keep I09-b deferred
 until first-party provider documentation exists.** HARD STOP after push.
+
+---
+
+## 181 - B5-I10E1 - Trade normalizer + Binance side map (implementation)
+
+**Directive:** SENSOR-B5-I10E1. **Starting HEAD:** 8fc2ba00f. **Authority:**
+BLOC_05_I10D1_DECISION_PACKAGE.md sections 1-9.5.
+
+Added `normalization/sensors/{__init__,side_maps,trade}.py`, two I10 test
+suites, two synthetic provenance-labeled fixtures, the H1 historical
+reproduction harness, and the disclosed custody amendments enumerated in
+`BLOC_05_I10_IMPLEMENTATION_EVIDENCE.md` section 6.
+
+**Disposition:** `B5-I10 = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW`.
+Layer 1 behavioural obligations discharged; Layer 2 provider semantics NOT
+EARNED (I09-b DEFERRED), so canonical `aggressor_side` stays `UNKNOWN` and rows
+stay `NATIVE_ONLY`. T10-07 collapse NOT EARNED (I17 UNAUTHORIZED).
+`notional_usd` remains BLOCKED with the `B5_I08_UNITS_V1` citation preserved.
+
+**Historical I08 reproduction (H1):** PASS - ref
+`03522870d40b839a2eac28eff7841bfb161e05f3`, producer exit 0, 55/55 rows,
+regenerated digest equals
+`260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4`.
+
+**Unchanged:** B5-I01..I08 OPERATOR_ACCEPTED; B5-I09a OPERATOR_ACCEPTED; B5-I09b
+DEFERRED; B5-I09 PARTIALLY ACCEPTED; BLOC_05 INCOMPLETE; ALL EIGHT PROGRAM GATES
+NOT_YET_EARNED; next_checkpoint_authorized = FALSE; B5-I11+ UNAUTHORIZED;
+BLOC_06 UNAUTHORIZED; RESEARCH FROZEN.

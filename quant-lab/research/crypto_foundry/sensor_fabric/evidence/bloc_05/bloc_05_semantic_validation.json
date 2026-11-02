@@ -462,10 +462,10 @@
     "src/crypto_sensor_fabric/normalization/common/comparability.py": "76416ea050b0dab5500a146189daa11bedd5f341aa051dbf254d11f16acd4130",
     "src/crypto_sensor_fabric/normalization/common/methodologies.py": "2f3ec79da6493d9a06ab4e3ae201b3dcf8f527ced80d6afc32231fc7d2100814",
     "src/crypto_sensor_fabric/normalization/common/semantic_registry.py": "40115411fb47e8c66a083a8e4c65ce402beff5feb054266c6a68d4636ae59f38",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": "478b9f39f4e9a4b0b6bcda04bb134227a29bc753cbe7f7ad74980e072cc2a504",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "5e8b89d442dfd792f1a020ece78cc6ddc19f9733aea57ac2d8d40df1500a1bab",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "5b70c012ed965c2a99c7c44953cdd121598edb2135b1206585e1c219c5ebda20",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": "5eab5a70a0a60ac1470c3dbe89fd4f440fecb4e9194077b5ef679f8706ee2024",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": "6a7a028071e0ba100a0b7078d144ff0ea5f44bf883a3ef5d973fd494010a56eb",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "4e88f325a2f47bb1dd63df44625f3e900da7f976726dc4ec5eed4794a7a58877",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "806e8829cdd3bb7d6feedd79a4d256d5e3326e3a2bcc28260f03fac12d970a5b",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": "ec1b4c4d3eea4e3bbb00c79b1785ddb0a92e81c61c726d2776122408266e0771",
     "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py": "9a361fac770e3932de5235d3d0fc0b8e49ed3ce2b01f2896244ceb2c180e4543"
   },
   "summary": {

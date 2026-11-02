@@ -1,0 +1,58 @@
+{
+  "fixture_id": "i10_trade_side_refusals",
+  "schema_note": "Deterministic synthetic fixture. Sorted keys, no timestamps written at authoring time, no absolute paths, no provider-specific semantics.",
+  "provider_neutral": true,
+  "provenance": {
+    "source": "operator-frozen",
+    "authoritative_for": [
+      "the refusal behaviour every provider that is not BINANCE_USDM must exhibit (bloc_05/04 section 2.1; bloc_05/07 F17; schema rule B1-T10)",
+      "the three exclusive SideEvidence states the provider-neutral normalizer consumes"
+    ],
+    "not_authoritative_for": [
+      "any provider's polarity, field name or side convention: no venue other than BINANCE_USDM is characterized here",
+      "provider semantic verification of any kind",
+      "a captured provider payload"
+    ],
+    "provenance_class": "SYNTHETIC_TEST_PAYLOAD_DERIVED_FROM_OPERATOR_FROZEN_RULE"
+  },
+  "cases": [
+    {
+      "case_id": "REFUSE-01",
+      "side_evidence_kind": "SIDE_FIELD_ABSENT",
+      "rationale": "the provider exposes no side-bearing field on this record; nothing may be inferred",
+      "expected_mapped_side": "UNKNOWN",
+      "expected_provisional_slot": "ABSENT",
+      "inference_from_price_forbidden": true
+    },
+    {
+      "case_id": "REFUSE-02",
+      "side_evidence_kind": "SIDE_SEMANTICS_UNDECLARED",
+      "rationale": "a side-bearing field exists but no semantic mapping row declares it; an undeclared mapping is never filled from a similar-looking row",
+      "expected_mapped_side": "UNKNOWN",
+      "expected_provisional_slot": "ABSENT",
+      "inference_from_price_forbidden": true
+    },
+    {
+      "case_id": "REFUSE-03",
+      "side_evidence_kind": "PROVIDER_BOOLEAN_FIELD",
+      "provider_field": "isBuyerMaker",
+      "mapping_row_present": false,
+      "rationale": "the frozen Binance field name on a venue that is not BINANCE_USDM; a provider's field name never transfers its polarity to another venue",
+      "expected_mapped_side": "UNKNOWN",
+      "expected_provisional_slot": "ABSENT",
+      "inference_from_price_forbidden": true
+    },
+    {
+      "case_id": "REFUSE-04",
+      "side_evidence_kind": "PROVIDER_BOOLEAN_FIELD",
+      "provider_field": "isBuyerMaker",
+      "mapping_row_present": true,
+      "mapping_equivalence_class": "CORROBORATION_ONLY",
+      "methodology_id_present": false,
+      "rationale": "a declared row that carries no methodology cannot be cited, so the mapping fails closed",
+      "expected_mapped_side": "UNKNOWN",
+      "expected_provisional_slot": "ABSENT",
+      "inference_from_price_forbidden": true
+    }
+  ]
+}

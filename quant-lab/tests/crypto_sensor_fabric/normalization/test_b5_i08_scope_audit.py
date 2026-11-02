@@ -130,7 +130,6 @@ def test_i09_and_deferred_modules_are_absent() -> None:
     modules remain absent; a bare module beside the package would shadow the
     authorized subpackage."""
     for forbidden in STILL_DEFERRED + (
-        "sensors",
         "lineage",
         "duplicates",
         "quality",
@@ -163,8 +162,16 @@ def test_terms_time_identity_packages_are_untouched_by_i08() -> None:
         for line in diff.splitlines()
         if line.startswith("diff --git")
     )
+    # DISCLOSED B5-I10 (SENSOR-B5-I10E1 directive section 10: "narrowly scoped
+    # additions for the new ``sensors/`` tree in the historical scope audits"):
+    # the I10E1 pass adds ``normalization/sensors/``, so this I08-era assertion
+    # accepts exactly that one additional tree.  Every other path under
+    # ``normalization/`` -- identity, terms, time, the top-level modules -- is
+    # still refused by name.
     for line in changed_paths:
-        assert "/common/" in line, f"non-common source change: {line}"
+        assert "/common/" in line or "/sensors/" in line, (
+            f"non-common/non-sensors source change: {line}"
+        )
 
 
 def test_no_network_or_provider_import() -> None:
