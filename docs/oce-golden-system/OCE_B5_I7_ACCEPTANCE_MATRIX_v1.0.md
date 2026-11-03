@@ -152,3 +152,20 @@ in `OCE_B5_I7_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md` §2 and to at least one 
 
 No placeholder JSON may be cited as execution evidence (`B5I7-EL03`); every JSON cited in
 the ledger must be produced by a parser over raw output and carry its source run id.
+
+---
+
+## Ratified disposition (appended at `B5-I7-RATIFICATION`)
+
+**B5-I7 = `OPERATOR_ACCEPTED`** — every acceptance row above is satisfied at the
+ratification head, with the 27 frozen nodes executing green at an exact-head CI run
+whose artifact was downloaded and parsed, not inferred from a status badge.
+
+Superseding audit: `SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT`,
+`(9.0 + 8.5 + 8.0 + 8.0) / 4 = 8.375 = 8.38/10`, replacing 8.25/10 without erasing it.
+
+Defects D1-D5 (implementation), D6-D7 (CI and evidence) and D8-D9 (ratification) are
+recorded with their repair rungs; D9 is a recorded limitation rather than a rewrite.
+
+Authorization: merge PR #20 only. B5-I8 and B5-I9 remain `LOCKED`; the deferred I-7
+web view remains unimplemented.

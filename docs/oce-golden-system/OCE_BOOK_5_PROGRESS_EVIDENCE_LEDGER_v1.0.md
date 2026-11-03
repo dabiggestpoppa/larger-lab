@@ -1780,3 +1780,74 @@ the authoritative P0 ratification score.
 
 **Disposition after this rung:** `B5_I7_P0_RATIFIED_MERGE_AUTHORIZED_P0_ONLY`.
 Implementation remains not authorized; `B5-I8`–`B5-I9` remain `LOCKED`.
+
+---
+
+### 18.12 B5-I7 implementation — governed read-only queue-depth panel
+
+**Status:** `B5_I7_IMPLEMENTATION_IN_PROGRESS_OPERATOR_REVIEW`
+**Base:** merged P0 main `9dc0b7d29ab869e256653a6b6ec68c987d0a4090` (PR #19).
+**Branch:** `oce-book-5-i7-build`.
+
+B5-I7 applies exactly one governed change (`B5I7-R02`): a read-only queue-depth
+observability panel projected over the already-declared `health.read`,
+`workers.list` and `jobs.schedules` reads. The control-plane source, the contract
+pack and every pre-existing test remain byte-identical to the base SHA; no
+endpoint, job type, schema, sixth status section or web view is added, and
+`test_b5_i7_web_view.py` does not exist (`B5I7-DF01`).
+
+**Observed locally (parsed raw output):** the twelve governed-change nodes and
+the fifteen evidence-law nodes execute with zero failures and zero skips; the
+fourteen-mutation battery discriminates 14/14 with byte-exact restoration and a
+clean mutated tree; the nine-file adjacent B5 population is 186 nodes at the base
+SHA and 186 at the implementation head, all passing; two live loopback drill
+reports are byte-identical after the frozen three-field canonicalization.
+Provenance now equals the contracted pack blob
+`45bcb4f63fdb44c039e81fa51ac01a877bb05faee048efa8193ed7fc16af14aa`.
+
+**Not executed:** GitHub Actions for this branch had not run when this section was
+appended, so no run id, check id, artifact id or head-bound badge is recorded
+here (`B5I7-EL02`). The machine-readable gate table in
+`OCE_B5_I7_REQUIREMENT_EXECUTION_ADDENDUM_v1.0.json` marks those gates
+`NOT_EXECUTED`. The local shared runner is *not* green: it returns `RC=1` with
+five environmental blockers (registry tool, ansible-playbook, ansible-lint,
+docker, gitleaks absent); authoritative CI covers those checks.
+
+**Defects repaired during implementation:** five demonstrated defects (D1-D5) in
+`OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md` section 4, including two
+credential-leak paths in redaction and a platform-dependent provenance digest.
+None was repaired by weakening an assertion.
+
+`MERGE_AUTHORIZED=false`. B5-I8 and B5-I9 remain `LOCKED`. Freebuff untouched.
+Recurring cost `$0`; `capital.authority = none`.
+
+**Authoritative CI (observed after the section above was appended):** run
+`41555083897` of `B1-I1R Validation` (`pull_request` -> `main`) concluded
+`success` at head `3bb49118040b21ee8780e578b55197918bd6d7ae`; job `validate`
+`125651894341`; artifact `13194580990` (`b1-i1r-evidence-eb392d9731e7`, 38915
+bytes). The `Execute B5-I7 governed-change proofs` step passed in that run, but
+the artifact carried no `b5-i7-*` file (defect D6, repaired in commit
+`255bf119339cbb0c721bc86596557a52cd8ea6ae`). The uploaded-artifact verification of
+the 27 nodes therefore rests on the run bound to the head carrying that repair;
+its identifiers are recorded in the pull request body rather than here, because
+writing them here would change the manifest row this section is hashed into.
+
+### §18.13 B5-I7 operator ratification
+
+B5-I7 is ratified `OPERATOR_ACCEPTED` after independent re-verification at this
+stage: 27 frozen nodes (12 governed-change/panel, 15 evidence-law) executed with zero
+failure/error/skip and 27 unique ids; 14/14 mutations discriminated with byte-exact
+restoration; 186/186 nodes green at both `9dc0b7d2` and head, with 186 common,
+0 base-only and 0 head-only; the pure-Python digest proven against 57 vectors
+including the NIST set; manifest rows recomputed; cleanup residual empty.
+
+Fresh same-agent audit `(9.0 + 8.5 + 8.0 + 8.0) / 4 = 8.375 = 8.38/10` SUPERSEDES the
+implementation-stage 8.25/10 and does not erase it.
+
+Stage defects: D8 (ambiguous implementation-head label, tree-consistent so `EL06`
+could not catch it) repaired in the ratification commit; D9 (mutation artifact hashes
+raw working-tree bytes rather than the LF blob) recorded as a portability limitation.
+
+Ratification authorizes merging PR #20 only. `B5-I8 = LOCKED`, `B5-I9 = LOCKED`, the
+deferred I-7 web view remains unimplemented, cost remains `$0`, and
+`capital.authority = none`.

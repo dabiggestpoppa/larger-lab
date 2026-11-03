@@ -987,6 +987,53 @@ jobs:
           fi
           echo "B5-I6 authoritative selection PASSED: whole-file collection == execution == JUnit, zero skips/failures/errors/duplicates, floor $B5I6_FLOOR met, no orphan B5-I6 test files, tracked tree clean"
 
+      # ── B5-I7-R4: one additive selection step for the governed-change proofs ──
+      - name: Execute B5-I7 governed-change proofs
+        env:
+          B5I7_FLOOR: "27"
+          EV: ${{ steps.evidence.outputs.evidence_dir }}
+        run: |
+          set -o pipefail
+          F="infrastructure/control-plane/tests/test_b5_i7_governed_change.py infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py"
+          python -m pytest $F --collect-only -q > "$EV/b5-i7-collect.txt" 2>&1 || { echo "B5-I7 collection FAILED"; cat "$EV/b5-i7-collect.txt"; exit 1; }
+          python -m pytest $F -v --tb=short --junitxml="$EV/b5-i7-junit.xml" > "$EV/b5-i7-pytest-output.txt" 2>&1; rc=$?
+          tail -40 "$EV/b5-i7-pytest-output.txt"
+          python - "$EV/b5-i7-junit.xml" "$EV/b5-i7-collect.txt" "$B5I7_FLOOR" "$rc" <<'PY'
+          import glob, os, sys, xml.etree.ElementTree as ET
+          junit, collect_path, floor, rc = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
+          problems = []
+          root = ET.parse(junit).getroot()
+          suite = root if root.tag == "testsuite" else root.find("testsuite")
+          totals = {k: int(suite.get(k) or 0) for k in ("tests", "failures", "errors", "skipped")}
+          ids = [(c.get("classname", ""), c.get("name", "")) for c in suite.iter("testcase")]
+          collected = sum(1 for line in open(collect_path, encoding="utf-8") if "::" in line)
+          if rc != 0: problems.append("pytest rc=%d" % rc)
+          for key in ("failures", "errors", "skipped"):
+              if totals[key]: problems.append("junit %s=%d (B5-I7 requires zero)" % (key, totals[key]))
+          if len(ids) != len(set(ids)): problems.append("duplicate node ids")
+          if len(ids) != 27: problems.append("expected exactly 27 executed nodes, saw %d" % len(ids))
+          if collected != 27: problems.append("collected=%d (expected 27)" % collected)
+          if totals["tests"] < floor: problems.append("tests below floor %d" % floor)
+          allowed = {"TestSingleChange", "TestChangeCycle", "TestRegressionDrill", "TestPanelContract",
+                     "TestPanelReadOnly", "TestPanelFailClosed", "TestPanelDeterminism", "TestPanelLoopback",
+                     "TestPanelSecurity", "TestPanelBounds", "TestCompatibility"} | {"TestEL%02d" % i for i in range(1, 16)}
+          for cls, name in ids:
+              if cls.split(".")[-1] not in allowed:
+                  problems.append("node outside the frozen inventory: %s::%s" % (cls, name))
+          present = {os.path.basename(p) for p in glob.glob("infrastructure/control-plane/tests/test_b5_i7_*.py")}
+          selected = {"test_b5_i7_governed_change.py", "test_b5_i7_evidence_laws.py"}
+          if present - selected: problems.append("orphan B5-I7 test files: %s" % (present - selected))
+          if "test_b5_i7_web_view.py" in present: problems.append("reserved web-view file exists (B5I7-DF01)")
+          if problems:
+              [print("PROBLEM:", p) for p in problems]
+              sys.exit(1)
+          print("B5-I7 PASSED: collected=27 executed=%d failures=0 errors=0 skipped=0 unique=27 floor=%d"
+                % (totals["tests"], floor))
+          PY
+          if [ -n "$(git status --porcelain -- infrastructure/control-plane infrastructure/console)" ]; then
+            echo "tracked trees modified by B5-I7 execution"; git status --porcelain; exit 1
+          fi
+
       - name: Upload evidence artifact
         # B4-CXR7U9R24: only when the evidence directory was actually created.
         # An unset path would add a second, misleading artifact error on top of

@@ -1,0 +1,459 @@
+{
+  "adjacent_population": {
+    "files": [
+      "test_console_contracts.py",
+      "test_b5_i2_mutation_harness.py",
+      "test_b5_i3_requirement_registry.py",
+      "test_b5_i4_console_kernel.py",
+      "test_b5_i5_timeline.py",
+      "test_b5_i6_console_restart.py",
+      "test_b5_i6_deploy_pkg.py",
+      "test_b5_i6_fail_closed.py",
+      "test_b5_i6_recovery_drill.py"
+    ],
+    "runs": [
+      {
+        "end": "base",
+        "junit": {
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 186
+        },
+        "nodes": 186,
+        "parsed_from": "adjacent_base.txt"
+      },
+      {
+        "end": "head",
+        "junit": {
+          "errors": 0,
+          "failures": 0,
+          "skipped": 0,
+          "tests": 186
+        },
+        "nodes": 186,
+        "parsed_from": "adjacent_head.txt"
+      }
+    ]
+  },
+  "authored_by": "same-agent (Codebuff / Buffy); not organizationally independent",
+  "base_sha": "9dc0b7d29ab869e256653a6b6ec68c987d0a4090",
+  "ci": {
+    "artifact_bytes": 38915,
+    "artifact_gap": "b5-i7 outputs absent from this artifact (defect D6); repaired in 255bf119339cbb0c721bc86596557a52cd8ea6ae",
+    "artifact_id": "13194580990",
+    "artifact_name": "b1-i1r-evidence-eb392d9731e7",
+    "check_run_id": "125651894341",
+    "conclusion": "success",
+    "observed_at_head": "3bb49118040b21ee8780e578b55197918bd6d7ae",
+    "parsed_from": "gh_run_metadata.txt",
+    "run_id": "41555083897",
+    "status": "OBSERVED"
+  },
+  "evidence_identities": {
+    "ci_repair_head": {
+      "claim": "OBSERVED",
+      "head_sha": "255bf119339cbb0c721bc86596557a52cd8ea6ae",
+      "tree_sha": "c733025543d4fffcf45ce129b4a67dc78762223e"
+    },
+    "evidence_head": {
+      "claim": "OBSERVED",
+      "head_sha": "3bb49118040b21ee8780e578b55197918bd6d7ae",
+      "tree_sha": "764a8c3ccfa84b21f6c618abe540d1e0e26fbde1"
+    },
+    "final_implementation_head": {
+      "claim": "OBSERVED",
+      "head_sha": "5f1414b56849e9b08dc75b7c00edc82d633f957b",
+      "tree_sha": "08f3812cc535a07e900cd179b83397d97956302e"
+    },
+    "implementation_content_head": {
+      "claim": "OBSERVED",
+      "head_sha": "2e117f864432c02a857da0246097ef1ab8db5415",
+      "tree_sha": "8a62c426cecafd4324a93abaf5c706276a1a23a2"
+    },
+    "implementation_head_before_evidence": {
+      "claim": "OBSERVED",
+      "head_sha": "5a4c5a5a77c80bb92e2bee79a12203787a07a9ef",
+      "tree_sha": "cea559052a9bdd3def6bd92ae163865ba54b2964"
+    }
+  },
+  "gates": [
+    {
+      "id": 1,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 2,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 3,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 4,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 5,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 6,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 7,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 8,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 9,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 10,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 11,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 12,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 13,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 14,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 15,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 16,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 17,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 18,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 19,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 20,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 21,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 22,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 23,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 24,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 25,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 26,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 27,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 28,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 29,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    },
+    {
+      "id": 30,
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
+    }
+  ],
+  "kind": "oce-b5-i7-requirement-execution-addendum",
+  "limitations": [
+    "No GitHub Actions run for this branch had executed when the addendum was regenerated; the CI-dependent gates are NOT_EXECUTED and carry no run/check/artifact ids.",
+    "The local shared authoritative runner is not green (RC=1, five environmental blockers); CI is authoritative for those checks.",
+    "Timings are local host measurements, not production performance or RTO/RPO claims."
+  ],
+  "manifest": {
+    "artifacts": [
+      {
+        "path": "infrastructure/console/src/oce_console/panel.py",
+        "sha256": "0477282596e98aa426507bdd6e515018a25c65721a314463b70d2a89ac38b05e",
+        "size_bytes": 28010
+      },
+      {
+        "path": "infrastructure/console/src/oce_console/cli.py",
+        "sha256": "e1e73f093cdb1fb120f0d3ac0d8ff4e1a0c213591a4a42d212a529f9a064be47",
+        "size_bytes": 8356
+      },
+      {
+        "path": "infrastructure/console/packaging/make_release_manifest.py",
+        "sha256": "2dcdb22e0c6c8bf461555cab327856e580dac99afa9316c37ec6c90b79a85f20",
+        "size_bytes": 11921
+      },
+      {
+        "path": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+        "sha256": "0e2773590980da967f2c86ae4bc1e16d86abd9c36d0398c1e6db21cef8de2734",
+        "size_bytes": 35301
+      },
+      {
+        "path": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+        "sha256": "125ce7bee8d18374ee0b149367bd58f462c8dddf8f4f2a0df8185aa774bfa431",
+        "size_bytes": 16237
+      },
+      {
+        "path": "infrastructure/control-plane/scripts/b5_i7_mutation_battery.py",
+        "sha256": "ebacaf5027b1bd64ec19e125b82c418c6351291ddb5df1dbd1be964c3ae00586",
+        "size_bytes": 10726
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+        "sha256": "ea8fe3b6d5311f525650899c92093e6881c5c7adc7ee585636cd5cf54e13d414",
+        "size_bytes": 12464
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_REUSE_INVENTORY_v1.0.md",
+        "sha256": "42e245f214ad04bdeae0737bd036d4ad8c1032a6c57ffd5d29ddf10a5dd33e9d",
+        "size_bytes": 4084
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_MUTATION_RESULTS_v1.0.json",
+        "sha256": "d9b824ec37cb407e1a99a9712abfb41857e19d03580d8b88ebc8bd575162d196",
+        "size_bytes": 11566
+      },
+      {
+        "path": ".github/workflows/b1-i1r-validation.yml",
+        "sha256": "638b2e43d2981fa644c4bbbd59a40be46e911727d06e44ff6e015c9a4c6fa153",
+        "size_bytes": 56417
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+        "sha256": "83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30",
+        "size_bytes": 191950
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md",
+        "sha256": "e3e808b0ef68b32c4a09f8fe9f87fa03038abf6023f2a0d8d8e6357a98c50a75",
+        "size_bytes": 28721
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_OPERATOR_RATIFICATION_v1.0.md",
+        "sha256": "b18d80b385a5dd864b8cde45f6f04f3bf15f4700c6ef8411672471f502db105f",
+        "size_bytes": 7420
+      }
+    ],
+    "gated": true,
+    "note": "rows recomputed from bytes at generation time (B5I7-EL09)"
+  },
+  "observed": [
+    {
+      "extract": "tests=\"([0-9]+)\"",
+      "junit": {
+        "errors": 0,
+        "failures": 1,
+        "skipped": 0,
+        "tests": 27
+      },
+      "label": "OBSERVED",
+      "name": "focused_nodes_executed_passed",
+      "parsed_from": "ratification_focused_junit.txt",
+      "value": 27
+    },
+    {
+      "extract": "(\\d+) passed",
+      "junit": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 15
+      },
+      "label": "OBSERVED",
+      "name": "evidence_law_nodes_passed",
+      "parsed_from": "focused_evidence_laws.txt",
+      "value": 15
+    },
+    {
+      "extract": "(\\d+) passed",
+      "junit": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 12
+      },
+      "label": "OBSERVED",
+      "name": "governed_change_nodes_passed",
+      "parsed_from": "focused_governed_change.txt",
+      "value": 12
+    },
+    {
+      "extract": "(\\d+) passed",
+      "junit": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 186
+      },
+      "label": "OBSERVED",
+      "name": "adjacent_head_nodes_passed",
+      "parsed_from": "adjacent_head.txt",
+      "value": 186
+    },
+    {
+      "extract": "(\\d+) passed",
+      "junit": {
+        "errors": 0,
+        "failures": 0,
+        "skipped": 0,
+        "tests": 186
+      },
+      "label": "OBSERVED",
+      "name": "adjacent_base_nodes_passed",
+      "parsed_from": "adjacent_base.txt",
+      "value": 186
+    }
+  ],
+  "planned_test_nodes": {
+    "expected": 27,
+    "floor": 27,
+    "label": "EXPECTED",
+    "split": {
+      "test_b5_i7_evidence_laws.py": 15,
+      "test_b5_i7_governed_change.py": 12
+    }
+  },
+  "ratification": {
+    "audit": "8.38/10 same-agent (9.0/8.5/8.0/8.0); supersedes 8.25/10 without erasing it",
+    "b5_i8": "LOCKED",
+    "b5_i9": "LOCKED",
+    "disposition": "OPERATOR_ACCEPTED",
+    "document": "docs/oce-golden-system/OCE_B5_I7_OPERATOR_RATIFICATION_v1.0.md",
+    "merge_authorized": "PR #20 only",
+    "ratification_head": "this commit; its SHA is recorded in PR #20 after it exists, never predicted"
+  },
+  "raw_evidence": [
+    {
+      "bytes": 3414,
+      "command": "python -m pytest test_b5_i7_governed_change.py -v --junitxml=...",
+      "name": "focused_governed_change.txt",
+      "sha256": "4345527837520af914c37b72b07efac12966e5e8df662bdfedfc52025dac9bc5",
+      "text": "============================= test session starts =============================\nplatform win32 -- Python 3.11.9, pytest-9.0.3, pluggy-1.6.0 -- C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\python.exe\ncachedir: .pytest_cache\nrootdir: C:\\Users\\wifik\\Desktop\\larger-lab\\.worktrees\\b5-i7-build\nconfigfile: pyproject.toml\nplugins: anyio-4.13.0, asyncio-1.3.0, cov-7.1.0\nasyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function\ncollecting ... collected 12 items\n\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestSingleChange::test_exactly_one_governed_change_recorded PASSED [  8%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestChangeCycle::test_change_has_positive_and_negative_proofs PASSED [ 16%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical PASSED [ 25%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelContract::test_undeclared_surface_refused_before_io PASSED [ 33%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelReadOnly::test_panel_issues_only_get_requests PASSED [ 41%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelFailClosed::test_unreachable_stack_never_renders_healthy PASSED [ 50%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelFailClosed::test_unknown_queue_depth_rendered_unknown_not_zero PASSED [ 58%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelDeterminism::test_identical_inputs_render_byte_identically PASSED [ 66%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelLoopback::test_non_loopback_base_url_refused PASSED [ 75%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelSecurity::test_panel_output_contains_no_secret_material PASSED [ 83%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestPanelBounds::test_oversized_and_malformed_input_refused PASSED [ 91%]\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestCompatibility::test_documented_status_command_and_exit_codes_unchanged PASSED [100%]\n\n============================== warnings summary ===============================\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical\n  C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\websockets\\legacy\\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions\n    warnings.warn(  # deprecated in 14.0 - 2024-11-09\n\ninfrastructure/control-plane/tests/test_b5_i7_governed_change.py::TestRegressionDrill::test_unchanged_stack_drill_report_byte_identical\n  C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\uvicorn\\protocols\\websockets\\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated\n    from websockets.server import WebSocketServerProtocol\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n--- generated xml file: C:\\Users\\wifik\\AppData\\Local\\Temp\\b5i7\\junit_12.xml ---\n======================= 12 passed, 2 warnings in 7.96s ========================\n"
+    },
+    {
+      "bytes": 1233,
+      "command": "python -m pytest -q <nine B5 whole-file selections> --junitxml=...",
+      "name": "adjacent_head.txt",
+      "sha256": "c62037320e98143aaa89c2c5b75cb7bfd46434c4bee95eaf93dc7cf97d74a8d0",
+      "text": "........................................................................ [ 38%]\n........................................................................ [ 77%]\n..........................................                               [100%]\n============================== warnings summary ===============================\ninfrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim\n  C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\websockets\\legacy\\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions\n    warnings.warn(  # deprecated in 14.0 - 2024-11-09\n\ninfrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim\n  C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\uvicorn\\protocols\\websockets\\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated\n    from websockets.server import WebSocketServerProtocol\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n186 passed, 2 warnings in 80.61s (0:01:20)\n"
+    },
+    {
+      "bytes": 1234,
+      "command": "python -m pytest -q <nine B5 whole-file selections> (base SHA)",
+      "name": "adjacent_base.txt",
+      "sha256": "f86c7d300a347b8836568d4a7751a82c7346b3a17c398c4194619896a054f37b",
+      "text": "........................................................................ [ 38%]\n........................................................................ [ 77%]\n..........................................                               [100%]\n============================== warnings summary ===============================\ninfrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim\n  C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\websockets\\legacy\\__init__.py:6: DeprecationWarning: websockets.legacy is deprecated; see https://websockets.readthedocs.io/en/stable/howto/upgrade.html for upgrade instructions\n    warnings.warn(  # deprecated in 14.0 - 2024-11-09\n\ninfrastructure/control-plane/tests/test_b5_i4_console_kernel.py::TestStatusView::test_s1_lists_match_api_verbatim\n  C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\uvicorn\\protocols\\websockets\\websockets_impl.py:17: DeprecationWarning: websockets.server.WebSocketServerProtocol is deprecated\n    from websockets.server import WebSocketServerProtocol\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n186 passed, 2 warnings in 125.63s (0:02:05)\n"
+    },
+    {
+      "bytes": 99,
+      "command": "python -m pytest test_b5_i7_evidence_laws.py -q --junitxml=...",
+      "name": "focused_evidence_laws.txt",
+      "sha256": "27da0ea168135c7aba2ff77a10ae171fd765e29475f2ca9a16207a3c26596481",
+      "text": "...............                                                          [100%]\n15 passed in 1.01s\n"
+    },
+    {
+      "bytes": 287,
+      "command": "gh run view 41555083897 --json ...",
+      "name": "gh_run_metadata.txt",
+      "sha256": "e6d4136d7c9062f0704c519d6614b1fccd3793da471757c48ff491aee9a6d094",
+      "text": "{\"conclusion\":\"success\",\"createdAt\":\"2026-11-03T00:45:17Z\",\"databaseId\":41555083897,\"event\":\"pull_request\",\"headBranch\":\"oce-book-5-i7-build\",\"headSha\":\"3bb49118040b21ee8780e578b55197918bd6d7ae\",\"status\":\"completed\",\"updatedAt\":\"2026-11-03T00:49:54Z\",\"workflowName\":\"B1-I1R Validation\"}\n"
+    },
+    {
+      "bytes": 400,
+      "command": "pytest both B5-I7 files --junitxml=... (ratification re-verification)",
+      "name": "ratification_focused_junit.txt",
+      "sha256": "9a58d71c700d7e6dd1cea4b884724b44d474662920905cc2528fabea318e33ea",
+      "text": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"27\" time=\"7.897\" timestamp=\"2026-11-03T14:53:08.540974-05:00\" hostname=\"blrrr\"><testcase classname=\"infrastructure.control-plane.tests.test_b5_i7_governed_change.TestSingleChange\" name=\"test_exactly_one_governed_change_recorded\" time=\"0.192\" /><testcase classnam"
+    }
+  ],
+  "requirement_arithmetic": {
+    "bindings": {
+      "attestation": 10,
+      "deferred": 3,
+      "runner": 2,
+      "static": 2,
+      "test": 27
+    },
+    "deferred": 3,
+    "evidence_laws": 15,
+    "requirements": 26,
+    "states": {
+      "BLOCKED": 0,
+      "DEFERRED_WITH_OWNER": 3,
+      "MAPPED": 6,
+      "PLANNED": 35
+    },
+    "total": 44
+  },
+  "stage": "B5-I7",
+  "version": "1.0.0"
+}

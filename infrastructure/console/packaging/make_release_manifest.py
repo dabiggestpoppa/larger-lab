@@ -55,6 +55,7 @@ CONSOLE_MODULES = (
     "infrastructure/console/src/oce_console/cli.py",
     "infrastructure/console/src/oce_console/drill.py",
     "infrastructure/console/src/oce_console/kernel.py",
+    "infrastructure/console/src/oce_console/panel.py",
     "infrastructure/console/src/oce_console/session_store.py",
     "infrastructure/console/src/oce_console/submit.py",
     "infrastructure/console/src/oce_console/timeline.py",

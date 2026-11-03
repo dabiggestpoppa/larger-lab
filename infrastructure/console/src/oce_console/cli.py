@@ -47,6 +47,13 @@ command stays a refused usage error decided before any I/O.
 
 No writes, no retries, no cache, no provider: stdlib argparse + the
 loopback transport only.
+
+B5-I7 (governed change, charter increment I-8): the additive ``panel``
+command renders the read-only queue-depth observability panel over the
+already-declared ``health.read`` / ``workers.list`` / ``jobs.schedules``
+surfaces. It is a projection of reads with no write path, and the
+``status`` command, its arguments, and every exit code above keep their
+exact previous behavior (`B5I7-R23`).
 """
 from __future__ import annotations
 
@@ -62,6 +69,11 @@ from .kernel import (
     ConsoleRefusal,
     build_status_document,
     render_status,
+)
+from .panel import (
+    STATE_DENIED as PANEL_STATE_DENIED,
+    build_panel_document,
+    render_panel,
 )
 from .transport import LoopbackTransport, validate_base_url
 
@@ -79,6 +91,16 @@ EXIT_BY_DOCUMENT_STATE = {
     STATE_OK: EXIT_OK,
     STATE_UNREACHABLE: EXIT_UNREACHABLE,
     STATE_DEGRADED: EXIT_DEGRADED,
+    STATE_UNVERIFIABLE: EXIT_UNVERIFIABLE,
+}
+
+# B5-I7 additive surface: the panel's own state map. ``DENIED`` reuses the
+# console's DEGRADED exit code because both mean "a governed read refused";
+# no panel state can ever map to EXIT_OK unless the panel is genuinely OK.
+EXIT_BY_PANEL_STATE = {
+    STATE_OK: EXIT_OK,
+    STATE_UNREACHABLE: EXIT_UNREACHABLE,
+    PANEL_STATE_DENIED: EXIT_DEGRADED,
     STATE_UNVERIFIABLE: EXIT_UNVERIFIABLE,
 }
 
@@ -100,8 +122,9 @@ def build_parser() -> argparse.ArgumentParser:
         "command",
         nargs="?",
         default="status",
-        choices=("status",),
-        help="command to run (default: %(default)s)",
+        choices=("status", "panel"),
+        help="command to run: status, or the additive B5-I7 read-only panel "
+             "(default: %(default)s)",
     )
     parser.add_argument(
         "--base-url",
@@ -131,7 +154,10 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         # work and no file reads.
         validate_base_url(args.base_url)
         client = LoopbackTransport(args.base_url, grant_id=args.grant, actor_id=args.actor)
-        document = build_status_document(client.read, client.routes)
+        if args.command == "panel":
+            document = build_panel_document(client.read, client.routes)
+        else:
+            document = build_status_document(client.read, client.routes)
     except ConsoleRefusal as refusal:
         sys.stderr.write(f"refused: {refusal.reason}: {refusal.detail}\n")
         return EXIT_REFUSED
@@ -140,6 +166,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         # success and never disguised as a stack verdict (X2).
         sys.stderr.write(f"internal_error: {type(exc).__name__}: {exc}\n")
         return EXIT_INTERNAL
+    # B5-I7 additive surface: same fail-closed derivation, its own state map.
+    if args.command == "panel":
+        sys.stdout.write(render_panel(document))
+        panel_code = EXIT_BY_PANEL_STATE.get(document.get("state"))
+        if panel_code is None:
+            sys.stderr.write(
+                f"internal_error: unknown panel state {document.get('state')!r}" + chr(10)
+            )
+            return EXIT_INTERNAL
+        return panel_code
     sys.stdout.write(render_status(document))
     # F-1 fail-closed: the kernel collapses a transport failure INTO the
     # document (whole view), so the exit code reads the document's own
