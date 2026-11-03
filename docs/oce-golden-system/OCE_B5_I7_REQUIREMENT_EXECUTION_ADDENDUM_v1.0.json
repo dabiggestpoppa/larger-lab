@@ -51,6 +51,26 @@
     "status": "OBSERVED"
   },
   "evidence_identities": {
+    "ci_repair_head": {
+      "claim": "OBSERVED",
+      "head_sha": "255bf119339cbb0c721bc86596557a52cd8ea6ae",
+      "tree_sha": "c733025543d4fffcf45ce129b4a67dc78762223e"
+    },
+    "evidence_head": {
+      "claim": "OBSERVED",
+      "head_sha": "3bb49118040b21ee8780e578b55197918bd6d7ae",
+      "tree_sha": "764a8c3ccfa84b21f6c618abe540d1e0e26fbde1"
+    },
+    "final_implementation_head": {
+      "claim": "OBSERVED",
+      "head_sha": "5f1414b56849e9b08dc75b7c00edc82d633f957b",
+      "tree_sha": "08f3812cc535a07e900cd179b83397d97956302e"
+    },
+    "implementation_content_head": {
+      "claim": "OBSERVED",
+      "head_sha": "2e117f864432c02a857da0246097ef1ab8db5415",
+      "tree_sha": "8a62c426cecafd4324a93abaf5c706276a1a23a2"
+    },
     "implementation_head_before_evidence": {
       "claim": "OBSERVED",
       "head_sha": "5a4c5a5a77c80bb92e2bee79a12203787a07a9ef",
@@ -60,122 +80,152 @@
   "gates": [
     {
       "id": 1,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 2,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 3,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 4,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 5,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 6,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 7,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 8,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 9,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 10,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 11,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 12,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 13,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 14,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 15,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 16,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 17,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 18,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 19,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 20,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 21,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 22,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 23,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 24,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 25,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 26,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 27,
-      "status": "NOT_EXECUTED"
+      "reverified_in": "B5-I7-RATIFICATION",
+      "status": "OBSERVED"
     },
     {
       "id": 28,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 29,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     },
     {
       "id": 30,
+      "reverified_in": "B5-I7-RATIFICATION",
       "status": "OBSERVED"
     }
   ],
@@ -239,8 +289,18 @@
       },
       {
         "path": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
-        "sha256": "b2cf86187526aac502031cff4b6b850aa2e16232fd2393483f702fc0cfee4615",
-        "size_bytes": 190851
+        "sha256": "83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30",
+        "size_bytes": 191950
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md",
+        "sha256": "e3e808b0ef68b32c4a09f8fe9f87fa03038abf6023f2a0d8d8e6357a98c50a75",
+        "size_bytes": 28721
+      },
+      {
+        "path": "docs/oce-golden-system/OCE_B5_I7_OPERATOR_RATIFICATION_v1.0.md",
+        "sha256": "b18d80b385a5dd864b8cde45f6f04f3bf15f4700c6ef8411672471f502db105f",
+        "size_bytes": 7420
       }
     ],
     "gated": true,
@@ -248,17 +308,17 @@
   },
   "observed": [
     {
-      "extract": "(\\d+) passed",
+      "extract": "tests=\"([0-9]+)\"",
       "junit": {
         "errors": 0,
         "failures": 1,
         "skipped": 0,
         "tests": 27
       },
-      "label": "NOT_OBSERVED",
+      "label": "OBSERVED",
       "name": "focused_nodes_executed_passed",
-      "parsed_from": null,
-      "value": null
+      "parsed_from": "ratification_focused_junit.txt",
+      "value": 27
     },
     {
       "extract": "(\\d+) passed",
@@ -322,6 +382,15 @@
       "test_b5_i7_governed_change.py": 12
     }
   },
+  "ratification": {
+    "audit": "8.38/10 same-agent (9.0/8.5/8.0/8.0); supersedes 8.25/10 without erasing it",
+    "b5_i8": "LOCKED",
+    "b5_i9": "LOCKED",
+    "disposition": "OPERATOR_ACCEPTED",
+    "document": "docs/oce-golden-system/OCE_B5_I7_OPERATOR_RATIFICATION_v1.0.md",
+    "merge_authorized": "PR #20 only",
+    "ratification_head": "this commit; its SHA is recorded in PR #20 after it exists, never predicted"
+  },
   "raw_evidence": [
     {
       "bytes": 3414,
@@ -357,6 +426,13 @@
       "name": "gh_run_metadata.txt",
       "sha256": "e6d4136d7c9062f0704c519d6614b1fccd3793da471757c48ff491aee9a6d094",
       "text": "{\"conclusion\":\"success\",\"createdAt\":\"2026-11-03T00:45:17Z\",\"databaseId\":41555083897,\"event\":\"pull_request\",\"headBranch\":\"oce-book-5-i7-build\",\"headSha\":\"3bb49118040b21ee8780e578b55197918bd6d7ae\",\"status\":\"completed\",\"updatedAt\":\"2026-11-03T00:49:54Z\",\"workflowName\":\"B1-I1R Validation\"}\n"
+    },
+    {
+      "bytes": 400,
+      "command": "pytest both B5-I7 files --junitxml=... (ratification re-verification)",
+      "name": "ratification_focused_junit.txt",
+      "sha256": "9a58d71c700d7e6dd1cea4b884724b44d474662920905cc2528fabea318e33ea",
+      "text": "<?xml version=\"1.0\" encoding=\"utf-8\"?><testsuites name=\"pytest tests\"><testsuite name=\"pytest\" errors=\"0\" failures=\"0\" skipped=\"0\" tests=\"27\" time=\"7.897\" timestamp=\"2026-11-03T14:53:08.540974-05:00\" hostname=\"blrrr\"><testcase classname=\"infrastructure.control-plane.tests.test_b5_i7_governed_change.TestSingleChange\" name=\"test_exactly_one_governed_change_recorded\" time=\"0.192\" /><testcase classnam"
     }
   ],
   "requirement_arithmetic": {

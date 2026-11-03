@@ -1831,3 +1831,23 @@ the artifact carried no `b5-i7-*` file (defect D6, repaired in commit
 the 27 nodes therefore rests on the run bound to the head carrying that repair;
 its identifiers are recorded in the pull request body rather than here, because
 writing them here would change the manifest row this section is hashed into.
+
+### §18.13 B5-I7 operator ratification
+
+B5-I7 is ratified `OPERATOR_ACCEPTED` after independent re-verification at this
+stage: 27 frozen nodes (12 governed-change/panel, 15 evidence-law) executed with zero
+failure/error/skip and 27 unique ids; 14/14 mutations discriminated with byte-exact
+restoration; 186/186 nodes green at both `9dc0b7d2` and head, with 186 common,
+0 base-only and 0 head-only; the pure-Python digest proven against 57 vectors
+including the NIST set; manifest rows recomputed; cleanup residual empty.
+
+Fresh same-agent audit `(9.0 + 8.5 + 8.0 + 8.0) / 4 = 8.375 = 8.38/10` SUPERSEDES the
+implementation-stage 8.25/10 and does not erase it.
+
+Stage defects: D8 (ambiguous implementation-head label, tree-consistent so `EL06`
+could not catch it) repaired in the ratification commit; D9 (mutation artifact hashes
+raw working-tree bytes rather than the LF blob) recorded as a portability limitation.
+
+Ratification authorizes merging PR #20 only. `B5-I8 = LOCKED`, `B5-I9 = LOCKED`, the
+deferred I-7 web view remains unimplemented, cost remains `$0`, and
+`capital.authority = none`.
