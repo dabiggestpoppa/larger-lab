@@ -64,7 +64,7 @@ MUTATIONS = [
     (
         "M03",
         "summarize a governed denial as OK (bypass the denial state)",
-        '        if STATE_DENIED in read_states:\n            state = STATE_DENIED',
+        '    if STATE_DENIED in read_states:\n        state = STATE_DENIED',
         '        if STATE_DENIED in read_states:\n            state = STATE_OK',
         R18,
     ),
