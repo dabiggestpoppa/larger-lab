@@ -126,10 +126,16 @@ are never treated as market-wide truth; no maker/taker role is invented.
 
 ## 8. RED-first
 
-The two test modules were written before the module they exercise and were run
-against the import boundary; the first executions failed on the absent package
-surface, and the implementation was then driven by them. During the pass two
-real defects were caught by static analysis rather than by tests:
+**Correction of record.** This section originally claimed a RED-first
+derivation. That claim is withdrawn: the module was written first and
+smoke-tested through a direct `normalize_liquidation` call, and the suite was
+written against that surface afterwards. No test was observed failing before the
+implementation existed, so this checkpoint does **not** evidence RED-first
+discipline for I11. The directive's RED-first requirement is therefore
+UNSATISFIED and is reported as such rather than dressed up.
+
+What the pass does evidence is defect discovery. Two real defects were caught by
+static analysis rather than by tests:
 
 * **F_I11_01** — the four I04B conversion primitives were called but not
   imported (`ruff F821`, `mypy name-defined`). Contract-denominated rows would
