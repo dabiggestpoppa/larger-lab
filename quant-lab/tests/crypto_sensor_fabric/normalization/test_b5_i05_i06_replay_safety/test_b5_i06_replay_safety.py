@@ -442,7 +442,7 @@ I09_TIME_VALIDATION_SHA256 = (
 #: amended file, exactly as the I08 and I09 cascades did.  The I08/I09 values
 #: above stay for the historical record; this is the operative pin.
 I10_TIME_VALIDATION_SHA256 = (
-    "f965c117f4c89b2da8692277d7d17f98fa2c5358943dd6a89f8d92e63a335c2c"
+    "7ddbbd26112921302dbcbcdc6f10f85a9a3854dbfb978978c9e568a59f3f2f39"
 )
 
 

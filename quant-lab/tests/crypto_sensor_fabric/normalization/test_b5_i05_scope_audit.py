@@ -336,6 +336,12 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
         "tests/crypto_sensor_fabric/normalization/test_b5_i08",
         "tests/crypto_sensor_fabric/normalization/test_b5_i09",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10",
+        # DISCLOSED B5-I11 (SENSOR-B5-I11E1 directive sections 07-09): the I11E1
+        # pass adds the liquidation suite and its scope audit on the same
+        # precedent by which this list grew test_b5_i08/test_b5_i09/test_b5_i10.
+        # The ``sensors/`` prefix above already covers liquidation.py.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i11",
+        "tests/crypto_sensor_fabric/fixtures/i11/",
         "tests/crypto_sensor_fabric/fixtures/i10/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
         "config/crypto_sensor_fabric/provider_time_semantics.yaml",

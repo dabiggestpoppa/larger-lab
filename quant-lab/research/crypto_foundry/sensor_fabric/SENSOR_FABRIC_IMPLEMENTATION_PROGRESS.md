@@ -8151,3 +8151,56 @@ DECISION
 
 NO GOVERNANCE CHANGE: BLOC_05 INCOMPLETE; B5-I11+ and BLOC_06 UNAUTHORIZED;
 RESEARCH FROZEN; next_checkpoint_authorized = FALSE.
+
+---
+
+## 185 - SENSOR-B5-I11E1: LIQUIDATION NORMALIZER (BOUNDED IMPLEMENTATION)
+
+Liquidation normalizer implemented, tested and recorded. Disposition:
+B5-I11 = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW.
+
+SURFACE
+  normalization/sensors/liquidation.py: four independent side fields
+  (position_side_liquidated, execution_side, aggressor_side, maker_taker_role),
+  the five frozen aggregation scopes, LiquidationZeroIntervalState, and a pure
+  normalize_liquidation over the accepted T1BaseEnvelope. Reuses the frozen
+  LiquidationRole enum and the accepted I04B conversion primitives by import.
+
+SEMANTICS
+  No side is derived from another, from a price move, or from a provider
+  aggregate direction. Canonical sides stay UNKNOWN until provider semantics are
+  certified; the provider reading survives as provisional evidence. Contradictory
+  evidence (LONG+BUY / SHORT+SELL) is QUARANTINED with INVALID_SIDE_MAPPING, not
+  reconciled. Aggregates require count and may not carry event ids. A zero
+  interval is admitted only with a completed-interval claim, a closed interval and
+  verified coverage; otherwise it is UNVERIFIED_MISSING, never a zero.
+  liquidation_usd stays blocked on B5_I08_UNITS_V1 with the citation preserved.
+
+DEFECTS CAUGHT BEFORE COMMIT
+  F_I11_01: the four I04B conversion primitives were called but not imported
+  (ruff F821 / mypy name-defined); contract-denominated rows would have raised
+  NameError. Fixed, with a test asserting the primitives are the accepted objects.
+  F_I11_02: a test resolved its module path one directory too high. Fixed.
+
+CUSTODY
+  Three disclosed audit amendments (I05 allowlist, I10 module set, I06 test pin)
+  and three producer-regenerated artifacts:
+    time      f965c117 -> 7ddbbd26112921302dbcbcdc6f10f85a9a3854dbfb978978c9e568a59f3f2f39
+    semantic  2587e373 -> d9834904d0784c3198bb2da00b38fd1a7f0c3527b0e378e73522fc1ce3018796
+    replay    b63e6a72 -> 1a8b3fc04a2f8326e87597997754644d8ad903ce40da1a3ada61472502e6de62
+  Only the operative I10_* pins moved; the I08/I09 historical pins are intact. No
+  LF<->CRLF conversion. Twelve Bloc 04 publisher side effects restored, not staged.
+
+VERIFICATION
+  Full canonical suite: 4425 passed, 14 skipped, exit 0 (936.43s). Baseline
+  4357/14 -> +68 passed / +0 skipped, exactly the I11 tests. ruff, mypy and
+  compileall clean on the new module.
+
+NOT CLAIMED
+  Provider-semantic certification for any venue; a positive inverse conversion
+  numeric case (no PIT terms fixture was constructed; A11-12 is PARTIAL); USD
+  notional; market-wide liquidation completeness; I17 collapse; replay eligibility.
+
+NO GOVERNANCE CHANGE: BLOC_05 INCOMPLETE; all eight program gates NOT_YET_EARNED;
+B5-I12+ and BLOC_06 UNAUTHORIZED; RESEARCH FROZEN;
+next_checkpoint_authorized = FALSE.

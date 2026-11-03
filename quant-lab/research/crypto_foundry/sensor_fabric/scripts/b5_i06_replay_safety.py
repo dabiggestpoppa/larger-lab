@@ -985,7 +985,7 @@ I10_DISCLOSED_SHA256 = {
         "6a7a028071e0ba100a0b7078d144ff0ea5f44bf883a3ef5d973fd494010a56eb"
     ),
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": (
-        "4e88f325a2f47bb1dd63df44625f3e900da7f976726dc4ec5eed4794a7a58877"
+        "d3ef462a4ba93eb420a1e2bc86b1bd72d09084c178bd7be7fa642cd8885db807"
     ),
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
         "806e8829cdd3bb7d6feedd79a4d256d5e3326e3a2bcc28260f03fac12d970a5b"
@@ -995,11 +995,11 @@ I10_DISCLOSED_SHA256 = {
 I10_DISCLOSED_EVIDENCE_SHA256 = {
     "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
     "bloc_05_time_validation.json": (
-        "f965c117f4c89b2da8692277d7d17f98fa2c5358943dd6a89f8d92e63a335c2c"
+        "7ddbbd26112921302dbcbcdc6f10f85a9a3854dbfb978978c9e568a59f3f2f39"
     ),
     "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
     "bloc_05_semantic_validation.json": (
-        "2587e373f269692bb69ed809c153ce6d6efb354e08b48f6520c22cecf54ff50a"
+        "d9834904d0784c3198bb2da00b38fd1a7f0c3527b0e378e73522fc1ce3018796"
     ),
 }
 

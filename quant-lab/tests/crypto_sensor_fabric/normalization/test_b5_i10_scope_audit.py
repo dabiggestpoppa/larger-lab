@@ -35,8 +35,12 @@ _I10_FIXTURES = _QUANT_LAB / "tests" / "crypto_sensor_fabric" / "fixtures" / "i1
 #: Directive-required starting HEAD == this checkpoint's custody base.
 I10_BASE_HEAD = "8fc2ba00f849670e4975c843ffba815fe55e53f6"
 
-#: The directive's section 03 approved surface, and nothing else.
-FROZEN_MODULES = ["__init__.py", "side_maps.py", "trade.py"]
+#: DISCLOSED B5-I11 (SENSOR-B5-I11E1 directive section 07): the I11E1 pass adds
+#: ``normalization/sensors/liquidation.py``, the authorized extension of the
+#: ``sensors/`` namespace on the same precedent this audit already records.  The
+#: set stays EXACT -- a fifth module is still an unapproved surface -- so this
+#: amendment widens the membership by exactly one named file.
+FROZEN_MODULES = ["__init__.py", "liquidation.py", "side_maps.py", "trade.py"]
 
 #: The frozen eight-member SensorFamily is untouched (R6).
 FROZEN_SENSOR_FAMILIES = [
@@ -94,8 +98,8 @@ def test_sensors_package_exists() -> None:
     assert _SENSORS.is_dir()
 
 
-def test_sensors_package_is_exactly_the_three_authorized_modules() -> None:
-    """Directive section 03 lists three modules; a fourth is an unapproved surface."""
+def test_sensors_package_is_exactly_the_four_authorized_modules() -> None:
+    """Three I10 modules plus the disclosed I11 ``liquidation.py``; a fifth is not approved."""
     files = sorted(entry.name for entry in _SENSORS.iterdir() if entry.suffix == ".py")
     assert files == FROZEN_MODULES
 
@@ -365,7 +369,9 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
     allowed = (
         "src/crypto_sensor_fabric/normalization/sensors/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
         "tests/crypto_sensor_fabric/fixtures/i10/",
+        "tests/crypto_sensor_fabric/fixtures/i11/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
         "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",

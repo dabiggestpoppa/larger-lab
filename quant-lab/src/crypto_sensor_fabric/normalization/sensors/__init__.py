@@ -46,6 +46,14 @@ from .side_maps import (
     require_side_mapping,
     resolve_side_mapping,
 )
+from .liquidation import (
+    LiquidationAggregationScope,
+    LiquidationObservationInput,
+    LiquidationPositionSide,
+    LiquidationZeroIntervalState,
+    T1LiquidationRecord,
+    normalize_liquidation,
+)
 from .trade import (
     I04B_METHODOLOGY_ID,
     I08_UNITS_METHODOLOGY_ID,
@@ -69,6 +77,13 @@ __all__ = [
     "binance_side_from_is_buyer_maker",
     "require_side_mapping",
     "resolve_side_mapping",
+    # liquidation normalization (B5-I11)
+    "LiquidationAggregationScope",
+    "LiquidationObservationInput",
+    "LiquidationPositionSide",
+    "LiquidationZeroIntervalState",
+    "T1LiquidationRecord",
+    "normalize_liquidation",
     # trade normalization
     "I04B_METHODOLOGY_ID",
     "I08_UNITS_METHODOLOGY_ID",
