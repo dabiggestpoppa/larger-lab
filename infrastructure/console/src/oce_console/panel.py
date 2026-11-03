@@ -113,13 +113,27 @@ CANONICALIZATION_LAW = {
 }
 
 #: Token-shaped material that must never reach the rendered document (R21).
+#: Markers are matched case-insensitively against EVERY string, key or value,
+#: at every depth. A credential that reaches the rendered document is a
+#: ``B5I7-R21`` failure, so the set is deliberately broad: over-redaction is a
+#: visible, reviewable loss; under-redaction is a leak.
 _SECRET_MARKERS = (
     "bearer ",
     "authorization:",
+    "authorization=",
     "x-oce-grant",
     "x-oce-actor",
+    "set-cookie",
+    "cookie",
     "private_key",
-    "secret=",
+    "secret",
+    "session=",
+    "password",
+    "passwd",
+    "api_key",
+    "apikey",
+    "token",
+    "credential",
 )
 REDACTED = "[redacted]"
 
@@ -243,9 +257,15 @@ def _sanitize(value: object, field: str, depth: int = 0) -> object:
     if isinstance(value, dict):
         rendered: dict = {}
         for key, item in value.items():
-            key_text, _ = _bounded_text(key, f"{field}.key")
+            key_text, key_redacted = _bounded_text(key, f"{field}.key")
             if key_text is None:
                 raise ConsoleRefusal("malformed_request", f"{field}: non-string key")
+            if key_redacted:
+                # A secret-NAMED key identifies a credential: the name must be
+                # hidden AND the value it labels, otherwise redacting the key
+                # alone leaks the secret under a placeholder name.
+                rendered[REDACTED] = REDACTED
+                continue
             rendered[key_text] = _sanitize(item, f"{field}.{key_text}", depth + 1)
         return rendered
     if isinstance(value, (list, tuple)):
