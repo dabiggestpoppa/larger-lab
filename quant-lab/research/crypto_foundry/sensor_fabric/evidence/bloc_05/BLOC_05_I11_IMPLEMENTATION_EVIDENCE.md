@@ -4,7 +4,9 @@
 **Branch:** `agent/crypto-sensor-fabric-build`
 **Required starting HEAD:** `82e44cf0ed8b8edca42eb4427db4cd6d659dd79a`
 **Frozen plan:** `4bb677f9e0266f4dc48405181696019f359ae49f` (7/7 bloc_05 documents blob-identical at start)
-**Status:** `B5-I11 = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW` (bounded; see section 12)
+**Status:** `B5-I11 = IMPLEMENTATION_PARTIAL` — the bounded normalizer is
+implemented, tested and regression-proven, but two mandatory directive items are
+unmet (RED-first derivation, A11-12 positive inverse case). See sections 8 and 12.
 
 ---
 
@@ -234,8 +236,17 @@ staged** — the commit surface below contains no Bloc 04 path.
 
 ## 13. Disposition and non-claims
 
-`B5-I11 = IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW`, bounded to the
-liquidation normalizer. Not claimed: provider-semantic certification for any
+`B5-I11 = IMPLEMENTATION_PARTIAL`, bounded to the liquidation normalizer.
+
+Blockers preventing an unqualified implementation PASS:
+
+1. **RED-first (§08) is UNSATISFIED.** The module preceded the suite; no test was
+   ever observed failing before it existed. Recorded, not disguised.
+2. **A11-12 is PARTIAL.** The I04B primitives are reused by identity and the
+   blocked paths are proven, but no PIT terms fixture was constructed, so no
+   positive linear/inverse numeric case is evidenced at I11.
+
+Everything else in the directive's implementation scope is done and measured. Not claimed: provider-semantic certification for any
 venue; a positive inverse conversion fixture; USD notional; market-wide
 liquidation completeness; I17 collapse; replay eligibility.
 
