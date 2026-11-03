@@ -264,7 +264,10 @@ class TestEL02:
         doc = addendum()
         check_el02(doc)
         bad = copy.deepcopy(doc)
-        bad["ci"]["run_id"] = "41345551281"
+        # The law forbids an id recorded BEFORE a run exists, so the
+        # falsified evidence must claim the pre-existence shape.
+        bad["ci"] = {"status": "NOT_EXECUTED", "observed_at_head": "0" * 40,
+                     "run_id": "41345551281", "parsed_from": None}
         with pytest.raises(AssertionError):
             check_el02(bad)
 

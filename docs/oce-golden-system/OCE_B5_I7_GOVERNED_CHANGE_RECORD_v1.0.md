@@ -77,6 +77,8 @@ the record after repair (`B5I7-EL12`).
 No defect was repaired by weakening an assertion, and no frozen test was
 modified (`B5I7-R03`, `B5I7-R10`).
 
+| D6 | The B5-I7 selection step ran green in CI but its outputs were absent from the uploaded artifact, because the step wrote into the repository working directory while the untouched upload step ships only the evidence directory | downloaded artifact `b1-i1r-evidence-eb392d9731e7` contained no `b5-i7-*` file | Repaired: the step writes collect, junit and pytest output into the evidence directory (X1); no existing step, trigger or gate changed |
+
 ## 5. Compatibility and refusal behaviour
 
 `status` keeps its five sections (`health`, `readiness`, `system`, `workers`,
@@ -154,3 +156,28 @@ carries the machine-readable gate table this section summarises.
 
 `MERGE_AUTHORIZED=false`. B5-I8 and B5-I9 are `LOCKED`. Freebuff is untouched.
 Recurring cost is `$0` and `capital.authority = none`.
+
+## 11. Authoritative CI observed after this record was first written
+
+These identifiers exist and were parsed after the fact; they are not predictions
+(`B5I7-EL01`, `B5I7-EL02`).
+
+| Field | Value |
+|---|---|
+| workflow | `B1-I1R Validation` |
+| event | `pull_request` against `main` |
+| run id | `41555083897` |
+| job | `validate` / `125651894341` |
+| artifact | `13194580990` / `b1-i1r-evidence-eb392d9731e7` / 38915 bytes |
+| run head SHA | `3bb49118040b21ee8780e578b55197918bd6d7ae` |
+| conclusion | `success` (4m33s) |
+
+The `Execute B5-I7 governed-change proofs` step is recorded `success` in that
+run. Its artifact did **not** contain the B5-I7 outputs (defect D6), so the
+27-node artifact-level verification rests on the run bound to the head that
+carries the X1 repair; that run and its artifact are recorded in the pull
+request body, which is append-only and does not participate in the manifest.
+
+The local shared authoritative runner remains **not green** (`RC=1`); in CI the
+same runner reached its gate, which is why `B5I7-R11` is evidenced from CI and
+not from the local host.

@@ -39,9 +39,16 @@
   "authored_by": "same-agent (Codebuff / Buffy); not organizationally independent",
   "base_sha": "9dc0b7d29ab869e256653a6b6ec68c987d0a4090",
   "ci": {
-    "observed_at_head": null,
-    "parsed_from": null,
-    "status": "NOT_EXECUTED"
+    "artifact_bytes": 38915,
+    "artifact_gap": "b5-i7 outputs absent from this artifact (defect D6); repaired in 255bf119339cbb0c721bc86596557a52cd8ea6ae",
+    "artifact_id": "13194580990",
+    "artifact_name": "b1-i1r-evidence-eb392d9731e7",
+    "check_run_id": "125651894341",
+    "conclusion": "success",
+    "observed_at_head": "3bb49118040b21ee8780e578b55197918bd6d7ae",
+    "parsed_from": "gh_run_metadata.txt",
+    "run_id": "41555083897",
+    "status": "OBSERVED"
   },
   "evidence_identities": {
     "implementation_head_before_evidence": {
@@ -202,8 +209,8 @@
       },
       {
         "path": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
-        "sha256": "e87cccf48d0513fcc54568234af97786c07341add11b907dfe7d93a504cbdda6",
-        "size_bytes": 16003
+        "sha256": "125ce7bee8d18374ee0b149367bd58f462c8dddf8f4f2a0df8185aa774bfa431",
+        "size_bytes": 16237
       },
       {
         "path": "infrastructure/control-plane/scripts/b5_i7_mutation_battery.py",
@@ -212,8 +219,8 @@
       },
       {
         "path": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
-        "sha256": "3ff4848208e4196d465751340a2ef859e625b72c2e28d71cca68c91bd9f441cf",
-        "size_bytes": 10921
+        "sha256": "ea8fe3b6d5311f525650899c92093e6881c5c7adc7ee585636cd5cf54e13d414",
+        "size_bytes": 12464
       },
       {
         "path": "docs/oce-golden-system/OCE_B5_I7_REUSE_INVENTORY_v1.0.md",
@@ -227,13 +234,13 @@
       },
       {
         "path": ".github/workflows/b1-i1r-validation.yml",
-        "sha256": "8779ef3b51a3c6e704db101d76c31a96824b7aabedf0865332ba97786c8350b8",
-        "size_bytes": 56318
+        "sha256": "638b2e43d2981fa644c4bbbd59a40be46e911727d06e44ff6e015c9a4c6fa153",
+        "size_bytes": 56417
       },
       {
         "path": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
-        "sha256": "e055c8fd3f2577dc5f980fa7661ed816cd1075c5df48aff945827c3837b823ab",
-        "size_bytes": 190077
+        "sha256": "b2cf86187526aac502031cff4b6b850aa2e16232fd2393483f702fc0cfee4615",
+        "size_bytes": 190851
       }
     ],
     "gated": true,
@@ -343,6 +350,13 @@
       "name": "focused_evidence_laws.txt",
       "sha256": "27da0ea168135c7aba2ff77a10ae171fd765e29475f2ca9a16207a3c26596481",
       "text": "...............                                                          [100%]\n15 passed in 1.01s\n"
+    },
+    {
+      "bytes": 287,
+      "command": "gh run view 41555083897 --json ...",
+      "name": "gh_run_metadata.txt",
+      "sha256": "e6d4136d7c9062f0704c519d6614b1fccd3793da471757c48ff491aee9a6d094",
+      "text": "{\"conclusion\":\"success\",\"createdAt\":\"2026-11-03T00:45:17Z\",\"databaseId\":41555083897,\"event\":\"pull_request\",\"headBranch\":\"oce-book-5-i7-build\",\"headSha\":\"3bb49118040b21ee8780e578b55197918bd6d7ae\",\"status\":\"completed\",\"updatedAt\":\"2026-11-03T00:49:54Z\",\"workflowName\":\"B1-I1R Validation\"}\n"
     }
   ],
   "requirement_arithmetic": {

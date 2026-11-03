@@ -1820,3 +1820,14 @@ None was repaired by weakening an assertion.
 
 `MERGE_AUTHORIZED=false`. B5-I8 and B5-I9 remain `LOCKED`. Freebuff untouched.
 Recurring cost `$0`; `capital.authority = none`.
+
+**Authoritative CI (observed after the section above was appended):** run
+`41555083897` of `B1-I1R Validation` (`pull_request` -> `main`) concluded
+`success` at head `3bb49118040b21ee8780e578b55197918bd6d7ae`; job `validate`
+`125651894341`; artifact `13194580990` (`b1-i1r-evidence-eb392d9731e7`, 38915
+bytes). The `Execute B5-I7 governed-change proofs` step passed in that run, but
+the artifact carried no `b5-i7-*` file (defect D6, repaired in commit
+`255bf119339cbb0c721bc86596557a52cd8ea6ae`). The uploaded-artifact verification of
+the 27 nodes therefore rests on the run bound to the head carrying that repair;
+its identifiers are recorded in the pull request body rather than here, because
+writing them here would change the manifest row this section is hashed into.
