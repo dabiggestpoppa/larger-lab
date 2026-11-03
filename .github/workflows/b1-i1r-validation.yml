@@ -991,13 +991,14 @@ jobs:
       - name: Execute B5-I7 governed-change proofs
         env:
           B5I7_FLOOR: "27"
+          EV: ${{ steps.evidence.outputs.evidence_dir }}
         run: |
           set -o pipefail
           F="infrastructure/control-plane/tests/test_b5_i7_governed_change.py infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py"
-          python -m pytest $F --collect-only -q > b5-i7-collect.txt 2>&1 || { echo "B5-I7 collection FAILED"; cat b5-i7-collect.txt; exit 1; }
-          python -m pytest $F -v --tb=short --junitxml=b5-i7-junit.xml > b5-i7-pytest-output.txt 2>&1; rc=$?
-          tail -40 b5-i7-pytest-output.txt
-          python - b5-i7-junit.xml b5-i7-collect.txt "$B5I7_FLOOR" "$rc" <<'PY'
+          python -m pytest $F --collect-only -q > "$EV/b5-i7-collect.txt" 2>&1 || { echo "B5-I7 collection FAILED"; cat "$EV/b5-i7-collect.txt"; exit 1; }
+          python -m pytest $F -v --tb=short --junitxml="$EV/b5-i7-junit.xml" > "$EV/b5-i7-pytest-output.txt" 2>&1; rc=$?
+          tail -40 "$EV/b5-i7-pytest-output.txt"
+          python - "$EV/b5-i7-junit.xml" "$EV/b5-i7-collect.txt" "$B5I7_FLOOR" "$rc" <<'PY'
           import glob, os, sys, xml.etree.ElementTree as ET
           junit, collect_path, floor, rc = sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4])
           problems = []
