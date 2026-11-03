@@ -8112,3 +8112,42 @@ authorized LF normalization with simultaneous repin, U08-20 to B5-I08R2.
 
 NO GOVERNANCE CHANGE: B5-I10 stays pending; all eight gates NOT_YET_EARNED;
 B5-I11+ and BLOC_06 UNAUTHORIZED; RESEARCH FROZEN; next_checkpoint_authorized = FALSE.
+
+---
+
+## 184 - SENSOR-B5-I10R2: CUSTODY CORRECTION AND BOUNDED RATIFICATION
+
+Append-only custody closure. No historical artifact was edited, normalized or repinned.
+
+F1 CORRECTED
+  bloc_05_semantic_validation.json independently remeasured at 29769 bytes,
+  sha256 2587e373f269692bb69ed809c153ce6d6efb354e08b48f6520c22cecf54ff50a.
+  The I10 evidence section 7 cell recording 459568e9... is withdrawn as a
+  transcription error: it names no blob at any commit, and the executable
+  I10_DISCLOSED_EVIDENCE_SHA256 pin already carried the measured value.
+
+F2 DISCLOSED
+  I10E1 384282cbca re-encoded five sealed files LF->CRLF without declaration:
+  b5_i06_replay_safety.py (45bd5f34->2898b44c, 0->1276 CRLF, +54/-5 logical),
+  test_b5_i01 (64b46dc5->34add81b, 0->433, +13/-9),
+  test_b5_i05 (b92b7e5c->432e9b26, 0->412, +7/-2),
+  test_b5_i08 (e005d4e9->2e44ce55, 0->305, +9/-2),
+  test_b5_i09 (eb4dcbb9->d2dfb784, 0->241, +0/-1).
+  Raw 2667/2603 lines for 83/19 logical; every logical edit is the authorized
+  sensors/ allowlist extension; no assertion removed or weakened.
+
+READJUDICATION
+  R10-01..R10-24 at cd8208ee4a: 24 PASS, 0 FAIL, 0 unearned. R10-08 satisfied by
+  correction rather than erasure; R10-09..R10-13 pass with F2 explicitly disclosed.
+  Regression 4357 passed / 14 skipped / exit 0 accepted on verified provenance
+  (13b0b39d7 touches only ledger + evidence); not re-executed.
+
+DECISION
+  B5-I10 = OPERATOR_ACCEPTED (bounded). Scope: the trade normalizer and Binance
+  side map only. Carried obligations: F3 U08-20 (0,1) allowance, F4 I08 producer
+  not re-runnable at HEAD, F5 stale I10 readiness doc, F6 I09 R09-21/R09-22
+  absent, I09-b provider certification, B5_I08_UNITS_V1 unresolved, I17 duplicate
+  collapse. I11 authorization PROPOSED, not granted.
+
+NO GOVERNANCE CHANGE: BLOC_05 INCOMPLETE; B5-I11+ and BLOC_06 UNAUTHORIZED;
+RESEARCH FROZEN; next_checkpoint_authorized = FALSE.
