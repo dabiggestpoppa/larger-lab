@@ -171,3 +171,16 @@ commit, and the I10 scope audit asserts that.
   rows with distinct `venue` (F24).
 - **Replay:** I10 records `source_revision_id`/`_state`/`_coverage_state` only;
   no replay verdict field is published (I06 owns `assess_replay_eligibility`).
+
+## Full canonical regression (A10-21), measured
+
+```
+python -m pytest tests -q
+-> 4357 passed, 14 skipped, exit 0, 1264.53s (21m04s)
+```
+
+Re-executed on this I10E1 tree to close A10-21. The I10D1 baseline was 4293
+passed / 14 skipped; the +64 delta is the I10 suites plus the amended
+scope-audit inventories. The storage tests rewrote exactly the 11 known Bloc 04
+evidence JSONs; each was restored to committed bytes and none was staged. This
+section is the only evidence-document change made for that measurement.

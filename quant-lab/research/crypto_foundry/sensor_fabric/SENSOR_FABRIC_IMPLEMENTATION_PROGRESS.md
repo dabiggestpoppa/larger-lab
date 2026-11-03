@@ -8060,3 +8060,25 @@ regenerated digest equals
 DEFERRED; B5-I09 PARTIALLY ACCEPTED; BLOC_05 INCOMPLETE; ALL EIGHT PROGRAM GATES
 NOT_YET_EARNED; next_checkpoint_authorized = FALSE; B5-I11+ UNAUTHORIZED;
 BLOC_06 UNAUTHORIZED; RESEARCH FROZEN.
+
+
+---
+
+## 182 - SENSOR-B5-I10E1: FULL CANONICAL REGRESSION (VERIFICATION ONLY)
+
+Read-only re-execution of the whole package on the I10E1 tree, closing the one
+acceptance gate left open at commit 384282cbc.
+
+MEASURED
+  python -m pytest tests -q  ->  4357 passed, 14 skipped, exit 0 (1264.53s)
+  I10D1 baseline: 4293 passed / 14 skipped.  Delta +64 = the I10 suites plus
+  the amended scope-audit inventories.
+
+SIDE EFFECTS
+  Exactly 11 committed Bloc 04 evidence JSONs were rewritten by the storage
+  tests (I03R1 x2, I04 x2, I04R1 x2, I04R2 x1, I15 x4).  Recognised class:
+  restored to committed bytes with `git checkout --`, never staged.
+
+UNCHANGED
+  No production, test or pin byte is changed by this entry.  B5-I10 remains
+  IMPLEMENTATION_PASS_PENDING_OPERATOR_REVIEW.
