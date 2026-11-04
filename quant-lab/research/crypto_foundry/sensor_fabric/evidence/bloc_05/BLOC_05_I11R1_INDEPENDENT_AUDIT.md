@@ -140,6 +140,18 @@ re-counted the index at **1088** (1087 + this audit's own suite). Exactly one
 non-inventory line changed; no other artifact was touched. This is recorded as a process
 defect of I11E1, not silently absorbed.
 
+### 2.4 F_I11R1_04 — disclosed: one audit file was re-encoded, and restored
+
+While adding the I11R1 allowlist entry, a scripted edit wrote
+`test_b5_i10_scope_audit.py` with LF endings although the file is CRLF. The resulting
+commit showed 851 changed lines for a five-line logical edit. The newline style was
+restored to CRLF in the follow-up commit (423 CRLF lines at the parent, 428 after the
+five-line addition, zero lone LF), so the logical change is again the only change.
+
+It is recorded because a 40x-inflated diff is exactly the custody event I10R2's F2
+disclosure exists to make visible, and because a silent repair would leave the reader
+unable to reconcile the two diffs.
+
 ---
 
 ## 3. Independent adversarial coverage (A11-19)
