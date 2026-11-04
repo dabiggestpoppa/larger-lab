@@ -8204,3 +8204,69 @@ NOT CLAIMED
 NO GOVERNANCE CHANGE: BLOC_05 INCOMPLETE; all eight program gates NOT_YET_EARNED;
 B5-I12+ and BLOC_06 UNAUTHORIZED; RESEARCH FROZEN;
 next_checkpoint_authorized = FALSE.
+
+---
+
+## 186 - SENSOR-B5-I11R1: INDEPENDENT LIQUIDATION AUDIT
+
+Adjudicated at 7715a065e. Disposition: I11_RATIFICATION_HOLD.
+
+A11-12 CLOSED (was PARTIAL)
+  Synthetic PIT fixtures now prove both payoff families numerically. Linear: 250
+  contracts x 0.01 = 2.5 BTC base, x 60000 = 150000 USDT quote. Inverse: 2.5 x 100 =
+  250 USD face, / 60000 = 0.0041666... BTC base, asserted against independently
+  computed Decimal expressions. The reference price, not the liquidation price, is
+  operative: varying price_native from 1 to 999999 leaves the base identical, and
+  moving the reference price alone halves/doubles it while the quote face is unchanged.
+  Missing, dimensionally wrong, quanto, UNKNOWN-payoff, family-mismatched, late and
+  base-dimension-mismatched terms all block with value=None.
+
+A11-14 FAILED (new, critical)
+  liquidation.py:690 computes verified = payload.provider_semantics_verified, a plain
+  caller Boolean. Measured: an untrusted caller passing True promotes provisional
+  LONG/SHORT and BUY/SELL into the canonical fields with no registry row, no confidence
+  rung and no evidence reference -- while the same record still carries
+  SEMANTICS_UNVERIFIED, because that flag is added unconditionally at line 693 and never
+  removed. The record contradicts itself and has no consistent promoted state.
+  Violated clause: bloc_05/03 section 13 (AMBIGUOUS blocks critical T1 normalized
+  fields). Regression against accepted precedent: I10's side_maps computes
+  canonical_admitted from admits_critical_t1_use(confidence) and the model states
+  admission is "never a caller choice"; normalize_trade takes a registry, I11 takes a
+  Boolean. Repair specified but NOT applied: evidence-backed admission via I09, drop
+  SEMANTICS_UNVERIFIED when admitted, plus the three negative tests. Production was not
+  touched under this audit directive.
+
+CUSTODY DEFECT OF I11E1 (repaired)
+  I11E1 published the I05 evidence before its three new .py files were tracked, so
+  BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json recorded python_files_scanned=1084 while
+  the index tracked 1087: green pre-commit, red post-commit. Republished through the
+  established UPDATE_I11R2_EVIDENCE=1 mechanism to 1088 (1087 + this audit's suite). One
+  non-inventory line; no other artifact touched.
+
+RED-FIRST DEVIATION (adjudicated, not excused)
+  Not retroactively satisfied and still recorded in the I11E1 evidence. The frozen
+  authority mandates coverage, determinism and fail-closed behaviour, not a development
+  sequence, so the deviation is operator-acceptable, not a release blocker. It stays on
+  the record because an unrecorded deviation becomes a false claim of discipline.
+
+CUSTODY
+  Starting HEAD equalled the required SHA and remote; frozen plan unchanged; I10
+  ratification untouched; I08/I09 pins intact; time and semantic artifacts byte-identical
+  to I11E1. Disclosed changes: one I10 audit allowlist entry (test_b5_i11r1_ prefix), the
+  mechanical I11R2 republish, and the audit suite. No LF/CRLF conversion.
+
+VERIFICATION
+  Independent suite: 20 passed, 1 xfailed (the xfail is the semantic-admission law, and
+  it will fail loudly when production is repaired). Four audit suites together: 90
+  passed, 1 xfailed. Full canonical suite: see section 187 or the I11R1 record.
+
+READ-ONLY OUTPUT
+  BLOC_05_I12_READINESS_ASSESSMENT.md reconstructs the frozen open-interest contract
+  (eight canonical fields, five snapshot_or_interval members, OI-is-a-stock, unit
+  honesty, oi_usd blocked on B5_I08_UNITS_V1, multi-venue aggregate isolation, and the
+  requirement that I12 adopt I09-backed semantic admission from its first commit).
+  I12 = READY_TO_IMPLEMENT_WITH_BLOCKS; not authorized.
+
+NO GOVERNANCE CHANGE: B5-I10 = OPERATOR_ACCEPTED; B5-I11 = IMPLEMENTATION_PARTIAL;
+BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
+RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.

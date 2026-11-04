@@ -370,6 +370,11 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
         "src/crypto_sensor_fabric/normalization/sensors/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
+        # DISCLOSED B5-I11R1 (independent audit): the audit suite is a
+        # distinct checkpoint file under the I11 prefix family, so it is
+        # admitted by its own named entry rather than by widening the
+        # I11E1 prefix.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i11r1_",
         "tests/crypto_sensor_fabric/fixtures/i10/",
         "tests/crypto_sensor_fabric/fixtures/i11/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
