@@ -17,6 +17,7 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
+CI_IDENTITY = REPO_ROOT / "docs" / "oce-golden-system" / "OCE_B5_I8_CI_IDENTITY_v1.0.json"
 sys.path.insert(0, str(REPO_ROOT / "infrastructure" / "control-plane" / "tests"))
 
 import b5_i8_audit_support as S  # noqa: E402
@@ -119,19 +120,7 @@ def build() -> dict:
         },
         "gates": {},
         "verdict": {},
-        "ci": {
-            "status": "NOT_EXECUTED",
-            "run_id": None,
-            "check_run_id": None,
-            "job_id": None,
-            "check_suite_id": None,
-            "artifact_id": None,
-            "artifact_name": None,
-            "tested_head": None,
-            "tested_tree": None,
-            "merge_ref": None,
-            "parsed_from": None,
-        },
+        "ci": ci_block(),
         "boundary": {
             "production_changed": False,
             "frontend_changed": False,
@@ -160,6 +149,38 @@ def build() -> dict:
     bundle["verdict"] = S.recompute_verdict(bundle)
     bundle["verdict"]["digest"] = S.verdict_digest(bundle)
     return bundle
+
+
+def ci_block() -> dict:
+    """Observed CI identity, or an explicit NOT_EXECUTED block before any run."""
+    if CI_IDENTITY.exists():
+        identity = json.loads(CI_IDENTITY.read_text(encoding="utf-8"))
+        return {
+            "status": "OBSERVED",
+            "run_id": identity["run_id"],
+            "check_run_id": identity["check_run_id"],
+            "job_id": identity["job_id"],
+            "check_suite_id": identity["check_suite_id"],
+            "artifact_id": identity["artifact_id"],
+            "artifact_name": identity["artifact_name"],
+            "tested_head": identity["head_sha"],
+            "tested_tree": identity["tested_tree"],
+            "merge_ref": identity["merge_ref"],
+            "parsed_from": identity["parsed_from"],
+        }
+    return {
+        "status": "NOT_EXECUTED",
+        "run_id": None,
+        "check_run_id": None,
+        "job_id": None,
+        "check_suite_id": None,
+        "artifact_id": None,
+        "artifact_name": None,
+        "tested_head": None,
+        "tested_tree": None,
+        "merge_ref": None,
+        "parsed_from": None,
+    }
 
 
 def main() -> int:

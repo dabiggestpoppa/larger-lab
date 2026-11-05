@@ -4,8 +4,8 @@
   "stage": "AUTHORIZED_STAGE=B5-I8-IMPLEMENTATION",
   "generated_by": "infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
   "tested": {
-    "head": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
-    "tree": "82fa85a020c2ae61afd54fdf5066fa08249e86af"
+    "head": "81673cef42c10e37d3b51fc4d0e580be360ccc12",
+    "tree": "d466da1be5024c9fed4a33e98f4710b1443daaa5"
   },
   "base_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
   "labels": {
@@ -112,7 +112,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 3,
-        "time_to_first_useful_state_ms": 120.083,
+        "time_to_first_useful_state_ms": 115.487,
         "state_observed": "OK",
         "comprehension": {
           "state_observed": "OK",
@@ -135,7 +135,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 3,
-        "time_to_first_useful_state_ms": 122.751,
+        "time_to_first_useful_state_ms": 114.654,
         "state_observed": "DENIED",
         "comprehension": {
           "state_observed": "DENIED",
@@ -158,7 +158,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 1,
-        "time_to_first_useful_state_ms": 116.291,
+        "time_to_first_useful_state_ms": 109.805,
         "state_observed": "STACK_UNREACHABLE",
         "comprehension": {
           "state_observed": "STACK_UNREACHABLE",
@@ -181,7 +181,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 3,
-        "time_to_first_useful_state_ms": 118.882,
+        "time_to_first_useful_state_ms": 116.559,
         "state_observed": "UNVERIFIABLE",
         "comprehension": {
           "state_observed": "UNVERIFIABLE",
@@ -256,7 +256,7 @@
       "unit": "tasks",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "tested_sha": "81673cef42c10e37d3b51fc4d0e580be360ccc12",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
@@ -265,7 +265,7 @@
       "unit": "tasks",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "tested_sha": "81673cef42c10e37d3b51fc4d0e580be360ccc12",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
@@ -274,7 +274,7 @@
       "unit": "errors",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "tested_sha": "81673cef42c10e37d3b51fc4d0e580be360ccc12",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
@@ -283,16 +283,16 @@
       "unit": "governed reads",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "tested_sha": "81673cef42c10e37d3b51fc4d0e580be360ccc12",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
     "time_to_first_useful_state_ms": {
-      "value": 122.751,
+      "value": 116.559,
       "unit": "ms",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "tested_sha": "81673cef42c10e37d3b51fc4d0e580be360ccc12",
       "environment": "local-win32-cpython3.11 (not a performance claim)",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     }
@@ -324,17 +324,17 @@
     "digest": "3e2eabd3c27af01d9a13ce86aaabb53eeb6446b1755c473896730c26831ce0d2"
   },
   "ci": {
-    "status": "NOT_EXECUTED",
-    "run_id": null,
-    "check_run_id": null,
-    "job_id": null,
-    "check_suite_id": null,
-    "artifact_id": null,
-    "artifact_name": null,
-    "tested_head": null,
-    "tested_tree": null,
-    "merge_ref": null,
-    "parsed_from": null
+    "status": "OBSERVED",
+    "run_id": 42061931200,
+    "check_run_id": 127365645961,
+    "job_id": 127365645961,
+    "check_suite_id": 113977456198,
+    "artifact_id": 13432118604,
+    "artifact_name": "b5-i8-evidence-c3ae4aedc154",
+    "tested_head": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910",
+    "tested_tree": "12fcec2edcff22337de1de33dfbebdb6dda9a472",
+    "merge_ref": "c2990c8cdbd9a221566dec6de8de6e7bc016d047",
+    "parsed_from": "b5-i8-evidence-c3ae4aedc154/b5-i8-registry-proof.json"
   },
   "boundary": {
     "production_changed": false,

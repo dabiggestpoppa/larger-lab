@@ -887,7 +887,13 @@
           "failures": 0,
           "errors": 0,
           "skipped": 0,
-          "unique_nodes": 40
+          "unique_nodes": 40,
+          "merge_ref_first_parent": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+          "merge_ref_second_parent": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910",
+          "check_run_id": 127365645961,
+          "job_id": 127365645961,
+          "artifact_id": 13432118604,
+          "tested_head": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910"
         }
       },
       "same_agent_audit": {

@@ -73,10 +73,24 @@ class TestEvidenceAudit:
         for path in (S.CONTRACT, S.PLAN, S.FAILURE, S.ACCEPTANCE, S.REGISTRY):
             shas |= set(S.HEX40.findall(path.read_text(encoding="utf-8")))
         assert len(shas) >= 5, "no prior-stage citations found"
+        ci = S.registry()["p0"]["implementation"]["evidence"].get("ci", {})
+        merge_ref = ci.get("merge_ref")
+        # A PR merge ref exists only on the server (refs/pull/N/merge); it is not a
+        # history citation. It is exempt from local resolution ONLY while the artifact
+        # that attests it is cited and both recorded parents resolve as real commits.
+        if merge_ref:
+            assert ci.get("status") == "GREEN", ci.get("status")
+            assert ci.get("artifact"), "merge ref exempt without an attesting artifact"
+            for parent_key in ("merge_ref_first_parent", "merge_ref_second_parent"):
+                parent = ci.get(parent_key)
+                assert parent and S.git("cat-file", "-e", parent).returncode == 0, parent_key
         for sha in sorted(shas):
             if sha in S.PRUNED_REFS:
                 # A pruned ref is exempt ONLY while the exemption is recorded.
                 assert sha in S.canonical(S.evidence()["limitations"]), sha
+                continue
+            if merge_ref and sha == merge_ref:
+                assert S.git("cat-file", "-e", sha).returncode != 0, "exempt sha resolves locally"
                 continue
             assert S.git("cat-file", "-e", sha).returncode == 0, sha
         # Discrimination: a fabricated sha does not resolve.
