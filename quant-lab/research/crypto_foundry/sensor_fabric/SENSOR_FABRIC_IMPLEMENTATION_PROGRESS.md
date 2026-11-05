@@ -8394,3 +8394,72 @@ DISPOSITION: I11_RATIFICATION_HOLD
 NO GOVERNANCE CHANGE: B5-I10 = OPERATOR_ACCEPTED; B5-I11 = IMPLEMENTATION_PARTIAL;
 BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
 RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
+
+## 189 - SENSOR-B5-I09P1: REGISTRY TRUST BOUNDARY (DESIGN + ADVERSARIAL CONTRACT)
+
+CUSTODY
+  HEAD 05eb98aae1 = remote; tracked tree clean but the three preserved scratch paths;
+  frozen plan 4bb677f9e resolves and is untouched; I09 ratification, I10 acceptance and
+  the whole I11 chain (E1/F1/R1/R2 + PIT correction) are reachable. Planning checkpoint
+  only: no production, test or configuration byte changed; two evidence documents and
+  this entry are the entire delta. Identifier SENSOR-B5-I09R1 (historical) is not reused.
+
+PRESENT BOUNDARY (read at source, not inferred)
+  Nine seams carry caller material into semantic authority. The registry is text-in only
+  (no path, no digest, no provenance); ProviderSemanticMapping accepts any non-pending
+  evidence STRING and any methodology_id STRING; neither admission path ever resolves a
+  methodology id; normalize_trade types its registry as `object`; schema_version is a free
+  string, never a content digest. ProviderSemanticRegistry( is constructed in exactly
+  three test modules and no production caller -- the exposure is latent, not live, and the
+  first ingestion path would inherit it.
+
+NO AUTHENTIC TRUST ROOT (explicit finding)
+  ABSENT: approved evidence inventory (provider_semantics/ does not exist), approved
+  registry artifact, pinned semantic-config digest, trusted artifact loader, evidence-to-
+  provider binding, approval/revocation. PRESENT_NOT_ENFORCED: blob-level source custody
+  (blob_sha256 of exact source bytes, no link to a semantic row), registry version token,
+  Bloc 1 capability `verified` flags. PRESENT_AND_ENFORCED: storage/export non-circular
+  digest domains (_DIGEST_NEUTRAL), methodology lookup, per-field admission logic.
+
+HARNESS (disposable, untracked, never staged)
+  .bu_tmp/probe_i09p1.py: 26 rows -- 7 CURRENT_BEHAVIOR_REPRODUCED, 15 PROPOSED_TEST_ONLY,
+  4 NOT_EXECUTABLE_UNTIL_IMPLEMENTATION; 7 gaps reproduced, 0 unexpected, exit 0.
+  Current surface reproduces all seven I11R2 gaps: invented evidence promotes LONG/SELL
+  with SEMANTICS_UNVERIFIED absent; an unregistered methodology is admitted; a foreign
+  venue's citation is admitted; a fabricated native field, a nonsense transformation and a
+  self-contradicting blocking assumption are all admitted; and a hand-minted admitted
+  decision with an invented evidence string still validates with a canonical side.
+
+DESIGN (proposed, NOT implemented)
+  Reuse the I09 registry and the storage blob custody. Add: a committed approval manifest
+  owned by review (artifact sha256, approval id, validity, revocation, permitted
+  methodologies, per-provider evidence bindings, declared native fields, approved
+  transformations, assumption resolutions); a pure loader that verifies bytes against the
+  MANIFEST's digest and refuses nine distinct ways before minting a loader-only authority
+  object. The expected digest always comes from the manifest, never from the artifact --
+  which is why rewriting bytes and their embedded digest still fails. Simulated model
+  rejects all seven inputs (DIGEST_MISMATCH, UNREGISTERED_METHODOLOGY,
+  EVIDENCE_NOT_BOUND_TO_PROVIDER, NATIVE_FIELD_NOT_DECLARED, TRANSFORMATION_NOT_APPROVED,
+  BLOCKING_ASSUMPTION_UNRESOLVED, loader-only constructor, UNTRUSTED_AUTHORITY) and admits
+  a labelled-synthetic approval, deterministically, with revocation honoured.
+
+CONSUMERS
+  I10 acceptance is NOT revoked: its ratified behaviour stays provisional under approved
+  data, no production path feeds it a registry, and the missing loader is recorded as an
+  unfulfilled P2 precondition. I11's A11-14 repair is additive at one seam (_admit_field
+  reads the authority instead of a bare registry) and leaves PIT economics, zero/missing,
+  side separation and all-or-nothing promotion untouched.
+
+WHAT REMAINS EXTERNALLY BLOCKED
+  Real provider semantics (B5-I09b), the first real manifest entry, the operator review
+  workflow, and the unresolved B5_I08_UNITS_V1 citation. Code closes the digest/enforcement
+  half; it cannot authenticate a venue's documentation, and this checkpoint does not claim
+  it does.
+
+STATUS: B5-I09P1_PLANNING_COMPLETE -- NO GATE PROMOTED. Evidence:
+BLOC_05_I09P1_REGISTRY_TRUST_BOUNDARY.md, BLOC_05_I09P1_ADVERSARIAL_TEST_CONTRACT.md.
+
+NO GOVERNANCE CHANGE: B5-I09a = OPERATOR_ACCEPTED; B5-I09b = DEFERRED; B5-I10 =
+OPERATOR_ACCEPTED (bounded); B5-I11 = IMPLEMENTATION_PARTIAL / RATIFICATION_HOLD;
+BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
+RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
