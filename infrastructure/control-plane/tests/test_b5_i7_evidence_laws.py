@@ -175,17 +175,120 @@ def check_el08(doc: dict) -> None:
         assert run["nodes"] >= floor, f"{run['end']} population {run['nodes']} < floor {floor}"
 
 
-def check_el09(doc: dict) -> None:
-    """Manifest rows are recomputed from bytes, never typed in."""
-    manifest = doc["manifest"]
-    assert manifest["gated"], "manifest has no gated rows"
-    for row in manifest["artifacts"]:
-        path = REPO_ROOT / row["path"]
-        assert path.is_file(), f"missing artifact {row['path']}"
-        assert hashlib.sha256(path.read_bytes().replace(bytes((13, 10)), bytes((10,)))).hexdigest() \
-            == row["sha256"], f"{row['path']}: hash mismatch"
-        assert path.stat().st_size >= 0
-        assert row["size_bytes"] == len(path.read_bytes().replace(bytes((13, 10)), bytes((10,))))
+# ── EL09 X1: manifest verification modes ────────────────────────────────────
+#
+# The historical B5-I7 manifest attests the COMPLETE bytes of thirteen files at
+# the B5-I7 evidence head. Twelve of them are immutable: any later edit must be
+# refused by whole-file equality. The thirteenth is the Book 5 progress ledger,
+# which is APPEND-ONLY by law — later authorized stages must preserve the B5-I7
+# bytes exactly and add their own evidence after them. Permanent whole-file
+# equality therefore contradicts the ledger law it was meant to protect; it is
+# corrected here, without rewriting the historical row
+# (see OCE_B5_I7_EL09_APPEND_ONLY_LEDGER_CORRECTION_v1.0.md).
+#
+# The durable invariant for that one path is
+#
+#     current_bytes[:size_bytes] == historical_bytes      (sha256 83a40ac7…)
+#
+# Exact path match — never a suffix, substring or extension heuristic. Suffix
+# bytes appended by a later stage are that stage's own evidence and are never
+# claimed as covered by the historical row.
+LEDGER_ROW_PATH = "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md"
+VERIFIER_ROW_PATH = "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py"
+SUPERSEDING = DOCS / "OCE_B5_I7_EL09_X1_SUPERSEDING_MANIFEST_v1.0.json"
+
+WHOLE_FILE = "whole_file"
+APPEND_ONLY_PREFIX = "append_only_prefix"
+VERIFICATION_MODES = frozenset({WHOLE_FILE, APPEND_ONLY_PREFIX})
+DIGEST64 = re.compile(r"[0-9a-f]{64}")
+
+
+def superseding_manifest() -> dict:
+    return json.loads(SUPERSEDING.read_text(encoding="utf-8"))
+
+
+def _normalized_bytes(path: Path) -> bytes:
+    return path.read_bytes().replace(bytes((13, 10)), bytes((10,)))
+
+
+def governed_mode(row: dict) -> str:
+    """Classify a row: only the exact Book 5 ledger path may be prefix-bound."""
+    path = row.get("path")
+    assert isinstance(path, str) and path, "manifest row without a path"
+    assert "\\" not in path and not path.startswith("/"), f"{path}: not a repository-relative path"
+    governed = APPEND_ONLY_PREFIX if path == LEDGER_ROW_PATH else WHOLE_FILE
+    declared = row.get("verification")
+    if declared is not None:
+        assert declared in VERIFICATION_MODES, f"{path}: unknown verification mode {declared!r}"
+        assert declared == governed, (
+            f"{path}: declared verification {declared!r} contradicts the governed mode {governed!r}"
+        )
+    return governed
+
+
+def verify_manifest_row(row: dict, root: Path = REPO_ROOT) -> None:
+    """Recompute one row from bytes under its governed verification mode."""
+    path = row["path"]
+    mode = governed_mode(row)
+    digest, size = row.get("sha256"), row.get("size_bytes")
+    assert isinstance(digest, str) and DIGEST64.fullmatch(digest), (
+        f"{path}: digest {digest!r} is not 64 lowercase hex"
+    )
+    assert isinstance(size, int) and not isinstance(size, bool) and size >= 0, (
+        f"{path}: size {size!r} is not a non-negative integer"
+    )
+    target = root / path
+    assert target.is_file(), f"missing artifact {path}"
+    data = _normalized_bytes(target)
+    if mode == WHOLE_FILE:
+        assert len(data) == size, f"{path}: size {len(data)} != recorded {size}"
+        assert hashlib.sha256(data).hexdigest() == digest, f"{path}: hash mismatch"
+        return
+    assert len(data) >= size, (
+        f"{path}: {len(data)} bytes is shorter than the historical prefix {size}"
+    )
+    assert hashlib.sha256(data[:size]).hexdigest() == digest, f"{path}: immutable prefix hash mismatch"
+
+
+def check_el09(doc: dict, *, superseding: dict | None = None, root: Path = REPO_ROOT) -> None:
+    """Manifest rows are recomputed from bytes; the Book 5 ledger is prefix-bound.
+
+    The historical manifest is never rewritten. Twelve rows must still equal
+    their historical bytes exactly; the ledger row must still begin with its
+    historical bytes. The verifier itself is revisioned by this correction, so
+    its current bytes are attested by the superseding manifest — which is in
+    turn proven to be an exact copy of the historical manifest for every other
+    row, so the correction cannot quietly weaken anything.
+    """
+    frozen = doc["manifest"]
+    assert frozen["gated"], "manifest has no gated rows"
+    frozen_rows = frozen["artifacts"]
+    frozen_paths = [row["path"] for row in frozen_rows]
+    assert len(frozen_paths) == len(set(frozen_paths)), "duplicate path in the historical manifest"
+    assert frozen_paths.count(LEDGER_ROW_PATH) == 1, (
+        "historical manifest must carry exactly one Book 5 ledger row"
+    )
+
+    revised = superseding if superseding is not None else superseding_manifest()
+    revised_rows = revised["artifacts"]
+    revised_paths = [row["path"] for row in revised_rows]
+    assert len(revised_paths) == len(set(revised_paths)), "duplicate path in the superseding manifest"
+    assert set(revised_paths) == set(frozen_paths), "superseding manifest changes the row population"
+    assert revised_paths.count(LEDGER_ROW_PATH) == 1, (
+        "superseding manifest must carry exactly one Book 5 ledger row"
+    )
+
+    for row in revised_rows:
+        governed_mode(row)
+
+    attested = {row["path"]: row for row in revised_rows}
+    for row in frozen_rows:
+        if row["path"] == VERIFIER_ROW_PATH:
+            continue
+        assert attested[row["path"]] == row, f"{row['path']}: historical manifest row was rewritten"
+
+    for row in revised_rows:
+        verify_manifest_row(row, root)
 
 
 def check_el10(doc_mut: dict) -> None:
@@ -339,13 +442,149 @@ class TestEL08:
 
 
 class TestEL09:
-    def test_manifest_rows_recomputed_hash_and_size(self):
-        doc = addendum()
-        check_el09(doc)
+    def test_manifest_rows_recomputed_hash_and_size(self, tmp_path):
+        """Law plus discriminating controls for the prefix invariant (X1).
+
+        Every negative control is refused BY THE LAW — the assertion message is
+        checked — never by a syntax, import or configuration error. Controls
+        live inside this node so the frozen inventory stays at twenty-seven.
+        """
+        doc, revised = addendum(), superseding_manifest()
+        check_el09(doc)  # positive: the real repository
         bad = copy.deepcopy(doc)
         bad["manifest"]["artifacts"][0]["sha256"] = "f" * 64
         with pytest.raises(AssertionError):
-            check_el09(bad)
+            check_el09(bad)  # the frozen falsification, unchanged
+
+        frozen_ledger = next(r for r in doc["manifest"]["artifacts"] if r["path"] == LEDGER_ROW_PATH)
+        historical_size = frozen_ledger["size_bytes"]
+        historical = _normalized_bytes(LEDGER)[:historical_size]
+        assert hashlib.sha256(historical).hexdigest() == frozen_ledger["sha256"]
+        assert revised["artifacts"][0] == doc["manifest"]["artifacts"][0]
+
+        immutable_bytes = b"# immutable B5-I7 evidence\n"
+        immutable_row = {
+            "path": "docs/immutable.md",
+            "sha256": hashlib.sha256(immutable_bytes).hexdigest(),
+            "size_bytes": len(immutable_bytes),
+        }
+        ledger_row = dict(frozen_ledger)
+
+        def materialize(name, ledger_bytes, *, rows, immutable=immutable_bytes, extra=None):
+            root = tmp_path / name
+            target = root / LEDGER_ROW_PATH
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(ledger_bytes)
+            other = root / "docs" / "immutable.md"
+            other.parent.mkdir(parents=True, exist_ok=True)
+            other.write_bytes(immutable)
+            for relative, payload in (extra or {}).items():
+                path = root / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(payload)
+            return (
+                {"manifest": {"gated": True, "artifacts": list(rows)}},
+                {"artifacts": list(rows)},
+                root,
+            )
+
+        def accepts(name, ledger_bytes, *, rows, **kwargs):
+            frozen_doc, revised_doc, root = materialize(name, ledger_bytes, rows=rows, **kwargs)
+            check_el09(frozen_doc, superseding=revised_doc, root=root)
+
+        def refuses(name, ledger_bytes, *, rows, fragment, **kwargs):
+            frozen_doc, revised_doc, root = materialize(name, ledger_bytes, rows=rows, **kwargs)
+            with pytest.raises(AssertionError) as raised:
+                check_el09(frozen_doc, superseding=revised_doc, root=root)
+            assert fragment in str(raised.value), f"{name}: {raised.value}"
+
+        # ── positives ──────────────────────────────────────────────────────
+        accepts("historical", historical, rows=[ledger_row, immutable_row])
+        accepts("one-suffix", historical + b"\nstage suffix\n", rows=[ledger_row, immutable_row])
+        accepts("multi-suffix", historical + b"\nfirst\n" + b"second\n", rows=[ledger_row, immutable_row])
+        accepts("immutable-exact", historical, rows=[ledger_row, immutable_row])
+
+        # ── negatives: prefix mutation ─────────────────────────────────────
+        flipped = bytearray(historical)
+        flipped[historical_size // 2] ^= 0x20
+        refuses(
+            "prefix-byte-same-size", bytes(flipped), rows=[ledger_row, immutable_row],
+            fragment="immutable prefix hash mismatch",
+        )
+        newline_at = historical.index(b"\n")
+        refuses(
+            "prefix-newline",
+            historical[:newline_at] + b"\r" + historical[newline_at + 1:],
+            rows=[ledger_row, immutable_row], fragment="immutable prefix hash mismatch",
+        )
+        refuses(
+            "prefix-insert", historical[:100] + b"INSERTED" + historical[100:],
+            rows=[ledger_row, immutable_row], fragment="immutable prefix hash mismatch",
+        )
+        refuses(
+            "prefix-delete", historical[:100] + historical[101:],
+            rows=[ledger_row, immutable_row], fragment="shorter than the historical prefix",
+        )
+        refuses(
+            "truncate", historical[:-10], rows=[ledger_row, immutable_row],
+            fragment="shorter than the historical prefix",
+        )
+        refuses(
+            "reorder", historical[::-1], rows=[ledger_row, immutable_row],
+            fragment="immutable prefix hash mismatch",
+        )
+
+        # ── negatives: row integrity ───────────────────────────────────────
+        refuses(
+            "wrong-digest", historical,
+            rows=[dict(ledger_row, sha256="f" * 64), immutable_row],
+            fragment="immutable prefix hash mismatch",
+        )
+        refuses(
+            "wrong-size", historical,
+            rows=[dict(ledger_row, size_bytes=historical_size + 1), immutable_row],
+            fragment="shorter than the historical prefix",
+        )
+        refuses(
+            "malformed-digest", historical,
+            rows=[dict(ledger_row, sha256="F" * 64), immutable_row],
+            fragment="not 64 lowercase hex",
+        )
+        refuses(
+            "unknown-mode", historical,
+            rows=[dict(ledger_row, verification="prefix_v2"), immutable_row],
+            fragment="unknown verification mode",
+        )
+
+        # ── negatives: classification and population ───────────────────────
+        refuses(
+            "missing-ledger-row", historical, rows=[immutable_row],
+            fragment="exactly one Book 5 ledger row",
+        )
+        refuses(
+            "duplicate-ledger-row", historical,
+            rows=[ledger_row, dict(ledger_row), immutable_row], fragment="duplicate path",
+        )
+        refuses(
+            "false-append-only", historical,
+            rows=[ledger_row, dict(immutable_row, verification=APPEND_ONLY_PREFIX)],
+            fragment="contradicts the governed mode",
+        )
+        refuses(
+            "append-to-immutable", historical,
+            rows=[ledger_row, immutable_row],
+            immutable=immutable_bytes + b"suffix\n", fragment="docs/immutable.md: size",
+        )
+        copy_row = {
+            "path": "docs/ledger-copy.md",
+            "sha256": ledger_row["sha256"],
+            "size_bytes": historical_size,
+        }
+        refuses(
+            "different-path-same-bytes", historical,
+            rows=[ledger_row, immutable_row, copy_row], fragment="docs/ledger-copy.md: size",
+            extra={"docs/ledger-copy.md": historical + b"\nsuffix\n"},
+        )
 
 
 class TestEL10:

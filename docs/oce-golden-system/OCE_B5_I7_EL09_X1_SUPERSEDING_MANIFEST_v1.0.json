@@ -1,0 +1,86 @@
+{
+  "artifacts": [
+    {
+      "path": "infrastructure/console/src/oce_console/panel.py",
+      "sha256": "0477282596e98aa426507bdd6e515018a25c65721a314463b70d2a89ac38b05e",
+      "size_bytes": 28010
+    },
+    {
+      "path": "infrastructure/console/src/oce_console/cli.py",
+      "sha256": "e1e73f093cdb1fb120f0d3ac0d8ff4e1a0c213591a4a42d212a529f9a064be47",
+      "size_bytes": 8356
+    },
+    {
+      "path": "infrastructure/console/packaging/make_release_manifest.py",
+      "sha256": "2dcdb22e0c6c8bf461555cab327856e580dac99afa9316c37ec6c90b79a85f20",
+      "size_bytes": 11921
+    },
+    {
+      "path": "infrastructure/control-plane/tests/test_b5_i7_governed_change.py",
+      "sha256": "0e2773590980da967f2c86ae4bc1e16d86abd9c36d0398c1e6db21cef8de2734",
+      "size_bytes": 35301
+    },
+    {
+      "path": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+      "sha256": "2546c49c33faaa33bb8a6d93c7ed587fb4a7386d9544efa12f62fcfa1588188f",
+      "size_bytes": 27758
+    },
+    {
+      "path": "infrastructure/control-plane/scripts/b5_i7_mutation_battery.py",
+      "sha256": "ebacaf5027b1bd64ec19e125b82c418c6351291ddb5df1dbd1be964c3ae00586",
+      "size_bytes": 10726
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_B5_I7_GOVERNED_CHANGE_RECORD_v1.0.md",
+      "sha256": "ea8fe3b6d5311f525650899c92093e6881c5c7adc7ee585636cd5cf54e13d414",
+      "size_bytes": 12464
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_B5_I7_REUSE_INVENTORY_v1.0.md",
+      "sha256": "42e245f214ad04bdeae0737bd036d4ad8c1032a6c57ffd5d29ddf10a5dd33e9d",
+      "size_bytes": 4084
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_B5_I7_MUTATION_RESULTS_v1.0.json",
+      "sha256": "d9b824ec37cb407e1a99a9712abfb41857e19d03580d8b88ebc8bd575162d196",
+      "size_bytes": 11566
+    },
+    {
+      "path": ".github/workflows/b1-i1r-validation.yml",
+      "sha256": "638b2e43d2981fa644c4bbbd59a40be46e911727d06e44ff6e015c9a4c6fa153",
+      "size_bytes": 56417
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "sha256": "83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30",
+      "size_bytes": 191950
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_B5_I7_ACCEPTANCE_MATRIX_v1.0.md",
+      "sha256": "e3e808b0ef68b32c4a09f8fe9f87fa03038abf6023f2a0d8d8e6357a98c50a75",
+      "size_bytes": 28721
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_B5_I7_OPERATOR_RATIFICATION_v1.0.md",
+      "sha256": "b18d80b385a5dd864b8cde45f6f04f3bf15f4700c6ef8411672471f502db105f",
+      "size_bytes": 7420
+    }
+  ],
+  "historical_manifest": {
+    "path": "docs/oce-golden-system/OCE_B5_I7_REQUIREMENT_EXECUTION_ADDENDUM_v1.0.json",
+    "sha256": "eea45b226889cf5e9c31663e2aa2eb45790aaee4327cf06247093739732e9b0a",
+    "size_bytes": 19812
+  },
+  "kind": "oce-b5-i7-el09-x1-superseding-manifest",
+  "ledger_prefix_row": {
+    "path": "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+    "sha256": "83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30",
+    "size_bytes": 191950
+  },
+  "note": "rows recomputed from LF-normalized bytes (B5I7-EL09 X1)",
+  "preserved_rows": 12,
+  "purpose": "Attest the verifier revisioned by the EL09 X1 correction without editing the frozen B5-I7 addendum. Every row other than the verifier is a byte-for-byte copy of the historical manifest, and the ledger row keeps its historical digest and size.",
+  "revisioned_row": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+  "stage": "B5-I7-EL09-X1",
+  "version": "1.0.0"
+}

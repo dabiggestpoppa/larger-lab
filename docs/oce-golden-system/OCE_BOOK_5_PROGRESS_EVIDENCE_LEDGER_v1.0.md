@@ -1852,6 +1852,7 @@ Ratification authorizes merging PR #20 only. `B5-I8 = LOCKED`, `B5-I9 = LOCKED`,
 deferred I-7 web view remains unimplemented, cost remains `$0`, and
 `capital.authority = none`.
 
+<<<<<<< HEAD
 ## 19. B5-I8 (plan §7 "Independent E2E, adversarial, usability and evidence audit") — P0 planning freeze (append-only; 2026-11-03)
 
 ### 19.1 Reality lock (observed before any authoring)
@@ -1952,3 +1953,43 @@ external hosting or telemetry · Freebuff untouched · no amend/squash/rebase/re
 The P0 commit SHA, its parent, the PR number and any run/check/job/artifact id cannot be known
 before they exist; per `EL01`/`EL02` they are recorded in a later append-only addendum after
 observation, never predicted.
+=======
+## 18.12 Superseding correction — EL09 manifest verification for the append-only ledger (X1; append-only; 2026-11-05)
+
+`B5I7-EL09` verified every manifest row by permanent whole-file equality. One of the thirteen rows
+is the Book 5 progress ledger, which is append-only by law: any later authorized stage must
+preserve the B5-I7 bytes and append its own evidence. The two obligations are incompatible, and the
+next legitimate append proved it — B5-I8 P0 appended `§19` at `145d31e9` and `TestEL09` failed at
+run `41724079443` (job `126232778697`, artifact `13274838782`) with
+`OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md: hash mismatch`, observed
+`2b139f12…` / `198231` against the attested `83a40ac7…` / `191950`.
+
+The historical row was accurate and is unchanged. The defect was the verifier's permanent
+whole-file interpretation of an immutable-prefix obligation. The corrected law binds that exact
+path (exact match, never substring or suffix) to:
+
+    sha256(current_bytes[:191950]) == 83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30
+    len(current_bytes) >= 191950
+
+All twelve non-ledger rows remain exact whole-file hash-and-size checks; only this ledger is
+prefix-bound. Appended suffix bytes are the appending stage's own evidence and are never claimed
+as covered by the historical row. Missing or duplicated ledger rows, unknown verification modes,
+and any attempt to grant append-only treatment to another path all fail closed.
+
+Because the verifier is itself a manifest row, its correction is attested by
+`OCE_B5_I7_EL09_X1_SUPERSEDING_MANIFEST_v1.0.json` (sha256 `e6210bb2eb6c78d946ddd2deac4995e8c9970bc7ee137ea753e7ab8b4739af47`,
+`3581` bytes, 13 rows: 12 preserved byte-for-byte, 1 revisioned verifier pinned by exact
+whole-file hash and size, historical ledger row unchanged at `83a40ac7…` / `191950`).
+The frozen B5-I7 addendum is not modified; the corrected verifier is `27758` bytes,
+sha256 `2546c49c33faaa33bb8a6d93c7ed587fb4a7386d9544efa12f62fcfa1588188f`.
+
+Twenty-one discriminating controls run inside the frozen `TestEL09` node (4 positive, 17
+negative), so the B5-I7 inventory remains exactly 27 nodes; every negative control is refused by
+the law itself and asserted on its message. No production behaviour changed, no historical
+evidence was erased, no gate was suppressed or skipped, and the 14-mutation battery and adjacent
+B5-I2…I7 populations remain green.
+
+Audit is `SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT`. `B5-I8` remains planning-only;
+`B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`; post-Book-6 evaluation not started. Cost `$0`,
+`capital.authority = none`, Freebuff untouched.
+>>>>>>> origin/main
