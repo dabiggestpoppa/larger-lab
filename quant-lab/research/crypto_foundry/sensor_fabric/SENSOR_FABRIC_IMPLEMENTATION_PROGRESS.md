@@ -8316,3 +8316,81 @@ DISPOSITION: I11_REPAIR_PASS_PENDING_OPERATOR_RATIFICATION
 NO GOVERNANCE CHANGE: B5-I10 = OPERATOR_ACCEPTED; B5-I11 = IMPLEMENTATION_PARTIAL;
 BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
 RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
+
+## 188 - SENSOR-B5-I11R2: INDEPENDENT RATIFICATION AUDIT + TRUST-BOUNDARY HOLD
+
+CUSTODY (unchanged by this checkpoint)
+  HEAD 6bb6490d10 = remote; tracked tree clean but the three preserved scratch paths; the
+  I11F1 parent diff is exactly its nine declared paths; frozen plan 4bb677f9e untouched;
+  I08/I09/I10 pins and sealed evidence intact. No production, test or configuration change
+  was made: this entry and two evidence documents are the whole checkpoint.
+
+AUTHORITY RECONSTRUCTED, NOT ACCEPTED FROM THE PRODUCER
+  03 §12 makes the provider semantic registry planned CONFIG and semantic confidence a
+  DECLARED attribute carrying an evidence reference; §13 blocks AMBIGUOUS for critical T1
+  and forbids community evidence masquerading as first-party; 04 §3.3 keeps
+  maker_taker_role optional; 07 F17/F18/F24/F25 fix provider-side semantics, side
+  separation, no T1 cross-venue synthesis and complete lineage. The frozen text nowhere
+  specifies how an evidence reference is AUTHENTICATED.
+
+MEASURED TRUST-BOUNDARY DEFECT (34 adversarial probes, public API only)
+  26 PASS, 7 GAP, 1 MEASURED, 0 unexplained. A caller-minted registry whose four rows
+  carry an INVENTED evidence string promotes canonical LONG/SELL as
+  VERIFIED_FIRST_PARTY with SEMANTICS_UNVERIFIED absent (T02). An unregistered
+  methodology_id (T03), another venue's evidence string on a BINANCE row (T04), a native
+  field no venue exposes (T05), a nonsense transformation (T06) and a blocking assumption
+  that contradicts the claim (T07) are all ADMITTED. A hand-minted admitted decision
+  spliced into a record validates WITH a canonical side (T12). SCHEMA_VALID,
+  ROW_RESOLVED, REFERENCE_PRESENT, AUTHENTICATED and APPROVED collapse into the first:
+  the system contains no trusted registry-loading or provenance boundary. The pattern is
+  shared with normalization/sensors/side_maps.py, so the root fix belongs to I09.
+
+WHAT PASSED INDEPENDENTLY
+  FIELD_MISMATCH and NO_REGISTRY_MAPPING per field; AMBIGUOUS refusal; pending evidence
+  unrepresentable at construction; LONG+BUY quarantined with every admission refused;
+  COMMUNITY_DOCUMENTED admitted but never relabelled first-party; SEMANTICS_UNVERIFIED
+  present exactly when nothing was promoted; cross-venue isolation; count and aggregate
+  identity laws; zero versus missing; liquidation_usd blocked with its citation; a
+  contradictory contract instance refused; a late reference price blocked with no
+  substitution; price_native proven not to be the conversion input. 23 of 24 A11 gates
+  pass.
+
+ALL-OR-NOTHING AND MAKER/TAKER (measured, disclosed)
+  An uncertified role claim withholds two independently certified side claims (T22), with
+  every would-be decision and refusal reason preserved. Consistent with 05 §12's single
+  record-level semantic token (a hybrid would attach SEMANTICS_UNVERIFIED to an asserted
+  canonical side); recorded as a capability limitation, revisitable only with a
+  field-level quality vocabulary that is not authorized. Role gating is accepted as a
+  necessary consistency effect: MAKER/TAKER/BOTH/UNKNOWN all survive, and UNKNOWN makes no
+  claim and blocks nothing.
+
+PIT CORRECTION (append-only)
+  I11R1 §2.1 said halving the reference price "halves the base". base = face / price, so it
+  DOUBLES. Production and the committed assertions were already correct
+  (at_60k = 250/60000, at_30k = 250/30000); only the prose was wrong -- classification A.
+  Independently re-measured: linear 2.5 BTC -> 150000 USDT; inverse 25000 USD face ->
+  0.41666... BTC at 60k and 0.83333... at 30k, ratio exactly 2. Superseded in
+  BLOC_05_I11R1_PIT_NARRATIVE_CORRECTION.md without rewriting the accepted record.
+
+REGRESSION PROVENANCE
+  4466 passed / 14 skipped implies 4480 executed, but --collect-only at this HEAD reports
+  4477: the collection report undercounts by three, so the tally was not accepted on
+  inspection. Re-measured here: 4466 passed, 14 skipped, 0 xfailed, exit 0, 1199.96s --
+  the same tally, independently reproduced. Focused suites (I11
+  semantics, I11F1 security, I11R1 audit, I10/I11 scope audits, governance binding):
+  135 passed, exit 0.
+
+DISPOSITION: I11_RATIFICATION_HOLD
+  A11-14 FAIL. The caller Boolean is gone and admission is per field, but the certification
+  the normalizer reads is still caller-supplied. Narrow repair proposed and NOT executed:
+  an I09-owned loader returning the registry with a provenance token (artifact digest,
+  schema version, source), methodology_id resolution, per-provider evidence binding, and
+  registry_digest + authority_source carried on the record. No new registry, no new
+  confidence vocabulary, no invented provider documentation.
+  I12 handoff: reuse the admission SHAPE, never the trust assumption; no I12 authorization
+  proposal is issued because I11 is not acceptable. Evidence:
+  BLOC_05_I11R2_INDEPENDENT_AUDIT.md.
+
+NO GOVERNANCE CHANGE: B5-I10 = OPERATOR_ACCEPTED; B5-I11 = IMPLEMENTATION_PARTIAL;
+BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
+RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
