@@ -2102,3 +2102,45 @@ production, frontend, contract, existing-test, provider or credential surface ch
 ### 20.9 CI identities
 
 Recorded in §20.10 and in the PR body once the exact-head runs exist. No id is written before it is observed.
+
+### 20.10 CI identities — head `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910`
+
+| Field | Value |
+|---|---|
+| `head_sha` | `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910` |
+| `head_tree` | `12fcec2edcff22337de1de33dfbebdb6dda9a472` |
+| `pr_head_sha` | `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910` |
+| `tested_tree` | `12fcec2edcff22337de1de33dfbebdb6dda9a472` |
+| `merge_ref_sha` | `c2990c8cdbd9a221566dec6de8de6e7bc016d047` |
+| `merge_ref_first_parent` | `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` |
+| `merge_ref_second_parent` | `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910` |
+| `merge_ref_tree` | `12fcec2edcff22337de1de33dfbebdb6dda9a472` |
+| `merge_ref_tree_equals_tested_tree` | `true` |
+| `b5_i8_run_id` | `42061931200` |
+| `b5_i8_check_suite_id` | `113977456198` |
+| `b5_i8_job_id` | `127365645961` |
+| `b5_i8_conclusion` | `success` |
+| `b5_i8_event` | `pull_request` |
+| `b1_i1r_run_id` | `42061931573` |
+| `b1_i1r_check_suite_id` | `113977457536` |
+| `b1_i1r_job_id` | `127365646581` |
+| `b1_i1r_conclusion` | `success` |
+| `artifact_id` | `13432118604` |
+| `artifact_name` | `b5-i8-evidence-c3ae4aedc154` |
+| `artifact_size_bytes` | `5071` |
+| `artifact_expires_at` | `2026-12-05T16:12:36Z` |
+| `collected` | `40` |
+| `executed` | `40` |
+| `passed` | `40` |
+| `failures` | `0` |
+| `errors` | `0` |
+| `skipped` | `0` |
+| `unique_nodes` | `40` |
+| `orphan_files` | `none` |
+| `node_closure` | `true` |
+| `adjacent_population` | `{'returncode': 0, 'counts': {'test_b5_i2_mutation_harness.py': 16, 'test_b5_i3_requirement_registry.py': 51, 'test_b5_i4_console_kernel.py': 23, 'test_b5_i5_timeline.py': 45, 'test_b5_i6_console_restart.py': 5, 'test_b5_i6_deploy_pkg.py': 9, 'test_b5_i6_fail_closed.py': 4, 'test_b5_i6_recovery_drill.py': 9, 'test_b5_i7_governed_change.py': 12, 'test_b5_i7_evidence_laws.py': 15}, 'total': 189}` |
+| `manifest_result` | `immutable rows exact; ledger prefix 191950 B = 83a40ac7…` |
+| `mutation_result` | `12/12 DISCRIMINATED; byte-exact restore; tracked tree clean` |
+| `cleanup_result` | `workspace cleaned in the workflow; no residue asserted` |
+| `local_pre_existing_failures` | `32` |
+| `local_pre_existing_scope` | `test_b4_startup_gate/​test_b4_cxr7/​test_b4_cxr6/​test_local_lifecycle (Windows host; 33 on base)` |

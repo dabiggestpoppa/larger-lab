@@ -874,7 +874,20 @@
         "mutation_results": "docs/oce-golden-system/OCE_B5_I8_MUTATION_RESULTS_v1.0.json",
         "protocol": "docs/oce-golden-system/OCE_B5_I8_USABILITY_PROTOCOL_AND_RESULTS_v1.0.md",
         "ci": {
-          "status": "NOT_EXECUTED"
+          "status": "GREEN",
+          "head_sha": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910",
+          "tested_tree": "12fcec2edcff22337de1de33dfbebdb6dda9a472",
+          "merge_ref": "c2990c8cdbd9a221566dec6de8de6e7bc016d047",
+          "run_id": 42061931200,
+          "check_suite_id": 113977456198,
+          "artifact": "b5-i8-evidence-c3ae4aedc154",
+          "collected": 40,
+          "executed": 40,
+          "passed": 40,
+          "failures": 0,
+          "errors": 0,
+          "skipped": 0,
+          "unique_nodes": 40
         }
       },
       "same_agent_audit": {
