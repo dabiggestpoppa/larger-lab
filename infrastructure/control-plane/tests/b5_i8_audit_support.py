@@ -626,3 +626,11 @@ def collect_adjacent() -> dict:
         name = Path(line.split("::", 1)[0].strip()).name
         counts[name] = counts.get(name, 0) + 1
     return {"returncode": proc.returncode, "counts": counts, "total": sum(counts.values())}
+
+
+CI_IDENTITY_PATH = REPO_ROOT / "docs" / "oce-golden-system" / "OCE_B5_I8_CI_IDENTITY_v1.0.json"
+
+
+def ci_identity() -> dict:
+    """The committed, parsed CI identity record ({} before any observed run)."""
+    return load(CI_IDENTITY_PATH) if CI_IDENTITY_PATH.exists() else {}

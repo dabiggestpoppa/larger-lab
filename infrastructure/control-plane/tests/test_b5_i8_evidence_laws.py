@@ -31,7 +31,15 @@ def _falsified() -> dict:
 
 def check_el01(bundle: dict) -> None:
     text = S.canonical(bundle)
+    ci = bundle.get("ci", {})
+    merge_ref = ci.get("merge_ref")
     for sha in set(S.HEX40.findall(text)):
+        if merge_ref and sha == merge_ref:
+            # A PR merge ref lives only on the server. Exempt ONLY while the parsed
+            # artifact is cited and the ref genuinely does not resolve locally.
+            assert ci.get("status") == "OBSERVED" and ci.get("parsed_from"), sha
+            assert S.git("cat-file", "-e", sha).returncode != 0, "exempt sha resolves locally"
+            continue
         if sha in S.PRUNED_REFS:
             # Exempt only because the exemption is recorded in the evidence.
             assert sha in S.canonical(bundle["limitations"]), sha
@@ -70,6 +78,23 @@ def check_el02(bundle: dict) -> None:
             assert isinstance(ci[key], int) and ci[key] > 0, key
         assert ci["parsed_from"], "OBSERVED CI row without its parsed artifact"
         assert ci["tested_head"] and ci["tested_tree"] and ci["merge_ref"]
+        # Every observed identity must equal the committed parsed record: an id that
+        # no artifact attests cannot be recorded as fact.
+        identity = S.ci_identity()
+        assert identity.get("status") == "OBSERVED", "no committed CI identity record"
+        for bundle_key, identity_key in (
+            ("run_id", "run_id"),
+            ("check_run_id", "check_run_id"),
+            ("job_id", "job_id"),
+            ("check_suite_id", "check_suite_id"),
+            ("artifact_id", "artifact_id"),
+            ("artifact_name", "artifact_name"),
+            ("tested_head", "head_sha"),
+            ("tested_tree", "tested_tree"),
+            ("merge_ref", "merge_ref"),
+        ):
+            assert ci[bundle_key] == identity[identity_key], bundle_key
+        assert identity["merge_ref_tree_equals_tested_tree"] is True
 
 
 class TestEL02:
