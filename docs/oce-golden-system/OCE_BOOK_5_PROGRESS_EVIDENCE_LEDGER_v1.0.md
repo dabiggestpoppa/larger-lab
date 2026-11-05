@@ -1890,3 +1890,163 @@ B5-I2…I7 populations remain green.
 Audit is `SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT`. `B5-I8` remains planning-only;
 `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`; post-Book-6 evaluation not started. Cost `$0`,
 `capital.authority = none`, Freebuff untouched.
+
+## 19. B5-I8 (plan §7 "Independent E2E, adversarial, usability and evidence audit") — P0 planning freeze (append-only; 2026-11-03)
+
+### 19.1 Reality lock (observed before any authoring)
+
+`origin/main` = `7393228dd4b21be9440785204ea9e640800d5d95` (PR #20 `MERGED` at
+`2026-11-03T20:20:27Z`; parents `9dc0b7d2…` + `08bf0b2d…`; merge tree `ada0f5a5…` equals the
+B5-I7 ratification-head tree). Frozen refs unchanged: `oce-book-5-i7` `29d7a7ed…`,
+`oce-book-5-i6` `335862bc…`, X1 `f6308181…`; implementation branch `oce-book-5-i7-build`
+`08bf0b2d…`. No B5-I8 branch, PR, source, test, evidence, workflow or planning artifact
+existed. No B5-I9 work; no `test_b5_i7_web_view.py`; no incomplete Git operation or lock;
+no unpublished commit on the base. Local `main` is `7e7ef722…`, 909 behind and an ancestor
+of `origin/main` — a stale local ref only, not repaired. Branch `oce-book-5-i8` derives from
+the exact merged `origin/main`. Cost `$0`; `capital.authority = none`; Freebuff untouched.
+
+### 19.2 Stage identity and the cross-numbering verdict
+
+Plan §7 row `B5-I8` = *independent E2E, adversarial, usability and evidence audit*, gate
+*zero critical bypass or false claim*. B5-I8 has **no charter increment row of its own**:
+charter `I-8` (governed change + observability demonstration) was consumed by stage B5-I7;
+charter `I-7` (optional loopback web view) is anchored to plan `B5-I6`, was never directed,
+and is owned by the Operator. B5-I8 therefore owns exactly one inherited registry entry,
+`G16` (received as `B5I7-DF02`), at the frozen node
+`test_b5_i8_independent_audit.py::TestUsabilityProtocol::test_accessibility_and_usability_verified`.
+
+**Web-view disposition = C**: B5-I8 proves usability without implementing the web view; the
+web view remains separately operator-directable and unscheduled (`B5I8-DF01`). The reserved
+`test_b5_i7_web_view.py` prefix is permanent debt of frozen B5-I3 text and cannot be repaired
+without editing frozen history; B5-I8 asserts its absence and creates nothing.
+
+### 19.3 Scope and exclusions
+
+Allowed: five new test files under `infrastructure/control-plane/tests/test_b5_i8_*.py`, new
+evidence documents under `docs/oce-golden-system/`, one additive CI selection step at the
+implementation rung, and append-only ledger sections. Prohibited: production, console,
+control-plane contracts, `oce/frontend`, existing tests, workflow changes before the
+authorized rung, providers, the web view, B5-I9 and Book 6.
+
+### 19.4 Requirement arithmetic (computed from the registry, never typed)
+
+Registry `OCE-B5-I8-REGISTRY-001` v1.0: **55 entries** — identity 3, boundary 4, e2e 4,
+adversarial 10, usability 7, evidence_audit 6, measurement 4, gate 4, evidence_law 8,
+deferred 5. Bindings: test 40, attestation 7, static 3, deferred 5. States: `PLANNED` 40,
+`MAPPED` 10, `DEFERRED_WITH_OWNER` 5, `BLOCKED` 0. Unique ids 55/55; binding closure empty;
+deferred-owner closure empty; zero `PASS` claims.
+
+### 19.5 Planned test arithmetic
+
+40 nodes across 5 files — `test_b5_i8_e2e.py` 4, `test_b5_i8_adversarial.py` 10,
+`test_b5_i8_independent_audit.py` 8, `test_b5_i8_usability_measurements.py` 10,
+`test_b5_i8_evidence_laws.py` 8. Focused floor **40** (`FLOOR`). Laws: zero skip/xfail,
+collection equals execution, unique ids, no orphan file, no orphan registry node.
+
+### 19.6 Adjacent regression population (recomputed, not inherited)
+
+`OBSERVED` at base `7393228d`: whole-file collection over the ten pre-existing
+`test_b5_i2…test_b5_i7` files returns **189 tests collected**. The inherited 186 came from a
+different, nine-file selection at the B5-I7 stage and is **not** used. Adjacent floor **189**.
+
+### 19.7 Failure taxonomy, mutation floor and measurement plan
+
+Failure taxonomy closed at **18** classes (`F01`–`F18`), each with trigger, requirement,
+expected state, observable, forbidden response, recovery owner, planned proof and stop
+condition; every class names a planned node and every `test` requirement is covered. Mutation
+floor **12** (`M01`–`M12`), each weakening a named law; none implemented at P0. Usability is
+split into executable gates, observable task measurements, deterministic accessibility checks,
+subjective review, same-agent audit, organizational independence (not available) and
+post-Book-6 blind evaluation (not begun). P0 labels are `EXPECTED`/`FLOOR`/`CEILING`/
+`NOT_YET_OBSERVED`; no usability metric is `OBSERVED`.
+
+### 19.8 Carry-forward B5-I7 limitations
+
+Recorded with a disposition each in the construction plan §7: no R4-only CI run; local shared
+runner environmentally blocked; `localhost` prose versus literal loopback transport;
+raw-working-tree mutation hashing; `EL09`/`EL10`/`EL11` trust boundaries; same-agent audit;
+reserved web-view prefix; D1–D9 history; stale local `main`. No frozen B5-I7 artifact was
+edited to address any of them.
+
+### 19.9 P0 validation (results recorded only after the checks ran)
+
+Deterministic ephemeral validator (not committed; this ledger makes no retained-tooling
+claim): five artifacts present; registry JSON canonical and parseable; 55 unique ids;
+kind/binding/state arithmetic each equal 55; 40 unique nodes with the frozen 4/10/8/10/8 file
+split; zero `PASS` claims; 18 failure classes; 12 mutations; 55/55 acceptance cross-references
+resolve; every failure-class requirement resolves to a registry id; LF ending convention;
+ledger base blob is a strict byte prefix; changed-file boundary is exactly the five new
+documents plus this append; `git diff --check` clean; no implementation, test, workflow,
+provider or frontend file changed; no secret material present.
+
+### 19.10 Locks and accounting
+
+`B5-I8 = P0_DRAFT_FOR_OPERATOR_REVIEW` · `B5-I9 = LOCKED` · Book 6 `UNAUTHORIZED` ·
+post-Book-6 evaluation not begun · `MERGE_AUTHORIZED=false` · implementation NOT authorized ·
+recurring cost `$0` · `capital.authority = none` · no broker or execution authority · no
+external hosting or telemetry · Freebuff untouched · no amend/squash/rebase/reset/force-push.
+
+### 19.11 Commit, PR and CI identity
+
+The P0 commit SHA, its parent, the PR number and any run/check/job/artifact id cannot be known
+before they exist; per `EL01`/`EL02` they are recorded in a later append-only addendum after
+observation, never predicted.
+
+### 19.12 Resumption against corrected main (append-only; 2026-11-05)
+
+The EL09 append-law correction landed on main before this packet resumed: PR #22
+(`20a211ebe65a46a3436b5207679fe5c37b80f6e1`) merged as `74fee0f086f9215bf6b93a1b3adbf1d69406da39`
+(parents `7393228dd4` + `20a211ebe6`, tree `f303b257a9` = the tree CI tested), after run
+`42028587424` / job `127248928873` / artifact `13414868839` parsed 27/27 B5-I7 nodes with zero
+failures and EL09 green.
+
+`B5-I7-EL09` now binds this ledger by its historical prefix: `sha256(current[:191950])` must equal
+`83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`. That is why this packet can
+append §19 at all, and why the resumption preserves both suffixes: this entry replaces nothing, and
+the §18.12 correction precedes it byte-for-byte.
+
+The first merge resolution (commit `ad654f6fbc`) failed to normalise this file — a script aborted on a
+non-ASCII literal — and the conflict markers were committed to that merge commit instead of being
+removed. That defect is recorded here rather than hidden; this commit replaces the marker text with
+the intended resolution, and the historical prefix is unchanged by both commits.
+
+The failed run `41724079443` (job `126232778697`, artifact `13274838782`) remains recorded in PR #21
+as the observed defect that motivated the correction; it is not retracted or relabelled. The
+resumption run id and its parsed totals are recorded in the PR body, as at B5-I7, so that no commit
+has to predict an identifier that does not yet exist.
+
+`MERGE_AUTHORIZED=false`; `B5-I8` remains planning-only; `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`;
+post-Book-6 evaluation not started; cost `$0`; `capital.authority = none`.
+
+### 19.13 P0 operator ratification (2026-11-05)
+
+The B5-I8 P0 planning packet is accepted as frozen planning on the corrected Book 5 base. This entry
+is append-only: it replaces nothing, and the sections above (`§18.12`, `§19` … `§19.12`) stay
+byte-for-byte.
+
+Ratified subjects: P0 `145d31e9…`; corrected-main merge `ad654f6f…` (the transient conflicted-ledger
+commit, preserved and disclosed); forward repair `49ed7b35…`; and the ratification commit whose
+subject is `B5-I8-P0-RATIFY: accept independent audit planning packet` — its SHA is the commit
+carrying this section, recorded in PR #21's body, never predicted here.
+
+Re-audited from bytes in this rung: the EL09 prefix invariant (13/13 exact at `08bf0b2d…` and
+`7393228d…`; twelve whole-file rows plus the ledger prefix at `74fee0f0…`), a re-run 14/14 mutation
+battery with byte-exact restoration and a green pristine rerun, requirement arithmetic
+`55 = 3+4+4+10+7+6+4+4+8+5 = 40+7+3+5 = 40+10+5+0` with zero `PASS`, 40 planned nodes in five files
+including the frozen `G16` node verbatim, 18 failure classes, and the 12-mutation floor. The
+adjacent floor of 189 was reproduced by re-running the plan's own collection command.
+
+Exact-head evidence before ratification: run `42030149828` (`success`), suite `113888785299`,
+check-run/job `127254239190`, artifact `13415518250` (`b1-i1r-evidence-12e3e43ad44e`, 42495 bytes),
+tested head `49ed7b35…` / tree `be5d30c6…`, merge ref `7dc1248e68…` (parents `74fee0f0…` and
+`49ed7b35…`, tree equal to the tested tree), B5-I7 27/27 with EL09 green, adjacent
+`24+16+51+23+45+27 = 186`, cleanup `removed+pruned`. The failed run `41724079443` and the superseded
+run `42030058641` stay recorded as they happened.
+
+Same-agent score for the packet: **8.38/10** (SPEC 9.0 · DESIGN 8.5 · CORRECTNESS 8.0 · QUALITY 8.0),
+superseding the packet's own 8.13 while preserving it. Label: `SAME-AGENT — NOT ORGANIZATIONALLY
+INDEPENDENT`.
+
+`P0 = OPERATOR_ACCEPTED — PLANNING_FROZEN`; `B5-I8_IMPLEMENTATION = NOT_STARTED`; `G16 = OPEN`;
+`MERGE_AUTHORIZED = true` for this ratification PR only; `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`;
+post-Book-6 evaluation `UNSTARTED`; web view `ABSENT`; cost `$0`; `capital.authority = none`.
