@@ -1,0 +1,357 @@
+{
+  "document_id": "OCE-B5-I8-EVIDENCE-001",
+  "version": "1.0",
+  "stage": "AUTHORIZED_STAGE=B5-I8-IMPLEMENTATION",
+  "generated_by": "infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
+  "tested": {
+    "head": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+    "tree": "82fa85a020c2ae61afd54fdf5066fa08249e86af"
+  },
+  "base_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+  "labels": {
+    "audit": "SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT",
+    "human_evidence": "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND",
+    "blind": false,
+    "independent": false
+  },
+  "planned": {
+    "label": "EXPECTED",
+    "total": 40,
+    "floor": 40,
+    "files": [
+      "test_b5_i8_adversarial.py",
+      "test_b5_i8_e2e.py",
+      "test_b5_i8_evidence_laws.py",
+      "test_b5_i8_independent_audit.py",
+      "test_b5_i8_usability_measurements.py"
+    ],
+    "nodes": [
+      "TestAccessibility::test_accessibility_semantics_verified",
+      "TestAuditVerdict::test_verdict_recomputable_from_committed_evidence",
+      "TestAuthorityMinting::test_client_cannot_mint_identity_or_grant",
+      "TestBounds::test_oversized_input_refused_within_bounds",
+      "TestComprehension::test_recovery_comprehension_recorded",
+      "TestComprehension::test_refusal_comprehension_recorded",
+      "TestComprehension::test_state_comprehension_recorded",
+      "TestComprehension::test_unknown_and_partial_recognized",
+      "TestDeterminism::test_adversarial_case_ordering_deterministic",
+      "TestEL01::test_no_unverified_sha_recorded_as_fact",
+      "TestEL02::test_no_run_or_artifact_id_recorded_before_existence",
+      "TestEL03::test_planned_totals_labeled_expected",
+      "TestEL04::test_observed_totals_bound_to_parsed_raw_artifact",
+      "TestEL05::test_human_evidence_labeled_non_blind_not_independent",
+      "TestEL06::test_no_all_gates_passed_language_while_gate_pending",
+      "TestEL07::test_audit_verdict_recomputable_not_free_text",
+      "TestEL08::test_no_evidence_value_untraceable_to_raw_source",
+      "TestEndToEndPath::test_denial_path_rendered_verbatim_end_to_end",
+      "TestEndToEndPath::test_drill_path_reproduces_recorded_disposition",
+      "TestEndToEndPath::test_full_governed_path_reexecuted_from_frozen_message",
+      "TestEndToEndPath::test_restart_preserves_governed_state_identity",
+      "TestEvidenceAudit::test_manifest_rows_recompute_over_committed_bytes",
+      "TestEvidenceAudit::test_no_all_green_claim_while_gate_pending",
+      "TestEvidenceAudit::test_prior_stage_citations_resolve_to_commits",
+      "TestEvidenceAudit::test_run_and_artifact_ids_resolve_to_raw_evidence",
+      "TestForgedState::test_forged_client_state_refused_before_effect",
+      "TestGateClosure::test_g14_adjacent_population_stays_green",
+      "TestGateClosure::test_g15_mutation_controls_discriminate",
+      "TestMeasurements::test_audit_replay_is_deterministic",
+      "TestMeasurements::test_navigation_steps_measured",
+      "TestMeasurements::test_task_completion_and_error_measured",
+      "TestMeasurements::test_time_to_first_useful_state_measured",
+      "TestRedaction::test_secret_material_absent_from_audit_output",
+      "TestTransport::test_non_loopback_request_fail_closed",
+      "TestTransport::test_unsupported_route_refused_before_side_effect",
+      "TestTruthCollapse::test_partial_never_renders_success",
+      "TestTruthCollapse::test_stale_state_never_renders_green",
+      "TestTruthCollapse::test_unknown_never_renders_zero",
+      "TestUsabilityProtocol::test_accessibility_and_usability_verified",
+      "TestUsabilityProtocolExecution::test_protocol_tasks_defined_and_executed"
+    ]
+  },
+  "protocol": {
+    "protocol_id": "OCE-B5-I8-USABILITY-PROTOCOL-001",
+    "executed_by": "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND",
+    "tasks": [
+      {
+        "task_id": "T1",
+        "scenario": "healthy",
+        "title": "Recognise the governed OK state and the queue depth",
+        "surface": "oce_console.panel.build_panel_document + render_panel",
+        "comprehension_question": "What state is the stack in, and what is the bounded depth?",
+        "executed": false
+      },
+      {
+        "task_id": "T2",
+        "scenario": "denied",
+        "title": "Recognise a governed denial verbatim",
+        "surface": "oce_console.panel.build_panel_document (DENIED envelope)",
+        "comprehension_question": "Was the read denied, and what is the exact refusal code?",
+        "executed": false
+      },
+      {
+        "task_id": "T3",
+        "scenario": "unreachable",
+        "title": "Recognise an unreachable stack and the recovery guidance",
+        "surface": "oce_console.panel.build_panel_document (transport refusal)",
+        "comprehension_question": "Is anything green, and what must the operator do next?",
+        "executed": false
+      },
+      {
+        "task_id": "T4",
+        "scenario": "partial",
+        "title": "Distinguish an unknown counter from a known zero",
+        "surface": "oce_console.panel.build_panel_document (partial envelope)",
+        "comprehension_question": "Is the missing counter zero, or unknown?",
+        "executed": false
+      }
+    ],
+    "results": [
+      {
+        "task_id": "T1",
+        "scenario": "healthy",
+        "completion": true,
+        "error": 0,
+        "navigation_steps": 3,
+        "time_to_first_useful_state_ms": 120.083,
+        "state_observed": "OK",
+        "comprehension": {
+          "state_observed": "OK",
+          "depth_known": true,
+          "depth_value": 5,
+          "denial_code": null,
+          "green_anywhere": true,
+          "recovery_guidance": "none required",
+          "unknown_rendered_not_zero": null
+        },
+        "recorded_by": "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND",
+        "executed_at": "2026-11-05T00:00:00Z",
+        "environment": "local-win32-cpython3.11",
+        "command": "python -m pytest (B5-I8 protocol task T1)",
+        "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+      },
+      {
+        "task_id": "T2",
+        "scenario": "denied",
+        "completion": true,
+        "error": 0,
+        "navigation_steps": 3,
+        "time_to_first_useful_state_ms": 122.751,
+        "state_observed": "DENIED",
+        "comprehension": {
+          "state_observed": "DENIED",
+          "depth_known": false,
+          "depth_value": null,
+          "denial_code": "E_DENIED",
+          "green_anywhere": false,
+          "recovery_guidance": "verify the operator grant and consent, then retry",
+          "unknown_rendered_not_zero": null
+        },
+        "recorded_by": "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND",
+        "executed_at": "2026-11-05T00:00:00Z",
+        "environment": "local-win32-cpython3.11",
+        "command": "python -m pytest (B5-I8 protocol task T2)",
+        "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+      },
+      {
+        "task_id": "T3",
+        "scenario": "unreachable",
+        "completion": true,
+        "error": 0,
+        "navigation_steps": 1,
+        "time_to_first_useful_state_ms": 116.291,
+        "state_observed": "STACK_UNREACHABLE",
+        "comprehension": {
+          "state_observed": "STACK_UNREACHABLE",
+          "depth_known": false,
+          "depth_value": null,
+          "denial_code": null,
+          "green_anywhere": false,
+          "recovery_guidance": "re-run after the local stack health is verified",
+          "unknown_rendered_not_zero": null
+        },
+        "recorded_by": "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND",
+        "executed_at": "2026-11-05T00:00:00Z",
+        "environment": "local-win32-cpython3.11",
+        "command": "python -m pytest (B5-I8 protocol task T3)",
+        "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+      },
+      {
+        "task_id": "T4",
+        "scenario": "partial",
+        "completion": true,
+        "error": 0,
+        "navigation_steps": 3,
+        "time_to_first_useful_state_ms": 118.882,
+        "state_observed": "UNVERIFIABLE",
+        "comprehension": {
+          "state_observed": "UNVERIFIABLE",
+          "depth_known": true,
+          "depth_value": 5,
+          "denial_code": null,
+          "green_anywhere": false,
+          "recovery_guidance": "none required",
+          "unknown_rendered_not_zero": true
+        },
+        "recorded_by": "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND",
+        "executed_at": "2026-11-05T00:00:00Z",
+        "environment": "local-win32-cpython3.11",
+        "command": "python -m pytest (B5-I8 protocol task T4)",
+        "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+      }
+    ]
+  },
+  "accessibility": [
+    {
+      "check_id": "A1",
+      "surface": "panel text render",
+      "assertion": "the governed state is named as a distinct token",
+      "result": "PASS",
+      "finding": "state token present and distinct"
+    },
+    {
+      "check_id": "A2",
+      "surface": "panel text render (denied)",
+      "assertion": "a refusal carries its machine-readable code in the text",
+      "result": "PASS",
+      "finding": "denial code legible in the rendered document"
+    },
+    {
+      "check_id": "A3",
+      "surface": "panel text render (unreachable)",
+      "assertion": "an unreachable stack is never rendered with a green summary",
+      "result": "PASS",
+      "finding": "fail-closed state token, no green summary"
+    },
+    {
+      "check_id": "A4",
+      "surface": "panel text render (unknown)",
+      "assertion": "an unknown counter renders null plus a reason, never 0",
+      "result": "PASS",
+      "finding": "unknown is textually distinguishable from zero"
+    },
+    {
+      "check_id": "A5",
+      "surface": "panel text render",
+      "assertion": "no browser, DOM or web-view surface is claimed or required",
+      "result": "PASS",
+      "finding": "checked over text surfaces only; no web view exists"
+    }
+  ],
+  "drill": {
+    "disposition": "DRILL_PASS",
+    "masked_sha256": "0fe3ecdf2f784b6bac0a1918014716e27eb69b5b0f0bd7be133790ce5db1606c",
+    "mask": [
+      "session_id",
+      "binding.job_id",
+      "binding.evidence_refs"
+    ]
+  },
+  "snapshot": {
+    "observed_at": "2026-11-05T00:00:00Z",
+    "panel_digest": "16b8e269495abe03ea27ea7caae58fbf132deb23784ca577679b2fbd280908cb"
+  },
+  "measurements": {
+    "tasks_defined": {
+      "value": 4,
+      "unit": "tasks",
+      "label": "OBSERVED",
+      "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
+      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "environment": "local-win32-cpython3.11",
+      "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+    },
+    "tasks_completed": {
+      "value": 4,
+      "unit": "tasks",
+      "label": "OBSERVED",
+      "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
+      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "environment": "local-win32-cpython3.11",
+      "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+    },
+    "task_errors": {
+      "value": 0,
+      "unit": "errors",
+      "label": "OBSERVED",
+      "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
+      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "environment": "local-win32-cpython3.11",
+      "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+    },
+    "navigation_steps_total": {
+      "value": 10,
+      "unit": "governed reads",
+      "label": "OBSERVED",
+      "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
+      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "environment": "local-win32-cpython3.11",
+      "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+    },
+    "time_to_first_useful_state_ms": {
+      "value": 122.751,
+      "unit": "ms",
+      "label": "OBSERVED",
+      "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
+      "tested_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "environment": "local-win32-cpython3.11 (not a performance claim)",
+      "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
+    }
+  },
+  "gates": {
+    "G16": {
+      "status": "OPEN",
+      "blocker": "no organizationally independent operator: the protocol was executed by the B5-I8 implementer (single operator, non-blind; B5I8-DF05 unresolved)",
+      "protocol_executed": true,
+      "attestation_class": [
+        "SAME_AGENT_SINGLE_OPERATOR_NON_BLIND"
+      ]
+    }
+  },
+  "verdict": {
+    "requirements_total": 55,
+    "requirements_unique": 55,
+    "planned_nodes": 40,
+    "collected_nodes": 40,
+    "node_closure": true,
+    "files": 5,
+    "mutations_required": 12,
+    "mutations_discriminated": 12,
+    "mutation_floor_met": true,
+    "protocol_tasks": 4,
+    "protocol_results": 4,
+    "g16_status": "OPEN",
+    "failure_classes": 18,
+    "digest": "3e2eabd3c27af01d9a13ce86aaabb53eeb6446b1755c473896730c26831ce0d2"
+  },
+  "ci": {
+    "status": "NOT_EXECUTED",
+    "run_id": null,
+    "check_run_id": null,
+    "job_id": null,
+    "check_suite_id": null,
+    "artifact_id": null,
+    "artifact_name": null,
+    "tested_head": null,
+    "tested_tree": null,
+    "merge_ref": null,
+    "parsed_from": null
+  },
+  "boundary": {
+    "production_changed": false,
+    "frontend_changed": false,
+    "existing_test_changed": false,
+    "web_view_present": false,
+    "b5_i9_started": false,
+    "book_6_started": false,
+    "evaluation_started": false,
+    "cost_usd": 0,
+    "capital_authority": "none"
+  },
+  "limitations": [
+    "SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT: one operator (the implementer) executed the protocol; no blind or independent attestation exists.",
+    "G16 therefore remains OPEN; the blocker is the missing independent operator (B5I8-DF05), not a protocol failure.",
+    "Time-to-first-useful-state is a local wall-clock observation on one machine; it is an OBSERVED sample, not a performance claim and not a ceiling.",
+    "No browser or web-view surface exists, so no browser accessibility is claimed.",
+    "Refs/pull/21/merge (7dc1248e68022b16ea3cb2b7931e22013517f3a3) was pruned by GitHub after PR #21 merged; the P0 ratification records it as a pre-merge observation and it is exempt from live commit resolution for that reason only."
+  ]
+}
