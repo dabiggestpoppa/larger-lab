@@ -103,3 +103,22 @@ record is `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`. Dispositions above are unch
 `PLANNED`, 10 `MAPPED`, 5 `DEFERRED_WITH_OWNER`, and **zero** `PASS`. `G16` remains open; no
 requirement in this matrix has executed. `B5-I8_IMPLEMENTATION = NOT_STARTED`; `MERGE_AUTHORIZED`
 is true for the P0 ratification PR only.
+
+## 4. Implementation disposition (appended 2026-11-05; the P0 rows above are unchanged)
+
+All 40 test-bound requirements transitioned `PLANNED → PASS` against executed evidence on `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf`.
+The 10 `MAPPED` static/attestation obligations are discharged by the same boundary and protocol
+evidence (registry `p0.implementation`); the 5 deferred obligations stay `DEFERRED_WITH_OWNER`
+(operator, `B5-I9`, Book 6, post-Book-6 phase, independent auditor).
+
+| Dimension | Before | After |
+|---|---|---|
+| `PLANNED` | 40 | 0 |
+| `PASS` | 0 | 40 |
+| `MAPPED` | 10 | 10 |
+| `DEFERRED_WITH_OWNER` | 5 | 5 |
+| `G16` | `OPEN` | `OPEN` (protocol executed; no independent operator) |
+| Mutation floor | planned 12 | 12/12 discriminated, byte-exact restore |
+
+`PASS` means the frozen observable executed successfully and turned red under its mutation. It
+does not ratify the stage and does not close `G16`. `MERGE_AUTHORIZED = false`.

@@ -2050,3 +2050,55 @@ INDEPENDENT`.
 `P0 = OPERATOR_ACCEPTED — PLANNING_FROZEN`; `B5-I8_IMPLEMENTATION = NOT_STARTED`; `G16 = OPEN`;
 `MERGE_AUTHORIZED = true` for this ratification PR only; `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`;
 post-Book-6 evaluation `UNSTARTED`; web view `ABSENT`; cost `$0`; `capital.authority = none`.
+
+---
+
+## 20. B5-I8 — independent audit implementation
+
+**Base:** `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` · **Implementation head:** `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` (tree `82fa85a020c2ae61afd54fdf5066fa08249e86af`) · **Merged:** no (`MERGE_AUTHORIZED = false`)
+
+### 20.1 Scope executed
+
+Five frozen test files (40 nodes), a test-only support module, the deterministic protocol/evidence
+generator, the 12-mutation battery, one additive CI workflow and the evidence documents. No
+production, frontend, contract, existing-test, provider or credential surface changed.
+
+### 20.2 Requirement closure
+
+- 55 requirements untouched (ids, kinds, bindings, owners, stage identity); bindings remain `40 test / 7 attestation / 3 static / 5 deferred`.
+- 40 test-bound requirements transitioned to `PASS` on executed evidence; 10 `MAPPED` and 5 deferred unchanged.
+- States: `PASS 40 · MAPPED 10 · DEFERRED_WITH_OWNER 5 · BLOCKED 0`.
+
+### 20.3 Node execution
+
+- Collected 40 · executed 40 · passed 40 · failures 0 · errors 0 · skipped 0 · xfailed 0 · duplicates 0 · orphans 0.
+- `TestUsabilityProtocol::test_accessibility_and_usability_verified` exists verbatim at its frozen path.
+
+### 20.4 Adversarial and failure classes
+
+- All 18 frozen classes are provoked against the real client surfaces; each node asserts its refusal or containment, two-sided.
+
+### 20.5 Usability and G16
+
+- Protocol executed: 4/4 tasks, zero errors, measurements with units and provenance.
+- `G16 = OPEN` — no organizationally independent operator: the protocol was executed by the B5-I8 implementer (single operator, non-blind; B5I8-DF05 unresolved)
+
+### 20.6 Mutation battery
+
+- 12/12 discriminated; byte-exact restoration; tracked worktree clean; confirming rerun `40 passed in 8.66s`.
+
+### 20.7 Evidence laws and EL09
+
+- `EL01`–`EL08` two-sided on the committed bundle.
+- Historical ledger prefix `83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30` (191950 bytes) recomputed.
+- The twelve immutable non-ledger manifest rows still match committed bytes; the pinned workflow row is untouched.
+
+### 20.8 Defects and limitations
+
+- `D-CI-1`: the P0-named workflow file is a frozen `EL09` whole-file row, so the selection step lives in a dedicated additive workflow; disclosed, not repaired by weakening `EL09`.
+- `D1` battery harness crash and restore helper; `D2` `G15` self-reference; `D3` negation-aware forbidden-phrase detector.
+- Same-agent limitation `B5I8-DF05` open; E2E proof is in-process; battery not run in CI.
+
+### 20.9 CI identities
+
+Recorded in §20.10 and in the PR body once the exact-head runs exist. No id is written before it is observed.
