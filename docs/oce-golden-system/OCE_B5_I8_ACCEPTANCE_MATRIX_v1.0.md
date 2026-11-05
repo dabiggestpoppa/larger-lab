@@ -3,11 +3,11 @@
 
 **Document ID:** OCE-B5-I8-ACCEPTANCE-001
 **Version:** 1.0
-**Status:** `P0_DRAFT_FOR_OPERATOR_REVIEW` — **planning only; zero PASS claims.**
-**Stage:** `AUTHORIZED_STAGE=B5-I8-P0` · **Base SHA (observed):** `7393228dd4b21be9440785204ea9e640800d5d95`
+**Status:** `P0_OPERATOR_ACCEPTED — PLANNING FROZEN` (2026-11-05; `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`) — **planning only; zero PASS claims.**
+**Stage:** `AUTHORIZED_STAGE=B5-I8-P0-RATIFICATION` · **Authoring base:** `7393228dd4b21be9440785204ea9e640800d5d95` · **Ratification base (corrected main):** `74fee0f086f9215bf6b93a1b3adbf1d69406da39`
 **Registry:** `OCE_B5_I8_REQUIREMENT_TEST_REGISTRY_v1.0.json` (`OCE-B5-I8-REGISTRY-001`, 55 entries)
 **Contract:** `OCE_B5_I8_IMPLEMENTATION_CONTRACT_v1.0.md` (clause column = its section)
-**`MERGE_AUTHORIZED=false`** · `B5-I9 = LOCKED` · Book 6 `UNAUTHORIZED` · cost `$0` · `capital.authority = none`
+**`MERGE_AUTHORIZED=true` (P0 ratification PR only)** · `B5-I9 = LOCKED` · Book 6 `UNAUTHORIZED` · cost `$0` · `capital.authority = none`
 
 ## 0. Frozen counts (arithmetic, recomputable from the registry JSON)
 
@@ -95,3 +95,11 @@ Every row above is a planning disposition: `PLANNED` (a future node is bound, no
 Every ID in this matrix is a registry ID, and every registry ID appears here exactly once
 (55/55). Every `test` row names a node in the frozen inventory; the inherited `G16` node
 `TestUsabilityProtocol::test_accessibility_and_usability_verified` appears verbatim at `B5I8-R39`.
+
+## 4. Operator ratification (2026-11-05)
+
+This matrix is **accepted as frozen planning** on corrected main `74fee0f0…`; the ratification
+record is `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`. Dispositions above are unchanged: still 40
+`PLANNED`, 10 `MAPPED`, 5 `DEFERRED_WITH_OWNER`, and **zero** `PASS`. `G16` remains open; no
+requirement in this matrix has executed. `B5-I8_IMPLEMENTATION = NOT_STARTED`; `MERGE_AUTHORIZED`
+is true for the P0 ratification PR only.

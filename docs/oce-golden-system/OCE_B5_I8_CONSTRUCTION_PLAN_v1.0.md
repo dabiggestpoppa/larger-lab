@@ -3,8 +3,8 @@
 
 **Document ID:** OCE-B5-I8-PLAN-001
 **Version:** 1.0
-**Status:** `P0_DRAFT_FOR_OPERATOR_REVIEW` — no rung beyond P0 is authorized.
-**Stage:** `AUTHORIZED_STAGE=B5-I8-P0` · Base `7393228dd4b21be9440785204ea9e640800d5d95`
+**Status:** `P0_OPERATOR_ACCEPTED — PLANNING FROZEN` (2026-11-05; `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`) — no rung beyond P0 is authorized.
+**Stage:** `AUTHORIZED_STAGE=B5-I8-P0-RATIFICATION` · Authoring base `7393228dd4b21be9440785204ea9e640800d5d95` · Ratification base `74fee0f086f9215bf6b93a1b3adbf1d69406da39`
 **Contract:** `OCE_B5_I8_IMPLEMENTATION_CONTRACT_v1.0.md` · **Registry:** `OCE-B5-I8-REGISTRY-001` (55) · **Failure plan:** `OCE_B5_I8_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md` (18 classes, 12 mutations)
 
 ---

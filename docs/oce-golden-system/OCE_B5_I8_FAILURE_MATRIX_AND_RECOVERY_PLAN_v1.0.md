@@ -3,8 +3,8 @@
 
 **Document ID:** OCE-B5-I8-FAILURE-001
 **Version:** 1.0
-**Status:** `P0_DRAFT_FOR_OPERATOR_REVIEW` — planning only; no failure class has been executed.
-**Stage:** `AUTHORIZED_STAGE=B5-I8-P0` · Base `7393228dd4b21be9440785204ea9e640800d5d95`
+**Status:** `P0_OPERATOR_ACCEPTED — PLANNING FROZEN` (2026-11-05; `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`) — planning only; no failure class has been executed.
+**Stage:** `AUTHORIZED_STAGE=B5-I8-P0-RATIFICATION` · Authoring base `7393228dd4b21be9440785204ea9e640800d5d95` · Ratification base `74fee0f086f9215bf6b93a1b3adbf1d69406da39`
 **Contract:** `OCE_B5_I8_IMPLEMENTATION_CONTRACT_v1.0.md` · **Registry:** `OCE-B5-I8-REGISTRY-001`
 
 ---

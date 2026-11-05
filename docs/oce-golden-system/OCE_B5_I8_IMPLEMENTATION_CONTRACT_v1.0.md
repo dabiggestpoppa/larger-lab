@@ -3,11 +3,12 @@
 
 **Document ID:** OCE-B5-I8-CONTRACT-001
 **Version:** 1.0
-**Status:** `P0_DRAFT_FOR_OPERATOR_REVIEW` — **planning only. No implementation gate has passed.**
-**Stage:** `AUTHORIZED_STAGE=B5-I8-P0`
-**Base SHA (observed):** `7393228dd4b21be9440785204ea9e640800d5d95` (= live merged `origin/main`)
+**Status:** `P0_OPERATOR_ACCEPTED — PLANNING FROZEN` (ratified 2026-11-05; see `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`) — **planning only. No implementation gate has passed.**
+**Stage:** `AUTHORIZED_STAGE=B5-I8-P0-RATIFICATION`
+**Base SHA (authoring):** `7393228dd4b21be9440785204ea9e640800d5d95` (= `origin/main` when the packet was written)
+**Ratification base (corrected main):** `74fee0f086f9215bf6b93a1b3adbf1d69406da39` (= live `origin/main` at acceptance)
 **Registry:** `OCE_B5_I8_REQUIREMENT_TEST_REGISTRY_v1.0.json` (`OCE-B5-I8-REGISTRY-001`, 55 entries)
-**Merge authority:** `MERGE_AUTHORIZED=false` — this packet must not be merged by its author.
+**Merge authority:** `MERGE_AUTHORIZED=true` **for the P0 ratification PR only**; the implementation rung and every later rung remain `MERGE_AUTHORIZED=false` until separately authorized.
 **Accounting:** recurring cost `$0` · `capital.authority = none` · Freebuff untouched · `B5-I9 = LOCKED` · Book 6 `UNAUTHORIZED`
 
 ---
@@ -194,7 +195,7 @@ Deterministic local validation proved: all five artifacts present; JSON canonica
 
 ## 17. Locks and accounting
 
-`B5-I8 = P0_DRAFT_FOR_OPERATOR_REVIEW` · `B5-I9 = LOCKED` · Book 6 `UNAUTHORIZED` · post-Book-6 evaluation not begun · `MERGE_AUTHORIZED=false` · recurring cost `$0` · `capital.authority = none` · no broker/execution authority · Freebuff untouched · no external hosting or telemetry · no history rewrite.
+`B5-I8 = P0_OPERATOR_ACCEPTED — PLANNING_FROZEN` · `B5-I9 = LOCKED` · Book 6 `UNAUTHORIZED` · post-Book-6 evaluation not begun · `MERGE_AUTHORIZED=true` (scope: P0 ratification PR only) · recurring cost `$0` · `capital.authority = none` · no broker/execution authority · Freebuff untouched · no external hosting or telemetry · no history rewrite.
 
 ## 18. Exit state
 
@@ -202,12 +203,12 @@ Deterministic local validation proved: all five artifacts present; JSON canonica
 B5_I8_STAGE_IDENTITY = plan §7 "Independent E2E, adversarial, usability and evidence audit"
 B5_I8_CHARTER_INCREMENT = NONE (charter I-8 was consumed by B5-I7; charter I-7 is the operator-owned web view)
 B5_I8_WEB_VIEW_DISPOSITION = C (usability proven without the web view; web view remains operator-directable, unscheduled)
-B5_I8_P0 = FROZEN_AWAITING_OPERATOR_REVIEW
+B5_I8_P0 = OPERATOR_ACCEPTED_PLANNING_FROZEN
 B5_I8_IMPLEMENTATION_AUTHORIZED = FALSE
 B5_I9 = LOCKED
 BOOK_6 = UNAUTHORIZED
 POST_BOOK_6_EVALUATION = NOT_BEGUN
-MERGE_AUTHORIZED = FALSE
+MERGE_AUTHORIZED = TRUE_FOR_P0_RATIFICATION_PR_ONLY
 CAPITAL_AUTHORITY = NONE
 RECURRING_COST = $0
 ```

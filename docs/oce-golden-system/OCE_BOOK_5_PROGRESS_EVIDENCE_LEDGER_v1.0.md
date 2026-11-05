@@ -2017,3 +2017,36 @@ has to predict an identifier that does not yet exist.
 
 `MERGE_AUTHORIZED=false`; `B5-I8` remains planning-only; `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`;
 post-Book-6 evaluation not started; cost `$0`; `capital.authority = none`.
+
+### 19.13 P0 operator ratification (2026-11-05)
+
+The B5-I8 P0 planning packet is accepted as frozen planning on the corrected Book 5 base. This entry
+is append-only: it replaces nothing, and the sections above (`§18.12`, `§19` … `§19.12`) stay
+byte-for-byte.
+
+Ratified subjects: P0 `145d31e9…`; corrected-main merge `ad654f6f…` (the transient conflicted-ledger
+commit, preserved and disclosed); forward repair `49ed7b35…`; and the ratification commit whose
+subject is `B5-I8-P0-RATIFY: accept independent audit planning packet` — its SHA is the commit
+carrying this section, recorded in PR #21's body, never predicted here.
+
+Re-audited from bytes in this rung: the EL09 prefix invariant (13/13 exact at `08bf0b2d…` and
+`7393228d…`; twelve whole-file rows plus the ledger prefix at `74fee0f0…`), a re-run 14/14 mutation
+battery with byte-exact restoration and a green pristine rerun, requirement arithmetic
+`55 = 3+4+4+10+7+6+4+4+8+5 = 40+7+3+5 = 40+10+5+0` with zero `PASS`, 40 planned nodes in five files
+including the frozen `G16` node verbatim, 18 failure classes, and the 12-mutation floor. The
+adjacent floor of 189 was reproduced by re-running the plan's own collection command.
+
+Exact-head evidence before ratification: run `42030149828` (`success`), suite `113888785299`,
+check-run/job `127254239190`, artifact `13415518250` (`b1-i1r-evidence-12e3e43ad44e`, 42495 bytes),
+tested head `49ed7b35…` / tree `be5d30c6…`, merge ref `7dc1248e68…` (parents `74fee0f0…` and
+`49ed7b35…`, tree equal to the tested tree), B5-I7 27/27 with EL09 green, adjacent
+`24+16+51+23+45+27 = 186`, cleanup `removed+pruned`. The failed run `41724079443` and the superseded
+run `42030058641` stay recorded as they happened.
+
+Same-agent score for the packet: **8.38/10** (SPEC 9.0 · DESIGN 8.5 · CORRECTNESS 8.0 · QUALITY 8.0),
+superseding the packet's own 8.13 while preserving it. Label: `SAME-AGENT — NOT ORGANIZATIONALLY
+INDEPENDENT`.
+
+`P0 = OPERATOR_ACCEPTED — PLANNING_FROZEN`; `B5-I8_IMPLEMENTATION = NOT_STARTED`; `G16 = OPEN`;
+`MERGE_AUTHORIZED = true` for this ratification PR only; `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`;
+post-Book-6 evaluation `UNSTARTED`; web view `ABSENT`; cost `$0`; `capital.authority = none`.
