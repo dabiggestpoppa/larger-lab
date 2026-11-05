@@ -10,9 +10,12 @@ Two purposes, deliberately separated:
 2. **Independent adversarial probes** for the rest of the A11 surface, using
    fresh counterexamples rather than re-running the I11E1 suite.
 
-The semantic-authority probe records the *observed* behaviour of a defect
-(F_I11R1_02) and marks the required behaviour as a strict xfail, so the suite is
-green today and will fail loudly the moment the defect is repaired.
+The semantic-authority probe recorded the *observed* behaviour of a defect
+(F_I11R1_02) and marked the required behaviour as a strict xfail.  SENSOR-B5-I11F1
+repaired it, so the marker is gone and the same probe -- now modelling the real
+authority, an I09 registry row -- is an ordinary passing test.  The historical
+finding itself is unchanged and stays in BLOC_05_I11R1_INDEPENDENT_AUDIT.md; only
+the executable expectation moved, which is what retiring an xfail means.
 """
 
 from __future__ import annotations
@@ -22,7 +25,18 @@ from decimal import Decimal
 
 import pytest
 
-from crypto_sensor_fabric.contracts.enums import AggressorSide, LiquidationRole
+from crypto_sensor_fabric.contracts.enums import (
+    AggressorSide,
+    LiquidationRole,
+    SemanticEquivalence,
+    SensorFamily,
+)
+from crypto_sensor_fabric.normalization.common.semantic_registry import (
+    IntervalDataScope,
+    ProviderSemanticMapping,
+    ProviderSemanticRegistry,
+    SemanticConfidence,
+)
 from crypto_sensor_fabric.normalization.enums import (
     NormalizationStatus,
     PayoffType,
@@ -142,6 +156,52 @@ def _payload(**overrides: object) -> LiquidationObservationInput:
 
 def _flags(record: object) -> set[str]:
     return {flag.value for flag in record.quality_flags}  # type: ignore[attr-defined]
+
+
+_SYNTH = "SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION"
+_SYNTH_METHOD = "SYNTHETIC_TEST_LIQUIDATION_SIDE_V1"
+
+
+def _synthetic_row(provider_field: str, canonical_field: str) -> ProviderSemanticMapping:
+    """One synthetic row: it certifies the MECHANISM, never the venue.
+
+    The repaired authority is a registry row, so this is what a "certified
+    provider" looks like now.  The label keeps the fixture from ever being read
+    as documentary evidence about Binance.
+    """
+    return ProviderSemanticMapping(
+        provider="BINANCE_USDM",
+        provider_field=provider_field,
+        canonical_sensor=SensorFamily.MECHANICAL_LIQUIDATION,
+        canonical_field=canonical_field,
+        semantic_equivalence_class=SemanticEquivalence.EXACT_EQUIVALENT,
+        native_definition=f"{_SYNTH}:{provider_field}",
+        transformation=f"{_SYNTH}:{provider_field}->{canonical_field}",
+        methodology_id=_SYNTH_METHOD,
+        blocking_assumptions=(f"{_SYNTH}:certifies-nothing-in-production",),
+        known_limitations=(f"{_SYNTH}:fixture-only-authority",),
+        source_endpoint_or_archive="synthetic://test-authority",
+        data_type="EVENT",
+        native_unit="ENUM",
+        timestamp_meaning="EVENT_TIME",
+        interval_data_scope=IntervalDataScope.INTERVAL_LOCAL,
+        direction_side_convention=f"{_SYNTH}:{canonical_field}",
+        evidence_reference=f"{_SYNTH}:evidence",
+        semantic_confidence=SemanticConfidence.VERIFIED_FIRST_PARTY,
+        last_verified_date=None,
+        version="1",
+    )
+
+
+def _synthetic_registry() -> ProviderSemanticRegistry:
+    return ProviderSemanticRegistry(
+        schema_version="SYNTHETIC_TEST_REGISTRY_V1",
+        mappings=(
+            _synthetic_row("side", "position_side_liquidated"),
+            _synthetic_row("orderSide", "execution_side"),
+            _synthetic_row("role", "maker_taker_role"),
+        ),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -311,35 +371,41 @@ def test_price_dimension_mismatch_blocks_conversion() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_untrusted_boolean_promotes_canonical_sides_today() -> None:
-    """F_I11R1_02, recorded as observed evidence rather than as acceptable law.
+def test_the_caller_boolean_is_gone_and_earns_nothing() -> None:
+    """F_I11R1_02, closed: the bypass is unrepresentable, not merely blocked.
 
-    The caller supplies ``provider_semantics_verified=True`` with no registry
-    row, no confidence and no evidence reference.  The canonical side fields are
-    populated anyway, while the same record still carries
-    ``SEMANTICS_UNVERIFIED`` -- the record contradicts itself.
+    Pre-repair this payload promoted LONG/SELL next to ``SEMANTICS_UNVERIFIED``
+    with no row, no confidence and no evidence reference.  The field no longer
+    exists, so the observation model refuses it outright and an unattributed
+    claim earns nothing.
     """
-    record = normalize_liquidation(_payload(provider_semantics_verified=True))
-    assert record.position_side_liquidated is LiquidationPositionSide.LONG
-    assert record.execution_side is AggressorSide.SELL
+    with pytest.raises(ValueError):
+        _payload(provider_semantics_verified=True)
+    record = normalize_liquidation(_payload())
+    assert record.position_side_liquidated is LiquidationPositionSide.UNKNOWN
+    assert record.execution_side is AggressorSide.UNKNOWN
     assert "SEMANTICS_UNVERIFIED" in _flags(record)
     assert record.normalization_status is NormalizationStatus.NATIVE_ONLY
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "F_I11R1_02: canonical admission must be a property of the I09 "
-        "provider-evidence ladder, never a caller choice (bloc_05/03 section 13)"
-    ),
-)
 def test_canonical_sides_must_not_be_promoted_by_a_caller_boolean() -> None:
-    record = normalize_liquidation(_payload(provider_semantics_verified=True))
+    """The former strict xfail, now an ordinary pass (I11F1 section 6).
+
+    Proven by behaviour rather than by a marker: the retired assertion is that a
+    caller cannot promote a side, and it holds because authority was never
+    granted -- every claim is refused with its typed cause.
+    """
+    record = normalize_liquidation(_payload())
     assert record.position_side_liquidated is LiquidationPositionSide.UNKNOWN
     assert record.execution_side is AggressorSide.UNKNOWN
+    assert record.side_admissions
+    assert all(not admission.admitted for admission in record.side_admissions)
+    assert all(
+        admission.refusal is not None for admission in record.side_admissions
+    )
 
 
-def test_a_false_boolean_keeps_the_provider_reading_provisional() -> None:
+def test_an_unauthorized_reading_stays_provisional() -> None:
     record = normalize_liquidation(_payload())
     assert record.position_side_liquidated is LiquidationPositionSide.UNKNOWN
     assert record.execution_side is AggressorSide.UNKNOWN
@@ -347,13 +413,17 @@ def test_a_false_boolean_keeps_the_provider_reading_provisional() -> None:
     assert record.provisional_execution_side is AggressorSide.SELL
 
 
-def test_a_contradictory_claim_is_quarantined_even_when_marked_verified() -> None:
+def test_a_contradictory_claim_is_quarantined_even_with_full_authority() -> None:
     record = normalize_liquidation(
         _payload(
             position_side_liquidated=LiquidationPositionSide.LONG,
             execution_side=AggressorSide.BUY,
-            provider_semantics_verified=True,
-        )
+            native_position_side_field="side",
+            native_position_side_value="LONG",
+            native_execution_side_field="orderSide",
+            native_execution_side_value="BUY",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.normalization_status is NormalizationStatus.QUARANTINED
     assert record.quarantine_reason is QuarantineReason.INVALID_SIDE_MAPPING
@@ -399,7 +469,16 @@ def test_zero_aggregate_with_every_condition_held_is_a_verified_zero() -> None:
 
 def test_maker_taker_role_and_revision_state_survive_unchanged() -> None:
     record = normalize_liquidation(
-        _payload(maker_taker_role=LiquidationRole.TAKER)
+        _payload(
+            maker_taker_role=LiquidationRole.TAKER,
+            native_position_side_field="side",
+            native_position_side_value="LONG",
+            native_execution_side_field="orderSide",
+            native_execution_side_value="SELL",
+            native_maker_taker_role_field="role",
+            native_maker_taker_role_value="TAKER",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.maker_taker_role is LiquidationRole.TAKER
     assert record.source_revision_state is RevisionState.STABLE

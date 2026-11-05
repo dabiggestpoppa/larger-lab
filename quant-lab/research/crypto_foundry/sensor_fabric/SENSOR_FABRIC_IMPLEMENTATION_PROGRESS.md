@@ -8270,3 +8270,49 @@ READ-ONLY OUTPUT
 NO GOVERNANCE CHANGE: B5-I10 = OPERATOR_ACCEPTED; B5-I11 = IMPLEMENTATION_PARTIAL;
 BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
 RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
+
+## 187 - SENSOR-B5-I11F1: SEMANTIC-ADMISSION SECURITY REPAIR
+
+DEFECT CLOSED: F_I11R1_02 / A11-14
+  provider_semantics_verified (a caller bool) is deleted. normalize_liquidation now takes
+  the I09 ProviderSemanticRegistry and resolves ONE row per canonical field, keyed by
+  (provider, that field's native provider field, MECHANICAL_LIQUIDATION), then requires the
+  row to declare that exact canonical field, a citable methodology, a non-pending evidence
+  reference and a confidence that admits_critical_t1_use. Ten typed refusals name the first
+  missing link. A canonical side cannot coexist with a record that carries no admitted
+  decision for it: T1LiquidationRecord._side_admission_law makes the pre-repair outcome
+  unrepresentable, and LiquidationObservationInput refuses the deleted field outright.
+
+AGGREGATION (disclosed trade)
+  One frozen semantic flag cannot describe a hybrid, so promotion is all-or-nothing: any
+  refused claim withholds every canonical side, and each admission still records whether it
+  would have been admitted. maker_taker_role is gated on the same ladder (it was previously
+  copied through unconditionally), disclosed as a change beyond the literal boolean.
+
+TESTS
+  New suite test_b5_i11f1_semantic_admission.py: SEC-01..SEC-20, 20 passed. The strict xfail
+  in the I11R1 audit is retired: marker removed, the probe is an ordinary pass, and the
+  historical finding stays in BLOC_05_I11R1_INDEPENDENT_AUDIT.md. I11E1's eight
+  provider_semantics_verified sites were re-modelled on native field names plus a labelled
+  synthetic registry row, with every original assertion preserved.
+
+CUSTODY
+  One I10 allowlist entry (test_b5_i11f1_) and one mechanical I11R2 republish, 1088 -> 1089,
+  performed after staging through UPDATE_I11R2_EVIDENCE=1. I08/I09/I10 pins and sealed
+  evidence unchanged; conftest.py deliberately untouched because it is outside the governed
+  allowlist. No LF/CRLF conversion; this ledger remains LF-only.
+
+VERIFICATION
+  I11 trio: 91 passed. Normalization tree incl. every scope audit: 1068 passed. Full
+  canonical suite: 4466 passed, 14 skipped, 0 xfailed, exit 0, 1199.69s (baseline
+  4445/14/1 xfail: +21 passed is the 20 new probes plus the retired xfail, skips unchanged).
+  ruff clean; mypy clean on the repaired module; compileall ok.
+
+DISPOSITION: I11_REPAIR_PASS_PENDING_OPERATOR_RATIFICATION
+  B5-I11 is NOT marked OPERATOR_ACCEPTED. A11 matrix 24 PASS / 0 FAIL. Independent
+  ratification belongs to the I11R2 checkpoint. Evidence:
+  BLOC_05_I11F1_REPAIR_EVIDENCE.md.
+
+NO GOVERNANCE CHANGE: B5-I10 = OPERATOR_ACCEPTED; B5-I11 = IMPLEMENTATION_PARTIAL;
+BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06 UNAUTHORIZED;
+RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.

@@ -47,9 +47,12 @@ from .side_maps import (
     resolve_side_mapping,
 )
 from .liquidation import (
+    LiquidationAdmissionRefusal,
     LiquidationAggregationScope,
+    LiquidationCanonicalField,
     LiquidationObservationInput,
     LiquidationPositionSide,
+    LiquidationSideAdmission,
     LiquidationZeroIntervalState,
     T1LiquidationRecord,
     normalize_liquidation,
@@ -77,10 +80,13 @@ __all__ = [
     "binance_side_from_is_buyer_maker",
     "require_side_mapping",
     "resolve_side_mapping",
-    # liquidation normalization (B5-I11)
+    # liquidation normalization (B5-I11 + the B5-I11F1 admission repair)
+    "LiquidationAdmissionRefusal",
     "LiquidationAggregationScope",
+    "LiquidationCanonicalField",
     "LiquidationObservationInput",
     "LiquidationPositionSide",
+    "LiquidationSideAdmission",
     "LiquidationZeroIntervalState",
     "T1LiquidationRecord",
     "normalize_liquidation",

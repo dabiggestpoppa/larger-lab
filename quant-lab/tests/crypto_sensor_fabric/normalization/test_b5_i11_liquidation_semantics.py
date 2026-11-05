@@ -11,7 +11,12 @@ from decimal import Decimal
 
 import pytest
 
-from crypto_sensor_fabric.contracts.enums import AggressorSide, LiquidationRole
+from crypto_sensor_fabric.contracts.enums import (
+    AggressorSide,
+    LiquidationRole,
+    SemanticEquivalence,
+    SensorFamily,
+)
 from crypto_sensor_fabric.normalization.sensors import (
     LiquidationAggregationScope,
     LiquidationObservationInput,
@@ -29,6 +34,12 @@ from crypto_sensor_fabric.normalization.enums import (
     NormalizationQualityFlag,
     NormalizationStatus,
     QuarantineReason,
+)
+from crypto_sensor_fabric.normalization.common.semantic_registry import (
+    IntervalDataScope,
+    ProviderSemanticMapping,
+    ProviderSemanticRegistry,
+    SemanticConfidence,
 )
 from crypto_sensor_fabric.storage.enums import CoverageState, RevisionState
 
@@ -78,13 +89,71 @@ def _flag_values(record: T1LiquidationRecord) -> set[str]:
     return {flag.value for flag in record.quality_flags}
 
 
+#: Every row below is labelled SYNTHETIC TEST AUTHORITY, twice, so a fixture can
+#: never be mistaken for documentary evidence about a venue (I11F1 section 5).
+_SYNTH = "SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION"
+_SYNTH_METHOD = "SYNTHETIC_TEST_LIQUIDATION_SIDE_V1"
+
+
+def _synthetic_row(provider_field: str, canonical_field: str) -> ProviderSemanticMapping:
+    """One synthetic registry row: it certifies the MECHANISM, not the venue.
+
+    ``provider_semantics_verified=True`` used to stand in for this.  Because the
+    repair deleted that assertion, the tests that model a certified provider now
+    model the real authority -- an I09 mapping row -- and the label keeps the
+    fixture distinguishable from production evidence.
+    """
+    return ProviderSemanticMapping(
+        provider="BINANCE_USDM",
+        provider_field=provider_field,
+        canonical_sensor=SensorFamily.MECHANICAL_LIQUIDATION,
+        canonical_field=canonical_field,
+        semantic_equivalence_class=SemanticEquivalence.EXACT_EQUIVALENT,
+        native_definition=f"{_SYNTH}:{provider_field}",
+        transformation=f"{_SYNTH}:{provider_field}->{canonical_field}",
+        methodology_id=_SYNTH_METHOD,
+        blocking_assumptions=(f"{_SYNTH}:certifies-nothing-in-production",),
+        known_limitations=(f"{_SYNTH}:fixture-only-authority",),
+        source_endpoint_or_archive="synthetic://test-authority",
+        data_type="EVENT",
+        native_unit="ENUM",
+        timestamp_meaning="EVENT_TIME",
+        interval_data_scope=IntervalDataScope.INTERVAL_LOCAL,
+        direction_side_convention=f"{_SYNTH}:{canonical_field}",
+        evidence_reference=f"{_SYNTH}:evidence",
+        semantic_confidence=SemanticConfidence.VERIFIED_FIRST_PARTY,
+        last_verified_date=None,
+        version="1",
+    )
+
+
+def _synthetic_registry() -> ProviderSemanticRegistry:
+    return ProviderSemanticRegistry(
+        schema_version="SYNTHETIC_TEST_REGISTRY_V1",
+        mappings=(
+            _synthetic_row("side", "position_side_liquidated"),
+            _synthetic_row("orderSide", "execution_side"),
+            _synthetic_row("aggressor", "aggressor_side"),
+            _synthetic_row("role", "maker_taker_role"),
+        ),
+    )
+
+
 # ---------------------------------------------------------------------------
 # I11-SIDE (04 section 3.1): four separate facts, never collapsed
 # ---------------------------------------------------------------------------
 
 
 def test_a_verified_long_liquidation_keeps_both_sides_independently() -> None:
-    record = normalize_liquidation(_payload(provider_semantics_verified=True))
+    record = normalize_liquidation(
+        _payload(
+            native_position_side_field="side",
+            native_position_side_value="LONG",
+            native_execution_side_field="orderSide",
+            native_execution_side_value="SELL",
+        ),
+        registry=_synthetic_registry(),
+    )
     assert record.position_side_liquidated is LiquidationPositionSide.LONG
     assert record.execution_side is AggressorSide.SELL
 
@@ -94,8 +163,12 @@ def test_a_verified_short_liquidation_keeps_both_sides_independently() -> None:
         _payload(
             position_side_liquidated=LiquidationPositionSide.SHORT,
             execution_side=AggressorSide.BUY,
-            provider_semantics_verified=True,
-        )
+            native_position_side_field="side",
+            native_position_side_value="SHORT",
+            native_execution_side_field="orderSide",
+            native_execution_side_value="BUY",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.SHORT
     assert record.execution_side is AggressorSide.BUY
@@ -107,8 +180,10 @@ def test_position_side_never_implies_execution_side() -> None:
         _payload(
             position_side_liquidated=LiquidationPositionSide.LONG,
             execution_side=AggressorSide.UNKNOWN,
-            provider_semantics_verified=True,
-        )
+            native_position_side_field="side",
+            native_position_side_value="LONG",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.LONG
     assert record.execution_side is AggressorSide.UNKNOWN
@@ -119,8 +194,10 @@ def test_execution_side_never_implies_position_side() -> None:
         _payload(
             position_side_liquidated=LiquidationPositionSide.UNKNOWN,
             execution_side=AggressorSide.SELL,
-            provider_semantics_verified=True,
-        )
+            native_execution_side_field="orderSide",
+            native_execution_side_value="SELL",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.execution_side is AggressorSide.SELL
     assert record.position_side_liquidated is LiquidationPositionSide.UNKNOWN
@@ -128,7 +205,7 @@ def test_execution_side_never_implies_position_side() -> None:
 
 def test_uncertified_semantics_keep_the_canonical_slots_unknown() -> None:
     """The provider reading is provisional, not canonical (06 section 9)."""
-    record = normalize_liquidation(_payload(provider_semantics_verified=False))
+    record = normalize_liquidation(_payload())
     assert record.position_side_liquidated is LiquidationPositionSide.UNKNOWN
     assert record.execution_side is AggressorSide.UNKNOWN
     assert record.provisional_position_side is LiquidationPositionSide.LONG
@@ -215,12 +292,17 @@ def test_the_strict_form_raises_instead_of_quarantining() -> None:
 
 
 def test_a_quarantined_row_makes_no_canonical_side_claim() -> None:
+    """Quarantine wins over full authority: admission never reconciles a conflict."""
     record = normalize_liquidation(
         _payload(
             position_side_liquidated=LiquidationPositionSide.SHORT,
             execution_side=AggressorSide.SELL,
-            provider_semantics_verified=True,
-        )
+            native_position_side_field="side",
+            native_position_side_value="SHORT",
+            native_execution_side_field="orderSide",
+            native_execution_side_value="SELL",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.execution_side is AggressorSide.UNKNOWN
     assert record.provisional_position_side is LiquidationPositionSide.SHORT
@@ -289,8 +371,10 @@ def test_a_long_liquidation_aggregate_is_a_position_side_claim_not_aggressor_flo
             position_side_liquidated=LiquidationPositionSide.LONG,
             execution_side=AggressorSide.UNKNOWN,
             aggressor_side=AggressorSide.UNKNOWN,
-            provider_semantics_verified=True,
-        )
+            native_position_side_field="side",
+            native_position_side_value="LONG",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.LONG
     assert record.aggressor_side is AggressorSide.UNKNOWN
@@ -303,8 +387,10 @@ def test_a_short_aggregate_never_becomes_buy_aggressor_flow() -> None:
         _aggregate(
             position_side_liquidated=LiquidationPositionSide.SHORT,
             execution_side=AggressorSide.UNKNOWN,
-            provider_semantics_verified=True,
-        )
+            native_position_side_field="side",
+            native_position_side_value="SHORT",
+        ),
+        registry=_synthetic_registry(),
     )
     assert record.aggressor_side is AggressorSide.UNKNOWN
     assert record.execution_side is AggressorSide.UNKNOWN
@@ -327,7 +413,24 @@ def test_an_aggregate_is_never_expanded_into_one_event() -> None:
     [LiquidationRole.MAKER, LiquidationRole.TAKER, LiquidationRole.BOTH, LiquidationRole.UNKNOWN],
 )
 def test_liquidation_roles_are_retained(role: LiquidationRole) -> None:
-    record = normalize_liquidation(_payload(maker_taker_role=role))
+    """A role is a fourth separate claim, so it carries its own row.
+
+    Every claim on the row must clear the ladder together, so the two side
+    claims are admitted alongside the role.  ``UNKNOWN`` makes no claim and is
+    preserved either way.
+    """
+    record = normalize_liquidation(
+        _payload(
+            maker_taker_role=role,
+            native_position_side_field="side",
+            native_position_side_value="LONG",
+            native_execution_side_field="orderSide",
+            native_execution_side_value="SELL",
+            native_maker_taker_role_field="role",
+            native_maker_taker_role_value=role.value,
+        ),
+        registry=_synthetic_registry(),
+    )
     assert record.maker_taker_role is role
 
 

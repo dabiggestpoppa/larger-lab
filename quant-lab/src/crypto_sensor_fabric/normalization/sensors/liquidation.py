@@ -22,6 +22,27 @@ provisional reading are preserved while the canonical slot stays ``UNKNOWN``:
 bloc_05/06 section 9 and the I11 readiness assessment both require Layer-1
 behaviour only, with canonical semantic confidence left unresolved.
 
+**SENSOR-B5-I11F1 removed caller-controlled certification.**  Before the repair a
+single caller-supplied ``provider_semantics_verified: bool`` promoted the
+position, execution and aggressor sides into their canonical slots with no
+registry row, no confidence and no evidence reference (F_I11R1_02).  That
+boolean is gone.  Admission now derives from the I09
+:class:`ProviderSemanticRegistry` exactly as the accepted I10 side adapter does:
+for EVERY canonical field it promotes, the normalizer resolves the row keyed by
+``(provider, native provider field, MECHANICAL_LIQUIDATION)``, requires that row
+to declare *that* canonical field, and reads the confidence off the row.  A
+provider's execution-side definition can therefore never authorize its
+position-side or aggressor-side claim (decision: one row per claim).
+
+Aggregation is all-or-nothing, because the frozen flag vocabulary carries ONE
+semantic flag: promoting a certified field while its sibling stays uncertified
+would leave ``SEMANTICS_UNVERIFIED`` on a record that also claims a canonical
+side, so the row would contradict itself in the same way the repaired defect
+did.  bloc_05/04 section 3.4's requirement that the frozen model not be forced
+into an inconsistent hybrid is therefore met by failing closed: either every
+supplied side claim is admitted, or none reaches a canonical slot and each
+refusal is recorded with its typed cause in ``side_admissions``.
+
 Three further frozen distinctions are structural here:
 
 * **Event versus aggregate** (04 section 3.3).  ``aggregation_scope`` is one of
@@ -69,12 +90,24 @@ from typing import Any
 
 from pydantic import Field, model_validator
 
-from ...contracts.enums import AggressorSide, LiquidationRole, SensorFamily
+from ...contracts.enums import (
+    AggressorSide,
+    LiquidationRole,
+    SemanticEquivalence,
+    SensorFamily,
+)
 from ...storage import (
     CoverageState,
     RevisionState,
     SourceUnitContract,
     SourceUnitEvidence,
+)
+from ..common.semantic_registry import (
+    PENDING_EVIDENCE_REFERENCE,
+    ProviderSemanticMapping,
+    ProviderSemanticRegistry,
+    SemanticConfidence,
+    admits_critical_t1_use,
 )
 from ..enums import (
     AvailabilityBasis,
@@ -116,9 +149,12 @@ from .trade import (
 __all__ = [
     "I04B_METHODOLOGY_ID",
     "I08_UNITS_METHODOLOGY_ID",
+    "LiquidationAdmissionRefusal",
     "LiquidationAggregationScope",
+    "LiquidationCanonicalField",
     "LiquidationObservationInput",
     "LiquidationPositionSide",
+    "LiquidationSideAdmission",
     "LiquidationZeroIntervalState",
     "T1LiquidationRecord",
     "normalize_liquidation",
@@ -219,13 +255,123 @@ class ContradictoryLiquidationSideError(ValueError):
     """
 
 
+class LiquidationCanonicalField(_StrEnum):
+    """The four liquidation fields that carry a semantic CLAIM (04 section 3).
+
+    Each is a separate claim about what the provider's own vocabulary means, so
+    the I09 registry row that authorizes one must declare that one: a row whose
+    ``canonical_field`` is ``execution_side`` cannot authorize
+    ``position_side_liquidated`` even when both are read off the same payload.
+    """
+
+    POSITION_SIDE_LIQUIDATED = "position_side_liquidated"
+    EXECUTION_SIDE = "execution_side"
+    AGGRESSOR_SIDE = "aggressor_side"
+    MAKER_TAKER_ROLE = "maker_taker_role"
+
+
+class LiquidationAdmissionRefusal(_StrEnum):
+    """Why one canonical field stayed out of its canonical slot (fail-closed).
+
+    Every value is a *stated* cause, so a provisional reading is never merely
+    absent: the record says which link of the evidence chain was missing.
+    """
+
+    #: The reading was supplied with no native provider field naming its source.
+    NO_NATIVE_FIELD = "NO_NATIVE_FIELD"
+    #: No registry was supplied, so there is no semantic authority at all.
+    NO_REGISTRY = "NO_REGISTRY"
+    #: The registry declares no row for (provider, field, liquidation family).
+    NO_REGISTRY_MAPPING = "NO_REGISTRY_MAPPING"
+    #: The row's provider is not the payload's provider (defence in depth).
+    PROVIDER_MISMATCH = "PROVIDER_MISMATCH"
+    #: The row declares the fields not comparable at all.
+    NOT_COMPARABLE_MAPPING = "NOT_COMPARABLE_MAPPING"
+    #: The row maps this provider field to a DIFFERENT canonical field.
+    FIELD_MISMATCH = "FIELD_MISMATCH"
+    #: The row cites no methodology, so a promoted value could not enter lineage.
+    UNCITABLE_METHODOLOGY = "UNCITABLE_METHODOLOGY"
+    #: The evidence reference is absent or still the pending probe token.
+    PENDING_EVIDENCE = "PENDING_EVIDENCE"
+    #: 03 section 13: ``AMBIGUOUS`` blocks use in critical T1 fields.
+    AMBIGUOUS_MAPPING = "AMBIGUOUS_MAPPING"
+    #: The provider's own sides contradict each other, so the row is quarantined.
+    CONTRADICTION = "CONTRADICTION"
+
+
+class LiquidationSideAdmission(NormalizationModelBase):
+    """One canonical field's admission decision, with its full evidence chain.
+
+    This is the record-level replacement for the removed caller boolean: it
+    carries the registry row's identity (provider field, methodology, version),
+    the row's semantic confidence READ verbatim, and the non-pending evidence
+    reference, so "this side was admitted" and "this side was refused, for this
+    reason" are both auditable facts rather than a bare ``bool``.
+
+    The model's own law is what makes a caller assertion useless: an admitted
+    row MUST name a confidence, an evidence reference and a citable methodology,
+    and may not be ``AMBIGUOUS`` or cite the pending token.
+    """
+
+    canonical_field: LiquidationCanonicalField
+    provider_field: OpaqueIdentifier | None = None
+    provisional_value: OpaqueIdentifier
+    semantic_confidence: SemanticConfidence | None = None
+    evidence_reference: OpaqueIdentifier | None = None
+    methodology_id: OpaqueIdentifier | None = None
+    mapping_version: OpaqueIdentifier | None = None
+    admitted: bool
+    refusal: LiquidationAdmissionRefusal | None = None
+
+    @model_validator(mode="after")
+    def _admission_laws(self) -> LiquidationSideAdmission:
+        if self.admitted == (self.refusal is not None):
+            raise ValueError(
+                "admitted must be exactly 'no refusal': an admitted field was not "
+                "refused and a refused field was not admitted"
+            )
+        if not self.admitted:
+            return self
+        missing = [
+            name
+            for name in (
+                "provider_field",
+                "semantic_confidence",
+                "evidence_reference",
+                "methodology_id",
+                "mapping_version",
+            )
+            if getattr(self, name) is None
+        ]
+        if missing:
+            raise ValueError(
+                "an admitted canonical field requires "
+                f"{', '.join(missing)}: admission is a property of the provider "
+                "evidence ladder, never a caller choice (bloc_05/03 section 13)"
+            )
+        if self.semantic_confidence is SemanticConfidence.AMBIGUOUS:
+            raise ValueError(
+                "an AMBIGUOUS mapping cannot admit a critical T1 field "
+                "(bloc_05/03 section 13)"
+            )
+        if self.evidence_reference == PENDING_EVIDENCE_REFERENCE:
+            raise ValueError(
+                f"an admitted field cannot cite {PENDING_EVIDENCE_REFERENCE}: a "
+                "provisional mapping is not a verified mapping (BOOK 00 Q7)"
+            )
+        return self
+
+
 class LiquidationObservationInput(NormalizationModelBase):
     """Transport-neutral liquidation observation, before any canonical claim.
 
     Provider-neutral: the only provider-specific things a caller supplies are
     the raw field names/values it observed (preserved verbatim for the audit
-    trail) and a claim about whether those semantics are certified.  Nothing
-    here reads a registry, a clock or a network.
+    trail) and the provider's own reading of them.  Nothing here reads a
+    registry, a clock or a network, and there is deliberately NO field by which
+    a caller can declare its own reading certified: semantic authority is
+    resolved by ``normalize_liquidation`` against the I09 registry, one row per
+    canonical field (SENSOR-B5-I11F1, F_I11R1_02).
     """
 
     provider: OpaqueIdentifier
@@ -246,11 +392,10 @@ class LiquidationObservationInput(NormalizationModelBase):
     native_position_side_value: OpaqueIdentifier | None = None
     native_execution_side_field: OpaqueIdentifier | None = None
     native_execution_side_value: OpaqueIdentifier | None = None
-
-    #: ``True`` only when provider-grade evidence establishes what the provider's
-    #: side fields mean.  While ``False`` the canonical side slots stay UNKNOWN
-    #: and the provider's reading is carried as provisional evidence only.
-    provider_semantics_verified: bool = False
+    native_aggressor_side_field: OpaqueIdentifier | None = None
+    native_aggressor_side_value: OpaqueIdentifier | None = None
+    native_maker_taker_role_field: OpaqueIdentifier | None = None
+    native_maker_taker_role_value: OpaqueIdentifier | None = None
 
     quantity_native: Decimal
     quantity_native_unit: OpaqueIdentifier
@@ -319,22 +464,34 @@ class LiquidationObservationInput(NormalizationModelBase):
 
     @model_validator(mode="after")
     def _native_side_law(self) -> LiquidationObservationInput:
-        if (
-            self.native_position_side_value is not None
-            and self.native_position_side_field is None
+        for label, field, value in (
+            (
+                "position-side",
+                self.native_position_side_field,
+                self.native_position_side_value,
+            ),
+            (
+                "execution-side",
+                self.native_execution_side_field,
+                self.native_execution_side_value,
+            ),
+            (
+                "aggressor-side",
+                self.native_aggressor_side_field,
+                self.native_aggressor_side_value,
+            ),
+            (
+                "maker/taker-role",
+                self.native_maker_taker_role_field,
+                self.native_maker_taker_role_value,
+            ),
         ):
-            raise ValueError(
-                "a preserved native position-side value requires the provider "
-                "field it came from; an unattributed value is not evidence"
-            )
-        if (
-            self.native_execution_side_value is not None
-            and self.native_execution_side_field is None
-        ):
-            raise ValueError(
-                "a preserved native execution-side value requires the provider "
-                "field it came from"
-            )
+            if value is not None and field is None:
+                raise ValueError(
+                    f"a preserved native {label} value requires the provider "
+                    "field it came from; an unattributed value is not evidence "
+                    "and cannot name the registry row that would admit it"
+                )
         return self
 
     @model_validator(mode="after")
@@ -378,10 +535,20 @@ class T1LiquidationRecord(T1BaseEnvelope):
 
     provisional_position_side: LiquidationPositionSide = LiquidationPositionSide.UNKNOWN
     provisional_execution_side: AggressorSide = AggressorSide.UNKNOWN
+    provisional_aggressor_side: AggressorSide = AggressorSide.UNKNOWN
+    provisional_maker_taker_role: LiquidationRole | None = None
     native_position_side_field: OpaqueIdentifier | None = None
     native_position_side_value: OpaqueIdentifier | None = None
     native_execution_side_field: OpaqueIdentifier | None = None
     native_execution_side_value: OpaqueIdentifier | None = None
+    native_aggressor_side_field: OpaqueIdentifier | None = None
+    native_aggressor_side_value: OpaqueIdentifier | None = None
+    native_maker_taker_role_field: OpaqueIdentifier | None = None
+    native_maker_taker_role_value: OpaqueIdentifier | None = None
+
+    #: One decision per canonical field that carried a provider reading.  The
+    #: canonical slots above may hold a value only when this list admits it.
+    side_admissions: tuple[LiquidationSideAdmission, ...] = ()
 
     zero_interval_state: LiquidationZeroIntervalState = (
         LiquidationZeroIntervalState.NOT_APPLICABLE
@@ -417,6 +584,71 @@ class T1LiquidationRecord(T1BaseEnvelope):
             raise ValueError(
                 "an aggregate liquidation record must not carry an event id"
             )
+        return self
+
+    @model_validator(mode="after")
+    def _side_admission_law(self) -> T1LiquidationRecord:
+        """A canonical side is unrepresentable without its registry admission.
+
+        This is the structural half of the repair: the caller boolean is gone,
+        and a record that promotes a side without an admitted
+        :class:`LiquidationSideAdmission` for that exact field cannot be built at
+        all.  `F_I11R1_02`'s outcome -- canonical LONG/SELL next to
+        ``SEMANTICS_UNVERIFIED`` and no evidence -- has no representation left.
+        """
+        fields = [admission.canonical_field for admission in self.side_admissions]
+        if len(set(fields)) != len(fields):
+            raise ValueError(
+                "side_admissions carries two decisions for one canonical field"
+            )
+        by_field = {a.canonical_field: a for a in self.side_admissions}
+        claims: tuple[tuple[LiquidationCanonicalField, str | None], ...] = (
+            (
+                LiquidationCanonicalField.POSITION_SIDE_LIQUIDATED,
+                None
+                if self.position_side_liquidated
+                is LiquidationPositionSide.UNKNOWN
+                else self.position_side_liquidated.value,
+            ),
+            (
+                LiquidationCanonicalField.EXECUTION_SIDE,
+                None
+                if self.execution_side is AggressorSide.UNKNOWN
+                else self.execution_side.value,
+            ),
+            (
+                LiquidationCanonicalField.AGGRESSOR_SIDE,
+                None
+                if self.aggressor_side is AggressorSide.UNKNOWN
+                else self.aggressor_side.value,
+            ),
+            (
+                LiquidationCanonicalField.MAKER_TAKER_ROLE,
+                (
+                    None
+                    if self.maker_taker_role is None
+                    or self.maker_taker_role is LiquidationRole.UNKNOWN
+                    else self.maker_taker_role.value
+                ),
+            ),
+        )
+        for field, value in claims:
+            if value is None:
+                continue
+            admission = by_field.get(field)
+            if admission is None or not admission.admitted:
+                raise ValueError(
+                    f"canonical {field.value}={value} has no admitted registry "
+                    "mapping; canonical admission is a property of the I09 "
+                    "provider-evidence ladder, never a caller choice "
+                    "(bloc_05/03 section 13, F_I11R1_02)"
+                )
+            if admission.provisional_value != value:
+                raise ValueError(
+                    f"canonical {field.value}={value} disagrees with the "
+                    f"admitted reading {admission.provisional_value!r}; the "
+                    "canonical field is the admitted reading, not a new claim"
+                )
         return self
 
     @model_validator(mode="after")
@@ -651,9 +883,127 @@ def _quality(
     )
 
 
+def _admit_field(
+    *,
+    canonical_field: LiquidationCanonicalField,
+    provisional_value: str,
+    provider: str,
+    provider_field: str | None,
+    registry: ProviderSemanticRegistry | None,
+    contradiction: bool,
+) -> LiquidationSideAdmission:
+    """Resolve ONE canonical field's authority.  Never guesses, never widens.
+
+    The order is the evidence chain, so the recorded refusal names the first
+    missing link: contradiction, source field, registry, row, provider, declared
+    canonical field, citable methodology, non-pending evidence, then the frozen
+    confidence ladder.  Nothing here reads a clock, a network or a default.
+    """
+
+    def refused(reason: LiquidationAdmissionRefusal) -> LiquidationSideAdmission:
+        return LiquidationSideAdmission(
+            canonical_field=canonical_field,
+            provider_field=provider_field,
+            provisional_value=provisional_value,
+            admitted=False,
+            refusal=reason,
+        )
+
+    if contradiction:
+        return refused(LiquidationAdmissionRefusal.CONTRADICTION)
+    if provider_field is None:
+        return refused(LiquidationAdmissionRefusal.NO_NATIVE_FIELD)
+    if registry is None:
+        return refused(LiquidationAdmissionRefusal.NO_REGISTRY)
+    row: ProviderSemanticMapping | None = registry.resolve(
+        provider, provider_field, SensorFamily.MECHANICAL_LIQUIDATION
+    )
+    if row is None:
+        return refused(LiquidationAdmissionRefusal.NO_REGISTRY_MAPPING)
+    if row.provider != provider:  # pragma: no cover - resolve() already filters
+        return refused(LiquidationAdmissionRefusal.PROVIDER_MISMATCH)
+    if row.semantic_equivalence_class is SemanticEquivalence.NOT_COMPARABLE:
+        return refused(LiquidationAdmissionRefusal.NOT_COMPARABLE_MAPPING)
+    if row.canonical_field != canonical_field.value:
+        return refused(LiquidationAdmissionRefusal.FIELD_MISMATCH)
+    if row.methodology_id is None:
+        return refused(LiquidationAdmissionRefusal.UNCITABLE_METHODOLOGY)
+    if (
+        row.evidence_reference is None
+        or row.evidence_reference == PENDING_EVIDENCE_REFERENCE
+    ):
+        return refused(LiquidationAdmissionRefusal.PENDING_EVIDENCE)
+    if not admits_critical_t1_use(row.semantic_confidence):
+        return refused(LiquidationAdmissionRefusal.AMBIGUOUS_MAPPING)
+    return LiquidationSideAdmission(
+        canonical_field=canonical_field,
+        provider_field=provider_field,
+        provisional_value=provisional_value,
+        semantic_confidence=row.semantic_confidence,
+        evidence_reference=row.evidence_reference,
+        methodology_id=row.methodology_id,
+        mapping_version=row.version,
+        admitted=True,
+    )
+
+
+def _admissions(
+    payload: LiquidationObservationInput,
+    registry: ProviderSemanticRegistry | None,
+    *,
+    contradiction: bool,
+) -> tuple[LiquidationSideAdmission, ...]:
+    """One decision per canonical field that actually carries a reading.
+
+    A field whose provider reading is absent or ``UNKNOWN`` makes no claim, so
+    there is nothing to admit and no decision is recorded: "not claimed" stays
+    distinguishable from "claimed and refused".
+    """
+    requests = (
+        (
+            LiquidationCanonicalField.POSITION_SIDE_LIQUIDATED,
+            payload.position_side_liquidated.value,
+            payload.native_position_side_field,
+        ),
+        (
+            LiquidationCanonicalField.EXECUTION_SIDE,
+            payload.execution_side.value,
+            payload.native_execution_side_field,
+        ),
+        (
+            LiquidationCanonicalField.AGGRESSOR_SIDE,
+            payload.aggressor_side.value,
+            payload.native_aggressor_side_field,
+        ),
+        (
+            LiquidationCanonicalField.MAKER_TAKER_ROLE,
+            None
+            if payload.maker_taker_role is None
+            else payload.maker_taker_role.value,
+            payload.native_maker_taker_role_field,
+        ),
+    )
+    decisions: list[LiquidationSideAdmission] = []
+    for canonical_field, value, provider_field in requests:
+        if value is None or value == "UNKNOWN":
+            continue
+        decisions.append(
+            _admit_field(
+                canonical_field=canonical_field,
+                provisional_value=value,
+                provider=payload.provider,
+                provider_field=provider_field,
+                registry=registry,
+                contradiction=contradiction,
+            )
+        )
+    return tuple(decisions)
+
+
 def normalize_liquidation(
     payload: LiquidationObservationInput,
     *,
+    registry: ProviderSemanticRegistry | None = None,
     terms: ContractTermsSnapshot | None = None,
     reference_price: ReferencePriceEvidence | None = None,
     knowledge_cutoff: datetime | None = None,
@@ -665,12 +1015,18 @@ def normalize_liquidation(
     * **quarantined** -- the provider's own sides contradict each other
       (LONG+BUY / SHORT+SELL).  The row is retained with a typed cause,
       evidence refs and a remediation note; nothing is reconciled by guessing.
-    * **provisional** -- side semantics are not certified, so the canonical
-      side slots stay ``UNKNOWN`` while the provider's reading is preserved.
-    * **verified** -- the caller established the provider's semantics; both
-      sides are carried in their own fields.
+    * **provisional** -- at least one side claim is not backed by an admissible
+      I09 registry row, so NO canonical side is promoted while every provider
+      reading is preserved and every refusal is recorded.
+    * **admitted** -- every supplied side claim resolved to its own admissible
+      registry row; the sides are carried in their own canonical fields, with
+      the row's identity, confidence and evidence reference kept on the record.
     * **unverified zero** -- zero reported without a completed-interval claim
       and verified coverage; retained as native evidence, never promoted.
+
+    ``registry`` is the I09 ``ProviderSemanticRegistry``.  Omitting it is not a
+    shortcut to authority: absent a registry every claim is refused with
+    ``NO_REGISTRY`` and the canonical slots stay ``UNKNOWN``.
     """
     if (
         terms is not None
@@ -687,13 +1043,35 @@ def normalize_liquidation(
     contradiction = _contradicts(
         payload.position_side_liquidated, payload.execution_side
     )
-    verified = payload.provider_semantics_verified and not contradiction
+    admissions = _admissions(payload, registry, contradiction=contradiction)
+    #: The frozen vocabulary carries ONE semantic flag, so a partly certified row
+    #: cannot be represented honestly: promoting a certified field while its
+    #: sibling stays uncertified would put a canonical side next to
+    #: ``SEMANTICS_UNVERIFIED`` -- the exact self-contradiction F_I11R1_02
+    #: produced.  So either every supplied claim is admitted or none is promoted
+    #: (bloc_05/04 section 3.4: no invented inconsistent hybrid).
+    fully_admitted = bool(admissions) and all(
+        admission.admitted for admission in admissions
+    )
+    position = (
+        payload.position_side_liquidated
+        if fully_admitted
+        else LiquidationPositionSide.UNKNOWN
+    )
+    execution = payload.execution_side if fully_admitted else AggressorSide.UNKNOWN
+    aggressor = payload.aggressor_side if fully_admitted else AggressorSide.UNKNOWN
+    role: LiquidationRole | None = (
+        None
+        if payload.maker_taker_role is None
+        else (payload.maker_taker_role if fully_admitted else LiquidationRole.UNKNOWN)
+    )
     zero_state = _zero_state(payload)
 
     flags: set[NormalizationQualityFlag] = {
-        NormalizationQualityFlag.SEMANTICS_UNVERIFIED,
         NormalizationQualityFlag.LINEAGE_COMPLETE,
     }
+    if not fully_admitted:
+        flags.add(NormalizationQualityFlag.SEMANTICS_UNVERIFIED)
     if payload.liquidation_event_id is None:
         flags.add(NormalizationQualityFlag.IDENTITY_PROVIDER_ID_MISSING)
         flags.add(NormalizationQualityFlag.NO_SAFE_DEDUPE_KEY)
@@ -769,7 +1147,6 @@ def normalize_liquidation(
         quality_flags=_canonical_flags(flags),
         versions=T1VersionContext(),
         liquidation_event_id=payload.liquidation_event_id,
-        maker_taker_role=payload.maker_taker_role,
         quantity_native=payload.quantity_native,
         quantity_native_unit=payload.quantity_native_unit,
         quantity_base=quantity_base,
@@ -781,10 +1158,17 @@ def normalize_liquidation(
         aggregation_scope=payload.aggregation_scope,
         provisional_position_side=payload.position_side_liquidated,
         provisional_execution_side=payload.execution_side,
+        provisional_aggressor_side=payload.aggressor_side,
+        provisional_maker_taker_role=payload.maker_taker_role,
         native_position_side_field=payload.native_position_side_field,
         native_position_side_value=payload.native_position_side_value,
         native_execution_side_field=payload.native_execution_side_field,
         native_execution_side_value=payload.native_execution_side_value,
+        native_aggressor_side_field=payload.native_aggressor_side_field,
+        native_aggressor_side_value=payload.native_aggressor_side_value,
+        native_maker_taker_role_field=payload.native_maker_taker_role_field,
+        native_maker_taker_role_value=payload.native_maker_taker_role_value,
+        side_admissions=admissions,
         zero_interval_state=zero_state,
         normalization_methodology_id=None,
         normalization_methodology_version=None,
@@ -809,18 +1193,11 @@ def normalize_liquidation(
                 "movement, or from a provider aggregate direction "
                 "(bloc_05/04 section 3.1)."
             ),
-            position_side_liquidated=LiquidationPositionSide.UNKNOWN,
-            execution_side=AggressorSide.UNKNOWN,
-            aggressor_side=AggressorSide.UNKNOWN,
+            position_side_liquidated=position,
+            execution_side=execution,
+            aggressor_side=aggressor,
+            maker_taker_role=role,
         )
-
-    position = (
-        payload.position_side_liquidated
-        if verified
-        else LiquidationPositionSide.UNKNOWN
-    )
-    execution = payload.execution_side if verified else AggressorSide.UNKNOWN
-    aggressor = payload.aggressor_side if verified else AggressorSide.UNKNOWN
 
     missingness = (
         MissingnessReason.SOURCE_GAP
@@ -840,4 +1217,5 @@ def normalize_liquidation(
         position_side_liquidated=position,
         execution_side=execution,
         aggressor_side=aggressor,
+        maker_taker_role=role,
     )
