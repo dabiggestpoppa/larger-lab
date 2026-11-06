@@ -237,6 +237,57 @@ class TestGateClosure:
         assert doc["pristine"]["restored_byte_exact"] is True
         assert doc["pristine"]["worktree_clean"] is True
 
+        # Independent totals owner: the committed CI identity record and the registry,
+        # NOT the bundle this stage is producing. G15's totals were previously removed
+        # for self-reference (defect D2); they are restored here against a distinct
+        # source and cross-checked against the registry's own arithmetic.
+        identity = S.ci_identity()
+        assert identity["status"] == "OBSERVED"
+        planned_total = S.registry()["requirement_set"]["total"]
+        assert len(planned) == 40 and planned_total == 55
+        assert identity["collected"] == identity["executed"] == identity["passed"] == 40
+        assert identity["failures"] == identity["errors"] == identity["skipped"] == 0
+        assert identity["unique_nodes"] == 40
+        assert identity["collected"] == len(planned) == identity["unique_nodes"]
+        assert S.git("cat-file", "-e", identity["head_sha"]).returncode == 0
+        assert S.git("cat-file", "-e", identity["tested_tree"]).returncode == 0
+        assert identity["merge_ref_tree_equals_tested_tree"] is True
+
+        # Machine-readable non-vacuity closure: every planned node is audited once,
+        # names a real target and oracle, and any cited mutation exists in the battery.
+        audit = json.loads(
+            (S.DOCS / "OCE_B5_I8_NODE_NONVACUITY_AUDIT_v1.0.json").read_text(encoding="utf-8")
+        )
+        audited = [row["node"] for row in audit["nodes"]]
+        assert len(audited) == 40 and len(set(audited)) == 40
+        assert set(audited) == planned, sorted(set(planned) - set(audited))
+        mutation_ids = {row["mutation_id"] for row in rows}
+        for row in audit["nodes"]:
+            assert row["verdict"] == "NON_VACUOUS", row["node"]
+            assert row["target"] and row["oracle"] and row["requirement"], row["node"]
+            if row["negative_control"].startswith("M"):
+                assert row["negative_control"] in mutation_ids, row["node"]
+        assert audit["totals"]["tautological"] == 0
+        assert audit["totals"]["orphan_nodes"] == 0
+        assert audit["totals"]["orphan_requirements"] == 0
+
+        def check_totals(record: dict) -> None:
+            assert record["collected"] == record["executed"] == record["passed"] == 40
+            assert record["failures"] == record["errors"] == record["skipped"] == 0
+            assert record["unique_nodes"] == 40
+
+        check_totals(identity)
+        for key, value in (("collected", 39), ("executed", 41), ("passed", 40),
+                           ("failures", 1), ("unique_nodes", 39)):
+            forged_identity = dict(identity)
+            forged_identity[key] = value
+            try:
+                check_totals(forged_identity)
+            except AssertionError:
+                pass
+            else:  # pragma: no cover
+                raise AssertionError(f"totals check accepted forged {key}={value}")
+
         # Discrimination: a non-red row invalidates the battery.
         def check(document: dict) -> None:
             bad = [

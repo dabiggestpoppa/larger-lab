@@ -179,3 +179,36 @@ Downloaded and parsed from the raw artifacts, not read from the badge.
 The selection proof records `collected=executed=passed=40`, `failures=errors=skipped=0`,
 `unique_nodes=40`, `node_closure=true`, no orphan files, the five planned files, `pr_head_sha`,
 the tested tree and both merge-ref parents.
+
+## 14. Shared-support audit (appended 2026-11-06)
+
+`b5_i8_audit_support.py` is shared by all five frozen files. Closure audit of every
+helper used by two or more files:
+
+| Helper | Class | Why it cannot create false agreement |
+|---|---|---|
+| `frozen_message`, `panel_document`, `protocol_tasks`, `accessibility_checks` | input fixture only | fixed inputs; they carry no expectation and cannot pass a node |
+| `recompute_verdict`, `verdict_digest`, `gates`, `digest_obj` | independent oracle | recompute from the registry and mutation document; the bundle's own verdict text is compared against them, never used as input |
+| `git`, `collect_adjacent`, `collected_nodes` | production adapter | shell out to real `git`/`pytest`; a defect shows up as a collection mismatch, and the CI selection step recomputes the same closure independently in `b5-i8-registry-proof.json` |
+| `evidence`, `registry`, `mutations`, `ci_identity`, `load` | evidence parser | pure readers of committed bytes; they never synthesize an expected value |
+| `forbidden_hits`, `workflow_text`, `workflow_b5_i8_step` | assertion helper | static text assertions with two-sided controls; they cannot make a runtime proof pass |
+
+Controls against circular agreement:
+
+- `M01`–`M12` mutate **production** panel/transport files, not the support module, so a
+  shared helper cannot satisfy them: the battery's red nodes come from the audited
+  surface.
+- The G15 totals owner was moved off the bundle onto the committed CI identity record
+  and the registry (§7 of this record, defect `D2`), so a defective bundle generator
+  cannot make its own totals pass.
+- The 40-node non-vacuity audit names each node's target, oracle and negative control
+  (`OCE_B5_I8_NODE_NONVACUITY_AUDIT_v1.0.json`); a node with no reachable target or no
+  discriminating control cannot be recorded as `NON_VACUOUS`.
+- No authority decision lives in the support module: it computes, it does not decide a
+  gate. Gate language and `G16` status are recomputed by `gates()` from the recorded
+  attestation class.
+
+Residual coupling (disclosed): the five files share one module, so a defect in a parser
+helper would surface as several red nodes at once. That is a blast-radius disclosure,
+not a circular-agreement path, because no helper both produces and checks the same
+value. The same-agent score in §11 carries this as a QUALITY deduction.
