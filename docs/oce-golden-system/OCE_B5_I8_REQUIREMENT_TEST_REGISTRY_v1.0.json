@@ -906,7 +906,30 @@
           "quality": 8.0
         }
       }
-    }
+    },
+    "amendments": [
+      {
+        "document": "docs/oce-golden-system/OCE_B5_I8_AMEND_001_CI_SELECTION_SURFACE_v1.0.md",
+        "document_id": "OCE-B5-I8-AMEND-001",
+        "status": "OPERATOR_RATIFIED",
+        "ratified_under": "AUTHORIZED_STAGE=B5-I8-RATIFICATION",
+        "supersedes": "plan section 1 rung R6: workflow placement in .github/workflows/b1-i1r-validation.yml and artifact name b1-i1r-evidence-<run_id>",
+        "replacement": [
+          ".github/workflows/b5-i8-audit-validation.yml",
+          "artifact b5-i8-evidence-<run_id>"
+        ],
+        "unchanged": [
+          "55 requirements",
+          "40 nodes",
+          "18 failure classes",
+          "12 mutation floor",
+          "floors 40 / 189",
+          "triggers, identity rules, retention, cleanup, authority boundaries",
+          "G16 disposition and every limitation label"
+        ],
+        "pinned_workflow_sha256_unchanged": true
+      }
+    ]
   },
   "registry_id": "OCE-B5-I8-REGISTRY-001",
   "registry_version": "1.0",

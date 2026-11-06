@@ -2144,3 +2144,20 @@ Recorded in §20.10 and in the PR body once the exact-head runs exist. No id is 
 | `cleanup_result` | `workspace cleaned in the workflow; no residue asserted` |
 | `local_pre_existing_failures` | `32` |
 | `local_pre_existing_scope` | `test_b4_startup_gate/​test_b4_cxr7/​test_b4_cxr6/​test_local_lifecycle (Windows host; 33 on base)` |
+
+### 20.11 B5-I8 amendment 001 — CI selection surface (appended 2026-11-06)
+
+| Field | Value |
+|---|---|
+| `stage` | `AUTHORIZED_STAGE=B5-I8-RATIFICATION` |
+| `amendment_id` | `OCE-B5-I8-AMEND-001` |
+| `status` | `OPERATOR_RATIFIED` |
+| `superseded_clause` | plan section 1 rung R6 — workflow placement + artifact name |
+| `why` | EL09 pins `.github/workflows/b1-i1r-validation.yml` as a whole-file immutable row; adding a step turns EL09 red (reproduced 26/27) |
+| `replacement` | dedicated additive workflow `b5-i8-audit-validation.yml`, artifact `b5-i8-evidence-<run_id>` |
+| `pinned_workflow_changed` | `false` (byte-identical) |
+| `requirements_changed` | `0` |
+| `nodes_changed` | `0` |
+| `failure_classes_changed` | `0` |
+| `mutation_floor_changed` | `0` |
+| `g16_status` | `OPEN` (unchanged) |

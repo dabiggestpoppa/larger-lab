@@ -122,3 +122,23 @@ evidence (registry `p0.implementation`); the 5 deferred obligations stay `DEFERR
 
 `PASS` means the frozen observable executed successfully and turned red under its mutation. It
 does not ratify the stage and does not close `G16`. `MERGE_AUTHORIZED = false`.
+
+## 5. Amendment 001 and implementation re-disposition (appended 2026-11-06; §4 unchanged)
+
+`OCE_B5_I8_AMEND_001_CI_SELECTION_SURFACE_v1.0.md` supersedes **plan R6's workflow
+placement and artifact name only**. The CI selection surface is the dedicated additive
+workflow `b5-i8-audit-validation.yml`; `.github/workflows/b1-i1r-validation.yml` remains
+byte-identical and is still pinned by EL09. The original clause is superseded, not
+satisfied.
+
+| Dimension | Value after ratification re-audit |
+|---|---|
+| Requirements | 55 unique, unchanged |
+| Nodes | 40 collected = 40 executed = 40 passed |
+| Failure classes | 18 |
+| Mutations | 12/12, now executed in authoritative CI as well as locally |
+| Floors | focused 40 · adjacent 189 |
+| `G16` | `OPEN` (carried; blocker `B5I8-DF05`) |
+| `MERGE_AUTHORIZED` | true for PR #23 only, after every gate in the ratification record |
+
+No requirement, node, class, mutation or floor was reduced.
