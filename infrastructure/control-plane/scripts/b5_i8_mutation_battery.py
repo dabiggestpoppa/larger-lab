@@ -214,7 +214,26 @@ def apply_edits(target: Path, edits) -> bool:
     return True
 
 
-def main() -> int:
+def _git(*args: str) -> str:
+    proc = subprocess.run(["git", *args], cwd=str(REPO_ROOT), capture_output=True, text=True)
+    return proc.stdout.strip() if proc.returncode == 0 else ""
+
+
+def main(argv: list[str] | None = None) -> int:
+    argv = list(sys.argv[1:] if argv is None else argv)
+    def status() -> str:
+        proc = subprocess.run(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=str(REPO_ROOT), capture_output=True, text=True,
+        )
+        return proc.stdout.strip()
+
+    baseline = status()
+    out = RESULTS
+    if "--out" in argv:
+        out = Path(argv[argv.index("--out") + 1])
+        if not out.is_absolute():
+            out = REPO_ROOT / out
     rows = []
     pristine_failures = []
     for mutation in MUTATIONS:
@@ -270,6 +289,17 @@ def main() -> int:
     for line in final.stdout.splitlines():
         if " passed" in line or " failed" in line:
             counts["summary"] = line.strip()
+    def residual_clean() -> bool:
+        lines = [
+            line for line in status().splitlines()
+            if "OCE_B5_I8_MUTATION_RESULTS" not in line
+        ]
+        base = [
+            line for line in baseline.splitlines()
+            if "OCE_B5_I8_MUTATION_RESULTS" not in line
+        ]
+        return chr(10).join(lines).strip() == chr(10).join(base).strip()
+
     document = {
         "document_id": "OCE-B5-I8-MUTATION-001",
         "version": "1.0",
@@ -277,10 +307,9 @@ def main() -> int:
         "mutations": rows,
         "pristine": {
             "restored_byte_exact": all(r.get("restored_byte_exact") for r in rows),
-            "worktree_clean": subprocess.run(
-                ["git", "status", "--porcelain", "--untracked-files=no"], cwd=str(REPO_ROOT),
-                capture_output=True, text=True,
-            ).stdout.strip() == "",
+            "worktree_clean": residual_clean(),
+            "baseline_dirty": baseline != "",
+            "baseline_status": baseline.splitlines(),
         },
         "final": {
             "collected": 40,
@@ -295,8 +324,10 @@ def main() -> int:
         },
         "verdict": "PASS" if not pristine_failures and final.returncode == 0 else "FAIL",
     }
-    RESULTS.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
-    print("wrote", RESULTS)
+    document["tested"] = {"head": _git("rev-parse", "HEAD"), "tree": _git("rev-parse", "HEAD^{tree}")}
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(document, indent=2) + "\n", encoding="utf-8")
+    print("wrote", out)
     print("verdict:", document["verdict"], "| clean:", document["pristine"]["worktree_clean"])
     return 0 if document["verdict"] == "PASS" else 1
 

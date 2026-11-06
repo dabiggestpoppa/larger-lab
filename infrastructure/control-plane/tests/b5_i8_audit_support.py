@@ -634,3 +634,18 @@ CI_IDENTITY_PATH = REPO_ROOT / "docs" / "oce-golden-system" / "OCE_B5_I8_CI_IDEN
 def ci_identity() -> dict:
     """The committed, parsed CI identity record ({} before any observed run)."""
     return load(CI_IDENTITY_PATH) if CI_IDENTITY_PATH.exists() else {}
+
+
+def workflow_b5_i8_text() -> str:
+    """The dedicated B5-I8 workflow bytes (never the pinned B1-I1R workflow)."""
+    return WORKFLOW_B5I8.read_text(encoding="utf-8")
+
+
+def workflow_mutation_step() -> str:
+    """Slice the mutation-battery step out of the dedicated B5-I8 workflow."""
+    text = WORKFLOW_B5I8.read_text(encoding="utf-8")
+    start = text.find("- name: Execute committed mutation battery")
+    if start < 0:
+        raise AssertionError("no mutation battery step in the B5-I8 workflow")
+    nxt = text.find("\n      - name:", start + 1)
+    return text[start : nxt if nxt > 0 else len(text)]

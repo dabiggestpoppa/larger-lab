@@ -216,6 +216,19 @@ class TestGateClosure:
         assert " -k " not in step  # whole-file selection, never a keyword subset
         assert "pytest" in step
 
+        # Mutation battery is authoritative in CI, not merely committed.
+        whole = S.workflow_b5_i8_text()
+        mutation_step = S.workflow_mutation_step()
+        assert "b5_i8_mutation_battery.py" in mutation_step
+        assert "--out" in mutation_step and "b5-i8-mutation-results.json" in mutation_step
+        assert "set -o pipefail" in mutation_step
+        assert "exit 1" in mutation_step
+        assert "continue-on-error" not in whole
+        assert whole.count("if: always()") == 1
+        assert "evidence_dir }}" in whole
+        assert "contents: read" in whole
+        assert "${{ secrets." not in whole  # no workflow secret is referenced
+
     def test_g15_mutation_controls_discriminate(self):
         doc = S.mutations()
         rows = doc["mutations"]
@@ -277,7 +290,7 @@ class TestGateClosure:
             assert record["unique_nodes"] == 40
 
         check_totals(identity)
-        for key, value in (("collected", 39), ("executed", 41), ("passed", 40),
+        for key, value in (("collected", 39), ("executed", 41), ("passed", 41),
                            ("failures", 1), ("unique_nodes", 39)):
             forged_identity = dict(identity)
             forged_identity[key] = value

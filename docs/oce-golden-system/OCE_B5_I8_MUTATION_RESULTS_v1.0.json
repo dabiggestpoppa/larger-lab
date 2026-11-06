@@ -170,9 +170,9 @@
       "expected_node": "TestAuditVerdict::test_verdict_recomputable_from_committed_evidence",
       "observed_node": "TestAuditVerdict::test_verdict_recomputable_from_committed_evidence",
       "applied": true,
-      "pre_sha256": "02efa40d04e1e59fddd4bd6e994552847099bb505dcab827848f59c13294379e",
-      "mutated_sha256": "0ce14ad6f4618a0e4708e7b05cb1090d2f661e15b547b7595f3609d187268af2",
-      "restored_sha256": "02efa40d04e1e59fddd4bd6e994552847099bb505dcab827848f59c13294379e",
+      "pre_sha256": "509c59602df29d89ce789385a3fbb6808565f3dcca3f1c7d068e2a76a2765c15",
+      "mutated_sha256": "a17a2378637277841301c4030b6cad0659c4563af454365371a93b5954ef691c",
+      "restored_sha256": "509c59602df29d89ce789385a3fbb6808565f3dcca3f1c7d068e2a76a2765c15",
       "restored_byte_exact": true,
       "exit_status": 1,
       "pristine_exit_status": 0,
@@ -186,9 +186,9 @@
       "expected_node": "TestAccessibility::test_accessibility_semantics_verified",
       "observed_node": "TestAccessibility::test_accessibility_semantics_verified",
       "applied": true,
-      "pre_sha256": "02efa40d04e1e59fddd4bd6e994552847099bb505dcab827848f59c13294379e",
-      "mutated_sha256": "99c63f395bd4f8af7f5a6169f751ab0f4805258a52bd54b45fd33ab1bf176dc9",
-      "restored_sha256": "02efa40d04e1e59fddd4bd6e994552847099bb505dcab827848f59c13294379e",
+      "pre_sha256": "509c59602df29d89ce789385a3fbb6808565f3dcca3f1c7d068e2a76a2765c15",
+      "mutated_sha256": "e3034a5e89b792c37fa4005328319900c2d789fb9d19ec35b16de35bb6b53bb4",
+      "restored_sha256": "509c59602df29d89ce789385a3fbb6808565f3dcca3f1c7d068e2a76a2765c15",
       "restored_byte_exact": true,
       "exit_status": 1,
       "pristine_exit_status": 0,
@@ -198,7 +198,15 @@
   ],
   "pristine": {
     "restored_byte_exact": true,
-    "worktree_clean": true
+    "worktree_clean": true,
+    "baseline_dirty": true,
+    "baseline_status": [
+      "M .github/workflows/b5-i8-audit-validation.yml",
+      " M docs/oce-golden-system/OCE_B5_I8_MUTATION_RESULTS_v1.0.json",
+      " M infrastructure/control-plane/scripts/b5_i8_mutation_battery.py",
+      " M infrastructure/control-plane/tests/b5_i8_audit_support.py",
+      " M infrastructure/control-plane/tests/test_b5_i8_independent_audit.py"
+    ]
   },
   "final": {
     "collected": 40,
@@ -209,7 +217,11 @@
     "skipped": 0,
     "xfailed": 0,
     "exit_status": 0,
-    "summary": "40 passed in 8.66s"
+    "summary": "40 passed in 9.89s"
   },
-  "verdict": "PASS"
+  "verdict": "PASS",
+  "tested": {
+    "head": "36288f4bf64e2a71741e77eb9bca6f29b12c8233",
+    "tree": "fcf3b3ea09bbf884615d8e19305f4de730248a00"
+  }
 }
