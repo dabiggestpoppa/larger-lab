@@ -309,3 +309,19 @@ material signature difference, and every one belongs to `test_b4_startup_gate`,
 failure and no common-node regression exists. The claim is not that the totals look
 similar; it is that the failing node ids match one to one, with zero set difference in
 either direction.
+
+## 19. Correction: observability of the merge ref
+
+Section 16 said the merge-ref exemption had been replaced by unconditional positive
+resolution. That was true on this host, which had fetched the ref, and false in CI: a
+branch checkout fetches only the *current* `refs/pull/<n>/merge`, so the historical
+merge commit recorded in the bundle is absent there. The first evidence head was
+therefore red on `EL01`, and the rung is preserved.
+
+The corrected law states the real condition instead of assuming one state: when the
+merge ref is observable it must resolve and match the recorded identity exactly
+(second parent equals the PR head, parents differ, tree equals the tested tree); when
+it is not observable, the parsed artifact must attest it and the identity must still
+name it, which is the original historical rationale. A ref that is neither observable
+nor attested fails under the general rule. This is a narrowing of a claim about the
+world, not of the check: the recorded identity is compared in both branches.

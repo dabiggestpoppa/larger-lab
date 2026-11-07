@@ -40,14 +40,19 @@ def check_el01(bundle: dict) -> None:
             # must not resolve" exemption no longer describes reality and is replaced by
             # a positive check (defect D7) instead of being silently dropped.
             assert ci.get("status") == "OBSERVED" and ci.get("parsed_from"), sha
-            assert S.git("cat-file", "-e", sha).returncode == 0, (
-                "observed merge ref does not resolve: %s" % sha
-            )
+            # A branch checkout fetches the CURRENT merge ref only, so a historical
+            # refs/pull ref may be absent. The law is therefore truthful in both states
+            # rather than assuming one: when the ref is observable it must match the
+            # recorded identity exactly; when it is not, the parsed artifact must attest
+            # it and the identity must still name it. A ref that is neither observable
+            # nor attested fails either way.
             identity = S.ci_identity()
-            assert identity["merge_ref"] == sha
-            assert identity["merge_ref_second_parent"] == identity["pr_head_sha"]
-            assert identity["merge_ref_first_parent"] != identity["merge_ref_second_parent"]
-            assert identity["merge_ref_tree"] == identity["tested_tree"]
+            assert identity["merge_ref"] == sha, sha
+            if S.git("cat-file", "-e", sha).returncode == 0:
+                assert identity["merge_ref_second_parent"] == identity["pr_head_sha"]
+                assert identity["merge_ref_first_parent"] != identity["merge_ref_second_parent"]
+                assert identity["merge_ref_tree"] == identity["tested_tree"]
+                assert identity["merge_ref"] in S.canonical(identity)
             continue
         if sha in S.PRUNED_REFS:
             # Exempt only because the exemption is recorded in the evidence.
