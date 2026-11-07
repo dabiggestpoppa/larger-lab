@@ -1,0 +1,60 @@
+{
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "evidence_kind": "observed (actual pytest runs, per-file counts captured; no aggregate relabeling)",
+  "tested_commit": "a1ed4b842992c72935c62aa16e6b2dfc7bbb3375",
+  "recorded_at": "2026-11-07T00:00:00Z",
+  "full_acceptance_suite": {
+    "command": ["python", "-m", "pytest", "qcae/tests/acceptance", "-q"],
+    "exit_code": 0,
+    "collected": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "per_file_counts": {
+    "operator_loop": {
+      "source": "qcae/tests/acceptance/test_p2_operator_loop.py",
+      "collected": 5,
+      "passed": 5,
+      "failed": 0,
+      "journeys": {
+        "A_lifecycle_and_restart": "TestJourneyA_CompleteLifecycle",
+        "B_no_worker_safety": "TestJourneyB_NoWorkerSafety",
+        "C_active_lease_then_expired_recovery": "TestJourneyC_CrashRecovery",
+        "D_identity_fail_closed": "TestJourneyD_IdentityFailClosed",
+        "E_approval_round_trip_DENY": "TestJourneyE_ApprovalRoundTrip"
+      }
+    },
+    "grant_journey": {
+      "source": "qcae/tests/acceptance/test_p2_grant_journey.py",
+      "collected": 2,
+      "passed": 2,
+      "failed": 0,
+      "journeys": {
+        "F_grant_durable_round_trip": "TestJourneyE_GrantDurableRoundTrip.test_grant_survives_restart_executes_consumes_terminal",
+        "G_grant_single_use_at_surface": "TestJourneyE_GrantDurableRoundTrip.test_consumed_grant_cannot_execute_second_step"
+      }
+    },
+    "process_crash": {
+      "source": "qcae/tests/acceptance/test_p2_process_crash.py",
+      "collected": 7,
+      "passed": 7,
+      "failed": 0,
+      "crash_windows": {
+        "A_lease_phase_truth_survives": "test_window_A_lease_phase_truth_survives",
+        "B_reservation_durable_before_effect": "test_window_B_reservation_durable_before_effect",
+        "C_executing_survives_abrupt_death": "test_window_C_executing_survives_abrupt_death",
+        "D_effect_before_commit_leaves_executing_truth": "test_window_D_effect_before_commit_leaves_executing_truth",
+        "E_committed_result_survives_and_reconstructs": "test_window_E_committed_result_survives_and_reconstructs",
+        "cross_process_recovery_completes_no_repeat": "test_full_execution_survives_kill_and_recovery_completes",
+        "non_replay_safe_ambiguity_escalates": "test_non_replay_safe_ambiguity_survives_abrupt_death"
+      }
+    }
+  },
+  "acceptance_total": {
+    "passed": 14,
+    "failed": 0,
+    "sum_of_files": 14
+  },
+  "notes": "No dead crash-harness code was present to remove; the crash harness in test_p2_process_crash.py is the live P2-R4-A01 acceptance test, not dead code."
+}

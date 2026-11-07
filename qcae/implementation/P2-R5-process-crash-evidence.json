@@ -1,0 +1,31 @@
+{
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "evidence_kind": "observed (subprocess children os._exit at crash windows; per-file counts captured)",
+  "tested_commit": "a1ed4b842992c72935c62aa16e6b2dfc7bbb3375",
+  "recorded_at": "2026-11-07T00:00:00Z",
+  "command": ["python", "-m", "pytest", "qcae/tests/acceptance/test_p2_process_crash.py", "-q"],
+  "exit_code": 0,
+  "collected": 7,
+  "passed": 7,
+  "failed": 0,
+  "skipped": 0,
+  "source": "qcae/tests/acceptance/test_p2_process_crash.py",
+  "crash_window_law": {
+    "A": "lease/RUNNING/attempt truth durable before any execution",
+    "B": "execution reservation durable before the worker runs",
+    "C": "EXECUTING state durable before the external effect",
+    "D": "effect may occur while DB holds only EXECUTING (truth for recovery)",
+    "E": "COMMITTED result survives; recovery reconstructs canonical state",
+    "F_to_I": "marker/step/checkpoint/job finalization each close their window via the post-effect flush and the idempotent recovery finalization sweep"
+  },
+  "replay_safety_disclosure": "REPLAY_SAFE work is at-least-once with durable dedup by reservation; NON_REPLAY_SAFE ambiguity escalates to WAITING_INPUT; NO exactly-once claim is made anywhere",
+  "per_node_counts": {
+    "test_window_A_lease_phase_truth_survives": "PASSED",
+    "test_window_B_reservation_durable_before_effect": "PASSED",
+    "test_window_C_executing_survives_abrupt_death": "PASSED",
+    "test_window_D_effect_before_commit_leaves_executing_truth": "PASSED",
+    "test_window_E_committed_result_survives_and_reconstructs": "PASSED",
+    "test_full_execution_survives_kill_and_recovery_completes": "PASSED",
+    "test_non_replay_safe_ambiguity_survives_abrupt_death": "PASSED"
+  }
+}
