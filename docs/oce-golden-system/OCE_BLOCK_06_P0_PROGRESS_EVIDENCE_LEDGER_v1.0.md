@@ -117,6 +117,10 @@ infrastructure/control-plane/scripts/block_06_p0_validate.py`: 108 checks, zero 
 the exact committed head. The validator is standard library only, offline, and reads only
 committed bytes; it never generates, repairs or simulates implementation.
 
+One repair rung (`B6-P0-X1`) removed a single unused standard-library import after Ruff
+reported it; behaviour and the check count are unchanged, and the defect is recorded here
+rather than suppressed with a lint waiver.
+
 ### 2.2 Holds
 
 `BOOK_6_AUTHORIZED = false`, `BOOK_6_IMPLEMENTATION_STARTED = false`, no package, no
