@@ -323,6 +323,11 @@ class TestGateClosure:
         assert "run_identity_problems" in step
         assert "run-context.json" in step
         assert "GITHUB_RUN_ID" in whole and "GITHUB_RUN_ATTEMPT" in whole
+        # The context-writing step needs the same PR identity as the audit step: a
+        # blank context field is exactly what made X6 red ("'23' does not match ''").
+        generate_step = whole.split("- name: Execute B5-I8", 1)[0]
+        assert "PR_NUMBER: ${{ github.event.pull_request.number }}" in generate_step
+        assert "GITHUB_RUN_ID" in generate_step and "GITHUB_RUN_ATTEMPT" in generate_step
 
     def test_g15_mutation_controls_discriminate(self):
         doc = S.mutations()

@@ -43,6 +43,8 @@ jobs:
 
       - name: Generate run identity and evidence directory
         id: run_id
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           OCE_RUN_ID=$(python -c "import secrets; print(secrets.token_hex(6))")
           echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
