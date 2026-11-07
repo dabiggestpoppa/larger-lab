@@ -14,8 +14,8 @@
 
 ```
 B5-I9 P0                      = OPERATOR_ACCEPTED — PLANNING FROZEN
-B5-I9 IMPLEMENTATION          = NOT STARTED
-MERGE_AUTHORIZED              = true (PR #24 only)
+B5-I9 IMPLEMENTATION          = IMPLEMENTED — PENDING OPERATOR REVIEW
+MERGE_AUTHORIZED              = false
 BOOK_6_AUTHORIZED             = false
 BOOK_6_STARTED                = false
 POST_BOOK_6_EVALUATION        = UNSTARTED
@@ -187,3 +187,20 @@ WEB_VIEW            = ABSENT            POST_BOOK_6_EVALUATION = UNSTARTED
 G16                 = OPEN (B5I8-DF05)  MERGE_AUTHORIZED = true (PR #24 only)
 RECURRING_COST      = $0                CAPITAL_AUTHORITY = none
 ```
+
+---
+
+## 7. Implementation stage record
+
+`AUTHORIZED_STAGE=B5-I9-IMPLEMENTATION` executed the contract above without extracting
+software. The deterministic factory-gate generator
+(`infrastructure/control-plane/scripts/b5_i9_factory_gate.py`) produces the packet under
+`infrastructure/control-plane/evidence/b5-i9/`; the five planned test files hold exactly the
+41 frozen nodes; the 25 failure classes and the 10 frozen mutations are executed by
+`infrastructure/control-plane/scripts/b5_i9_mutation_battery.py`; and
+`.github/workflows/b5-i9-factory-gate-validation.yml` selects the whole surface.
+
+This stage produces evidence, a proposed Book 6 extraction contract and an operator hold. It
+performs no extraction, packages no code, publishes nothing, starts no Book 6 work, closes no
+G16 finding and claims no Book 5 governance completion. `MERGE_AUTHORIZED = false` and
+`RATIFICATION_AUTHORIZED = false` for the implementation PR; completion remains operator-only.
