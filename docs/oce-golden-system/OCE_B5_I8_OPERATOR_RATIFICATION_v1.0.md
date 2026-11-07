@@ -194,3 +194,136 @@ CAPITAL_AUTHORITY = NONE
 RECURRING_COST = $0
 SAME_AGENT = NOT ORGANIZATIONALLY INDEPENDENT
 ```
+
+---
+
+# B5-I8 Implementation Ratification
+
+**Stage:** `AUTHORIZED_STAGE=B5-I8-RATIFICATION`
+**Base:** `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` (`origin/main`)
+**P0 merge:** `74fee0f086f9215bf6b93a1b3adbf1d69406da39` (PR #22)
+**Scope:** the independent audit implementation carried by PR #23, and nothing else.
+
+## R1. Forward ladder
+
+| Rung | Commit | Disposition |
+|---|---|---|
+| `X1` | `3a90b8548a` | cite the observed artifact; exempt only the server-side merge ref |
+| `X2` | `801730c4c3` | bind observed CI identities to the committed parsed record |
+| **`X3`** | **`e0f6a73c46`** | **Amendment 001: the CI-selection surface is formally superseded** |
+| `X4` | `36288f4b49` | G15 independent totals and the 40-node non-vacuity audit; **committed red, preserved** |
+| `X5` | `6b26214637` | narrow the false-positive secret assertion; run the mutation battery in authoritative CI |
+| `X6` | `8fcb28097d` | bind the real Actions run identity; **CI red, preserved** |
+| `X7` | `1f54168b81` | bind the PR identity into the context-writing step; implementation head |
+| `EVIDENCE-FINAL` | `8e39d8cd11` | seal the observed identity, ledger identities and Windows comparison; **CI red**, preserved |
+| `X8` | `5da5ae9e1b` | state the merge-ref law truthfully in both observability states; final evidence head |
+
+No rung was amended, squashed, rebased or force-pushed. Both red rungs remain in
+history: a repaired defect that leaves no trace is indistinguishable from one that
+never existed.
+
+## R2. The selection conflict, resolved rather than reinterpreted
+
+Plan section 1 rung `R6` placed the selection step inside
+`.github/workflows/b1-i1r-validation.yml` and named the artifact
+`b1-i1r-evidence-<run_id>`. B5-I7's frozen `EL09` manifest pins that file as a
+**whole-file** immutable row, so editing it turns `TestEL09` red (reproduced: 26/27).
+Amendment 001 records the disposition as **superseded, not satisfied**, and performs
+the same fail-closed selection in a dedicated additive workflow with artifact
+`b5-i8-evidence-<run_id>`. The pinned file is byte-identical, the original clause
+remains visible in history, and triggers, identity rules, retention, cleanup and
+authority boundaries are unchanged. The workflow holds `permissions: contents: read`
+and references no repository secret.
+
+## R3. Arithmetic
+
+| Dimension | Value |
+|---|---|
+| Requirements | 55 unique (`attestation` 7, `deferred` 5, `static` 3, `test` 40) |
+| Nodes | 40 collected = 40 executed = 40 passed; `unique_nodes` 40 |
+| Node closure | `planned == collected == executed`; zero orphan files, zero orphan nodes |
+| Failure classes | 18 |
+| Mutations | 12 required, 12 executed, 12 `DISCRIMINATED` in authoritative CI |
+| Floors | focused 40; adjacent 189 |
+| Duplicate nodes | 0 |
+| `pass_claims` | 0 |
+
+## R4. Evidence
+
+Evidence-head run `42328131722`, artifact `b5-i8-evidence-a4abf73d3f2a` (7398 bytes,
+expires 2026-12-07). `oce_run_id` is `a4abf73d3f2a`: non-empty and bound to the
+artifact name. The recorded run id, attempt, workflow path, PR number and event are
+the values Actions actually supplied, and the proof refuses itself if any of them is
+blank or inconsistent. Tested head
+`5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c`, tested tree
+`288d14623da4586a5a2f6f1ef916dd39d202b97d`; merge ref
+`99b65278e8d1f38c7e1bd7ee302ce94c69aa04ae` with parents `e999a4a3…` and
+`5da5ae9e…` and a tree equal to the tested tree.
+
+Mutation evidence is CI-authoritative: each of `M01`-`M12` applies, turns its named
+node red, restores byte-exactly, and the pristine rerun is 40/40 with
+`baseline_dirty false`. The 40-node non-vacuity audit names a target, an oracle and a
+negative control per node; `tautological`, `orphan_nodes` and `orphan_requirements`
+are all zero.
+
+## R5. E2E boundary
+
+The end-to-end claim is **re-execution of the governed path against the real
+production surfaces, in-process**. It is not a live multi-process stack: no frozen
+source names a process or port boundary, and this stage may not add endpoints. The
+wording in the contract, plan and tests matches what is exercised.
+
+## R6. Gate dispositions
+
+| Gate | Disposition |
+|---|---|
+| `G14` | adjacent population 189, all ten files green |
+| `G15` | independent totals owner: the committed CI identity plus the registry, with forged-total controls |
+| `EL01`-`EL08` | executed green and red on falsification |
+| `EL09` | prefix `83a40ac7…` over `191950` bytes intact; the current ledger is recorded separately |
+| `G16` | **`OPEN`**, blocker `B5I8-DF05` |
+
+## R7. `G16` carried open under the governing permission
+
+The registry's `deferred_owners` names the closure owner as *"Operator (independent
+auditor distinct from the implementer)"*. B5-I8 acceptance therefore does not require
+closing `G16`; it requires not lying about it. `G16` stays `OPEN`, the protocol stays
+labelled `SAME_AGENT_SINGLE_OPERATOR_NON_BLIND`, no usability statement is made
+unqualified, and the inherited requirement state is untouched. This operator
+authorization is not completion of the usability protocol.
+
+## R8. Audit
+
+`SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT`
+
+| Dimension | Score |
+|---|---|
+| `SPEC` | 8.6 |
+| `DESIGN` | 8.4 |
+| `CORRECTNESS` | 8.7 |
+| `QUALITY` | 8.5 |
+| **Mean** | **8.55** |
+
+Deductions, each for a distinct impact rather than a repeated root cause: the original
+workflow-placement conflict (`SPEC`); the in-process E2E boundary and the
+single-operator protocol (`SPEC`, `DESIGN`); the committed-red `X4` rung, the mutation
+battery's initial absence from CI, the blank `oce_run_id` and the red `X6`
+(`CORRECTNESS`); the shared support-module blast radius, cross-file evidence density,
+and the `G15` self-reference and `D4`/`D5` attribution repairs (`QUALITY`, `DESIGN`).
+The mean is not inflated because the repairs are green: a repaired defect still cost a
+rung. This supersedes the P0 score of 8.38.
+
+## R9. Tokens
+
+```text
+B5_I8_IMPLEMENTATION = RATIFIED_INDEPENDENT_AUDIT
+MERGE_AUTHORIZED = true (PR #23 only, after ratification-head CI passes)
+G16 = OPEN (blocker B5I8-DF05)
+B5_I9 = LOCKED
+BOOK_6 = UNAUTHORIZED
+POST_BOOK_6_EVALUATION = UNSTARTED
+WEB_VIEW = ABSENT
+CAPITAL_AUTHORITY = NONE
+RECURRING_COST = $0
+SAME_AGENT = NOT ORGANIZATIONALLY INDEPENDENT
+```

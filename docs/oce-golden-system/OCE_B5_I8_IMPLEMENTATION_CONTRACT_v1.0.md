@@ -212,3 +212,28 @@ MERGE_AUTHORIZED = TRUE_FOR_P0_RATIFICATION_PR_ONLY
 CAPITAL_AUTHORITY = NONE
 RECURRING_COST = $0
 ```
+
+---
+
+## 16. Amendment 001 — CI selection surface (operator-ratified 2026-11-06)
+
+Superseded clause: plan §1 rung **R6**'s allowed-file column
+(`.github/workflows/b1-i1r-validation.yml`, additive only) and its artifact name.
+Reason: B5-I7's EL09 superseding manifest pins that file as a **whole-file** immutable
+row, so adding the selection step changes its bytes and turns
+`TestEL09::test_manifest_rows_recomputed_hash_and_size` red (reproduced: 26/27).
+
+Disposition: `SUPERSEDED`, not satisfied. The selection surface is the dedicated
+additive workflow `.github/workflows/b5-i8-audit-validation.yml`, which triggers on the
+same `pull_request → main` event class as the pinned workflow, runs on the same head and
+merge context, holds `permissions: contents: read` only, and performs the identical
+fail-closed selection (five files, floor 40, collection == execution, zero
+fail/error/skip, unique ids, registry node closure, orphan refusal). The pinned workflow
+stays byte-identical and continues to emit `b1-i1r-evidence-<run_id>` on the same head;
+the dedicated workflow emits `b5-i8-evidence-<run_id>`.
+
+Not changed by this amendment: the 55 requirements, 40 nodes, 18 failure classes, 12
+mutation floor, floors 40/189, triggers, identity rules, artifact retention, cleanup
+rules, authority boundaries, `G16` disposition and every limitation label.
+
+Full text: `OCE_B5_I8_AMEND_001_CI_SELECTION_SURFACE_v1.0.md`.

@@ -1,0 +1,409 @@
+{
+  "document_id": "OCE-B5-I8-NODE-AUDIT-001",
+  "version": "1.0",
+  "stage": "AUTHORIZED_STAGE=B5-I8-RATIFICATION",
+  "law": "Every frozen node must reach a real surface, assert an independent oracle or refusal law, and carry a negative control. A node that compares generated evidence to the generator that produced it is vacuous.",
+  "totals": {
+    "audited": 40,
+    "planned": 40,
+    "unique_ids": 40,
+    "non_vacuous": 40,
+    "tautological": 0,
+    "orphan_requirements": 0,
+    "orphan_nodes": 0,
+    "unclassified_shared_oracles": 0
+  },
+  "shared_support_oracle_classes": {
+    "input_fixture_only": [
+      "frozen_message",
+      "panel_document",
+      "protocol_tasks",
+      "accessibility_checks"
+    ],
+    "independent_oracle": [
+      "recompute_verdict",
+      "verdict_digest",
+      "gates",
+      "digest_obj"
+    ],
+    "production_adapter": [
+      "git",
+      "collect_adjacent",
+      "collected_nodes"
+    ],
+    "evidence_parser": [
+      "evidence",
+      "registry",
+      "mutations",
+      "ci_identity",
+      "load"
+    ],
+    "assertion_helper": [
+      "forbidden_hits",
+      "workflow_text",
+      "workflow_b5_i8_step"
+    ]
+  },
+  "nodes": [
+    {
+      "node": "TestEndToEndPath::test_full_governed_path_reexecuted_from_frozen_message",
+      "requirement": "B5I8-R08",
+      "target": "oce_console.panel/kernel real read surfaces (no mock)",
+      "oracle": "frozen message digest + non_authoritative flag + canonical-state absence",
+      "negative_control": "M01",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEndToEndPath::test_restart_preserves_governed_state_identity",
+      "requirement": "B5I8-R09",
+      "target": "fresh interpreter restart against the same canonical store",
+      "oracle": "state identity digest recomputed in a new process",
+      "negative_control": "M06",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEndToEndPath::test_drill_path_reproduces_recorded_disposition",
+      "requirement": "B5I8-R10",
+      "target": "oce_console.drill recorded disposition",
+      "oracle": "frozen three-field disposition mask",
+      "negative_control": "M03",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEndToEndPath::test_denial_path_rendered_verbatim_end_to_end",
+      "requirement": "B5I8-R11",
+      "target": "oce_console kernel denial projection",
+      "oracle": "verbatim denial envelope and absence of any green summary",
+      "negative_control": "M04",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestAuthorityMinting::test_client_cannot_mint_identity_or_grant",
+      "requirement": "B5I8-R12",
+      "target": "panel document authority fields",
+      "oracle": "non_authoritative true and no grant/intent field surfaced",
+      "negative_control": "M01",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestForgedState::test_forged_client_state_refused_before_effect",
+      "requirement": "B5I8-R13",
+      "target": "panel/accepted client state seam",
+      "oracle": "explicit refusal and unchanged canonical bytes",
+      "negative_control": "M06",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestTruthCollapse::test_unknown_never_renders_zero",
+      "requirement": "B5I8-R14",
+      "target": "panel unknown-value rendering",
+      "oracle": "unknown token distinct from 0 and from empty",
+      "negative_control": "M02",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestTruthCollapse::test_partial_never_renders_success",
+      "requirement": "B5I8-R15",
+      "target": "panel partial-state aggregation",
+      "oracle": "partial marker distinct from success",
+      "negative_control": "M03",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestTruthCollapse::test_stale_state_never_renders_green",
+      "requirement": "B5I8-R16",
+      "target": "panel stale-state labelling",
+      "oracle": "stale label present and green absent",
+      "negative_control": "M02",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestTransport::test_non_loopback_request_fail_closed",
+      "requirement": "B5I8-R17",
+      "target": "oce_console.transport host acceptance",
+      "oracle": "loopback-only refusal before I/O",
+      "negative_control": "M05",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestTransport::test_unsupported_route_refused_before_side_effect",
+      "requirement": "B5I8-R18",
+      "target": "oce_console.transport route table",
+      "oracle": "unsupported refusal with zero side effects",
+      "negative_control": "M07",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestRedaction::test_secret_material_absent_from_audit_output",
+      "requirement": "B5I8-R19",
+      "target": "recursive redaction over rendered audit output",
+      "oracle": "no planted token/cookie/key value survives at any depth",
+      "negative_control": "M08",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestBounds::test_oversized_input_refused_within_bounds",
+      "requirement": "B5I8-R20",
+      "target": "panel collection width bound",
+      "oracle": "explicit bound/truncation marker, never silent completeness",
+      "negative_control": "M09",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestDeterminism::test_adversarial_case_ordering_deterministic",
+      "requirement": "B5I8-R21",
+      "target": "adversarial case iteration order",
+      "oracle": "byte-identical output across permuted input",
+      "negative_control": "M10",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestUsabilityProtocol::test_accessibility_and_usability_verified",
+      "requirement": "B5I8-R39",
+      "target": "rendered text surfaces + recorded protocol results",
+      "oracle": "protocol results complete and accessibility checks pass over existing surfaces only",
+      "negative_control": "M12",
+      "evidence_source": "b5-i8-junit.xml + usability protocol record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEvidenceAudit::test_prior_stage_citations_resolve_to_commits",
+      "requirement": "B5I8-R29",
+      "target": "committed evidence citations",
+      "oracle": "every cited SHA resolves via git cat-file (guarded merge-ref attestation)",
+      "negative_control": "M11",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEvidenceAudit::test_run_and_artifact_ids_resolve_to_raw_evidence",
+      "requirement": "B5I8-R30",
+      "target": "committed CI identity record",
+      "oracle": "observed ids equal the committed parsed artifact identity",
+      "negative_control": "M11",
+      "evidence_source": "b5-i8-junit.xml + CI identity record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEvidenceAudit::test_no_all_green_claim_while_gate_pending",
+      "requirement": "B5I8-R31",
+      "target": "bundle prose and gate dispositions",
+      "oracle": "no all-green assertion while G16 is open",
+      "negative_control": "M11",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEvidenceAudit::test_manifest_rows_recompute_over_committed_bytes",
+      "requirement": "B5I8-R33",
+      "target": "committed evidence files",
+      "oracle": "recomputed sha256/size equal the committed manifest rows",
+      "negative_control": "M11",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestAuditVerdict::test_verdict_recomputable_from_committed_evidence",
+      "requirement": "B5I8-R34",
+      "target": "registry + mutation results + bundle",
+      "oracle": "recomputed verdict object equals the committed digest",
+      "negative_control": "M11",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestGateClosure::test_g14_adjacent_population_stays_green",
+      "requirement": "B5I8-R40",
+      "target": "ten pre-existing B5 test files",
+      "oracle": "collected population equals the frozen 189 floor",
+      "negative_control": "M10",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestGateClosure::test_g15_mutation_controls_discriminate",
+      "requirement": "B5I8-R41",
+      "target": "committed mutation results + authoritative selection proof",
+      "oracle": "12/12 discriminated, byte-exact restore, independent CI totals (not the bundle under construction)",
+      "negative_control": "M11",
+      "evidence_source": "b5-i8-junit.xml + CI identity + mutation report",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestUsabilityProtocolExecution::test_protocol_tasks_defined_and_executed",
+      "requirement": "B5I8-R22",
+      "target": "protocol task set over existing surfaces",
+      "oracle": "every task has an executed result row",
+      "negative_control": "M12",
+      "evidence_source": "usability protocol record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestComprehension::test_state_comprehension_recorded",
+      "requirement": "B5I8-R23",
+      "target": "state-rendering surface",
+      "oracle": "recorded comprehension result bound to the state task",
+      "negative_control": "M12",
+      "evidence_source": "usability protocol record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestComprehension::test_refusal_comprehension_recorded",
+      "requirement": "B5I8-R24",
+      "target": "refusal rendering",
+      "oracle": "recorded refusal comprehension result",
+      "negative_control": "M04",
+      "evidence_source": "usability protocol record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestComprehension::test_recovery_comprehension_recorded",
+      "requirement": "B5I8-R25",
+      "target": "recovery surface",
+      "oracle": "recorded recovery comprehension result",
+      "negative_control": "M12",
+      "evidence_source": "usability protocol record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestComprehension::test_unknown_and_partial_recognized",
+      "requirement": "B5I8-R26",
+      "target": "unknown and partial states",
+      "oracle": "both states recognized as distinct from zero and success",
+      "negative_control": "M02",
+      "evidence_source": "usability protocol record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestAccessibility::test_accessibility_semantics_verified",
+      "requirement": "B5I8-R27",
+      "target": "text rendering semantics of existing surfaces",
+      "oracle": "five frozen accessibility checks pass; no browser surface claimed",
+      "negative_control": "M12",
+      "evidence_source": "accessibility checks record",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestMeasurements::test_time_to_first_useful_state_measured",
+      "requirement": "B5I8-R35",
+      "target": "executed protocol timing",
+      "oracle": "observed ms value with unit and command recorded",
+      "negative_control": "M12",
+      "evidence_source": "measurements block",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestMeasurements::test_navigation_steps_measured",
+      "requirement": "B5I8-R36",
+      "target": "executed protocol step counts",
+      "oracle": "observed integer steps per task",
+      "negative_control": "M12",
+      "evidence_source": "measurements block",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestMeasurements::test_task_completion_and_error_measured",
+      "requirement": "B5I8-R37",
+      "target": "executed protocol outcomes",
+      "oracle": "completion and error counts equal the recorded rows",
+      "negative_control": "M12",
+      "evidence_source": "measurements block",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestMeasurements::test_audit_replay_is_deterministic",
+      "requirement": "B5I8-R38",
+      "target": "re-generated evidence",
+      "oracle": "replay digest equality across two generations",
+      "negative_control": "M10",
+      "evidence_source": "b5-i8-junit.xml",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL01::test_no_unverified_sha_recorded_as_fact",
+      "requirement": "B5I8-EL01",
+      "target": "bundle citations",
+      "oracle": "resolution via git; forged sha red",
+      "negative_control": "self-falsified copy",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL02::test_no_run_or_artifact_id_recorded_before_existence",
+      "requirement": "B5I8-EL02",
+      "target": "bundle ci block vs committed identity",
+      "oracle": "observed ids must equal the parsed committed record; forged id red",
+      "negative_control": "forged run id",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL03::test_planned_totals_labeled_expected",
+      "requirement": "B5I8-EL03",
+      "target": "bundle planned block",
+      "oracle": "EXPECTED/FLOOR labels only; OBSERVED label red",
+      "negative_control": "forged label",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL04::test_observed_totals_bound_to_parsed_raw_artifact",
+      "requirement": "B5I8-EL04",
+      "target": "bundle observed totals",
+      "oracle": "totals bound to the parsed raw artifact identity",
+      "negative_control": "altered total",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL05::test_human_evidence_labeled_non_blind_not_independent",
+      "requirement": "B5I8-EL05",
+      "target": "protocol attestation labels",
+      "oracle": "SAME_AGENT label mandatory; INDEPENDENT claim red",
+      "negative_control": "forged attestation",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL06::test_no_all_gates_passed_language_while_gate_pending",
+      "requirement": "B5I8-EL06",
+      "target": "bundle prose",
+      "oracle": "forbidden all-green phrase detection",
+      "negative_control": "injected phrase",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL07::test_audit_verdict_recomputable_not_free_text",
+      "requirement": "B5I8-EL07",
+      "target": "verdict document",
+      "oracle": "digest recomputation equality",
+      "negative_control": "altered verdict",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    },
+    {
+      "node": "TestEL08::test_no_evidence_value_untraceable_to_raw_source",
+      "requirement": "B5I8-EL08",
+      "target": "every evidence value",
+      "oracle": "traceability to a raw committed source",
+      "negative_control": "injected untraceable value",
+      "evidence_source": "law output",
+      "verdict": "NON_VACUOUS"
+    }
+  ]
+}

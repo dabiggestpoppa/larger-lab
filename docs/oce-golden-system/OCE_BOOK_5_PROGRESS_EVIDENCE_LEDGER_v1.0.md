@@ -2050,3 +2050,193 @@ INDEPENDENT`.
 `P0 = OPERATOR_ACCEPTED — PLANNING_FROZEN`; `B5-I8_IMPLEMENTATION = NOT_STARTED`; `G16 = OPEN`;
 `MERGE_AUTHORIZED = true` for this ratification PR only; `B5-I9 = LOCKED`; Book 6 `UNAUTHORIZED`;
 post-Book-6 evaluation `UNSTARTED`; web view `ABSENT`; cost `$0`; `capital.authority = none`.
+
+---
+
+## 20. B5-I8 — independent audit implementation
+
+**Base:** `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` · **Implementation head:** `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` (tree `82fa85a020c2ae61afd54fdf5066fa08249e86af`) · **Merged:** no (`MERGE_AUTHORIZED = false`)
+
+### 20.1 Scope executed
+
+Five frozen test files (40 nodes), a test-only support module, the deterministic protocol/evidence
+generator, the 12-mutation battery, one additive CI workflow and the evidence documents. No
+production, frontend, contract, existing-test, provider or credential surface changed.
+
+### 20.2 Requirement closure
+
+- 55 requirements untouched (ids, kinds, bindings, owners, stage identity); bindings remain `40 test / 7 attestation / 3 static / 5 deferred`.
+- 40 test-bound requirements transitioned to `PASS` on executed evidence; 10 `MAPPED` and 5 deferred unchanged.
+- States: `PASS 40 · MAPPED 10 · DEFERRED_WITH_OWNER 5 · BLOCKED 0`.
+
+### 20.3 Node execution
+
+- Collected 40 · executed 40 · passed 40 · failures 0 · errors 0 · skipped 0 · xfailed 0 · duplicates 0 · orphans 0.
+- `TestUsabilityProtocol::test_accessibility_and_usability_verified` exists verbatim at its frozen path.
+
+### 20.4 Adversarial and failure classes
+
+- All 18 frozen classes are provoked against the real client surfaces; each node asserts its refusal or containment, two-sided.
+
+### 20.5 Usability and G16
+
+- Protocol executed: 4/4 tasks, zero errors, measurements with units and provenance.
+- `G16 = OPEN` — no organizationally independent operator: the protocol was executed by the B5-I8 implementer (single operator, non-blind; B5I8-DF05 unresolved)
+
+### 20.6 Mutation battery
+
+- 12/12 discriminated; byte-exact restoration; tracked worktree clean; confirming rerun `40 passed in 8.66s`.
+
+### 20.7 Evidence laws and EL09
+
+- `EL01`–`EL08` two-sided on the committed bundle.
+- Historical ledger prefix `83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30` (191950 bytes) recomputed.
+- The twelve immutable non-ledger manifest rows still match committed bytes; the pinned workflow row is untouched.
+
+### 20.8 Defects and limitations
+
+- `D-CI-1`: the P0-named workflow file is a frozen `EL09` whole-file row, so the selection step lives in a dedicated additive workflow; disclosed, not repaired by weakening `EL09`.
+- `D1` battery harness crash and restore helper; `D2` `G15` self-reference; `D3` negation-aware forbidden-phrase detector.
+- Same-agent limitation `B5I8-DF05` open; E2E proof is in-process; battery not run in CI.
+
+### 20.9 CI identities
+
+Recorded in §20.10 and in the PR body once the exact-head runs exist. No id is written before it is observed.
+
+### 20.10 CI identities — head `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910`
+
+| Field | Value |
+|---|---|
+| `head_sha` | `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910` |
+| `head_tree` | `12fcec2edcff22337de1de33dfbebdb6dda9a472` |
+| `pr_head_sha` | `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910` |
+| `tested_tree` | `12fcec2edcff22337de1de33dfbebdb6dda9a472` |
+| `merge_ref_sha` | `c2990c8cdbd9a221566dec6de8de6e7bc016d047` |
+| `merge_ref_first_parent` | `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` |
+| `merge_ref_second_parent` | `b3e761e33948a4a7e763ac2bcfef5a8d1dadf910` |
+| `merge_ref_tree` | `12fcec2edcff22337de1de33dfbebdb6dda9a472` |
+| `merge_ref_tree_equals_tested_tree` | `true` |
+| `b5_i8_run_id` | `42061931200` |
+| `b5_i8_check_suite_id` | `113977456198` |
+| `b5_i8_job_id` | `127365645961` |
+| `b5_i8_conclusion` | `success` |
+| `b5_i8_event` | `pull_request` |
+| `b1_i1r_run_id` | `42061931573` |
+| `b1_i1r_check_suite_id` | `113977457536` |
+| `b1_i1r_job_id` | `127365646581` |
+| `b1_i1r_conclusion` | `success` |
+| `artifact_id` | `13432118604` |
+| `artifact_name` | `b5-i8-evidence-c3ae4aedc154` |
+| `artifact_size_bytes` | `5071` |
+| `artifact_expires_at` | `2026-12-05T16:12:36Z` |
+| `collected` | `40` |
+| `executed` | `40` |
+| `passed` | `40` |
+| `failures` | `0` |
+| `errors` | `0` |
+| `skipped` | `0` |
+| `unique_nodes` | `40` |
+| `orphan_files` | `none` |
+| `node_closure` | `true` |
+| `adjacent_population` | `{'returncode': 0, 'counts': {'test_b5_i2_mutation_harness.py': 16, 'test_b5_i3_requirement_registry.py': 51, 'test_b5_i4_console_kernel.py': 23, 'test_b5_i5_timeline.py': 45, 'test_b5_i6_console_restart.py': 5, 'test_b5_i6_deploy_pkg.py': 9, 'test_b5_i6_fail_closed.py': 4, 'test_b5_i6_recovery_drill.py': 9, 'test_b5_i7_governed_change.py': 12, 'test_b5_i7_evidence_laws.py': 15}, 'total': 189}` |
+| `manifest_result` | `immutable rows exact; ledger prefix 191950 B = 83a40ac7…` |
+| `mutation_result` | `12/12 DISCRIMINATED; byte-exact restore; tracked tree clean` |
+| `cleanup_result` | `workspace cleaned in the workflow; no residue asserted` |
+| `local_pre_existing_failures` | `32` |
+| `local_pre_existing_scope` | `test_b4_startup_gate/​test_b4_cxr7/​test_b4_cxr6/​test_local_lifecycle (Windows host; 33 on base)` |
+
+### 20.11 B5-I8 amendment 001 — CI selection surface (appended 2026-11-06)
+
+| Field | Value |
+|---|---|
+| `stage` | `AUTHORIZED_STAGE=B5-I8-RATIFICATION` |
+| `amendment_id` | `OCE-B5-I8-AMEND-001` |
+| `status` | `OPERATOR_RATIFIED` |
+| `superseded_clause` | plan section 1 rung R6 — workflow placement + artifact name |
+| `why` | EL09 pins `.github/workflows/b1-i1r-validation.yml` as a whole-file immutable row; adding a step turns EL09 red (reproduced 26/27) |
+| `replacement` | dedicated additive workflow `b5-i8-audit-validation.yml`, artifact `b5-i8-evidence-<run_id>` |
+| `pinned_workflow_changed` | `false` (byte-identical) |
+| `requirements_changed` | `0` |
+| `nodes_changed` | `0` |
+| `failure_classes_changed` | `0` |
+| `mutation_floor_changed` | `0` |
+| `g16_status` | `OPEN` (unchanged) |
+
+
+## 20.12 B5-I8 final evidence and provenance repair
+
+The implementation rung closed with one further forward repair, because the X5
+machine-readable proof recorded `oce_run_id` as `""`: the selection step never
+received the id the generate step had produced, and it read the value with an empty
+default. A blank run identity is not a provenance detail - it severs the evidence
+from the run that produced it - so it was repaired rather than annotated.
+
+| Rung | Commit | Disposition |
+|---|---|---|
+| `X3` | `e0f6a73c46` | Amendment 001: the CI-selection surface is formally superseded, edited territory untouched |
+| `X4` | `36288f4b49` | G15 independent totals + 40-node non-vacuity audit; **committed red**, preserved |
+| `X5` | `6b26214637` | forward repair: the false-positive secret assertion narrowed, mutation battery executed in authoritative CI |
+| `X6` | `8fcb28097d` | run identity bound to the real Actions values; **CI red**, preserved |
+| `X7` | `1f54168b81` | forward repair: the context-writing step also receives the PR identity |
+
+`X6` failed for the reason the new validator exists: `run-context.json` recorded
+`pr_number` as `""` while the audit step recorded `23`, so the proof refused itself
+with `pull request number '23' does not match the run context ''`. The failing value
+was a genuine missing binding, not a validator artefact, and `X7` bound it.
+
+Authoritative exact-head evidence (run `42324807796`, artifact
+`b5-i8-evidence-62e6d763b63e`, 7412 bytes, expires 2026-12-07):
+
+| Field | Observed |
+|---|---|
+| `oce_run_id` | `62e6d763b63e` (non-empty; bound to the artifact name) |
+| `github_run_id` / `run_attempt` | `42324807796` / `1` |
+| `workflow_path` | `.../.github/workflows/b5-i8-audit-validation.yml@refs/pull/23/merge` |
+| `pr_number` / `event` | `23` / `pull_request` |
+| `pr_head_sha` / `tested_tree` | `1f54168b81c6d5602fbb5c26bcfb497f41788725` / `845f2cd5d34d4257c3e712d7245faf81374b790e` |
+| merge ref / parents / tree | `982aea1ed92ab58b32c3e57cb2ab8b1dedac3213` / `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` + `1f54168b…` / `845f2cd5…` |
+| nodes | collected 40 = executed 40 = passed 40; failures/errors/skipped 0/0/0 |
+| mutations | 12/12 `DISCRIMINATED`, byte-exact restore, pristine rerun 40/40, `baseline_dirty false` |
+
+Two evidence laws were strengthened rather than relaxed while sealing this record.
+EL01 previously exempted the merge ref as "server-only, must not resolve locally";
+the ref has now been fetched and parsed, so the exemption was replaced by positive
+resolution plus parent/tree equality (`D7`). The X6 validator accepts either
+spelling of the merge-parent fields because the committed record and the workflow
+name the same fact differently - tolerance of a synonym, not of a missing value.
+
+`G16` remains `OPEN` under `B5I8-DF05`: same-agent, single-operator, non-blind. No
+usability statement in this record claims otherwise.
+
+Boundary unchanged: no production, frontend or web-view path; `B5-I9` locked; Book 6
+unauthorized; post-Book-6 evaluation unstarted; cost `$0`; `capital.authority = none`.
+
+
+## 20.13 Ledger identity law: protected prefix versus appended ledger
+
+Two different identities are recorded here and must never be confused.
+
+**Historical protected prefix (immutable EL09 claim).** The first `191950` bytes of
+the LF-normalized ledger hash to
+`83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`. That figure is
+the historical row's identity and stays exactly as ratified; B5-I8's appended
+evidence does not replace it, and the manifest row for this file still checks only
+those bytes.
+
+**Current appended ledger (this section's measurement).** Measured immediately
+before this section was appended, on the evidence head:
+
+| Measurement | Value |
+|---|---|
+| Offset at which this section begins | `213650` normalized bytes |
+| Digest of bytes `[0, 213650)` | `e6a4b7b2138f28e7001de5ed48e2c45c99b7246284bccfea987622d555d8c81e` |
+| LF normalization law | CRLF replaced by LF before measuring |
+| Appended sections after the prefix | section 20.10, 20.11, 20.12, this section |
+
+The measured digest is of the bytes *before* this section, so it cannot be
+self-referential and it stays recomputable. No historical byte was rewritten: the
+append-only rung added sections after offset `191950` only, and the prefix check
+above is executed by the frozen surface on every run.
+
+No ledger write follows this section in the B5-I8 ratification, so the measured
+identity remains exact at the ratification head.

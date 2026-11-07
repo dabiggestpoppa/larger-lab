@@ -103,3 +103,64 @@ record is `OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md`. Dispositions above are unch
 `PLANNED`, 10 `MAPPED`, 5 `DEFERRED_WITH_OWNER`, and **zero** `PASS`. `G16` remains open; no
 requirement in this matrix has executed. `B5-I8_IMPLEMENTATION = NOT_STARTED`; `MERGE_AUTHORIZED`
 is true for the P0 ratification PR only.
+
+## 4. Implementation disposition (appended 2026-11-05; the P0 rows above are unchanged)
+
+All 40 test-bound requirements transitioned `PLANNED → PASS` against executed evidence on `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf`.
+The 10 `MAPPED` static/attestation obligations are discharged by the same boundary and protocol
+evidence (registry `p0.implementation`); the 5 deferred obligations stay `DEFERRED_WITH_OWNER`
+(operator, `B5-I9`, Book 6, post-Book-6 phase, independent auditor).
+
+| Dimension | Before | After |
+|---|---|---|
+| `PLANNED` | 40 | 0 |
+| `PASS` | 0 | 40 |
+| `MAPPED` | 10 | 10 |
+| `DEFERRED_WITH_OWNER` | 5 | 5 |
+| `G16` | `OPEN` | `OPEN` (protocol executed; no independent operator) |
+| Mutation floor | planned 12 | 12/12 discriminated, byte-exact restore |
+
+`PASS` means the frozen observable executed successfully and turned red under its mutation. It
+does not ratify the stage and does not close `G16`. `MERGE_AUTHORIZED = false`.
+
+## 5. Amendment 001 and implementation re-disposition (appended 2026-11-06; §4 unchanged)
+
+`OCE_B5_I8_AMEND_001_CI_SELECTION_SURFACE_v1.0.md` supersedes **plan R6's workflow
+placement and artifact name only**. The CI selection surface is the dedicated additive
+workflow `b5-i8-audit-validation.yml`; `.github/workflows/b1-i1r-validation.yml` remains
+byte-identical and is still pinned by EL09. The original clause is superseded, not
+satisfied.
+
+| Dimension | Value after ratification re-audit |
+|---|---|
+| Requirements | 55 unique, unchanged |
+| Nodes | 40 collected = 40 executed = 40 passed |
+| Failure classes | 18 |
+| Mutations | 12/12, now executed in authoritative CI as well as locally |
+| Floors | focused 40 · adjacent 189 |
+| `G16` | `OPEN` (carried; blocker `B5I8-DF05`) |
+| `MERGE_AUTHORIZED` | true for PR #23 only, after every gate in the ratification record |
+
+No requirement, node, class, mutation or floor was reduced.
+
+---
+
+## 6. Implementation ratification re-audit
+
+| Dimension | Value at ratification |
+|---|---|
+| Requirements | 55 unique, unchanged |
+| Nodes | 40 collected = 40 executed = 40 passed, zero duplicates |
+| Non-vacuity | 40/40 audited; tautological 0, orphan nodes 0, orphan requirements 0 |
+| Failure classes | 18 |
+| Mutations | 12/12 `DISCRIMINATED` in authoritative CI, byte-exact restore, pristine 40/40 |
+| Run identity | `oce_run_id` populated and bound to the artifact name |
+| Floors | focused 40; adjacent 189 |
+| E2E boundary | in-process production-surface re-execution, not a live stack |
+| `G16` | `OPEN`: blocker `B5I8-DF05`, owner named, not passed |
+| `MERGE_AUTHORIZED` | true for PR #23 only, after ratification-head CI passes |
+| EL09 | historical prefix `83a40ac7…` over `191950` bytes intact; current ledger recorded separately |
+
+The original clause that placed the selection step in the pinned workflow is
+**superseded** by Amendment 001, not satisfied. No requirement, node, class, mutation
+or floor was reduced at any point in the ladder, including across the two red rungs.
