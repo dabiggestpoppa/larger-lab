@@ -649,3 +649,126 @@ def workflow_mutation_step() -> str:
         raise AssertionError("no mutation battery step in the B5-I8 workflow")
     nxt = text.find("\n      - name:", start + 1)
     return text[start : nxt if nxt > 0 else len(text)]
+
+
+#: Repository run-id law (cloud-ground/scripts/run-validation.sh): 12+ lowercase hex.
+RUN_ID_RE = re.compile(r"^[0-9a-f]{12,}$")
+WORKFLOW_B5I8_SUFFIX = ".github/workflows/b5-i8-audit-validation.yml"
+LOCAL_EVIDENCE_LABEL = "LOCAL_REPRODUCTION_NOT_CI"
+HEX40_RE = re.compile(r"^[0-9a-f]{40}$")
+
+
+def run_identity_problems(identity: dict, run_context: dict | None = None) -> list:
+    """Why a run identity may NOT stand as authoritative CI evidence (empty == ok).
+
+    Fail-closed: a blank id, a malformed id, an id that does not match the run
+    context Actions actually supplied, a mismatched attempt/workflow/head/merge
+    ref, or a locally invented placeholder all yield at least one problem. The
+    caller turns a non-empty list into a red job, so CI evidence can never
+    silently degrade to an empty string.
+    """
+    problems: list = []
+    ctx = run_context or {}
+
+    if identity.get("source") != "ci":
+        problems.append(
+            "evidence source is %r; only 'ci' is authoritative and a local "
+            "reproduction must be labelled %r"
+            % (identity.get("source"), LOCAL_EVIDENCE_LABEL)
+        )
+
+    run_id = identity.get("oce_run_id") or ""
+    if not run_id:
+        problems.append("oce_run_id is blank")
+    elif not RUN_ID_RE.match(run_id):
+        problems.append("oce_run_id %r is malformed (expected 12+ lowercase hex)" % run_id)
+
+    artifact = identity.get("artifact_name") or ""
+    if not run_id or artifact != "b5-i8-evidence-" + run_id:
+        problems.append(
+            "artifact name %r is not bound to oce_run_id %r" % (artifact, run_id)
+        )
+
+    gh_run = str(identity.get("github_run_id") or "")
+    if not (gh_run.isdigit() and int(gh_run) > 0):
+        problems.append("github_run_id %r is not a positive integer" % gh_run)
+    elif ctx and str(ctx.get("github_run_id")) != gh_run:
+        problems.append(
+            "github_run_id %r does not match the run context %r"
+            % (gh_run, ctx.get("github_run_id"))
+        )
+
+    attempt = str(identity.get("run_attempt") or "")
+    if not (attempt.isdigit() and int(attempt) >= 1):
+        problems.append("run_attempt %r is not a positive integer" % attempt)
+    elif ctx and str(ctx.get("run_attempt")) != attempt:
+        problems.append(
+            "run_attempt %r does not match the run context %r"
+            % (attempt, ctx.get("run_attempt"))
+        )
+
+    workflow = identity.get("workflow_path") or ""
+    workflow_file = workflow.split("@", 1)[0]
+    if not workflow_file.endswith(WORKFLOW_B5I8_SUFFIX):
+        problems.append(
+            "workflow path %r is not the governed B5-I8 workflow" % workflow
+        )
+    if ctx and ctx.get("workflow") != "b5-i8-audit-validation":
+        problems.append(
+            "run-context workflow %r is not b5-i8-audit-validation" % ctx.get("workflow")
+        )
+
+    if identity.get("event") != "pull_request":
+        problems.append(
+            "event %r is not the governed trigger pull_request" % identity.get("event")
+        )
+    if ctx and ctx.get("event") != "pull_request":
+        problems.append("run-context event %r is not pull_request" % ctx.get("event"))
+
+    repository = identity.get("repository") or ""
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        problems.append("repository %r is not owner/name" % repository)
+    elif ctx and ctx.get("repository") != repository:
+        problems.append(
+            "repository %r does not match the run context %r"
+            % (repository, ctx.get("repository"))
+        )
+
+    pr = str(identity.get("pr_number") or "")
+    if not (pr.isdigit() and int(pr) > 0):
+        problems.append("pull request number %r is missing" % pr)
+    elif ctx and str(ctx.get("pr_number")) != pr:
+        problems.append(
+            "pull request number %r does not match the run context %r"
+            % (pr, ctx.get("pr_number"))
+        )
+
+    head = identity.get("pr_head_sha") or ""
+    if not HEX40_RE.match(head):
+        problems.append("pr_head_sha %r is not a 40-hex commit" % head)
+    tree = identity.get("tested_tree") or ""
+    if not HEX40_RE.match(tree):
+        problems.append("tested_tree %r is not a 40-hex tree" % tree)
+
+    merge_ref = identity.get("merge_ref") or ""
+    if not HEX40_RE.match(merge_ref):
+        problems.append("merge_ref %r is not a 40-hex commit" % merge_ref)
+    elif ctx and ctx.get("sha") != merge_ref:
+        problems.append(
+            "merge_ref %r is not the run-context sha %r" % (merge_ref, ctx.get("sha"))
+        )
+
+    first = identity.get("merge_first_parent") or ""
+    second = identity.get("merge_second_parent") or ""
+    if not HEX40_RE.match(first):
+        problems.append("merge_first_parent %r is not a 40-hex commit" % first)
+    if not HEX40_RE.match(second):
+        problems.append("merge_second_parent %r is not a 40-hex commit" % second)
+    if HEX40_RE.match(first) and HEX40_RE.match(second):
+        if first == second:
+            problems.append("merge-ref parents are identical")
+        if head and second != head:
+            problems.append(
+                "merge-ref second parent %r is not the PR head %r" % (second, head)
+            )
+    return problems

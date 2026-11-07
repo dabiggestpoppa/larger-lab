@@ -48,16 +48,46 @@ jobs:
           echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
           EVIDENCE_DIR="$RUNNER_TEMP/b5-i8-evidence-$OCE_RUN_ID"
           mkdir -p "$EVIDENCE_DIR"
-          printf '{"oce_run_id":"%s","repository":"%s","ref":"%s","sha":"%s","workflow":"b5-i8-audit-validation","event":"%s"}\n' \
-            "$OCE_RUN_ID" "$GITHUB_REPOSITORY" "$GITHUB_REF_NAME" "$GITHUB_SHA" "$GITHUB_EVENT_NAME" \
-            > "$EVIDENCE_DIR/run-context.json"
           echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=b5-i8-evidence-$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
+          # The run-context carries the ACTUAL workflow identity supplied by Actions
+          # (run id, attempt, workflow_ref, PR number), never a predicted value.
+          OCE_RUN_ID="$OCE_RUN_ID" python - "$EVIDENCE_DIR/run-context.json" <<'CTX'
+          import json, os, sys
+          json.dump(
+              {
+                  "source": "ci",
+                  "oce_run_id": os.environ["OCE_RUN_ID"],
+                  "artifact_name": "b5-i8-evidence-" + os.environ["OCE_RUN_ID"],
+                  "github_run_id": os.environ.get("GITHUB_RUN_ID", ""),
+                  "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", ""),
+                  "workflow": "b5-i8-audit-validation",
+                  "workflow_ref": os.environ.get("GITHUB_WORKFLOW_REF", ""),
+                  "repository": os.environ.get("GITHUB_REPOSITORY", ""),
+                  "ref": os.environ.get("GITHUB_REF_NAME", ""),
+                  "sha": os.environ.get("GITHUB_SHA", ""),
+                  "event": os.environ.get("GITHUB_EVENT_NAME", ""),
+                  "pr_number": (os.environ.get("PR_NUMBER", "") or ""),
+              },
+              open(sys.argv[1], "w", encoding="utf-8"),
+              indent=2,
+              sort_keys=True,
+          )
+          CTX
 
       - name: Execute B5-I8 independent audit proofs
         env:
           B5I8_FLOOR: "40"
           EV: ${{ steps.run_id.outputs.evidence_dir }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          # Run identity is BOUND here: without these the proof cannot be authoritative.
+          OCE_EVIDENCE_SOURCE: ci
+          OCE_RUN_ID: ${{ steps.run_id.outputs.oce_run_id }}
+          OCE_EVIDENCE_ARTIFACT: b5-i8-evidence-${{ steps.run_id.outputs.oce_run_id }}
+          OCE_GITHUB_RUN_ID: ${{ github.run_id }}
+          OCE_GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
+          OCE_WORKFLOW_REF: ${{ github.workflow_ref }}
         run: |
           set -o pipefail
           F="infrastructure/control-plane/tests/test_b5_i8_e2e.py infrastructure/control-plane/tests/test_b5_i8_adversarial.py infrastructure/control-plane/tests/test_b5_i8_independent_audit.py infrastructure/control-plane/tests/test_b5_i8_usability_measurements.py infrastructure/control-plane/tests/test_b5_i8_evidence_laws.py"
@@ -66,6 +96,9 @@ jobs:
           tail -60 "$EV/b5-i8-pytest-output.txt"
           python - "$EV" "$B5I8_FLOOR" "$rc" <<'PY'
           import glob, json, os, subprocess, sys, xml.etree.ElementTree as ET
+
+          sys.path.insert(0, "infrastructure/control-plane/tests")
+          import b5_i8_audit_support as S
 
           ev, floor, rc = sys.argv[1], int(sys.argv[2]), int(sys.argv[3])
           registry_path = "docs/oce-golden-system/OCE_B5_I8_REQUIREMENT_TEST_REGISTRY_v1.0.json"
@@ -129,7 +162,34 @@ jobs:
           if len(present) != 5:
               problems.append("expected exactly 5 B5-I8 test files, saw %s" % sorted(present))
 
-          head = os.environ.get("PR_HEAD_SHA") or git("rev-parse", "HEAD")
+          head = os.environ.get("PR_HEAD_SHA") or ""
+          tree = git("rev-parse", "HEAD^{tree}")
+          def ident_env(name):
+              # One named reader: a missing value stays blank and is rejected by
+              # run_identity_problems() below, never silently written into the proof.
+              return os.environ.get(name) or ""
+
+          identity = {
+              "source": ident_env("OCE_EVIDENCE_SOURCE"),
+              "oce_run_id": ident_env("OCE_RUN_ID"),
+              "artifact_name": ident_env("OCE_EVIDENCE_ARTIFACT"),
+              "github_run_id": ident_env("OCE_GITHUB_RUN_ID"),
+              "run_attempt": ident_env("OCE_GITHUB_RUN_ATTEMPT"),
+              "workflow_path": ident_env("OCE_WORKFLOW_REF"),
+              "event": ident_env("GITHUB_EVENT_NAME"),
+              "repository": ident_env("GITHUB_REPOSITORY"),
+              "pr_number": ident_env("PR_NUMBER"),
+              "pr_head_sha": head,
+              "tested_tree": tree,
+              "merge_ref": ident_env("GITHUB_SHA"),
+              "merge_first_parent": git("rev-parse", "HEAD^1"),
+              "merge_second_parent": git("rev-parse", "HEAD^2"),
+          }
+          run_context = json.load(
+              open(os.path.join(ev, "run-context.json"), encoding="utf-8")
+          )
+          for problem in S.run_identity_problems(identity, run_context):
+              problems.append("run identity: " + problem)
           proof = {
               "proof": "b5-i8-independent-audit-selection",
               "registry": registry_path,
@@ -152,7 +212,20 @@ jobs:
               "merge_first_parent": git("rev-parse", "HEAD^1"),
               "merge_second_parent": git("rev-parse", "HEAD^2"),
               "event": os.environ.get("GITHUB_EVENT_NAME", ""),
-              "oce_run_id": os.environ.get("OCE_RUN_ID", ""),
+              "oce_run_id": identity["oce_run_id"],
+              "github_run_id": int(identity["github_run_id"])
+              if identity["github_run_id"].isdigit()
+              else 0,
+              "run_attempt": int(identity["run_attempt"])
+              if identity["run_attempt"].isdigit()
+              else 0,
+              "workflow_path": identity["workflow_path"],
+              "pr_number": int(identity["pr_number"])
+              if identity["pr_number"].isdigit()
+              else 0,
+              "artifact_name": identity["artifact_name"],
+              "evidence_source": identity["source"],
+              "run_context": run_context,
           }
           (open(os.path.join(ev, "b5-i8-registry-proof.json"), "w", encoding="utf-8")).write(
               json.dumps(proof, indent=2, sort_keys=True) + "\n")

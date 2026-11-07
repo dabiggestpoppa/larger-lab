@@ -118,6 +118,83 @@ class TestEvidenceAudit:
             assert ci["parsed_from"], "no parsed raw artifact cited"
             assert ci["tested_head"] and ci["tested_tree"]
 
+        # X6: the recorded identity must be populated and bound, and the validator
+        # must reject every unbound, mismatched or locally invented shape.
+        identity = S.ci_identity()
+        # Bootstrap ordering: the populated record can only exist AFTER the run that
+        # produces it. Until X6's artifact is parsed the fixtures below carry the law;
+        # the evidence rung removes this guard and asserts the record unconditionally.
+        if identity.get("status") == "OBSERVED" and identity.get("oce_run_id"):
+            run = identity.get("oce_run_id") or ""
+            assert S.RUN_ID_RE.match(run), run
+            assert identity["artifact_name"] == "b5-i8-evidence-" + run
+            assert isinstance(identity["github_run_id"], int) and identity["github_run_id"] > 0
+            assert identity["evidence_source"] == "ci"
+            assert identity["workflow_path"].endswith(S.WORKFLOW_B5I8_SUFFIX)
+            assert identity["run_context"]["github_run_id"] == str(identity["github_run_id"])
+            assert S.run_identity_problems(identity, identity["run_context"]) == []
+
+        h, t = "a" * 40, "b" * 40
+        good_ctx = {
+            "source": "ci",
+            "oce_run_id": "abcdef123456",
+            "artifact_name": "b5-i8-evidence-abcdef123456",
+            "github_run_id": "42313907550",
+            "run_attempt": "1",
+            "workflow_path": (
+                "dabiggestpoppa/larger-lab/.github/workflows/"
+                "b5-i8-audit-validation.yml@refs/pull/23/merge"
+            ),
+            "event": "pull_request",
+            "repository": "dabiggestpoppa/larger-lab",
+            "pr_number": "23",
+            "pr_head_sha": h,
+            "tested_tree": t,
+            "merge_ref": "c" * 40,
+            "merge_first_parent": "d" * 40,
+            "merge_second_parent": h,
+        }
+        context = {
+            "source": "ci",
+            "workflow": "b5-i8-audit-validation",
+            "github_run_id": "42313907550",
+            "run_attempt": "1",
+            "repository": "dabiggestpoppa/larger-lab",
+            "pr_number": "23",
+            "event": "pull_request",
+            "sha": "c" * 40,
+        }
+        assert S.run_identity_problems(good_ctx, context) == []
+
+        forged = [
+            ("source", "local"),
+            ("oce_run_id", ""),
+            ("oce_run_id", "NOT-A-RUN-ID"),
+            ("artifact_name", "b5-i8-evidence-000000000000"),
+            ("github_run_id", "99999999999"),
+            ("github_run_id", "0"),
+            ("run_attempt", "2"),
+            ("workflow_path", ".github/workflows/b1-i1r-validation.yml"),
+            ("pr_head_sha", "e" * 40),
+            ("merge_second_parent", "f" * 40),
+            ("pr_number", ""),
+            ("repository", "elsewhere/other"),
+            ("event", "push"),
+        ]
+        for key, value in forged:
+            broken = dict(good_ctx)
+            broken[key] = value
+            assert S.run_identity_problems(broken, context), f"accepted forged {key}={value!r}"
+        # A locally invented identity cannot be relabelled into CI evidence.
+        local = dict(good_ctx, source=S.LOCAL_EVIDENCE_LABEL)
+        assert any(
+            "local" in problem.lower()
+            for problem in S.run_identity_problems(local, context)
+        )
+        # A blank identity (the pre-X6 defect) fails closed.
+        blank = {key: "" for key in good_ctx}
+        assert S.run_identity_problems(blank, {}) != []
+
         # The P0 CI identities that ARE cited carry their parseable artifact name.
         import re as _re
 
@@ -228,6 +305,24 @@ class TestGateClosure:
         assert "evidence_dir }}" in whole
         assert "contents: read" in whole
         assert "${{ secrets." not in whole  # no workflow secret is referenced
+
+        # X6: the audit step is BOUND to the workflow run Actions actually supplied.
+        # The defect this repairs: the proof read OCE_RUN_ID with an empty default and
+        # the step was never given it, so `oce_run_id` was recorded as "". A silent
+        # fallback is therefore forbidden outright, not merely discouraged.
+        assert '"oce_run_id": os.environ.get("OCE_RUN_ID", "")' not in step
+        assert 'problems.append("run identity: "' in step
+        assert "ident_env(" in step
+        assert "OCE_RUN_ID: ${{ steps.run_id.outputs.oce_run_id }}" in step
+        assert "OCE_EVIDENCE_ARTIFACT: b5-i8-evidence-${{ steps.run_id.outputs.oce_run_id }}" in step
+        assert "OCE_GITHUB_RUN_ID: ${{ github.run_id }}" in step
+        assert "OCE_GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}" in step
+        assert "OCE_WORKFLOW_REF: ${{ github.workflow_ref }}" in step
+        assert "PR_NUMBER: ${{ github.event.pull_request.number }}" in step
+        assert "OCE_EVIDENCE_SOURCE: ci" in step
+        assert "run_identity_problems" in step
+        assert "run-context.json" in step
+        assert "GITHUB_RUN_ID" in whole and "GITHUB_RUN_ATTEMPT" in whole
 
     def test_g15_mutation_controls_discriminate(self):
         doc = S.mutations()

@@ -202,8 +202,6 @@
     "baseline_dirty": true,
     "baseline_status": [
       "M .github/workflows/b5-i8-audit-validation.yml",
-      " M docs/oce-golden-system/OCE_B5_I8_MUTATION_RESULTS_v1.0.json",
-      " M infrastructure/control-plane/scripts/b5_i8_mutation_battery.py",
       " M infrastructure/control-plane/tests/b5_i8_audit_support.py",
       " M infrastructure/control-plane/tests/test_b5_i8_independent_audit.py"
     ]
@@ -217,11 +215,11 @@
     "skipped": 0,
     "xfailed": 0,
     "exit_status": 0,
-    "summary": "40 passed in 9.89s"
+    "summary": "40 passed in 10.68s"
   },
   "verdict": "PASS",
   "tested": {
-    "head": "36288f4bf64e2a71741e77eb9bca6f29b12c8233",
-    "tree": "fcf3b3ea09bbf884615d8e19305f4de730248a00"
+    "head": "6b26214637343fbc9ebd3bdf266a6dfac2d2d3dc",
+    "tree": "f7e0eb3efed8e93a76420fb824cc7bf0b9ce0a49"
   }
 }
