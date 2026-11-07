@@ -168,9 +168,12 @@ def test_terms_time_identity_packages_are_untouched_by_i08() -> None:
     # accepts exactly that one additional tree.  Every other path under
     # ``normalization/`` -- identity, terms, time, the top-level modules -- is
     # still refused by name.
+    # DISCLOSED SENSOR-B5-I09P2A: the trusted authority loader package joins the
+    # disclosed delta.  identity/, terms/, time/ and the top-level modules stay
+    # refused by name.
     for line in changed_paths:
-        assert "/common/" in line or "/sensors/" in line, (
-            f"non-common/non-sensors source change: {line}"
+        assert "/common/" in line or "/sensors/" in line or "/authority/" in line, (
+            f"non-common/non-sensors/non-authority source change: {line}"
         )
 
 

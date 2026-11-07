@@ -102,6 +102,7 @@ from ...storage import (
     SourceUnitContract,
     SourceUnitEvidence,
 )
+from ..authority import SemanticAuthority, resolve_authority_inputs
 from ..common.semantic_registry import (
     PENDING_EVIDENCE_REFERENCE,
     ProviderSemanticMapping,
@@ -297,6 +298,14 @@ class LiquidationAdmissionRefusal(_StrEnum):
     AMBIGUOUS_MAPPING = "AMBIGUOUS_MAPPING"
     #: The provider's own sides contradict each other, so the row is quarantined.
     CONTRADICTION = "CONTRADICTION"
+    #: No trusted approval context was supplied: a registry SHAPE is not authority
+    #: (SENSOR-B5-I09P2A).  A caller-minted registry resolves rows for diagnostics
+    #: and admits nothing.
+    UNTRUSTED_AUTHORITY = "UNTRUSTED_AUTHORITY"
+    #: A trusted authority exists but does not cover this row: the approval binds
+    #: evidence to (provider, field), declares the native field, names the
+    #: transformation and resolves the blocking assumptions.
+    NOT_APPROVED_BY_AUTHORITY = "NOT_APPROVED_BY_AUTHORITY"
 
 
 class LiquidationSideAdmission(NormalizationModelBase):
@@ -322,6 +331,11 @@ class LiquidationSideAdmission(NormalizationModelBase):
     mapping_version: OpaqueIdentifier | None = None
     admitted: bool
     refusal: LiquidationAdmissionRefusal | None = None
+    #: The approving authority, when one issued this decision (SENSOR-B5-I09P2A).
+    #: Provenance EVIDENCE, not an authenticated signature: record construction
+    #: still validates internal consistency only (see the I09P2A evidence).
+    admission_approval_id: OpaqueIdentifier | None = None
+    admission_registry_digest: OpaqueIdentifier | None = None
 
     @model_validator(mode="after")
     def _admission_laws(self) -> LiquidationSideAdmission:
@@ -358,6 +372,15 @@ class LiquidationSideAdmission(NormalizationModelBase):
             raise ValueError(
                 f"an admitted field cannot cite {PENDING_EVIDENCE_REFERENCE}: a "
                 "provisional mapping is not a verified mapping (BOOK 00 Q7)"
+            )
+        if (
+            self.admission_approval_id is None
+            or self.admission_registry_digest is None
+        ):
+            raise ValueError(
+                "an admitted canonical field must name the approving authority "
+                "(approval id and registry digest): model validity is not upstream "
+                "authorization (SENSOR-B5-I09P2A)"
             )
         return self
 
@@ -890,6 +913,7 @@ def _admit_field(
     provider: str,
     provider_field: str | None,
     registry: ProviderSemanticRegistry | None,
+    authority: SemanticAuthority | None,
     contradiction: bool,
 ) -> LiquidationSideAdmission:
     """Resolve ONE canonical field's authority.  Never guesses, never widens.
@@ -935,6 +959,13 @@ def _admit_field(
         return refused(LiquidationAdmissionRefusal.PENDING_EVIDENCE)
     if not admits_critical_t1_use(row.semantic_confidence):
         return refused(LiquidationAdmissionRefusal.AMBIGUOUS_MAPPING)
+    # The evidence chain above decides whether this row MAY admit; the approval
+    # decides whether it DID.  A registry the caller minted reaches this point and
+    # stops: shape is not authority (SENSOR-B5-I09P2A).
+    if authority is None:
+        return refused(LiquidationAdmissionRefusal.UNTRUSTED_AUTHORITY)
+    if authority.attests(row) is not None:
+        return refused(LiquidationAdmissionRefusal.NOT_APPROVED_BY_AUTHORITY)
     return LiquidationSideAdmission(
         canonical_field=canonical_field,
         provider_field=provider_field,
@@ -944,6 +975,8 @@ def _admit_field(
         methodology_id=row.methodology_id,
         mapping_version=row.version,
         admitted=True,
+        admission_approval_id=authority.approval_id,
+        admission_registry_digest=authority.registry_digest,
     )
 
 
@@ -951,6 +984,7 @@ def _admissions(
     payload: LiquidationObservationInput,
     registry: ProviderSemanticRegistry | None,
     *,
+    authority: SemanticAuthority | None,
     contradiction: bool,
 ) -> tuple[LiquidationSideAdmission, ...]:
     """One decision per canonical field that actually carries a reading.
@@ -994,6 +1028,7 @@ def _admissions(
                 provider=payload.provider,
                 provider_field=provider_field,
                 registry=registry,
+                authority=authority,
                 contradiction=contradiction,
             )
         )
@@ -1003,7 +1038,7 @@ def _admissions(
 def normalize_liquidation(
     payload: LiquidationObservationInput,
     *,
-    registry: ProviderSemanticRegistry | None = None,
+    registry: ProviderSemanticRegistry | SemanticAuthority | None = None,
     terms: ContractTermsSnapshot | None = None,
     reference_price: ReferencePriceEvidence | None = None,
     knowledge_cutoff: datetime | None = None,
@@ -1040,10 +1075,16 @@ def normalize_liquidation(
             "against its own contract instance or not at all (bloc_05/07 F3)"
         )
 
+    # Split the two inputs: an approved authority (authority path) versus a bare
+    # registry the caller built itself (diagnostic only).  Rows still resolve from
+    # either, but only the approved authority can admit a canonical field.
+    authority, registry = resolve_authority_inputs(registry, None)
     contradiction = _contradicts(
         payload.position_side_liquidated, payload.execution_side
     )
-    admissions = _admissions(payload, registry, contradiction=contradiction)
+    admissions = _admissions(
+        payload, registry, authority=authority, contradiction=contradiction
+    )
     #: The frozen vocabulary carries ONE semantic flag, so a partly certified row
     #: cannot be represented honestly: promoting a certified field while its
     #: sibling stays uncertified would put a canonical side next to

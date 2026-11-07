@@ -43,6 +43,18 @@ from crypto_sensor_fabric.normalization.common.semantic_registry import (
 )
 from crypto_sensor_fabric.storage.enums import CoverageState, RevisionState
 
+import hashlib
+import json
+
+from crypto_sensor_fabric.normalization.authority import load_semantic_authority
+from crypto_sensor_fabric.normalization.common.methodologies import (
+    NormalizationMethodology,
+    NormalizationMethodologyRegistry,
+)
+from crypto_sensor_fabric.normalization.common.semantic_registry import (
+    serialize_provider_semantic_registry_yaml,
+)
+
 _DIGEST = "a" * 64
 
 
@@ -152,7 +164,7 @@ def test_a_verified_long_liquidation_keeps_both_sides_independently() -> None:
             native_execution_side_field="orderSide",
             native_execution_side_value="SELL",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.LONG
     assert record.execution_side is AggressorSide.SELL
@@ -168,7 +180,7 @@ def test_a_verified_short_liquidation_keeps_both_sides_independently() -> None:
             native_execution_side_field="orderSide",
             native_execution_side_value="BUY",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.SHORT
     assert record.execution_side is AggressorSide.BUY
@@ -183,7 +195,7 @@ def test_position_side_never_implies_execution_side() -> None:
             native_position_side_field="side",
             native_position_side_value="LONG",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.LONG
     assert record.execution_side is AggressorSide.UNKNOWN
@@ -197,7 +209,7 @@ def test_execution_side_never_implies_position_side() -> None:
             native_execution_side_field="orderSide",
             native_execution_side_value="SELL",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.execution_side is AggressorSide.SELL
     assert record.position_side_liquidated is LiquidationPositionSide.UNKNOWN
@@ -302,7 +314,7 @@ def test_a_quarantined_row_makes_no_canonical_side_claim() -> None:
             native_execution_side_field="orderSide",
             native_execution_side_value="SELL",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.execution_side is AggressorSide.UNKNOWN
     assert record.provisional_position_side is LiquidationPositionSide.SHORT
@@ -374,7 +386,7 @@ def test_a_long_liquidation_aggregate_is_a_position_side_claim_not_aggressor_flo
             native_position_side_field="side",
             native_position_side_value="LONG",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.position_side_liquidated is LiquidationPositionSide.LONG
     assert record.aggressor_side is AggressorSide.UNKNOWN
@@ -390,7 +402,7 @@ def test_a_short_aggregate_never_becomes_buy_aggressor_flow() -> None:
             native_position_side_field="side",
             native_position_side_value="SHORT",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.aggressor_side is AggressorSide.UNKNOWN
     assert record.execution_side is AggressorSide.UNKNOWN
@@ -429,7 +441,7 @@ def test_liquidation_roles_are_retained(role: LiquidationRole) -> None:
             native_maker_taker_role_field="role",
             native_maker_taker_role_value=role.value,
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.maker_taker_role is role
 
@@ -735,3 +747,77 @@ def test_no_conversion_arithmetic_is_reimplemented_in_the_module() -> None:
     ).read_text(encoding="utf-8")
     for forbidden in ("* multiplier", "/ price", "ROUND_HALF"):
         assert forbidden not in text, forbidden
+
+
+def _p2a_trust_root(registry):
+    """Synthetic P2a approval covering THIS registry (a test trust root).
+
+    SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION: it certifies no venue and
+    no production row may be derived from it.  It exists so the historical I11
+    fixtures keep exercising ADMISSION under the real loader instead of asserting
+    that a bare registry object is authority.
+    """
+    artifact = serialize_provider_semantic_registry_yaml(registry).encode("utf-8")
+    fields: dict[str, dict[str, list[str]]] = {}
+    declared: dict[str, list[str]] = {}
+    methods: list[str] = []
+    assumptions: list[str] = []
+    rows_by_identity: dict[tuple[str, str], object] = {}
+    for row in registry.mappings:
+        ref = row.evidence_reference or ""
+        fields.setdefault(row.provider, {}).setdefault(row.provider_field, []).append(ref)
+        declared.setdefault(row.provider, []).append(row.provider_field)
+        if row.methodology_id is not None:
+            if row.methodology_id not in methods:
+                methods.append(row.methodology_id)
+            rows_by_identity[(row.methodology_id, row.version)] = row
+        for assumption in row.blocking_assumptions:
+            if assumption not in assumptions:
+                assumptions.append(assumption)
+    manifest = json.dumps(
+        {
+            "schema_version": "b5-i09p2a-1",
+            "authority_id": "SYNTHETIC_TEST_TRUST_ROOT",
+            "artifacts": {
+                "synthetic-test-registry": {
+                    "sha256": hashlib.sha256(artifact).hexdigest(),
+                    "approval_id": "SYNTHETIC-TEST-APPROVAL-P2A",
+                    "registry_schema_version": registry.schema_version,
+                    "approved_at": "2026-11-06",
+                    "valid_until": None,
+                    "allowed_methodologies": methods,
+                    "evidence": fields,
+                    "declared_native_fields": declared,
+                    "approved_transformations": {},
+                    "resolved_blocking_assumptions": assumptions,
+                }
+            },
+            "revoked_approval_ids": [],
+        },
+        indent=2,
+        sort_keys=True,
+    ).encode("utf-8")
+    methodologies = NormalizationMethodologyRegistry(
+        schema_version="1",
+        methodologies=tuple(
+            NormalizationMethodology(
+                methodology_id=row.methodology_id,
+                version=row.version,
+                sensor_family=row.canonical_sensor,
+                description="SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION",
+                formula_or_algorithm="preserve the declared native field",
+                required_inputs=("native_field",),
+                output_units=("ENUM",),
+                PIT_requirements="no derivation; the field is read as declared",
+                known_limitations=("SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION",),
+                introduced_at="e2df7109b4ae336c2ed71f1cb8b56e2b4360874e",
+            )
+            for row in rows_by_identity.values()
+        ),
+    )
+    return load_semantic_authority(
+        manifest_bytes=manifest,
+        artifact_id="synthetic-test-registry",
+        artifact_bytes=artifact,
+        methodology_registry=methodologies,
+    )

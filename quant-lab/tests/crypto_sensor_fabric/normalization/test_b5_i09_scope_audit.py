@@ -106,6 +106,9 @@ def test_sem_a04_sealed_trees_are_untouched_relative_to_the_i09_base() -> None:
         "src/crypto_sensor_fabric/normalization/enums.py",
         "src/crypto_sensor_fabric/registry",
         "config/crypto_sensor_fabric",
+        # DISCLOSED SENSOR-B5-I09P2A: the approval manifest is the checkpoint's
+        # authorized NEW configuration surface, not a change to a Sealed I09 file.
+        ":(exclude)config/crypto_sensor_fabric/provider_semantics",
     )
     assert diff == "", f"sealed tree changed:\n{diff}"
 

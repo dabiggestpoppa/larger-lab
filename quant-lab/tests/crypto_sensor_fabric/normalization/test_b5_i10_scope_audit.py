@@ -123,8 +123,19 @@ def test_no_frozen_common_or_top_level_module_was_added() -> None:
 
 
 def test_no_competing_provider_mapping_registry_was_invented() -> None:
-    """R1: no new YAML under config/, and no second registry module."""
-    for forbidden in ("provider_semantics", "side_maps.py", "trade.py", "sensors"):
+    """R1: no new semantic YAML, and no second registry module.
+
+    DISCLOSED SENSOR-B5-I09P2A: the authorized approval manifest is one JSON file
+    in exactly one new directory.  It approves ZERO artifacts, and a second
+    semantic registry YAML is still refused -- the prohibition this test exists
+    for is unchanged; only the directory it named is now the approved location.
+    """
+    semantics = _QUANT_LAB / "config" / "crypto_sensor_fabric" / "provider_semantics"
+    assert not sorted(semantics.glob("*.yaml")), "a second semantic registry YAML appeared"
+    assert sorted(entry.name for entry in semantics.iterdir()) == [
+        "approval_manifest.json"
+    ]
+    for forbidden in ("side_maps.py", "trade.py", "sensors"):
         assert not (_QUANT_LAB / "config" / "crypto_sensor_fabric" / forbidden).exists()
 
 
@@ -192,6 +203,10 @@ def test_sealed_trees_are_untouched_relative_to_the_i10_base() -> None:
         "src/crypto_sensor_fabric/registry",
         "src/crypto_sensor_fabric/schemas",
         "config/crypto_sensor_fabric",
+        # DISCLOSED SENSOR-B5-I09P2A: the authority loader and its manifest are
+        # the checkpoint's authorized NEW surfaces, not edits to a sealed file.
+        ":(exclude)src/crypto_sensor_fabric/normalization/common/authority.py",
+        ":(exclude)config/crypto_sensor_fabric/provider_semantics",
     )
     assert diff == "", f"sealed tree changed:\n{diff}"
 
@@ -368,6 +383,11 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
     """
     allowed = (
         "src/crypto_sensor_fabric/normalization/sensors/",
+        # DISCLOSED SENSOR-B5-I09P2A: the loader module, the empty approval
+        # manifest and the authority suite are this checkpoint's named surfaces.
+        "src/crypto_sensor_fabric/normalization/authority/",
+        "config/crypto_sensor_fabric/provider_semantics/",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
         # DISCLOSED B5-I11R1 (independent audit): the audit suite is a
@@ -385,6 +405,10 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
         "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
         "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+        # DISCLOSED SENSOR-B5-I09P2A: SEM-32 measures the Bloc 1 registry
+        # surface by changed path rather than by total emptiness, because the
+        # trust root adds one config file.  Named individually, not by prefix.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py",
         # the I06 replay-safety suite re-pins its disclosed src prefix and its
         # inventory-carrying artifact pin for this checkpoint (section 9.5 A17)
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/",

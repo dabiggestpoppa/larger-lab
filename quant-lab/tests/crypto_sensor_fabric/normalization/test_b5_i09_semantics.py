@@ -903,7 +903,21 @@ def test_sem32_bloc1_registry_surfaces_are_untouched() -> None:
         encoding="utf-8",
         check=False,
     )
-    assert result.stdout == "", f"sealed Bloc 1 surface changed:\n{result.stdout}"
+    # DISCLOSED SENSOR-B5-I09P2A: the authority checkpoint adds one trust-root
+    # file under config/.  No Bloc 1 registry module and no YAML may change, so
+    # the measurement stays per changed path instead of being waived.
+    changed = [
+        line
+        for line in result.stdout.splitlines()
+        if line.startswith("diff --git")
+    ]
+    manifest = (
+        "quant-lab/config/crypto_sensor_fabric/provider_semantics/"
+        "approval_manifest.json"
+    )
+    assert all(manifest in line for line in changed), (
+        "sealed Bloc 1 surface changed: " + result.stdout
+    )
 
 
 def test_sem33_the_eight_provider_schema_is_the_live_provider_set() -> None:

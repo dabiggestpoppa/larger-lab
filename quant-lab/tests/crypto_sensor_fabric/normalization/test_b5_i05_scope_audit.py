@@ -331,6 +331,11 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
     allowed_prefixes = (
         "src/crypto_sensor_fabric/normalization/time/",
         "src/crypto_sensor_fabric/normalization/common/",
+        # DISCLOSED SENSOR-B5-I09P2A: the authorized authority loader package
+        # plus its single trust-root manifest directory (one empty-artifact
+        # manifest; no provider approval artifact is shipped).
+        "src/crypto_sensor_fabric/normalization/authority/",
+        "config/crypto_sensor_fabric/provider_semantics/",
         "src/crypto_sensor_fabric/normalization/sensors/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i05_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i08",

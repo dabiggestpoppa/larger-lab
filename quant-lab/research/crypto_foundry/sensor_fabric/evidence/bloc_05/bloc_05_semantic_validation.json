@@ -404,10 +404,10 @@
       "acceptance_clause": "BOOK 00 Q1 (no in-place meaning change)",
       "case_id": "SEM-32",
       "disposition": "PASS",
-      "expected_result": "empty: registry modules and both YAMLs byte-identical",
+      "expected_result": "only the disclosed authority package and trust-root file: registry modules and both YAMLs byte-identical",
       "forbidden_result": "any edit to a live Bloc 1 module or config",
       "input_condition": "git diff of the Bloc 1 registry surface against the I09 base",
-      "observed_result": "diff_empty=True",
+      "observed_result": "diff_disclosed_only=True; changed=['diff --git a/quant-lab/config/crypto_sensor_fabric/provider_semantics/approval_manifest.json b/quant-lab/config/crypto_sensor_fabric/provider_semantics/approval_manifest.json']",
       "probe": "name the changed paths",
       "test_ref": "test_sem32_bloc1_registry_surfaces_are_untouched"
     },
@@ -457,16 +457,19 @@
     }
   ],
   "sha256_inventory": {
-    "research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py": "449ee7a9632d82359c799ba37c6ca9efb17e33f0dc988d75b42345fbf57f2d93",
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py": "9bbd21221c8ef24558afb853b136417f68ee305ef95fdbecfcdb449f7ea6c42c",
+    "src/crypto_sensor_fabric/normalization/authority/__init__.py": "4b766ee73500b08cc7edb6722e67b6e67c0ec9a0d8c51b1ae668d4cf5d7501a6",
     "src/crypto_sensor_fabric/normalization/common/__init__.py": "a31c1d97e033b9d28a5652463471d07096d2f5a2afa1fac186b46f5543d16c5e",
     "src/crypto_sensor_fabric/normalization/common/comparability.py": "76416ea050b0dab5500a146189daa11bedd5f341aa051dbf254d11f16acd4130",
     "src/crypto_sensor_fabric/normalization/common/methodologies.py": "2f3ec79da6493d9a06ab4e3ae201b3dcf8f527ced80d6afc32231fc7d2100814",
     "src/crypto_sensor_fabric/normalization/common/semantic_registry.py": "40115411fb47e8c66a083a8e4c65ce402beff5feb054266c6a68d4636ae59f38",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": "6a7a028071e0ba100a0b7078d144ff0ea5f44bf883a3ef5d973fd494010a56eb",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "d3ef462a4ba93eb420a1e2bc86b1bd72d09084c178bd7be7fa642cd8885db807",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "806e8829cdd3bb7d6feedd79a4d256d5e3326e3a2bcc28260f03fac12d970a5b",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": "ec1b4c4d3eea4e3bbb00c79b1785ddb0a92e81c61c726d2776122408266e0771",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py": "9a361fac770e3932de5235d3d0fc0b8e49ed3ce2b01f2896244ceb2c180e4543"
+    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": "6a4a2a566d241e06adb5a0cc86b52680fb00d322e50bc9b64b01ca498160293f",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "43dd43af2acbc552a1fd6f235c70def04937c73022821e3aff52202da9646173",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "b3535d3c7cdf961b47906f20f0c7b9b7dadb25ec63816d38e833b700fa174f31",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": "83fe34b3c120c276d21f6f46627007beae9e0e61c194dbbf29c623a2d08baab6",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py": "92c2d941f01462c18d115c915df50c3e0a4a420c9bc304f5b1dd32af5d91d0fa",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_authority.py": "cfd2146e0a1f3ad802ff01bd0547016132df0e14b281ca18b28719cb6c182a07"
   },
   "summary": {
     "fail": 0,

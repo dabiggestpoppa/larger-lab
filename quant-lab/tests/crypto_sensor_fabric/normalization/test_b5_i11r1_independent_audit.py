@@ -56,6 +56,18 @@ from crypto_sensor_fabric.normalization.terms.conversion import (
 from crypto_sensor_fabric.normalization.terms.snapshot import ContractTermsSnapshot
 from crypto_sensor_fabric.storage.enums import CoverageState, RevisionState
 
+import hashlib
+import json
+
+from crypto_sensor_fabric.normalization.authority import load_semantic_authority
+from crypto_sensor_fabric.normalization.common.methodologies import (
+    NormalizationMethodology,
+    NormalizationMethodologyRegistry,
+)
+from crypto_sensor_fabric.normalization.common.semantic_registry import (
+    serialize_provider_semantic_registry_yaml,
+)
+
 _DIGEST = "b" * 64
 _AT = datetime(2026, 3, 1, 12, 0, tzinfo=timezone.utc)
 _CUTOFF = datetime(2026, 3, 1, 13, 0, tzinfo=timezone.utc)
@@ -423,7 +435,7 @@ def test_a_contradictory_claim_is_quarantined_even_with_full_authority() -> None
             native_execution_side_field="orderSide",
             native_execution_side_value="BUY",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.normalization_status is NormalizationStatus.QUARANTINED
     assert record.quarantine_reason is QuarantineReason.INVALID_SIDE_MAPPING
@@ -478,7 +490,7 @@ def test_maker_taker_role_and_revision_state_survive_unchanged() -> None:
             native_maker_taker_role_field="role",
             native_maker_taker_role_value="TAKER",
         ),
-        registry=_synthetic_registry(),
+        registry=_p2a_trust_root(_synthetic_registry()),
     )
     assert record.maker_taker_role is LiquidationRole.TAKER
     assert record.source_revision_state is RevisionState.STABLE
@@ -512,3 +524,77 @@ def test_an_aggregate_without_a_count_is_refused_at_construction() -> None:
             liquidation_event_id=None,
             aggregation_scope=LiquidationAggregationScope.INTERVAL_AGGREGATE,
         )
+
+
+def _p2a_trust_root(registry):
+    """Synthetic P2a approval covering THIS registry (a test trust root).
+
+    SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION: it certifies no venue and
+    no production row may be derived from it.  It exists so the historical I11
+    fixtures keep exercising ADMISSION under the real loader instead of asserting
+    that a bare registry object is authority.
+    """
+    artifact = serialize_provider_semantic_registry_yaml(registry).encode("utf-8")
+    fields: dict[str, dict[str, list[str]]] = {}
+    declared: dict[str, list[str]] = {}
+    methods: list[str] = []
+    assumptions: list[str] = []
+    rows_by_identity: dict[tuple[str, str], object] = {}
+    for row in registry.mappings:
+        ref = row.evidence_reference or ""
+        fields.setdefault(row.provider, {}).setdefault(row.provider_field, []).append(ref)
+        declared.setdefault(row.provider, []).append(row.provider_field)
+        if row.methodology_id is not None:
+            if row.methodology_id not in methods:
+                methods.append(row.methodology_id)
+            rows_by_identity[(row.methodology_id, row.version)] = row
+        for assumption in row.blocking_assumptions:
+            if assumption not in assumptions:
+                assumptions.append(assumption)
+    manifest = json.dumps(
+        {
+            "schema_version": "b5-i09p2a-1",
+            "authority_id": "SYNTHETIC_TEST_TRUST_ROOT",
+            "artifacts": {
+                "synthetic-test-registry": {
+                    "sha256": hashlib.sha256(artifact).hexdigest(),
+                    "approval_id": "SYNTHETIC-TEST-APPROVAL-P2A",
+                    "registry_schema_version": registry.schema_version,
+                    "approved_at": "2026-11-06",
+                    "valid_until": None,
+                    "allowed_methodologies": methods,
+                    "evidence": fields,
+                    "declared_native_fields": declared,
+                    "approved_transformations": {},
+                    "resolved_blocking_assumptions": assumptions,
+                }
+            },
+            "revoked_approval_ids": [],
+        },
+        indent=2,
+        sort_keys=True,
+    ).encode("utf-8")
+    methodologies = NormalizationMethodologyRegistry(
+        schema_version="1",
+        methodologies=tuple(
+            NormalizationMethodology(
+                methodology_id=row.methodology_id,
+                version=row.version,
+                sensor_family=row.canonical_sensor,
+                description="SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION",
+                formula_or_algorithm="preserve the declared native field",
+                required_inputs=("native_field",),
+                output_units=("ENUM",),
+                PIT_requirements="no derivation; the field is read as declared",
+                known_limitations=("SYNTHETIC_TEST_AUTHORITY_NOT_PROVIDER_DOCUMENTATION",),
+                introduced_at="e2df7109b4ae336c2ed71f1cb8b56e2b4360874e",
+            )
+            for row in rows_by_identity.values()
+        ),
+    )
+    return load_semantic_authority(
+        manifest_bytes=manifest,
+        artifact_id="synthetic-test-registry",
+        artifact_bytes=artifact,
+        methodology_registry=methodologies,
+    )

@@ -115,6 +115,9 @@ INVENTORY = (
     "src/crypto_sensor_fabric/normalization/common/comparability.py",
     "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py",
     "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_authority.py",
+    "src/crypto_sensor_fabric/normalization/authority/__init__.py",
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
     "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
     "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
     "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
@@ -883,15 +886,30 @@ def _build_rows() -> list[dict[str, Any]]:
         encoding="utf-8",
         check=False,
     ).stdout
+    # DISCLOSED SENSOR-B5-I09P2A: the authority checkpoint adds one package
+    # under normalization/ and one trust-root file under config/.  No YAML and
+    # no Bloc 1 registry module may change; the delta is admitted by full path.
+    changed_surfaces = [
+        line for line in diff.splitlines() if line.startswith("diff --git")
+    ]
+    _p2a_allowed = (
+        "quant-lab/src/crypto_sensor_fabric/normalization/authority/",
+        "quant-lab/config/crypto_sensor_fabric/provider_semantics/",
+    )
+    diff_disclosed_only = all(
+        any(path in line for path in _p2a_allowed) for line in changed_surfaces
+    )
+
     add(
         "SEM-32",
         "BOOK 00 Q1 (no in-place meaning change)",
         "git diff of the Bloc 1 registry surface against the I09 base",
         "name the changed paths",
-        "empty: registry modules and both YAMLs byte-identical",
+        "only the disclosed authority package and trust-root file: registry "
+        "modules and both YAMLs byte-identical",
         "any edit to a live Bloc 1 module or config",
-        f"diff_empty={diff == ''}",
-        diff == "",
+        f"diff_disclosed_only={diff_disclosed_only}; changed={changed_surfaces}",
+        diff_disclosed_only,
         "test_sem32_bloc1_registry_surfaces_are_untouched",
     )
 

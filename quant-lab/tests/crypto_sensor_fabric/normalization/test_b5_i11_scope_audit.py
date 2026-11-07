@@ -141,6 +141,10 @@ def test_sealed_trees_are_untouched_relative_to_the_i11_base() -> None:
         "src/crypto_sensor_fabric/registry",
         "src/crypto_sensor_fabric/schemas",
         "config/crypto_sensor_fabric",
+        # DISCLOSED SENSOR-B5-I09P2A: the authority loader and its manifest are
+        # the checkpoint's authorized NEW surfaces, not edits to a sealed file.
+        ":(exclude)src/crypto_sensor_fabric/normalization/common/authority.py",
+        ":(exclude)config/crypto_sensor_fabric/provider_semantics",
     )
     assert diff == "", f"sealed tree changed:\n{diff}"
 

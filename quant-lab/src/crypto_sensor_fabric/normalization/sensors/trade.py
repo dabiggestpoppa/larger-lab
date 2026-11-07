@@ -85,6 +85,8 @@ from ..terms.conversion import (
     inverse_quote_face,
     linear_base_exposure,
 )
+from ..authority import SemanticAuthority, resolve_authority_inputs
+from ..common.semantic_registry import ProviderSemanticRegistry
 from ..terms.snapshot import ContractTermsSnapshot
 from .side_maps import (
     ProvisionalSideMapping,
@@ -407,16 +409,19 @@ def _canonical_flags(
 def normalize_trade(
     payload: TradeObservationInput,
     *,
-    registry: object,
+    registry: ProviderSemanticRegistry | SemanticAuthority | None = None,
     terms: ContractTermsSnapshot | None = None,
     reference_price: ReferencePriceEvidence | None = None,
     knowledge_cutoff: datetime | None = None,
 ) -> T1TradeRecord:
     """Normalize one trade observation.  Pure, deterministic, fail-closed.
 
-    ``registry`` is the I09 ``ProviderSemanticRegistry``; it is typed loosely at
-    the boundary only so this module does not widen its import surface for an
-    argument it merely forwards.
+    ``registry`` carries EITHER a loader-issued
+    :class:`~crypto_sensor_fabric.normalization.common.authority.SemanticAuthority`
+    (the only thing that may promote a canonical aggressor side) OR a bare I09
+    ``ProviderSemanticRegistry``, which stays a DIAGNOSTIC value: its rows are
+    resolved so a provisional reading can still be computed, but no canonical
+    field is admitted from it (SENSOR-B5-I09P2A).
 
     Raises ``ValueError`` for the one contradiction the record cannot represent:
     a payload whose ``contract_instance_id`` disagrees with the supplied PIT
@@ -436,23 +441,33 @@ def normalize_trade(
             "its own contract instance or not at all (bloc_05/07 F3)"
         )
 
-    # -- side: provisional only; canonical stays UNKNOWN unless admitted ----
+    authority, registry = resolve_authority_inputs(registry, None)
+
+    # -- side: provisional only; canonical stays UNKNOWN unless approved -----
     evidence = payload.side_evidence
     mapping = None
     if (
         evidence.kind is SideEvidenceKind.PROVIDER_BOOLEAN_FIELD
         and evidence.provider_field
+        and registry is not None
     ):
         mapping = resolve_side_mapping(
-            registry,  # type: ignore[arg-type]
+            registry,
             payload.provider,
             evidence.provider_field,
             SensorFamily.MECHANICAL_TRADE,
         )
     provisional = apply_side_map(evidence, mapping)
+    # Three conjuncts, all required: the ladder must admit, an approval must
+    # exist, and that approval must cover THIS row.  A caller-minted registry
+    # satisfies the first and neither of the others.
     canonical_side = (
         provisional.mapped_side
-        if provisional is not None and provisional.canonical_admitted
+        if provisional is not None
+        and provisional.canonical_admitted
+        and mapping is not None
+        and authority is not None
+        and authority.attests(mapping) is None
         else AggressorSide.UNKNOWN
     )
 

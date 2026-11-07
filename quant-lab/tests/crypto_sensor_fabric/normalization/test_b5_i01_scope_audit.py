@@ -82,7 +82,11 @@ def test_only_authorized_subpackages_exist() -> None:
     ``normalization/sensors/`` as the home of the sensor-specific normalizers --
     the same disclosed extension on the same precedent, with the I10E1 directive
     naming the scope.  Every other subpackage remains forbidden at this layer."""
-    allowed = {"identity", "terms", "time", "common", "sensors"}
+    # DISCLOSED SENSOR-B5-I09P2A: the authorized trusted authority loader is a
+    # subpackage (not a ``common/`` module) because digest verification and a
+    # read-only clock-free validity check would violate the ratified I08 purity
+    # law inside ``common/``.  Membership grows by exactly one named package.
+    allowed = {"identity", "terms", "time", "common", "sensors", "authority"}
     present = {
         entry.name
         for entry in PACKAGE.iterdir()
