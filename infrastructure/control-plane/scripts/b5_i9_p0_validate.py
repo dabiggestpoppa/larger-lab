@@ -438,15 +438,29 @@ def validate():
         check("boundary/no_scratch_residue", not residue.exists(), str(residue))
 
     # ------------------------------------------------------------ style, secrets, prefix
+    def consistent_newlines(raw):
+        """One newline style, no bare CR. CRLF is a checkout artefact, not a law."""
+        if b"" in raw.replace(b"
+", b""):
+            return False
+        has_crlf = b"
+" in raw
+        lone_lf = raw.count(b"
+") - raw.count(b"
+")
+        return not (has_crlf and lone_lf > 0)
+
     for name in DELIVERABLES:
         raw = (DOCS / name).read_bytes()
-        check("style/crlf_" + name, b"\r\n" in raw, "not CRLF")
+        check("style/newlines_" + name, consistent_newlines(raw),
+              "mixed or bare-CR newlines")
         check("style/no_trailing_ws_" + name,
               not [l for l in raw.decode("utf-8").replace("\r\n", "\n").split("\n")
                    if l.rstrip() != l], "trailing whitespace")
     ledger_text = LEDGER.read_bytes().decode("utf-8").replace("\r\n", "\n")
     marker = "## 21. B5-I9 P0"
-    check("style/ledger_crlf", b"\r\n" in LEDGER.read_bytes(), "ledger not CRLF")
+    check("style/ledger_newlines", consistent_newlines(LEDGER.read_bytes()),
+          "ledger has mixed or bare-CR newlines")
     check("style/appended_section_clean",
           not [l for l in ledger_text[ledger_text.index(marker):].split("\n")
                if l.rstrip() != l], "trailing whitespace in the appended section")
