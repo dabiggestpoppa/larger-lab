@@ -43,7 +43,7 @@ FUTURE_BASE = "a794a9af80ae8deddacf2991de17b7d71e445756"
 AMENDMENT_ID = "B5-I9-AMEND-001"
 AMENDMENT_DOC = ("docs/oce-golden-system/"
                  "OCE_B5_I9_AMENDMENT_001_FUTURE_STAGE_BOUNDARY_COMPATIBILITY_v1.0.md")
-AMENDMENT_SHA256 = "9ebfbd659f76c4a1fd2605b6f8db40774dc4d2eeb1e191a433444da378430a71"
+AMENDMENT_SHA256 = "2dcfa3a4dea9d21160850f43cfb2c3659a961c0cd2affb54b05ccde035da558e"
 HISTORICAL_PATH_FLOOR = 20
 PROTECTED_PATH_FLOOR = 31
 BACKSLASH = chr(92)
@@ -74,6 +74,18 @@ def _amendment():
     assert doc["node"] == "TestLocks::test_changed_file_boundary", doc
     assert doc["no_waiver"] is True and doc["no_retroactive_rewrite"] is True, doc
     return doc
+
+
+def _amendment_anchor():
+    """The latest commit that touched the amendment document. Authorizing a protected path
+    outside that commit is impossible without revising the document itself."""
+    proc = _git_text("log", "-1", "--format=%H", "--", AMENDMENT_DOC)
+    assert proc.returncode == 0, proc.stderr
+    shas = [line.strip() for line in proc.stdout.splitlines() if line.strip()]
+    assert shas, "amendment anchor not found"
+    anchor = shas[0]
+    assert _git_text("merge-base", "--is-ancestor", anchor, "HEAD").returncode == 0, anchor
+    return anchor
 
 
 def repository():
@@ -193,16 +205,17 @@ class TestLocks:
         claimable = protected_set | {AMENDMENT_DOC}
         assert authorized <= claimable, sorted(authorized - claimable)
 
-        touched = [p for p in future if p in protected_set]
-        unauthorized = [p for p in touched if p not in authorized]
-        assert not unauthorized, unauthorized
+        anchor = _amendment_anchor()
+        introduced = _diff_paths(FUTURE_BASE, anchor)
+        claimed = {p for p in introduced if p in claimable}
+        assert claimed == authorized, sorted(claimed ^ authorized)
+
+        later = [p for p in _diff_paths(anchor, "HEAD") if p in protected_set]
+        assert not later, later
 
         added = [p for p in future if p.startswith(ALLOWED_CHANGES)
                  and p not in protected_set and p not in authorized]
         assert not added, added
-
-        unexercised = sorted(p for p in authorized if p not in future)
-        assert not unexercised, unexercised
 
     def test_no_scratch_residue(self):
         scratch = []

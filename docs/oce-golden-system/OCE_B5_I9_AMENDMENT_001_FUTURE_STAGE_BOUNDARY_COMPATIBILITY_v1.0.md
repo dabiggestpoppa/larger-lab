@@ -1,7 +1,7 @@
 # OCE — B5-I9 Amendment 001: future-stage boundary compatibility
 
 **Document ID.** OCE-B5-I9-AMEND-001
-**Version.** 1.0
+**Version.** 1.1
 **Status.** RATIFIED — operator-authorized in the Book 6 P0 ratification stage
 **Amends.** `B5I9-BD-04` / node `TestLocks::test_changed_file_boundary`
 **Ratification evidence.** `OCE_BLOCK_06_P0_OPERATOR_RATIFICATION_v1.0.md`
@@ -99,6 +99,14 @@ traversal-bearing, so prefix collisions cannot be manufactured.
 amendment body, inventing a differently named amendment file, or authorizing a path that is not a
 protected B5-I9 surface all fail closed.
 
+**The anchor is this document, not a mutable constant.** The node locates the amendment as the
+latest commit that touched this document, then requires that the protected paths introduced in
+`a794a9af..anchor` equal the declared `authorized_paths` exactly, and that no protected path
+changes after the anchor. A later edit of the test without a revision of this document therefore
+fails closed, because the anchor does not move and the edit becomes an unauthorized protected
+change. Revising this document moves the anchor, and the SHA-256 pin is refreshed in the same
+commit, so every authorization step is one reviewable diff.
+
 ## 6. Preserved prohibitions
 
 Unchanged and still enforced: no production source, console source, deployment configuration,
@@ -139,6 +147,8 @@ was written for. `B6-I0` still requires a fresh `AUTHORIZED_STAGE`.
 {
   "amendment_id": "B5-I9-AMEND-001",
   "amends": "B5I9-BD-04",
+  "revision": "1.1",
+  "authorization_anchor": "latest commit touching this document",
   "node": "TestLocks::test_changed_file_boundary",
   "status": "RATIFIED",
   "no_retroactive_rewrite": true,
