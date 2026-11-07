@@ -459,7 +459,7 @@
   "sha256_inventory": {
     "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
     "research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py": "9bbd21221c8ef24558afb853b136417f68ee305ef95fdbecfcdb449f7ea6c42c",
-    "src/crypto_sensor_fabric/normalization/authority/__init__.py": "fb71f7b238495f6d301a2b527c81f4a660f8bcf9a890b879cc25b5031d721d59",
+    "src/crypto_sensor_fabric/normalization/authority/__init__.py": "6bdc4697621b3d417850b9bd76b2324e83690adb2e22e0f3adba8689a7170d44",
     "src/crypto_sensor_fabric/normalization/common/__init__.py": "a31c1d97e033b9d28a5652463471d07096d2f5a2afa1fac186b46f5543d16c5e",
     "src/crypto_sensor_fabric/normalization/common/comparability.py": "76416ea050b0dab5500a146189daa11bedd5f341aa051dbf254d11f16acd4130",
     "src/crypto_sensor_fabric/normalization/common/methodologies.py": "2f3ec79da6493d9a06ab4e3ae201b3dcf8f527ced80d6afc32231fc7d2100814",

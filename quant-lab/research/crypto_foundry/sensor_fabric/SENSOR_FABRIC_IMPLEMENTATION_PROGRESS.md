@@ -8865,3 +8865,48 @@ STATUS: B5-I09P2C = RATIFICATION_HOLD (P2C-14 FAIL). B5-I09a = OPERATOR_ACCEPTED
 B5-I09b = DEFERRED; B5-I10 = OPERATOR_ACCEPTED (bounded); B5-I11 =
 IMPLEMENTATION_PARTIAL / RATIFICATION_HOLD; B5-I12+, I17, BLOC_06 UNAUTHORIZED;
 RESEARCH = FROZEN. Evidence: BLOC_05_I09P2CR1_INDEPENDENT_AUDIT.md.
+
+## 196 - SENSOR-B5-I09P2d: CUSTODY AUTHORITY, SCOPED VERIFICATION, PIT FAIL-CLOSURE
+
+START 0f0b3195b43a47b88896ef8d1cfa49e2568a581e (local == remote). Repairs only
+the four defects the P2cR1 audit measured; no provider certification, no real
+approval, no fabricated evidence, no invented liquidation transform, no I11
+ratification, no I12/I17 work, no gate promotion.
+
+REPAIRS
+  F-R1-01 custody is BYTES: TrustedCustodyProvider.read_evidence() hands bytes
+  over and authority.evidence_digest() hashes them, so a counterfeit object that
+  echoes the approved digest (or a store that claims integrity for other bytes)
+  is refused. custody_source_authorized stays False: no application owns the
+  store, and operational custody remains unearned.
+  F-R1-02 the verdict is scoped. trust_scope=ECONOMIC_FIELD_BINDING is the only
+  permitted meaning of downstream_trusted, and every verdict enumerates
+  unverified_dimensions (source lineage, venue, instrument, source revision,
+  acquisition lineage, custody-source authority).
+  F-R1-03 RecordVerification enforces its own laws at construction and at
+  validation; assert_trustworthy() catches model_copy(update=...) bypasses with
+  CONTRADICTORY_VERIFICATION. Lineage/instrument/revision claims require proof
+  references this evaluator cannot mint.
+  F-R1-04 an approval stating neither available_at nor available_at_instant is
+  admissible at no instant (PIT_AVAILABILITY_MISSING). Instant precedence,
+  date-only refusal on the same day, offsets and the DST repeated hour are
+  unchanged and re-measured.
+
+PRESERVED: liquidation keeps semantic_mapping_approved=True with
+record_transformation_verified=False and downstream_trusted=False for a
+coordinated rewrite; I10 and I11 behaviour untouched; production manifest
+byte-identical (artifacts == {}, pin 3d707c59...).
+
+VERIFICATION: P2d 39 passed; P2c 43 passed (custody fixture ported from digests
+to bytes only); i09/i10/i11 selection 532 passed / 5 skipped; governance 4
+passed; I05 86/86/0 (+7/7) and I06 14/14/0 (+8/8) reproduce; I09 regenerated
+because its inventory pins the authority module -> 845f1c66... (35 rows, 0 fail,
+3 unresolved); canonical suite 4604 passed, 11 skipped, 0 failed across 11 file-partitioned chunks (4615 collected); ruff clean on the four touched Python
+files; bloc_04 side effects restored, never staged.
+
+DISPOSITION: I09P2D_IMPLEMENTATION_PARTIAL (P2D-05 partial: no application-owned
+custody handle exists). B5-I09P2C remains RATIFICATION_HOLD and is NOT ratified
+here; B5-I09a/I10 unchanged; B5-I09b DEFERRED; B5-I11 IMPLEMENTATION_PARTIAL /
+RATIFICATION_HOLD; B5-I12+, I17, BLOC_06 UNAUTHORIZED; RESEARCH FROZEN.
+Independent P2dR1 audit recommended, NOT executed. Evidence:
+BLOC_05_I09P2D_IMPLEMENTATION_EVIDENCE.md.

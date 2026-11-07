@@ -405,6 +405,10 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
         # intraday-PIT security suite is a distinct checkpoint file under the
         # authority prefix family, admitted by its own named entry.
         "tests/crypto_sensor_fabric/normalization/test_b5_i09p2c_",
+        # DISCLOSED SENSOR-B5-I09P2d: the custody-authority, scoped-verdict and
+        # PIT-fail-closure security suite is a distinct checkpoint file under
+        # the same authority prefix family, admitted by its own named entry.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2d_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
         # DISCLOSED B5-I11R1 (independent audit): the audit suite is a

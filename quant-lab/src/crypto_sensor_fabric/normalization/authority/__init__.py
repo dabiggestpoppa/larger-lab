@@ -79,6 +79,7 @@ __all__ = [
     "resolve_authority_inputs",
     "load_semantic_authority",
     "manifest_digest",
+    "evidence_digest",
 ]
 
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
@@ -420,6 +421,25 @@ def manifest_digest(manifest_bytes: bytes) -> str:
     layer is audited to stay hash-free (I10/I11 scope audits).
     """
     return hashlib.sha256(manifest_bytes).hexdigest()
+
+
+def evidence_digest(blob: bytes) -> str:
+    """SHA-256 of evidence BYTES -- computed here, never asserted by custody.
+
+    SENSOR-B5-I09P2d: the P2c custody boundary asked a provider object for the
+    digest it "held" and believed the answer, so an object holding no bytes
+    could echo the approval's own public digest (P2cR1 F-R1-01).  Verification
+    now hands the bytes over and hashes them HERE -- the module that owns
+    digest verification -- so satisfying custody requires the approved bytes,
+    not a string that repeats the expected value.  Hashing still never
+    happens in the pure sensor layer (I10/I11 scope audits).
+    """
+    if not isinstance(blob, (bytes, bytearray)):
+        raise TypeError(
+            f"evidence_digest hashes bytes, got {type(blob).__name__}; a "
+            "digest string is exactly the claim custody must stop accepting"
+        )
+    return hashlib.sha256(bytes(blob)).hexdigest()
 
 
 def parse_approval_manifest(manifest_bytes: bytes) -> ApprovalManifest:

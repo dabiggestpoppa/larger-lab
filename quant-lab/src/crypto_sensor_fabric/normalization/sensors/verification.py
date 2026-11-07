@@ -36,6 +36,15 @@ What this module deliberately does NOT claim, and says so in its result:
   ``transformation`` string is not proof.  Guessing one would invent provider
   semantics (bloc_05/04 section 3, bloc_05/07 F17).
 
+Custody is verified by BYTES, never by a provider's report about itself: the
+protocol hands over bytes and this module hashes them through the authority
+module, so an object that echoes the approved digest without holding the bytes
+fails (P2cR1 F-R1-01).  ``downstream_trusted`` is scoped to
+``ECONOMIC_FIELD_BINDING`` and every dimension outside that scope is enumerated
+in ``unverified_dimensions`` (F-R1-02); the result model refuses contradictory
+combinations (F-R1-03); and an approval carrying no availability information is
+admissible at no instant (F-R1-04).
+
 Deployment state: ``INTEGRATION_STATE`` is ``INTEGRATION_REQUIRED``.  There is no
 production ingestion application in this repository, so the initializer that
 would read the reviewed manifest at startup does not exist; the boundary is
@@ -55,6 +64,7 @@ from ...storage import IntegrityState, StorageEncoding
 from .. import authority as _authority_pkg
 from ..authority import (
     SemanticAuthority,
+    evidence_digest,
     manifest_digest,
     SemanticAuthorityRefusal,
     load_trusted_authority,
@@ -78,6 +88,7 @@ __all__ = [
     "BlobStoreCustody",
     "RecordVerification",
     "RecordVerificationError",
+    "TRUST_SCOPE_ECONOMIC_FIELD_BINDING",
     "RecordVerificationRefusal",
     "TrustedAuthorityContext",
     "TrustedCustodyProvider",
@@ -94,6 +105,33 @@ _LINEAGE_NOTE = (
     "raw observation bytes are not reconstructible from a normalized record, so "
     "source lineage is not verified here; custody proves the approved evidence "
     "blob is held unchanged, not that the provider authored it"
+)
+
+#: SENSOR-B5-I09P2d: the ONE thing ``downstream_trusted`` is allowed to mean.
+#: The P2cR1 audit measured that the flag read like a full authenticity badge
+#: while venue, instrument, revision and acquisition stayed unauthenticated
+#: (F-R1-02).  The scope is now named, and every dimension outside it is
+#: enumerated in :attr:`RecordVerification.unverified_dimensions`.
+TRUST_SCOPE_ECONOMIC_FIELD_BINDING = "ECONOMIC_FIELD_BINDING"
+
+_SCOPE_NOTE = (
+    "downstream_trusted is scoped to ECONOMIC_FIELD_BINDING only: the declared "
+    "canonical field was re-derived from the approved mapping and the approved "
+    "evidence bytes hash to the digest the approval names. Venue, instrument, "
+    "source revision, acquisition lineage and custody-source authority are NOT "
+    "authenticated and are enumerated in unverified_dimensions"
+)
+
+#: The dimensions this evaluator never establishes, in result order.  A trust
+#: verdict that omitted them would read as an authentication claim it cannot
+#: support (P2cR1 F-R1-02), so they are emitted on every verification.
+_UNVERIFIED_DIMENSIONS: tuple[str, ...] = (
+    "SOURCE_LINEAGE",
+    "VENUE_IDENTITY",
+    "INSTRUMENT_IDENTITY",
+    "SOURCE_REVISION",
+    "ACQUISITION_LINEAGE",
+    "CUSTODY_SOURCE_AUTHORITY",
 )
 
 
@@ -145,6 +183,10 @@ class RecordVerificationRefusal(str, Enum):
     CUSTODY_REQUIRED = "CUSTODY_REQUIRED"
     CUSTODY_UNVERIFIED = "CUSTODY_UNVERIFIED"
 
+    # -- result-level (P2d) ------------------------------------------------
+    PIT_AVAILABILITY_MISSING = "PIT_AVAILABILITY_MISSING"
+    CONTRADICTORY_VERIFICATION = "CONTRADICTORY_VERIFICATION"
+
 
 class RecordVerificationError(ValueError):
     """Typed refusal: ``refusal`` names the link, ``detail`` says why."""
@@ -157,14 +199,22 @@ class RecordVerificationError(ValueError):
 
 @runtime_checkable
 class TrustedCustodyProvider(Protocol):
-    """Custody as a BOUNDARY, not a dictionary.
+    """Custody as BYTES, not as a report about itself.
 
-    An implementation must return the digest it computed from bytes it actually
-    holds, in a store the observation actor cannot rewrite.  Returning ``None``
-    means "not held / not intact" and must never be softened into a default.
+    SENSOR-B5-I09P2d: P2c asked for ``held_digest()`` and believed the answer,
+    so an object that held no bytes but returned the approval's own public
+    digest earned ``custody_verified=True`` and full downstream trust (P2cR1
+    F-R1-01).  The boundary now hands over BYTES and the verifier hashes them
+    itself, so the only way to satisfy ``read_evidence`` is to hold the
+    approved bytes: producing that digest from other bytes is a preimage search.
+
+    Returning ``None`` means "not held / not intact" and is never softened into
+    a default.  Returning bytes proves they are PRESENT and UNCHANGED; it still
+    does not prove who wrote them, which ``source_lineage_verified`` refuses to
+    claim and ``custody_source_authorized`` reports separately.
     """
 
-    def held_digest(self, reference: str) -> str | None: ...
+    def read_evidence(self, reference: str) -> bytes | None: ...
 
 
 class BlobStoreCustody:
@@ -183,17 +233,37 @@ class BlobStoreCustody:
         self._store = store
         self._index = dict(index)
 
-    def held_digest(self, reference: str) -> str | None:
+    def read_evidence(self, reference: str) -> bytes | None:
+        """Return the STORED BYTES, or ``None`` when nothing intact is held.
+
+        The object is re-read and re-verified first, so a mutated object is
+        refused even while the operator index still names the original digest.
+        The verifier hashes what comes back; this adapter never speaks for the
+        bytes it returns.
+        """
         digest = self._index.get(reference)
         if digest is None:
             return None
         try:
             check = self._store.verify_blob(digest, StorageEncoding.NONE)
+            if check.integrity_state is not IntegrityState.LOCAL_HASH_VERIFIED:
+                return None
+            with self._store.open_blob(digest, StorageEncoding.NONE) as handle:
+                return handle.read()
         except Exception:  # a missing or unreadable object is not custody
             return None
-        if check.integrity_state is not IntegrityState.LOCAL_HASH_VERIFIED:
+
+    def held_digest(self, reference: str) -> str | None:
+        """Digest of the bytes ACTUALLY READ, or ``None`` -- inspection only.
+
+        Kept so operators (and the P2c tamper tests) can see what the adapter
+        found; the verifier never calls this, because a digest that travels
+        alone is the exact claim P2d stopped accepting.
+        """
+        blob = self.read_evidence(reference)
+        if blob is None:
             return None
-        return check.observed_hash
+        return evidence_digest(blob)
 
 
 class TrustedAuthorityContext(NormalizationModelBase):
@@ -250,7 +320,23 @@ class TrustedAuthorityContext(NormalizationModelBase):
 
 
 class RecordVerification(NormalizationModelBase):
-    """What was actually established -- six distinct claims, never one badge."""
+    """What was actually established -- distinct claims, never one badge.
+
+    P2d adds three things the P2cR1 audit found missing:
+
+    * ``trust_scope`` names what ``downstream_trusted`` means (one scope only:
+      ``ECONOMIC_FIELD_BINDING``), so the flag can no longer be read as an
+      authenticity badge for the whole record;
+    * ``unverified_dimensions`` enumerates what the verdict does NOT cover, and
+      the laws refuse a downstream verdict that leaves it empty;
+    * ``custody_source_authorized`` stays separate from ``custody_verified``:
+      the second says the approved bytes were handed over and hashed here; the
+      first says an independently controlled application owns that store, and
+      this repository has no such initializer, so it is always ``False``.
+
+    The positive claims are gated on proof references, so a result cannot
+    assert lineage, instrument or revision authenticity it never established.
+    """
 
     model_config = {"extra": "forbid", "frozen": True}
 
@@ -267,8 +353,90 @@ class RecordVerification(NormalizationModelBase):
     instrument_authenticated: bool = False
     source_revision_authenticated: bool = False
     downstream_trusted: bool
+    trust_scope: OpaqueIdentifier = TRUST_SCOPE_ECONOMIC_FIELD_BINDING
+    unverified_dimensions: tuple[OpaqueIdentifier, ...] = ()
+    custody_source_authorized: bool = False
+    lineage_proof: OpaqueIdentifier | None = None
+    instrument_authentication_ref: OpaqueIdentifier | None = None
+    revision_authentication_ref: OpaqueIdentifier | None = None
     fields_verified: tuple[OpaqueIdentifier, ...] = ()
     notes: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def _trust_laws(self) -> RecordVerification:
+        """A verdict may not claim more than its evidence established."""
+        if self.trust_scope != TRUST_SCOPE_ECONOMIC_FIELD_BINDING:
+            raise ValueError(
+                f"trust_scope must be {TRUST_SCOPE_ECONOMIC_FIELD_BINDING!r}; a "
+                "verdict that cannot name its scope cannot be consumed safely"
+            )
+        if self.downstream_trusted:
+            prerequisites = {
+                "semantic_mapping_approved": self.semantic_mapping_approved,
+                "record_transformation_verified": self.record_transformation_verified,
+                "custody_verified": self.custody_verified,
+                "pit_admissible": self.pit_admissible,
+            }
+            absent = sorted(name for name, held in prerequisites.items() if not held)
+            if absent:
+                raise ValueError(
+                    "downstream_trusted requires every in-scope prerequisite; "
+                    f"absent: {absent} (P2cR1 F-R1-03)"
+                )
+            if not self.fields_verified:
+                raise ValueError(
+                    "downstream_trusted requires at least one verified canonical field"
+                )
+            if not self.unverified_dimensions:
+                raise ValueError(
+                    "a downstream verdict must enumerate the dimensions it does NOT "
+                    "cover; an empty list reads as a whole-record authentication "
+                    "claim no evaluator here can support (P2cR1 F-R1-02)"
+                )
+        claimed = {
+            "SOURCE_LINEAGE": self.source_lineage_verified,
+            "INSTRUMENT_IDENTITY": self.instrument_authenticated,
+            "SOURCE_REVISION": self.source_revision_authenticated,
+        }
+        for dimension, held in claimed.items():
+            if held and dimension in self.unverified_dimensions:
+                raise ValueError(
+                    f"{dimension} is claimed authentic and listed as unverified"
+                )
+        if self.source_lineage_verified and self.lineage_proof is None:
+            raise ValueError(
+                "source_lineage_verified requires a lineage proof reference; no "
+                "evaluator in this repository can attest provider authorship"
+            )
+        if self.instrument_authenticated and self.instrument_authentication_ref is None:
+            raise ValueError(
+                "instrument_authenticated requires an approval that actually names "
+                "the instrument; semantic mapping approval is not instrument identity"
+            )
+        if self.source_revision_authenticated and self.revision_authentication_ref is None:
+            raise ValueError(
+                "source_revision_authenticated requires a revision proof reference; "
+                "a preserved revision string is data, not authentication"
+            )
+        return self
+
+    def assert_trustworthy(self) -> None:
+        """Re-run the laws over this object's own payload.
+
+        ``model_copy(update=...)`` is a documented Pydantic bypass: it stamps a
+        new field set without validating.  A consumer that accepts a copied
+        result as final trusted evidence must call this first; the verifier's
+        own results are validated at construction and pass unchanged.
+        """
+        try:
+            RecordVerification.model_validate(self.model_dump())
+        except ValueError as exc:
+            raise RecordVerificationError(
+                RecordVerificationRefusal.CONTRADICTORY_VERIFICATION,
+                "this verification object does not satisfy its own laws; a "
+                "model_copy(update=...) bypass can construct exactly this state, "
+                f"so it must not be consumed as final evidence ({exc})",
+            ) from exc
 
 
 def _map_refusal(refusal: Any) -> RecordVerificationRefusal:
@@ -401,7 +569,12 @@ def _assert_intraday_pit(
         return
     available_date = getattr(authority, "available_at", None)
     if available_date is None:
-        return
+        raise RecordVerificationError(
+            RecordVerificationRefusal.PIT_AVAILABILITY_MISSING,
+            "the approval states neither available_at nor available_at_instant, so "
+            "no cutoff can be shown to postdate it; an approval with no availability "
+            "is admissible at no instant (P2cR1 F-R1-04)",
+        )
     if knowledge_cutoff.date() <= date.fromisoformat(str(available_date)):
         raise RecordVerificationError(
             RecordVerificationRefusal.INTRADAY_PIT_AMBIGUOUS,
@@ -427,18 +600,20 @@ def _custody_verified(
     if not authority.evidence_blobs:
         return False
     for reference, expected in authority.evidence_blobs.items():
-        observed = custody.held_digest(reference)
-        if observed is None:
+        blob = custody.read_evidence(reference)
+        if blob is None:
             raise RecordVerificationError(
                 RecordVerificationRefusal.CUSTODY_UNVERIFIED,
                 f"evidence reference {reference!r} is approved but the trusted "
-                "custody provider holds no intact blob for it",
+                "custody provider handed over no intact bytes for it",
             )
+        observed = evidence_digest(blob)
         if observed != expected:
             raise RecordVerificationError(
                 RecordVerificationRefusal.CUSTODY_UNVERIFIED,
-                f"evidence reference {reference!r} resolves to {observed}, the "
-                f"approval names {expected}",
+                f"the bytes held for {reference!r} hash to {observed}, the "
+                f"approval names {expected}; a custody object's own report is "
+                "not evidence (P2cR1 F-R1-01)",
             )
     return True
 
@@ -563,6 +738,7 @@ def verify_trade_record(
 
     notes = [
         _LINEAGE_NOTE,
+        _SCOPE_NOTE,
         "instrument identity is not part of the approved mapping, so it is "
         "preserved but not authenticated",
         "source revision identity is preserved but not authenticated by a "
@@ -587,6 +763,9 @@ def verify_trade_record(
         instrument_authenticated=False,
         source_revision_authenticated=False,
         downstream_trusted=custody_ok,
+        trust_scope=TRUST_SCOPE_ECONOMIC_FIELD_BINDING,
+        unverified_dimensions=_UNVERIFIED_DIMENSIONS,
+        custody_source_authorized=False,
         fields_verified=(row.canonical_field,),
         notes=tuple(notes),
     )
@@ -688,6 +867,9 @@ def verify_liquidation_record(
             custody_verified=False,
             pit_admissible=False,
             downstream_trusted=False,
+            trust_scope=TRUST_SCOPE_ECONOMIC_FIELD_BINDING,
+            unverified_dimensions=_UNVERIFIED_DIMENSIONS,
+            custody_source_authorized=False,
             fields_verified=(),
             notes=(
                 "the record claims no canonical side, so there is nothing to "
@@ -810,6 +992,7 @@ def verify_liquidation_record(
     custody_ok = _custody_verified(authority, custody)
 
     notes = [
+        _SCOPE_NOTE,
         "no executable liquidation transformation is declared in this repository, "
         "so each canonical value is verified against its admission rather than a "
         "re-executed provider transform; a posteriori mutation of BOTH the record "
@@ -835,6 +1018,9 @@ def verify_liquidation_record(
         instrument_authenticated=False,
         source_revision_authenticated=False,
         downstream_trusted=False,
+        trust_scope=TRUST_SCOPE_ECONOMIC_FIELD_BINDING,
+        unverified_dimensions=_UNVERIFIED_DIMENSIONS,
+        custody_source_authorized=False,
         fields_verified=tuple(verified_fields),
         notes=tuple(notes),
     )

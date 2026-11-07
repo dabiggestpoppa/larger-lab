@@ -333,12 +333,16 @@ def _liq_record(monkeypatch: pytest.MonkeyPatch, **kwargs) -> T1LiquidationRecor
 
 
 class FakeCustody:
-    """Test-only custody provider: an independently held digest index."""
+    """Test-only custody provider: an independently held BYTE store.
 
-    def __init__(self, held: dict[str, str]) -> None:
+    SENSOR-B5-I09P2d: the fixture now holds bytes because the verifier hashes
+    them; a fixture that held digests would be re-testing the defect.
+    """
+
+    def __init__(self, held: dict[str, bytes]) -> None:
         self._held = dict(held)
 
-    def held_digest(self, reference: str) -> str | None:
+    def read_evidence(self, reference: str) -> bytes | None:
         return self._held.get(reference)
 
 
@@ -381,7 +385,7 @@ def test_rec_01_authorized_trade_record_verifies(monkeypatch: pytest.MonkeyPatch
     result = _verify_trade(
         record,
         context=_context(_synthetic_manifest()),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
     )
     assert isinstance(result, RecordVerification)
     assert result.semantic_mapping_approved is True
@@ -421,7 +425,7 @@ def test_rec_02_flipped_canonical_side_is_refused(monkeypatch: pytest.MonkeyPatc
             lambda: _verify_trade(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "CANONICAL_VALUE_MISMATCH"
@@ -437,7 +441,7 @@ def test_rec_03_provider_substitution_is_refused(monkeypatch: pytest.MonkeyPatch
             lambda: _verify_trade(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "PROVIDER_MISMATCH"
@@ -453,7 +457,7 @@ def test_rec_04_instrument_substitution_is_outside_mapping_authority(
     result = _verify_trade(
         forged,
         context=_context(_synthetic_manifest()),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
     )
     assert result.instrument_authenticated is False
     assert any("instrument" in note for note in result.notes)
@@ -469,7 +473,7 @@ def test_rec_05_native_field_substitution_is_refused(
             lambda: _verify_trade(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "NATIVE_FIELD_MISMATCH"
@@ -486,7 +490,7 @@ def test_rec_06_native_value_substitution_is_refused(
             lambda: _verify_trade(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "CANONICAL_VALUE_MISMATCH"
@@ -550,7 +554,7 @@ def test_rec_08_to_11_mutated_provenance_identity_is_refused(
             lambda: _verify_trade(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "PROVENANCE_MISMATCH"
@@ -566,7 +570,7 @@ def test_rec_12_source_revision_is_preserved_not_authenticated(
     result = _verify_trade(
         forged,
         context=_context(_synthetic_manifest()),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
     )
     assert result.source_revision_authenticated is False
 
@@ -586,7 +590,7 @@ def test_rec_13_rec_22_same_day_intraday_cutoff_is_refused(
             lambda: _verify_trade(
                 record,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
                 cutoff=datetime(2026, 3, 1, hour, 0, tzinfo=UTC),
             )
         )
@@ -599,7 +603,7 @@ def test_rec_13_a_later_day_is_admissible(monkeypatch: pytest.MonkeyPatch) -> No
     result = _verify_trade(
         record,
         context=_context(_synthetic_manifest()),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
         cutoff=datetime(2026, 3, 2, 0, 0, tzinfo=UTC),
     )
     assert result.pit_admissible is True
@@ -613,7 +617,7 @@ def test_rec_22_missing_or_naive_cutoff_is_refused(
     assert (
         _refusal(
             lambda: _verify_trade(
-                record, context=context, custody=FakeCustody({REF: DOC_SHA}), cutoff=None
+                record, context=context, custody=FakeCustody({REF: DOC_BYTES}), cutoff=None
             )
         )
         == "PIT_CUTOFF_REQUIRED"
@@ -623,7 +627,7 @@ def test_rec_22_missing_or_naive_cutoff_is_refused(
             lambda: _verify_trade(
                 record,
                 context=context,
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
                 cutoff=datetime(2026, 6, 1, 12, 0),
             )
         )
@@ -640,7 +644,7 @@ def test_rec_23_an_instant_precise_availability_is_honoured(
     okay = _verify_trade(
         record,
         context=_context(manifest),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
         cutoff=datetime(2026, 3, 1, 15, 5, tzinfo=UTC),
     )
     assert okay.pit_admissible is True
@@ -649,7 +653,7 @@ def test_rec_23_an_instant_precise_availability_is_honoured(
             lambda: _verify_trade(
                 record,
                 context=_context(manifest),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
                 cutoff=datetime(2026, 3, 1, 14, 55, tzinfo=UTC),
             )
         )
@@ -685,7 +689,7 @@ def test_rec_14_position_side_substitution_is_refused(
             lambda: _verify_liq(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "CANONICAL_VALUE_MISMATCH"
@@ -703,7 +707,7 @@ def test_rec_15_execution_side_substitution_is_refused(
             lambda: _verify_liq(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "CANONICAL_VALUE_MISMATCH"
@@ -720,7 +724,7 @@ def test_rec_16_aggressor_side_without_an_admission_is_refused(
             lambda: _verify_liq(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "ADMISSION_MISSING"
@@ -737,7 +741,7 @@ def test_rec_17_maker_taker_role_substitution_is_refused(
             lambda: _verify_liq(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "ADMISSION_MISSING"
@@ -755,7 +759,7 @@ def test_rec_18_wrong_provider_liquidation_record_is_refused(
             lambda: _verify_liq(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "PROVIDER_MISMATCH"
@@ -769,7 +773,7 @@ def test_liquidation_reports_transformation_not_executable(
     result = _verify_liq(
         record,
         context=_context(_synthetic_manifest()),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
     )
     assert result.semantic_mapping_approved is True
     assert result.record_transformation_verified is False
@@ -850,7 +854,7 @@ def test_custody_binds_the_reference_the_approval_names(
     result = _verify_trade(
         record,
         context=_context(_synthetic_manifest()),
-        custody=FakeCustody({REF: DOC_SHA}),
+        custody=FakeCustody({REF: DOC_BYTES}),
     )
     assert result.custody_verified is True
     assert (
@@ -858,7 +862,7 @@ def test_custody_binds_the_reference_the_approval_names(
             lambda: _verify_trade(
                 record,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: hashlib.sha256(b"other").hexdigest()}),
+                custody=FakeCustody({REF: b"other"}),
             )
         )
         == "CUSTODY_UNVERIFIED"
@@ -897,7 +901,7 @@ def test_forged_direct_construction_cannot_reach_trust(
             lambda: _verify_trade(
                 forged,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "CANONICAL_VALUE_MISMATCH"
@@ -915,7 +919,7 @@ def test_a_record_without_provenance_cannot_be_verified(
             lambda: _verify_trade(
                 record,
                 context=_context(_synthetic_manifest()),
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "PROVENANCE_MISSING"
@@ -925,8 +929,8 @@ def test_a_record_without_provenance_cannot_be_verified(
 def test_verification_is_deterministic(monkeypatch: pytest.MonkeyPatch) -> None:
     record = _trade_record(monkeypatch)
     context = _context(_synthetic_manifest())
-    first = _verify_trade(record, context=context, custody=FakeCustody({REF: DOC_SHA}))
-    second = _verify_trade(record, context=context, custody=FakeCustody({REF: DOC_SHA}))
+    first = _verify_trade(record, context=context, custody=FakeCustody({REF: DOC_BYTES}))
+    second = _verify_trade(record, context=context, custody=FakeCustody({REF: DOC_BYTES}))
     assert first.model_dump() == second.model_dump()
 
 
@@ -950,7 +954,7 @@ def test_unknown_record_kind_is_refused(monkeypatch: pytest.MonkeyPatch) -> None
                 artifact_bytes=ARTIFACT,
                 methodology_registry=_methodologies(),
                 knowledge_cutoff=CUTOFF,
-                custody=FakeCustody({REF: DOC_SHA}),
+                custody=FakeCustody({REF: DOC_BYTES}),
             )
         )
         == "RECORD_KIND_MISMATCH"
