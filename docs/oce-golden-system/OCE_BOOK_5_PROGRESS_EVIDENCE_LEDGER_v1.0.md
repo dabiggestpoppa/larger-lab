@@ -2240,3 +2240,65 @@ above is executed by the frozen surface on every run.
 
 No ledger write follows this section in the B5-I8 ratification, so the measured
 identity remains exact at the ratification head.
+
+## 21. B5-I9 P0 — factory gate and B6 extraction contract (planning packet)
+
+**Stage.** `AUTHORIZED_STAGE=B5-I9-P0`, executed 2026-11-07 from merged
+`origin/main` `833f7d1b9f2dfec2986fb9516d0abde06bf23dae` (PR #23 merge `833f7d1b9f2dfec2986fb9516d0abde06bf23dae`, parents
+`e999a4a3…` and `a926bd61…`, tree `c674e74f…`). Status `DRAFT FOR OPERATOR REVIEW`;
+implementation `NOT STARTED`; `MERGE_AUTHORIZED = false`.
+
+**Stage identity (derived).** Block 5 plan §7 row `B5-I9` = *Factory gate and B6
+reusable-extraction contract*, gate *Operator-only completion*; plan §6 `B5.C5.S5`
+deliverable *correction ADRs and B6 contract*; roadmap §4 row `I9` = *gate packet, learning
+ledger, downstream contract, operator hold*. B5-I9 is therefore a governed combination of
+factory gate, learning closure, B6 extraction **contract** and operator hold. It is not
+extraction, not packaging of code, not portability engineering, not agent-performed Book 5
+closure, and not Book 6.
+
+**Note on §1.** The increment table above still shows `B5-I9 | LOCKED`. That row sits
+inside the EL09 protected prefix and is historically accurate at the moment it was
+written; it is not edited. This section is the live status.
+
+**Source-to-claim.** Sixteen claims are mapped to their clauses in the contract §2; no
+claim rests on narrative, and each citation names a file and a clause.
+
+**Arithmetic.** 51 requirements — book6_handoff 8, boundary 5, extraction 10, g16 4, no_platform_law 9, packaging 9, stage_identity 6. Bindings: attestation 4, deferred 2, static 4, test 41. States: DEFERRED_WITH_OWNER 2, MAPPED 41, PLANNED 8;
+`PASS` claims `0`. Planned nodes `41` across `5` planned test files (none
+created). Failure classes declared `25` with `25` bound (floor 22). Mutations
+planned `10` (floor 10). Extraction candidates classified `27`.
+
+**Extraction classifications.** `EXTRACTABLE_PATTERN` 7 · `EXTRACTABLE_WITH_LIMITATION` 5 ·
+`REFERENCE_ONLY` 4 · `PLATFORM_INTERNAL` 3 · `PRIVATE_API` 2 · `AUTHORITY_BEARING` 3 ·
+`PROHIBITED` 1 · `DEFERRED_TO_BOOK_6` 1 (the extraction act itself) · `NOT_APPLICABLE` 1.
+No authority-bearing item was promoted, and importability promoted nothing.
+
+**Packaging disposition.** This stage packages evidence, not software. Determinism,
+reproducibility, portability and self-containment are defined measurably (boundary §4);
+`deployable` is not claimed and no runtime package is produced. Release packaging remains
+B5-I6's, templates remain B6's.
+
+**Book 6 handoff.** Seven states are distinguished; evidence-complete and
+implementation-complete are true, governance-complete, B5-I9-complete, authorized and
+started are false, input-ready is true. `BOOK_6_AUTHORIZED = false`,
+`BOOK_6_STARTED = false`, `POST_BOOK_6_EVALUATION = UNSTARTED`. No Book 6 artifact exists.
+
+**G16.** Remains `OPEN` under `B5I8-DF05`, evidence class
+`SAME_AGENT_SINGLE_OPERATOR_NON_BLIND`, owner *Operator (independent auditor distinct from
+the implementer)*. It blocks no B5-I9 planning work and blocks any independence claim. Not
+closed, not packaged as closed.
+
+**Changed-file boundary.** Six new documents, one registry, one read-only validator, this
+section. No production, runtime, frontend, test, workflow or B5-I0–I8 evidence file
+changed.
+
+**Locks.** `MERGE_AUTHORIZED = false`; Book 6 `UNAUTHORIZED`; web view `ABSENT`; cost
+`$0`; cloud/provider mutations `0`; `capital.authority = none`; Freebuff untouched.
+
+**Audit.** `SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT` — SPEC 8.4 · DESIGN 8.2 ·
+CORRECTNESS 8.6 · QUALITY 8.3 → **8.375**.
+
+**Ledger identity.** The protected prefix `[0, 191950)` still hashes to
+`83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`; the size and digest
+before this section were `215081` normalized bytes and `31dd01508571775057731304230f560347ffa15d91d67b5bf57250201280ee81`. This section
+only appends.
