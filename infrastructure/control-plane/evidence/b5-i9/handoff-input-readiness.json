@@ -1,0 +1,122 @@
+{
+  "authorization_token_required": "AUTHORIZED_STAGE=B6-I0",
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "consumable_evidence": [
+    {
+      "item": "ratified Product Charter",
+      "path": "OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md"
+    },
+    {
+      "item": "frozen lifecycle model",
+      "path": "OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md"
+    },
+    {
+      "item": "deterministic kernel contract",
+      "path": "OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md"
+    },
+    {
+      "item": "B5-I4–I8 evidence records",
+      "path": "OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md"
+    },
+    {
+      "item": "refusal and recovery laws",
+      "path": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md"
+    },
+    {
+      "item": "usability limitations including G16",
+      "path": "OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md"
+    },
+    {
+      "item": "extraction classification and limitations",
+      "path": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md"
+    },
+    {
+      "item": "remaining limitations and open decisions",
+      "path": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md"
+    },
+    {
+      "item": "cost and authority boundaries",
+      "path": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md"
+    },
+    {
+      "item": "manifests and hashes",
+      "path": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md"
+    },
+    {
+      "item": "exact merged-main identity",
+      "path": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md"
+    }
+  ],
+  "document_id": "OCE-B5-I9-HANDOFF-READINESS-001",
+  "g16": {
+    "blocker": "B5I8-DF05",
+    "blocks": [
+      "any independence claim"
+    ],
+    "condition": "an independent operator, distinct from the implementer, repeats the usability measurement",
+    "does_not_block": [
+      "B5-I9 planning or implementation"
+    ],
+    "owner": "Operator (independent auditor distinct from the implementer)",
+    "status": "OPEN"
+  },
+  "non_implications": [
+    "input-ready never implies authorized",
+    "authorized never implies started",
+    "evidence completeness never implies governance completeness",
+    "no state transitions on CI success alone",
+    "B5-I9 is not complete because a packet exists"
+  ],
+  "seven_states": [
+    {
+      "owner": "occurred",
+      "source": "B5-I8 §16; ledger §20",
+      "state": "Book 5 evidence complete",
+      "value": true
+    },
+    {
+      "owner": "occurred",
+      "source": "Block 5 plan §7 B5-I1–I8",
+      "state": "Book 5 implementation complete",
+      "value": true
+    },
+    {
+      "owner": "operator",
+      "source": "Block 5 plan §7 gate",
+      "state": "Book 5 governance complete",
+      "value": false
+    },
+    {
+      "owner": "operator",
+      "source": "Block 5 plan §6 B5.C5.S5; ledger §1",
+      "state": "B5-I9 complete",
+      "value": false
+    },
+    {
+      "owner": "occurred",
+      "source": "Block 6 plan dependency; B6-I0 (narrow: upstream evidence only)",
+      "state": "Book 6 input-ready",
+      "value": true
+    },
+    {
+      "owner": "operator",
+      "source": "roadmap §10",
+      "state": "Book 6 authorized",
+      "value": false
+    },
+    {
+      "owner": "operator",
+      "source": "Block 6 plan §1",
+      "state": "Book 6 started",
+      "value": false
+    }
+  ],
+  "stage": "B5-I9-IMPLEMENTATION",
+  "start_conditions": [
+    "fresh operator authorization naming AUTHORIZED_STAGE=B6-I0",
+    "operator review of this stage accepted",
+    "classifications consumed, not re-decided"
+  ],
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "version": "1.0"
+}

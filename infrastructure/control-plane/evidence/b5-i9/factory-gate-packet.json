@@ -1,0 +1,88 @@
+{
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "census_counts": {
+    "AUTHORITY_BEARING": 3,
+    "DEFERRED_TO_BOOK_6": 1,
+    "EXTRACTABLE_PATTERN": 7,
+    "EXTRACTABLE_WITH_LIMITATION": 5,
+    "NOT_APPLICABLE": 1,
+    "PLATFORM_INTERNAL": 3,
+    "PRIVATE_API": 2,
+    "PROHIBITED": 1,
+    "REFERENCE_ONLY": 4
+  },
+  "census_total": 27,
+  "document_id": "OCE-B5-I9-FACTORY-GATE-001",
+  "gate": {
+    "by_binding": {
+      "attestation": 4,
+      "deferred": 2,
+      "static": 4,
+      "test": 41
+    },
+    "by_state": {
+      "DEFERRED_WITH_OWNER": 2,
+      "MAPPED": 41,
+      "PLANNED": 8
+    },
+    "extraction_executed": false,
+    "failure_classes": 25,
+    "implementation_executed": true,
+    "mutations_planned": 10,
+    "pass_claims": 0,
+    "planned_files": 5,
+    "planned_nodes": 41,
+    "requirements_total": 51,
+    "result": "FROZEN_SURFACES_VERIFIED"
+  },
+  "identity": {
+    "components": [
+      {
+        "citation": "OCE_BLOCK_05_REFERENCE_APPLICATION_FACTORY_PLAN_v1.0.md#B5-I9 row",
+        "name": "factory gate"
+      },
+      {
+        "citation": "OCE_BLOCK_05_REFERENCE_APPLICATION_FACTORY_PLAN_v1.0.md#B5.C5.S4",
+        "name": "learning closure"
+      },
+      {
+        "citation": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md#A contract, not an extraction",
+        "name": "B6 reusable-extraction contract"
+      },
+      {
+        "citation": "OCE_BLOCK_05_REFERENCE_APPLICATION_FACTORY_PLAN_v1.0.md#Operator-only completion",
+        "name": "operator hold"
+      }
+    ],
+    "non_identities": [
+      {
+        "citation": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#Freeze extraction decisions",
+        "name": "extraction execution"
+      },
+      {
+        "citation": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md#No packaging of code",
+        "name": "packaging of code"
+      },
+      {
+        "citation": "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md#start Book 6",
+        "name": "Book 6"
+      }
+    ]
+  },
+  "packaging": {
+    "deployable_claim": false,
+    "owner": "B5-I6 release packaging; B6.C1.S3 templates and install sets",
+    "runtime_package_produced": false
+  },
+  "sources": {
+    "acceptance_matrix_sha256": "7267318632900569f350fcb856dd55d78faecc26f0a609af3a7ad2adcbfc4c02",
+    "boundary_sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea",
+    "construction_plan_sha256": "93f2a5a0ed9a4216eca06e66e38bc8349530790c435561dc27d4c73ba913a3d9",
+    "contract_sha256": "ad15c926fdc06d4c67176e895bbfa6f360af01b266a418076e34e0a81fb1cbce",
+    "failure_matrix_sha256": "25c1716ebb7f51efe5295da626d4ff889d300b5e12c6daa8be1672dc410e3ab1",
+    "registry_sha256": "6879f44073184b6ea0afdc178680bb973594b49ed89b977624607525dc57fd51"
+  },
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "version": "1.0"
+}

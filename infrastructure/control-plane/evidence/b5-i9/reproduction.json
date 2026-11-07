@@ -1,0 +1,20 @@
+{
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "document_id": "OCE-B5-I9-REPRODUCTION-001",
+  "guarantees": [
+    "no network access",
+    "no secret or credential input",
+    "no wall-clock, hostname or absolute path in any artifact",
+    "byte-identical regeneration from the same commit"
+  ],
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "steps": [
+    "python infrastructure/control-plane/scripts/b5_i9_factory_gate.py --check",
+    "python infrastructure/control-plane/scripts/b5_i9_factory_gate.py --emit <temporary directory outside the repository>",
+    "python infrastructure/control-plane/scripts/b5_i9_p0_validate.py --self-check",
+    "python -m pytest infrastructure/control-plane/tests/test_b5_i9_stage_identity_and_scope.py infrastructure/control-plane/tests/test_b5_i9_extraction_classification.py infrastructure/control-plane/tests/test_b5_i9_no_platform_extraction.py infrastructure/control-plane/tests/test_b5_i9_packet_packaging_and_provenance.py infrastructure/control-plane/tests/test_b5_i9_book6_handoff.py",
+    "python infrastructure/control-plane/scripts/b5_i9_mutation_battery.py --json <evidence path>"
+  ],
+  "version": "1.0"
+}

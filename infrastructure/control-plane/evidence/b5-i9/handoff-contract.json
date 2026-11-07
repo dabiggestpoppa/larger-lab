@@ -1,0 +1,202 @@
+{
+  "allowed_classes": [
+    "EXTRACTABLE_PATTERN",
+    "EXTRACTABLE_WITH_LIMITATION"
+  ],
+  "allowed_design_inputs": [
+    {
+      "candidate": "Product Charter as a freeze instrument",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C01",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Product lifecycle stages",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C02",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Deterministic kernel contract",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C03",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Read-only client seam",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C04",
+      "limitation": "stdlib-only closure and loopback transport are frozen; copying the import set would freeze a consumer's dependency policy"
+    },
+    {
+      "candidate": "Denial enveloping as a rendering law",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C05",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Recovery drill protocol",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C07",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Evidence laws EL01–EL10",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C09",
+      "limitation": "laws are bound to this repository's paths and frozen manifest rows"
+    },
+    {
+      "candidate": "Manifest computation",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C10",
+      "limitation": "install-set membership is console-specific"
+    },
+    {
+      "candidate": "Mutation battery harness",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C12",
+      "limitation": "targets are this repo's nodes"
+    },
+    {
+      "candidate": "Requirement-test registry shape",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C13",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Failure matrix shape",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C14",
+      "limitation": "none"
+    },
+    {
+      "candidate": "Usability protocol",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C15",
+      "limitation": "single-operator, same-agent, non-blind sample"
+    }
+  ],
+  "authority_owners": {
+    "admission": "control-plane admission gate",
+    "broker": null,
+    "configuration": "control-plane configuration schema",
+    "evidence": "control-plane workflow",
+    "execution": null,
+    "recovery": "control-plane recovery",
+    "refusal_reason": "control-plane refusal vocabulary",
+    "spend": null
+  },
+  "authorization": {
+    "book_6_authorized": false,
+    "book_6_started": false
+  },
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "canonical_state": {
+    "consumer_stores": [],
+    "owner": "control-plane"
+  },
+  "configuration_truth": {
+    "duplicates": [],
+    "source": "control-plane configuration schema"
+  },
+  "contains_extracted_source": false,
+  "deferred": [
+    {
+      "candidate": "The extraction act itself (moving B5-proven surfaces into platform form)",
+      "class": "DEFERRED_TO_BOOK_6",
+      "disposition": "Book 6, after a fresh operator authorization",
+      "id": "C27"
+    }
+  ],
+  "document_id": "OCE-B5-I9-HANDOFF-CONTRACT-001",
+  "excluded_candidates": [
+    {
+      "candidate": "Admission / refusal decision",
+      "class": "AUTHORITY_BEARING",
+      "id": "C06"
+    },
+    {
+      "candidate": "Recovery enactment",
+      "class": "PLATFORM_INTERNAL",
+      "id": "C08"
+    },
+    {
+      "candidate": "CI evidence-selection workflow",
+      "class": "REFERENCE_ONLY",
+      "id": "C11"
+    },
+    {
+      "candidate": "Web view",
+      "class": "NOT_APPLICABLE",
+      "id": "C16"
+    },
+    {
+      "candidate": "Canonical job/event stores",
+      "class": "PLATFORM_INTERNAL",
+      "id": "C17"
+    },
+    {
+      "candidate": "Canonical-state ownership rule",
+      "class": "PROHIBITED",
+      "id": "C18"
+    },
+    {
+      "candidate": "Capability/authority machinery",
+      "class": "AUTHORITY_BEARING",
+      "id": "C19"
+    },
+    {
+      "candidate": "Credential/provider boundaries",
+      "class": "AUTHORITY_BEARING",
+      "id": "C20"
+    },
+    {
+      "candidate": "Persistence boundaries (SQLite paths)",
+      "class": "PLATFORM_INTERNAL",
+      "id": "C21"
+    },
+    {
+      "candidate": "Local deployment assumptions (compose stack)",
+      "class": "REFERENCE_ONLY",
+      "id": "C22"
+    },
+    {
+      "candidate": "Console session records",
+      "class": "REFERENCE_ONLY",
+      "id": "C23"
+    },
+    {
+      "candidate": "Queue-depth panel",
+      "class": "REFERENCE_ONLY",
+      "id": "C24"
+    },
+    {
+      "candidate": "Control-plane health/status API",
+      "class": "PRIVATE_API",
+      "id": "C25"
+    },
+    {
+      "candidate": "Shared test support helpers",
+      "class": "PRIVATE_API",
+      "id": "C26"
+    }
+  ],
+  "files_copied": [],
+  "obligations": [
+    "consume classifications, never re-decide them",
+    "re-derive every design input; copy no source file",
+    "carry each limitation verbatim",
+    "keep canonical state, admission, refusal, recovery and spend inside the owner"
+  ],
+  "public_surface_paths": [],
+  "stage": "B5-I9-IMPLEMENTATION",
+  "start_preconditions": [
+    "AUTHORIZED_STAGE=B6-I0 issued by the operator after this stage's review",
+    "B5-I9 operator review accepted",
+    "no extraction before that authorization"
+  ],
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "title": "proposed Book 6 reusable-extraction contract (proposal, not authorization)",
+  "version": "1.0"
+}

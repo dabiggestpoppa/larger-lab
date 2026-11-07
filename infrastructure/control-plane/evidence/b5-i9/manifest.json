@@ -1,0 +1,110 @@
+{
+  "artifact_count": 10,
+  "artifacts": [
+    {
+      "document_id": "OCE-B5-I9-CENSUS-001",
+      "kind": "json",
+      "path": "classification-census.json",
+      "sha256": "a4f22bc57417a4e174f95e973cc52a05deedbd86f52cbf53ee111350148cb84c",
+      "size_bytes": 23293,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-FACTORY-GATE-001",
+      "kind": "json",
+      "path": "factory-gate-packet.json",
+      "sha256": "0063fefce9afd02a04b520f74d4d0cdeb6af60ad8d17dc74754be7bd47797b54",
+      "size_bytes": 2841,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-G16-LIMITATION-001",
+      "kind": "json",
+      "path": "g16-limitation.json",
+      "sha256": "d6c72c5f1db3369ced08911bbe8df93efc6746cb38b516a0dd9292d474559a9a",
+      "size_bytes": 566,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-HANDOFF-CONTRACT-001",
+      "kind": "json",
+      "path": "handoff-contract.json",
+      "sha256": "d846ea5943a2ee00115357510ca8d76f647b7f006b4328613666655641f251ef",
+      "size_bytes": 5545,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-HANDOFF-READINESS-001",
+      "kind": "json",
+      "path": "handoff-input-readiness.json",
+      "sha256": "d77a7825c55140e88dff60a2d4e8c9ca0a2c8ec31df9e7e1ad8283b47bd58c06",
+      "size_bytes": 3541,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-LEARNING-001",
+      "kind": "json",
+      "path": "learning-closure.json",
+      "sha256": "f1f7112851269bf205be30dd8af39a76f18a8579208bd7490a0820fff3e87ebe",
+      "size_bytes": 4190,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-OPERATOR-HOLD-001",
+      "kind": "json",
+      "path": "operator-hold.json",
+      "sha256": "142b1952e40979caaf04687d3809a04b7c716d4564ec9d6dfea13544fe6aeef7",
+      "size_bytes": 624,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-PROVENANCE-001",
+      "kind": "json",
+      "path": "provenance.json",
+      "sha256": "462bf163da569b5fce65d759b217e69e203c88c5a25f4a5fef118f1614054c52",
+      "size_bytes": 1278,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-REPRODUCTION-001",
+      "kind": "json",
+      "path": "reproduction.json",
+      "sha256": "60754172b56426d4cb858617b2812ae119c1451358a1e25c3793ba46ce759f34",
+      "size_bytes": 1215,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    },
+    {
+      "document_id": "OCE-B5-I9-VALIDATION-001",
+      "kind": "json",
+      "path": "validation.json",
+      "sha256": "81b72e737ba3a215333fe1dbdb1ad1a3da849056e52f78c9f4ffa60465768f9a",
+      "size_bytes": 1429,
+      "stage": "B5-I9-IMPLEMENTATION",
+      "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+      "version": "1.0"
+    }
+  ],
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "document_id": "OCE-B5-I9-MANIFEST-001",
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "version": "1.0"
+}
