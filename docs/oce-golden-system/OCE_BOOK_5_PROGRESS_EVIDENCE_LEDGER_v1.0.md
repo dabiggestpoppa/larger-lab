@@ -2498,3 +2498,77 @@ Book 5 closure follows the ratified definition of *Book 5 governance complete* (
 has ratified the factory gate, Block 5 plan §7 gate *Operator-only completion*), not the mere
 existence of a final numbered stage. G16 remains open with an independent owner and is
 disclosed, not closed. Book 6 requires a fresh `AUTHORIZED_STAGE=B6-I0`.
+
+## 25. B5-I9 post-merge paired-regression proof closure
+
+**Stage:** `AUTHORIZED_STAGE=B5-I9-POST-MERGE-PROOF-CLOSURE`
+**Corrective base:** `139cb7fd2da6648fb513d2caf9c5b80b9a8969b5` (merge of PR #25)
+**Frozen endpoints:** base `e81bef4335de5e222fb6647c602080a129dea543` (tree
+`5fe7d38cb81ae0fdce7fdd4fe73117095fb76c0d`), head
+`9db35aac5c1d9cfbdc5bd902b74c2bb09bfd9d3c` (tree `2d0285f3e718a8b7ceda27a07179b62607dd1556`)
+**Record:** `OCE_B5_I9_POST_MERGE_PAIRED_PROOF_v1.0.md`
+
+### 25.1 The defect
+
+§24 stated that no separate base-versus-head paired artifact was produced and that the full
+population ran only against pull-request merge refs. That gate was mandatory, ordinary merge-ref
+CI is not equivalent, and the closure claim in §24.5 was therefore premature at merge time. No
+exception is accepted. §24 and the ratification commit `9db35aac` remain exactly as written;
+this section supersedes only the closure claim.
+
+### 25.2 The comparison that was owed
+
+Contract `OCE_B5_I9_POST_MERGE_PAIRED_COMPARISON_CONTRACT_v1.0.json`; workflow
+`b5-i9-post-merge-paired-comparison.yml`; comparator
+`infrastructure/control-plane/scripts/b5_i9_paired_compare.py`. Population: every
+`infrastructure/control-plane/tests/test_b5_i[2-9]*.py` file. Each endpoint ran in its own fresh
+clone under one pinned toolchain (ubuntu-24.04, Python 3.12, hash-locked control-plane CI set;
+identical freeze digest `116da2d79d64…` at both ends).
+
+| Endpoint | Files | Collected | Executed | Passed | Failed | Errors | Skipped |
+|---|---|---|---|---|---|---|---|
+| Base `e81bef43…` | 15 | 229 | 229 | 229 | 0 | 0 | 0 |
+| Head `9db35aac…` | 20 | 270 | 270 | 270 | 0 | 0 | 0 |
+
+Common nodes **229** (= measured floor), base-only **0**, head-only **41** (exactly the frozen
+B5-I9 population), duplicates **0**, status transitions **0** (every common node PASS→PASS),
+collection equals execution at both endpoints.
+
+### 25.3 Head-only proofs
+
+Validator `PASS` 172 mandatory checks / 98 candidate inspections / 0 failures; 25 failure
+classes; 10/10 mutations applied and discriminated with byte-exact restoration and a pristine
+rerun; two isolated packet emissions byte-identical (11 files each); manifest re-hashed
+independently (10 rows, 11 files, no mismatch); cleanup `cleanup_ok true` with no residuals.
+
+### 25.4 Corrective CI identity
+
+Corrective head `ed8546ffbc493b8cb1ea24f98dd73fa6b9dcaaa5`: paired-comparison run
+`42416078595` (suite `114911642555`, job `128534361447`, artifact
+`b5-i9-post-merge-paired-42416078595` = `13592045745`, 31 818 B, verdict `PASS` with
+`reasons: []`); B5-I9 factory gate `42416078602` success; B5-I8 audit `42416078596` success;
+B1-I1R `42416078617` success. The evidence head's own identities are appended to PR #26 after
+they exist; none is predicted.
+
+### 25.5 Corrected disposition
+
+```
+PAIRED_REGRESSION_PROOF       = RESTORED
+B5-I9 TECHNICAL IMPLEMENTATION = ACCEPTED
+B5-I9 RATIFICATION            = ACCEPTED (historical procedural defect preserved)
+BOOK_5 GOVERNANCE COMPLETE    = true (now supported by the required comparison)
+G16                           = OPEN (B5I8-DF05)
+BOOK_6_AUTHORIZED             = false
+BOOK_6_STARTED                = false
+POST_BOOK_6_EVALUATION        = UNSTARTED
+REUSABLE_EXTRACTION           = NOT STARTED
+CAPITAL_AUTHORITY             = none
+RECURRING_COST                = $0
+```
+
+### 25.6 Audit
+
+`SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT` — SPEC 8.2 · DESIGN 8.2 · CORRECTNESS 8.0 ·
+QUALITY 8.0 → **8.1** ((8.2 + 8.2 + 8.0 + 8.0) / 4), down from 8.2: a mandatory gate was
+declared satisfied without its proof, and the corrective rung exposed two further defects of its
+own before passing. Green CI did not raise the score.

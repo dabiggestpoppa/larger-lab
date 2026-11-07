@@ -1,0 +1,128 @@
+{
+  "document_id": "OCE-B5-I9-PAIRED-COMPARISON-001",
+  "version": "1.0",
+  "status": "FROZEN",
+  "stage": "AUTHORIZED_STAGE=B5-I9-POST-MERGE-PROOF-CLOSURE",
+  "purpose": "execute and publish the isolated base-versus-head paired regression comparison that was omitted before PR #25 merged",
+  "corrective_branch": "oce-book-5-i9-post-merge-proof-closure",
+  "defect_recorded": {
+    "omitted_gate": "isolated base-versus-head paired comparison before merge",
+    "substitution_rejected": "ordinary pull-request merge-ref CI is not equivalent to the frozen paired comparison",
+    "affected_claim": "BOOK_5 GOVERNANCE COMPLETE was premature at merge time",
+    "history_policy": "append-only supersession; no ratification or implementation commit is rewritten"
+  },
+  "endpoints": {
+    "base_sha": "e81bef4335de5e222fb6647c602080a129dea543",
+    "base_tree": "5fe7d38cb81ae0fdce7fdd4fe73117095fb76c0d",
+    "head_sha": "9db35aac5c1d9cfbdc5bd902b74c2bb09bfd9d3c",
+    "head_tree": "2d0285f3e718a8b7ceda27a07179b62607dd1556",
+    "merge_sha": "139cb7fd2da6648fb513d2caf9c5b80b9a8969b5",
+    "merge_tree": "2d0285f3e718a8b7ceda27a07179b62607dd1556",
+    "frozen": true,
+    "note": "BASE_SHA is the pre-merge main that PR #25 targeted; HEAD_SHA is the exact B5-I9 ratification head. Neither endpoint is replaced by the corrective branch or by any later commit."
+  },
+  "population": {
+    "selection_rule": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
+    "base_files_measured": 15,
+    "head_files_expected": 20,
+    "base_nodes_measured": 229,
+    "head_nodes_expected": 270,
+    "common_floor": 229,
+    "head_only_expected": 41,
+    "head_only_prefix": "test_b5_i9_",
+    "surface": "the complete pre-existing governed Book 5 control-plane validation population (B5-I2 through B5-I8) plus the B5-I9 implementation population",
+    "exclusions": [
+      "B5-I9's five files at base: they do not exist at BASE_SHA, so they are a legitimate head-only population, not a common-node substitute",
+      "cloud-ground Book 1 validation runner: unchanged by this branch and separately exercised by B1-I1R on the pull request; it is not part of the Book 5 population this stage compares"
+    ]
+  },
+  "environment": {
+    "runner": "ubuntu-24.04",
+    "python": "3.12",
+    "dependency_locks": [
+      "infrastructure/control-plane/requirements-ci.lock.txt"
+    ],
+    "install": "python -m pip install --upgrade pip && pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt",
+    "pytest_pin": ">=9.0.3",
+    "shared_toolchain": "one job installs once so both endpoints execute with identical dependency versions",
+    "isolated_checkouts": "git clone --no-hardlinks file://<workspace> <tmp> per endpoint, detached at the frozen SHA",
+    "shared_state": "none: no cache action, no shared virtual environment, no shared result path between endpoints",
+    "lfs": "smudge skipped: no surface in this population consumes LFS objects; pointer files keep worktrees clean"
+  },
+  "commands": {
+    "collect": "python -m pytest <files> --collect-only -q -o addopts=",
+    "execute": "python -m pytest <files> -q --tb=short -o addopts= --junitxml=<junit>",
+    "identity_check": "git rev-parse HEAD and HEAD^{tree} must equal the frozen SHA and tree, and the worktree must be clean",
+    "head_only_proofs": [
+      "python infrastructure/control-plane/scripts/b5_i9_p0_validate.py --json",
+      "python infrastructure/control-plane/scripts/b5_i9_mutation_battery.py --json <artifact>",
+      "python infrastructure/control-plane/scripts/b5_i9_factory_gate.py --emit <tmp-a> twice, then diff -r",
+      "python infrastructure/control-plane/scripts/b5_i9_paired_compare.py --verify-manifest <repo-root> --json <artifact>"
+    ]
+  },
+  "node_identity": {
+    "rule": "junit classname + '::' + name",
+    "rationale": "junit keys are stable across both endpoints because common modules keep their dotted module path and test names",
+    "collection_cross_check": "the collected-node count must equal the junit testcase count at each endpoint",
+    "duplicate_rule": "any duplicate junit key at either endpoint is a hard failure",
+    "orphan_rule": "no head-only key may fall outside the B5-I9 prefix; no base-only key may exist"
+  },
+  "status_rules": {
+    "pass": "no failure, error or skipped child element",
+    "transitions": "every common node's head status must be PASS; a common node that was PASS at base and is not PASS at head is a regression",
+    "zero_skip": "head skipped count must be 0",
+    "collection_equals_execution": "junit tests must equal the collected count at each endpoint"
+  },
+  "head_only_rules": {
+    "count": 41,
+    "prefix": "test_b5_i9_",
+    "status": "every head-only node must be PASS",
+    "note": "NEW_TESTS_AT_HEAD_ONLY alone is never sufficient proof; it is only accepted alongside a non-zero common population that meets the floor with zero status regressions"
+  },
+  "proof_obligations": {
+    "validator": "status PASS, failures 0",
+    "failure_classes": 25,
+    "mutations": "10 applied, 10 discriminated, byte-exact restore, pristine rerun green",
+    "determinism": "two isolated packet emissions byte-identical",
+    "manifest": "every row's SHA-256 and size recomputed by the comparator, not by the generator",
+    "cleanup": "both clones and every comparison-created directory removed, residuals empty",
+    "g16": "OPEN",
+    "book_6": "not authorized, not started"
+  },
+  "cleanup": {
+    "clones": [
+      "$RUNNER_TEMP/b5i9-base",
+      "$RUNNER_TEMP/b5i9-head"
+    ],
+    "temporary": [
+      "$RUNNER_TEMP/b5i9-art/emit-a",
+      "$RUNNER_TEMP/b5i9-art/emit-b"
+    ],
+    "rule": "cleanup runs even on failure; residual paths fail the proof"
+  },
+  "fail_closed_conditions": [
+    "endpoint SHA or tree mismatch",
+    "dirty endpoint worktree",
+    "B5-I9 files present at base",
+    "common population of zero",
+    "common population below the measured floor",
+    "any base-only node",
+    "any duplicate node id",
+    "any common-node status regression",
+    "head skipped count above zero",
+    "head-only count different from 41 or outside the B5-I9 prefix",
+    "validator not PASS",
+    "mutation battery below 10/10 or restoration not byte-exact",
+    "packet regeneration not byte-identical",
+    "manifest mismatch",
+    "cleanup residual present",
+    "any missing evidence file"
+  ],
+  "non_goals": [
+    "Book 6",
+    "reusable extraction",
+    "post-Book-6 evaluation",
+    "any change to production code, tests, workflows or frozen evidence of B5-I0 through B5-I8",
+    "any rewrite of the B5-I9 implementation or ratification history"
+  ]
+}
