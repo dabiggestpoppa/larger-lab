@@ -107,11 +107,14 @@ def validate():
     reqs = reg["requirements"]
     ids = [r["id"] for r in reqs]
     status = reg["status"]
+    impl = reg.get("implementation") or {}
+    IMPLEMENTED = impl.get("status") == "IMPLEMENTED_PENDING_OPERATOR_REVIEW"
 
     check("registry/kind", reg["kind"] == "oce-b5-i9-requirement-test-registry", reg["kind"])
     check("registry/base_sha", reg["base_sha"] == BASE, reg["base_sha"])
     check("registry/status_known", status in {STATUS_DRAFT, STATUS_RATIFIED}, status)
-    check("registry/implementation", reg["implementation_status"] == "NOT_STARTED",
+    expected = "IMPLEMENTED" if IMPLEMENTED else "NOT_STARTED"
+    check("registry/implementation", reg["implementation_status"] == expected,
           reg["implementation_status"])
     check("ids/unique", len(ids) == len(set(ids)), "duplicate requirement id")
     check("ids/format", all(re.fullmatch(r"B5I9-[A-Z]{2}-\d{2}", i) for i in ids),
@@ -163,7 +166,9 @@ def validate():
     check("nodes/unique", len(nodes) == len(set(nodes)), "duplicate planned node")
     inventory = []
     for f in reg["planned_surface"]["files"]:
-        check("nodes/plan_only", not (ROOT / f["path"]).exists(), f["path"])
+        target = ROOT / "infrastructure/control-plane" / f["path"]
+        check("nodes/plan_only", target.exists() if IMPLEMENTED else not target.exists(),
+              f["path"])
         inventory.extend(f["nodes"])
     check("nodes/inventory_matches", sorted(inventory) == sorted(nodes),
           set(inventory) ^ set(nodes))
@@ -179,6 +184,20 @@ def validate():
     check("nodes/class_qualified",
           all("::" in n and n.split("::")[0].startswith("Test") for n in nodes),
           [n for n in nodes if "::" not in n])
+    if IMPLEMENTED:
+        import ast as _ast
+        harvested = []
+        for f in reg["planned_surface"]["files"]:
+            src = (ROOT / "infrastructure/control-plane" / f["path"]).read_text(encoding="utf-8")
+            for node in _ast.parse(src).body:
+                if isinstance(node, _ast.ClassDef):
+                    for item in node.body:
+                        if isinstance(item, _ast.FunctionDef) and item.name.startswith("test_"):
+                            harvested.append("{}::{}".format(node.name, item.name))
+        check("nodes/executable_inventory", sorted(harvested) == sorted(nodes),
+              sorted(set(harvested) ^ set(nodes)))
+        check("nodes/no_orphans", len(harvested) == len(set(harvested)) == len(nodes),
+              (len(harvested), len(set(harvested)), len(nodes)))
 
     deferred = [r for r in reqs if r["binding"] == "deferred"]
     check("deferred/owner", all(r.get("deferred_owner") and r.get("future_stage")
@@ -213,6 +232,15 @@ def validate():
     for m in reg["mutations"]:
         candidate("mutation/row_" + m["id"], ("| `" + m["id"] + "` |") in fm,
                   "missing mutation row")
+    if IMPLEMENTED:
+        check("mutation/executed", impl.get("nodes_executed") == len(nodes),
+              (impl.get("nodes_executed"), len(nodes)))
+        mutated = impl.get("mutations_executed") or 0
+        check("mutation/mutations_executed", mutated == len(muts), (mutated, len(muts)))
+        check("mutation/floor_executed", mutated >= arith["mutation_floor"], mutated)
+        check("mutation/failure_classes_executed",
+              impl.get("failure_classes_executed") == len(declared),
+              impl.get("failure_classes_executed"))
 
     # ------------------------------------------------------------ classification boundary
     bnd = norm(BOUNDARY)
@@ -257,7 +285,16 @@ def validate():
 
     # ------------------------------------------------------------ status coherence
     ctr = norm(CONTRACT)
-    if status == STATUS_DRAFT:
+    if IMPLEMENTED:
+        tokens = ["B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN",
+                  "B5-I9 IMPLEMENTATION          = IMPLEMENTED — PENDING OPERATOR REVIEW",
+                  "MERGE_AUTHORIZED              = false",
+                  "BOOK_6_AUTHORIZED             = false",
+                  "BOOK_6_STARTED                = false",
+                  "POST_BOOK_6_EVALUATION        = UNSTARTED"]
+        check("status/ratification_present", (DOCS / RATIFICATION).exists(),
+              "implemented status without a ratification record")
+    elif status == STATUS_DRAFT:
         tokens = ["B5-I9 P0 = DRAFT FOR OPERATOR REVIEW", "B5-I9 IMPLEMENTATION = NOT STARTED",
                   "MERGE_AUTHORIZED              = false", "BOOK_6_AUTHORIZED             = false",
                   "BOOK_6_STARTED                = false",
@@ -284,7 +321,12 @@ def validate():
     check("handoff/book6_not_started", locks["book_6_started"] is False, "started")
     check("handoff/evaluation_unstarted", locks["post_book_6_evaluation"] == "UNSTARTED",
           locks["post_book_6_evaluation"])
-    if status == STATUS_DRAFT:
+    if IMPLEMENTED:
+        check("handoff/merge_false", locks["merge_authorized"] is False,
+              "merge authorized at implementation stage")
+        check("handoff/contract_ratified", locks.get("book_6_contract_ratified") is True,
+              locks.get("book_6_contract_ratified"))
+    elif status == STATUS_DRAFT:
         check("handoff/merge_false", locks["merge_authorized"] is False, "merge authorized")
         check("handoff/contract_not_ratified",
               locks.get("book_6_contract_ratified") is False,
@@ -314,12 +356,18 @@ def validate():
     # ------------------------------------------------------------ file boundary (aggregate)
     allowed = {"docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
                "infrastructure/control-plane/scripts/b5_i9_p0_validate.py"}
-    prefix = "docs/oce-golden-system/OCE_B5_I9_"
+    prefixes = ["docs/oce-golden-system/OCE_B5_I9_"]
+    if IMPLEMENTED:
+        prefixes += ["infrastructure/control-plane/tests/test_b5_i9_",
+                     "infrastructure/control-plane/src/oce_control/b5_i9_gate.py",
+                     "infrastructure/control-plane/scripts/b5_i9_",
+                     "infrastructure/control-plane/evidence/b5-i9/",
+                     ".github/workflows/b5-i9-"]
     status_lines = [l for l in git("status", "--porcelain", "--untracked-files=all").stdout.splitlines() if l.strip()]
     offenders, untracked = [], []
     for line in status_lines:
         path = line[3:].strip().strip('"').replace("\\", "/")
-        ok = path.startswith(prefix) or path in allowed
+        ok = any(path.startswith(p) for p in prefixes) or path in allowed
         if line.startswith("??"):
             untracked.append(path)
         if not ok:
@@ -327,19 +375,68 @@ def validate():
     check("boundary/paths_authorized", not offenders, offenders)
     warnings.append("git candidates scanned: {} (untracked {})".format(
         len(status_lines), len(untracked)))
-    check("boundary/no_test_artifact",
-          not list(ROOT.glob("infrastructure/control-plane/tests/test_b5_i9_*.py")),
-          "a B5-I9 test file exists")
-    check("boundary/no_workflow_artifact",
-          not [p for p in (ROOT / ".github/workflows").glob("*.yml")
-               if "b5_i9" in p.read_text(encoding="utf-8", errors="ignore").lower()],
-          "a workflow mentions b5_i9")
-    check("boundary/no_book6_artifact",
-          not [p for p in ROOT.rglob("*") if p.is_file()
-               and re.search(r"(book[_-]?6|b6)[_-]", p.name.lower())
-               and ".git" not in p.parts], "a Book 6 artifact exists")
+    test_files = sorted(ROOT.glob("infrastructure/control-plane/tests/test_b5_i9_*.py"))
+    workflows = sorted(p for p in (ROOT / ".github/workflows").glob("*.yml")
+                       if "b5_i9" in p.read_text(encoding="utf-8", errors="ignore").lower())
+    if IMPLEMENTED:
+        check("boundary/no_test_artifact", len(test_files) == len(reg["planned_surface"]["files"]),
+              [p.name for p in test_files])
+        check("boundary/no_workflow_artifact", len(workflows) == 1,
+              [p.name for p in workflows])
+        if workflows:
+            wf = workflows[0].read_text(encoding="utf-8")
+            for f in reg["planned_surface"]["files"]:
+                check("selection/" + f["path"], f["path"] in wf, "not selected: " + f["path"])
+            check("selection/validator", "b5_i9_p0_validate.py" in wf, "validator not invoked")
+            check("selection/battery", "b5_i9_mutation_battery.py" in wf, "battery not invoked")
+            check("selection/reproduce", "--check" in wf, "packet not reproduced")
+    else:
+        check("boundary/no_test_artifact", not test_files, "a B5-I9 test file exists")
+        check("boundary/no_workflow_artifact", not workflows, "a workflow mentions b5_i9")
+    exempt = {f["path"].split("/")[-1] for f in reg["planned_surface"]["files"]}
+    if IMPLEMENTED:
+        exempt |= {p.name for p in (ROOT / "infrastructure/control-plane/evidence/b5-i9").glob("*")}
+    book6 = [p for p in ROOT.rglob("*") if p.is_file()
+             and re.search(r"(book[_-]?6|b6)[_-]", p.name.lower())
+             and ".git" not in p.parts and "__pycache__" not in p.parts
+             and p.name not in exempt]
+    check("boundary/no_book6_artifact", not book6, [p.name for p in book6])
     check("boundary/no_web_view_change", not any("frontend" in p for p in offenders),
           "frontend changed")
+
+    # ------------------------------------------------------------ implemented packet
+    if IMPLEMENTED:
+        packet_dir = ROOT / "infrastructure/control-plane/evidence/b5-i9"
+        check("packet/present", (packet_dir / "manifest.json").exists(), "no manifest")
+        if (packet_dir / "manifest.json").exists():
+            man = json.loads((packet_dir / "manifest.json").read_text(encoding="utf-8"))
+            check("packet/artifact_count", man["artifact_count"] == len(man["artifacts"]),
+                  man["artifact_count"])
+            for row in man["artifacts"]:
+                body = (packet_dir / row["path"]).read_bytes().replace(b"\r\n", b"\n")
+                check("packet/hash_" + row["path"],
+                      hashlib.sha256(body).hexdigest() == row["sha256"]
+                      and len(body) == row["size_bytes"], row["path"])
+        validation = packet_dir / "validation.json"
+        check("packet/validation_present", validation.exists(), "no validation.json")
+        if validation.exists():
+            doc = json.loads(validation.read_text(encoding="utf-8"))
+            check("packet/validation_clean", doc["failures"] == 0, doc["failures"])
+            check("packet/validation_count", doc["checks_total"] >= 10, doc["checks_total"])
+        gen = subprocess.run(
+            [sys.executable, str(ROOT / "infrastructure/control-plane/scripts/b5_i9_factory_gate.py"),
+             "--check"], cwd=ROOT, capture_output=True, text=True)
+        check("packet/deterministic", gen.returncode == 0, (gen.stdout + gen.stderr)[-300:])
+        battery = subprocess.run(
+            [sys.executable, str(ROOT / "infrastructure/control-plane/scripts/b5_i9_mutation_battery.py"),
+             "--json", str(ROOT / ".b5i9-battery-check.json")], cwd=ROOT,
+            capture_output=True, text=True)
+        check("mutation/battery_green", battery.returncode == 0,
+              (battery.stdout + battery.stderr)[-300:])
+        residue = ROOT / ".b5i9-battery-check.json"
+        if residue.exists():
+            residue.unlink()
+        check("boundary/no_scratch_residue", not residue.exists(), str(residue))
 
     # ------------------------------------------------------------ style, secrets, prefix
     for name in DELIVERABLES:

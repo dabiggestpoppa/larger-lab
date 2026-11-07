@@ -2357,3 +2357,67 @@ CORRECTNESS 8.7 · QUALITY 8.4 → **8.5**, superseding 8.375.
 **Ledger identity.** The protected prefix `[0, 191950)` still hashes to
 `83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`. Size and digest before
 this section were recorded in §21; this section only appends.
+
+---
+
+## 23. B5-I9 implementation
+
+**Stage:** `AUTHORIZED_STAGE=B5-I9-IMPLEMENTATION`
+**Base:** `e81bef4335de5e222fb6647c602080a129dea543` (merged `origin/main`, PR #24)
+**Status:** implementation executed; operator review pending; Book 6 unauthorized.
+
+### 23.1 What was built
+
+A deterministic factory-gate generator (`infrastructure/control-plane/scripts/b5_i9_factory_gate.py`
+over `infrastructure/control-plane/src/oce_control/b5_i9_gate.py`) turns the ratified packet
+into a governed, byte-reproducible evidence set under
+`infrastructure/control-plane/evidence/b5-i9/`: the factory-gate packet, the 27-candidate
+classification census, the learning closure, the proposed Book 6 extraction contract, the
+Book 6 input-readiness record, provenance, the operator hold, the machine-readable validation
+result and a manifest whose hashes and sizes are recomputed from bytes.
+
+The five planned test files hold exactly the 41 frozen nodes. The 25 failure classes and the
+10 frozen mutations are executed by `infrastructure/control-plane/scripts/b5_i9_mutation_battery.py`,
+which mutates copies only, requires each named discriminator to go red, restores byte-exact
+bytes and requires a pristine green rerun. `infrastructure/control-plane/scripts/b5_i9_p0_validate.py`
+gained an implementation branch: every P0 check is retained, and the planned surface, the
+workflow selection, the packet manifest, the deterministic reproduction and the battery are
+now mandatory checks.
+
+### 23.2 What did not happen
+
+No software was extracted. No file under the control plane was copied, re-exported or
+relabelled into a package, library, template, plugin, SDK or platform. No package was
+published, nothing was deployed, no cloud resource, provider, telemetry, credential or
+secret was introduced, and no Book 6 branch, folder, test, source or evidence file exists.
+
+### 23.3 Learning carried forward
+
+The learning closure records eight observations, including: the validator's P0 boundary
+checks are stage-scoped (L01); the frozen `book6-`/`b6-` filename rule false-positives on the
+frozen planned surface (L02, L07); the frozen 41-node inventory forbids adding the mutation
+discriminators as extra nodes (L03); two P0 observable strings said 26 where the table,
+arithmetic and total say 27 (L04); and two validator defects found while implementing (L05,
+L08). Each observation carries its correction and is not discarded.
+
+### 23.4 Verification
+
+Local exact-tree results are recorded in
+`OCE_B5_I9_IMPLEMENTATION_EVIDENCE_v1.0.md` together with the exact-head CI run, suite, job
+and artifact identities once those runs exist. No CI identity is written before it exists.
+
+### 23.5 Locks
+
+```
+B5-I9 COMPLETE                = false
+BOOK_5 GOVERNANCE COMPLETE    = false
+MERGE_AUTHORIZED              = false
+RATIFICATION_AUTHORIZED       = false
+BOOK_6 AUTHORIZED             = false
+BOOK_6 CONTRACT_RATIFIED      = true
+POST_BOOK_6_EVALUATION        = UNSTARTED
+G16                           = OPEN (B5I8-DF05)
+CAPITAL_AUTHORITY             = none
+RECURRING_COST                = $0
+BOOK_6_AUTHORIZED = false
+```
