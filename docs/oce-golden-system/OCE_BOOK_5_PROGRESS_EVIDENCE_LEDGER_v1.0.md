@@ -2572,3 +2572,26 @@ RECURRING_COST                = $0
 QUALITY 8.0 → **8.1** ((8.2 + 8.2 + 8.0 + 8.0) / 4), down from 8.2: a mandatory gate was
 declared satisfied without its proof, and the corrective rung exposed two further defects of its
 own before passing. Green CI did not raise the score.
+
+## 26. B5-I9 post-merge closure record
+
+**Corrective merge:** PR #26 `OCE Book 5 B5-I9 — post-merge paired-regression proof closure`,
+merged `2026-11-07T21:45:18Z` as `26add84a7ddd342a4e8155d21482b465c44208bd`.
+
+**Topology.** First parent `139cb7fd2da6648fb513d2caf9c5b80b9a8969b5` (exact pre-correction
+main), second parent `c27951214bb14e7585742e0a943e6c994e9a9f55` (exact corrective evidence head),
+merge tree `666153fdc06df94e1e358b9c6de4db79c6fe186b` equal to the corrective-head tree. Normal
+two-parent merge only: no squash, rebase, amend, reset or force-push; the corrective branch is
+retained at `c2795121…`; PR #25, `9db35aac` and `455a8ff0` remain reachable; no history rewritten.
+
+**Evidence-head CI (`c2795121…`).** Paired comparison run `42416712785` SUCCESS, verdict `PASS`,
+`reasons: []`, artifact `b5-i9-post-merge-paired-42416712785` = `13592240170` (31 803 B); B5-I9
+factory gate `42416712769`; B5-I8 audit `42416712793`; B1-I1R `42416712791` — all SUCCESS. The
+first corrective rung `ed8546ff…` carries paired `42416078595` and artifact `13592045745`.
+
+**Disposition.** §25.5 takes effect at this merge: it was recorded at `c2795121…`, which became
+authoritative only when `26add84a` landed on `main`. `PAIRED_REGRESSION_PROOF = RESTORED`,
+B5-I9 technical implementation and ratification accepted with the historical procedural defect
+preserved, `BOOK_5 GOVERNANCE COMPLETE = true`, `G16 = OPEN (B5I8-DF05)`,
+`BOOK_6_AUTHORIZED = false`, `BOOK_6_STARTED = false`, reusable extraction not started,
+post-Book-6 evaluation system not started, `capital.authority = none`, recurring cost `$0`.
