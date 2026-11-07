@@ -9,7 +9,43 @@
 
 ## Current Phase
 
-**P3 — IN PROGRESS (I0 + C01–C05 landed, plus R1–R3 repairs + A1/A2 structure passes + C06–C12; 1315/1315 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. Tranche 1 delivered the discovery *contract* layer: plan domain, adapter port + leads, internal-first baseline, canonical merge/families/ranking/saturation, and the terminal artifact assembler. Not yet delivered: GitHub adapter with egress authority, Research Mesh delegation seam, IT/T01 qualification, freeze. P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`); no P2 repair is open.
+**P3 — PARKED IN PLACE (I0 + C01–C12 landed, R1–R3 repairs + A1/A2/C06–C12 completed; 1315/1315 LOCAL TEST EVIDENCE)** — Discovery Vertical Slice. P3 work preserved unchanged; no P3 capability added during this repair.
+
+**P2-R5 — ACTIVE NOW (substrate closure beneath parked P3)** — repairs to the P2 substrate that remained internally inconsistent while P3 advanced: (K) false per-suite evidence attribution, (L) schema authority inconsistency (user_version=1 vs runtime schema_version=4 vs historical V3_TO_V4 mutation), (M) historical grant not bound to current verdict, (N) backup manifest omits `runtime_execution`/`governance_approval_use`, (O) untyped no-work CLI result.
+
+P2 is FROZEN / OPERATOR-REVIEWED + R1–R4 COMPLETE (LOCAL TEST EVIDENCE: 1108/1108 at `f2fc7757`).
+
+## P2-R5-I0 — Reconciliation Ledger + Baseline (this commit)
+
+**P3 was started after P2-R4 before operator R5 review completed.** P3 is not invalid; it is parked.
+
+**Recorded state:**
+
+| Field | Value |
+| --- | --- |
+| P3_IMPLEMENTATION_PARKED | TRUE |
+| P3_WORK_PRESERVED | TRUE |
+| P3_EXTERNAL_EGRESS_NOT_STARTED | TRUE |
+| P2_R5_REPAIR_ACTIVE | TRUE |
+| Start head (live P3 head) | `a1ed4b842992c72935c62aa16e6b2dfc7bbb3375` |
+| Predecessor P2-R4 freeze | `P2-R4-freeze-manifest.json` at `65ca004b`, blockers `[]` |
+| Current P3 local test claim | `1315 / 1315` LOCAL TEST EVIDENCE |
+
+**Findings requiring repair (confirmed at start head):**
+
+| ID | Finding | Repair |
+| --- | --- | --- |
+| K | R4 evidence attribution is false at per-suite level: generator runs `qcae/tests/acceptance` once and copies aggregate 14/14 counts into per-file blocks that do not each contain 14 tests; per-window crash booleans are hardcoded `True`. | C01: truthful per-suite + per-node crash evidence; remove dead crash-harness code. |
+| L | Schema authority inconsistent: `sqlite_metadata_store.SCHEMA_VERSION = 1`, `open_metadata_db` writes `PRAGMA user_version = 1`, but `build_local_runtime` constructs `LocalRuntimeService(schema_version=4)` and does not run `MigrationRunner`. Runtime can report schema 4 while durable DB reports schema 1; `V3_TO_V4` DDL was mutated after becoming historical truth. | C02: one canonical `CURRENT_SCHEMA_VERSION` (=5), migration chain v3→v4→v5 (`V4_TO_V5` additive for `governance_approval_use`), historical migrations immutable, production startup migrates, legacy misversioned DB classification. |
+| M | `_grant_admits(job_id, step_id, principal)` consumes an old grant without comparing the current verdict's action/resource/scope/authority requirement/binding against the approved request. | C03: live-verdict approval binding + provider-neutral `ApprovalAdmissionProvider` port; live binding digest == approved binding digest before consumption. |
+| N | Backup manifest row-count coverage omits `runtime_execution` and `governance_approval_use` (the latter is authority truth: "this grant has already been consumed"). | C05: extend backup/restore manifest coverage + disaster tests A & B. |
+| O | `qcae job run` on a valid future/not-runnable job returns bare `exit 1` "no eligible step to run", collapsing unknown jobs into the same operator experience. | C06: typed `NO_RUNNABLE_STEP / NOT_READY` outcome with reasons (`FUTURE_NOT_BEFORE`, `DEPENDENCY_PENDING`, `WAITING_POLICY`, `WAITING_INPUT`, `ACTIVE_LEASE`, `TERMINAL_JOB`, `UNKNOWN_JOB`), distinct exit code, structured JSON output. |
+
+**Baseline (to be recorded after this commit runs):**
+
+`python -m pytest qcae/tests -q` at start head `a1ed4b84` — actual result pending.
+
+Commit: `P2-R5-I0`.
 
 ### P3-I0 — Phase Start / Plan Lock (this commit)
 
