@@ -2,7 +2,7 @@
 
 **Document ID:** OCE-B5-I9-CONSTRUCTION-001
 **Version:** 1.0
-**Status:** `B5-I9 P0 = DRAFT FOR OPERATOR REVIEW` — implementation NOT STARTED
+**Status:** `B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN` — implementation NOT STARTED
 **Base:** `833f7d1b9f2dfec2986fb9516d0abde06bf23dae`
 
 ---

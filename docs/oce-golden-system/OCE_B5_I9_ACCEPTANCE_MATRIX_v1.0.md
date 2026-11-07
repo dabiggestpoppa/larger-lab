@@ -2,7 +2,7 @@
 
 **Document ID:** OCE-B5-I9-ACCEPTANCE-001
 **Version:** 1.0
-**Status:** `B5-I9 P0 = DRAFT FOR OPERATOR REVIEW`
+**Status:** `B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN`
 **Registry:** `OCE_B5_I9_REQUIREMENT_TEST_REGISTRY_v1.0.json` (canonical; this matrix is derived and must not drift from it)
 **Base:** `833f7d1b9f2dfec2986fb9516d0abde06bf23dae`
 
@@ -97,4 +97,4 @@ class is bound by at least one requirement, and every requirement's class is dec
 Acceptance is not "the documents exist". It requires the 37 planned nodes to execute,
 the 10 mutations to be discriminated with byte-exact restoration, a pristine rerun to
 match, and the operator to ratify the extraction scope. Until then the stage is
-`DRAFT FOR OPERATOR REVIEW`.
+`OPERATOR_ACCEPTED — PLANNING FROZEN`.

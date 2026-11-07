@@ -32,12 +32,13 @@
     "requirements_total": 51
   },
   "audit": {
-    "correctness": 8.6,
-    "design": 8.2,
+    "correctness": 8.7,
+    "design": 8.4,
     "label": "SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT",
-    "mean": 8.375,
-    "quality": 8.3,
-    "spec": 8.4
+    "mean": 8.5,
+    "quality": 8.4,
+    "spec": 8.5,
+    "supersedes": 8.375
   },
   "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
   "failure_classes": [
@@ -193,9 +194,9 @@
   "kind": "oce-b5-i9-requirement-test-registry",
   "locks": {
     "b5_i9_implementation": "NOT_STARTED",
-    "b5_i9_p0": "DRAFT_FOR_OPERATOR_REVIEW",
+    "b5_i9_p0": "OPERATOR_ACCEPTED_PLANNING_FROZEN",
     "book_6_authorized": false,
-    "book_6_contract_ratified": false,
+    "book_6_contract_ratified": true,
     "book_6_input_ready": {
       "excludes": [
         "ratified B6 extraction contract",
@@ -215,7 +216,8 @@
       "owner": "Operator (independent auditor distinct from the implementer)",
       "status": "OPEN"
     },
-    "merge_authorized": false,
+    "merge_authorization_scope": "PR #24 only, after ratification-head CI passes",
+    "merge_authorized": true,
     "post_book_6_evaluation": "UNSTARTED",
     "web_view": "ABSENT"
   },
@@ -357,16 +359,31 @@
     "b5_i8_merge_authorization_scope": "PR #23 only; does not authorize B5-I9, Book 6 or any later merge",
     "generator": "transient builder, not committed; the matrix and construction plan are verified, not regenerated",
     "packet_artifacts": [
-      "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md",
-      "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
-      "OCE_B5_I9_REQUIREMENT_TEST_REGISTRY_v1.0.json",
       "OCE_B5_I9_ACCEPTANCE_MATRIX_v1.0.md",
+      "OCE_B5_I9_CONSTRUCTION_PLAN_v1.0.md",
+      "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
       "OCE_B5_I9_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md",
-      "OCE_B5_I9_CONSTRUCTION_PLAN_v1.0.md"
+      "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md",
+      "OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md",
+      "OCE_B5_I9_REQUIREMENT_TEST_REGISTRY_v1.0.json"
     ],
     "predecessor": "B5-I8 RATIFIED_INDEPENDENT_AUDIT merged 833f7d1b",
     "reproducibility_scope": "P0 claims verifiability by the committed validator, not byte-identical regeneration",
     "validator": "infrastructure/control-plane/scripts/b5_i9_p0_validate.py"
+  },
+  "ratification": {
+    "b5_i9_complete": false,
+    "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+    "book_5_governance_complete": false,
+    "book_6_input_ready_scope": "upstream B5-I0-I8 evidence plus internal consistency; excludes contract ratification",
+    "merge_authorized_scope": "PR #24 only",
+    "original_p0_sha": "f6b5448fd2fc0785209327e0f31b6ce199bacdb5",
+    "record": "OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md",
+    "repair_commits": [
+      "368c2a09dd175e9c998394a4e1577fe5e170ddb5"
+    ],
+    "stage": "AUTHORIZED_STAGE=B5-I9-P0-RATIFICATION",
+    "verdict": "OPERATOR_ACCEPTED_PLANNING_FROZEN"
   },
   "requirements": [
     {
@@ -1296,6 +1313,6 @@
     "PASS": "reserved; zero PASS claims are permitted in P0",
     "PLANNED": "binding=static or attestation; obligation accepted at P0, and no node is applicable because verification is a named static check or an operator attestation"
   },
-  "status": "DRAFT_FOR_OPERATOR_REVIEW",
+  "status": "OPERATOR_ACCEPTED_PLANNING_FROZEN",
   "version": "1.0.0"
 }

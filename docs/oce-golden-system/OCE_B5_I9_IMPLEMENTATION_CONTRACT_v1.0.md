@@ -2,7 +2,7 @@
 
 **Document ID:** OCE-B5-I9-CONTRACT-001
 **Version:** 1.0
-**Status:** `B5-I9 P0 = DRAFT FOR OPERATOR REVIEW`
+**Status:** `B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN`
 **Stage:** `AUTHORIZED_STAGE=B5-I9-P0`
 **Base:** `833f7d1b9f2dfec2986fb9516d0abde06bf23dae` (merged `origin/main`, PR #23)
 **Predecessor:** B5-I8 `RATIFIED_INDEPENDENT_AUDIT`, ratified and merged 2026-11-07
@@ -13,9 +13,9 @@
 ## 0. Status block
 
 ```
-B5-I9 P0                      = DRAFT FOR OPERATOR REVIEW
+B5-I9 P0                      = OPERATOR_ACCEPTED — PLANNING FROZEN
 B5-I9 IMPLEMENTATION          = NOT STARTED
-MERGE_AUTHORIZED              = false
+MERGE_AUTHORIZED              = true (PR #24 only)
 BOOK_6_AUTHORIZED             = false
 BOOK_6_STARTED                = false
 POST_BOOK_6_EVALUATION        = UNSTARTED
@@ -153,8 +153,10 @@ workflow or B5-I0–I8 evidence files; no history rewrite.
 
 The stage is complete only when the operator has (a) reviewed this packet, (b) ratified
 the extraction scope and the correction decisions, and (c) recorded the Book 6 handoff as
-authorized or withheld. Until then the stage is `DRAFT FOR OPERATOR REVIEW` and
-`MERGE_AUTHORIZED = false`.
+authorized or withheld. (a)-(c) were performed on 2026-11-07 and recorded in
+`OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md`; the packet is now `OPERATOR_ACCEPTED — PLANNING FROZEN`. Stage-completion
+of Book 5 governance still requires the operator's Book 5 closure act, so
+`B5-I9 COMPLETE = false` and `BOOK_5 GOVERNANCE COMPLETE = false` remain.
 
 ### 4.5 Deferred owners
 
@@ -172,9 +174,9 @@ authorized or withheld. Until then the stage is `DRAFT FOR OPERATOR REVIEW` and
 
 It does not extract, package, publish, deploy, close Book 5, close G16, authorize the web
 view, start Book 6, create a Book 6 artifact, grant capital or execution authority, or
-change any B5-I0–I8 evidence byte. `MERGE_AUTHORIZED` is `false`, and B5-I9 starts from
-`false` regardless of the B5-I8 registry, whose `merge_authorized: true` was scoped to PR
-#23 only (ratification §R4: *for the P0 ratification PR only*; §R9: *PR #23 only*).
+change any B5-I0–I8 evidence byte. `MERGE_AUTHORIZED` is now `true` for **PR #24 only**,
+granted by the operator ratification record; it remains `false` for every later rung, and
+B5-I8's `merge_authorized: true` stays scoped to PR #23 (ratification §R4, §R9).
 
 ## 6. Locks and accounting
 
@@ -182,6 +184,6 @@ change any B5-I0–I8 evidence byte. `MERGE_AUTHORIZED` is `false`, and B5-I9 st
 B5-I9 IMPLEMENTATION = NOT STARTED      B5_I9_LOCKED = true (until operator authorizes)
 BOOK_6_AUTHORIZED   = false             BOOK_6_STARTED = false
 WEB_VIEW            = ABSENT            POST_BOOK_6_EVALUATION = UNSTARTED
-G16                 = OPEN (B5I8-DF05)  MERGE_AUTHORIZED = false
+G16                 = OPEN (B5I8-DF05)  MERGE_AUTHORIZED = true (PR #24 only)
 RECURRING_COST      = $0                CAPITAL_AUTHORITY = none
 ```

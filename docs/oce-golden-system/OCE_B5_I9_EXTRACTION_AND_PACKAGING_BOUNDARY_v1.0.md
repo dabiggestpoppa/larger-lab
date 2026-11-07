@@ -2,7 +2,7 @@
 
 **Document ID:** OCE-B5-I9-BOUNDARY-001
 **Version:** 1.0
-**Status:** `B5-I9 P0 = DRAFT FOR OPERATOR REVIEW`
+**Status:** `B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN`
 **Base:** `833f7d1b9f2dfec2986fb9516d0abde06bf23dae`
 **Cost:** `$0` · **`capital.authority = none`**
 
@@ -218,8 +218,8 @@ Book 6 folder, branch, test, source, workflow or evidence artifact exists in thi
 
 ### 5.3 Contract-ratified gate
 
-`BOOK_6 CONTRACT_RATIFIED` is a gate, not a handoff state: it is false while this packet is
-a draft, and becomes true only when the operator ratification record exists. Input-readiness
+`BOOK_6 CONTRACT_RATIFIED` is a gate, not a handoff state: it became true when the operator
+ratification record was created, and it never authorizes Book 6 on its own. Input-readiness
 does not wait on it; Book 6 *start* does. The two `agent/crypto-systems-intelligence-atlas-book6-*`
 branches predate this program (2026-10-01, a different atlas effort) and are not OCE Book 6
 artifacts.
