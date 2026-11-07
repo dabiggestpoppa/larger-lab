@@ -116,7 +116,8 @@ class TestProvenance:
         ]
         for path in targets:
             names = imports_of(path)
-            external = {n for n in names if n not in STDLIB_ALLOWED and n != "oce_control"}
+            local = {"oce_control", "b5_i9_gate"}
+            external = {n for n in names if n not in STDLIB_ALLOWED and n not in local}
             assert not external, (path.name, external)
             assert not (names & NETWORK_MODULES), (path.name, names & NETWORK_MODULES)
             body = path.read_text(encoding="utf-8")
