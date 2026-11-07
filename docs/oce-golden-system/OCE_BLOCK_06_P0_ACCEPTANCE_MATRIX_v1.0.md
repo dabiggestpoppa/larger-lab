@@ -45,3 +45,22 @@ check passes on the committed head. No row claims Book 6 implementation.
 Rows P0-23, P0-24 and P0-25 are recorded by the operator-review step after the branch is
 pushed; they are not claims of this document about an unperformed action. Row P0-02 cites the
 paired proof rather than re-running it, because Book 5 closure is an input, not a Book 6 task.
+
+## Ratification (BOOK_6-P0-RATIFICATION)
+
+| ID | Criterion | Result |
+| --- | --- | --- |
+| R-01 | Reality lock matched every identity in the amendment mission | PASS |
+| R-02 | Collision reproduced from source and from the raw CI artifact | PASS |
+| R-03 | Amendment preserves the original B5-I9 boundary over its frozen range | PASS |
+| R-04 | Historical range `e81bef43…9db35aac` remains inside the seven prefixes | PASS |
+| R-05 | Unauthorized protected mutations are refused by the amended node | PASS |
+| R-06 | Legitimate future-stage paths no longer fail the B5-I9 gate | PASS |
+| R-07 | P0 boundary validation cannot hide a tracked file | PASS |
+| R-08 | All 17 P0 artifacts re-audited against machine-readable sources | PASS |
+| R-09 | Requirement registry remains 47 with `PASS 0` | PASS |
+| R-10 | `B6-I0…I9` remain `LOCKED`; no implementation, package or evaluation exists | PASS |
+
+The ratification does not promote any of the 47 implementation requirements. It accepts the
+extraction boundary and freezes the construction plan as planning evidence, and it authorizes one
+normal merge of PR #28 after exact-head CI is green.

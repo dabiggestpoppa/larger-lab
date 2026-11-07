@@ -59,9 +59,30 @@
       "blocker": "B5I8-DF05",
       "status": "OPEN"
     },
-    "merge_authorized": false,
+    "merge_authorized": true,
     "post_book_6_evaluation_started": false,
     "reusable_extraction_started": false
+  },
+  "ratification": {
+    "amendment": "B5-I9-AMEND-001",
+    "amendment_commits": [
+      "f63740c845",
+      "b6e0de21e6"
+    ],
+    "amendment_document": "OCE_B5_I9_AMENDMENT_001_FUTURE_STAGE_BOUNDARY_COMPATIBILITY_v1.0.md",
+    "b6_i0_status": "LOCKED",
+    "b6_i1_i9_status": "LOCKED",
+    "b6_p0_status": "OPERATOR_RATIFIED — PLANNING FROZEN",
+    "base_sha": "a794a9af80ae8deddacf2991de17b7d71e445756",
+    "implementation_authorized": false,
+    "merge_authorization_scope": "one normal two-parent merge of PR #28, only after every required check on the exact ratification head is green",
+    "record": "OCE_BLOCK_06_P0_OPERATOR_RATIFICATION_v1.0.md",
+    "record_identity": "the commit that first introduces the record",
+    "requirements_marked_pass": 0,
+    "scope": "planning packet accepted; extraction boundary frozen; construction plan frozen",
+    "stage": "BOOK_6-P0-RATIFICATION",
+    "status": "OPERATOR_RATIFIED",
+    "validator_repair_commit": "d32612c5cd"
   },
   "requirements": [
     {

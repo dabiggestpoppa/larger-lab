@@ -156,3 +156,25 @@ Book 5 failure.
 `block_06_p0_validate.py`: 108 checks, 0 failures. Truthful CI disposition for this head:
 paired comparison SUCCESS, B5-I8 audit SUCCESS, B1-I1R SUCCESS, B5-I9 factory gate FAILURE on
 the single boundary node described in §2.4 (40/41 nodes pass).
+
+## 3. Book 6 P0 operator ratification
+
+`B6-P0 = OPERATOR_RATIFIED — PLANNING FROZEN`. `B6-I0 = LOCKED — REQUIRES FRESH
+AUTHORIZED_STAGE`; `B6-I1…B6-I9 = LOCKED`. `BOOK_6_IMPLEMENTATION_STARTED = false`,
+`REUSABLE_EXTRACTION_STARTED = false`, `PACKAGE_PUBLICATION_STARTED = false`,
+`POST_BOOK_6_EVALUATION_SYSTEM = RESERVED_NOT_AUTHORIZED`, `G16 = OPEN (B5I8-DF05)`.
+
+The frozen B5-I9 changed-file law was amended by `B5-I9-AMEND-001` after the collision it caused on
+this branch: the original node compared a frozen base against a live `HEAD`, so 40 of 41 nodes
+passed and the boundary node refused every Book 6 planning path. The amendment keeps the original
+range proof, recomputes the protected inventory from the frozen tree, and refuses any protected
+change no pinned amendment names. `B5I9-BD-04`, its owner, its failure class and the 41-node floor
+are unchanged, and no B5-I9 technical outcome moved.
+
+The P0 boundary validator now enumerates tracked Git paths instead of walking the filesystem, so a
+tracked file under a cache-like name can no longer hide and ignored residue is excluded by Git
+itself. The amended surfaces are an exact enumerated exception, never a widened prefix.
+
+Ratification accepts the planning packet only: 47 requirements remain `PLANNED 43`,
+`DEFERRED_WITH_OWNER 3`, `BLOCKED 1`, `PASS 0`; the API census remains 30 rows with zero exports;
+the construction sequence remains acyclic with only `B6-I0` recommended for a future authorization.

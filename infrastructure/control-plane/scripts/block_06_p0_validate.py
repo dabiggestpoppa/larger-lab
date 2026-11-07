@@ -37,6 +37,7 @@ FILES = {
     "evaluation": f"{DOCS}/{P}EVALUATION_READINESS_HANDOFF_v1.0.md",
     "acceptance": f"{DOCS}/{P}ACCEPTANCE_MATRIX_v1.0.md",
     "ledger": f"{DOCS}/{P}PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+    "ratification": f"{DOCS}/{P}OPERATOR_RATIFICATION_v1.0.md",
 }
 VALIDATOR = "infrastructure/control-plane/scripts/block_06_p0_validate.py"
 AMENDMENT = f"{DOCS}/OCE_B5_I9_AMENDMENT_001_FUTURE_STAGE_BOUNDARY_COMPATIBILITY_v1.0.md"
@@ -139,7 +140,15 @@ def check_identity_and_locks(c: Checker) -> None:
     c.need("locks/package_false", locks["book_6_package_exists"] is False, locks)
     c.need("locks/extraction_false", locks["reusable_extraction_started"] is False, locks)
     c.need("locks/evaluation_false", locks["post_book_6_evaluation_started"] is False, locks)
-    c.need("locks/merge_false", locks["merge_authorized"] is False, locks)
+    rat = r.get("ratification") or {}
+    if rat.get("status") == "OPERATOR_RATIFIED":
+        c.need("locks/merge_authorized_scope",
+               locks["merge_authorized"] is True
+               and bool(rat.get("merge_authorization_scope"))
+               and rat.get("requirements_marked_pass") == 0
+               and rat.get("implementation_authorized") is False, rat)
+    else:
+        c.need("locks/merge_false", locks["merge_authorized"] is False, locks)
     c.need("locks/cost_zero", locks["cost_usd"] == 0 and locks["cloud_mutations"] == 0, locks)
     c.need("locks/capital_none", locks["capital_authority"] == "none", locks)
     c.need("locks/book5_closed", locks["book_5_governance_complete"] is True, locks)
@@ -417,6 +426,7 @@ def check_docs_tokens(c: Checker) -> None:
         "evaluation": ["POST_BOOK_6_EVALUATION_SYSTEM — RESERVED, NOT AUTHORIZED"],
         "acceptance": ["P0-01", "P0-28"],
         "ledger": ["B5I8-DF05", BASE_SHA, "BOOK_6_IMPLEMENTATION_STARTED = false"],
+        "ratification": ["OPERATOR_RATIFIED", "B6-I0", "LOCKED"],
     }
     for key, tokens in need.items():
         text = c.text(FILES[key])
@@ -477,13 +487,38 @@ def check_git(c: Checker) -> None:
     c.need("git/tree_resolves", code == 0, tree)
 
 
+
+def check_ratification(c: Checker) -> None:
+    r = c.data("registry")
+    rat = r.get("ratification") or {}
+    c.need("rat/status", rat.get("status") == "OPERATOR_RATIFIED", rat.get("status"))
+    c.need("rat/stage", rat.get("stage") == "BOOK_6-P0-RATIFICATION", rat.get("stage"))
+    c.need("rat/amendment", rat.get("amendment") == "B5-I9-AMEND-001", rat.get("amendment"))
+    c.need("rat/b6_i0_locked", rat.get("b6_i0_status") == "LOCKED", rat.get("b6_i0_status"))
+    c.need("rat/i1_i9_locked", rat.get("b6_i1_i9_status") == "LOCKED", rat.get("b6_i1_i9_status"))
+    c.need("rat/no_implementation", rat.get("implementation_authorized") is False, rat)
+    c.need("rat/no_pass", rat.get("requirements_marked_pass") == 0, rat.get("requirements_marked_pass"))
+    c.need("rat/merge_scope", bool(rat.get("merge_authorization_scope")), rat)
+    text = c.text(FILES["ratification"])
+    need = ("BOOK_6_IMPLEMENTATION_STARTED = false", "G16", "B5I8-DF05",
+            "POST_BOOK_6_EVALUATION_SYSTEM — RESERVED, NOT AUTHORIZED",
+            BASE_SHA, "B5-I9-AMEND-001", "B6-I0", "PASS 0")
+    missing = [t for t in need if t not in text]
+    c.need("rat/record_content", not missing, missing)
+    acc = c.text(FILES["acceptance"])
+    c.need("rat/acceptance_rows", "R-01" in acc and "R-10" in acc, "ratification rows absent")
+    led = c.text(FILES["ledger"])
+    c.need("rat/ledger_carries",
+           "OPERATOR_RATIFIED" in led and "B5-I9-AMEND-001" in led, "ledger omits ratification")
+
+
 def run(root: pathlib.Path) -> dict:
     c = Checker(root)
     for fn in (check_packet_files, check_canonical_json, check_identity_and_locks,
                check_requirements, check_candidates, check_api, check_sequence,
                check_failures_and_threats, check_compat, check_handoff, check_boundary,
                check_text_hygiene, check_secrets_and_urls, check_docs_tokens,
-               check_acceptance_matrix, check_git):
+               check_acceptance_matrix, check_ratification, check_git):
         fn(c)
     status = "PASS" if not c.failures else "FAIL"
     payload = {
