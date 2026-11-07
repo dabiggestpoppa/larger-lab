@@ -8,7 +8,12 @@
 # Endpoints are hard-pinned (BASE = pre-merge main, HEAD = exact B5-I9 ratification head);
 # each endpoint gets its own fresh clone, its own evidence directory and no shared cache;
 # one pinned toolchain is installed once so dependency versions are identical by construction.
-# Cleanup runs even on failure; the comparator re-derives every verdict from raw evidence.
+# Cleanup runs before the verdict and on failure; the comparator re-derives every verdict
+# from raw evidence.
+#
+# The head endpoint is the pinned ratification commit, which does not contain the comparator
+# or this workflow; both live on the corrective branch. Every proof that needs this branch's
+# tooling is therefore executed from $GITHUB_WORKSPACE against the pinned clone as data.
 #
 # Cost: $0. No secret, provider, cloud resource or telemetry is used.
 
@@ -195,39 +200,33 @@ jobs:
           python3 infrastructure/control-plane/scripts/b5_i9_mutation_battery.py \
             --json "$ART/mutations.json" > "$ART/mutations.log" 2>&1 || true
           # Head-only proof 3: two isolated packet emissions must be byte-identical.
-          rm -rf "$ART/emit-a" "$ART/emit-b"
-          python3 infrastructure/control-plane/scripts/b5_i9_factory_gate.py --emit "$ART/emit-a" \
-            > "$ART/emit-a.log" 2>&1 || true
-          python3 infrastructure/control-plane/scripts/b5_i9_factory_gate.py --emit "$ART/emit-b" \
-            > "$ART/emit-b.log" 2>&1 || true
-          python3 - "$ART/emit-a" "$ART/emit-b" "$ART/determinism.json" <<'PY'
+          rm -rf "$RUNNER_TEMP/emit-a" "$RUNNER_TEMP/emit-b"
+          python3 infrastructure/control-plane/scripts/b5_i9_factory_gate.py \
+            --emit "$RUNNER_TEMP/emit-a" > "$ART/emit-a.log" 2>&1 || true
+          python3 infrastructure/control-plane/scripts/b5_i9_factory_gate.py \
+            --emit "$RUNNER_TEMP/emit-b" > "$ART/emit-b.log" 2>&1 || true
+          python3 - "$RUNNER_TEMP/emit-a" "$RUNNER_TEMP/emit-b" "$ART/determinism.json" <<'PY'
           import hashlib, json, pathlib, sys
           a, b, out = (pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]),
                        pathlib.Path(sys.argv[3]))
           def inventory(root):
+              if not root.exists():
+                  return {}
               return {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
                       for p in sorted(root.iterdir()) if p.is_file()}
           left, right = inventory(a), inventory(b)
           doc = {"files_a": len(left), "files_b": len(right),
-                 "identical": left == right or (not left and not right),
+                 "identical": bool(left) and left == right,
                  "mismatched": sorted(set(left.items()) ^ set(right.items()))[:5]}
-          if not left or not right:
-              doc["identical"] = False
-              doc["note"] = "an emission produced no files"
           out.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
           print(json.dumps(doc, indent=2, sort_keys=True))
           PY
-          # Head-only proof 4: independent manifest re-hash (never imports the generator).
-          python3 infrastructure/control-plane/scripts/b5_i9_paired_compare.py \
-            --verify-manifest . --json "$ART/manifest-check.json" > "$ART/manifest.log" 2>&1 || true
-          python3 - "$ART/emit-a" <<'PY'
-          import json, pathlib, sys
-          root = pathlib.Path(sys.argv[1])
-          files = sorted(p.name for p in root.iterdir() if p.is_file())
-          pathlib.Path(sys.argv[1] + "/emitted-files.json").write_text(
-              json.dumps({"files": files, "count": len(files)}, indent=2) + "\n",
-              encoding="utf-8")
-          PY
+          # Head-only proof 4: independent manifest re-hash against the HEAD clone, executed
+          # from the corrective workspace because the comparator is new on this branch.
+          python3 "$GITHUB_WORKSPACE/infrastructure/control-plane/scripts/b5_i9_paired_compare.py" \
+            --verify-manifest "$W" --json "$ART/manifest-check.json" \
+            > "$ART/manifest.log" 2>&1 || true
+          cat "$ART/manifest.log"
           cat "$ART/exit-collect-head.txt" "$ART/exit-run-head.txt"
           cd "$RUNNER_TEMP"
           rm -rf "$W"
@@ -235,19 +234,7 @@ jobs:
           test "$(cat "$ART/exit-collect-head.txt")" = "0"
           test "$(cat "$ART/exit-run-head.txt")" = "0"
 
-      - name: Compare paired results (fail-closed)
-        if: always()
-        run: |
-          set -uo pipefail
-          ART="$RUNNER_TEMP/b5i9-art"
-          rc=0
-          python3 infrastructure/control-plane/scripts/b5_i9_paired_compare.py \
-            --artifacts "$ART" --contract "$CONTRACT_PATH" > "$ART/compare.log" 2>&1 || rc=$?
-          echo "$rc" > "$ART/exit-compare.txt"
-          cat "$ART/compare.log"
-          exit "$rc"
-
-      - name: Cleanup proof
+      - name: Cleanup proof (before the verdict)
         if: always()
         run: |
           set -uo pipefail
@@ -257,11 +244,12 @@ jobs:
           for W in "$RUNNER_TEMP/b5i9-base" "$RUNNER_TEMP/b5i9-head"; do
             if [ -e "$W" ]; then rm -rf "$W" && removed+=("$W") || rc=1; fi
           done
-          for P in "$ART/emit-a" "$ART/emit-b"; do
+          for P in "$RUNNER_TEMP/emit-a" "$RUNNER_TEMP/emit-b"; do
             if [ -e "$P" ]; then rm -rf "$P" && removed+=("$P") || rc=1; fi
           done
           residuals=()
-          for W in "$RUNNER_TEMP/b5i9-base" "$RUNNER_TEMP/b5i9-head" "$ART/emit-a" "$ART/emit-b"; do
+          for W in "$RUNNER_TEMP/b5i9-base" "$RUNNER_TEMP/b5i9-head" \
+                   "$RUNNER_TEMP/emit-a" "$RUNNER_TEMP/emit-b"; do
             [ -e "$W" ] && residuals+=("$W")
           done
           CLEANUP_RC="$rc" REMOVED="$(IFS=';'; echo "${removed[*]}")" \
@@ -281,6 +269,19 @@ jobs:
           print(json.dumps(doc, indent=2, sort_keys=True))
           PY
           echo "$rc" > "$ART/exit-cleanup.txt"
+          if [ "$rc" -ne 0 ]; then echo "cleanup reported failures (rc=$rc)"; fi
+          exit 0
+
+      - name: Compare paired results (fail-closed)
+        if: always()
+        run: |
+          set -uo pipefail
+          ART="$RUNNER_TEMP/b5i9-art"
+          rc=0
+          python3 infrastructure/control-plane/scripts/b5_i9_paired_compare.py \
+            --artifacts "$ART" --contract "$CONTRACT_PATH" > "$ART/compare.log" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-compare.txt"
+          cat "$ART/compare.log"
           exit "$rc"
 
       - name: Upload paired-comparison evidence

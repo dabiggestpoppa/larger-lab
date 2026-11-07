@@ -397,8 +397,11 @@ def validate():
     warnings.append("git candidates scanned: {} (untracked {})".format(
         len(status_lines), len(untracked)))
     test_files = sorted(ROOT.glob("infrastructure/control-plane/tests/test_b5_i9_*.py"))
+    # The corrective post-merge paired-comparison workflow is a proof surface, not an
+    # implementation-selection surface: it must not be counted as a second selection job.
     workflows = sorted(p for p in (ROOT / ".github/workflows").glob("*.yml")
-                       if "b5_i9" in p.read_text(encoding="utf-8", errors="ignore").lower())
+                       if "b5_i9" in p.read_text(encoding="utf-8", errors="ignore").lower()
+                       and "paired" not in p.name.lower())
     if IMPLEMENTED:
         check("boundary/no_test_artifact", len(test_files) == len(reg["planned_surface"]["files"]),
               [p.name for p in test_files])
