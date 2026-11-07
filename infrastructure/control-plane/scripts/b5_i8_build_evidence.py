@@ -157,6 +157,13 @@ def ci_block() -> dict:
         identity = json.loads(CI_IDENTITY.read_text(encoding="utf-8"))
         return {
             "status": "OBSERVED",
+            "oce_run_id": identity["oce_run_id"],
+            "github_run_id": identity["github_run_id"],
+            "run_attempt": identity["run_attempt"],
+            "workflow_path": identity["workflow_path"],
+            "pr_number": identity["pr_number"],
+            "artifact_binding": identity["artifact_name"] == "b5-i8-evidence-" + identity["oce_run_id"],
+            "run_context": identity["run_context"],
             "run_id": identity["run_id"],
             "check_run_id": identity["check_run_id"],
             "job_id": identity["job_id"],

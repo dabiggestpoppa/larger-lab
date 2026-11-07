@@ -121,16 +121,19 @@ class TestEvidenceAudit:
         # X6: the recorded identity must be populated and bound, and the validator
         # must reject every unbound, mismatched or locally invented shape.
         identity = S.ci_identity()
-        # Bootstrap ordering: the populated record can only exist AFTER the run that
-        # produces it. Until X6's artifact is parsed the fixtures below carry the law;
-        # the evidence rung removes this guard and asserts the record unconditionally.
-        if identity.get("status") == "OBSERVED" and identity.get("oce_run_id"):
+        # The record is now asserted unconditionally: X6/X7 produced the populated
+        # artifact, so a blank run identity can no longer be tolerated at all.
+        assert identity.get("status") == "OBSERVED"
+        if identity.get("status") == "OBSERVED":
             run = identity.get("oce_run_id") or ""
             assert S.RUN_ID_RE.match(run), run
             assert identity["artifact_name"] == "b5-i8-evidence-" + run
             assert isinstance(identity["github_run_id"], int) and identity["github_run_id"] > 0
             assert identity["evidence_source"] == "ci"
-            assert identity["workflow_path"].endswith(S.WORKFLOW_B5I8_SUFFIX)
+            assert (
+                identity["workflow_path"].split("@", 1)[0].endswith(S.WORKFLOW_B5I8_SUFFIX)
+            )
+            assert identity["run_attempt"] >= 1 and identity["pr_number"] == 23
             assert identity["run_context"]["github_run_id"] == str(identity["github_run_id"])
             assert S.run_identity_problems(identity, identity["run_context"]) == []
 

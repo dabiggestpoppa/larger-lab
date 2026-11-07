@@ -212,3 +212,100 @@ Residual coupling (disclosed): the five files share one module, so a defect in a
 helper would surface as several red nodes at once. That is a blast-radius disclosure,
 not a circular-agreement path, because no helper both produces and checks the same
 value. The same-agent score in §11 carries this as a QUALITY deduction.
+
+## 15. Provenance repair: the evidence now names the run that produced it
+
+The X5 proof wrote `oce_run_id` as `""`. The cause was mechanical and entirely inside
+the workflow: the step that generated the id published it as an output, the selection
+step never received it, and the proof read it with an empty default. A blank identity
+does not falsify the 40/40 totals, but it severs the artifact from the run that
+produced it, so it was repaired instead of annotated.
+
+| Rung | Disposition |
+|---|---|
+| `X5` (`6b26214637`) | recorded `oce_run_id = ""`; the defect this section closes |
+| `X6` (`8fcb28097d`) | bound the real Actions identity (run id, attempt, `workflow_ref`, PR number, artifact name) and routed it through a fail-closed validator; **CI red**, preserved |
+| `X7` (`1f54168b81`) | forward repair: the context-writing step also received `PR_NUMBER`; CI success |
+
+`X6` went red with `pull request number '23' does not match the run context ''` —
+the validator refusing a genuinely missing binding. The red rung is kept in history
+because the proof of enforcement is that it fired on real evidence, not on a fixture.
+
+Observed identity, parsed from artifact `b5-i8-evidence-62e6d763b63e`:
+
+| Field | Value |
+|---|---|
+| `oce_run_id` | `62e6d763b63e`, equal to the artifact-name suffix |
+| `github_run_id` / attempt | `42324807796` / `1` |
+| workflow | `B5-I8 Audit Validation`, `pull_request` |
+| `workflow_path` | `dabiggestpoppa/larger-lab/.github/workflows/b5-i8-audit-validation.yml@refs/pull/23/merge` |
+| PR / head / tree | `23` / `1f54168b81c6d5602fbb5c26bcfb497f41788725` / `845f2cd5d34d4257c3e712d7245faf81374b790e` |
+| merge ref / first parent / second parent | `982aea1ed92ab58b32c3e57cb2ab8b1dedac3213` / `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` / `1f54168b81c6d5602fbb5c26bcfb497f41788725` |
+| merge-ref tree | `845f2cd5d34d4257c3e712d7245faf81374b790e` (equals the tested tree) |
+| totals | collected 40 = executed 40 = passed 40; failures/errors/skipped `0/0/0` |
+| mutations | 12/12 `DISCRIMINATED`; byte-exact restore; pristine rerun 40/40; `baseline_dirty false` |
+
+The committed record is asserted unconditionally now. While the artifact did not yet
+exist the node carried a bootstrap guard; the evidence rung removed it, so a blank run
+identity is no longer tolerated even in principle.
+
+## 16. Laws strengthened while sealing, never relaxed
+
+**EL01 (`D7`).** The law previously exempted the merge ref as "server-only, does not
+resolve locally". That was true when the ref had not been fetched. It has now been
+fetched and parsed, so the exemption was replaced with positive resolution plus
+parent/tree equality: the sha must exist, must equal the recorded `merge_ref`, its
+second parent must equal the PR head, its parents must differ, and its tree must equal
+the tested tree. An exemption was removed because the fact behind it changed.
+
+**Run-identity synonyms.** `run_identity_problems()` accepts either
+`merge_first_parent` or `merge_ref_first_parent` because the workflow and the committed
+record name the same fact differently. A synonym is accepted; a missing or blank value
+is still rejected, which is what the forged-context controls prove.
+
+**Bootstrap removal.** The `and identity.get("oce_run_id")` guard existed only so the
+rung that introduced the validator could run before its own artifact existed. It is
+gone; the committed identity is asserted on every run.
+
+## 17. Ledger identity: protected prefix versus appended evidence
+
+| Identity | Value |
+|---|---|
+| Historical protected prefix | first `191950` normalized bytes, sha256 `83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30` |
+| Current appended ledger | `215081` normalized bytes, sha256 `31dd01508571775057731304230f560347ffa15d91d67b5bf57250201280ee81` |
+| Ledger sections added by B5-I8 | `20.10`, `20.11`, `20.12`, `20.13` |
+| Historical bytes rewritten | none |
+
+The prefix digest remains the EL09 claim and is checked against the manifest row on
+every run (verified live: `sha256(ledger[0:191950])` still equals the ratified value).
+The full-file digest is a different measurement, it moves with authorized append-only
+evidence, and it must never be quoted as the EL09 identity. No ledger write follows
+the ratification, so the figures above stay exact at the ratification head.
+
+`G16` remains `OPEN` under `B5I8-DF05`: same-agent, single-operator, non-blind.
+
+## 18. Windows base/head comparison
+
+Both revisions were executed on this Windows host in isolated worktrees, with the same
+interpreter and the same command, so a difference in the failure set is attributable to
+the change rather than to the environment.
+
+| Revision | Result |
+|---|---|
+| base `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` | 32 failed, 983 passed, 103 skipped, 2 warnings in 405.46s (0:06:45) |
+| head (ratified surface) | 32 failed, 1023 passed, 103 skipped, 2 warnings in 462.34s (0:07:42) |
+
+```text
+base failures: 32 | head failures: 32
+base-only: 0 | head-only: 0 | common: 32
+signature diffs:
+```
+
+The 40 additional passing nodes on the head are the B5-I8 surface itself. All 32
+failures are common: each fails on both revisions under the same full node id with no
+material signature difference, and every one belongs to `test_b4_startup_gate`,
+`test_b4_cxr7_trusted_program`, `test_b4_cxr6_activation_capability` or
+`test_local_lifecycle`, none of which this stage edits. No head-only environmental
+failure and no common-node regression exists. The claim is not that the totals look
+similar; it is that the failing node ids match one to one, with zero set difference in
+either direction.

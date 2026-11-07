@@ -758,8 +758,12 @@ def run_identity_problems(identity: dict, run_context: dict | None = None) -> li
             "merge_ref %r is not the run-context sha %r" % (merge_ref, ctx.get("sha"))
         )
 
-    first = identity.get("merge_first_parent") or ""
-    second = identity.get("merge_second_parent") or ""
+    # The committed identity record names these merge_ref_*; the workflow supplies the
+    # shorter names. Both are the same fact, so accept either spelling.
+    first = identity.get("merge_first_parent") or identity.get("merge_ref_first_parent") or ""
+    second = (
+        identity.get("merge_second_parent") or identity.get("merge_ref_second_parent") or ""
+    )
     if not HEX40_RE.match(first):
         problems.append("merge_first_parent %r is not a 40-hex commit" % first)
     if not HEX40_RE.match(second):

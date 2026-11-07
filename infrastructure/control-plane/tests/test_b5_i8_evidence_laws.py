@@ -35,10 +35,19 @@ def check_el01(bundle: dict) -> None:
     merge_ref = ci.get("merge_ref")
     for sha in set(S.HEX40.findall(text)):
         if merge_ref and sha == merge_ref:
-            # A PR merge ref lives only on the server. Exempt ONLY while the parsed
-            # artifact is cited and the ref genuinely does not resolve locally.
+            # The merge ref is now OBSERVED, not merely asserted: it was fetched, so it
+            # must resolve and its recorded identity must match. The older "server-only,
+            # must not resolve" exemption no longer describes reality and is replaced by
+            # a positive check (defect D7) instead of being silently dropped.
             assert ci.get("status") == "OBSERVED" and ci.get("parsed_from"), sha
-            assert S.git("cat-file", "-e", sha).returncode != 0, "exempt sha resolves locally"
+            assert S.git("cat-file", "-e", sha).returncode == 0, (
+                "observed merge ref does not resolve: %s" % sha
+            )
+            identity = S.ci_identity()
+            assert identity["merge_ref"] == sha
+            assert identity["merge_ref_second_parent"] == identity["pr_head_sha"]
+            assert identity["merge_ref_first_parent"] != identity["merge_ref_second_parent"]
+            assert identity["merge_ref_tree"] == identity["tested_tree"]
             continue
         if sha in S.PRUNED_REFS:
             # Exempt only because the exemption is recorded in the evidence.

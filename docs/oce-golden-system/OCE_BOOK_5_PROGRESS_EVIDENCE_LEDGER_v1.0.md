@@ -2161,3 +2161,82 @@ Recorded in §20.10 and in the PR body once the exact-head runs exist. No id is 
 | `failure_classes_changed` | `0` |
 | `mutation_floor_changed` | `0` |
 | `g16_status` | `OPEN` (unchanged) |
+
+
+## 20.12 B5-I8 final evidence and provenance repair
+
+The implementation rung closed with one further forward repair, because the X5
+machine-readable proof recorded `oce_run_id` as `""`: the selection step never
+received the id the generate step had produced, and it read the value with an empty
+default. A blank run identity is not a provenance detail - it severs the evidence
+from the run that produced it - so it was repaired rather than annotated.
+
+| Rung | Commit | Disposition |
+|---|---|---|
+| `X3` | `e0f6a73c46` | Amendment 001: the CI-selection surface is formally superseded, edited territory untouched |
+| `X4` | `36288f4b49` | G15 independent totals + 40-node non-vacuity audit; **committed red**, preserved |
+| `X5` | `6b26214637` | forward repair: the false-positive secret assertion narrowed, mutation battery executed in authoritative CI |
+| `X6` | `8fcb28097d` | run identity bound to the real Actions values; **CI red**, preserved |
+| `X7` | `1f54168b81` | forward repair: the context-writing step also receives the PR identity |
+
+`X6` failed for the reason the new validator exists: `run-context.json` recorded
+`pr_number` as `""` while the audit step recorded `23`, so the proof refused itself
+with `pull request number '23' does not match the run context ''`. The failing value
+was a genuine missing binding, not a validator artefact, and `X7` bound it.
+
+Authoritative exact-head evidence (run `42324807796`, artifact
+`b5-i8-evidence-62e6d763b63e`, 7412 bytes, expires 2026-12-07):
+
+| Field | Observed |
+|---|---|
+| `oce_run_id` | `62e6d763b63e` (non-empty; bound to the artifact name) |
+| `github_run_id` / `run_attempt` | `42324807796` / `1` |
+| `workflow_path` | `.../.github/workflows/b5-i8-audit-validation.yml@refs/pull/23/merge` |
+| `pr_number` / `event` | `23` / `pull_request` |
+| `pr_head_sha` / `tested_tree` | `1f54168b81c6d5602fbb5c26bcfb497f41788725` / `845f2cd5d34d4257c3e712d7245faf81374b790e` |
+| merge ref / parents / tree | `982aea1ed92ab58b32c3e57cb2ab8b1dedac3213` / `e999a4a342f8a2ebb8f99045206d67d04d6fcbbf` + `1f54168b…` / `845f2cd5…` |
+| nodes | collected 40 = executed 40 = passed 40; failures/errors/skipped 0/0/0 |
+| mutations | 12/12 `DISCRIMINATED`, byte-exact restore, pristine rerun 40/40, `baseline_dirty false` |
+
+Two evidence laws were strengthened rather than relaxed while sealing this record.
+EL01 previously exempted the merge ref as "server-only, must not resolve locally";
+the ref has now been fetched and parsed, so the exemption was replaced by positive
+resolution plus parent/tree equality (`D7`). The X6 validator accepts either
+spelling of the merge-parent fields because the committed record and the workflow
+name the same fact differently - tolerance of a synonym, not of a missing value.
+
+`G16` remains `OPEN` under `B5I8-DF05`: same-agent, single-operator, non-blind. No
+usability statement in this record claims otherwise.
+
+Boundary unchanged: no production, frontend or web-view path; `B5-I9` locked; Book 6
+unauthorized; post-Book-6 evaluation unstarted; cost `$0`; `capital.authority = none`.
+
+
+## 20.13 Ledger identity law: protected prefix versus appended ledger
+
+Two different identities are recorded here and must never be confused.
+
+**Historical protected prefix (immutable EL09 claim).** The first `191950` bytes of
+the LF-normalized ledger hash to
+`83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`. That figure is
+the historical row's identity and stays exactly as ratified; B5-I8's appended
+evidence does not replace it, and the manifest row for this file still checks only
+those bytes.
+
+**Current appended ledger (this section's measurement).** Measured immediately
+before this section was appended, on the evidence head:
+
+| Measurement | Value |
+|---|---|
+| Offset at which this section begins | `213650` normalized bytes |
+| Digest of bytes `[0, 213650)` | `e6a4b7b2138f28e7001de5ed48e2c45c99b7246284bccfea987622d555d8c81e` |
+| LF normalization law | CRLF replaced by LF before measuring |
+| Appended sections after the prefix | section 20.10, 20.11, 20.12, this section |
+
+The measured digest is of the bytes *before* this section, so it cannot be
+self-referential and it stays recomputable. No historical byte was rewritten: the
+append-only rung added sections after offset `191950` only, and the prefix check
+above is executed by the frozen surface on every run.
+
+No ledger write follows this section in the B5-I8 ratification, so the measured
+identity remains exact at the ratification head.
