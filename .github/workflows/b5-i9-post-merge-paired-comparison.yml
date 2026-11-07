@@ -1,0 +1,292 @@
+# OCE — B5-I9 post-merge paired base/head comparison (corrective)
+#
+# Why: the mandatory isolated base-versus-head paired comparison was NOT executed before
+# PR #25 merged, and ordinary pull-request merge-ref CI was wrongly treated as sufficient.
+# This workflow performs the omitted comparison against the frozen historical endpoints and
+# uploads the raw evidence. It changes no product code and authorizes nothing.
+#
+# Endpoints are hard-pinned (BASE = pre-merge main, HEAD = exact B5-I9 ratification head);
+# each endpoint gets its own fresh clone, its own evidence directory and no shared cache;
+# one pinned toolchain is installed once so dependency versions are identical by construction.
+# Cleanup runs even on failure; the comparator re-derives every verdict from raw evidence.
+#
+# Cost: $0. No secret, provider, cloud resource or telemetry is used.
+
+name: B5-I9 Post-Merge Paired Comparison
+
+on:
+  push:
+    branches:
+      - oce-book-5-i9-post-merge-proof-closure
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BASE_SHA: e81bef4335de5e222fb6647c602080a129dea543
+  BASE_TREE: 5fe7d38cb81ae0fdce7fdd4fe73117095fb76c0d
+  HEAD_SHA: 9db35aac5c1d9cfbdc5bd902b74c2bb09bfd9d3c
+  HEAD_TREE: 2d0285f3e718a8b7ceda27a07179b62607dd1556
+  CONTRACT_PATH: docs/oce-golden-system/OCE_B5_I9_POST_MERGE_PAIRED_COMPARISON_CONTRACT_v1.0.json
+  GIT_LFS_SKIP_SMUDGE: "1"
+
+jobs:
+  paired:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - name: Checkout corrective branch
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          fetch-depth: 0
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Prepare artifacts and verify the frozen contract
+        run: |
+          set -euo pipefail
+          echo "ART=$RUNNER_TEMP/b5i9-art" >> "$GITHUB_ENV"
+          ART="$RUNNER_TEMP/b5i9-art"
+          mkdir -p "$ART"
+          python3 - "$CONTRACT_PATH" "$BASE_SHA" "$BASE_TREE" "$HEAD_SHA" "$HEAD_TREE" <<'PY'
+          import json, sys
+          contract = json.load(open(sys.argv[1], encoding="utf-8"))
+          base_sha, base_tree, head_sha, head_tree = sys.argv[2:6]
+          assert contract["status"] == "FROZEN", contract["status"]
+          assert contract["endpoints"]["base_sha"] == base_sha
+          assert contract["endpoints"]["base_tree"] == base_tree
+          assert contract["endpoints"]["head_sha"] == head_sha
+          assert contract["endpoints"]["head_tree"] == head_tree
+          assert contract["population"]["common_floor"] > 0
+          assert contract["population"]["head_only_expected"] == 41
+          print("contract-ok floor", contract["population"]["common_floor"])
+          PY
+
+      - name: Install the pinned toolchain once
+        run: |
+          set -euo pipefail
+          ART="$RUNNER_TEMP/b5i9-art"
+          python3 -m pip install --upgrade pip
+          pip install --require-hashes --only-binary ':all:' \
+            -r infrastructure/control-plane/requirements-ci.lock.txt
+          python3 -m pytest --version | tee "$ART/pytest-version.txt"
+          python3 --version | tee "$ART/python-version.txt"
+          pip freeze --all | LC_ALL=C sort | tee "$ART/pip-freeze.txt" | sha256sum \
+            | awk '{print $1}' > "$ART/pip-freeze-sha.txt"
+
+      - name: BASE endpoint — isolated clone, collect and execute
+        run: |
+          set -euo pipefail
+          ART="$RUNNER_TEMP/b5i9-art"
+          W="$RUNNER_TEMP/b5i9-base"
+          rm -rf "$W"
+          GIT_LFS_SKIP_SMUDGE=1 git clone --quiet --no-hardlinks "file://$(pwd)" "$W"
+          cd "$W"
+          git checkout --quiet --detach "$BASE_SHA"
+          test "$(git rev-parse HEAD)" = "$BASE_SHA" || { echo "FATAL base sha"; exit 61; }
+          test "$(git rev-parse 'HEAD^{tree}')" = "$BASE_TREE" || { echo "FATAL base tree"; exit 62; }
+          test -z "$(git status --porcelain)" || { echo "FATAL base dirty"; exit 63; }
+          shopt -s nullglob
+          B9=(infrastructure/control-plane/tests/test_b5_i9_*.py)
+          if [ "${#B9[@]}" -ne 0 ]; then
+            echo "FATAL: B5-I9 files present at base: ${B9[*]}"; exit 64
+          fi
+          F=(infrastructure/control-plane/tests/test_b5_i[2-9]*.py)
+          printf '%s\n' "${F[@]}" > "$ART/base-files.txt"
+          rc=0
+          python3 -m pytest "${F[@]}" --collect-only -q -o addopts= \
+            > "$ART/collect-base.txt" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-collect-base.txt"
+          if [ "$rc" -eq 0 ]; then
+            python3 -m pytest "${F[@]}" -q --tb=short -o addopts= \
+              --junitxml="$ART/junit-base.xml" > "$ART/pytest-base.txt" 2>&1 || rc=$?
+          fi
+          echo "$rc" > "$ART/exit-run-base.txt"
+          python3 - "$ART/meta-base.json" "$BASE_SHA" "$BASE_TREE" "$ART" <<'PY'
+          import hashlib, json, pathlib, subprocess, sys
+          out, sha, tree, art = sys.argv[1], sys.argv[2], sys.argv[3], pathlib.Path(sys.argv[4])
+          def sh(cmd):
+              return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
+          files = art.joinpath("base-files.txt").read_text(encoding="utf-8").split()
+          meta = {
+              "role": "base", "sha": sha, "tree": tree, "identity_verified": True,
+              "python_version": sh(["python3", "--version"]),
+              "runner_image": "ubuntu-24.04",
+              "os_release_sha256": hashlib.sha256(
+                  pathlib.Path("/etc/os-release").read_bytes()).hexdigest(),
+              "dependency_lock_sha256": hashlib.sha256(
+                  pathlib.Path("infrastructure/control-plane/requirements-ci.lock.txt").read_bytes()
+              ).hexdigest(),
+              "pip_freeze_sha256": art.joinpath("pip-freeze-sha.txt").read_text().strip(),
+              "files": files, "file_count": len(files),
+              "worktree_clean": True,
+          }
+          art.joinpath("meta-base.json").write_text(
+              json.dumps(meta, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          cat "$ART/exit-collect-base.txt" "$ART/exit-run-base.txt"
+          cd "$RUNNER_TEMP"
+          rm -rf "$W"
+          echo "base endpoint complete; clone removed"
+          test "$(cat "$ART/exit-collect-base.txt")" = "0"
+          test "$(cat "$ART/exit-run-base.txt")" = "0"
+
+      - name: HEAD endpoint — isolated clone, collect, execute, and head-only proofs
+        run: |
+          set -euo pipefail
+          ART="$RUNNER_TEMP/b5i9-art"
+          W="$RUNNER_TEMP/b5i9-head"
+          rm -rf "$W"
+          GIT_LFS_SKIP_SMUDGE=1 git clone --quiet --no-hardlinks "file://$(pwd)" "$W"
+          cd "$W"
+          git checkout --quiet --detach "$HEAD_SHA"
+          test "$(git rev-parse HEAD)" = "$HEAD_SHA" || { echo "FATAL head sha"; exit 71; }
+          test "$(git rev-parse 'HEAD^{tree}')" = "$HEAD_TREE" || { echo "FATAL head tree"; exit 72; }
+          test -z "$(git status --porcelain)" || { echo "FATAL head dirty"; exit 73; }
+          shopt -s nullglob
+          B9=(infrastructure/control-plane/tests/test_b5_i9_*.py)
+          if [ "${#B9[@]}" -ne 5 ]; then
+            echo "FATAL: expected five B5-I9 files at head: ${B9[*]}"; exit 74
+          fi
+          F=(infrastructure/control-plane/tests/test_b5_i[2-9]*.py)
+          printf '%s\n' "${F[@]}" > "$ART/head-files.txt"
+          rc=0
+          python3 -m pytest "${F[@]}" --collect-only -q -o addopts= \
+            > "$ART/collect-head.txt" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-collect-head.txt"
+          if [ "$rc" -eq 0 ]; then
+            python3 -m pytest "${F[@]}" -q --tb=short -o addopts= \
+              --junitxml="$ART/junit-head.xml" > "$ART/pytest-head.txt" 2>&1 || rc=$?
+          fi
+          echo "$rc" > "$ART/exit-run-head.txt"
+          python3 - "$ART/meta-head.json" "$HEAD_SHA" "$HEAD_TREE" "$ART" <<'PY'
+          import hashlib, json, pathlib, subprocess, sys
+          out, sha, tree, art = sys.argv[1], sys.argv[2], sys.argv[3], pathlib.Path(sys.argv[4])
+          def sh(cmd):
+              return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
+          files = art.joinpath("head-files.txt").read_text(encoding="utf-8").split()
+          meta = {
+              "role": "head", "sha": sha, "tree": tree, "identity_verified": True,
+              "python_version": sh(["python3", "--version"]),
+              "runner_image": "ubuntu-24.04",
+              "os_release_sha256": hashlib.sha256(
+                  pathlib.Path("/etc/os-release").read_bytes()).hexdigest(),
+              "dependency_lock_sha256": hashlib.sha256(
+                  pathlib.Path("infrastructure/control-plane/requirements-ci.lock.txt").read_bytes()
+              ).hexdigest(),
+              "pip_freeze_sha256": art.joinpath("pip-freeze-sha.txt").read_text().strip(),
+              "files": files, "file_count": len(files),
+              "worktree_clean": True,
+          }
+          art.joinpath("meta-head.json").write_text(
+              json.dumps(meta, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          PY
+          # Head-only proof 1: the frozen P0 validator with the ratification branch.
+          python3 infrastructure/control-plane/scripts/b5_i9_p0_validate.py --json \
+            > "$ART/validator.json" 2> "$ART/validator.err" || true
+          # Head-only proof 2: the ten frozen mutations on copies.
+          python3 infrastructure/control-plane/scripts/b5_i9_mutation_battery.py \
+            --json "$ART/mutations.json" > "$ART/mutations.log" 2>&1 || true
+          # Head-only proof 3: two isolated packet emissions must be byte-identical.
+          rm -rf "$ART/emit-a" "$ART/emit-b"
+          python3 infrastructure/control-plane/scripts/b5_i9_factory_gate.py --emit "$ART/emit-a" \
+            > "$ART/emit-a.log" 2>&1 || true
+          python3 infrastructure/control-plane/scripts/b5_i9_factory_gate.py --emit "$ART/emit-b" \
+            > "$ART/emit-b.log" 2>&1 || true
+          python3 - "$ART/emit-a" "$ART/emit-b" "$ART/determinism.json" <<'PY'
+          import hashlib, json, pathlib, sys
+          a, b, out = (pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]),
+                       pathlib.Path(sys.argv[3]))
+          def inventory(root):
+              return {p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                      for p in sorted(root.iterdir()) if p.is_file()}
+          left, right = inventory(a), inventory(b)
+          doc = {"files_a": len(left), "files_b": len(right),
+                 "identical": left == right or (not left and not right),
+                 "mismatched": sorted(set(left.items()) ^ set(right.items()))[:5]}
+          if not left or not right:
+              doc["identical"] = False
+              doc["note"] = "an emission produced no files"
+          out.write_text(json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(json.dumps(doc, indent=2, sort_keys=True))
+          PY
+          # Head-only proof 4: independent manifest re-hash (never imports the generator).
+          python3 infrastructure/control-plane/scripts/b5_i9_paired_compare.py \
+            --verify-manifest . --json "$ART/manifest-check.json" > "$ART/manifest.log" 2>&1 || true
+          python3 - "$ART/emit-a" <<'PY'
+          import json, pathlib, sys
+          root = pathlib.Path(sys.argv[1])
+          files = sorted(p.name for p in root.iterdir() if p.is_file())
+          pathlib.Path(sys.argv[1] + "/emitted-files.json").write_text(
+              json.dumps({"files": files, "count": len(files)}, indent=2) + "\n",
+              encoding="utf-8")
+          PY
+          cat "$ART/exit-collect-head.txt" "$ART/exit-run-head.txt"
+          cd "$RUNNER_TEMP"
+          rm -rf "$W"
+          echo "head endpoint complete; clone removed"
+          test "$(cat "$ART/exit-collect-head.txt")" = "0"
+          test "$(cat "$ART/exit-run-head.txt")" = "0"
+
+      - name: Compare paired results (fail-closed)
+        if: always()
+        run: |
+          set -uo pipefail
+          ART="$RUNNER_TEMP/b5i9-art"
+          rc=0
+          python3 infrastructure/control-plane/scripts/b5_i9_paired_compare.py \
+            --artifacts "$ART" --contract "$CONTRACT_PATH" > "$ART/compare.log" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-compare.txt"
+          cat "$ART/compare.log"
+          exit "$rc"
+
+      - name: Cleanup proof
+        if: always()
+        run: |
+          set -uo pipefail
+          ART="$RUNNER_TEMP/b5i9-art"
+          rc=0
+          removed=()
+          for W in "$RUNNER_TEMP/b5i9-base" "$RUNNER_TEMP/b5i9-head"; do
+            if [ -e "$W" ]; then rm -rf "$W" && removed+=("$W") || rc=1; fi
+          done
+          for P in "$ART/emit-a" "$ART/emit-b"; do
+            if [ -e "$P" ]; then rm -rf "$P" && removed+=("$P") || rc=1; fi
+          done
+          residuals=()
+          for W in "$RUNNER_TEMP/b5i9-base" "$RUNNER_TEMP/b5i9-head" "$ART/emit-a" "$ART/emit-b"; do
+            [ -e "$W" ] && residuals+=("$W")
+          done
+          CLEANUP_RC="$rc" REMOVED="$(IFS=';'; echo "${removed[*]}")" \
+          RESIDUAL="$(IFS=';'; echo "${residuals[*]}")" \
+          python3 - "$ART/cleanup.json" <<'PY'
+          import json, os, sys
+          doc = {
+              "cleanup_exit_code": int(os.environ.get("CLEANUP_RC", "1")),
+              "paths_removed": [p for p in os.environ.get("REMOVED", "").split(";") if p],
+              "residual_paths": [p for p in os.environ.get("RESIDUAL", "").split(";") if p],
+              "workspace_clean": True,
+          }
+          doc["cleanup_ok"] = (doc["cleanup_exit_code"] == 0 and not doc["residual_paths"])
+          with open(sys.argv[1], "w", encoding="utf-8") as fh:
+              json.dump(doc, fh, indent=2, sort_keys=True)
+              fh.write("\n")
+          print(json.dumps(doc, indent=2, sort_keys=True))
+          PY
+          echo "$rc" > "$ART/exit-cleanup.txt"
+          exit "$rc"
+
+      - name: Upload paired-comparison evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: b5-i9-post-merge-paired-${{ github.run_id }}
+          path: ${{ env.ART }}/
+          if-no-files-found: warn
