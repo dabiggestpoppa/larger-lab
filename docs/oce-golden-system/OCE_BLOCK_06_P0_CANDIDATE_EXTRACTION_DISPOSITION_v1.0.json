@@ -1,0 +1,539 @@
+{
+  "base_sha": "a794a9af80ae8deddacf2991de17b7d71e445756",
+  "base_tree": "762dc5696f2135a14455f11d13d5c958ba812723",
+  "candidate_total": 27,
+  "candidates": [
+    {
+      "authority_implications": "none: fields transfer, content does not",
+      "b5_index": 1,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "no private import"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 1",
+      "id": "C-01",
+      "limitation_or_prohibition": "none",
+      "name": "Product Charter as a freeze instrument",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 2,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "no private import"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 2",
+      "id": "C-02",
+      "limitation_or_prohibition": "none",
+      "name": "Product lifecycle stages",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md#9",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "none: prohibits LLM authority",
+      "b5_index": 3,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "LLM prohibition only"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 3",
+      "id": "C-03",
+      "limitation_or_prohibition": "none",
+      "name": "Deterministic kernel contract",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md#7",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "none: rendering only",
+      "b5_index": 4,
+      "book6_disposition": "design_input_with_limitation",
+      "classification": "EXTRACTABLE_WITH_LIMITATION",
+      "dependency_closure": [
+        "console package only",
+        "no console state"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 4",
+      "id": "C-04",
+      "limitation_or_prohibition": "stdlib-only closure and loopback transport stay frozen; consumer inherits refusal vocabulary",
+      "name": "Read-only client seam",
+      "owner": "console",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/console/src/oce_console/kernel.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal_package"
+    },
+    {
+      "authority_implications": "none: admission stays in authority.py",
+      "b5_index": 5,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "schema only"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 5",
+      "id": "C-05",
+      "limitation_or_prohibition": "rendering only; admission decision excluded",
+      "name": "Denial enveloping as a rendering law",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/contracts/denial-envelope.schema.json",
+      "source_resolved_at_p0": true,
+      "visibility": "public_schema"
+    },
+    {
+      "authority_implications": "decides: duplicates policy",
+      "b5_index": 6,
+      "book6_disposition": "never_extractable_authority",
+      "classification": "AUTHORITY_BEARING",
+      "dependency_closure": [
+        "decides admission"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 6",
+      "id": "C-06",
+      "limitation_or_prohibition": "never extractable",
+      "name": "Admission / refusal decision",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/src/oce_control/authority.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none: enactment is platform internal",
+      "b5_index": 7,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "doc only"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 7",
+      "id": "C-07",
+      "limitation_or_prohibition": "protocol only; enactment excluded",
+      "name": "Recovery drill protocol",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I6_DEPLOYMENT_OBSERVABILITY_RUNBOOK_v1.0.md",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "decides: second recovery authority",
+      "b5_index": 8,
+      "book6_disposition": "not_available_platform_internal",
+      "classification": "PLATFORM_INTERNAL",
+      "dependency_closure": [
+        "lease expiry decides recovery"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 8",
+      "id": "C-08",
+      "limitation_or_prohibition": "never extractable",
+      "name": "Recovery enactment",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/src/oce_control/recovery.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 9,
+      "book6_disposition": "design_input_with_limitation",
+      "classification": "EXTRACTABLE_WITH_LIMITATION",
+      "dependency_closure": [
+        "test paths"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 9",
+      "id": "C-09",
+      "limitation_or_prohibition": "laws bound to this repository's paths and frozen manifest rows",
+      "name": "Evidence laws EL01-EL10",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+      "source_resolved_at_p0": true,
+      "visibility": "public_test"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 10,
+      "book6_disposition": "design_input_with_limitation",
+      "classification": "EXTRACTABLE_WITH_LIMITATION",
+      "dependency_closure": [
+        "console install set"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 10",
+      "id": "C-10",
+      "limitation_or_prohibition": "install-set membership is console-specific",
+      "name": "Manifest computation",
+      "owner": "console",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/console/packaging/make_release_manifest.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal_script"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 11,
+      "book6_disposition": "study_only_no_copy",
+      "classification": "REFERENCE_ONLY",
+      "dependency_closure": [
+        "repo-specific gate names"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 11",
+      "id": "C-11",
+      "limitation_or_prohibition": "encodes this repository's supersession and gate names",
+      "name": "CI evidence-selection workflow",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": ".github/workflows/b5-i8-audit-validation.yml",
+      "source_resolved_at_p0": true,
+      "visibility": "public"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 12,
+      "book6_disposition": "design_input_with_limitation",
+      "classification": "EXTRACTABLE_WITH_LIMITATION",
+      "dependency_closure": [
+        "repo test nodes"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 12",
+      "id": "C-12",
+      "limitation_or_prohibition": "targets are this repository's nodes",
+      "name": "Mutation battery harness",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/scripts/b5_i7_mutation_battery.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal_script"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 13,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "json only"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 13",
+      "id": "C-13",
+      "limitation_or_prohibition": "fields and state vocabulary transfer; counts do not",
+      "name": "Requirement-test registry shape",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I9_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "source_resolved_at_p0": true,
+      "visibility": "public_json"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 14,
+      "book6_disposition": "design_input_rederive",
+      "classification": "EXTRACTABLE_PATTERN",
+      "dependency_closure": [
+        "doc only"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 14",
+      "id": "C-14",
+      "limitation_or_prohibition": "shape only; rows do not transfer",
+      "name": "Failure matrix shape",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I9_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 15,
+      "book6_disposition": "design_input_with_limitation",
+      "classification": "EXTRACTABLE_WITH_LIMITATION",
+      "dependency_closure": [
+        "doc only"
+      ],
+      "eligible_for_extraction": true,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 15",
+      "id": "C-15",
+      "limitation_or_prohibition": "single-operator, same-agent, non-blind sample",
+      "name": "Usability protocol",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I8_USABILITY_PROTOCOL_AND_RESULTS_v1.0.md",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 16,
+      "book6_disposition": "none_absent",
+      "classification": "NOT_APPLICABLE",
+      "dependency_closure": [],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 16",
+      "id": "C-16",
+      "limitation_or_prohibition": "never implemented",
+      "name": "Web view",
+      "owner": "none",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "",
+      "source_resolved_at_p0": false,
+      "visibility": "absent"
+    },
+    {
+      "authority_implications": "decides state ownership",
+      "b5_index": 17,
+      "book6_disposition": "not_available_platform_internal",
+      "classification": "PLATFORM_INTERNAL",
+      "dependency_closure": [
+        "canonical state"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 17",
+      "id": "C-17",
+      "limitation_or_prohibition": "never extractable: copy would create second canonical state",
+      "name": "Canonical job/event stores",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/src/oce_control/job_store.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "prohibited by charter",
+      "b5_index": 18,
+      "book6_disposition": "forbidden_constitutional",
+      "classification": "PROHIBITED",
+      "dependency_closure": [
+        "charter law 5"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 18",
+      "id": "C-18",
+      "limitation_or_prohibition": "extracting the rule as a shared store is the prohibited duplication",
+      "name": "Canonical-state ownership rule",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md#5",
+      "source_resolved_at_p0": true,
+      "visibility": "public_doc"
+    },
+    {
+      "authority_implications": "decides",
+      "b5_index": 19,
+      "book6_disposition": "never_extractable_authority",
+      "classification": "AUTHORITY_BEARING",
+      "dependency_closure": [
+        "grants"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 19",
+      "id": "C-19",
+      "limitation_or_prohibition": "never reusable",
+      "name": "Capability/authority machinery",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/src/oce_control/authority.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "decides",
+      "b5_index": 20,
+      "book6_disposition": "never_extractable_authority",
+      "classification": "AUTHORITY_BEARING",
+      "dependency_closure": [
+        "secrets"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 20",
+      "id": "C-20",
+      "limitation_or_prohibition": "a reusable credential seam is an authority seam",
+      "name": "Credential/provider boundaries",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md#10",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 21,
+      "book6_disposition": "not_available_platform_internal",
+      "classification": "PLATFORM_INTERNAL",
+      "dependency_closure": [
+        "database"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 21",
+      "id": "C-21",
+      "limitation_or_prohibition": "environment-specific",
+      "name": "Persistence boundaries (SQLite paths)",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/src/oce_control/pg_store.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 22,
+      "book6_disposition": "study_only_no_copy",
+      "classification": "REFERENCE_ONLY",
+      "dependency_closure": [
+        "compose"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 22",
+      "id": "C-22",
+      "limitation_or_prohibition": "local topology is an environment, not a contract",
+      "name": "Local deployment assumptions (compose stack)",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/compose/compose.yml",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 23,
+      "book6_disposition": "study_only_no_copy",
+      "classification": "REFERENCE_ONLY",
+      "dependency_closure": [
+        "console state"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 23",
+      "id": "C-23",
+      "limitation_or_prohibition": "product-specific artifact",
+      "name": "Console session records",
+      "owner": "console",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "docs/oce-golden-system/OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md#8.1",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 24,
+      "book6_disposition": "study_only_no_copy",
+      "classification": "REFERENCE_ONLY",
+      "dependency_closure": [
+        "console state"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 24",
+      "id": "C-24",
+      "limitation_or_prohibition": "a governed change instance, not a reusable surface",
+      "name": "Queue-depth panel",
+      "owner": "console",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/console/src/oce_console/panel.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 25,
+      "book6_disposition": "not_available_private_api",
+      "classification": "PRIVATE_API",
+      "dependency_closure": [
+        "health module"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 25",
+      "id": "C-25",
+      "limitation_or_prohibition": "not published; consumers must not bind",
+      "name": "Control-plane health/status API",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/src/oce_control/health.py",
+      "source_resolved_at_p0": true,
+      "visibility": "internal"
+    },
+    {
+      "authority_implications": "none",
+      "b5_index": 26,
+      "book6_disposition": "not_available_private_api",
+      "classification": "PRIVATE_API",
+      "dependency_closure": [
+        "test import"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 26",
+      "id": "C-26",
+      "limitation_or_prohibition": "test scaffolding, not a contract",
+      "name": "Shared test support helpers",
+      "owner": "control_plane",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "infrastructure/control-plane/tests/b5_i8_audit_support.py",
+      "source_resolved_at_p0": true,
+      "visibility": "test_only"
+    },
+    {
+      "authority_implications": "would create authority if careless",
+      "b5_index": 27,
+      "book6_disposition": "book6_work_after_authorization",
+      "classification": "DEFERRED_TO_BOOK_6",
+      "dependency_closure": [
+        "would create package boundary"
+      ],
+      "eligible_for_extraction": false,
+      "evidence_citation": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2 row 27",
+      "id": "C-27",
+      "limitation_or_prohibition": "belongs to Book 6 after fresh operator authorization",
+      "name": "The extraction act itself",
+      "owner": "operator",
+      "reaudit_result": "CONFIRMED_NO_DRIFT",
+      "source_path": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#7 B6-I0",
+      "source_resolved_at_p0": true,
+      "visibility": "not_started"
+    }
+  ],
+  "distribution": {
+    "AUTHORITY_BEARING": 3,
+    "DEFERRED_TO_BOOK_6": 1,
+    "EXTRACTABLE_PATTERN": 7,
+    "EXTRACTABLE_WITH_LIMITATION": 5,
+    "NOT_APPLICABLE": 1,
+    "PLATFORM_INTERNAL": 3,
+    "PRIVATE_API": 2,
+    "PROHIBITED": 1,
+    "REFERENCE_ONLY": 4
+  },
+  "document_id": "OCE-B6-P0-CANDIDATES-001",
+  "drift_findings": [],
+  "reaudit_method": "each B5-I9 row re-read against live repository bytes at base; classification re-derived from what the candidate decides, not from importability",
+  "source_authority": [
+    "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#2",
+    "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#3 NP-1..NP-8"
+  ],
+  "stage": "AUTHORIZED_STAGE=BOOK_6-P0-PLANNING_ONLY",
+  "version": "1.0"
+}

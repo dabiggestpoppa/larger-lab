@@ -1,0 +1,645 @@
+{
+  "base_sha": "a794a9af80ae8deddacf2991de17b7d71e445756",
+  "distribution": {
+    "deferred": 7,
+    "internal": 10,
+    "private": 0,
+    "prohibited": 5,
+    "public_experimental": 8,
+    "public_stable": 0
+  },
+  "document_id": "OCE-B6-P0-API-FIREWALL-001",
+  "export_policy": {
+    "exports_at_p0": 0,
+    "prohibitions": [
+      "undocumented_public_symbol",
+      "wildcard_export",
+      "implicit_public_api",
+      "private_name_reexport",
+      "source_path_as_api",
+      "internal_state_object",
+      "database_handle",
+      "hidden_global_state",
+      "environment_variable_authority"
+    ],
+    "public_stable_symbols": 0,
+    "rule": "nothing is exported, packaged or importable at P0; every proposed symbol is a planning name, not an artifact"
+  },
+  "rows_total": 30,
+  "stage": "AUTHORIZED_STAGE=BOOK_6-P0-PLANNING_ONLY",
+  "symbols": [
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "reference page plus typed signature",
+      "error_behavior": "deny_by_default",
+      "examples_planned": "one worked request",
+      "exported_at_p0": false,
+      "owner": "platform_api_owner",
+      "section": "C1.S1",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S1",
+      "symbol": "oce.api.v1.capabilities.get",
+      "tests_planned": "contract and denial tests",
+      "typed_inputs": [
+        "actor_id",
+        "scope"
+      ],
+      "typed_outputs": [
+        "capability_set"
+      ],
+      "version_introduced": "B6-I1"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "reference page plus generated type",
+      "error_behavior": "typed_refusal",
+      "examples_planned": "one worked request",
+      "exported_at_p0": false,
+      "owner": "sdk_owner",
+      "section": "C1.S2",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S2",
+      "symbol": "oce.sdk.intents.submit",
+      "tests_planned": "sdk contract tests",
+      "typed_inputs": [
+        "intent",
+        "actor"
+      ],
+      "typed_outputs": [
+        "receipt"
+      ],
+      "version_introduced": "B6-I1"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "template README",
+      "error_behavior": "refuse_invalid_manifest",
+      "examples_planned": "generated app",
+      "exported_at_p0": false,
+      "owner": "template_owner",
+      "section": "C1.S3",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S3",
+      "symbol": "template:oce-app-skeleton",
+      "tests_planned": "generated app starts",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "B6-I2"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "harness README",
+      "error_behavior": "refuse_missing_service",
+      "examples_planned": "one profile",
+      "exported_at_p0": false,
+      "owner": "harness_owner",
+      "section": "C1.S4",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S4",
+      "symbol": "oce.harness.local.up",
+      "tests_planned": "fresh-machine path",
+      "typed_inputs": [
+        "profile"
+      ],
+      "typed_outputs": [
+        "endpoint_set"
+      ],
+      "version_introduced": "B6-I2"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "compatibility page",
+      "error_behavior": "refuse_unknown_version",
+      "examples_planned": "one matrix row",
+      "exported_at_p0": false,
+      "owner": "compat_owner",
+      "section": "C1.S5",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S5",
+      "symbol": "oce.compat.matrix.check",
+      "tests_planned": "unsupported-version refusal",
+      "typed_inputs": [
+        "consumer_version"
+      ],
+      "typed_outputs": [
+        "verdict"
+      ],
+      "version_introduced": "B6-I1"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "operator guide",
+      "error_behavior": "refuse_unproven",
+      "examples_planned": "one view",
+      "exported_at_p0": false,
+      "owner": "operator_surface_owner",
+      "section": "C2.S1",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S1",
+      "symbol": "oce.operator.capability.view",
+      "tests_planned": "no scaffold shown as proof",
+      "typed_inputs": [
+        "scope"
+      ],
+      "typed_outputs": [
+        "view"
+      ],
+      "version_introduced": "B6-I3"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "approval page",
+      "error_behavior": "refuse_stale_or_self",
+      "examples_planned": "one decision",
+      "exported_at_p0": false,
+      "owner": "operator_surface_owner",
+      "section": "C2.S2",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S2",
+      "symbol": "oce.operator.approval.inbox",
+      "tests_planned": "replay and self-approval refusal",
+      "typed_inputs": [
+        "actor",
+        "decision"
+      ],
+      "typed_outputs": [
+        "approval_record"
+      ],
+      "version_introduced": "B6-I3"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "operator guide",
+      "error_behavior": "refuse_unbounded",
+      "examples_planned": "one query",
+      "exported_at_p0": false,
+      "owner": "operator_surface_owner",
+      "section": "C2.S3",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S3",
+      "symbol": "oce.operator.evidence.explorer",
+      "tests_planned": "manifest reconciliation",
+      "typed_inputs": [
+        "query"
+      ],
+      "typed_outputs": [
+        "evidence_view"
+      ],
+      "version_introduced": "B6-I3"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "operator guide",
+      "error_behavior": "refuse_unknown_scope",
+      "examples_planned": "one drill",
+      "exported_at_p0": false,
+      "owner": "operator_surface_owner",
+      "section": "C2.S4",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S4",
+      "symbol": "oce.operator.incident.view",
+      "tests_planned": "drill legibility",
+      "typed_inputs": [
+        "scope"
+      ],
+      "typed_outputs": [
+        "incident_view"
+      ],
+      "version_introduced": "B6-I4"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "operator guide",
+      "error_behavior": "refuse_estimate_as_actual",
+      "examples_planned": "one period",
+      "exported_at_p0": false,
+      "owner": "cost_owner",
+      "section": "C2.S5",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S5",
+      "symbol": "oce.operator.cost.attribution",
+      "tests_planned": "estimate/actual separation",
+      "typed_inputs": [
+        "period"
+      ],
+      "typed_outputs": [
+        "cost_view"
+      ],
+      "version_introduced": "B6-I4"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "service doc",
+      "error_behavior": "refuse_unknown_identity",
+      "examples_planned": "one actor",
+      "exported_at_p0": false,
+      "owner": "identity_owner",
+      "section": "C3.S1",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S1",
+      "symbol": "oce.identity.resolve",
+      "tests_planned": "revocation and isolation",
+      "typed_inputs": [
+        "credential_reference"
+      ],
+      "typed_outputs": [
+        "actor_identity"
+      ],
+      "version_introduced": "B6-I4"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "service doc",
+      "error_behavior": "refuse_illegal_transition",
+      "examples_planned": "one machine",
+      "exported_at_p0": false,
+      "owner": "workflow_owner",
+      "section": "C3.S2",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S2",
+      "symbol": "oce.workflow.transition",
+      "tests_planned": "crash/replay tests",
+      "typed_inputs": [
+        "state",
+        "event"
+      ],
+      "typed_outputs": [
+        "next_state"
+      ],
+      "version_introduced": "B6-I4"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "service doc",
+      "error_behavior": "refuse_missing_provenance",
+      "examples_planned": "one claim",
+      "exported_at_p0": false,
+      "owner": "knowledge_owner",
+      "section": "C3.S3",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S3",
+      "symbol": "oce.knowledge.promote",
+      "tests_planned": "scope isolation",
+      "typed_inputs": [
+        "claim",
+        "provenance"
+      ],
+      "typed_outputs": [
+        "promotion_record"
+      ],
+      "version_introduced": "B6-I5"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "service doc",
+      "error_behavior": "refuse_tampered",
+      "examples_planned": "one artifact",
+      "exported_at_p0": false,
+      "owner": "artifact_owner",
+      "section": "C3.S4",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S4",
+      "symbol": "oce.artifact.register",
+      "tests_planned": "tamper refusal",
+      "typed_inputs": [
+        "artifact",
+        "manifest"
+      ],
+      "typed_outputs": [
+        "registration"
+      ],
+      "version_introduced": "B6-I5"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "service doc",
+      "error_behavior": "refuse_builder_change",
+      "examples_planned": "one evaluator",
+      "exported_at_p0": false,
+      "owner": "evaluation_owner",
+      "section": "C3.S5",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S5",
+      "symbol": "oce.evaluation.run",
+      "tests_planned": "independent gate",
+      "typed_inputs": [
+        "evaluator",
+        "subject"
+      ],
+      "typed_outputs": [
+        "evaluation_report"
+      ],
+      "version_introduced": "B6-I5"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "adapter guide",
+      "error_behavior": "refuse_bypass",
+      "examples_planned": "one adapter",
+      "exported_at_p0": false,
+      "owner": "adapter_owner",
+      "section": "C4.S1",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C4.S1",
+      "symbol": "oce.adapter.contract",
+      "tests_planned": "conformance kit",
+      "typed_inputs": [
+        "adapter_identity"
+      ],
+      "typed_outputs": [
+        "conformance_result"
+      ],
+      "version_introduced": "B6-I6"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "adapter guide",
+      "error_behavior": "refuse_ambiguous_mapping",
+      "examples_planned": "one mapping",
+      "exported_at_p0": false,
+      "owner": "adapter_owner",
+      "section": "C4.S2",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C4.S2",
+      "symbol": "oce.adapter.identity_map",
+      "tests_planned": "collision tests",
+      "typed_inputs": [
+        "external_id"
+      ],
+      "typed_outputs": [
+        "canonical_id"
+      ],
+      "version_introduced": "B6-I6"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "documentation_obligation": "adapter guide",
+      "error_behavior": "refuse_lossy_without_declaration",
+      "examples_planned": "one fixture",
+      "exported_at_p0": false,
+      "owner": "adapter_owner",
+      "section": "C4.S3",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C4.S3",
+      "symbol": "oce.adapter.translate",
+      "tests_planned": "round-trip tests",
+      "typed_inputs": [
+        "payload",
+        "schema_version"
+      ],
+      "typed_outputs": [
+        "canonical_payload"
+      ],
+      "version_introduced": "B6-I6"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "adapter guide",
+      "error_behavior": "refuse_unbounded",
+      "examples_planned": "one drill",
+      "exported_at_p0": false,
+      "owner": "adapter_owner",
+      "section": "C4.S4",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C4.S4",
+      "symbol": "oce.adapter.resilience",
+      "tests_planned": "isolation drill",
+      "typed_inputs": [
+        "policy"
+      ],
+      "typed_outputs": [
+        "bounded_policy"
+      ],
+      "version_introduced": "B6-I6"
+    },
+    {
+      "classification": "internal",
+      "compatibility_promise": "none",
+      "deterministic": true,
+      "documentation_obligation": "certification guide",
+      "error_behavior": "refuse_uncertified",
+      "examples_planned": "one candidate",
+      "exported_at_p0": false,
+      "owner": "adapter_owner",
+      "section": "C4.S5",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C4.S5",
+      "symbol": "oce.adapter.certification",
+      "tests_planned": "uncertified inactive",
+      "typed_inputs": [
+        "candidate"
+      ],
+      "typed_outputs": [
+        "certification"
+      ],
+      "version_introduced": "B6-I6"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "charter",
+      "error_behavior": "operator_only",
+      "examples_planned": "one charter",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "section": "C5.S1",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C5.S1",
+      "symbol": "not_symbolic:second_app_charter",
+      "tests_planned": "distinct scope proof",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "B6-I7"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "measurement protocol",
+      "error_behavior": "refuse_assertion_without_data",
+      "examples_planned": "one comparison",
+      "exported_at_p0": false,
+      "owner": "reuse_owner",
+      "section": "C5.S2",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C5.S2",
+      "symbol": "oce.reuse.measure",
+      "tests_planned": "material improvement measured",
+      "typed_inputs": [
+        "baseline",
+        "result"
+      ],
+      "typed_outputs": [
+        "measurement"
+      ],
+      "version_introduced": "B6-I7"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "kernel guide",
+      "error_behavior": "domain_owned",
+      "examples_planned": "one kernel",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "section": "C5.S3",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C5.S3",
+      "symbol": "not_symbolic:second_app_kernel",
+      "tests_planned": "property tests",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "B6-I7"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "isolation protocol",
+      "error_behavior": "refuse_cross_app",
+      "examples_planned": "two apps",
+      "exported_at_p0": false,
+      "owner": "reuse_owner",
+      "section": "C5.S4",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C5.S4",
+      "symbol": "oce.isolation.suite",
+      "tests_planned": "cross-app denial",
+      "typed_inputs": [
+        "apps"
+      ],
+      "typed_outputs": [
+        "isolation_report"
+      ],
+      "version_introduced": "B6-I7"
+    },
+    {
+      "classification": "deferred",
+      "compatibility_promise": "not_published",
+      "deterministic": true,
+      "documentation_obligation": "gate record",
+      "error_behavior": "operator_only",
+      "examples_planned": "one gate",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "section": "C5.S5",
+      "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C5.S5",
+      "symbol": "oce.platform.gate",
+      "tests_planned": "operator ratification",
+      "typed_inputs": [
+        "evidence"
+      ],
+      "typed_outputs": [
+        "gate_record"
+      ],
+      "version_introduced": "B6-I9"
+    },
+    {
+      "classification": "prohibited",
+      "compatibility_promise": "never",
+      "deterministic": false,
+      "documentation_obligation": "listed as prohibited",
+      "error_behavior": "never_exists",
+      "examples_planned": "none",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "prohibition_reason": "decides admission",
+      "section": "PROHIBITED",
+      "source_authority": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#3",
+      "symbol": "oce.authority.admit",
+      "tests_planned": "static prohibited-symbol scan",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "never"
+    },
+    {
+      "classification": "prohibited",
+      "compatibility_promise": "never",
+      "deterministic": false,
+      "documentation_obligation": "listed as prohibited",
+      "error_behavior": "never_exists",
+      "examples_planned": "none",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "prohibition_reason": "decides recovery",
+      "section": "PROHIBITED",
+      "source_authority": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#3",
+      "symbol": "oce.recovery.enact",
+      "tests_planned": "static prohibited-symbol scan",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "never"
+    },
+    {
+      "classification": "prohibited",
+      "compatibility_promise": "never",
+      "deterministic": false,
+      "documentation_obligation": "listed as prohibited",
+      "error_behavior": "never_exists",
+      "examples_planned": "none",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "prohibition_reason": "duplicates canonical state",
+      "section": "PROHIBITED",
+      "source_authority": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#3",
+      "symbol": "oce.state.canonical_store",
+      "tests_planned": "static prohibited-symbol scan",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "never"
+    },
+    {
+      "classification": "prohibited",
+      "compatibility_promise": "never",
+      "deterministic": false,
+      "documentation_obligation": "listed as prohibited",
+      "error_behavior": "never_exists",
+      "examples_planned": "none",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "prohibition_reason": "carries provider credentials",
+      "section": "PROHIBITED",
+      "source_authority": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#3",
+      "symbol": "oce.credentials.provider",
+      "tests_planned": "static prohibited-symbol scan",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "never"
+    },
+    {
+      "classification": "prohibited",
+      "compatibility_promise": "never",
+      "deterministic": false,
+      "documentation_obligation": "listed as prohibited",
+      "error_behavior": "never_exists",
+      "examples_planned": "none",
+      "exported_at_p0": false,
+      "owner": "operator",
+      "prohibition_reason": "creates a second scheduler authority",
+      "section": "PROHIBITED",
+      "source_authority": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md#3",
+      "symbol": "oce.scheduler.lease",
+      "tests_planned": "static prohibited-symbol scan",
+      "typed_inputs": [],
+      "typed_outputs": [],
+      "version_introduced": "never"
+    }
+  ],
+  "version": "1.0"
+}

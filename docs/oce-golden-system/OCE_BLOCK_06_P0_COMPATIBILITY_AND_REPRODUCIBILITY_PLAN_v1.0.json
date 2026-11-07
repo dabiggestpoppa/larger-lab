@@ -1,0 +1,301 @@
+{
+  "base_sha": "a794a9af80ae8deddacf2991de17b7d71e445756",
+  "compatibility_matrix": {
+    "columns": [
+      "surface",
+      "version",
+      "supported_from",
+      "supported_to",
+      "consumer_evidence",
+      "state"
+    ],
+    "note": "no implementation row is proven; every row is UNPROVEN at P0",
+    "rows": [
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C1.S1",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C1.S2",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C1.S3",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C1.S4",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C1.S5",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C2.S1",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C2.S2",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C2.S3",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C2.S4",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C2.S5",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C3.S1",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C3.S2",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C3.S3",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C3.S4",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C3.S5",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C4.S1",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C4.S2",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C4.S3",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C4.S4",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C4.S5",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C5.S1",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C5.S2",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C5.S3",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C5.S4",
+        "version": "UNPROVEN"
+      },
+      {
+        "consumer_evidence": "none",
+        "state": "UNPROVEN",
+        "supported_from": "UNPROVEN",
+        "supported_to": "UNPROVEN",
+        "surface": "C5.S5",
+        "version": "UNPROVEN"
+      }
+    ],
+    "state": "PLANNING_SCHEMA_ONLY"
+  },
+  "document_id": "OCE-B6-P0-COMPAT-REPRO-001",
+  "reproducibility": {
+    "external_service": "none",
+    "recurring_cost_usd": 0,
+    "requirements": [
+      [
+        "deterministic_build",
+        "byte-identical rebuild from the same declared inputs"
+      ],
+      [
+        "pinned_dependencies",
+        "every dependency is version pinned and hash recorded"
+      ],
+      [
+        "offline_capable_tests",
+        "the test surface runs with no network"
+      ],
+      [
+        "source_to_artifact_traceability",
+        "artifact names the commit, tree and generator version"
+      ],
+      [
+        "sha256_size_manifest",
+        "per-file SHA-256 and size, recomputed not typed"
+      ],
+      [
+        "sbom_inventory",
+        "dependency inventory recorded if governing sources require it"
+      ],
+      [
+        "license_inventory",
+        "every dependency carries a recorded licence"
+      ],
+      [
+        "provenance_attestation",
+        "artifact bound to source and builder identity"
+      ],
+      [
+        "signing_policy",
+        "signing is deferred and operator-only"
+      ],
+      [
+        "clean_build_verification",
+        "build from a clean checkout only"
+      ],
+      [
+        "two_build_byte_comparison",
+        "two independent builds compared byte-wise"
+      ],
+      [
+        "secret_scan",
+        "no credential, token or key in any artifact"
+      ],
+      [
+        "dependency_vulnerability_review",
+        "recorded review before any publication"
+      ],
+      [
+        "release_immutability",
+        "a released artifact is never rewritten"
+      ],
+      [
+        "rollback_yank_policy",
+        "yank is recorded; history is never rewritten"
+      ]
+    ],
+    "state": "ALL_PLANNED_NOT_IMPLEMENTED"
+  },
+  "stage": "AUTHORIZED_STAGE=BOOK_6-P0-PLANNING_ONLY",
+  "version": "1.0",
+  "versioning": {
+    "api_versioning": "path-versioned surface (v1) with additive-only minor changes inside a major",
+    "artifact_identity": "sha256 over LF-normalised bytes plus byte size, recorded per file and per bundle",
+    "backward_compatibility": "a consumer pinned to a supported version keeps working or is refused explicitly",
+    "deprecation": "announced in the compatibility matrix, one minor cycle minimum, refusal after removal",
+    "forward_compatibility": "not promised; unknown newer versions are refused rather than guessed",
+    "migration_evidence": "per-consumer migration record naming old and new version and the test that passed",
+    "package_version_format": "semver MAJOR.MINOR.PATCH with a leading stage tag (for example 0.1.0 at B6-I1)",
+    "removal": "only in a major version, with a migration note and a recorded operator decision",
+    "reproducible_build": "same declared inputs and generator version produce byte-identical output",
+    "schema_versioning": "every schema carries an integer version and a content hash",
+    "structural_fingerprint": "sorted symbol inventory hashed together with schema versions",
+    "unsupported_version_refusal": "explicit named refusal; silent latest selection is forbidden"
+  }
+}

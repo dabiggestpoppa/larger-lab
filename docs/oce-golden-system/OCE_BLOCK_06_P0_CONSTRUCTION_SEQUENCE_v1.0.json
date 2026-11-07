@@ -1,0 +1,436 @@
+{
+  "acyclic": true,
+  "all_other_stages": "LOCKED",
+  "base_sha": "a794a9af80ae8deddacf2991de17b7d71e445756",
+  "document_id": "OCE-B6-P0-SEQUENCE-001",
+  "implementation_increments": [
+    "B6-I0",
+    "B6-I1",
+    "B6-I2",
+    "B6-I3",
+    "B6-I4",
+    "B6-I5",
+    "B6-I6",
+    "B6-I7"
+  ],
+  "recommended_next_authorization": "B6-I0",
+  "source_authority": "OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#7",
+  "stage": "AUTHORIZED_STAGE=BOOK_6-P0-PLANNING_ONLY",
+  "stage_total": 11,
+  "stages": [
+    {
+      "authority_boundary": "operator_only",
+      "depends_on": [],
+      "entry_gate": "operator mission",
+      "evidence_artifact": "P0 packet + validator",
+      "exit_gate": "this packet validated and reviewed",
+      "id": "B6-P0",
+      "implementation_surfaces": [],
+      "inputs": [
+        "B5-I9 ratified handoff"
+      ],
+      "kind": "planning",
+      "mutation_floor": 0,
+      "non_goals": [
+        "implementation of any kind"
+      ],
+      "outputs": [
+        "this packet"
+      ],
+      "purpose": "freeze extraction decisions, API firewall, compatibility, provenance and construction plan for operator review",
+      "scope": "planning only",
+      "sections": [],
+      "status": "PLANNING_ONLY_PENDING_OPERATOR_RATIFICATION",
+      "stop_conditions": [
+        "stop after review"
+      ],
+      "tests": []
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-P0"
+      ],
+      "entry_gate": "operator AUTHORIZED_STAGE=B6-I0",
+      "evidence_artifact": "frozen contract",
+      "exit_gate": "contract frozen and validated",
+      "id": "B6-I0",
+      "implementation_surfaces": [
+        "contracts"
+      ],
+      "inputs": [
+        "ratified P0 packet"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 0,
+      "non_goals": [
+        "extraction of code"
+      ],
+      "outputs": [
+        "frozen contract"
+      ],
+      "purpose": "freeze extraction decisions, API principles, compatibility and conformance baseline",
+      "scope": "only B5-proven reuse included",
+      "sections": [
+        "C1.S5"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop if any candidate is unproven"
+      ],
+      "tests": [
+        "conformance baseline"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I0"
+      ],
+      "entry_gate": "B6-I0 exit",
+      "evidence_artifact": "contract + denial evidence",
+      "exit_gate": "canonical path and compatibility pass",
+      "id": "B6-I1",
+      "implementation_surfaces": [
+        "api",
+        "sdk"
+      ],
+      "inputs": [
+        "B6-I0"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 3,
+      "non_goals": [
+        "templates"
+      ],
+      "outputs": [
+        "API and SDK"
+      ],
+      "purpose": "C1 API/SDK",
+      "scope": "C1.S1, C1.S2, C1.S5",
+      "sections": [
+        "C1.S1",
+        "C1.S2"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop on authority leak"
+      ],
+      "tests": [
+        "contract",
+        "denial"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I1"
+      ],
+      "entry_gate": "B6-I1 exit",
+      "evidence_artifact": "fresh-machine evidence",
+      "exit_gate": "fresh generated app starts locally",
+      "id": "B6-I2",
+      "implementation_surfaces": [
+        "templates",
+        "harness"
+      ],
+      "inputs": [
+        "B6-I1"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 3,
+      "non_goals": [
+        "cloud dependency"
+      ],
+      "outputs": [
+        "template",
+        "harness"
+      ],
+      "purpose": "C1 templates and local harness",
+      "scope": "C1.S3, C1.S4",
+      "sections": [
+        "C1.S3",
+        "C1.S4"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop if cloud is required"
+      ],
+      "tests": [
+        "generated app start"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I2"
+      ],
+      "entry_gate": "B6-I2 exit",
+      "evidence_artifact": "operator truth evidence",
+      "exit_gate": "operator truth and authority tests pass",
+      "id": "B6-I3",
+      "implementation_surfaces": [
+        "operator_surface"
+      ],
+      "inputs": [
+        "B6-I2"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 3,
+      "non_goals": [
+        "incident and cost"
+      ],
+      "outputs": [
+        "operator views"
+      ],
+      "purpose": "C2 capability, approval and evidence views",
+      "scope": "C2.S1, C2.S2, C2.S3",
+      "sections": [
+        "C2.S1",
+        "C2.S2",
+        "C2.S3"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop on self-approval"
+      ],
+      "tests": [
+        "authority tests"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I3"
+      ],
+      "entry_gate": "B6-I3 exit",
+      "evidence_artifact": "end-to-end failure and cost trace",
+      "exit_gate": "failure and cost trace end-to-end",
+      "id": "B6-I4",
+      "implementation_surfaces": [
+        "operator_surface",
+        "services"
+      ],
+      "inputs": [
+        "B6-I3"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 4,
+      "non_goals": [
+        "knowledge and artifacts"
+      ],
+      "outputs": [
+        "incident",
+        "cost",
+        "identity",
+        "workflow"
+      ],
+      "purpose": "C2 incident and cost plus C3 identity and workflow",
+      "scope": "C2.S4, C2.S5, C3.S1, C3.S2",
+      "sections": [
+        "C2.S4",
+        "C2.S5",
+        "C3.S1",
+        "C3.S2"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop on isolation failure"
+      ],
+      "tests": [
+        "failure and cost trace"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I4"
+      ],
+      "entry_gate": "B6-I4 exit",
+      "evidence_artifact": "provenance and tamper evidence",
+      "exit_gate": "provenance, tamper and independent gate pass",
+      "id": "B6-I5",
+      "implementation_surfaces": [
+        "services"
+      ],
+      "inputs": [
+        "B6-I4"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 3,
+      "non_goals": [
+        "adapter layer"
+      ],
+      "outputs": [
+        "knowledge",
+        "artifact",
+        "evaluation"
+      ],
+      "purpose": "C3 knowledge, artifact and evaluation services",
+      "scope": "C3.S3, C3.S4, C3.S5",
+      "sections": [
+        "C3.S3",
+        "C3.S4",
+        "C3.S5"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop if builder can alter evaluator"
+      ],
+      "tests": [
+        "provenance",
+        "tamper"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I5"
+      ],
+      "entry_gate": "B6-I5 exit",
+      "evidence_artifact": "conformance evidence",
+      "exit_gate": "conformance kit rejects bad adapters",
+      "id": "B6-I6",
+      "implementation_surfaces": [
+        "adapters"
+      ],
+      "inputs": [
+        "B6-I5"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 5,
+      "non_goals": [
+        "second application"
+      ],
+      "outputs": [
+        "adapter kit"
+      ],
+      "purpose": "C4 adapter contract, translation, isolation and certification",
+      "scope": "C4.S1-C4.S5",
+      "sections": [
+        "C4.S1",
+        "C4.S2",
+        "C4.S3",
+        "C4.S4",
+        "C4.S5"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop on bypass"
+      ],
+      "tests": [
+        "conformance kit"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I6"
+      ],
+      "entry_gate": "B6-I6 exit",
+      "evidence_artifact": "reuse measurement evidence",
+      "exit_gate": "material reuse and cross-app isolation demonstrated",
+      "id": "B6-I7",
+      "implementation_surfaces": [
+        "application"
+      ],
+      "inputs": [
+        "B6-I6"
+      ],
+      "kind": "implementation",
+      "mutation_floor": 5,
+      "non_goals": [
+        "platform gate"
+      ],
+      "outputs": [
+        "second app",
+        "measurements"
+      ],
+      "purpose": "C5 second application and reuse measurement",
+      "scope": "C5.S1-C5.S4",
+      "sections": [
+        "C5.S1",
+        "C5.S2",
+        "C5.S3",
+        "C5.S4"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop if reuse is asserted not measured"
+      ],
+      "tests": [
+        "reuse measurement"
+      ]
+    },
+    {
+      "authority_boundary": "builder_within_contract",
+      "depends_on": [
+        "B6-I7"
+      ],
+      "entry_gate": "B6-I7 exit",
+      "evidence_artifact": "audit evidence",
+      "exit_gate": "no governance bypass or speculative claim",
+      "id": "B6-I8",
+      "implementation_surfaces": [],
+      "inputs": [
+        "B6-I7"
+      ],
+      "kind": "audit",
+      "mutation_floor": 0,
+      "non_goals": [
+        "platform gate"
+      ],
+      "outputs": [
+        "audit report"
+      ],
+      "purpose": "independent API, security, compatibility and recovery audit",
+      "scope": "audit of I1-I7",
+      "sections": [],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop on unrepaired finding"
+      ],
+      "tests": [
+        "audit"
+      ]
+    },
+    {
+      "authority_boundary": "operator_only",
+      "depends_on": [
+        "B6-I8"
+      ],
+      "entry_gate": "B6-I8 exit",
+      "evidence_artifact": "gate packet",
+      "exit_gate": "operator-only completion",
+      "id": "B6-I9",
+      "implementation_surfaces": [
+        "gate"
+      ],
+      "inputs": [
+        "B6-I8"
+      ],
+      "kind": "gate",
+      "mutation_floor": 0,
+      "non_goals": [
+        "Book 7 implementation"
+      ],
+      "outputs": [
+        "gate record",
+        "dependency contract"
+      ],
+      "purpose": "platform gate and downstream dependency contract",
+      "scope": "C5.S5",
+      "sections": [
+        "C5.S5"
+      ],
+      "status": "LOCKED",
+      "stop_conditions": [
+        "stop before Book 7"
+      ],
+      "tests": [
+        "operator ratification"
+      ]
+    }
+  ],
+  "version": "1.0"
+}
