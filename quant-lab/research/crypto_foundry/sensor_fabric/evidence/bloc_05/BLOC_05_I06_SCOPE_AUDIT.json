@@ -33,8 +33,8 @@
       "row_id": "frozen_plan_unchanged"
     },
     {
-      "clause": "I06E1 s00 M3/M4 (registry and ladder sealed)",
-      "detail": "git diff 32a897436 -- quant-lab/config is empty",
+      "clause": "I06E1 s00 M3/M4 (registry and ladder sealed) + DISCLOSED SENSOR-B5-I09P2A (one new trust-root file)",
+      "detail": "git diff 32a897436 -- quant-lab/config changes at most the single provider_semantics/approval_manifest.json; every YAML and every registry row is byte-identical",
       "pass": true,
       "row_id": "configurations_unchanged"
     },
