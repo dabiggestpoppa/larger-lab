@@ -8672,3 +8672,64 @@ UNAUTHORIZED; RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
 
 STATUS: B5-I09P2B_IMPLEMENTATION_PARTIAL - HARD STOP. Evidence:
 BLOC_05_I09P2B_IMPLEMENTATION_EVIDENCE.md.
+
+## 193 - SENSOR-B5-I09P2bR1: INDEPENDENT PROVENANCE AUDIT (HOLD)
+
+AUDIT TARGET: 7144b554729e30f0ff938a505ec5cc194644b5f0 (= origin), read-only.
+No production file, test or frozen document changed. Disposable probe only.
+
+RECONSTRUCTION
+  Authority chain re-read at source: manifest bytes and artifact bytes remain
+  caller-supplied at load_semantic_authority; load_trusted_authority adds the
+  reviewed SHA-256 pin; trade sets provenance only on an admitted, attested row;
+  verify_mapping_provenance compares the PROVENANCE OBJECT and the approved row;
+  verify_evidence_custody compares a caller-supplied digest map; the liquidation
+  verifier reads seven admission facts and no record.
+
+FINDINGS
+  F1 verify_mapping_provenance takes no record: parameters are provenance,
+     manifest_bytes, artifact_bytes, methodology_registry, evaluation_at. A record
+     whose aggressor_side was flipped to BUY against an approved isBuyerMaker=true
+     -> SELL row verified with no refusal, as did the same provenance attached to a
+     record claiming provider OKX, venue OKX_SWAP. T1TradeRecord laws tie
+     aggressor_side only to provisional coherence, never to authority_provenance.
+     P2B-18 and P2B-19 therefore do not hold.
+  F2 liquidation admission carries no provider; the row is selected by
+     (provider_field, canonical_field, methodology_id, version) uniqueness and the
+     record's economic side is never in scope.
+  F3 custody reads no bytes; a custody map echoing the manifest digest passes, so
+     verification is conditional on an externally trusted inventory.
+  F4 any datetime is truncated to .date(): an approval available 2026-03-01 was
+     admitted for cutoffs 00:00, 09:00 and 15:00 the same day, so intraday
+     admissibility is not enforced and must not be certified.
+  F5 pin matches committed manifest bytes and the manifest ships artifacts == {};
+     no production caller exists for either loader, so initialization is contract
+     only. PINNED_ROOT_INTEGRITY = PROVEN; OPERATOR_APPROVAL_PROCESS and
+     PROVIDER_EVIDENCE_AUTHENTICITY = NOT_PROVEN.
+  F6 pin cascade intact: P2B block appended last, predecessor pins byte-preserved,
+     one named allowlist entry, I05 artifact byte-identical, I06/I09 deterministic.
+
+RE-ADJUDICATED MATRIX: 18 PASS, 4 PARTIAL (P2B-11, 12, 13, 17), 2 FAIL (P2B-18,
+  P2B-19). The P2b matrix's 21 PASS / 3 PARTIAL is corrected.
+
+EXECUTED: normalization 1124 passed exit 0; governance binding audit 4 passed exit
+  0; b5_i05 86/0 fail, b5_i06 14/0 fail, b5_i09 35/0 fail (8b3dbd3f...) all
+  --check exit 0 with the tree unchanged afterwards. Full canonical suite not
+  rerun: 4522 passed, 14 skipped, exit 0 is accepted prior evidence at this exact
+  commit, whose source and test bytes are unchanged. No test skipped or xfailed.
+
+DECISION: I09P2B_RATIFICATION_HOLD. A forged record passes the purported trusted
+  verification boundary, so that boundary is not ratified. Trusted-root mechanics
+  are independently confirmed; the G7 record-verification claim is not.
+  SENSOR-B5-I09P2c (full-record verification and trusted integration contract) is
+  specified in the audit and NOT implemented.
+
+NO GOVERNANCE CHANGE: B5-I09a = OPERATOR_ACCEPTED; B5-I09b = DEFERRED; B5-I10 =
+  OPERATOR_ACCEPTED (bounded); B5-I11 = IMPLEMENTATION_PARTIAL / RATIFICATION_HOLD;
+  B5-I09P2A = IMPLEMENTATION_COMPLETE, NOT RATIFIED (HOLD); B5-I09P2B =
+  IMPLEMENTATION_PARTIAL, NOT RATIFIED; B5-I09P2B INDEPENDENT AUDIT =
+  RATIFICATION_HOLD; BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and
+  BLOC_06 UNAUTHORIZED; RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
+
+STATUS: B5-I09P2BR1_AUDIT_COMPLETE - HOLD RECORDED. Evidence:
+  BLOC_05_I09P2BR1_INDEPENDENT_AUDIT.md.
