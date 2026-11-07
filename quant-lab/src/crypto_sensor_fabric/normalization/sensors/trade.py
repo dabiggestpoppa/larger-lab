@@ -85,7 +85,11 @@ from ..terms.conversion import (
     inverse_quote_face,
     linear_base_exposure,
 )
-from ..authority import SemanticAuthority, resolve_authority_inputs
+from ..authority import (
+    MappingProvenance,
+    SemanticAuthority,
+    resolve_authority_inputs,
+)
 from ..common.semantic_registry import ProviderSemanticRegistry
 from ..terms.snapshot import ContractTermsSnapshot
 from .side_maps import (
@@ -305,6 +309,11 @@ class T1TradeRecord(T1BaseEnvelope):
     normalization_methodology_id: OpaqueIdentifier | None = None
     normalization_methodology_version: OpaqueIdentifier | None = None
 
+    #: SENSOR-B5-I09P2b: what the canonical side claims about its
+    #: authorization.  Present only when the side was actually admitted;
+    #: a consumer re-derives it with ``verify_mapping_provenance``.
+    authority_provenance: MappingProvenance | None = None
+
     @model_validator(mode="after")
     def _sensor_family_law(self) -> T1TradeRecord:
         if self.sensor_family is not SensorFamily.MECHANICAL_TRADE:
@@ -469,6 +478,31 @@ def normalize_trade(
         and authority is not None
         and authority.attests(mapping) is None
         else AggressorSide.UNKNOWN
+    )
+
+    provenance = (
+        MappingProvenance(
+            artifact_id=authority.artifact_id,
+            approval_id=authority.approval_id,
+            registry_digest=authority.registry_digest,
+            provider=mapping.provider,
+            provider_field=mapping.provider_field,
+            canonical_field=mapping.canonical_field,
+            canonical_sensor=mapping.canonical_sensor.value,
+            methodology_id=mapping.methodology_id,
+            methodology_version=mapping.version,
+            evidence_reference=mapping.evidence_reference,
+            semantic_confidence=mapping.semantic_confidence.value,
+            approved_at=authority.approved_at,
+            available_at=authority.available_at,
+        )
+        if (
+            canonical_side is not AggressorSide.UNKNOWN
+            and mapping is not None
+            and authority is not None
+            and mapping.methodology_id is not None
+        )
+        else None
     )
 
     # -- native values: preserved verbatim, never overwritten --------------
@@ -668,4 +702,5 @@ def normalize_trade(
         source_trade_count=payload.source_trade_count,
         normalization_methodology_id=None,
         normalization_methodology_version=None,
+        authority_provenance=provenance,
     )

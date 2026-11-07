@@ -8609,3 +8609,66 @@ B5-I12+ and BLOC_06 UNAUTHORIZED; RESEARCH = FROZEN; next_checkpoint_authorized 
 
 STATUS: B5-I09P2AR1_AUDIT_COMPLETE - HOLD RECORDED. Evidence:
 BLOC_05_I09P2AR1_INDEPENDENT_AUDIT.md.
+## 192 - SENSOR-B5-I09P2b: TRUSTED INITIALIZATION, RECORD VERIFICATION, PIT PROVENANCE (BOUNDED)
+
+CUSTODY
+  HEAD fa758874ea766eebcb3a6d31ade09b7dece6f4ae (= origin at start). Frozen plan
+  4bb677f9e026 untouched. .bu_tmp/ and the two pre-existing untracked evidence scratch
+  files untouched and never staged. Shipped approval manifest artifacts == {}.
+
+CHAIN (read at source, not inferred from names)
+  manifest_bytes and artifact_bytes were both caller-supplied; no component in src/
+  calls load_semantic_authority outside the authority package, so the repository ships a
+  normalization library and no ingestion application. T1TradeRecord carried no authority
+  field; LiquidationSideAdmission carried an approval id and registry digest with no
+  verifier. SemanticAuthority proved byte-consistency and per-row coverage only.
+
+IMPLEMENT
+  TRUSTED_MANIFEST_SHA256 = 3d707c59...c7042654 pinned in reviewed source, with
+  TRUSTED_MANIFEST_RELPATH and TRUSTED_MANIFEST_SCHEMA_VERSION; load_trusted_authority
+  refuses any other manifest bytes (TRUSTED_ROOT_MISMATCH) and delegates to the P2a
+  loader. Approval entries gain available_at (PIT gate: APPROVAL_NOT_YET_AVAILABLE,
+  EVALUATION_TIME_REQUIRED) and evidence_blobs (ref -> sha256, construction law refuses
+  unbound keys). MappingProvenance plus verify_mapping_provenance and
+  verify_liquidation_admission_provenance re-derive an admission under the trusted root.
+  T1TradeRecord.authority_provenance carries the audit trail when the canonical side was
+  admitted. No new module, no new config file, no operator identity invented.
+
+TESTS ACTUALLY EXECUTED IN THIS CHECKPOINT
+  test_b5_i09p2b_trusted_root.py 24 passed, exit 0.
+  tests/crypto_sensor_fabric/normalization 1124 passed, exit 0.
+  I05 producer 86 rows 0 fail (artifact byte-identical); I06 producer 14 rows 0 fail and
+  artifact regenerated; I09 producer 35 rows 0 fail, --check exit 0 (artifact regenerated).
+  ruff and mypy clean on changed production.
+  Full canonical suite on this tree: 4522 passed, 14 skipped, exit 0 (newly executed
+  in this checkpoint, 2066 s). The prior 4498/14 baseline is historical evidence from
+  6b112f196e and is not re-attributed to this build.
+
+CASCADE
+  test_b5_i10_scope_audit.py allowlist extended by the single named entry
+  test_b5_i09p2b_; b5_i06_replay_safety.py gains P2B_DISCLOSED_SHA256 merged last while
+  every P2A/I08/I09/I10 pin is preserved unmodified. Producers ran I05 -> I06 -> I09.
+  Governance counts republished only after staging. No sealed assertion weakened.
+
+MATRIX
+  P2B-01..P2B-10, P2B-14..P2B-24 PASS. P2B-11 PARTIAL (no in-repo evidence-blob store;
+  custody is checked against the deploying process's inventory). P2B-12 PARTIAL
+  (availability is ISO date-granular by the accepted I05/I06 conventions). P2B-13 PARTIAL
+  (no production application or ingestion initializer exists in this repository, so the
+  trusted entry is an interface plus integration contract).
+
+DECISION: I09P2B_IMPLEMENTATION_PARTIAL. The mechanics are enforceable - an untrusted
+  actor cannot self-approve, records are re-derived rather than believed, evidence
+  references bind to held bytes, PIT availability is enforced - but calling it a PASS
+  would assert a trusted application integration that does not exist in the tree. No
+  venue is certified, no production approval is nonempty, no USD methodology is resolved,
+  and no provenance string is treated as a signature.
+
+NO GOVERNANCE CHANGE: B5-I09a = OPERATOR_ACCEPTED; B5-I09b = DEFERRED; B5-I10 =
+OPERATOR_ACCEPTED (bounded); B5-I11 = IMPLEMENTATION_PARTIAL / RATIFICATION_HOLD; B5-I09P2A =
+IMPLEMENTATION_COMPLETE, NOT RATIFIED (HOLD); B5-I09P2B = IMPLEMENTATION_PARTIAL, NOT
+RATIFIED; BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED; B5-I12+ and BLOC_06
+UNAUTHORIZED; RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
+
+STATUS: B5-I09P2B_IMPLEMENTATION_PARTIAL - HARD STOP. Evidence:
+BLOC_05_I09P2B_IMPLEMENTATION_EVIDENCE.md.

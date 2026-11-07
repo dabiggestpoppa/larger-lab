@@ -388,6 +388,10 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
         "src/crypto_sensor_fabric/normalization/authority/",
         "config/crypto_sensor_fabric/provider_semantics/",
         "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_",
+        # DISCLOSED SENSOR-B5-I09P2b: the trusted-root/provenance security
+        # suite is a distinct checkpoint file under the authority prefix
+        # family, admitted by its own named entry.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2b_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
         # DISCLOSED B5-I11R1 (independent audit): the audit suite is a

@@ -47,6 +47,7 @@ from typing import Any
 
 from pydantic import Field, model_validator
 
+from ...contracts.enums import SensorFamily
 from ..models import NormalizationModelBase, OpaqueIdentifier, RegistryVersion
 from ..common.methodologies import (
     NormalizationMethodologyRegistry,
@@ -62,6 +63,14 @@ from ..common.semantic_registry import (
 
 __all__ = [
     "ApprovalManifest",
+    "MappingProvenance",
+    "TRUSTED_MANIFEST_RELPATH",
+    "TRUSTED_MANIFEST_SCHEMA_VERSION",
+    "TRUSTED_MANIFEST_SHA256",
+    "load_trusted_authority",
+    "verify_evidence_custody",
+    "verify_liquidation_admission_provenance",
+    "verify_mapping_provenance",
     "ApprovedArtifact",
     "AuthorityRefusal",
     "SemanticAuthority",
@@ -126,6 +135,16 @@ class AuthorityRefusal(_StrEnum):
     UNTRUSTED_AUTHORITY = "UNTRUSTED_AUTHORITY"
     #: Rows carry no confidence that may back a critical T1 field.
     AMBIGUOUS_MAPPING = "AMBIGUOUS_MAPPING"
+    #: The manifest bytes are not the reviewed production manifest.
+    TRUSTED_ROOT_MISMATCH = "TRUSTED_ROOT_MISMATCH"
+    #: The approval did not exist yet at the instant being evaluated.
+    APPROVAL_NOT_YET_AVAILABLE = "APPROVAL_NOT_YET_AVAILABLE"
+    #: An evidence reference has no verifiable blob under custody.
+    EVIDENCE_BLOB_UNVERIFIED = "EVIDENCE_BLOB_UNVERIFIED"
+    #: A record claims an admission without any provenance to check.
+    PROVENANCE_MISSING = "PROVENANCE_MISSING"
+    #: A record's declared provenance contradicts the trusted authority.
+    PROVENANCE_MISMATCH = "PROVENANCE_MISMATCH"
 
 
 class SemanticAuthorityRefusal(ValueError):
@@ -172,6 +191,12 @@ class ApprovedArtifact(NormalizationModelBase):
     registry_schema_version: RegistryVersion
     approved_at: str
     valid_until: str | None = None
+    #: When this approval first became operative.  A revision approved after a
+    #: knowledge cutoff must not be applied before it existed (PIT law).
+    available_at: str | None = None
+    #: evidence reference -> SHA-256 of the source blob held under custody.  A
+    #: reference is only evidence when the bytes behind it can be checked.
+    evidence_blobs: dict[str, str] = {}
     allowed_methodologies: tuple[OpaqueIdentifier, ...] = Field(min_length=1)
     evidence: dict[str, dict[str, tuple[OpaqueIdentifier, ...]]]
     declared_native_fields: dict[str, tuple[OpaqueIdentifier, ...]]
@@ -188,6 +213,30 @@ class ApprovedArtifact(NormalizationModelBase):
             raise ValueError("valid_until must be an ISO date (YYYY-MM-DD) or null")
         if self.valid_until is not None and self.valid_until < self.approved_at:
             raise ValueError("valid_until must not precede approved_at")
+        if self.available_at is not None:
+            if not _ISO_DATE_RE.match(self.available_at):
+                raise ValueError("available_at must be an ISO date (YYYY-MM-DD)")
+            if self.available_at < self.approved_at:
+                raise ValueError(
+                    "available_at must not precede approved_at: an approval cannot "
+                    "be operative before it was granted"
+                )
+        bound_refs = {
+            ref
+            for fields in self.evidence.values()
+            for refs in fields.values()
+            for ref in refs
+        }
+        for ref, blob in self.evidence_blobs.items():
+            if not _SHA256_HEX_RE.match(blob):
+                raise ValueError(
+                    f"evidence blob digest for {ref!r} must be 64 lowercase hex characters"
+                )
+            if ref not in bound_refs:
+                raise ValueError(
+                    f"evidence blob {ref!r} is not bound to any provider field by this "
+                    "approval; an unbound blob certifies nothing"
+                )
         for provider, fields in self.evidence.items():
             if not provider.strip() or not fields:
                 raise ValueError(
@@ -277,6 +326,8 @@ class SemanticAuthority(NormalizationModelBase):
     resolved_blocking_assumptions: tuple[OpaqueIdentifier, ...] = ()
     approved_at: str = ""
     valid_until: str | None = None
+    available_at: str | None = None
+    evidence_blobs: dict[str, str] = {}
 
     @model_validator(mode="before")
     @classmethod
@@ -423,6 +474,29 @@ def load_semantic_authority(
                 f"approval {entry.approval_id!r} expired on {entry.valid_until}; "
                 "staleness is a refusal, never an automatic re-admission",
             )
+    as_of_instant = None
+    if evaluation_at is not None:
+        as_of_instant = (
+            evaluation_at.date()
+            if isinstance(evaluation_at, datetime)
+            else evaluation_at
+        )
+    if entry.available_at is not None:
+        if as_of_instant is None:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.EVALUATION_TIME_REQUIRED,
+                "this approval records when it became operative, so the caller must "
+                "state the instant it is being applied at; a revision is not "
+                "retroactively authoritative",
+            )
+        if as_of_instant < date.fromisoformat(entry.available_at):
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE,
+                f"approval {entry.approval_id!r} became operative on "
+                f"{entry.available_at}, after the evaluated instant "
+                f"{as_of_instant.isoformat()}; a later approval cannot be projected "
+                "backwards over an earlier knowledge cutoff",
+            )
     digest = hashlib.sha256(artifact_bytes).hexdigest()
     if digest != entry.sha256:
         raise SemanticAuthorityRefusal(
@@ -472,6 +546,8 @@ def load_semantic_authority(
             "resolved_blocking_assumptions": entry.resolved_blocking_assumptions,
             "approved_at": entry.approved_at,
             "valid_until": entry.valid_until,
+            "available_at": entry.available_at,
+            "evidence_blobs": entry.evidence_blobs,
         }
     )
 
@@ -494,3 +570,325 @@ def resolve_authority_inputs(
     if resolved_authority is not None:
         return resolved_authority, resolved_authority.registry
     return None, resolved_registry
+
+# ---------------------------------------------------------------------------
+# SENSOR-B5-I09P2b - trusted initialization, custody and record verification
+# ---------------------------------------------------------------------------
+
+#: The reviewed production approval root, relative to the ``quant-lab`` tree.
+TRUSTED_MANIFEST_RELPATH = (
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json"
+)
+
+#: SHA-256 of the reviewed production manifest.  This constant IS the bootstrap
+#: pin: it lives in reviewed source and in a governance ledger line, never
+#: inside the manifest it describes, so the manifest cannot authenticate itself.
+#: Changing the shipped manifest therefore requires a reviewed change here.
+TRUSTED_MANIFEST_SHA256 = (
+    "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654"
+)
+
+#: The exact generation the reviewed root may declare.
+TRUSTED_MANIFEST_SCHEMA_VERSION = "b5-i09p2a-1"
+
+
+class MappingProvenance(NormalizationModelBase):
+    """What one admitted canonical field claims about its authorization.
+
+    An AUDIT TRAIL, not authentication: every field here is data a caller can
+    type.  It becomes meaningful only when a consumer re-derives it with
+    :func:`verify_mapping_provenance` against the trusted root.
+    """
+
+    model_config = {"extra": "forbid", "frozen": True}
+
+    artifact_id: OpaqueIdentifier
+    approval_id: OpaqueIdentifier
+    registry_digest: str
+    provider: OpaqueIdentifier
+    provider_field: OpaqueIdentifier
+    canonical_field: OpaqueIdentifier
+    canonical_sensor: OpaqueIdentifier
+    methodology_id: OpaqueIdentifier
+    methodology_version: OpaqueIdentifier
+    evidence_reference: OpaqueIdentifier | None = None
+    semantic_confidence: str
+    approved_at: str = ""
+    available_at: str | None = None
+
+    @model_validator(mode="after")
+    def _digest_law(self) -> MappingProvenance:
+        if not _SHA256_HEX_RE.match(self.registry_digest):
+            raise ValueError("registry_digest must be 64 lowercase hex characters")
+        return self
+
+
+def load_trusted_authority(
+    *,
+    manifest_bytes: bytes,
+    artifact_id: str,
+    artifact_bytes: bytes,
+    methodology_registry: NormalizationMethodologyRegistry,
+    evaluation_at: datetime | date | None = None,
+) -> SemanticAuthority:
+    """The production entry point: authority under the REVIEWED root.
+
+    The distinction from :func:`load_semantic_authority` is the repair: that
+    function trusts whichever manifest it is handed, which is a caller approving
+    itself.  This one refuses any manifest whose bytes are not the pinned,
+    reviewed production manifest, so an untrusted actor controlling both the
+    artifact and the manifest gets ``TRUSTED_ROOT_MISMATCH``.
+
+    Deployment assumption, stated plainly: the constant above is the anchor and
+    it is only as strong as review of the commit that changes it.  This is a
+    data boundary inside one process; it is not a signature scheme and does not
+    resist code running with the application's privileges.
+    """
+    digest = hashlib.sha256(manifest_bytes).hexdigest()
+    if digest != TRUSTED_MANIFEST_SHA256:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.TRUSTED_ROOT_MISMATCH,
+            f"manifest bytes hash to {digest}; the reviewed production root is "
+            f"{TRUSTED_MANIFEST_SHA256}. A manifest supplied by the actor that "
+            "also supplies the artifact is not an approval (SENSOR-B5-I09P2b)",
+        )
+    manifest = parse_approval_manifest(manifest_bytes)
+    if manifest.schema_version != TRUSTED_MANIFEST_SCHEMA_VERSION:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.TRUSTED_ROOT_MISMATCH,
+            f"reviewed root declares schema {manifest.schema_version!r}, the pin "
+            f"names {TRUSTED_MANIFEST_SCHEMA_VERSION!r}",
+        )
+    return load_semantic_authority(
+        manifest_bytes=manifest_bytes,
+        artifact_id=artifact_id,
+        artifact_bytes=artifact_bytes,
+        methodology_registry=methodology_registry,
+        evaluation_at=evaluation_at,
+    )
+
+
+def verify_evidence_custody(
+    authority: SemanticAuthority, custody: dict[str, str]
+) -> None:
+    """Every approved evidence reference must resolve to the bytes it names.
+
+    ``custody`` maps an evidence reference to the SHA-256 the storage layer
+    holds.  Custody proves the bytes exist and are unchanged; it does NOT prove
+    the provider authored them, which stays an operator review obligation.
+    """
+    for reference, expected in authority.evidence_blobs.items():
+        observed = custody.get(reference)
+        if observed is None:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.EVIDENCE_BLOB_UNVERIFIED,
+                f"evidence reference {reference!r} is approved but no blob is "
+                "held under custody; a citation without bytes is a claim",
+            )
+        if observed != expected:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.EVIDENCE_BLOB_UNVERIFIED,
+                f"evidence reference {reference!r} resolves to blob {observed}, "
+                f"the approval names {expected}",
+            )
+
+
+def verify_mapping_provenance(
+    provenance: MappingProvenance | None,
+    *,
+    manifest_bytes: bytes,
+    artifact_bytes: bytes,
+    methodology_registry: NormalizationMethodologyRegistry,
+    evaluation_at: datetime | date | None = None,
+) -> None:
+    """Re-derive one record's admission against the trusted root.
+
+    A consumer passes the record's declared provenance plus the independently
+    held root, artifact bytes and evaluation instant.  It does not believe the
+    record: it rebuilds the authority and checks that the row the record names
+    is the row the approval actually covers.
+    """
+    if provenance is None:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISSING,
+            "the record carries no authority provenance, so nothing can be "
+            "verified; an unprovenanced admission is indistinguishable from a "
+            "hand-written one",
+        )
+    authority = load_trusted_authority(
+        manifest_bytes=manifest_bytes,
+        artifact_id=provenance.artifact_id,
+        artifact_bytes=artifact_bytes,
+        methodology_registry=methodology_registry,
+        evaluation_at=evaluation_at,
+    )
+    if authority.approval_id != provenance.approval_id:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"record claims approval {provenance.approval_id!r}, the trusted root "
+            f"issues {authority.approval_id!r}",
+        )
+    if authority.registry_digest != provenance.registry_digest:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"record claims registry digest {provenance.registry_digest}, the "
+            f"approved bytes hash to {authority.registry_digest}",
+        )
+    row = authority.registry.resolve(
+        provenance.provider,
+        provenance.provider_field,
+        SensorFamily(provenance.canonical_sensor),
+    )
+    if row is None:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            "the approved registry declares no row for "
+            f"({provenance.provider}, {provenance.provider_field}, "
+            f"{provenance.canonical_sensor})",
+        )
+    if row.canonical_field != provenance.canonical_field:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"row maps to canonical field {row.canonical_field!r}, the record "
+            f"claims {provenance.canonical_field!r}",
+        )
+    if (
+        row.methodology_id != provenance.methodology_id
+        or row.version != provenance.methodology_version
+    ):
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"row cites methodology {row.methodology_id!r}@{row.version!r}, the "
+            f"record claims {provenance.methodology_id!r}"
+            f"@{provenance.methodology_version!r}",
+        )
+    if row.evidence_reference != provenance.evidence_reference:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            "the record's evidence reference is not the approved row's reference",
+        )
+    if row.semantic_confidence.value != provenance.semantic_confidence:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"row confidence is {row.semantic_confidence.value}, the record "
+            f"claims {provenance.semantic_confidence}",
+        )
+    refusal = authority.attests(row)
+    if refusal is not None:
+        raise SemanticAuthorityRefusal(
+            refusal,
+            "the approved row is not attested by the trusted root; the record "
+            "claims an admission the approval does not cover",
+        )
+
+
+
+def verify_liquidation_admission_provenance(
+    admission: object,
+    *,
+    artifact_id: str,
+    manifest_bytes: bytes,
+    artifact_bytes: bytes,
+    methodology_registry: NormalizationMethodologyRegistry,
+    evaluation_at: datetime | date | None = None,
+) -> MappingProvenance:
+    """Re-derive one liquidation side admission against the trusted root.
+
+    ``LiquidationSideAdmission`` carries the approving identity rather than a
+    full provenance object, so this reconstructs the provenance from the approved
+    row and then applies the same re-derivation trade records get.  The admission
+    does not serialize its provider, so the row is resolved by its exact
+    (canonical field, provider field, methodology, version) identity and an
+    ambiguous match refuses rather than guessing.
+    """
+
+    def _text(value: object) -> str:
+        return str(getattr(value, "value", value))
+
+    def _required(name: str) -> object:
+        value = getattr(admission, name, None)
+        if value is None:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.PROVENANCE_MISSING,
+                f"liquidation admission states no {name!r}; a decision without an "
+                "approving identity cannot be re-derived",
+            )
+        return value
+
+    if not getattr(admission, "admitted", False):
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISSING,
+            "a refused liquidation field is not an admission; nothing to verify",
+        )
+    approval_id = _text(_required("admission_approval_id"))
+    registry_digest = _text(_required("admission_registry_digest"))
+    canonical_field = _text(_required("canonical_field"))
+    provider_field = _text(_required("provider_field"))
+    methodology_id = _text(_required("methodology_id"))
+    mapping_version = _text(_required("mapping_version"))
+    _required("evidence_reference")
+
+    authority = load_trusted_authority(
+        manifest_bytes=manifest_bytes,
+        artifact_id=artifact_id,
+        artifact_bytes=artifact_bytes,
+        methodology_registry=methodology_registry,
+        evaluation_at=evaluation_at,
+    )
+    if authority.approval_id != approval_id:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"admission claims approval {approval_id!r}, the trusted root issues "
+            f"{authority.approval_id!r}",
+        )
+    if authority.registry_digest != registry_digest:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"admission claims registry digest {registry_digest}, the approved "
+            f"bytes hash to {authority.registry_digest}",
+        )
+    candidates = [
+        row
+        for row in authority.registry.mappings
+        if row.canonical_sensor is SensorFamily.MECHANICAL_LIQUIDATION
+        and row.provider_field == provider_field
+        and row.canonical_field == canonical_field
+        and row.methodology_id == methodology_id
+        and row.version == mapping_version
+    ]
+    if len(candidates) != 1:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            f"the admission names {len(candidates)} approved rows; exactly one is "
+            "required, so an ambiguous or absent mapping cannot be verified",
+        )
+    row = candidates[0]
+    if row.methodology_id is None:  # pragma: no cover - filtered above
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.PROVENANCE_MISMATCH,
+            "the approved row cites no methodology, so its admission cannot be "
+            "re-derived",
+        )
+    provenance = MappingProvenance(
+        artifact_id=artifact_id,
+        approval_id=authority.approval_id,
+        registry_digest=authority.registry_digest,
+        provider=row.provider,
+        provider_field=row.provider_field,
+        canonical_field=row.canonical_field,
+        canonical_sensor=row.canonical_sensor.value,
+        methodology_id=row.methodology_id,
+        methodology_version=row.version,
+        evidence_reference=row.evidence_reference,
+        semantic_confidence=row.semantic_confidence.value,
+        approved_at=str(getattr(authority, "approved_at", "")),
+        available_at=authority.available_at,
+    )
+    verify_mapping_provenance(
+        provenance,
+        manifest_bytes=manifest_bytes,
+        artifact_bytes=artifact_bytes,
+        methodology_registry=methodology_registry,
+        evaluation_at=evaluation_at,
+    )
+    return provenance
