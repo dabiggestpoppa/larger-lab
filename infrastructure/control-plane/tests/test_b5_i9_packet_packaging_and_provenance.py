@@ -4,11 +4,16 @@ from __future__ import annotations
 import ast
 import json
 import pathlib
+import sys
 import tempfile
 
 import pytest
 
-from oce_control import b5_i9_gate as gate
+import pathlib as _pathlib
+import sys as _sys
+
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[1] / "scripts"))
+import b5_i9_gate as gate
 
 ROOT = gate.repo_root()
 PACKET = ROOT / gate.PACKET_DIR
@@ -97,14 +102,14 @@ class TestProvenance:
             for pattern in gate.SECRET_PATTERNS:
                 assert not pattern.search(body), path.name
         for name in ("b5_i9_gate.py",):
-            body = (ROOT / "infrastructure/control-plane/src/oce_control" / name).read_text(
+            body = (SCRIPTS / name).read_text(
                 encoding="utf-8")
             for pattern in gate.SECRET_PATTERNS:
                 assert not pattern.search(body), name
 
     def test_validator_stdlib_only_and_offline(self):
         targets = [
-            ROOT / "infrastructure/control-plane/src/oce_control/b5_i9_gate.py",
+            ROOT / "infrastructure/control-plane/scripts/b5_i9_gate.py",
             SCRIPTS / "b5_i9_p0_validate.py",
             SCRIPTS / "b5_i9_factory_gate.py",
             SCRIPTS / "b5_i9_mutation_battery.py",

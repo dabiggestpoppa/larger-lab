@@ -3,12 +3,17 @@ from __future__ import annotations
 
 import json
 import pathlib
+import sys
 import subprocess
 import tempfile
 
 import pytest
 
-from oce_control import b5_i9_gate as gate
+import pathlib as _pathlib
+import sys as _sys
+
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[1] / "scripts"))
+import b5_i9_gate as gate
 
 ROOT = gate.repo_root()
 DOCS = ROOT / gate.DOCS_DIR
@@ -20,7 +25,7 @@ ALLOWED_CHANGES = (
     "docs/oce-golden-system/OCE_B5_I9_",
     "docs/oce-golden-system/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
     "infrastructure/control-plane/tests/test_b5_i9_",
-    "infrastructure/control-plane/src/oce_control/b5_i9_gate.py",
+    "infrastructure/control-plane/scripts/b5_i9_gate.py",
     "infrastructure/control-plane/scripts/b5_i9_",
     "infrastructure/control-plane/evidence/b5-i9/",
     ".github/workflows/b5-i9-",

@@ -3,7 +3,7 @@
   "determinism": "sorted keys, LF, UTF-8, no timestamps, repository-relative paths only",
   "document_id": "OCE-B5-I9-PROVENANCE-001",
   "generator": "infrastructure/control-plane/scripts/b5_i9_factory_gate.py",
-  "generator_library": "infrastructure/control-plane/src/oce_control/b5_i9_gate.py",
+  "generator_library": "infrastructure/control-plane/scripts/b5_i9_gate.py",
   "language": "python3 standard library only",
   "network_access": false,
   "reproduce": "python infrastructure/control-plane/scripts/b5_i9_factory_gate.py --check",

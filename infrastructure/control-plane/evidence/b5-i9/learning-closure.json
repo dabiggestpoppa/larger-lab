@@ -52,6 +52,20 @@
       "observation": "the stage branch initially compared executed nodes against the mutation count"
     },
     {
+      "consequence": "on a Linux checkout the rule is unsatisfiable, so the validator was red for a platform reason rather than a content defect",
+      "correction": "the style rule is now 'one newline style, no bare CR', which holds for LF and CRLF checkouts alike; content rules are unchanged",
+      "disposition": "repaired forward; no content check weakened",
+      "id": "L09",
+      "observation": "the frozen style rule required CRLF bytes in the checkout, but repository blobs are LF and .gitattributes scopes LF for infrastructure/"
+    },
+    {
+      "consequence": "placing the gate library beside production modules made three frozen governance proofs red",
+      "correction": "the library lives in infrastructure/control-plane/scripts/b5_i9_gate.py, outside the production tree; the production tree stays byte-identical to its base",
+      "disposition": "repaired forward; the frozen law was not touched",
+      "id": "L10",
+      "observation": "a frozen B5-I3 law forbids adding or changing any module under src/oce_control/ after its base"
+    },
+    {
       "consequence": "a future classifier that silently drops a class would still look arithmetically plausible",
       "correction": "every class has a frozen count, and the generator refuses a census that differs",
       "disposition": "enforced at generation time and asserted by the tests",

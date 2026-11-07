@@ -3,9 +3,16 @@ from __future__ import annotations
 
 import json
 
+import pathlib
+import sys
+
 import pytest
 
-from oce_control import b5_i9_gate as gate
+import pathlib as _pathlib
+import sys as _sys
+
+_sys.path.insert(0, str(_pathlib.Path(__file__).resolve().parents[1] / "scripts"))
+import b5_i9_gate as gate
 
 ROOT = gate.repo_root()
 PACKET = ROOT / gate.PACKET_DIR

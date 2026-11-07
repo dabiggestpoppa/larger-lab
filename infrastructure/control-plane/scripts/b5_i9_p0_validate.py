@@ -359,7 +359,6 @@ def validate():
     prefixes = ["docs/oce-golden-system/OCE_B5_I9_"]
     if IMPLEMENTED:
         prefixes += ["infrastructure/control-plane/tests/test_b5_i9_",
-                     "infrastructure/control-plane/src/oce_control/b5_i9_gate.py",
                      "infrastructure/control-plane/scripts/b5_i9_",
                      "infrastructure/control-plane/evidence/b5-i9/",
                      ".github/workflows/b5-i9-"]

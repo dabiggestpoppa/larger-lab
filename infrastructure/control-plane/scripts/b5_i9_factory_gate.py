@@ -17,9 +17,7 @@ import json
 import pathlib
 import sys
 
-sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1] / "src"))
-
-from oce_control import b5_i9_gate as gate  # noqa: E402
+import b5_i9_gate as gate  # noqa: E402
 
 
 def main(argv=None):

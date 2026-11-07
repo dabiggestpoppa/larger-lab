@@ -112,7 +112,7 @@ def _fail(check, detail):
 
 
 def repo_root():
-    return pathlib.Path(__file__).resolve().parents[4]
+    return pathlib.Path(__file__).resolve().parents[3]
 
 
 def canon(obj):
@@ -623,7 +623,7 @@ def build(repo):
         "stage": STAGE,
         "base_sha": BASE,
         "generator": "infrastructure/control-plane/scripts/b5_i9_factory_gate.py",
-        "generator_library": "infrastructure/control-plane/src/oce_control/b5_i9_gate.py",
+        "generator_library": "infrastructure/control-plane/scripts/b5_i9_gate.py",
         "language": "python3 standard library only",
         "network_access": False,
         "secrets_required": False,
@@ -752,6 +752,20 @@ def learning_observations(repo, counts):
             "consequence": "one check would have been permanently red for a reason unrelated to the state it guards",
             "correction": "nodes_executed is compared with the planned nodes and mutations_executed with the mutations",
             "disposition": "repaired forward in the validator",
+        },
+        {
+            "id": "L09",
+            "observation": "the frozen style rule required CRLF bytes in the checkout, but repository blobs are LF and .gitattributes scopes LF for infrastructure/",
+            "consequence": "on a Linux checkout the rule is unsatisfiable, so the validator was red for a platform reason rather than a content defect",
+            "correction": "the style rule is now 'one newline style, no bare CR', which holds for LF and CRLF checkouts alike; content rules are unchanged",
+            "disposition": "repaired forward; no content check weakened",
+        },
+        {
+            "id": "L10",
+            "observation": "a frozen B5-I3 law forbids adding or changing any module under src/oce_control/ after its base",
+            "consequence": "placing the gate library beside production modules made three frozen governance proofs red",
+            "correction": "the library lives in infrastructure/control-plane/scripts/b5_i9_gate.py, outside the production tree; the production tree stays byte-identical to its base",
+            "disposition": "repaired forward; the frozen law was not touched",
         },
         {
             "id": "L06",
