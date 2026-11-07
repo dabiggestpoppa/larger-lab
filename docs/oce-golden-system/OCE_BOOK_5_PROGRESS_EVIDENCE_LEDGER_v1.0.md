@@ -2240,3 +2240,120 @@ above is executed by the frozen surface on every run.
 
 No ledger write follows this section in the B5-I8 ratification, so the measured
 identity remains exact at the ratification head.
+
+## 21. B5-I9 P0 — factory gate and B6 extraction contract (planning packet)
+
+**Stage.** `AUTHORIZED_STAGE=B5-I9-P0`, executed 2026-11-07 from merged
+`origin/main` `833f7d1b9f2dfec2986fb9516d0abde06bf23dae` (PR #23 merge `833f7d1b9f2dfec2986fb9516d0abde06bf23dae`, parents
+`e999a4a3…` and `a926bd61…`, tree `c674e74f…`). Status `DRAFT FOR OPERATOR REVIEW`;
+implementation `NOT STARTED`; `MERGE_AUTHORIZED = false`.
+
+**Stage identity (derived).** Block 5 plan §7 row `B5-I9` = *Factory gate and B6
+reusable-extraction contract*, gate *Operator-only completion*; plan §6 `B5.C5.S5`
+deliverable *correction ADRs and B6 contract*; roadmap §4 row `I9` = *gate packet, learning
+ledger, downstream contract, operator hold*. B5-I9 is therefore a governed combination of
+factory gate, learning closure, B6 extraction **contract** and operator hold. It is not
+extraction, not packaging of code, not portability engineering, not agent-performed Book 5
+closure, and not Book 6.
+
+**Note on §1.** The increment table above still shows `B5-I9 | LOCKED`. That row sits
+inside the EL09 protected prefix and is historically accurate at the moment it was
+written; it is not edited. This section is the live status.
+
+**Source-to-claim.** Sixteen claims are mapped to their clauses in the contract §2; no
+claim rests on narrative, and each citation names a file and a clause.
+
+**Arithmetic.** 51 requirements — book6_handoff 8, boundary 5, extraction 10, g16 4, no_platform_law 9, packaging 9, stage_identity 6. Bindings: attestation 4, deferred 2, static 4, test 41. States: DEFERRED_WITH_OWNER 2, MAPPED 41, PLANNED 8;
+`PASS` claims `0`. Planned nodes `41` across `5` planned test files (none
+created). Failure classes declared `25` with `25` bound (floor 22). Mutations
+planned `10` (floor 10). Extraction candidates classified `27`.
+
+**Extraction classifications.** `EXTRACTABLE_PATTERN` 7 · `EXTRACTABLE_WITH_LIMITATION` 5 ·
+`REFERENCE_ONLY` 4 · `PLATFORM_INTERNAL` 3 · `PRIVATE_API` 2 · `AUTHORITY_BEARING` 3 ·
+`PROHIBITED` 1 · `DEFERRED_TO_BOOK_6` 1 (the extraction act itself) · `NOT_APPLICABLE` 1.
+No authority-bearing item was promoted, and importability promoted nothing.
+
+**Packaging disposition.** This stage packages evidence, not software. Determinism,
+reproducibility, portability and self-containment are defined measurably (boundary §4);
+`deployable` is not claimed and no runtime package is produced. Release packaging remains
+B5-I6's, templates remain B6's.
+
+**Book 6 handoff.** Seven states are distinguished; evidence-complete and
+implementation-complete are true, governance-complete, B5-I9-complete, authorized and
+started are false, input-ready is true. `BOOK_6_AUTHORIZED = false`,
+`BOOK_6_STARTED = false`, `POST_BOOK_6_EVALUATION = UNSTARTED`. No Book 6 artifact exists.
+
+**G16.** Remains `OPEN` under `B5I8-DF05`, evidence class
+`SAME_AGENT_SINGLE_OPERATOR_NON_BLIND`, owner *Operator (independent auditor distinct from
+the implementer)*. It blocks no B5-I9 planning work and blocks any independence claim. Not
+closed, not packaged as closed.
+
+**Changed-file boundary.** Six new documents, one registry, one read-only validator, this
+section. No production, runtime, frontend, test, workflow or B5-I0–I8 evidence file
+changed.
+
+**Locks.** `MERGE_AUTHORIZED = false`; Book 6 `UNAUTHORIZED`; web view `ABSENT`; cost
+`$0`; cloud/provider mutations `0`; `capital.authority = none`; Freebuff untouched.
+
+**Audit.** `SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT` — SPEC 8.4 · DESIGN 8.2 ·
+CORRECTNESS 8.6 · QUALITY 8.3 → **8.375**.
+
+**Ledger identity.** The protected prefix `[0, 191950)` still hashes to
+`83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`; the size and digest
+before this section were `215081` normalized bytes and `31dd01508571775057731304230f560347ffa15d91d67b5bf57250201280ee81`. This section
+only appends.
+
+## 22. B5-I9 P0 — operator ratification (planning frozen)
+
+**Stage.** `AUTHORIZED_STAGE=B5-I9-P0-RATIFICATION`, executed 2026-11-07 against base
+`833f7d1b9f2dfec2986fb9516d0abde06bf23dae` (PR #23 merge). Original P0 commit `f6b5448fd2fc0785209327e0f31b6ce199bacdb5`; forward repair commit `368c2a09dd175e9c998394a4e1577fe5e170ddb5`;
+no history rewrite, no amend, no force-push.
+
+**Verdict.** `B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN`. Record:
+`OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md`. `B5-I9 IMPLEMENTATION = NOT STARTED`,
+`B5-I9 COMPLETE = false`, `BOOK_5 GOVERNANCE COMPLETE = false`.
+
+**Defects found and repaired (forward only).** D1 four cited source paths did not exist
+(`job_store.py`, `worker_leases.py`, the B5-I8 audit helper, the release-manifest generator)
+and one row cited none — all five now exact and machine-checked. D2 the extraction
+requirement set still said `26 candidates` after the boundary grew to 27 — corrected.
+D3 the state vocabulary was undefined — `MAPPED`/`PLANNED`/`DEFERRED_WITH_OWNER` are now
+defined and enforced, so `MAPPED` ⇔ `test` binding, `PLANNED` ⇔ `static`/`attestation`.
+D4 `Book 6 input-ready = true` was defined to include the extraction contract and could not
+be true before completion — narrowed to upstream B5-I0–I8 evidence, with contract
+ratification separated as `BOOK_6 CONTRACT_RATIFIED` and non-implications stated. D5 the
+validator reported 206 then 198 checks for one packet because untracked-path checks vanished
+with the scratch — coverage is now 137 mandatory checks plus 93 candidate inspections, with
+`--json` and `--self-check`, stable for a tree.
+
+**Book 6 handoff.** Seven states, values: evidence-complete `true`, implementation-complete
+`true`, governance-complete `false`, B5-I9-complete `false`, input-ready `true` (narrow,
+upstream only), authorized `false`, started `false`. `BOOK_6 CONTRACT_RATIFIED = true` is a
+gate, not a state, and never authorizes Book 6. This section supersedes §21's unqualified
+`input-ready is true`; §21 is retained exactly as written.
+
+**Arithmetic (recomputed).** 51 requirements — stage_identity 6, extraction 10,
+no_platform_law 9, packaging 9, book6_handoff 8, g16 4, boundary 5. Bindings: test 41,
+static 4, attestation 4, deferred 2. States: MAPPED 41, PLANNED 8, DEFERRED_WITH_OWNER 2,
+BLOCKED 0, `PASS` 0. Planned nodes 41 across 5 files (9/7/9/8/7, none created). Failure
+classes 25 declared and 25 bound (floor 22). Mutations 10 planned (floor 10), not executed.
+Extraction candidates 27 across all nine classes, no authority-bearing item extractable.
+
+**Validator.** `137` mandatory checks, `93` candidate inspections, `0` failures, run twice
+with identical totals and digest (`--self-check`). Read-only, offline, stdlib-only.
+
+**CI.** P0 head `f6b5448fd2fc0785209327e0f31b6ce199bacdb5`: runs `42383441729` and `42383441749`, both SUCCESS. Repair head
+`368c2a09dd175e9c998394a4e1577fe5e170ddb5`: runs `42386803838` and `42386803818`, both SUCCESS. B5-I8 40/40 and B5-I7 27/27
+unchanged; no B5-I9 execution step exists, so none ran.
+
+**Locks.** `MERGE_AUTHORIZED = true` for PR #24 only; `BOOK_6_AUTHORIZED = false`;
+`BOOK_6_STARTED = false`; `POST_BOOK_6_EVALUATION = UNSTARTED`; `G16 = OPEN (B5I8-DF05)`;
+web view `ABSENT`; cost `$0`; cloud/provider mutations `0`; `capital.authority = none`;
+Freebuff untouched.
+
+**Audit.** `SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT` — SPEC 8.5 · DESIGN 8.4 ·
+CORRECTNESS 8.7 · QUALITY 8.4 → **8.5**, superseding 8.375.
+
+**Ledger identity.** The protected prefix `[0, 191950)` still hashes to
+`83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`. Size and digest before
+this section were recorded in §21; this section only appends.
