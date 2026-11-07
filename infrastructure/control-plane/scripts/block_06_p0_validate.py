@@ -336,7 +336,8 @@ def base_inventory(c: Checker) -> set[str]:
 
 
 def check_boundary(c: Checker) -> None:
-    impl = [p for p in c.root.rglob("*") if p.is_file() and ".git" not in p.parts]
+    caches = {".git", "__pycache__", ".pytest_cache", ".ruff_cache", ".mypy_cache", ".venv"}
+    impl = [p for p in c.root.rglob("*") if p.is_file() and not (caches & set(p.parts))]
     base = base_inventory(c)
     rel = [str(p.relative_to(c.root)).replace("\\", "/") for p in impl]
     new_files = [r for r in rel if r not in base]
