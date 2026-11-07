@@ -78,9 +78,9 @@
     "acceptance_matrix_sha256": "7267318632900569f350fcb856dd55d78faecc26f0a609af3a7ad2adcbfc4c02",
     "boundary_sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea",
     "construction_plan_sha256": "93f2a5a0ed9a4216eca06e66e38bc8349530790c435561dc27d4c73ba913a3d9",
-    "contract_sha256": "ad15c926fdc06d4c67176e895bbfa6f360af01b266a418076e34e0a81fb1cbce",
+    "contract_sha256": "e10ce0e37f20bdba0f26427e9ac46b835c5e3314f276006004373056b9f66968",
     "failure_matrix_sha256": "25c1716ebb7f51efe5295da626d4ff889d300b5e12c6daa8be1672dc410e3ab1",
-    "registry_sha256": "6879f44073184b6ea0afdc178680bb973594b49ed89b977624607525dc57fd51"
+    "registry_sha256": "a1721b2610f5574295f4d1e4215307e94c82aadb8f92aaa81ae402c6e733f068"
   },
   "stage": "B5-I9-IMPLEMENTATION",
   "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",

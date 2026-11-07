@@ -44,6 +44,7 @@ ACCEPTANCE = "OCE_B5_I9_ACCEPTANCE_MATRIX_v1.0.md"
 FAILURE = "OCE_B5_I9_FAILURE_MATRIX_AND_RECOVERY_PLAN_v1.0.md"
 PLAN = "OCE_B5_I9_CONSTRUCTION_PLAN_v1.0.md"
 RATIFICATION = "OCE_B5_I9_P0_OPERATOR_RATIFICATION_v1.0.md"
+RATIFICATION_IMPL = "OCE_B5_I9_IMPLEMENTATION_RATIFICATION_v1.0.md"
 DELIVERABLES = [CONTRACT, BOUNDARY, REGISTRY, ACCEPTANCE, FAILURE, PLAN]
 
 STATES = {"PLANNED", "MAPPED", "DEFERRED_WITH_OWNER", "BLOCKED"}
@@ -108,7 +109,7 @@ def validate():
     ids = [r["id"] for r in reqs]
     status = reg["status"]
     impl = reg.get("implementation") or {}
-    IMPLEMENTED = impl.get("status") == "IMPLEMENTED_PENDING_OPERATOR_REVIEW"
+    IMPLEMENTED = impl.get("status") in {"IMPLEMENTED_PENDING_OPERATOR_REVIEW", "OPERATOR_ACCEPTED"}
 
     check("registry/kind", reg["kind"] == "oce-b5-i9-requirement-test-registry", reg["kind"])
     check("registry/base_sha", reg["base_sha"] == BASE, reg["base_sha"])
@@ -285,13 +286,27 @@ def validate():
 
     # ------------------------------------------------------------ status coherence
     ctr = norm(CONTRACT)
+    impl_ratified = reg.get("implementation", {}).get("status") == "OPERATOR_ACCEPTED"
     if IMPLEMENTED:
-        tokens = ["B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN",
-                  "B5-I9 IMPLEMENTATION          = IMPLEMENTED — PENDING OPERATOR REVIEW",
-                  "MERGE_AUTHORIZED              = false",
-                  "BOOK_6_AUTHORIZED             = false",
-                  "BOOK_6_STARTED                = false",
-                  "POST_BOOK_6_EVALUATION        = UNSTARTED"]
+        if impl_ratified:
+            tokens = ["B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN",
+                      "B5-I9 IMPLEMENTATION          = OPERATOR_ACCEPTED — RATIFIED",
+                      "B5-I9 COMPLETE                = true",
+                      "BOOK_5 GOVERNANCE COMPLETE    = true",
+                      "MERGE_AUTHORIZED              = true (PR #25 only)",
+                      "BOOK_6_AUTHORIZED             = false",
+                      "BOOK_6_STARTED                = false",
+                      "POST_BOOK_6_EVALUATION        = UNSTARTED"]
+            check("status/implementation_ratification_present",
+                  (DOCS / RATIFICATION_IMPL).exists(),
+                  "ratified implementation without an implementation ratification record")
+        else:
+            tokens = ["B5-I9 P0 = OPERATOR_ACCEPTED — PLANNING FROZEN",
+                      "B5-I9 IMPLEMENTATION          = IMPLEMENTED — PENDING OPERATOR REVIEW",
+                      "MERGE_AUTHORIZED              = false",
+                      "BOOK_6_AUTHORIZED             = false",
+                      "BOOK_6_STARTED                = false",
+                      "POST_BOOK_6_EVALUATION        = UNSTARTED"]
         check("status/ratification_present", (DOCS / RATIFICATION).exists(),
               "implemented status without a ratification record")
     elif status == STATUS_DRAFT:
@@ -322,8 +337,15 @@ def validate():
     check("handoff/evaluation_unstarted", locks["post_book_6_evaluation"] == "UNSTARTED",
           locks["post_book_6_evaluation"])
     if IMPLEMENTED:
-        check("handoff/merge_false", locks["merge_authorized"] is False,
-              "merge authorized at implementation stage")
+        if impl_ratified:
+            check("handoff/merge_scoped_pr25",
+                  locks["merge_authorized"] is False
+                  and "PR #25" in str(reg["implementation_ratification"]
+                                      .get("merge_authorized_scope", "")),
+                  reg["implementation_ratification"].get("merge_authorized_scope"))
+        else:
+            check("handoff/merge_false", locks["merge_authorized"] is False,
+                  "merge authorized at implementation stage")
         check("handoff/contract_ratified", locks.get("book_6_contract_ratified") is True,
               locks.get("book_6_contract_ratified"))
     elif status == STATUS_DRAFT:
