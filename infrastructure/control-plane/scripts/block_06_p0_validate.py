@@ -39,6 +39,12 @@ FILES = {
     "ledger": f"{DOCS}/{P}PROGRESS_EVIDENCE_LEDGER_v1.0.md",
 }
 VALIDATOR = "infrastructure/control-plane/scripts/block_06_p0_validate.py"
+AMENDMENT = f"{DOCS}/OCE_B5_I9_AMENDMENT_001_FUTURE_STAGE_BOUNDARY_COMPATIBILITY_v1.0.md"
+AMENDMENT_EXACT = frozenset({
+    AMENDMENT,
+    f"{DOCS}/OCE_BOOK_5_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+    "infrastructure/control-plane/tests/test_b5_i9_stage_identity_and_scope.py",
+})
 BASE_SHA = "a794a9af80ae8deddacf2991de17b7d71e445756"
 BASE_TREE = "762dc5696f2135a14455f11d13d5c958ba812723"
 G16_PACKET = "infrastructure/control-plane/evidence/b5-i9/g16-limitation.json"
@@ -335,11 +341,24 @@ def base_inventory(c: Checker) -> set[str]:
     return set(out.splitlines()) if code == 0 else set()
 
 
+def tracked_paths(c: Checker):
+    """Paths Git tracks or would track; ignored runtime residue is excluded by Git itself."""
+    if not (c.root / ".git").exists():
+        return None
+    code, out = git(c, ["ls-files", "-z", "--cached", "--others", "--exclude-standard"])
+    if code != 0:
+        return None
+    return [p for p in out.split("\0") if p]
+
+
 def check_boundary(c: Checker) -> None:
-    caches = {".git", "__pycache__", ".pytest_cache", ".ruff_cache", ".mypy_cache", ".venv"}
-    impl = [p for p in c.root.rglob("*") if p.is_file() and not (caches & set(p.parts))]
+    rel = tracked_paths(c)
+    c.need("boundary/tracked_source", rel is not None,
+           "git path enumeration unavailable; the boundary cannot be proven")
+    if rel is None:
+        return
     base = base_inventory(c)
-    rel = [str(p.relative_to(c.root)).replace("\\", "/") for p in impl]
+    c.need("boundary/base_inventory", bool(base), "empty base inventory")
     new_files = [r for r in rel if r not in base]
     hits = [r for r in new_files
             if re.search(r"(book[_-]?6|b6)[_-]", r.rsplit("/", 1)[-1], re.I)
@@ -417,6 +436,21 @@ def git(c: Checker, args: list[str]) -> tuple[int, str]:
     return proc.returncode, (proc.stdout + proc.stderr).strip()
 
 
+def amendment_scope(c: Checker) -> set[str]:
+    """The protected paths the pinned B5-I9 amendment authorizes, or an empty set."""
+    path = c.path(AMENDMENT)
+    if not path.exists():
+        return set()
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8").split("```json", 1)[1]
+                         .split("```", 1)[0])
+    except (IndexError, ValueError):
+        return set()
+    if doc.get("amendment_id") != "B5-I9-AMEND-001" or doc.get("no_waiver") is not True:
+        return set()
+    return set(doc.get("authorized_paths") or [])
+
+
 def check_git(c: Checker) -> None:
     if not (c.root / ".git").exists():
         c.ok("git/skipped_scratch_root")
@@ -428,10 +462,15 @@ def check_git(c: Checker) -> None:
     c.need("git/base_is_locked", base == BASE_SHA, base)
     code, out = git(c, ["diff", "--name-only", f"{BASE_SHA}..HEAD"])
     changed = [x for x in out.splitlines() if x.strip()]
-    outside = [p for p in changed if not p.startswith(ALLOWED_PREFIXES)]
+    outside = [p for p in changed
+               if not p.startswith(ALLOWED_PREFIXES) and p not in AMENDMENT_EXACT]
     c.need("git/changed_boundary", not outside, outside)
-    forbidden = [p for p in changed if p.startswith(FORBIDDEN_DIFF_PREFIXES)]
+    forbidden = [p for p in changed
+                 if p.startswith(FORBIDDEN_DIFF_PREFIXES) and p not in AMENDMENT_EXACT]
     c.need("git/forbidden_surfaces", not forbidden, forbidden)
+    declared = amendment_scope(c)
+    c.need("git/amendment_scope", declared == set(AMENDMENT_EXACT),
+           sorted(declared ^ set(AMENDMENT_EXACT)))
     code, out = git(c, ["diff", "--check", f"{BASE_SHA}..HEAD"])
     c.need("git/diff_check", code == 0, out)
     code, tree = git(c, ["rev-parse", "HEAD^{tree}"])
