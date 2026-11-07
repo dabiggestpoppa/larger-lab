@@ -14,8 +14,10 @@
 
 ```
 B5-I9 P0                      = OPERATOR_ACCEPTED — PLANNING FROZEN
-B5-I9 IMPLEMENTATION          = NOT STARTED
-MERGE_AUTHORIZED              = true (PR #24 only)
+B5-I9 IMPLEMENTATION          = OPERATOR_ACCEPTED — RATIFIED
+B5-I9 COMPLETE                = true
+BOOK_5 GOVERNANCE COMPLETE    = true
+MERGE_AUTHORIZED              = true (PR #25 only)
 BOOK_6_AUTHORIZED             = false
 BOOK_6_STARTED                = false
 POST_BOOK_6_EVALUATION        = UNSTARTED
@@ -187,3 +189,38 @@ WEB_VIEW            = ABSENT            POST_BOOK_6_EVALUATION = UNSTARTED
 G16                 = OPEN (B5I8-DF05)  MERGE_AUTHORIZED = true (PR #24 only)
 RECURRING_COST      = $0                CAPITAL_AUTHORITY = none
 ```
+
+---
+
+## 7. Implementation stage record
+
+`AUTHORIZED_STAGE=B5-I9-IMPLEMENTATION` executed the contract above without extracting
+software. The deterministic factory-gate generator
+(`infrastructure/control-plane/scripts/b5_i9_factory_gate.py`) produces the packet under
+`infrastructure/control-plane/evidence/b5-i9/`; the five planned test files hold exactly the
+41 frozen nodes; the 25 failure classes and the 10 frozen mutations are executed by
+`infrastructure/control-plane/scripts/b5_i9_mutation_battery.py`; and
+`.github/workflows/b5-i9-factory-gate-validation.yml` selects the whole surface.
+
+This stage produces evidence, a proposed Book 6 extraction contract and an operator hold. It
+performs no extraction, packages no code, publishes nothing, starts no Book 6 work, closes no
+G16 finding and claims no Book 5 governance completion. `MERGE_AUTHORIZED = false` and
+`RATIFICATION_AUTHORIZED = false` for the implementation PR; completion remains operator-only.
+
+---
+
+## 8. Implementation ratification record
+
+`AUTHORIZED_STAGE=B5-I9-RATIFICATION` accepted the implementation on 2026-11-07 and is
+recorded in `OCE_B5_I9_IMPLEMENTATION_RATIFICATION_v1.0.md`: implementation head
+`fe836cd7f9b2c55d58113a57f049b3ff7e970396`, evidence head
+`56e3c861b00bb347d0feb7a5a2b3a24b173bb91f`, 41/41 nodes, 10/10 mutations, 25 failure
+classes, 27 candidates, NP-1…NP-8, deterministic packet and an independently recomputed
+manifest. The status block in §0 is the live state; §6's locks are the historical
+implementation-stage values and are not rewritten.
+
+Ratification closes `B5-I9` and Book 5 governance under the ratified definition (operator
+ratified the factory gate). It does not close G16 (`B5I8-DF05` stays `OPEN`), does not
+authorize extraction, does not authorize Book 6 (a fresh `AUTHORIZED_STAGE=B6-I0` is required),
+and does not begin the post-Book-6 evaluation system. `MERGE_AUTHORIZED = true` applies to
+PR #25 only.

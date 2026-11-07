@@ -1,0 +1,80 @@
+{
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "document_id": "OCE-B5-I9-LEARNING-001",
+  "observations": [
+    {
+      "consequence": "implementing without a stage-aware validator would make its mandatory checks fail by construction and invite deleting them",
+      "correction": "the validator gained a stage branch: in implementation it requires the five files, the 41 nodes, the workflow selection and the packet, and it keeps every P0 check",
+      "disposition": "repaired forward in the validator; no P0 check removed",
+      "id": "L01",
+      "observation": "the frozen P0 validator asserts that no B5-I9 test or workflow exists and that planned files do not exist"
+    },
+    {
+      "consequence": "naming this stage's handoff files book6-handoff.json would be reported as a Book 6 artifact, which would be false",
+      "correction": "the packet files are handoff-contract.json and handoff-input-readiness.json; the Book 6 state lives inside them",
+      "disposition": "naming constraint recorded; classification unchanged",
+      "id": "L02",
+      "observation": "the frozen boundary check treats any filename matching book6-/b6- as a Book 6 artifact"
+    },
+    {
+      "consequence": "the 10 mutation discriminators named by the failure matrix cannot be added as extra collected nodes",
+      "correction": "each discriminator is a named invariant invoked by a frozen node and executed by the battery; the battery resolves discriminators by name",
+      "disposition": "design constraint recorded; node count remains exactly 41",
+      "id": "L03",
+      "observation": "the 41-node inventory is frozen and the validator rejects orphan nodes"
+    },
+    {
+      "consequence": "a literal reader would see a contradiction between the observable text and the table",
+      "correction": "the two observable strings were corrected to 27 in a separate narrow repair commit; statements, ids, bindings and states are unchanged",
+      "disposition": "repaired forward in the B5-I9-R5 stage-state commit; history preserved",
+      "id": "L04",
+      "observation": "registry rows B5I9-EX-01 and B5I9-EX-09 describe the census as 26 rows while the frozen total, the table and the arithmetic are 27"
+    },
+    {
+      "consequence": "scanning only the boundary document would leave the packet path rule unproven",
+      "correction": "the environment-path invariant scans every emitted packet artifact as well as the boundary text",
+      "disposition": "implemented in the gate library",
+      "id": "L05",
+      "observation": "mutation M08 targets a packet artifact copy, not the boundary document"
+    },
+    {
+      "consequence": "a naive scan reports the frozen planned node file as a Book 6 artifact, which would be false",
+      "correction": "the scan exempts the frozen planned surface and the B5-I9 evidence directory, and keeps a negative control proving a planted Book 6 name is still caught",
+      "disposition": "repaired forward in the validator and in the test node",
+      "id": "L07",
+      "observation": "the frozen boundary check rejects any filename matching book6-/b6-, and the frozen planned surface itself contains test_b5_i9_book6_handoff.py"
+    },
+    {
+      "consequence": "one check would have been permanently red for a reason unrelated to the state it guards",
+      "correction": "nodes_executed is compared with the planned nodes and mutations_executed with the mutations",
+      "disposition": "repaired forward in the validator",
+      "id": "L08",
+      "observation": "the stage branch initially compared executed nodes against the mutation count"
+    },
+    {
+      "consequence": "on a Linux checkout the rule is unsatisfiable, so the validator was red for a platform reason rather than a content defect",
+      "correction": "the style rule is now 'one newline style, no bare CR', which holds for LF and CRLF checkouts alike; content rules are unchanged",
+      "disposition": "repaired forward; no content check weakened",
+      "id": "L09",
+      "observation": "the frozen style rule required CRLF bytes in the checkout, but repository blobs are LF and .gitattributes scopes LF for infrastructure/"
+    },
+    {
+      "consequence": "placing the gate library beside production modules made three frozen governance proofs red",
+      "correction": "the library lives in infrastructure/control-plane/scripts/b5_i9_gate.py, outside the production tree; the production tree stays byte-identical to its base",
+      "disposition": "repaired forward; the frozen law was not touched",
+      "id": "L10",
+      "observation": "a frozen B5-I3 law forbids adding or changing any module under src/oce_control/ after its base"
+    },
+    {
+      "consequence": "a future classifier that silently drops a class would still look arithmetically plausible",
+      "correction": "every class has a frozen count, and the generator refuses a census that differs",
+      "disposition": "enforced at generation time and asserted by the tests",
+      "id": "L06",
+      "observation": "the census counts sum to 27 only if all nine classes are present"
+    }
+  ],
+  "principle": "no meaningful observation is silently discarded",
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "version": "1.0"
+}

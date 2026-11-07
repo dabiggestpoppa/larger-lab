@@ -1,0 +1,12 @@
+{
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "blocker": "B5I8-DF05",
+  "document_id": "OCE-B5-I9-G16-LIMITATION-001",
+  "missing_condition": "an independent operator, distinct from the implementer, repeats the usability measurement",
+  "note": "B5-I9 implementation changes nothing about independence; same-agent evidence stays same-agent",
+  "owner": "Operator (independent auditor distinct from the implementer)",
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "status_value": "OPEN",
+  "version": "1.0"
+}

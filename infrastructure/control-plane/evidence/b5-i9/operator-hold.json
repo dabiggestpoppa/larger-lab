@@ -1,0 +1,19 @@
+{
+  "b5_i9_complete": false,
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "book_5_governance_complete": false,
+  "book_6": "UNAUTHORIZED",
+  "capital_authority": "none",
+  "cost_usd": 0,
+  "document_id": "OCE-B5-I9-OPERATOR-HOLD-001",
+  "extraction": "NOT_PERFORMED",
+  "freebuff_touched": false,
+  "g16": "OPEN",
+  "hold": "this stage ends at operator review; the operator performs completion",
+  "merge_authorized": false,
+  "post_book_6_evaluation": "UNSTARTED",
+  "ratification_authorized": false,
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "version": "1.0"
+}

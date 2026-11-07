@@ -1,0 +1,62 @@
+{
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "checks_total": 10,
+  "document_id": "OCE-B5-I9-VALIDATION-001",
+  "failures": 0,
+  "packet_digest": "f3f1b483d70e1a92bb4255683115f4ea9b4ed4807915c3456b2d3029dfbe9d5f",
+  "results": [
+    {
+      "detail": "",
+      "id": "test_requirement_ids_unique",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_zero_pass_claims",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_every_requirement_has_one_binding",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_every_test_requirement_maps_to_a_planned_node",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_base_sha_is_the_merged_main",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_book6_states_remain_false",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_g16_remains_open_with_owner",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_private_interfaces_never_promoted",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_authority_bearing_items_are_never_extractable",
+      "status": "PASS"
+    },
+    {
+      "detail": "",
+      "id": "test_no_environment_specific_paths",
+      "status": "PASS"
+    }
+  ],
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "version": "1.0"
+}

@@ -190,11 +190,42 @@
     ],
     "summary": "factory gate + learning closure + B6 reusable-extraction contract + operator hold"
   },
-  "implementation_status": "NOT_STARTED",
+  "implementation": {
+    "base_sha": "e81bef4335de5e222fb6647c602080a129dea543",
+    "battery": "infrastructure/control-plane/scripts/b5_i9_mutation_battery.py",
+    "extraction_performed": false,
+    "failure_classes_executed": 25,
+    "files_executed": 5,
+    "generator": "infrastructure/control-plane/scripts/b5_i9_factory_gate.py",
+    "library": "infrastructure/control-plane/scripts/b5_i9_gate.py",
+    "merge_authorized": false,
+    "mutations_executed": 10,
+    "nodes_executed": 41,
+    "packet": "infrastructure/control-plane/evidence/b5-i9",
+    "ratification_authorized": false,
+    "stage": "B5-I9-IMPLEMENTATION",
+    "status": "OPERATOR_ACCEPTED",
+    "workflow": ".github/workflows/b5-i9-factory-gate-validation.yml"
+  },
+  "implementation_ratification": {
+    "b5_i9_complete": true,
+    "base_sha": "e81bef4335de5e222fb6647c602080a129dea543",
+    "book_5_governance_complete": true,
+    "book_6_authorization": "WITHHELD — a fresh AUTHORIZED_STAGE=B6-I0 is required",
+    "evidence_head": "56e3c861b00bb347d0feb7a5a2b3a24b173bb91f",
+    "implementation_head": "fe836cd7f9b2c55d58113a57f049b3ff7e970396",
+    "merge_authorized_scope": "PR #25 only",
+    "record": "OCE_B5_I9_IMPLEMENTATION_RATIFICATION_v1.0.md",
+    "stage": "AUTHORIZED_STAGE=B5-I9-RATIFICATION",
+    "verdict": "OPERATOR_ACCEPTED"
+  },
+  "implementation_status": "IMPLEMENTED",
   "kind": "oce-b5-i9-requirement-test-registry",
   "locks": {
-    "b5_i9_implementation": "NOT_STARTED",
+    "b5_i9_complete": true,
+    "b5_i9_implementation": "OPERATOR_ACCEPTED",
     "b5_i9_p0": "OPERATOR_ACCEPTED_PLANNING_FROZEN",
+    "book_5_governance_complete": true,
     "book_6_authorized": false,
     "book_6_contract_ratified": true,
     "book_6_input_ready": {
@@ -216,8 +247,8 @@
       "owner": "Operator (independent auditor distinct from the implementer)",
       "status": "OPEN"
     },
-    "merge_authorization_scope": "PR #24 only, after ratification-head CI passes",
-    "merge_authorized": true,
+    "merge_authorization_scope": "expired: PR #24 merged 2026-11-07T15:51:42Z; the implementation stage did not authorize its own merge. Operator merge authority for PR #25 is recorded in implementation_ratification.merge_authorized_scope",
+    "merge_authorized": false,
     "post_book_6_evaluation": "UNSTARTED",
     "web_view": "ABSENT"
   },
@@ -358,6 +389,7 @@
   "provenance": {
     "b5_i8_merge_authorization_scope": "PR #23 only; does not authorize B5-I9, Book 6 or any later merge",
     "generator": "transient builder, not committed; the matrix and construction plan are verified, not regenerated",
+    "implementation_record": "docs/oce-golden-system/OCE_B5_I9_IMPLEMENTATION_EVIDENCE_v1.0.md",
     "packet_artifacts": [
       "OCE_B5_I9_ACCEPTANCE_MATRIX_v1.0.md",
       "OCE_B5_I9_CONSTRUCTION_PLAN_v1.0.md",
@@ -505,7 +537,7 @@
       "future_stage": null,
       "id": "B5I9-EX-01",
       "node": "TestClassification::test_every_candidate_classified_once",
-      "observable": "26 rows, nine-class vocabulary, no unclassified candidate",
+      "observable": "27 rows, nine-class vocabulary, no unclassified candidate",
       "observable_on_rejection": "stage blocked; the requirement's own observable is echoed with the failing field",
       "owner": "Builder",
       "state": "MAPPED",
@@ -649,7 +681,7 @@
       "future_stage": null,
       "id": "B5I9-EX-09",
       "node": null,
-      "observable": "each of the 26 rows has a source path or an absent marker",
+      "observable": "each of the 27 rows has a source path or an absent marker",
       "observable_on_rejection": "stage blocked; the requirement's own observable is echoed with the failing field",
       "owner": "Builder",
       "state": "PLANNED",

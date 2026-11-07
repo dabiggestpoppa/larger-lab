@@ -1,0 +1,511 @@
+{
+  "base_sha": "833f7d1b9f2dfec2986fb9516d0abde06bf23dae",
+  "counts": {
+    "AUTHORITY_BEARING": 3,
+    "DEFERRED_TO_BOOK_6": 1,
+    "EXTRACTABLE_PATTERN": 7,
+    "EXTRACTABLE_WITH_LIMITATION": 5,
+    "NOT_APPLICABLE": 1,
+    "PLATFORM_INTERNAL": 3,
+    "PRIVATE_API": 2,
+    "PROHIBITED": 1,
+    "REFERENCE_ONLY": 4
+  },
+  "document_id": "OCE-B5-I9-CENSUS-001",
+  "rows": [
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Product Charter as a freeze instrument",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C01",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 1,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Fields (identity, users, outcomes, authority law, non-goals, gates, ceiling) transfer; content does not",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "OCE_B5_I1_PRODUCT_CHARTER_CAND-004_v1.0.md",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Product lifecycle stages",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C02",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 2,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Stage expectations are domain-neutral",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "charter §9",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Deterministic kernel contract",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C03",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 3,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "It is a *prohibition on LLM authority*, not an implementation",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "charter §7 (eleven functions)",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input with the limitation carried verbatim",
+      "candidate": "Read-only client seam",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C04",
+      "limitation": "stdlib-only closure and loopback transport are frozen; copying the import set would freeze a consumer's dependency policy",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 4,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Limitation: stdlib-only closure and loopback transport are frozen; copying the import set would freeze a consumer's dependency policy",
+      "recovery": "consumer discards the derived artifact and regenerates under the recorded limitation; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; the limitation cannot be waived",
+      "source": "infrastructure/console/src/oce_console/kernel.py",
+      "visibility": "Internal package"
+    },
+    {
+      "authority_impact": "None (rendering only)",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Denial enveloping as a rendering law",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C05",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 5,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Verbatim refusal rendering is a portable law; the *admission* decision is not",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "infrastructure/control-plane/contracts/denial-envelope.schema.json",
+      "visibility": "Public schema"
+    },
+    {
+      "authority_impact": "Decides",
+      "book6_disposition": "excluded; never extracted",
+      "candidate": "Admission / refusal decision",
+      "class": "AUTHORITY_BEARING",
+      "id": "C06",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 6,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Cannot be extracted; would duplicate policy",
+      "recovery": "no artifact created; the authority owner keeps recovery authority",
+      "refusal": "extraction refused by NP-4; the decision is not transferable",
+      "source": "infrastructure/control-plane/src/oce_control/authority.py",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Recovery drill protocol",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C07",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 7,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Inject → observe → reconcile → report is portable",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "OCE_B5_I6_DEPLOYMENT_OBSERVABILITY_RUNBOOK_v1.0.md",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "Decides",
+      "book6_disposition": "excluded from any public surface",
+      "candidate": "Recovery enactment",
+      "class": "PLATFORM_INTERNAL",
+      "id": "C08",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 8,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Extraction would create a second recovery authority",
+      "recovery": "no artifact created; the single owner keeps recovery authority",
+      "refusal": "extraction refused by NP-1/NP-3/NP-5; ownership stays in the control plane",
+      "source": "infrastructure/control-plane/src/oce_control/recovery.py`, `infrastructure/control-plane/src/oce_control/worker_leases.py` lease expiry",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input with the limitation carried verbatim",
+      "candidate": "Evidence laws EL01–EL10",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C09",
+      "limitation": "laws are bound to this repository's paths and frozen manifest rows",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 9,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Limitation: laws are bound to this repository's paths and frozen manifest rows",
+      "recovery": "consumer discards the derived artifact and regenerates under the recorded limitation; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; the limitation cannot be waived",
+      "source": "infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py",
+      "visibility": "Public test"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input with the limitation carried verbatim",
+      "candidate": "Manifest computation",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C10",
+      "limitation": "install-set membership is console-specific",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 10,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Limitation: install-set membership is console-specific",
+      "recovery": "consumer discards the derived artifact and regenerates under the recorded limitation; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; the limitation cannot be waived",
+      "source": "infrastructure/console/packaging/make_release_manifest.py",
+      "visibility": "Internal script"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "study only; not consumable",
+      "candidate": "CI evidence-selection workflow",
+      "class": "REFERENCE_ONLY",
+      "id": "C11",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 11,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Encodes this repo's supersession (Amendment 001) and gate names; copying would import a decision that is not a law",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "copying is refused; study only",
+      "source": ".github/workflows/b5-i8-audit-validation.yml",
+      "visibility": "Public"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input with the limitation carried verbatim",
+      "candidate": "Mutation battery harness",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C12",
+      "limitation": "targets are this repo's nodes",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 12,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Limitation: targets are this repo's nodes",
+      "recovery": "consumer discards the derived artifact and regenerates under the recorded limitation; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; the limitation cannot be waived",
+      "source": "infrastructure/control-plane/scripts/b5_i*_mutation_battery*.py",
+      "visibility": "Internal script"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Requirement-test registry shape",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C13",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 13,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Fields and state vocabulary transfer; counts do not",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "OCE_B5_I*_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "visibility": "Public JSON"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input, re-derived by the consumer",
+      "candidate": "Failure matrix shape",
+      "class": "EXTRACTABLE_PATTERN",
+      "id": "C14",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 14,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Trigger/containment/proof/evidence/recovery is domain-neutral",
+      "recovery": "consumer discards the derived artifact and regenerates from its own sources; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; it must not decide admission",
+      "source": "OCE_B5_I*_FAILURE_MATRIX_*.md",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "design input with the limitation carried verbatim",
+      "candidate": "Usability protocol",
+      "class": "EXTRACTABLE_WITH_LIMITATION",
+      "id": "C15",
+      "limitation": "single-operator, same-agent, non-blind sample",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 15,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Limitation: single-operator, same-agent, non-blind sample",
+      "recovery": "consumer discards the derived artifact and regenerates under the recorded limitation; no state is restored here",
+      "refusal": "a consumer that lacks a declared input must refuse and name it; the limitation cannot be waived",
+      "source": "OCE_B5_I8_USABILITY_PROTOCOL_AND_RESULTS_v1.0.md",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "—",
+      "book6_disposition": "none",
+      "candidate": "Web view",
+      "class": "NOT_APPLICABLE",
+      "id": "C16",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 16,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Never implemented; no disposition to extract",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "nothing exists to consume; refusal is vacuous",
+      "source": "—",
+      "visibility": "—"
+    },
+    {
+      "authority_impact": "Decides",
+      "book6_disposition": "excluded from any public surface",
+      "candidate": "Canonical job/event stores",
+      "class": "PLATFORM_INTERNAL",
+      "id": "C17",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 17,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Extracting a copy creates a second canonical state",
+      "recovery": "no artifact created; the single owner keeps recovery authority",
+      "refusal": "extraction refused by NP-1/NP-3/NP-5; ownership stays in the control plane",
+      "source": "infrastructure/control-plane/src/oce_control/job_store.py`, `infrastructure/control-plane/src/oce_control/worker_leases.py",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "—",
+      "book6_disposition": "excluded; never extracted",
+      "candidate": "Canonical-state ownership rule",
+      "class": "PROHIBITED",
+      "id": "C18",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 18,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Extracting \"the rule\" as a shared state container is exactly the prohibited duplication",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "extraction refused by charter §5 law 5 and Constitution §7.8",
+      "source": "charter §5",
+      "visibility": "Public doc"
+    },
+    {
+      "authority_impact": "Decides",
+      "book6_disposition": "excluded; never extracted",
+      "candidate": "Capability/authority machinery",
+      "class": "AUTHORITY_BEARING",
+      "id": "C19",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 19,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Never reusable",
+      "recovery": "no artifact created; the authority owner keeps recovery authority",
+      "refusal": "extraction refused by NP-4; the decision is not transferable",
+      "source": "control-plane grants",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "Decides",
+      "book6_disposition": "excluded; never extracted",
+      "candidate": "Credential/provider boundaries",
+      "class": "AUTHORITY_BEARING",
+      "id": "C20",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 20,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "A reusable credential seam is an authority seam",
+      "recovery": "no artifact created; the authority owner keeps recovery authority",
+      "refusal": "extraction refused by NP-4; the decision is not transferable",
+      "source": "charter §10, runbook",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "excluded from any public surface",
+      "candidate": "Persistence boundaries (SQLite paths)",
+      "class": "PLATFORM_INTERNAL",
+      "id": "C21",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 21,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Environment-specific",
+      "recovery": "no artifact created; the single owner keeps recovery authority",
+      "refusal": "extraction refused by NP-1/NP-3/NP-5; ownership stays in the control plane",
+      "source": "infrastructure/control-plane/src/oce_control/pg_store.py",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "study only; not consumable",
+      "candidate": "Local deployment assumptions (compose stack)",
+      "class": "REFERENCE_ONLY",
+      "id": "C22",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 22,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Local topology is an environment, not a contract",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "copying is refused; study only",
+      "source": "infrastructure/control-plane/compose/compose.yml",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "study only; not consumable",
+      "candidate": "Console session records",
+      "class": "REFERENCE_ONLY",
+      "id": "C23",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 23,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Product-specific artifact",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "copying is refused; study only",
+      "source": "charter §8.1",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "study only; not consumable",
+      "candidate": "Queue-depth panel",
+      "class": "REFERENCE_ONLY",
+      "id": "C24",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 24,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "A governed change instance, not a reusable surface",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "copying is refused; study only",
+      "source": "infrastructure/console/src/oce_console/panel.py",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "excluded from any public surface",
+      "candidate": "Control-plane health/status API",
+      "class": "PRIVATE_API",
+      "id": "C25",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 25,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Not published; consumers must not bind to it",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "exposure refused by NP-2; the interface is not published",
+      "source": "infrastructure/control-plane/src/oce_control/health.py",
+      "visibility": "Internal"
+    },
+    {
+      "authority_impact": "None",
+      "book6_disposition": "excluded from any public surface",
+      "candidate": "Shared test support helpers",
+      "class": "PRIVATE_API",
+      "id": "C26",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 26,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Test scaffolding, not a contract",
+      "recovery": "no artifact created; nothing to recover",
+      "refusal": "exposure refused by NP-2; the interface is not published",
+      "source": "infrastructure/control-plane/tests/b5_i8_audit_support.py",
+      "visibility": "Test-only"
+    },
+    {
+      "authority_impact": "Would create",
+      "book6_disposition": "Book 6, after a fresh operator authorization",
+      "candidate": "The extraction act itself (moving B5-proven surfaces into platform form)",
+      "class": "DEFERRED_TO_BOOK_6",
+      "id": "C27",
+      "limitation": "none",
+      "provenance": {
+        "document": "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
+        "row": 27,
+        "sha256": "b0cbbe86525684a6fdd80bad2d55ef88453645a4a828df992c5ee679cec38aea"
+      },
+      "reason": "Legitimate work, but it belongs to Book 6 after a fresh operator authorization; B5-I9 contracts it and does not perform it",
+      "recovery": "no artifact created; B6 owns the future recovery statement",
+      "refusal": "refused until a fresh operator authorization names B6-I0",
+      "source": "B6 plan §7 `B6-I0",
+      "visibility": "Not started"
+    }
+  ],
+  "rules": [
+    "R1 import is not promotion: classification is by ownership and authority",
+    "R2 authority is contagious: one embedded authority decision makes an item authority-bearing"
+  ],
+  "stage": "B5-I9-IMPLEMENTATION",
+  "status": "IMPLEMENTED_PENDING_OPERATOR_REVIEW",
+  "total": 27,
+  "version": "1.0"
+}

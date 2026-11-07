@@ -2357,3 +2357,144 @@ CORRECTNESS 8.7 · QUALITY 8.4 → **8.5**, superseding 8.375.
 **Ledger identity.** The protected prefix `[0, 191950)` still hashes to
 `83a40ac7bb2d80ae2cc9176e1b1ba91d8bfeb189680572ce3939134b6aeb5c30`. Size and digest before
 this section were recorded in §21; this section only appends.
+
+---
+
+## 23. B5-I9 implementation
+
+**Stage:** `AUTHORIZED_STAGE=B5-I9-IMPLEMENTATION`
+**Base:** `e81bef4335de5e222fb6647c602080a129dea543` (merged `origin/main`, PR #24)
+**Status:** implementation executed; operator review pending; Book 6 unauthorized.
+
+### 23.1 What was built
+
+A deterministic factory-gate generator (`infrastructure/control-plane/scripts/b5_i9_factory_gate.py`
+over `infrastructure/control-plane/src/oce_control/b5_i9_gate.py`) turns the ratified packet
+into a governed, byte-reproducible evidence set under
+`infrastructure/control-plane/evidence/b5-i9/`: the factory-gate packet, the 27-candidate
+classification census, the learning closure, the proposed Book 6 extraction contract, the
+Book 6 input-readiness record, provenance, the operator hold, the machine-readable validation
+result and a manifest whose hashes and sizes are recomputed from bytes.
+
+The five planned test files hold exactly the 41 frozen nodes. The 25 failure classes and the
+10 frozen mutations are executed by `infrastructure/control-plane/scripts/b5_i9_mutation_battery.py`,
+which mutates copies only, requires each named discriminator to go red, restores byte-exact
+bytes and requires a pristine green rerun. `infrastructure/control-plane/scripts/b5_i9_p0_validate.py`
+gained an implementation branch: every P0 check is retained, and the planned surface, the
+workflow selection, the packet manifest, the deterministic reproduction and the battery are
+now mandatory checks.
+
+### 23.2 What did not happen
+
+No software was extracted. No file under the control plane was copied, re-exported or
+relabelled into a package, library, template, plugin, SDK or platform. No package was
+published, nothing was deployed, no cloud resource, provider, telemetry, credential or
+secret was introduced, and no Book 6 branch, folder, test, source or evidence file exists.
+
+### 23.3 Learning carried forward
+
+The learning closure records eight observations, including: the validator's P0 boundary
+checks are stage-scoped (L01); the frozen `book6-`/`b6-` filename rule false-positives on the
+frozen planned surface (L02, L07); the frozen 41-node inventory forbids adding the mutation
+discriminators as extra nodes (L03); two P0 observable strings said 26 where the table,
+arithmetic and total say 27 (L04); and two validator defects found while implementing (L05,
+L08). Each observation carries its correction and is not discarded.
+
+### 23.4 Verification
+
+Local exact-tree results are recorded in
+`OCE_B5_I9_IMPLEMENTATION_EVIDENCE_v1.0.md` together with the exact-head CI run, suite, job
+and artifact identities once those runs exist. No CI identity is written before it exists.
+
+### 23.5 Locks
+
+```
+B5-I9 COMPLETE                = false
+BOOK_5 GOVERNANCE COMPLETE    = false
+MERGE_AUTHORIZED              = false
+RATIFICATION_AUTHORIZED       = false
+BOOK_6 AUTHORIZED             = false
+BOOK_6 CONTRACT_RATIFIED      = true
+POST_BOOK_6_EVALUATION        = UNSTARTED
+G16                           = OPEN (B5I8-DF05)
+CAPITAL_AUTHORITY             = none
+RECURRING_COST                = $0
+BOOK_6_AUTHORIZED = false
+```
+
+## 24. B5-I9 implementation ratification and Book 5 closure
+
+**Stage:** `AUTHORIZED_STAGE=B5-I9-RATIFICATION`
+**Base:** `e81bef4335de5e222fb6647c602080a129dea543` (merged `origin/main`, PR #24)
+**Implementation head:** `fe836cd7f9b2c55d58113a57f049b3ff7e970396`
+**Evidence head:** `56e3c861b00bb347d0feb7a5a2b3a24b173bb91f`
+**Ratification record:** `OCE_B5_I9_IMPLEMENTATION_RATIFICATION_v1.0.md`
+**Status:** B5-I9 implementation operator-accepted; Book 5 governance complete; Book 6 withheld.
+
+### 24.1 Ladder and narrative corrections
+
+The ladder is fourteen first-parent commits with zero merges: R1–R6
+(`c6cb15111a`, `f9672157af`, `03539ec90d`, `2e4696838f`, `485ea1b0c8`, `93f7f89fcd`),
+X1–X7 (`6d72729264`, `a927816439`, `afcbbc56d4`, `65e691cac5`, `074fa4ec11`,
+`7b8cf11f7f`, `fe836cd7f9`) and EVIDENCE (`56e3c861b0`). Nine defects were demonstrated
+(D1–D9), not eleven; the branch changes **25 paths**, not 18 files; the packet is **ten
+governed artifacts plus a manifest**, not eleven artifacts. §23.1 is corrected: the gate
+library lives at `infrastructure/control-plane/scripts/b5_i9_gate.py` and not in the
+production tree. §23.3 is corrected: the learning closure records **ten** observations
+(L01–L10), not eight. §23 is retained exactly as written; this section is the live status.
+
+### 24.2 Verification at three heads
+
+Local exact-tree: validator `PASS`, 169 mandatory checks, 96 candidate inspections, 0
+failures; 41/41 nodes; 10/10 mutations discriminated with byte-exact restoration; packet
+regeneration byte-identical across two isolated emissions; manifest re-verified by an
+independent hasher (10 rows, 11 files, zero mismatches); adjacent suites 53, B5-I8 e2e 4,
+B5-I2–I5 135, B5-I6 9; production tree byte-identical to base.
+
+Implementation head `fe836cd7…` (tree `2d9d5bd3…`, merge ref `7c9dd23b…`): B5-I9 run
+`42407861257` / artifact `13587244611`, B5-I8 run `42407861328` / artifact `13588520640`,
+B1-I1R `42407861362`, all success, artifacts parsed. Evidence head `56e3c861…` (tree
+`37da5fdc…`, merge ref `1cf2a0c3…`): B5-I9 run `42408473420` / artifact `13588711513`,
+B5-I8 run `42408473424` / artifact `13588133560`, B1-I1R `42408473447`, all success,
+artifacts parsed. Merge-ref tree equals tested tree at both heads; the evidence commit is
+documentation-only by inspection. The ratification head's own identities are appended to PR
+#25 after they exist.
+
+### 24.3 Defects found by this audit
+
+D10: the registry's `implementation.library` named the pre-relocation production path, which
+does not exist; corrected here. D11: the ledger and the handoff narrative carried three
+imprecisions (stale library path, "eight observations", "18 files"/"11 artifacts"); corrected
+here and in the ratification record, without editing any earlier section.
+
+### 24.4 Audit
+
+`SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT` — SPEC 8.4 · DESIGN 8.2 · CORRECTNESS 8.0 ·
+QUALITY 8.1 → **8.2** ((8.4 + 8.2 + 8.0 + 8.1) / 4). Deductions retained for nine
+implementation defects, seven repair rungs including one pushed syntax error, indirect
+mutation witnesses, same-agent review and G16 open.
+
+### 24.5 Locks
+
+```
+B5-I9 P0                      = OPERATOR_ACCEPTED — PLANNING FROZEN
+B5-I9 IMPLEMENTATION          = OPERATOR_ACCEPTED — RATIFIED
+B5-I9 COMPLETE                = true
+BOOK_5 GOVERNANCE COMPLETE    = true
+BOOK_6 INPUT_READY            = true (upstream evidence + ratified contract)
+BOOK_6 CONTRACT_RATIFIED      = true
+BOOK_6_AUTHORIZED             = false
+BOOK_6_STARTED                = false
+POST_BOOK_6_EVALUATION        = UNSTARTED
+G16                           = OPEN (B5I8-DF05)
+MERGE_AUTHORIZED              = true (PR #25 only)
+REUSABLE_EXTRACTION           = NOT STARTED
+WEB_VIEW                      = ABSENT
+CAPITAL_AUTHORITY             = none
+RECURRING_COST                = $0
+```
+
+Book 5 closure follows the ratified definition of *Book 5 governance complete* (the operator
+has ratified the factory gate, Block 5 plan §7 gate *Operator-only completion*), not the mere
+existence of a final numbered stage. G16 remains open with an independent owner and is
+disclosed, not closed. Book 6 requires a fresh `AUTHORIZED_STAGE=B6-I0`.
