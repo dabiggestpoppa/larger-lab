@@ -40,7 +40,16 @@ I10_BASE_HEAD = "8fc2ba00f849670e4975c843ffba815fe55e53f6"
 #: ``sensors/`` namespace on the same precedent this audit already records.  The
 #: set stays EXACT -- a fifth module is still an unapproved surface -- so this
 #: amendment widens the membership by exactly one named file.
-FROZEN_MODULES = ["__init__.py", "liquidation.py", "side_maps.py", "trade.py"]
+FROZEN_MODULES = [
+    "__init__.py",
+    "liquidation.py",
+    "side_maps.py",
+    "trade.py",
+    # DISCLOSED SENSOR-B5-I09P2c: the full-record trusted verification surface
+    # (trusted context, custody boundary, intraday PIT). It is named here by its
+    # own entry; it is not a normalizer and mints no canonical value.
+    "verification.py",
+]
 
 #: The frozen eight-member SensorFamily is untouched (R6).
 FROZEN_SENSOR_FAMILIES = [
@@ -99,7 +108,7 @@ def test_sensors_package_exists() -> None:
 
 
 def test_sensors_package_is_exactly_the_four_authorized_modules() -> None:
-    """Three I10 modules plus the disclosed I11 ``liquidation.py``; a fifth is not approved."""
+    """The authorized modules, each a disclosed checkpoint surface."""
     files = sorted(entry.name for entry in _SENSORS.iterdir() if entry.suffix == ".py")
     assert files == FROZEN_MODULES
 
@@ -392,6 +401,10 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
         # suite is a distinct checkpoint file under the authority prefix
         # family, admitted by its own named entry.
         "tests/crypto_sensor_fabric/normalization/test_b5_i09p2b_",
+        # DISCLOSED SENSOR-B5-I09P2c: the full-record verification, custody and
+        # intraday-PIT security suite is a distinct checkpoint file under the
+        # authority prefix family, admitted by its own named entry.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2c_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
         # DISCLOSED B5-I11R1 (independent audit): the audit suite is a

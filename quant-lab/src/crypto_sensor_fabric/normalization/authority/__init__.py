@@ -78,10 +78,37 @@ __all__ = [
     "parse_approval_manifest",
     "resolve_authority_inputs",
     "load_semantic_authority",
+    "manifest_digest",
 ]
 
 _SHA256_HEX_RE = re.compile(r"^[0-9a-f]{64}$")
 _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+#: SENSOR-B5-I09P2c: an offset-aware ISO-8601 instant.  The date-only
+#: ``available_at`` cannot say when during the day an approval became operative,
+#: so an intraday cutoff needs this finer statement (P2bR1 F4).
+_ISO_INSTANT_RE = re.compile(
+    r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$"
+)
+
+
+def _parse_offset_instant(value: str) -> datetime:
+    """Parse an offset-aware instant, or refuse -- a naive value orders nothing.
+
+    A bare timestamp has no position on a timeline, so it is refused rather than
+    assumed to be UTC midnight; that assumption is exactly what made same-day
+    availability look admissible in the previous checkpoint.
+    """
+    if not _ISO_INSTANT_RE.match(value):
+        raise ValueError(
+            "available_at_instant must be an offset-aware ISO-8601 instant "
+            "(e.g. 2026-03-01T15:00:00+00:00); a naive or date-only value cannot "
+            "be ordered against a knowledge cutoff"
+        )
+    parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    if parsed.tzinfo is None or parsed.utcoffset() is None:  # pragma: no cover
+        raise ValueError("available_at_instant must state its UTC offset")
+    return parsed
 
 #: Module-private issuance seal.  ``SemanticAuthority`` cannot be constructed
 #: without it, so a caller holding registry bytes has no path to an authority
@@ -194,6 +221,10 @@ class ApprovedArtifact(NormalizationModelBase):
     #: When this approval first became operative.  A revision approved after a
     #: knowledge cutoff must not be applied before it existed (PIT law).
     available_at: str | None = None
+    #: SENSOR-B5-I09P2c: when present this instant is authoritative over the
+    #: date-only ``available_at``.  The date stays for history; the instant is the
+    #: only statement precise enough to order against an intraday cutoff.
+    available_at_instant: str | None = None
     #: evidence reference -> SHA-256 of the source blob held under custody.  A
     #: reference is only evidence when the bytes behind it can be checked.
     evidence_blobs: dict[str, str] = {}
@@ -220,6 +251,13 @@ class ApprovedArtifact(NormalizationModelBase):
                 raise ValueError(
                     "available_at must not precede approved_at: an approval cannot "
                     "be operative before it was granted"
+                )
+        if self.available_at_instant is not None:
+            instant = _parse_offset_instant(self.available_at_instant)
+            if instant.date() < date.fromisoformat(self.approved_at):
+                raise ValueError(
+                    "available_at_instant must not precede approved_at: an "
+                    "approval cannot be operative before it was granted"
                 )
         bound_refs = {
             ref
@@ -327,6 +365,10 @@ class SemanticAuthority(NormalizationModelBase):
     approved_at: str = ""
     valid_until: str | None = None
     available_at: str | None = None
+    #: SENSOR-B5-I09P2c: when present this instant is authoritative over the
+    #: date-only ``available_at``.  The date stays for history; the instant is the
+    #: only statement precise enough to order against an intraday cutoff.
+    available_at_instant: str | None = None
     evidence_blobs: dict[str, str] = {}
 
     @model_validator(mode="before")
@@ -368,6 +410,16 @@ class SemanticAuthority(NormalizationModelBase):
         if not admits_critical_t1_use(row.semantic_confidence):
             return AuthorityRefusal.AMBIGUOUS_MAPPING
         return None
+
+
+def manifest_digest(manifest_bytes: bytes) -> str:
+    """SHA-256 of manifest BYTES -- the only digest the trust boundary needs.
+
+    Exposed so the record-verification layer never imports a hashing library
+    itself: digest verification IS this module's job (P2a), and the pure sensor
+    layer is audited to stay hash-free (I10/I11 scope audits).
+    """
+    return hashlib.sha256(manifest_bytes).hexdigest()
 
 
 def parse_approval_manifest(manifest_bytes: bytes) -> ApprovalManifest:
@@ -497,6 +549,33 @@ def load_semantic_authority(
                 f"{as_of_instant.isoformat()}; a later approval cannot be projected "
                 "backwards over an earlier knowledge cutoff",
             )
+    if entry.available_at_instant is not None:
+        if evaluation_at is None:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.EVALUATION_TIME_REQUIRED,
+                "this approval states an instant-precise availability, so the "
+                "caller must state an offset-aware instant; a calendar day "
+                "cannot be ordered against an instant",
+            )
+        if (
+            not isinstance(evaluation_at, datetime)
+            or evaluation_at.tzinfo is None
+            or evaluation_at.utcoffset() is None
+        ):
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.EVALUATION_TIME_REQUIRED,
+                "an instant-precise availability requires an offset-aware "
+                "evaluation instant; a bare date or a naive datetime is refused "
+                "rather than assumed to be UTC midnight",
+            )
+        if evaluation_at < _parse_offset_instant(entry.available_at_instant):
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE,
+                f"approval {entry.approval_id!r} became operative at "
+                f"{entry.available_at_instant}, after the evaluated instant "
+                f"{evaluation_at.isoformat()}; an intraday approval cannot be "
+                "projected backwards over an earlier knowledge cutoff",
+            )
     digest = hashlib.sha256(artifact_bytes).hexdigest()
     if digest != entry.sha256:
         raise SemanticAuthorityRefusal(
@@ -547,6 +626,7 @@ def load_semantic_authority(
             "approved_at": entry.approved_at,
             "valid_until": entry.valid_until,
             "available_at": entry.available_at,
+            "available_at_instant": entry.available_at_instant,
             "evidence_blobs": entry.evidence_blobs,
         }
     )
@@ -615,6 +695,10 @@ class MappingProvenance(NormalizationModelBase):
     semantic_confidence: str
     approved_at: str = ""
     available_at: str | None = None
+    #: SENSOR-B5-I09P2c: when present this instant is authoritative over the
+    #: date-only ``available_at``.  The date stays for history; the instant is the
+    #: only statement precise enough to order against an intraday cutoff.
+    available_at_instant: str | None = None
 
     @model_validator(mode="after")
     def _digest_law(self) -> MappingProvenance:

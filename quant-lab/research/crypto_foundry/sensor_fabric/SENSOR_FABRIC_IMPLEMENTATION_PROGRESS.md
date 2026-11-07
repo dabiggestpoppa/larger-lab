@@ -8733,3 +8733,65 @@ NO GOVERNANCE CHANGE: B5-I09a = OPERATOR_ACCEPTED; B5-I09b = DEFERRED; B5-I10 =
 
 STATUS: B5-I09P2BR1_AUDIT_COMPLETE - HOLD RECORDED. Evidence:
   BLOC_05_I09P2BR1_INDEPENDENT_AUDIT.md.
+
+## 194 - SENSOR-B5-I09P2c: FULL-RECORD VERIFICATION, TRUSTED CUSTODY, INTRADAY PIT (PARTIAL)
+
+TARGET: 9d9380631e1aa577b880de9be382be943185de50 (= origin). Bounded production
+repair of the three measured holes; no provider approval added, no venue
+certified, no ingestion application invented, no program gate promoted.
+
+RED (recorded before any production edit): the new suite failed to import
+verify_trade_record (ImportError, exit 2) against the unrepaired tree; the R1
+probes remain the behavioural baseline (record-blind verifier, row-uniqueness
+liquidation resolution, caller-authored custody dict, same-day PIT truncation).
+
+REPAIR
+  sensors/verification.py (NEW): verify_trade_record(record, *, trusted_context,
+  artifact_bytes, methodology_registry, knowledge_cutoff, custody=None) re-derives
+  the approved row under the pinned root and RE-EXECUTES the declared native ->
+  canonical transformation on the record's preserved boolean;
+  verify_liquidation_record(record, ...) requires one admission per canonical
+  field, re-resolves it under the RECORD's provider, and refuses sibling-field
+  borrowing. Both refuse a plain custody dict and return a six-claim
+  RecordVerification instead of a single badge.
+  sensors/side_maps.py: apply_declared_side_transformation -- executable rule table
+  only; prose transformation strings and unproven venue polarities return None.
+  authority/__init__.py: available_at_instant (offset-aware) with instant
+  precedence and naive-instant refusal; manifest_digest keeps hashing inside the
+  trust module so the sensor layer stays hash-free.
+
+MEASURED
+  Record forgery is now refused: flipped canonical side (CANONICAL_VALUE_MISMATCH),
+  provider substitution, native field/value substitution, mutated approval id /
+  digest / methodology / evidence reference, wrong-provider liquidation, missing or
+  tampered custody blob, caller-dict custody (TypeError), same-day intraday cutoff
+  at 09/12/15/23 (INTRADAY_PIT_AMBIGUOUS), naive or missing cutoff
+  (PIT_CUTOFF_REQUIRED), actor-supplied manifest (TRUSTED_CONTEXT_MISMATCH), and a
+  forged model-validated record. Bounded states are stated in the result rather
+  than hidden: instrument and source revision preserved-not-authenticated;
+  liquidation transformation not executable (no admitted transform exists);
+  source lineage never claimed.
+  P2c suite 43 passed; normalization 1167 passed; governance 4 passed;
+  b5_i05 86/0, b5_i06 14/0, b5_i09 35/0 (artifact 8b3dbd3f -> 567716a4, one
+  inventory hash changed); canonical 4565 passed / 14 skipped / exit 0
+  (1266.84 s, +43 over the 4522/14 baseline); ruff, mypy and compileall clean on
+  changed modules.
+
+GATES: P2C-01..24 = 18 PASS, 5 PARTIAL (07 liquidation canonical coherence, 08
+venue binding, 10 instrument binding, 12 revision authentication, 14 operator-
+owned custody catalog), 1 recorded at push (24). A partial is not a pass.
+
+CASCADE: authority 894 -> 967 CRLF lines, 0 bare LF (no line-ending churn); I09
+artifact regenerated; governance python_files_scanned 1092 -> 1094 republished via
+UPDATE_I11R2_EVIDENCE=1 after staging; scope audits amended by named DISCLOSED
+entries only. Frozen plan, approval manifest (artifacts == {}) and every prior
+approval untouched.
+
+DECISION: I09P2C_IMPLEMENTATION_PARTIAL. The record-level bypass is closed for
+trade records and record-bound for liquidation; custody and initialization remain
+INTEGRATION_REQUIRED (operator evidence catalog, trusted application initializer).
+NOT ratified. NO PROGRAM GATE PROMOTED; I11 hold and I09b deferral stand; B5-I12+,
+I17 and BLOC_06 UNAUTHORIZED; RESEARCH = FROZEN.
+
+STATUS: B5-I09P2C_IMPLEMENTED_PARTIAL - INDEPENDENT RATIFICATION AUDIT REQUIRED.
+Evidence: BLOC_05_I09P2C_IMPLEMENTATION_EVIDENCE.md.

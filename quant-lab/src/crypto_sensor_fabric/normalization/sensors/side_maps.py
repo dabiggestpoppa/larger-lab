@@ -69,6 +69,7 @@ __all__ = [
     "SideMappingStatus",
     "UnsupportedSideMappingError",
     "admit_aggressor_side",
+    "apply_declared_side_transformation",
     "apply_side_map",
     "binance_side_from_is_buyer_maker",
     "require_side_mapping",
@@ -394,6 +395,47 @@ def apply_side_map(
         canonical_admitted=admitted,
         rule_id=rule_id,
     )
+
+
+def apply_declared_side_transformation(
+    mapping: ProviderSemanticMapping | None, native_value: object
+) -> AggressorSide | None:
+    """Re-execute the DECLARED rule for this row, or refuse by returning ``None``.
+
+    SENSOR-B5-I09P2c needs an EXECUTABLE transformation: the row's
+    ``transformation`` prose describes a mapping, it does not prove a record
+    follows one.  This is the only sanctioned way to recompute a canonical side
+    from a preserved native value, and it refuses unless a mechanical rule is
+    declared for the exact ``(provider, provider_field)`` with the frozen
+    methodology identity:
+
+    * another sensor family, or a canonical field other than ``aggressor_side``
+      -> ``None`` (a liquidation side domain is provider semantics this
+      checkpoint has no executable rule for);
+    * a ``NOT_COMPARABLE`` row -> ``None``;
+    * a methodology other than the frozen Binance adapter -> ``None``;
+    * a native value that is not the declared boolean -> ``None``.
+
+    Nothing is inferred from tape direction, momentum or another venue's rule
+    (bloc_05/06 section 1 G9, bloc_05/07 F17): an absent rule stays absent.
+    """
+    if mapping is None:
+        return None
+    if mapping.canonical_sensor is not SensorFamily.MECHANICAL_TRADE:
+        return None
+    if mapping.canonical_field != "aggressor_side":
+        return None
+    if mapping.semantic_equivalence_class is SemanticEquivalence.NOT_COMPARABLE:
+        return None
+    if mapping.methodology_id != BINANCE_IS_BUYER_MAKER_METHODOLOGY_ID:
+        return None
+    rule = _SIDE_RULES.get((mapping.provider, mapping.provider_field))
+    if rule is None:
+        return None
+    if not isinstance(native_value, bool):
+        return None
+    _, transform = rule
+    return transform(native_value)
 
 
 def admit_aggressor_side(side: AggressorSide, confidence: SemanticConfidence) -> bool:

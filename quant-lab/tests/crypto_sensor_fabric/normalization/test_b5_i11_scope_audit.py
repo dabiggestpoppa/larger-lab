@@ -30,7 +30,16 @@ _EVIDENCE = (
 I11_BASE_HEAD = "82e44cf0ed8b8edca42eb4427db4cd6d659dd79a"
 
 #: The authorized surface: the I10 three plus the disclosed I11 module.
-FROZEN_MODULES = ["__init__.py", "liquidation.py", "side_maps.py", "trade.py"]
+FROZEN_MODULES = [
+    "__init__.py",
+    "liquidation.py",
+    "side_maps.py",
+    "trade.py",
+    # DISCLOSED SENSOR-B5-I09P2c: the full-record trusted verification surface
+    # (trusted context, custody boundary, intraday PIT). It is named here by its
+    # own entry; it is not a normalizer and mints no canonical value.
+    "verification.py",
+]
 
 #: Sensor families that must NOT have a normalizer module yet (I12+).
 UNAUTHORIZED_MODULE_STEMS = [
