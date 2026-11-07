@@ -440,14 +440,12 @@ def validate():
     # ------------------------------------------------------------ style, secrets, prefix
     def consistent_newlines(raw):
         """One newline style, no bare CR. CRLF is a checkout artefact, not a law."""
-        if b"" in raw.replace(b"
-", b""):
+        cr = bytes([13])
+        lf = bytes([10])
+        if cr in raw.replace(cr + lf, b""):
             return False
-        has_crlf = b"
-" in raw
-        lone_lf = raw.count(b"
-") - raw.count(b"
-")
+        has_crlf = (cr + lf) in raw
+        lone_lf = raw.count(lf) - raw.count(cr + lf)
         return not (has_crlf and lone_lf > 0)
 
     for name in DELIVERABLES:
