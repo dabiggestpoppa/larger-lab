@@ -195,6 +195,16 @@
     "b5_i9_implementation": "NOT_STARTED",
     "b5_i9_p0": "DRAFT_FOR_OPERATOR_REVIEW",
     "book_6_authorized": false,
+    "book_6_contract_ratified": false,
+    "book_6_input_ready": {
+      "excludes": [
+        "ratified B6 extraction contract",
+        "authorization",
+        "start"
+      ],
+      "scope": "narrow: upstream B5-I0-I8 evidence exists and this packet's classification table is internally consistent",
+      "value": true
+    },
     "book_6_started": false,
     "capital_authority": "none",
     "cloud_mutations": 0,
@@ -345,6 +355,7 @@
   },
   "provenance": {
     "b5_i8_merge_authorization_scope": "PR #23 only; does not authorize B5-I9, Book 6 or any later merge",
+    "generator": "transient builder, not committed; the matrix and construction plan are verified, not regenerated",
     "packet_artifacts": [
       "OCE_B5_I9_IMPLEMENTATION_CONTRACT_v1.0.md",
       "OCE_B5_I9_EXTRACTION_AND_PACKAGING_BOUNDARY_v1.0.md",
@@ -354,6 +365,7 @@
       "OCE_B5_I9_CONSTRUCTION_PLAN_v1.0.md"
     ],
     "predecessor": "B5-I8 RATIFIED_INDEPENDENT_AUDIT merged 833f7d1b",
+    "reproducibility_scope": "P0 claims verifiability by the committed validator, not byte-identical regeneration",
     "validator": "infrastructure/control-plane/scripts/b5_i9_p0_validate.py"
   },
   "requirements": [
@@ -480,7 +492,7 @@
       "observable_on_rejection": "stage blocked; the requirement's own observable is echoed with the failing field",
       "owner": "Builder",
       "state": "MAPPED",
-      "statement": "All 26 reference-application candidates are classified into exactly one of the nine classes.",
+      "statement": "All 27 reference-application candidates are classified into exactly one of the nine classes.",
       "surface": "tests/test_b5_i9_extraction_classification.py"
     },
     {
@@ -1277,6 +1289,13 @@
     }
   ],
   "stage": "AUTHORIZED_STAGE=B5-I9-P0",
+  "state_vocabulary": {
+    "BLOCKED": "obligation cannot proceed; declared for completeness and unused at P0",
+    "DEFERRED_WITH_OWNER": "binding=deferred; owner, future stage, observable disposition and evidence obligation recorded",
+    "MAPPED": "binding=test; exactly one frozen planned node exists and the requirement maps to it one-to-one",
+    "PASS": "reserved; zero PASS claims are permitted in P0",
+    "PLANNED": "binding=static or attestation; obligation accepted at P0, and no node is applicable because verification is a named static check or an operator attestation"
+  },
   "status": "DRAFT_FOR_OPERATOR_REVIEW",
   "version": "1.0.0"
 }
