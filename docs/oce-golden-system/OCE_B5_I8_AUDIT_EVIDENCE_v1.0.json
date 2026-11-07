@@ -4,8 +4,8 @@
   "stage": "AUTHORIZED_STAGE=B5-I8-IMPLEMENTATION",
   "generated_by": "infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
   "tested": {
-    "head": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
-    "tree": "845f2cd5d34d4257c3e712d7245faf81374b790e"
+    "head": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
+    "tree": "288d14623da4586a5a2f6f1ef916dd39d202b97d"
   },
   "base_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
   "labels": {
@@ -112,7 +112,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 3,
-        "time_to_first_useful_state_ms": 348.481,
+        "time_to_first_useful_state_ms": 118.914,
         "state_observed": "OK",
         "comprehension": {
           "state_observed": "OK",
@@ -135,7 +135,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 3,
-        "time_to_first_useful_state_ms": 205.218,
+        "time_to_first_useful_state_ms": 119.44,
         "state_observed": "DENIED",
         "comprehension": {
           "state_observed": "DENIED",
@@ -158,7 +158,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 1,
-        "time_to_first_useful_state_ms": 231.682,
+        "time_to_first_useful_state_ms": 113.292,
         "state_observed": "STACK_UNREACHABLE",
         "comprehension": {
           "state_observed": "STACK_UNREACHABLE",
@@ -181,7 +181,7 @@
         "completion": true,
         "error": 0,
         "navigation_steps": 3,
-        "time_to_first_useful_state_ms": 247.714,
+        "time_to_first_useful_state_ms": 123.756,
         "state_observed": "UNVERIFIABLE",
         "comprehension": {
           "state_observed": "UNVERIFIABLE",
@@ -256,7 +256,7 @@
       "unit": "tasks",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
+      "tested_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
@@ -265,7 +265,7 @@
       "unit": "tasks",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
+      "tested_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
@@ -274,7 +274,7 @@
       "unit": "errors",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
+      "tested_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
@@ -283,16 +283,16 @@
       "unit": "governed reads",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
+      "tested_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
       "environment": "local-win32-cpython3.11",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     },
     "time_to_first_useful_state_ms": {
-      "value": 348.481,
+      "value": 123.756,
       "unit": "ms",
       "label": "OBSERVED",
       "command": "python infrastructure/control-plane/scripts/b5_i8_build_evidence.py",
-      "tested_sha": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
+      "tested_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
       "environment": "local-win32-cpython3.11 (not a performance claim)",
       "artifact": "docs/oce-golden-system/OCE_B5_I8_AUDIT_EVIDENCE_v1.0.json"
     }
@@ -325,36 +325,36 @@
   },
   "ci": {
     "status": "OBSERVED",
-    "oce_run_id": "62e6d763b63e",
-    "github_run_id": 42324807796,
+    "oce_run_id": "a4abf73d3f2a",
+    "github_run_id": 42328131722,
     "run_attempt": 1,
     "workflow_path": "dabiggestpoppa/larger-lab/.github/workflows/b5-i8-audit-validation.yml@refs/pull/23/merge",
     "pr_number": 23,
     "artifact_binding": true,
     "run_context": {
-      "artifact_name": "b5-i8-evidence-62e6d763b63e",
+      "artifact_name": "b5-i8-evidence-a4abf73d3f2a",
       "event": "pull_request",
-      "github_run_id": "42324807796",
-      "oce_run_id": "62e6d763b63e",
+      "github_run_id": "42328131722",
+      "oce_run_id": "a4abf73d3f2a",
       "pr_number": "23",
       "ref": "23/merge",
       "repository": "dabiggestpoppa/larger-lab",
       "run_attempt": "1",
-      "sha": "982aea1ed92ab58b32c3e57cb2ab8b1dedac3213",
+      "sha": "99b65278e8d1f38c7e1bd7ee302ce94c69aa04ae",
       "source": "ci",
       "workflow": "b5-i8-audit-validation",
       "workflow_ref": "dabiggestpoppa/larger-lab/.github/workflows/b5-i8-audit-validation.yml@refs/pull/23/merge"
     },
-    "run_id": 42324807796,
-    "check_run_id": 128257514703,
-    "job_id": 128257514703,
-    "check_suite_id": 114677639793,
-    "artifact_id": 13554288593,
-    "artifact_name": "b5-i8-evidence-62e6d763b63e",
-    "tested_head": "1f54168b81c6d5602fbb5c26bcfb497f41788725",
-    "tested_tree": "845f2cd5d34d4257c3e712d7245faf81374b790e",
-    "merge_ref": "982aea1ed92ab58b32c3e57cb2ab8b1dedac3213",
-    "parsed_from": "b5-i8-evidence-62e6d763b63e/b5-i8-registry-proof.json"
+    "run_id": 42328131722,
+    "check_run_id": 128268125156,
+    "job_id": 128268125156,
+    "check_suite_id": 114686108438,
+    "artifact_id": 13555419700,
+    "artifact_name": "b5-i8-evidence-a4abf73d3f2a",
+    "tested_head": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
+    "tested_tree": "288d14623da4586a5a2f6f1ef916dd39d202b97d",
+    "merge_ref": "99b65278e8d1f38c7e1bd7ee302ce94c69aa04ae",
+    "parsed_from": "b5-i8-evidence-a4abf73d3f2a/b5-i8-registry-proof.json"
   },
   "boundary": {
     "production_changed": false,

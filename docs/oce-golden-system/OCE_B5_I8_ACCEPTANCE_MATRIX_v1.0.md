@@ -142,3 +142,25 @@ satisfied.
 | `MERGE_AUTHORIZED` | true for PR #23 only, after every gate in the ratification record |
 
 No requirement, node, class, mutation or floor was reduced.
+
+---
+
+## 6. Implementation ratification re-audit
+
+| Dimension | Value at ratification |
+|---|---|
+| Requirements | 55 unique, unchanged |
+| Nodes | 40 collected = 40 executed = 40 passed, zero duplicates |
+| Non-vacuity | 40/40 audited; tautological 0, orphan nodes 0, orphan requirements 0 |
+| Failure classes | 18 |
+| Mutations | 12/12 `DISCRIMINATED` in authoritative CI, byte-exact restore, pristine 40/40 |
+| Run identity | `oce_run_id` populated and bound to the artifact name |
+| Floors | focused 40; adjacent 189 |
+| E2E boundary | in-process production-surface re-execution, not a live stack |
+| `G16` | `OPEN`: blocker `B5I8-DF05`, owner named, not passed |
+| `MERGE_AUTHORIZED` | true for PR #23 only, after ratification-head CI passes |
+| EL09 | historical prefix `83a40ac7…` over `191950` bytes intact; current ledger recorded separately |
+
+The original clause that placed the selection step in the pinned workflow is
+**superseded** by Amendment 001, not satisfied. No requirement, node, class, mutation
+or floor was reduced at any point in the ladder, including across the two red rungs.

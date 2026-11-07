@@ -840,10 +840,10 @@
     "status": "P0_OPERATOR_ACCEPTED",
     "web_view_disposition": "C",
     "implementation": {
-      "status": "IMPLEMENTED_AUDIT_SURFACE",
+      "status": "RATIFIED_INDEPENDENT_AUDIT",
       "implemented_at": "2026-11-05",
       "authorized_stage": "B5-I8-IMPLEMENTATION",
-      "merge_authorized": false,
+      "merge_authorized": true,
       "nodes": {
         "planned": 40,
         "collected": 40,
@@ -875,12 +875,19 @@
         "protocol": "docs/oce-golden-system/OCE_B5_I8_USABILITY_PROTOCOL_AND_RESULTS_v1.0.md",
         "ci": {
           "status": "GREEN",
-          "head_sha": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910",
-          "tested_tree": "12fcec2edcff22337de1de33dfbebdb6dda9a472",
-          "merge_ref": "c2990c8cdbd9a221566dec6de8de6e7bc016d047",
-          "run_id": 42061931200,
-          "check_suite_id": 113977456198,
-          "artifact": "b5-i8-evidence-c3ae4aedc154",
+          "run_id": 42328131722,
+          "run_attempt": 1,
+          "workflow": "B5-I8 Audit Validation",
+          "event": "pull_request",
+          "head_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
+          "tested_tree": "288d14623da4586a5a2f6f1ef916dd39d202b97d",
+          "merge_ref_sha": "99b65278e8d1f38c7e1bd7ee302ce94c69aa04ae",
+          "merge_ref_first_parent": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+          "merge_ref_second_parent": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
+          "merge_ref_tree": "288d14623da4586a5a2f6f1ef916dd39d202b97d",
+          "oce_run_id": "a4abf73d3f2a",
+          "artifact": "b5-i8-evidence-a4abf73d3f2a",
+          "artifact_id": 13555419700,
           "collected": 40,
           "executed": 40,
           "passed": 40,
@@ -888,12 +895,7 @@
           "errors": 0,
           "skipped": 0,
           "unique_nodes": 40,
-          "merge_ref_first_parent": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
-          "merge_ref_second_parent": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910",
-          "check_run_id": 127365645961,
-          "job_id": 127365645961,
-          "artifact_id": 13432118604,
-          "tested_head": "b3e761e33948a4a7e763ac2bcfef5a8d1dadf910"
+          "note": "Merge-ref identity is recorded as merge_ref_sha; the server-side ref itself is not a history citation."
         }
       },
       "same_agent_audit": {
@@ -905,7 +907,8 @@
           "correctness": 8.0,
           "quality": 8.0
         }
-      }
+      },
+      "ratified_at": "2026-11-07"
     },
     "amendments": [
       {
@@ -929,7 +932,66 @@
         ],
         "pinned_workflow_sha256_unchanged": true
       }
-    ]
+    ],
+    "ratification_implementation": {
+      "document": "docs/oce-golden-system/OCE_B5_I8_OPERATOR_RATIFICATION_v1.0.md",
+      "section": "B5-I8 Implementation Ratification",
+      "authorized_stage": "AUTHORIZED_STAGE=B5-I8-RATIFICATION",
+      "base_sha": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
+      "p0_merge_sha": "74fee0f086f9215bf6b93a1b3adbf1d69406da39",
+      "amendment": "OCE-B5-I8-AMEND-001",
+      "ladder": [
+        "3a90b8548a",
+        "801730c4c3",
+        "e0f6a73c46",
+        "36288f4b49",
+        "6b26214637",
+        "8fcb28097d",
+        "1f54168b81c6d5602fbb5c26bcfb497f41788725"
+      ],
+      "red_rungs_preserved": [
+        "36288f4b49 (X4)",
+        "8fcb28097d (X6)",
+        "8e39d8cd11 (EVIDENCE-FINAL)"
+      ],
+      "final_evidence_head": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
+      "arithmetic": {
+        "requirements": 55,
+        "planned_nodes": 40,
+        "planned_files": 5,
+        "failure_classes": 18,
+        "mutation_floor": 12,
+        "pass_claims": 0,
+        "adjacent_floor": 189,
+        "focused_floor": 40
+      },
+      "run_identity": {
+        "oce_run_id": "a4abf73d3f2a",
+        "run_id": 42328131722,
+        "run_attempt": 1,
+        "artifact": "b5-i8-evidence-a4abf73d3f2a"
+      },
+      "e2e_boundary": "in-process production-surface re-execution",
+      "g16_status": "OPEN",
+      "g16_blocker": "B5I8-DF05",
+      "g16_owner": "Operator (independent auditor distinct from the implementer)",
+      "audit": {
+        "label": "SAME-AGENT — NOT ORGANIZATIONALLY INDEPENDENT",
+        "spec": 8.6,
+        "design": 8.4,
+        "correctness": 8.7,
+        "quality": 8.5,
+        "mean": 8.55,
+        "supersedes": 8.38
+      },
+      "merge_authority_scope": "PR #23 only, after ratification-head CI passes",
+      "b5_i9_status": "LOCKED",
+      "book_6_status": "UNAUTHORIZED",
+      "post_book_6_evaluation": "NOT_BEGUN",
+      "web_view_disposition": "ABSENT",
+      "cost_usd": 0,
+      "capital_authority": "none"
+    }
   },
   "registry_id": "OCE-B5-I8-REGISTRY-001",
   "registry_version": "1.0",

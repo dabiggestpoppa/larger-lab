@@ -325,3 +325,16 @@ it is not observable, the parsed artifact must attest it and the identity must s
 name it, which is the original historical rationale. A ref that is neither observable
 nor attested fails under the general rule. This is a narrowing of a claim about the
 world, not of the check: the recorded identity is compared in both branches.
+
+## 20. Evidence-head run identity
+
+The record above was sealed by a further documentation-only rung, so the run that
+carries it is not the X7 run. Evidence head `5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c`,
+tested tree `288d14623da4586a5a2f6f1ef916dd39d202b97d`, run `42328131722`, artifact
+`b5-i8-evidence-a4abf73d3f2a`, `oce_run_id` `a4abf73d3f2a`, merge ref
+`99b65278e8d1f38c7e1bd7ee302ce94c69aa04ae` with parents `e999a4a3…` and `5da5ae9e…`,
+tree equal to the tested tree, 40/40 nodes, 12/12 mutations, `baseline_dirty false`.
+
+The X7 figures quoted in sections 15 and 18 describe the implementation head that
+first produced a populated identity; they are historical observations, not the
+ratification identity, and both remain true of the run they name.
