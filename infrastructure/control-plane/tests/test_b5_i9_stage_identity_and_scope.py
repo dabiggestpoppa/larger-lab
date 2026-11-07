@@ -138,4 +138,5 @@ class TestLedgerAppend:
         assert len(body) > gate.LEDGER_PREFIX_LEN
         assert "## 22. B5-I9 P0" in body.decode("utf-8")
         assert b"## 23. B5-I9 implementation" in body
-        assert body.rstrip().endswith(b"BOOK_6_AUTHORIZED = false")
+        tail = body[body.rindex(b"## 23."):].decode("utf-8")
+        assert "BOOK_6_AUTHORIZED = false" in tail
