@@ -2595,3 +2595,19 @@ B5-I9 technical implementation and ratification accepted with the historical pro
 preserved, `BOOK_5 GOVERNANCE COMPLETE = true`, `G16 = OPEN (B5I8-DF05)`,
 `BOOK_6_AUTHORIZED = false`, `BOOK_6_STARTED = false`, reusable extraction not started,
 post-Book-6 evaluation system not started, `capital.authority = none`, recurring cost `$0`.
+## 27. B5-I9 boundary amendment 001 — future-stage compatibility
+
+`B5I9-BD-04` (`TestLocks::test_changed_file_boundary`) compared the frozen implementation base
+`e81bef43…` against `HEAD`, so every future branch inherited a B5-I9-local path allowlist and a
+legitimate later stage could never pass. The collision was demonstrated on Book 6 P0: PR #28,
+workflow `B5-I9 Factory Gate Validation`, run `42421366928`, head `ab72f0a6…`, where 40 of 41
+nodes passed and the boundary node refused 17 Book 6 planning paths.
+
+`OCE_B5_I9_AMENDMENT_001_FUTURE_STAGE_BOUNDARY_COMPATIBILITY_v1.0.md` replaces the moving range
+with two proofs: the frozen historical range `e81bef43…9db35aac` must still sit entirely inside
+the original seven prefixes, and the protected inventory recomputed from the frozen tree may
+change only where the pinned amendment names the exact path. The original boundary is preserved,
+not waived; the 41-node floor, the node identifier, its owner and its failure class are unchanged;
+no B5-I9 technical outcome moves, and `BOOK_6_AUTHORIZED = false` still holds. The amendment is
+operator-authorized in the Book 6 P0 ratification stage and is recorded here, without rewriting
+any earlier Book 5 record.
