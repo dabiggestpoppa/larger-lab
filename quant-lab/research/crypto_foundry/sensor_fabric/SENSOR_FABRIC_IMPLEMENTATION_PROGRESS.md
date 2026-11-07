@@ -8795,3 +8795,73 @@ I17 and BLOC_06 UNAUTHORIZED; RESEARCH = FROZEN.
 
 STATUS: B5-I09P2C_IMPLEMENTED_PARTIAL - INDEPENDENT RATIFICATION AUDIT REQUIRED.
 Evidence: BLOC_05_I09P2C_IMPLEMENTATION_EVIDENCE.md.
+
+## 195 - SENSOR-B5-I09P2cR1: INDEPENDENT AUDIT RECORDS A RATIFICATION HOLD
+
+AUDITED HEAD: 3a732e18878e96adbc192731c4b4a2ded30379ea (local == remote). Read-only
+audit: no production file, test file, historical artifact or frozen plan changed;
+the three preserved scratch paths stay untouched and unstaged.
+
+RECONSTRUCTION: eleven properties kept distinct (model validity, mapping approval,
+transformation verification, provider, venue, instrument, revision, custody,
+acquisition, PIT, downstream verdict). P2c enforces economic re-derivation for
+trade records and record-bound admission for liquidation; it does not authenticate
+venue, instrument, contract, revision or acquisition identity, and says so in
+per-dimension flags.
+
+MEASURED ATTACKS
+  Trade: flipped canonical side, flipped native boolean, native-field swap, provider
+  swap, approval/digest/methodology/evidence swap -> refused (CANONICAL_VALUE_
+  MISMATCH, NATIVE_FIELD_MISMATCH, PROVIDER_MISMATCH, PROVENANCE_MISMATCH).
+  Venue, instrument, contract, source-revision and acquisition mutations -> VERIFIED
+  with downstream_trusted=True while the corresponding flags are False (F-R1-02).
+  Liquidation: canonical-only and admission-only rewrites refused; the coordinated
+  record+admission rewrite (L03) is ACCEPTED as an approved mapping with
+  record_transformation_verified=False and downstream_trusted=False, which is the
+  classification the frozen directive requires (F-R1-05); no transform may be
+  invented.
+  Custody: a caller-minted object satisfying the runtime Protocol -- holding no
+  bytes, returning the public approved digest -- receives custody_verified=True and
+  downstream_trusted=True. The real BlobStoreCustody does refuse tampered and
+  missing objects (F-R1-01, CRITICAL).
+  Model: RecordVerification enforces no invariant; downstream_trusted=True with
+  custody_verified=False, and with semantic_mapping_approved=False, construct and
+  serialize (F-R1-03).
+  PIT: instants compared across offsets, DST repeated hour correct, same-day
+  date-only refused at 09:00 and 23:59, naive/missing cutoff refused, naive
+  available_at_instant and instant-before-approved_at refused as MALFORMED_MANIFEST.
+  An approval with NEITHER availability field imposes no constraint and verifies an
+  earlier cutoff (F-R1-04).
+  Bootstrap: production pin == bytes (3d707c59...), empty manifest admits nothing,
+  forged root and raw bytes refused, revocation and expiry refused, no mutable
+  approval cache. The context's authority is a deployment assumption (F-R1-06).
+
+GATES: P2C-01..24 re-adjudicated from the frozen clauses: 17 PASS, 6 PARTIAL (05,
+07, 08, 10, 12, 15), 1 FAIL (14). The implementation evidence reported 19/5/0; the
+difference is F-R1-01 and the downstream_trusted scope finding.
+
+VERIFICATION: 43 P2c tests inside a 321-test i09/i10/i11 selection; 150 tests for
+I10 trade, I11 liquidation, P2a and P2b; governance binding 4 passed; I05 86/86/0
+(+7/7), I06 14/14/0 (+8/8), I09 35 pass/0 fail/3 unresolved at 567716a4; seven
+frozen Bloc 5 documents byte-identical since dafcd86a02; canonical suite NOT
+re-executed because no production or test byte changed since the measured
+4565 passed / 14 skipped / exit 0.
+
+DECISION: I09P2C_RATIFICATION_HOLD. Bounded recognition of trade canonical-side
+verification, provider/native/provenance binding, liquidation record-binding,
+intraday PIT fail-closure, determinism and historical custody; ratification
+withheld because the strongest verdict is obtainable from a counterfeit custody
+object and is awarded alongside unauthenticated record dimensions.
+
+REMEDIATION SPECIFIED, NOT EXECUTED - SENSOR-B5-I09P2d: custody identity from an
+application-owned handle rather than Protocol shape; a scoped verdict plus an
+explicit unverified-dimensions set and a validator forbidding downstream trust
+without custody; refusal of approvals carrying no availability field; regression
+tests for all four vectors. Out of scope: inventing a liquidation transform,
+fabricating provider evidence, building the ingestion application, I11
+ratification, I12/I17, any program-gate promotion.
+
+STATUS: B5-I09P2C = RATIFICATION_HOLD (P2C-14 FAIL). B5-I09a = OPERATOR_ACCEPTED;
+B5-I09b = DEFERRED; B5-I10 = OPERATOR_ACCEPTED (bounded); B5-I11 =
+IMPLEMENTATION_PARTIAL / RATIFICATION_HOLD; B5-I12+, I17, BLOC_06 UNAUTHORIZED;
+RESEARCH = FROZEN. Evidence: BLOC_05_I09P2CR1_INDEPENDENT_AUDIT.md.
