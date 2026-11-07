@@ -131,3 +131,28 @@ extraction, no publication, no evaluation system, no merge, no credential, no cl
 
 Branch `oce-book-6-p0` from `a794a9af…`. Draft PR #28 opened and deliberately left draft,
 open and unmerged; merge authorized false. Local branch equals remote at the reviewed head.
+
+### 2.4 Disclosed limitation — the frozen B5-I9 boundary node
+
+The B5-I9 factory gate runs on this pull request because its workflow is triggered by any pull
+request. Forty of its forty-one frozen nodes pass; `TestLocks::test_changed_file_boundary`
+fails by construction. That node asserts every path added by the branch lies inside the B5-I9
+prefixes (`docs/oce-golden-system/OCE_B5_I9_`, `tests/test_b5_i9_`, `scripts/b5_i9_`,
+`evidence/b5-i9/`, `.github/workflows/b5-i9-`), and every Book 6 planning file is outside them.
+
+On `main` at `a794a9af…` the gate is green, so no Book 5 regression is implied and none is
+claimed. No frozen Book 5 test, workflow, generator or packet was edited to obtain a green
+badge, and Book 6 implementation remains absent. The collision is structural: a Book 6
+planning artifact and that node cannot both be green on one branch.
+
+Operator options, none of which this packet takes: keep Book 6 artifacts outside the repository
+until a Book 5 boundary amendment scopes the node to its own stage; authorize such an
+amendment; or accept a red Book 5 gate on an unmerged planning PR. Until the operator decides,
+this PR must not be merged and the red check must not be described as a Book 6 defect or a
+Book 5 failure.
+
+### 2.5 Validation at the reviewed head
+
+`block_06_p0_validate.py`: 108 checks, 0 failures. Truthful CI disposition for this head:
+paired comparison SUCCESS, B5-I8 audit SUCCESS, B1-I1R SUCCESS, B5-I9 factory gate FAILURE on
+the single boundary node described in §2.4 (40/41 nodes pass).
