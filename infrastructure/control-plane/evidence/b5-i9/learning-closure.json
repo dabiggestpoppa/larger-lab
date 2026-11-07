@@ -26,7 +26,7 @@
     {
       "consequence": "a literal reader would see a contradiction between the observable text and the table",
       "correction": "the two observable strings were corrected to 27 in a separate narrow repair commit; statements, ids, bindings and states are unchanged",
-      "disposition": "repaired forward as B5-I9-X1; history preserved",
+      "disposition": "repaired forward in the B5-I9-R5 stage-state commit; history preserved",
       "id": "L04",
       "observation": "registry rows B5I9-EX-01 and B5I9-EX-09 describe the census as 26 rows while the frozen total, the table and the arithmetic are 27"
     },

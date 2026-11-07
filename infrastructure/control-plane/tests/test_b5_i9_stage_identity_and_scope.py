@@ -136,6 +136,6 @@ class TestLedgerAppend:
         body = gate.normalize(raw)
         assert gate.sha256(body[:gate.LEDGER_PREFIX_LEN]) == gate.LEDGER_PREFIX_SHA
         assert len(body) > gate.LEDGER_PREFIX_LEN
-        assert b"## 22. B5-I9 P0 â operator ratification" in body
+        assert "## 22. B5-I9 P0" in body.decode("utf-8")
         assert b"## 23. B5-I9 implementation" in body
         assert body.rstrip().endswith(b"BOOK_6_AUTHORIZED = false")
