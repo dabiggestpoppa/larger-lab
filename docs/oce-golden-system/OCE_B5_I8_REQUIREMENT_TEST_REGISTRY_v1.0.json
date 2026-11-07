@@ -881,7 +881,6 @@
           "event": "pull_request",
           "head_sha": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
           "tested_tree": "288d14623da4586a5a2f6f1ef916dd39d202b97d",
-          "merge_ref_sha": "99b65278e8d1f38c7e1bd7ee302ce94c69aa04ae",
           "merge_ref_first_parent": "e999a4a342f8a2ebb8f99045206d67d04d6fcbbf",
           "merge_ref_second_parent": "5da5ae9e1b82507443f4d3faa2d06f8ebae0fb4c",
           "merge_ref_tree": "288d14623da4586a5a2f6f1ef916dd39d202b97d",
@@ -895,7 +894,8 @@
           "errors": 0,
           "skipped": 0,
           "unique_nodes": 40,
-          "note": "Merge-ref identity is recorded as merge_ref_sha; the server-side ref itself is not a history citation."
+          "note": "Merge-ref identity is recorded as merge_ref_sha; the server-side ref itself is not a history citation.",
+          "merge_ref_note": "The server-side refs/pull merge commit is recorded in OCE_B5_I8_CI_IDENTITY_v1.0.json, not here: a branch checkout fetches a NEW merge commit for every head, so a historical merge sha is not a resolvable history citation."
         }
       },
       "same_agent_audit": {
@@ -990,7 +990,8 @@
       "post_book_6_evaluation": "NOT_BEGUN",
       "web_view_disposition": "ABSENT",
       "cost_usd": 0,
-      "capital_authority": "none"
+      "capital_authority": "none",
+      "merge_ref_recorded_in": "docs/oce-golden-system/OCE_B5_I8_CI_IDENTITY_v1.0.json"
     }
   },
   "registry_id": "OCE-B5-I8-REGISTRY-001",
