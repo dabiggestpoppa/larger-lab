@@ -35,8 +35,11 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install pytest
-        run: python -m pip install --quiet --disable-pip-version-check pytest
+      - name: Install pinned CI dependencies
+        # The hash-locked CI set already carries pytest and the control-plane runtime the
+        # adjacent governed-change drill needs; installing ad hoc packages would unpin CI.
+        run: |
+          pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
 
       - name: Generate run identity and evidence directory
         id: run_id
