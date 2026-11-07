@@ -8521,3 +8521,91 @@ NOT CLAIMED
   INCOMPLETE, no gate earned, I12/I17 unauthorized, RESEARCH frozen.
 
 STATUS: B5-I09P2A_IMPLEMENTATION_COMPLETE - NO GATE PROMOTED, NOT RATIFIED.
+## 191 - SENSOR-B5-I09P2aR1: INDEPENDENT AUTHORITY AUDIT (HOLD)
+
+CUSTODY
+  HEAD 6b112f196ef086550bd9e4b107bc23bfabbf0f0a = remote; tracked tree clean; the three
+  preserved scratch paths untracked and unstaged; frozen plan 4bb677f9e resolves with no
+  planning document in the range; exactly two P2a commits above I09P1 (89c6939457,
+  6b112f196e). No production or test byte changed by this audit: one evidence record and
+  this entry are the entire delta.
+
+METHOD (disposable, untracked, never staged)
+  .bu_tmp/probe_i09p2ar1.py: 18 rows, 18 pass, exit 0 - G1-G6, the nine manifest-boundary
+  probes, determinism, mutation sensitivity, and two G7 export probes. Outcomes are
+  constructed attacks against production imports, not descriptions.
+
+MEASURED - loader logic validated
+  Empty shipped manifest -> NO_APPROVAL (artifacts: 0). Bytes carrying their own declared
+  digest -> DIGEST_MISMATCH. One-byte mutation -> DIGEST_MISMATCH. Revoked -> APPROVAL_REVOKED.
+  Expired -> AUTHORITY_EXPIRED. Validity window without an instant -> EVALUATION_TIME_REQUIRED.
+  Schema revision mismatch -> VERSION_MISMATCH. Unapproved artifact id -> ARTIFACT_NOT_APPROVED.
+  Minted methodology -> UNREGISTERED_METHODOLOGY. Foreign evidence -> EVIDENCE_NOT_BOUND_TO_
+  PROVIDER. Undeclared field -> NATIVE_FIELD_NOT_DECLARED. Unapproved transformation ->
+  TRANSFORMATION_NOT_APPROVED. Unresolved assumption -> BLOCKING_ASSUMPTION_UNRESOLVED.
+  Unsealed SemanticAuthority construction -> ValueError. A labelled synthetic approval is
+  issued, deterministically, and only under its own manifest.
+
+MEASURED - the boundary that is NOT enforced
+  A caller who supplies BOTH artifact bytes and manifest bytes receives authority for its
+  own approval id (observed approval=ATTACKER-APPROVAL). Nothing in src/ loads the manifest
+  from an independently controlled location, pins its digest, or provides an application
+  initialization boundary; load_semantic_authority takes manifest_bytes from its caller.
+  Therefore: LOADER_LOGIC_VALIDATED = YES; TRUSTED_MANIFEST_SOURCE_ENFORCED = NO;
+  PROVIDER_EVIDENCE_AUTHENTICATED = NO; OPERATOR_APPROVAL_PROVEN = NO. The module-private
+  sentinel resists data, not code holding the application's privileges.
+
+MEASURED - G1-G7
+  G1 caller-minted authority REFUSED; G2 unknown methodology REFUSED; G3 foreign evidence
+  REFUSED; G4 undeclared native field REFUSED; G5 unsupported transformation REFUSED;
+  G6 unresolved blocking assumption REFUSED; G7 PARTIAL. G7 is not closed by carrying an
+  approval id: a hand-minted LiquidationSideAdmission reproduces an approved one exactly
+  (identical model_dump), and T1TradeRecord carries no approval/authority/digest field at
+  all. Provenance is currently data, not independent verification.
+
+CONSUMERS
+  I10: a bare registry computes provisional_side and leaves aggressor_side UNKNOWN (ladder
+  AND authority AND attests); a duck-typed object cannot serve as authority; notional_usd
+  stays blocked on B5_I08_UNITS_V1; accepted economics unchanged. I11: registry alone records
+  UNTRUSTED_AUTHORITY; the four side fields stay separate; contradictions quarantine before
+  authority; all-or-nothing promotion and SEMANTICS_UNVERIFIED unchanged; liquidation_usd
+  blocked. I11 operator acceptance is NOT granted and the I11R2 hold stands.
+
+CUSTODY OF THE SECOND COMMIT
+  89c6939457..6b112f196e touches one file and two lines inside one existing row
+  (configurations_unchanged) - disclosed wording only. Row ids, counts and pass values are
+  unchanged; no failure became a pass; no allowlist widened. Both producers now pass --check
+  (i06 = 0, i09 = 0), so the second commit corrected real drift instead of masking it.
+  Pin table re-measured: I05 9ba207fd7433..., I06 04770f5f31df..., I09 7eeca3ec3b96... -
+  all equal to their operative pins. normalization/{common,identity,terms,time} is
+  byte-identical to e2df7109b4, so the I08 detached-worktree reproduction was not required.
+
+TESTS
+  Re-executed on this tree: normalization + governance binding = 1104 passed, exit 0.
+  Accepted from documented provenance without re-running: canonical suite 4498 passed,
+  14 skipped, exit 0 on 6b112f196e (ledger section 190), code and test bytes unchanged.
+
+MATRIX
+  P09-01, 03-21, 22, 23, 24 EARNED mechanically (23 of 24). P09-02 NOT EARNED: no
+  independently controlled approval-source identity exists, and no gate requiring a real
+  operator-approval mechanism may be earned from a synthetic root.
+
+DECISION: I09P2A_RATIFICATION_HOLD. The mechanical layer is correct; it is correct about
+  bytes whose approval the same actor can supply. Describing this as an authenticated
+  trust root would be false, so HOLD rather than bounded acceptance.
+
+NEXT (proposed, NOT executed): SENSOR-B5-I09P2b - trusted consumption and export-provenance
+  closure. Engineering only: operator-controlled manifest location with a pinned governance
+  digest, a single production initializer, a consumer verifier that re-loads the authority
+  and refuses payload provenance that does not match, a provenance field for T1TradeRecord,
+  blob-level evidence binding through existing storage custody, PIT revision constraints, and
+  adversarial tests for each. Real-provider onboarding (B5-I09b) remains a separate future
+  checkpoint and is never merged into P2b.
+
+NO GOVERNANCE CHANGE: B5-I09a = OPERATOR_ACCEPTED; B5-I09b = DEFERRED; B5-I10 =
+OPERATOR_ACCEPTED (bounded); B5-I11 = IMPLEMENTATION_PARTIAL / RATIFICATION_HOLD; B5-I09P2A =
+IMPLEMENTATION_COMPLETE, NOT RATIFIED (HOLD); BLOC_05 = INCOMPLETE; eight gates NOT_YET_EARNED;
+B5-I12+ and BLOC_06 UNAUTHORIZED; RESEARCH = FROZEN; next_checkpoint_authorized = FALSE.
+
+STATUS: B5-I09P2AR1_AUDIT_COMPLETE - HOLD RECORDED. Evidence:
+BLOC_05_I09P2AR1_INDEPENDENT_AUDIT.md.
