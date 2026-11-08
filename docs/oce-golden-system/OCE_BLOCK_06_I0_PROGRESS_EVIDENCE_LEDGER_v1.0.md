@@ -88,3 +88,18 @@ path; `G16` stays `OPEN` under `B5I8-DF05`.
 `READY_FOR_OPERATOR_REVIEW`. `NOT MERGE AUTHORIZED`. Ratification, merge, publication, B6-I1 and
 the reserved evaluation system remain unauthorized; the pull request stays draft, open and
 unmerged, cost is `$0`, `capital.authority = none`, and Freebuff is untouched.
+
+## 10. Exact-head CI identity
+
+Implementation head `6aa168f1ecc9f831a39bc150e42157d61601672e` (tree `5a7fb3cd7b25c9b7f95415ec3170baee6d3bfc10`). Every workflow below executed on that head:
+
+- `B1-I1R Validation` — run `42530983201` — success
+- `B5-I8 Audit Validation` — run `42530983196` — success
+- `B5-I9 Factory Gate Validation` — run `42530983238` — success
+- `B5-I9 Post-Merge Paired Comparison` — run `42530983384` — success
+- `B6-I0 Validation` — run `42530983207` — success
+
+Local gates on the same tree: conformance validator `PASS` (131 checks), mutation battery
+`12/12 discriminated, 12/12 restored, pristine green`, focused suite `70 passed, 2 skipped`
+(the two skips are the POSIX-only symlink controls, which execute in Linux CI), frozen Book 5
+suite `41 passed`, deterministic double generation byte-identical.
