@@ -42,8 +42,9 @@ from qcae.orchestration.jobs.runtime import (
     assert_job_transition,
     assert_step_transition,
 )
-from qcae.governance.standalone.approvals import GrantUse
 from qcae.orchestration.authority_gate import (
+    ApprovalAdmissionProvider,
+    ApprovalRequestResolver,
     AuthorityRequestSink,
     FailClosedStepAuthorityGate,
     StepAuthorityDecision,
@@ -116,10 +117,13 @@ class OrchestratorEngine:
         self._authority_sink = authority_request_sink
         # P2-R4-C03 (finding G): approval authority is a DURABLE grant
         # consumed atomically at admission — never process-memory state.
-        # The registry is duck-typed (effective_grant / mark_grant_used) so
-        # the orchestrator does not import infrastructure; the composition
-        # root wires the real one.
-        self._approvals = approval_registry
+        # The provider is the provider-neutral ApprovalAdmissionProvider port
+        # so the orchestrator never imports governance standalone (architecture
+        # guard); the composition root wires the real registry.
+        self._admissions: ApprovalAdmissionProvider = approval_registry
+        # P2-R5-C04: one authority-request resolver shared by execution-time
+        # admission and grant-release verification.
+        self._resolver = ApprovalRequestResolver(self._store.events_for_job)
 
     # -- explicit interfaces (P2-R2-C05: no private-attribute reach-ins) -----
 
@@ -649,32 +653,6 @@ class OrchestratorEngine:
             return "unsinked"
         return self._authority_sink.record_authority_request(verdict)
 
-    def _latest_authority_request_for_step(
-        self, job_id: str, step_id: str
-    ) -> Optional[str]:
-        """The request id from the step's latest APPROVAL_REQUESTED event.
-
-        Same truth the runtime service verifies grants against (P2-R2-C02);
-        the engine reads it so grant admission consumes the RIGHT durable
-        request, never a memory-cached key.
-        """
-        import json
-
-        for _seq, _ev, payload in reversed(self._store.events_for_job(job_id)):
-            if (
-                _ev.event_type is JobEventType.APPROVAL_REQUESTED
-                and _ev.step_id == step_id
-                and payload
-            ):
-                try:
-                    data = json.loads(payload)
-                except ValueError:
-                    continue
-                rid = data.get("authority_request_id", "")
-                if rid and rid != "unsinked":
-                    return rid
-        return None
-
     def record_exact_scope_grant(self, job_id: str, step_id: str) -> None:
         """Release one WAITING_POLICY step after an exact-scope operator grant.
 
@@ -729,21 +707,21 @@ class OrchestratorEngine:
         same grant is refused (a retry that still requires approval performs
         a new authority evaluation and needs a new grant).
         """
-        if self._approvals is None:
+        if self._admissions is None:
             return False
         job_id, step_id, principal = verdict.job_id, verdict.step_id, verdict.principal
-        # The durable request this step raised (recorded by the sink).
-        request_id = self._latest_authority_request_for_step(job_id, step_id)
+        # One resolver shared by admission and release verification.
+        request_id = self._resolver.latest_for_step(job_id, step_id)
         if not request_id:
             return False
         try:
-            request = self._approvals.get_request(request_id)
+            request = self._admissions.get_request(request_id)
         except QcaeValidationError:
             return False
         if request is None:
             return False
         try:
-            grant = self._approvals.effective_grant(request_id, now=self._clock())
+            grant = self._admissions.effective_grant(request_id, now=self._clock())
         except QcaeValidationError:
             return False
         if grant is None:
@@ -756,15 +734,14 @@ class OrchestratorEngine:
         # A stale mismatch refuses admission and does not consume the grant.
         if verdict.binding_digest() != grant.binding_digest(request.principal):
             return False
-        # Single-use consumption, atomically: the INSERT wins for exactly
-        # one caller; concurrent/replayed admissions read it as consumed.
-        use = GrantUse(
+        # Atomically consume; the provider builds the durable GrantUse record
+        # internally so the orchestrator stays free of governance types.
+        return self._admissions.consume_grant(
             use_id=f"use-{secrets.token_hex(8)}",
             decision_ref=grant.decision_id,
             step_id=step_id,
             used_at=self._clock(),
         )
-        return self._approvals.mark_grant_used(use)
 
     def _complete(self, step: RuntimeStep, result: WorkerResult) -> None:
         # P2-C07R2: commit is durable and carries the result payload, closing

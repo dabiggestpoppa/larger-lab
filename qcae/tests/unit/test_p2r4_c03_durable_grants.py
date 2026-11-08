@@ -108,7 +108,7 @@ def _reach_waiting_policy(stack, queue, engine, clock, job_id="job-12345678"):
     result = engine.execute_step(lease, worker_id="id-worker-runtime")
     assert result.status.value == "BLOCKED_POLICY"
     assert stack.get_step(STEP).status is RuntimeStepStatus.WAITING_POLICY
-    rid = engine._latest_authority_request_for_step(job_id, STEP)
+    rid = engine._resolver.latest_for_step(job_id, STEP)
     assert rid
     return rid
 

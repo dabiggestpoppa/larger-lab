@@ -137,7 +137,7 @@ def _reach_waiting_policy(service, engine, job, step, worker="id-worker-runtime"
     lease = engine.lease_next(job.job_id, worker)
     result = engine.execute_step(lease, worker_id=worker)
     assert result.status is WorkerStatus.BLOCKED_POLICY
-    request_id = service._latest_authority_request_for_step(job.job_id, step.step_id)
+    request_id = service._resolver.latest_for_step(job.job_id, step.step_id)
     assert request_id
     return request_id
 

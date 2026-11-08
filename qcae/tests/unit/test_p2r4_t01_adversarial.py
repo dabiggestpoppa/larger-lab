@@ -263,7 +263,7 @@ class TestApprovalAdversarial:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "id-worker-runtime")
         engine.execute_step(lease, worker_id="id-worker-runtime")
-        rid = engine._latest_authority_request_for_step("job-12345678", SID)
+        rid = engine._resolver.latest_for_step("job-12345678", SID)
         service.decide_approval(
             request_id=rid, decision="GRANTED", decided_by="id-operator-1",
             job_id="job-12345678", reason="ok")
@@ -323,7 +323,7 @@ class TestApprovalAdversarial:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "id-worker-runtime")
         engine.execute_step(lease, worker_id="id-worker-runtime")
-        rid = engine._latest_authority_request_for_step("job-12345678", SID)
+        rid = engine._resolver.latest_for_step("job-12345678", SID)
         service = LocalRuntimeService(
             runtime_store=store, queue=queue, engine=engine,
             identity_provider=_identities(), policy_provider=None,
@@ -351,7 +351,7 @@ class TestApprovalAdversarial:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "id-worker-runtime")
         engine.execute_step(lease, worker_id="id-worker-runtime")
-        rid = engine._latest_authority_request_for_step("job-12345678", SID)
+        rid = engine._resolver.latest_for_step("job-12345678", SID)
         service.decide_approval(
             request_id=rid, decision="DENIED", decided_by="id-operator-1",
             job_id="job-12345678", reason="no")

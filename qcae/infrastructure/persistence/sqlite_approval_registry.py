@@ -220,6 +220,28 @@ class SqliteApprovalRegistry:
         except sqlite3.IntegrityError:
             return False
 
+    def consume_grant(
+        self,
+        *,
+        use_id: str,
+        decision_ref: str,
+        step_id: str,
+        used_at: str,
+    ) -> bool:
+        """Provider-neutral single-use consumption (ApprovalAdmissionProvider).
+
+        Builds the durable GrantUse record internally and delegates to
+        ``mark_grant_used``; True iff this call won the single-use race.
+        """
+        return self.mark_grant_used(
+            GrantUse(
+                use_id=use_id,
+                decision_ref=decision_ref,
+                step_id=step_id,
+                used_at=used_at,
+            )
+        )
+
     def uses_for_decision(self, decision_id: str) -> List[GrantUse]:
         """All consumption records for one grant (oldest first)."""
         rows = self._conn.execute(

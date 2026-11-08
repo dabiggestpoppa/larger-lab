@@ -25,6 +25,7 @@ from qcae.core.errors import QcaeValidationError
 from qcae.core.jobs import deterministic_job_id
 from qcae.governance.standalone.approvals import ApprovalDecision, ApprovalState
 from qcae.governance.standalone.identity import LocalIdentityProvider
+from qcae.orchestration.authority_gate import ApprovalRequestResolver
 from qcae.orchestration.jobs.graph import StepGraph
 from qcae.orchestration.jobs.runtime import (
     JobEvent,
@@ -82,13 +83,7 @@ class LocalRuntimeService:
         self._engine = engine
         self._identity = identity_provider
         self._authority = policy_provider
-        self._approvals = approval_registry
-        self._clock = clock
-        self._schema_version = schema_version
-        self._policy_version = policy_version
-        self._storage_location = storage_location
-        self._runtime_id = runtime_id
-        self._version = version
+        self._approvals = approval_registry        self._clock = clock        self._schema_version = schema_version        self._policy_version = policy_version        self._storage_location = storage_location        self._runtime_id = runtime_id        self._version = version        # P2-R5-C04: one authority-request resolver shared by admission and        # release verification.        self._resolver = ApprovalRequestResolver(self._store.events_for_job)
 
     # -- identity ------------------------------------------------------------
 
@@ -358,9 +353,7 @@ class LocalRuntimeService:
             raise QcaeValidationError(
                 f"step {step_id!r} is not WAITING_POLICY; nothing to release"
             )
-        # Find the durable authority request recorded for this step.
-        request_id = self._latest_authority_request_for_step(job_id, step_id)
-        if request_id is None:
+        # Find the durable authority request recorded for this step.        request_id = self._resolver.latest_for_step(job_id, step_id)        if request_id is None:
             raise QcaeValidationError(
                 f"no authority request recorded for step {step_id!r}; refusing release"
             )
@@ -391,27 +384,6 @@ class LocalRuntimeService:
                 "approval laundering rejected"
             )
         self._engine.record_exact_scope_grant(job_id, step_id)
-
-    def _latest_authority_request_for_step(
-        self, job_id: str, step_id: str
-    ) -> Optional[str]:
-        """The request id from the step's latest APPROVAL_REQUESTED event."""
-        for _seq, _ev, payload in reversed(self._store.events_for_job(job_id)):
-            if (
-                _ev.event_type is JobEventType.APPROVAL_REQUESTED
-                and _ev.step_id == step_id
-                and payload
-            ):
-                import json
-
-                try:
-                    data = json.loads(payload)
-                except ValueError:
-                    continue
-                rid = data.get("authority_request_id", "")
-                if rid and rid != "unsinked":
-                    return rid
-        return None
 
     def _already_decided(self, request_id: str) -> bool:
         """True if any durable decision exists for the request.
