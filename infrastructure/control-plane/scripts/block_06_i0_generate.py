@@ -355,6 +355,7 @@ def build_contract(root: pathlib.Path, scope: dict) -> dict:
             "infrastructure/control-plane/scripts/block_06_i0_validate.py",
             "infrastructure/control-plane/scripts/block_06_i0_mutation_battery.py",
             "infrastructure/control-plane/tests/test_block_06_i0_",
+            "infrastructure/control-plane/tests/block_06_i0_support.py",
             ".github/workflows/block-06-i0-validation.yml",
         ],
         "prohibited_paths": [
