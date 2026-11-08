@@ -8910,3 +8910,55 @@ here; B5-I09a/I10 unchanged; B5-I09b DEFERRED; B5-I11 IMPLEMENTATION_PARTIAL /
 RATIFICATION_HOLD; B5-I12+, I17, BLOC_06 UNAUTHORIZED; RESEARCH FROZEN.
 Independent P2dR1 audit recommended, NOT executed. Evidence:
 BLOC_05_I09P2D_IMPLEMENTATION_EVIDENCE.md.
+
+## 197 - SENSOR-B5-I09P2dR1: INDEPENDENT AUDIT FINDS A COMMITTED REGRESSION
+
+AUDITED cce32c549e (local == remote); the 8-path P2d surface, seven frozen Bloc 5
+planning documents, production manifest (artifacts == {}, 3d707c59...), file
+endings (authority 998 CRLF/0 bare LF, verification and both test suites LF),
+ledger section 196 (exactly one) and the three preserved scratch paths were
+re-verified. Read-only audit: no production, test, frozen-plan or historical
+artifact was modified; probes live in .bu_tmp and are unstaged.
+
+SURVIVED independent attack (54-case probe suite): byte custody (digest echo,
+plain dict, wrong bytes, lying store, absent/mutated/foreign blob, other
+approval all refused; custody_source_authorized stays False everywhere), the
+scoped verdict with six mandatory unverified dimensions, result laws (11
+contradictory constructions plus JSON reconstruction refused), record-level PIT
+closure (missing availability, same-day date-only, offsets, DST repeated hour,
+revocation, expiry), liquidation economic uncertainty (coordinated rewrite
+mapped=True / transform=False / down=False), and the pins: I05 86/86/0 (+7/7),
+I06 14/14/0 (+8/8), I09 35/35/0/3 = 845f1c66....
+
+REGRESSION: canonical 4603 passed, 11 skipped, 2 FAILED across 11 audited
+partitions that cover the 4616-test universe exactly (0 omitted, 0 duplicated).
+Both failures are the P2d commit adding one tracked .py without updating the two
+governance count pins: python_files_scanned is 1094 while git ls-files '*.py' is
+1095 -> test_b5_i05_scope_audit::test_the_governance_audit_republish_is_mechanical_only
+(assert 1094 == 1095) and test_i11r2_binding_audit
+::test_governance_binding_audit_is_measured_and_committed (artifact drifted,
+'4' != '5'). Both reproduce in isolation. The P2d record's "governance 4 passed"
+and its chunk totals were measured before that file was staged, so the committed
+tree was never tested as committed; its 4615 "collected" also omits one test
+(partition 3 recorded 464 against 465 collected), its six-failure anomaly kept no
+test identity or trace, its ledger says 39 tests where 40 exist, and its own
+P2D-22 row is blank while the operator report counted it PASS.
+
+RESIDUAL: verify_mapping_provenance still admits an approval with neither
+availability field, so the PIT closure is record-entry only; and no module in
+this tree consumes RecordVerification, so the scope guard is a contract for the
+integration checkpoint, not an enforced boundary. Verified bytes are also not
+re-bound when consumed later (no TOCTOU binding after verification).
+
+ENVIRONMENT: the volume reached 100% (4 MB free) during a single-invocation run,
+which then failed en masse on ENOSPC; stale pytest temp held ~1.2 GB. This
+explains the earlier "terminated at 74%" episodes; partitions were used instead
+and the two failures are reproducible, not environmental.
+
+DISPOSITION: I09P2D_RATIFICATION_HOLD (P2D-22 FAIL; P2D-03/05/07/11/16 PARTIAL;
+18 PASS). B5-I09P2C remains RATIFICATION_HOLD and is NOT ratified here; B5-I09a
+and B5-I10 unchanged; B5-I09b DEFERRED; B5-I11 IMPLEMENTATION_PARTIAL /
+RATIFICATION_HOLD; B5-I12+, I17, BLOC_06 UNAUTHORIZED; RESEARCH FROZEN. Remediation
+specified, not executed. Evidence: BLOC_05_I09P2DR1_INDEPENDENT_AUDIT.md.
+Governance-only commit on agent/crypto-sensor-fabric-audit-p2dr1; the production
+branch was not modified. Next checkpoint P2dR2 recommended, NOT executed.
