@@ -94,6 +94,21 @@ class StepAuthorityVerdict(SerializableRecord):
         "decision": lambda v: coerce_enum(v, StepAuthorityDecision),
     }
 
+    def binding_digest(self) -> str:
+        """Digest of the authority binding this verdict admits.
+
+        principal -> action -> resource -> scope, verbatim.
+        Used to detect stale grants whose binding no longer matches the
+        live verdict (P2-R5-C03: live binding digest must equal approved
+        binding digest before any grant consumption).
+        """
+        import hashlib
+
+        material = (
+            f"{self.principal}|{self.action}|{self.resource}|{self.scope}"
+        ).encode("utf-8")
+        return hashlib.sha256(material).hexdigest()
+
     def validate(self) -> None:
         require_identifier(self.step_id, "step_id")
         require_identifier(self.job_id, "job_id")

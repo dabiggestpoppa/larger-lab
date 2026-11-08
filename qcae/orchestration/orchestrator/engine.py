@@ -510,8 +510,7 @@ class OrchestratorEngine:
                 error_summary=f"authority denied: {verdict.reason}",
             )
         if verdict.decision is StepAuthorityDecision.REQUIRE_APPROVAL:
-            if not self._grant_admits(job_id=step.job_id, step_id=step.step_id,
-                                      principal=principal):
+            if not self._grant_admits(verdict=verdict):
                 request_id = self._persist_authority_request(verdict)
                 assert_step_transition(step.status, RuntimeStepStatus.WAITING_POLICY)
                 self._store.update_step(
@@ -710,7 +709,7 @@ class OrchestratorEngine:
 
     # -- P2-R4-C03: durable single-use grant admission -----------------------
 
-    def _grant_admits(self, *, job_id: str, step_id: str, principal: str) -> bool:
+    def _grant_admits(self, *, verdict: StepAuthorityVerdict) -> bool:
         """Whether a durable grant admits this execution — consuming it if so.
 
         Law (directive §6/§7, finding G): authority comes from the durable
@@ -719,6 +718,12 @@ class OrchestratorEngine:
         registry wired the answer is NO — fail closed; grants cannot live
         in process memory.
 
+        Live grant binding (P2-R5-C03): the binding the verdict currently
+        authorizes (principal -> action -> resource -> scope) must digest-
+        equal the approved decision's binding before any consumption. A
+        stale mismatch (different principal/action/resource/scope) refuses
+        admission and does NOT consume the grant.
+
         Consumption semantics: exactly one use row per grant decision.
         The first admitted attempt consumes it; a second attempt under the
         same grant is refused (a retry that still requires approval performs
@@ -726,6 +731,7 @@ class OrchestratorEngine:
         """
         if self._approvals is None:
             return False
+        job_id, step_id, principal = verdict.job_id, verdict.step_id, verdict.principal
         # The durable request this step raised (recorded by the sink).
         request_id = self._latest_authority_request_for_step(job_id, step_id)
         if not request_id:
@@ -743,9 +749,12 @@ class OrchestratorEngine:
         if grant is None:
             # No GRANTED decision, or the approval window has expired.
             return False
+        # Identity binding: the grant admits the requesting principal only.
         if request.principal != principal:
-            # The grant admits the principal who requested it — never a
-            # different execution identity (identity binding law).
+            return False
+        # Live binding digest == approved binding digest before consumption.
+        # A stale mismatch refuses admission and does not consume the grant.
+        if verdict.binding_digest() != grant.binding_digest(request.principal):
             return False
         # Single-use consumption, atomically: the INSERT wins for exactly
         # one caller; concurrent/replayed admissions read it as consumed.

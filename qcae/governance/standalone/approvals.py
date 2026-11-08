@@ -125,6 +125,21 @@ class ApprovalDecision(SerializableRecord):
 
     _COERCIONS = {"state": lambda v: coerce_enum(v, ApprovalState)}
 
+    def binding_digest(self, principal: str) -> str:
+        """Digest of the binding this granted decision covers.
+
+        principal -> bound_action -> bound_resource -> bound_scope.
+        Must equal the live verdict's binding digest before the grant
+        may be consumed (P2-R5-C03).
+        """
+        import hashlib
+
+        material = (
+            f"{principal}|{self.bound_action}|{self.bound_resource}|"
+            f"{self.bound_scope}"
+        ).encode("utf-8")
+        return hashlib.sha256(material).hexdigest()
+
     def validate(self) -> None:
         require_identifier(self.decision_id, "decision_id")
         require_identifier(self.request_ref, "request_ref")
