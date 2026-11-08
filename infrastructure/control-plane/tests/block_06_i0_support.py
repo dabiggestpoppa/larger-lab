@@ -27,13 +27,14 @@ I0_MODULES = (
     "test_block_06_i0_decisions_and_api.py",
     "test_block_06_i0_compat_and_failures.py",
     "test_block_06_i0_authority_and_boundary.py",
-    "test_block_06_i0_b5_i9_regression.py",
+    "test_block_06_i0_book5_regression.py",
     "test_block_06_i0_reproducibility_and_ci.py",
 )
 SCRIPTS_I0 = (
     "block_06_i0_generate.py",
     "block_06_i0_validate.py",
     "block_06_i0_mutation_battery.py",
+    "block_06_i0_gate.py",
 )
 
 

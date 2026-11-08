@@ -44,7 +44,7 @@ MODULES = {
     "decisions": "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py",
     "compat": "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py",
     "authority": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py",
-    "regression": "infrastructure/control-plane/tests/test_block_06_i0_b5_i9_regression.py",
+    "regression": "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py",
     "repro": "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py",
 }
 

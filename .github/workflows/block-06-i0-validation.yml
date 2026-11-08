@@ -152,7 +152,7 @@ jobs:
              infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py \
              infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py \
              infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py \
-             infrastructure/control-plane/tests/test_block_06_i0_b5_i9_regression.py \
+             infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py \
              infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py"
           python -m pytest $F -v --tb=short --junitxml="$EVIDENCE_DIR/b6-i0-junit.xml" \
             > "$EVIDENCE_DIR/b6-i0-pytest-output.txt" 2>&1; rc=$?
@@ -182,34 +182,15 @@ jobs:
           python infrastructure/control-plane/scripts/block_06_i0_mutation_battery.py \
             --json "$EVIDENCE_DIR/mutations.json"
 
-      - name: Frozen B5-I9 gate (41 nodes)
+      - name: Frozen Book 5 gate (41 nodes)
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
-          F="infrastructure/control-plane/tests/test_b5_i9_stage_identity_and_scope.py \
-             infrastructure/control-plane/tests/test_b5_i9_extraction_classification.py \
-             infrastructure/control-plane/tests/test_b5_i9_no_platform_extraction.py \
-             infrastructure/control-plane/tests/test_b5_i9_packet_packaging_and_provenance.py \
-             infrastructure/control-plane/tests/test_b5_i9_book6_handoff.py"
-          python infrastructure/control-plane/scripts/b5_i9_factory_gate.py --check \
-            | tee "$EVIDENCE_DIR/b5-i9-factory-gate.txt"
-          python -m pytest $F -q --no-header --junitxml="$EVIDENCE_DIR/b5-i9-junit.xml" \
-            | tee "$EVIDENCE_DIR/b5-i9-output.txt"
-          python - "$EVIDENCE_DIR/b5-i9-junit.xml" "$EVIDENCE_DIR/b5-i9-totals.json" <<'TOT'
-          import json, sys, xml.etree.ElementTree as ET
-          root = ET.parse(sys.argv[1]).getroot()
-          suite = root if root.tag == "testsuite" else root.find("testsuite")
-          totals = {k: int(suite.get(k) or 0) for k in
-                    ("tests", "failures", "errors", "skipped")}
-          totals["expected"] = 41
-          totals["zero_problems"] = (totals["tests"] == 41 and totals["failures"] == 0
-                                     and totals["errors"] == 0 and totals["skipped"] == 0)
-          with open(sys.argv[2], "w", encoding="utf-8") as handle:
-              json.dump(totals, handle, indent=2, sort_keys=True)
-          print(json.dumps(totals, indent=2, sort_keys=True))
-          if not totals["zero_problems"]:
-              raise SystemExit("B5-I9 gate is not 41/41")
-          TOT
+          # The frozen Book 5 authority keeps exactly one workflow that selects its suite, so
+          # this stage runs the same gate through a runner script instead of duplicating the
+          # selection surface inside this workflow body.
+          python infrastructure/control-plane/scripts/block_06_i0_gate.py \
+            --json "$EVIDENCE_DIR/book5-gate.json" | tee "$EVIDENCE_DIR/book5-gate.txt"
 
       - name: Adjacent frozen Book 5 suites
         env:

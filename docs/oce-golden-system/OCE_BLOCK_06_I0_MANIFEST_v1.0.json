@@ -2,12 +2,12 @@
   "artifacts": [
     {
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_SCOPE_DERIVATION_v1.0.json",
-      "sha256": "1690fa54c7e5860b01bc1c64a8759a887527896c0ab34713b481996343377b6a",
+      "sha256": "b833ca45670ac90082812aa100284164497008b4ac200bf1a28149a4445dedf5",
       "size": 14361
     },
     {
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_IMPLEMENTATION_CONTRACT_v1.0.json",
-      "sha256": "712a67ae930be81e8fe5f3adfa9d38d26187cda339a5219430fbde367cb6e7eb",
+      "sha256": "4c23e5d76f000cd5784efa1a5539775b5a643bc059328a852b43be1860d2280e",
       "size": 17173
     },
     {
@@ -32,7 +32,7 @@
     },
     {
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
-      "sha256": "784f4bfa0a8386d4ec1bb06ba475fe259c5ae89531f7ffc09b465f9445010b34",
+      "sha256": "2cf363d2f67d2fdffa05643f45edfc4cb98582c350358b25ea5951e6c467a200",
       "size": 30789
     }
   ],
