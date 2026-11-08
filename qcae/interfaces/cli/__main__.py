@@ -15,6 +15,7 @@ from typing import List, Optional
 
 from qcae.core.errors import QcaeValidationError
 from qcae.interfaces.cli.app import QcaeApp, build_local_runtime
+from qcae.orchestration.orchestrator.worker_availability import NoRunnableStep, WorkerUnavailable
 
 
 def _app(db: str) -> QcaeApp:
@@ -223,10 +224,7 @@ def _dispatch(app: QcaeApp, args) -> int:
             _print(job)
         elif args.job_command == "run":
             result = app.job_run_step(args.job_id, args.worker)
-            if result is None:
-                print("no eligible step to run", file=sys.stderr)
-                return 1
-            if getattr(result, "reason", "") == "WORKER_UNAVAILABLE":
+            if isinstance(result, WorkerUnavailable):
                 # Typed operator outcome (P2-R3-C02/C05): deterministic exit
                 # code, structured output, no traceback, nothing leased.
                 print(json.dumps({
@@ -235,6 +233,15 @@ def _dispatch(app: QcaeApp, args) -> int:
                     "missing_step_types": list(result.missing_step_types),
                 }, indent=2), file=sys.stderr)
                 return 3
+            if isinstance(result, NoRunnableStep):
+                # P2-R5-C06: typed no-work outcome, distinct exit code 5,
+                # structured JSON; unknown job is exit 2 (never masquerades).
+                print(json.dumps({
+                    "error": "NO_RUNNABLE_STEP",
+                    "job_id": result.job_id,
+                    "reason": result.reason,
+                }, indent=2), file=sys.stderr)
+                return 5
             _print(result)
         return 0
 

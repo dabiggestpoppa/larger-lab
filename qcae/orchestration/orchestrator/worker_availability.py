@@ -11,7 +11,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Optional
 
-__all__ = ["WorkerUnavailableError", "WorkerAvailability", "WorkerUnavailable"]
+from qcae.core.errors import QcaeValidationError
+
+__all__ = ["WorkerUnavailableError", "WorkerAvailability", "WorkerUnavailable", "NoRunnableStep"]
 
 
 class WorkerUnavailableError(RuntimeError):
@@ -55,6 +57,56 @@ class WorkerUnavailable:
 
     def __repr__(self) -> str:  # pragma: no cover - repr symmetry
         return f"WorkerUnavailable(job_id={self.job_id!r}, missing={self.missing_step_types!r})"
+
+
+class NoRunnableStep:
+    """Typed no-runnable-step outcome (P2-R5-C06).
+
+    Distinct from WORKER_UNAVAILABLE (exit 3): the step exists and may even
+    be covered by a worker, but something about its schedule, state, or the
+    job itself means nothing can be leased right now. Carries a classified
+    reason so the operator (CLI exit 5) never confuses "nothing to do" with
+    an unknown or terminal job.
+    """
+
+    REASON = "NO_RUNNABLE_STEP"
+
+    #: One of FUTURE_NOT_BEFORE, DEPENDENCY_PENDING, WAITING_POLICY,
+    #: WAITING_INPUT, ACTIVE_LEASE, TERMINAL_JOB, UNKNOWN_JOB,
+    #: or the generic NO_RUNNABLE_STEP.
+    REASONS = (
+        "FUTURE_NOT_BEFORE", "DEPENDENCY_PENDING", "WAITING_POLICY",
+        "WAITING_INPUT", "ACTIVE_LEASE", "TERMINAL_JOB", "UNKNOWN_JOB",
+    )
+
+    def __init__(self, job_id: str, reason: str) -> None:
+        if reason not in self.REASONS:
+            raise QcaeValidationError(
+                f"no_runnable reason must be one of {self.REASONS}, got {reason!r}"
+            )
+        self.job_id = job_id
+        self.reason = reason
+
+    @property
+    def reason(self) -> str:
+        return self._reason
+
+    @reason.setter
+    def reason(self, value: str) -> None:
+        if value not in self.REASONS:
+            raise QcaeValidationError(
+                f"no_runnable reason must be one of {self.REASONS}, got {value!r}"
+            )
+        self._reason = value
+
+    def message(self) -> str:
+        return (
+            f"NO_RUNNABLE_STEP: {self.reason} for job {self.job_id}; "
+            f"nothing leased, nothing attempted"
+        )
+
+    def __repr__(self) -> str:  # pragma: no cover - repr symmetry
+        return f"NoRunnableStep(job_id={self.job_id!r}, reason={self.reason!r})"
 
 
 def worker_availability_for(engine, job_id: str) -> WorkerAvailability:

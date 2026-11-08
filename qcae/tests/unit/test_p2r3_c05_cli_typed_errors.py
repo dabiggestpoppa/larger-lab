@@ -233,6 +233,52 @@ class TestRecoveryConvergence:
             })())
 
 
+class TestNoRunnableStep:
+    """P2-R5-C06: typed NO_RUNNABLE_STEP outcome with distinct exit code 5."""
+
+    def test_unknown_job_is_exit_2_not_nothing_to_do(self, tmp_db):
+        # Unknown job must NOT masquerade as NO_RUNNABLE_STEP.
+        proc = _run_cli("job", "run", "job-does-not-exist", db=tmp_db)
+        assert proc.returncode == 2, proc.stderr
+        assert "Traceback" not in proc.stderr
+        assert "unknown job" in proc.stderr.lower()
+
+    def test_terminal_job_is_norunnable_exit_5(self, tmp_path):
+        clock = _Clock()
+        rt = build_local_runtime(tmp_path / "term.sqlite3", clock=clock)
+        rt.engine.register_worker_type("GENERIC", DeterministicSuccessWorker())
+        rt.identity.register(LocalIdentity(
+            identity_id="id-worker-a", kind=IdentityKind.WORKER,
+            display_name="a",
+        ))
+        app = QcaeApp(rt, clock=clock)
+        app.submit_job(_job(), [_step("s-1")])
+        # Drive the step to completion so the job becomes terminal.
+        app.job_run_step("job-clierrors", "id-worker-a")
+        from qcae.interfaces.cli.app import NoRunnableStep
+        result = app.job_run_step("job-clierrors", "id-worker-a")
+        assert isinstance(result, NoRunnableStep)
+        assert result.reason == "TERMINAL_JOB"
+
+    def test_future_not_before_is_norunnable_exit_5(self, tmp_path):
+        clock = _Clock()
+        rt = build_local_runtime(tmp_path / "fb.sqlite3", clock=clock)
+        rt.engine.register_worker_type("GENERIC", DeterministicSuccessWorker())
+        rt.identity.register(LocalIdentity(
+            identity_id="id-worker-a", kind=IdentityKind.WORKER,
+            display_name="a",
+        ))
+        app = QcaeApp(rt, clock=clock)
+        app.submit_job(
+            _job(), [_step("s-1")], not_before="2099-01-01T00:00:00Z",
+        )
+        from qcae.interfaces.cli.app import NoRunnableStep
+        result = app.job_run_step("job-clierrors", "id-worker-a")
+        assert isinstance(result, NoRunnableStep)
+        assert result.reason == "FUTURE_NOT_BEFORE"
+
+
+
 class TestCLIApprovalPath:
     def test_approval_decide_rejection_typed(self, tmp_db):
         submit = _run_cli(

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, Dict, Optional, Union
 
+from qcae.core.errors import QcaeValidationError
 from qcae.governance.standalone.approvals import ApprovalRequest
 from qcae.governance.standalone.authority import LocalAuthorityProvider
 from qcae.governance.standalone.identity import LocalIdentityProvider
@@ -43,7 +44,13 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
     SqliteStepQueue,
 )
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
-from qcae.orchestration.orchestrator.worker_availability import WorkerUnavailableError
+from qcae.orchestration.orchestrator.worker_availability import (
+    NoRunnableStep,
+    WorkerUnavailableError,
+)
+from qcae.orchestration.jobs.graph import StepGraph
+from qcae.orchestration.jobs.runtime import RuntimeStepStatus
+from qcae.orchestration.orchestrator.engine import is_terminal
 from qcae.orchestration.workers.base import Worker
 
 __all__ = [
@@ -271,6 +278,9 @@ class QcaeApp:
         # worker). An unregistered principal is refused before any surface
         # probe, regardless of worker presence.
         self._rt.service.require_identity(worker_id)
+        # P2-R5-C06: an unknown job must not masquerade as nothing-to-do.
+        if self._rt.store.get_job(job_id) is None:
+            raise QcaeValidationError(f"unknown job {job_id!r}")
         self._rt.service.ready_steps(job_id)
         availability = worker_availability_for(self._rt.engine, job_id)
         if availability.uncovered_step_ids and not availability.covered_step_ids:
@@ -281,8 +291,44 @@ class QcaeApp:
             # Narrow race: coverage existed at the probe, gone at the claim.
             return WorkerUnavailable(job_id, _missing_types_from_error(str(exc)))
         if lease is None:
-            return None
+            # No currently claimable step: classify why instead of returning
+            # bare None, so the CLI renders a typed NO_RUNNABLE_STEP outcome.
+            return NoRunnableStep(job_id, self._no_runnable_reason(job_id))
         return self._rt.service.execute_step(lease, worker_id=worker_id)
+
+    def _no_runnable_reason(self, job_id: str) -> str:
+        """Classify why a job has no currently claimable step (P2-R5-C06).
+
+        Returns one of FUTURE_NOT_BEFORE, DEPENDENCY_PENDING,
+        WAITING_POLICY, WAITING_INPUT, ACTIVE_LEASE, TERMINAL_JOB,
+        UNKNOWN_JOB, or the generic NO_RUNNABLE_STEP.
+        """
+        job = self._rt.store.get_job(job_id)
+        if job is None:
+            return "UNKNOWN_JOB"
+        if is_terminal(job.status):
+            return "TERMINAL_JOB"
+        steps = self._rt.store.list_steps_for_job(job_id)
+        if not steps:
+            return "NO_RUNNABLE_STEP"
+        now = self._clock()
+        for step in steps:
+            if step.status is RuntimeStepStatus.RUNNING:
+                return "ACTIVE_LEASE"
+            if step.status is RuntimeStepStatus.WAITING_POLICY:
+                return "WAITING_POLICY"
+            if step.status is RuntimeStepStatus.WAITING_INPUT:
+                return "WAITING_INPUT"
+        graph = StepGraph(steps)
+        runnable = graph.runnable()
+        pending = [s for s in steps if s.status is RuntimeStepStatus.PENDING]
+        if pending and not runnable:
+            return "DEPENDENCY_PENDING"
+        for step in steps:
+            nb = self._rt.engine.effective_not_before(job_id, step)
+            if nb and nb > now:
+                return "FUTURE_NOT_BEFORE"
+        return "NO_RUNNABLE_STEP"
 
     def job_resume(self, job_id: str):
         """Resume a job through the ONE recovery law (P2-R3-C03/C05).
