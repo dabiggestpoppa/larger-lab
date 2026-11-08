@@ -34,7 +34,10 @@ from qcae.infrastructure.persistence.sqlite_runtime_store import (
     RUNTIME_DDL,
     SqliteRuntimeStore,
 )
-from qcae.infrastructure.persistence.store_factory import open_metadata_db
+from qcae.infrastructure.persistence.store_factory import (
+    CURRENT_SCHEMA_VERSION,
+    open_metadata_db,
+)
 from qcae.infrastructure.queue.sqlite_step_queue import (
     QUEUE_INTEGRITY_DDL,
     SqliteStepQueue,
@@ -191,7 +194,7 @@ def build_local_runtime(
         policy_provider=authority,
         approval_registry=approvals,
         clock=clock,
-        schema_version=4,
+        schema_version=CURRENT_SCHEMA_VERSION,
         policy_version=policy.policy.policy_version,
         storage_location=str(db_path),
     )

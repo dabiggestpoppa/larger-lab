@@ -19,7 +19,12 @@ from typing import Callable, Dict, List, Optional
 from qcae.core.errors import QcaeValidationError
 
 __all__ = ["Migration", "MigrationLedgerEntry", "MigrationRunner", "MIGRATION_LEDGER_DDL",
-           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4"]
+           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4", "V4_TO_V5", "CURRENT_SCHEMA_VERSION"]
+
+#: Canonical schema version for this build. ``PRAGMA user_version``,
+#: ``RuntimeIdentity.schema_version``, and the freeze manifest schema version
+#: must all equal this value (schema invariant, P2-R5-C02).
+CURRENT_SCHEMA_VERSION = 5
 
 MIGRATION_LEDGER_DDL = """
 CREATE TABLE IF NOT EXISTS schema_migration_ledger (
@@ -411,5 +416,31 @@ V3_TO_V4 = Migration(
     description=(
         "P2: adds runtime job/step/event/checkpoint/idempotency/claim/budget "
         "and governance policy/approval/escalation tables (additive)"
+    ),
+)
+
+
+def _apply_v5(conn: sqlite3.Connection) -> None:
+    """P2-R5: additive grant-use admission indexes (v4 -> v5).
+
+    Purely additive; no existing row or table is altered. The new index on
+    ``governance_approval_use(step_id)`` supports the live grant-binding
+    admission lookup (which step consumed a grant) without touching the
+    historical single-use unique index on ``decision_ref``.
+    """
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS ix_approval_use_step "
+        "ON governance_approval_use(step_id)"
+    )
+
+
+V4_TO_V5 = Migration(
+    from_version=4,
+    to_version=5,
+    migration_id="P2-R5-0005-grant-use-admission-index",
+    apply=_apply_v5,
+    description=(
+        "P2-R5: adds governance_approval_use(step_id) index for live "
+        "grant-binding admission lookups (additive; single-use law unchanged)"
     ),
 )

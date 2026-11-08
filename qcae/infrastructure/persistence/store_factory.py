@@ -12,6 +12,13 @@ from pathlib import Path
 from typing import Optional, Union
 
 from qcae.core.errors import QcaeValidationError
+from qcae.infrastructure.persistence.migrations import (
+    CURRENT_SCHEMA_VERSION,
+    MigrationRunner,
+    V3_TO_V4,
+    V4_TO_V5,
+    V2_TO_V3,
+)
 from qcae.infrastructure.persistence.sqlite_metadata_store import (
     SCHEMA_VERSION,
     SqliteEvidenceRepository,
@@ -22,13 +29,30 @@ from qcae.infrastructure.persistence.sqlite_metadata_store import (
 #: Runtime engine version, exposed here so build tools need no engine import.
 SQLITE_VERSION = sqlite3.sqlite_version
 
+#: Production migration chain keyed by TARGET version. ``TEST_V1_TO_V2`` is
+#: test-only (it rebuilds evidence_artifact) and is NOT registered here;
+#: historical migrations stay immutable.
+_PRODUCTION_MIGRATIONS = {
+    3: V2_TO_V3,
+    4: V3_TO_V4,
+    5: V4_TO_V5,
+}
+
 __all__ = [
     "SqliteEvidenceRepository",
     "SqliteLifecycleLogRepository",
     "SCHEMA_VERSION",
     "SQLITE_VERSION",
+    "CURRENT_SCHEMA_VERSION",
     "open_metadata_db",
 ]
+
+
+def _iso_now() -> str:
+    """UTC ISO-8601 timestamp for migration ledger timestamps."""
+    from datetime import datetime, timezone
+
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
 def open_raw_connection(path: Union[str, Path]) -> sqlite3.Connection:
@@ -72,13 +96,31 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
         conn.executescript(_SCHEMA_DDL)
         current = conn.execute("PRAGMA user_version").fetchone()[0]
         if current == 0:
-            conn.execute(f"PRAGMA user_version = {SCHEMA_VERSION}")
-        elif current > SCHEMA_VERSION:
+            # Fresh database: create at the canonical version; no migration
+            # history to replay (the DDL above already matches this version).
+            conn.execute(f"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}")
+            conn.commit()
+        elif current > CURRENT_SCHEMA_VERSION:
             raise QcaeValidationError(
                 f"database schema version {current} is newer than this build "
-                f"supports ({SCHEMA_VERSION}); refusing to open (forward-compat guard)"
+                f"supports ({CURRENT_SCHEMA_VERSION}); refusing to open "
+                f"(forward-compat guard)"
             )
-        conn.commit()
+        else:
+            # 0 < current <= CURRENT_SCHEMA_VERSION: replay the production
+            # migration chain so an existing database is brought to the
+            # canonical version. A gap in the chain (for example a legacy
+            # database stuck at v1/v2 with no production 1->2 migration)
+            # is a legacy misversioned database: refuse with a clear error
+            # rather than silently opening at the wrong version.
+            runner = MigrationRunner(conn, clock=_iso_now)
+            try:
+                runner.migrate_to(CURRENT_SCHEMA_VERSION, _PRODUCTION_MIGRATIONS)
+            except QcaeValidationError as exc:
+                raise QcaeValidationError(
+                    f"legacy misversioned database at schema {current} cannot be "
+                    f"migrated to {CURRENT_SCHEMA_VERSION}: {exc}"
+                ) from exc
     except QcaeValidationError:
         if conn is not None:
             conn.close()
