@@ -126,7 +126,9 @@ class BackupService:
             "runtime_budget",
             "governance_policy_request", "governance_policy_decision",
             "governance_approval_request", "governance_approval_decision",
+            "governance_approval_use",
             "governance_escalation", "governance_escalation_decision",
+            "runtime_execution",
         )
         counts: Dict[str, int] = {}
         for table in tables:
