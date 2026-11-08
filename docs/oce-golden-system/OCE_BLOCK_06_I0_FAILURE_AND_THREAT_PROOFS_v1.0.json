@@ -1,0 +1,249 @@
+{
+  "base_sha": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+  "document_id": "OCE-B6-I0-PROOFS-001",
+  "failure_classes": [
+    {
+      "bound": true,
+      "expected_refusal": "extraction refused",
+      "id": "F01",
+      "implemented_proof": [
+        "decisions:test_eligibility_scan"
+      ],
+      "name": "unauthorized_candidate",
+      "negative_control": "plant the unauthorized candidate condition and require F01 refusal",
+      "observable": "register mismatch named",
+      "owner": "builder",
+      "planned_test": "B6-I0 static",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "candidate removed or operator amendment",
+      "trigger": "a candidate outside the 27-row register is proposed"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "extraction refused",
+      "id": "F02",
+      "implemented_proof": [
+        "decisions:test_no_authority_bearing_admitted",
+        "decisions:test_reference_only_not_copied"
+      ],
+      "name": "prohibited_candidate",
+      "negative_control": "plant the prohibited candidate condition and require F02 refusal",
+      "observable": "class and id echoed",
+      "owner": "builder",
+      "planned_test": "B6-I0 static",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "row restored",
+      "trigger": "the prohibited candidate is made eligible"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "extraction refused",
+      "id": "F03",
+      "implemented_proof": [
+        "authority:test_np_4",
+        "authority:test_np_8"
+      ],
+      "name": "authority_bearing_candidate",
+      "negative_control": "plant the authority bearing candidate condition and require F03 refusal",
+      "observable": "authority scan names symbol",
+      "owner": "builder",
+      "planned_test": "B6-I0 static",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "surface removed",
+      "trigger": "an authority-bearing or private surface is promoted"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "export refused",
+      "id": "F04",
+      "implemented_proof": [
+        "decisions:test_no_wildcard_or_private_reexport",
+        "decisions:test_prohibited_symbols_absent"
+      ],
+      "name": "private_api",
+      "negative_control": "plant the private api condition and require F04 refusal",
+      "observable": "private path named",
+      "owner": "builder",
+      "planned_test": "B6-I0 static",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "export removed",
+      "trigger": "a private module is exported"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "publication refused",
+      "id": "F17",
+      "implemented_proof": [
+        "repro:test_no_secrets_or_providers"
+      ],
+      "name": "secret_reference",
+      "negative_control": "plant the secret reference condition and require F17 refusal",
+      "observable": "reference named",
+      "owner": "builder",
+      "planned_test": "B6-I0 static",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "reference removed",
+      "trigger": "a unit references a secret or credential"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "publication refused",
+      "id": "F20",
+      "implemented_proof": [
+        "authority:test_np_7",
+        "authority:test_np_2"
+      ],
+      "name": "unlicensed_dependency",
+      "negative_control": "plant the unlicensed dependency condition and require F20 refusal",
+      "observable": "dependency named",
+      "owner": "builder",
+      "planned_test": "B6-I0 static",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "dependency replaced or licensed",
+      "trigger": "a dependency has no recorded licence"
+    }
+  ],
+  "failure_classes_total": 6,
+  "kind": "book6_i0_failure_and_threat_proofs",
+  "later_failure_classes": [
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10",
+    "F11",
+    "F12",
+    "F13",
+    "F14",
+    "F15",
+    "F16",
+    "F18",
+    "F19",
+    "F21",
+    "F22",
+    "F23"
+  ],
+  "later_failure_state": "PLANNED_NOT_IMPLEMENTED",
+  "later_threat_state": "PLANNED_NOT_IMPLEMENTED",
+  "later_threats": [
+    "T01",
+    "T02",
+    "T03",
+    "T06",
+    "T10",
+    "T11",
+    "T12",
+    "T13",
+    "T15",
+    "T16",
+    "T17",
+    "T18",
+    "T19"
+  ],
+  "p0_source": "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json",
+  "policy": {
+    "no_later_stage_pulled_forward": true,
+    "structural_parsing_required": true,
+    "text_scan_only_insufficient": true
+  },
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "threats": [
+    {
+      "asset": "install set",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T04",
+      "negative_control": [
+        "repro:test_no_secrets_or_providers",
+        "authority:test_np_2"
+      ],
+      "owner": "builder",
+      "required_refusal": "pin and verify source",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "dependency confusion",
+      "trust_boundary": "resolution boundary"
+    },
+    {
+      "asset": "symbol space",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T05",
+      "negative_control": [
+        "authority:test_traversal_refused"
+      ],
+      "owner": "builder",
+      "required_refusal": "refuse duplicate",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "namespace collision",
+      "trust_boundary": "publish boundary"
+    },
+    {
+      "asset": "evidence",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T07",
+      "negative_control": [
+        "repro:test_manifest_independent_verify"
+      ],
+      "owner": "builder",
+      "required_refusal": "refuse mismatch",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "manifest tampering",
+      "trust_boundary": "evidence boundary"
+    },
+    {
+      "asset": "provenance",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T08",
+      "negative_control": [
+        "repro:test_manifest_independent_verify",
+        "repro:test_double_generation_identical"
+      ],
+      "owner": "builder",
+      "required_refusal": "refuse unsigned or unbound attestation",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "provenance forgery",
+      "trust_boundary": "attestation boundary"
+    },
+    {
+      "asset": "credentials",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T09",
+      "negative_control": [
+        "repro:test_no_secrets_or_providers"
+      ],
+      "owner": "builder",
+      "required_refusal": "refuse and rotate",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "secret leakage",
+      "trust_boundary": "publication boundary"
+    },
+    {
+      "asset": "configuration",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T14",
+      "negative_control": [
+        "decisions:test_environment_authority_absent"
+      ],
+      "owner": "builder",
+      "required_refusal": "refuse implicit authority",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "environment variable authority",
+      "trust_boundary": "config boundary"
+    },
+    {
+      "asset": "governance",
+      "evidence_artifact": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "id": "T20",
+      "negative_control": [
+        "decisions:test_zero_extracted_files",
+        "authority:test_np_1"
+      ],
+      "owner": "builder",
+      "required_refusal": "refuse extraction",
+      "state": "BOUND_PENDING_EVIDENCE",
+      "threat": "authority-bearing extraction",
+      "trust_boundary": "authority boundary"
+    }
+  ],
+  "threats_total": 7,
+  "version": "1.0.0"
+}
