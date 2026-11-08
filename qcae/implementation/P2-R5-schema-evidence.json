@@ -1,0 +1,63 @@
+{
+  "evidence_label": "P2-R5-C02 SCHEMA AUTHORITY EVIDENCE",
+  "evidence_kind": "observed (schema invariant checks across store factory, migrations, runtime build, and backup manifest)",
+  "tested_commit": "c07e947104",
+  "recorded_at": "2026-11-08T00:00:00Z",
+  "schema_invariant": "PRAGMA user_version == CURRENT_SCHEMA_VERSION == RuntimeIdentity.schema_version == freeze manifest schema version == 5",
+  "canonical_version": 5,
+  "checks": {
+    "CURRENT_SCHEMA_VERSION_equals_5": {
+      "source": "qcae/infrastructure/persistence/migrations.py",
+      "result": "CURRENT_SCHEMA_VERSION == 5",
+      "passed": true
+    },
+    "sqlite_metadata_store_SCHEMA_VERSION_equals_5": {
+      "source": "qcae/infrastructure/persistence/sqlite_metadata_store.py",
+      "result": "SCHEMA_VERSION == 5",
+      "passed": true
+    },
+    "open_metadata_db_creates_at_version_5": {
+      "source": "qcae/infrastructure/persistence/store_factory.py",
+      "result": "fresh database leaves PRAGMA user_version == 5; no migration history to replay",
+      "passed": true
+    },
+    "open_metadata_db_migrates_existing_db_to_5": {
+      "source": "qcae/infrastructure/persistence/store_factory.py",
+      "result": "0 < current <= 5 replays the production migration chain (3->4->5) via MigrationRunner",
+      "passed": true
+    },
+    "open_metadata_db_refuses_newer_schema": {
+      "source": "qcae/infrastructure/persistence/store_factory.py",
+      "result": "current > 5 raises QcaeValidationError (forward-compat guard)",
+      "passed": true
+    },
+    "open_metadata_db_refuses_legacy_misversioned_db": {
+      "source": "qcae/infrastructure/persistence/store_factory.py",
+      "result": "a schema-1 database with no production 1->2 migration raises QcaeValidationError ('legacy misversioned database') instead of silently opening at the wrong version",
+      "passed": true
+    },
+    "build_local_runtime_reports_schema_5": {
+      "source": "qcae/interfaces/cli/app.py",
+      "result": "LocalRuntimeService constructed with schema_version=CURRENT_SCHEMA_VERSION (5); RuntimeIdentity.schema_version == 5",
+      "passed": true
+    },
+    "backup_manifest_schema_version_equals_5": {
+      "source": "qcae/infrastructure/persistence/backup_restore.py",
+      "result": "manifest['schema_version'] == PRAGMA user_version == 5",
+      "passed": true
+    },
+    "historical_migrations_immutable": {
+      "source": "qcae/infrastructure/persistence/migrations.py",
+      "result": "V2_TO_V3 (1->2 test-only, not in production chain), V3_TO_V4 (3->4, identity/bounds unchanged), and TEST_V1_TO_V2 are unmodified; no historical migration was rewritten",
+      "passed": true
+    },
+    "V4_TO_V5_additive_for_governance_approval_use": {
+      "source": "qcae/infrastructure/persistence/migrations.py",
+      "result": "new migration V4_TO_V5 (4->5, id 'P2-R5-0005-grant-use-admission-index') adds ONLY governance_approval_use(step_id) index; no existing row/table altered; single-use unique index on decision_ref untouched",
+      "passed": true
+    }
+  },
+  "test_suite": "qcae/tests/unit/test_p2r5_c02_schema_authority.py (11 tests, all passed)",
+  "full_suite_result": "1336 passed, 0 failed",
+  "evidence_label_final": "LOCAL TEST EVIDENCE"
+}

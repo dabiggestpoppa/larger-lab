@@ -1,0 +1,59 @@
+{
+  "evidence_label": "P2-R5 ACCEPTANCE EVIDENCE",
+  "evidence_kind": "observed (actual pytest runs, per-file counts captured, no aggregate relabeling, no hardcoded booleans)",
+  "tested_commit": "c07e947104",
+  "recorded_at": "2026-11-08T00:00:00Z",
+  "findings_repaired": {
+    "K": "false per-suite evidence attribution -> C01 truthful per-suite + per-node evidence",
+    "L": "schema authority inconsistency -> C02 CURRENT_SCHEMA_VERSION=5 + V4_TO_V5 + migration-on-open",
+    "M": "historical grant not bound to current verdict -> C03 live-verdict grant binding + digest comparison",
+    "N": "backup manifest omits runtime_execution/governance_approval_use -> C05 manifest coverage + disaster tests",
+    "O": "untyped no-work CLI result -> C06 typed NO_RUNNABLE_STEP with exit code 5"
+  },
+  "full_acceptance_suite": {
+    "command": ["python", "-m", "pytest", "qcae/tests/acceptance", "-q"],
+    "exit_code": 0,
+    "collected": 14,
+    "passed": 14,
+    "failed": 0,
+    "skipped": 0
+  },
+  "per_file_counts": {
+    "operator_loop": {
+      "artifact": "qcae/implementation/P2-R5-operator-acceptance.json",
+      "source": "qcae/tests/acceptance/test_p2_operator_loop.py",
+      "collected": 5,
+      "passed": 5,
+      "failed": 0
+    },
+    "grant_journey": {
+      "artifact": "qcae/implementation/P2-R5-operator-acceptance.json",
+      "source": "qcae/tests/acceptance/test_p2_grant_journey.py",
+      "collected": 2,
+      "passed": 2,
+      "failed": 0
+    },
+    "process_crash": {
+      "artifact": "qcae/implementation/P2-R5-process-crash-evidence.json",
+      "source": "qcae/tests/acceptance/test_p2_process_crash.py",
+      "collected": 7,
+      "passed": 7,
+      "failed": 0
+    }
+  },
+  "acceptance_total": {
+    "passed": 14,
+    "failed": 0,
+    "sum_of_per_file_counts": 14
+  },
+  "full_unit_suite": {
+    "command": ["python", "-m", "pytest", "qcae/tests", "-q"],
+    "exit_code": 0,
+    "collected": 1336,
+    "passed": 1336,
+    "failed": 0,
+    "skipped": 0,
+    "evidence_label": "LOCAL TEST EVIDENCE"
+  },
+  "evidence_label_final": "LOCAL TEST EVIDENCE"
+}

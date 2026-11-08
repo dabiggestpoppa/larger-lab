@@ -1,0 +1,45 @@
+{
+  "evidence_label": "P2-R5-C03 LIVE GRANT BINDING EVIDENCE",
+  "evidence_kind": "observed (live-verdict admission + binding digest comparison before consumption)",
+  "tested_commit": "c07e947104",
+  "recorded_at": "2026-11-08T00:00:00Z",
+  "law": "P2-R5-C03: _grant_admits receives the current StepAuthorityVerdict; the live binding digest (principal|action|resource|scope) must equal the approved decision's binding digest BEFORE any grant consumption; a stale mismatch refuses admission and does NOT consume the grant.",
+  "changes": {
+    "_grant_admits_signature": "now receives the current StepAuthorityVerdict (job_id/step_id/principal derived from the verdict) instead of separate job_id/step_id/principal arguments",
+    "binding_digest_on_verdict": "StepAuthorityVerdict.binding_digest() = sha256('principal|action|resource|scope')",
+    "binding_digest_on_decision": "ApprovalDecision.binding_digest(principal) = sha256('principal|bound_action|bound_resource|bound_scope')",
+    "admission_preflight": "verdict.binding_digest() == grant.binding_digest(request.principal) is required before mark_grant_used; a mismatch returns False and writes no use row",
+    "single_use_consumption": "exactly one use row per grant decision (unique decision_ref index); the first admitted attempt consumes, a second is refused",
+    "identity_binding": "grant admits the requesting principal only (request.principal == verdict.principal)",
+    "effective_guard": "no GRANTED/non-expired decision, wrong principal, stale binding, or missing request -> False (fail closed)",
+    "architecture": "orchestrator depends on the provider-neutral ApprovalAdmissionProvider port; no qcae.governance.standalone import in engine.py (verified by architecture guard test)"
+  },
+  "proof_tests": {
+    "test_stale_binding_digest_does_not_consume_grant": {
+      "file": "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+      "assertion": "a verdict with action 'execute.OTHER' (digest != approved grant's digest) is refused and len(uses_for_decision) stays 0"
+    },
+    "test_grant_admits_exactly_one_execution": {
+      "file": "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+      "assertion": "first admission True, second False, one durable use row"
+    },
+    "test_consumed_grant_cannot_replay_after_restart": {
+      "file": "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+      "assertion": "consumption survives restart; engine2._grant_admits returns False"
+    },
+    "test_grant_survives_restart_before_use": {
+      "file": "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+      "assertion": "unconsumed grant still admits after restart"
+    },
+    "test_wrong_principal_admitted_nothing": {
+      "file": "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+      "assertion": "different principal -> False"
+    },
+    "test_expired_grant_admits_nothing": {
+      "file": "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+      "assertion": "past window -> False"
+    }
+  },
+  "full_suite_result": "1336 passed, 0 failed",
+  "evidence_label_final": "LOCAL TEST EVIDENCE"
+}

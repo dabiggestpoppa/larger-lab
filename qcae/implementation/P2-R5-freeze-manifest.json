@@ -1,0 +1,213 @@
+{
+  "phase": "P2-R5 \\u2014 Substrate Closure Beneath Parked P3 (schema authority, live grant binding, backup/restore truth, typed no-work CLI result, truthful evidence)",
+  "supersedes": {
+    "original_freeze_artifact": "qcae/implementation/P2-freeze-manifest.json",
+    "original_freeze_commit": "4cca8729",
+    "original_freeze_digest": "sha256:0c2c7a1df104a58c70c528f99ffeb59c4560124e9d021a75709a0a4b47b272f1",
+    "r1_freeze_artifact": "qcae/implementation/P2-R1-freeze-manifest.json",
+    "r1_freeze_digest": "sha256:2329eea9e9ef14338c5c1484ff726623392a5814488c9c78ae1f24d166d40410",
+    "r2_freeze_artifact": "qcae/implementation/P2-R2-freeze-manifest.json",
+    "r2_freeze_digest": "sha256:b637fea164101509e3e63da369ede72934cef416146f4947e349e2cfbb58d2b8",
+    "r3_freeze_artifact": "qcae/implementation/P2-R3-freeze-manifest.json",
+    "r3_freeze_digest": "sha256:c4f5119bc9ab8f3209bc8bdaf3a17056da55d8886997c47e390cb060ff1a6d8c",
+    "r3_acceptance_artifact": "qcae/implementation/P2-R3-operator-acceptance.json",
+    "r3_acceptance_digest": "sha256:32ef3382517c9eb6e346e586b391d37108e6aada7ae7664bbb765a7c1914e0e4",
+    "r4_freeze_artifact": "qcae/implementation/P2-R4-freeze-manifest.json",
+    "r4_freeze_digest": "sha256:29a4481f060dca4d300c2946edea4c55b2cdad7cf46fc3cab8f11eb8a766da95",
+    "r4_acceptance_artifact": "qcae/implementation/P2-R4-operator-acceptance.json",
+    "r4_process_crash_artifact": "qcae/implementation/P2-R4-process-crash-evidence.json",
+    "relationship": "superseding repair manifest; the original P2 freeze and the P2-R1/P2-R2/P2-R3/P2-R4 repair manifests are preserved unchanged as historical truth; P3 remains PARKED IN PLACE with no P3 capability added during this repair"
+  },
+  "operator_review_trigger": "Operator review of P2 head: schema authority inconsistent (user_version=1 vs runtime schema_version=4 vs historical V3_TO_V4 mutation), historical grant not bound to the current verdict, backup manifest omitted runtime_execution/governance_approval_use, acceptance evidence falsely attributed per-suite, and qcae job run collapsed unknown jobs into nothing-to-do (exit 1)",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "branch": "qcae-p2-r5-substrate-repair",
+  "head_commit": "c07e947104",
+  "tested_commit": "c07e947104",
+  "phase_commits": {
+    "p2_r5_i0_reconciliation_ledger": [
+      "9d25f31989"
+    ],
+    "p2_r5_c01_truthful_evidence": [
+      "6a050e3661"
+    ],
+    "p2_r5_c02_schema_authority": [
+      "0d2cba925a"
+    ],
+    "p2_r5_c03_live_grant_binding": [
+      "e08ca74393"
+    ],
+    "p2_r5_c04_resolver_and_guard": [
+      "5215cb3f6a"
+    ],
+    "p2_r5_c05_backup_restore_disaster_tests": [
+      "fdf22ec345"
+    ],
+    "p2_r5_c06_typed_no_work": [
+      "c07e947104"
+    ]
+  },
+  "adr_refs": [
+    "qcae/implementation/decisions/ADR-0006-persistence-architecture.md",
+    "qcae/implementation/decisions/ADR-0007-repository-identity-vs-revision-identity.md",
+    "qcae/implementation/decisions/ADR-0008-p2-runtime-state-vocabulary.md",
+    "qcae/implementation/decisions/ADR-0009-policy-vs-authority-vocabularies.md"
+  ],
+  "prior_freeze_refs": [
+    "qcae/implementation/P1-R1-freeze-manifest.json",
+    "qcae/implementation/P2-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R1-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R2-freeze-manifest.json (historical)",
+    "qcae/implementation/P2-R3-freeze-manifest.json (historical, superseded)",
+    "qcae/implementation/P2-R4-freeze-manifest.json (historical, superseded)"
+  ],
+  "repairs": {
+    "c01_truthful_evidence_capture": {
+      "finding": "K \\u2014 acceptance evidence generator ran qcae/tests/acceptance once and copied aggregate 14/14 into per-file blocks that do not each contain 14 tests; per-window crash booleans hardcoded true; dead crash-harness suspected",
+      "repair": "captured truthful per-file + per-node acceptance counts (operator_loop=5, grant_journey=2, process_crash=7, total=14) with no aggregate relabeling and no hardcoded booleans; no dead crash-harness code existed outside the live P2-R4-A01 acceptance test, so nothing was removed",
+      "artifacts": [
+        "qcae/implementation/P2-R5-operator-acceptance.json",
+        "qcae/implementation/P2-R5-process-crash-evidence.json"
+      ]
+    },
+    "c02_schema_authority": {
+      "finding": "L \\u2014 sqlite_metadata_store.SCHEMA_VERSION=1, open_metadata_db wrote PRAGMA user_version=1, build_local_runtime constructed schema_version=4 and never ran MigrationRunner; runtime could report schema 4 while durable DB reported schema 1",
+      "repair": "one canonical CURRENT_SCHEMA_VERSION (=5) used by sqlite_metadata_store, store_factory (runs MigrationRunner on open; migrates 3->4->5, refuses newer/legacy-misversioned DBs), build_local_runtime, and RuntimeIdentity; additive V4_TO_V5 migration (governance_approval_use(step_id) index) with historical migrations immutable",
+      "tests": [
+        "qcae/tests/unit/test_p2r5_c02_schema_authority.py",
+        "qcae/tests/unit/test_p1_migrations.py (fixture pinned to v1)",
+        "qcae/tests/unit/test_p1_backup_restore.py (schema assertion now 5)"
+      ]
+    },
+    "c03_live_grant_binding": {
+      "finding": "M \\u2014 _grant_admits(job_id, step_id, principal) consumed an old grant without comparing the current verdict's action/resource/scope/binding against the approved request",
+      "repair": "_grant_admits receives the current StepAuthorityVerdict; live binding digest (principal|action|resource|scope) must equal the approved decision's binding digest before consumption; stale mismatch refuses admission and writes no use row; ApprovalAdmissionProvider port replaces the governance-standalone import in engine.py",
+      "tests": [
+        "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+        "qcae/tests/unit/test_p2r4_t01_adversarial.py"
+      ]
+    },
+    "c04_resolver_and_guard": {
+      "finding": "duplicate authority-request lookup (engine._latest_authority_request_for_step and runtime_service._latest_authority_request_for_step) and engine.py importing qcae.governance.standalone (architecture violation)",
+      "repair": "single ApprovalRequestResolver.latest_for_step shared by execution-time admission and grant-release verification; ApprovalAdmissionProvider provider-neutral port; SqliteApprovalRegistry.consume_grant implements the port",
+      "tests": [
+        "qcae/tests/unit/test_p2r5_c04_architecture.py",
+        "qcae/tests/unit/test_p2r2_c02_approval_round_trip.py",
+        "qcae/tests/unit/test_p2r2_t01_governance_adversarial.py"
+      ]
+    },
+    "c05_backup_restore_truth": {
+      "finding": "N \\u2014 backup/restore manifest row-count coverage omitted runtime_execution and governance_approval_use (authority truth: this grant has already been consumed)",
+      "repair": "added runtime_execution and governance_approval_use to the manifest registry row counts; disaster test A (consumed grant cannot replay after restore) and B (unconsumed grant still eligible exactly once after restore)",
+      "tests": [
+        "qcae/tests/unit/test_p2r5_c05_backup_disaster.py"
+      ]
+    },
+    "c06_typed_no_work": {
+      "finding": "O \\u2014 qcae job run on a valid future/not-runnable job returned bare 'no eligible step to run' exit 1, collapsing unknown jobs into nothing-to-do",
+      "repair": "typed NoRunnableStep outcome with reasons (FUTURE_NOT_BEFORE, DEPENDENCY_PENDING, WAITING_POLICY, WAITING_INPUT, ACTIVE_LEASE, TERMINAL_JOB, UNKNOWN_JOB), distinct CLI exit code 5, structured JSON; unknown job raises QcaeValidationError (exit 2) so it never masquerades as nothing-to-do",
+      "tests": [
+        "qcae/tests/unit/test_p2r3_c05_cli_typed_errors.py"
+      ]
+    }
+  },
+  "persistence": {
+    "engine": "SQLite (stdlib sqlite3)",
+    "metadata_schema_version": 5,
+    "artifact_hash_algorithm": "sha256",
+    "durability_boundaries": "explicit flush() at pre-effect and post-effect semantic boundaries; BEGIN IMMEDIATE transactions for multi-row groups; no write transaction spans worker execution",
+    "grant_consumption_table": "governance_approval_use(use_id PK, decision_ref UNIQUE, step_id, used_at) \\u2014 single-use consumption law, now covered by backup/restore manifest"
+  },
+  "observed_acceptance_evidence": {
+    "evidence_artifact": "qcae/implementation/P2-R5-evidence.json",
+    "schema_evidence_artifact": "qcae/implementation/P2-R5-schema-evidence.json",
+    "grant_binding_evidence_artifact": "qcae/implementation/P2-R5-grant-binding-evidence.json",
+    "operator_loop_artifact": "qcae/implementation/P2-R5-operator-acceptance.json",
+    "process_crash_artifact": "qcae/implementation/P2-R5-process-crash-evidence.json",
+    "summary": {
+      "operator_loop_journeys": 5,
+      "grant_journeys": 2,
+      "crash_windows_observed": 7,
+      "all_acceptance_suites_passed": true,
+      "all_per_file_counts_match_suite": true
+    }
+  },
+  "test_commands": [
+    [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ]
+  ],
+  "test_results": {
+    "collected": 1336,
+    "passed": 1336,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "duration_seconds": 23.83,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-11-08T00:00:00Z",
+    "tested_commit": "c07e947104"
+  },
+  "acceptance_suite_results": {
+    "collected": 14,
+    "passed": 14,
+    "passed_is_placeholder": false,
+    "failed": 0,
+    "skipped": 0,
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "qcae/tests/acceptance",
+      "-q"
+    ],
+    "evidence_label": "LOCAL TEST EVIDENCE",
+    "executed_at": "2026-11-08T00:00:00Z",
+    "tested_commit": "c07e947104"
+  },
+  "evidence_label": "LOCAL TEST EVIDENCE",
+  "architecture_guard_evidence": {
+    "core_stdlib_only": "qcae/tests/architecture/test_p0_dependency_guards.py",
+    "orchestrator_has_no_governance_standalone_import": true,
+    "one_authority_request_resolver_shared": "ApprovalRequestResolver.latest_for_step used by engine and runtime service",
+    "grant_authority_durable_not_memory": true,
+    "scheduling_truth_single_law": "effective_not_before = max(job, step)",
+    "oce_absent": "runtime reports OCE_ABSENT; no OCE import in qcae/"
+  },
+  "known_external_failures": [
+    "tests/forge/phase_00/test_extension_docs.py: 2 pre-existing failures external to qcae/ (documented since P1; unchanged)"
+  ],
+  "deferred_design_debt": {
+    "classification": "MINOR / DESIGN_DEBT_PARKED",
+    "items": [
+      "OrchestratorEngine decomposition (further grown by R4 repairs)",
+      "QcaeApp vs LocalRuntimeService facade consolidation",
+      "freeze-generator parameterization/deduplication across phases",
+      "Permissive/FailClosed test gates moved out of the production module"
+    ],
+    "trigger": "P10 Agent Orchestration preparation, or earlier only if P3-P5 provide evidence it is needed"
+  },
+  "blockers": [],
+  "p3_parked_in_place": true,
+  "generated_at": "2026-11-08T00:00:00Z"
+}
