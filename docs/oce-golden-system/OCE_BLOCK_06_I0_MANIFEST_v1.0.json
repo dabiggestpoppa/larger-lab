@@ -1,0 +1,46 @@
+{
+  "artifacts": [
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_SCOPE_DERIVATION_v1.0.json",
+      "sha256": "1690fa54c7e5860b01bc1c64a8759a887527896c0ab34713b481996343377b6a",
+      "size": 14361
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "sha256": "8b049192f13594cf84f6e267152188a0b91555db3b5cf4a08cf1082827b8cbc0",
+      "size": 17108
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_EXTRACTION_DECISION_FREEZE_v1.0.json",
+      "sha256": "be813db9774111a3b91401cb3a83dac1f28828334b1e6c0eb6d950f95ce73559",
+      "size": 26043
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_API_PRINCIPLES_AND_FIREWALL_v1.0.json",
+      "sha256": "addde9d0720b89fff9eee1e63e96989578796139f1ad500eb5425f669746bdbc",
+      "size": 27393
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_COMPATIBILITY_AND_CONFORMANCE_BASELINE_v1.0.json",
+      "sha256": "747d43d5fbe81579644f5017dc1d7abb9784b3f1b4b143fd989fae8822e5837b",
+      "size": 7912
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "sha256": "5211b98027c5a5568ae449bc7e39ec2adf600db673e0027a261272ff821fe7d2",
+      "size": 7932
+    },
+    {
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "sha256": "784f4bfa0a8386d4ec1bb06ba475fe259c5ae89531f7ffc09b465f9445010b34",
+      "size": 30789
+    }
+  ],
+  "base_sha": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+  "document_id": "OCE-B6-I0-MANIFEST-001",
+  "generator": "block_06_i0_generate.py",
+  "kind": "book6_i0_packet_manifest",
+  "schema_version": "1.0.0",
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "version": "1.0.0"
+}
