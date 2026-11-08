@@ -1,0 +1,305 @@
+{
+  "backward_compatibility": {
+    "rule": "an admitted version keeps its documented behaviour for its supported range",
+    "state": "UNPROVEN"
+  },
+  "base_sha": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+  "compatibility_rows": [
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C1.S1",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C1.S2",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C1.S3",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C1.S4",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C1.S5",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C2.S1",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C2.S2",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C2.S3",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C2.S4",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C2.S5",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C3.S1",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C3.S2",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C3.S3",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C3.S4",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C3.S5",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C4.S1",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C4.S2",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C4.S3",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C4.S4",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C4.S5",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C5.S1",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C5.S2",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C5.S3",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C5.S4",
+      "version": "1.0.0-draft"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "1.0.0",
+      "supported_to": "1.x",
+      "surface": "C5.S5",
+      "version": "1.0.0-draft"
+    }
+  ],
+  "conformance": {
+    "declaration_without_test": "UNPROVEN",
+    "default_state": "UNPROVEN",
+    "evidence_schema": {
+      "closure": "unknown fields are rejected",
+      "required": [
+        "subject",
+        "state",
+        "evidence",
+        "reason"
+      ],
+      "state_vocabulary": [
+        "PASS",
+        "FAIL",
+        "UNPROVEN",
+        "REFUSED"
+      ]
+    },
+    "pass_requires": "an executed discriminating test with recorded evidence",
+    "vocabulary": [
+      "PASS",
+      "FAIL",
+      "UNPROVEN",
+      "REFUSED"
+    ]
+  },
+  "deprecation": {
+    "required_fields": [
+      "surface",
+      "since_version",
+      "removal_version",
+      "replacement"
+    ],
+    "state": "DECLARED_NOT_APPLIED"
+  },
+  "document_id": "OCE-B6-I0-COMPAT-001",
+  "identifiers": {
+    "api_version": "1.0.0-draft",
+    "conformance_version": "1.0.0",
+    "package_version_format": "semver",
+    "schema_version": "1.0.0"
+  },
+  "kind": "book6_i0_compatibility_and_conformance_baseline",
+  "migration_evidence": {
+    "required": true,
+    "state": "ABSENT"
+  },
+  "observed": {
+    "consumer_available": false,
+    "proven_rows": 0,
+    "unproven_rows": 25
+  },
+  "p0_source": "docs/oce-golden-system/OCE_BLOCK_06_P0_COMPATIBILITY_AND_REPRODUCIBILITY_PLAN_v1.0.json",
+  "refusal": {
+    "rule": "an unknown or unsupported version is refused explicitly; the platform never silently resolves to the latest version",
+    "silent_latest": false,
+    "unknown_version": "REFUSED",
+    "unsupported_version": "REFUSED with the supported range named"
+  },
+  "removal": {
+    "requires_migration_evidence": true,
+    "state": "DECLARED_NOT_APPLIED"
+  },
+  "rows_total": 25,
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "structural_fingerprint": {
+    "algorithm": "sha256 over canonical JSON of the compatibility rows",
+    "covers": "rows",
+    "value": "37d1bf03e70d5d10f56ef79e129d6b6527a6867b53febc7803c51a65d21798d5"
+  },
+  "version": "1.0.0"
+}
