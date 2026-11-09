@@ -1,8 +1,9 @@
 """Non-vacuous negative controls for B6-I0-STAGE-SCOPE-AMENDMENT-001.
 
-Every control mutates an isolated clone of the exact head and asserts that the amended validator
+Every control mutates an isolated worktree of the exact head and asserts that the amended validator
 fails for the intended, named reason. A pristine run must pass first, so no control can pass
-vacuously. One clone is reused and reset between controls to keep the suite fast.
+vacuously. The worktree is reused and reset between controls; the base control uses a throwaway
+repository so no shared ref is ever moved.
 """
 from __future__ import annotations
 
@@ -35,33 +36,34 @@ def commit(wt: pathlib.Path) -> None:
 
 
 def run(wt: pathlib.Path, mode: str = "auto") -> tuple[int, set[str], dict]:
-    out = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-out-")) / "validator.json"
+    out_dir = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-out-"))
+    out = out_dir / "validator.json"
     proc = subprocess.run(
         [sys.executable, str(wt / "infrastructure/control-plane/scripts/block_06_i0_validate.py"),
          "--root", str(wt), "--stage-scope", mode, "--json", str(out)],
         cwd=str(wt), capture_output=True, text=True)
     doc = json.loads(out.read_text(encoding="utf-8"))
-    shutil.rmtree(out.parent, ignore_errors=True)
+    shutil.rmtree(out_dir, ignore_errors=True)
     return proc.returncode, {f["check"] for f in doc["failure_detail"]}, doc
 
 
 @pytest.fixture(scope="session")
-def clone():
+def shared():
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-amend-"))
     wt = tmp / "wt"
     head = git(ROOT, "rev-parse", "HEAD").stdout.strip()
-    assert git(ROOT, "clone", "-q", "--no-local", ".", str(wt)).returncode == 0
-    assert git(wt, "checkout", "-q", "--detach", head).returncode == 0
+    add = git(ROOT, "worktree", "add", "--detach", str(wt), "HEAD")
+    assert add.returncode == 0, add.stdout + add.stderr
     yield wt, head
+    git(ROOT, "worktree", "remove", "--force", str(wt))
     shutil.rmtree(tmp, ignore_errors=True)
 
 
 @pytest.fixture()
-def probe(clone):
-    wt, head = clone
+def probe(shared):
+    wt, head = shared
     assert git(wt, "reset", "-q", "--hard", head).returncode == 0
     assert git(wt, "clean", "-qfdx").returncode == 0
-    assert git(wt, "update-ref", "refs/remotes/origin/main", I0_MERGE).returncode == 0
     return wt
 
 
@@ -156,10 +158,21 @@ def test_package_path_fails(probe):
     assert "boundary/no_prohibited_surface" in fails
 
 
-def test_moved_base_fails(probe):
-    assert git(probe, "update-ref", "refs/remotes/origin/main", "HEAD").returncode == 0
-    _, fails, _ = run(probe)
-    assert "stage/base_moved" in fails
+def test_moved_base_fails():
+    tmp = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-base-"))
+    try:
+        repo = tmp / "repo"
+        repo.mkdir()
+        assert git(repo, "init", "-q").returncode == 0
+        (repo / "README.md").write_text("probe\n", encoding="utf-8")
+        assert git(repo, "add", "-A").returncode == 0
+        assert git(repo, "-c", "user.email=ci@example.com", "-c", "user.name=ci",
+                   "commit", "-qm", "probe").returncode == 0
+        assert git(repo, "update-ref", "refs/remotes/origin/main", "HEAD").returncode == 0
+        _, fails, _ = run(repo)
+        assert "stage/base_moved" in fails
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
 
 
 def test_workflow_has_no_waiver():
