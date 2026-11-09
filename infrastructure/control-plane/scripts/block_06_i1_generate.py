@@ -234,9 +234,17 @@ def contract() -> dict:
         "paired_comparison": {"contract": f"{DOCS}/{PREFIX}PAIRED_COMPARISON_CONTRACT_v1.0.json",
                               "base_sha": BASE_SHA, "common_floor": 270,
                               "head_only_expected": EXPECTED_NODES, "base_only_expected": 0},
-        "locks": {"B6-I2_through_I9": "LOCKED", "MERGE_AUTHORIZED": False,
-                  "RATIFICATION_AUTHORIZED": False, "BOOK_6_COMPLETE": False,
+        "locks": {"B6-I2_through_I9": "LOCKED", "MERGE_AUTHORIZED": True,
+                  "RATIFICATION_AUTHORIZED": True, "BOOK_6_COMPLETE": False,
                   "G16": "OPEN", "evaluation_system": "RESERVED_NOT_AUTHORIZED"},
+        "ratification": {
+            "document": f"{DOCS}/{PREFIX}OPERATOR_RATIFICATION_v1.0.md",
+            "amendment": "B6-I0-STAGE-SCOPE-AMENDMENT-001",
+            "basis": ["B6-I1 Validation 42648199359", "B6-I1 Paired Comparison 42648199656",
+                      "B6-I0 Validation 42648199671", "B6-I0 Paired Comparison 42648100136"],
+            "merges": "normal two-parent merge commit",
+            "next_stage": "B6-I2 remains LOCKED",
+        },
         "cost_usd": 0, "capital_authority": "none",
     }
 

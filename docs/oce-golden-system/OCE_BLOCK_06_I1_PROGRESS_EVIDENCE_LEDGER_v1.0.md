@@ -123,3 +123,23 @@ failure, and it is recorded rather than hidden.
 `BOOK_6_COMPLETE = false`; `G16` OPEN under `B5I8-DF05`; evaluation system
 `RESERVED_NOT_AUTHORIZED`; no package, publication, registry, cloud, broker, capital or execution
 authority; cost `$0`.
+
+## 10. Prior-stage repair and operator ratification
+
+`B6-I0-STAGE-SCOPE-AMENDMENT-001` was frozen at `e19eea69` before any validation change. It
+preserves strict B6-I0 mode unchanged, adds a fail-closed stage-aware mode, keeps the P0 packet and
+the frozen B6-I0 packet immutable in later-stage mode, admits only the B6-I1 contract paths and the
+amendment paths, and refuses missing, unknown, spoofed, tampered or moved identity. Thirteen
+negative controls prove each refusal is real and that the pristine run passes.
+
+Amended-head evidence: B6-I0 Validation `42648199671` PASS 136/136 with 72 of 72 nodes, zero
+failures, errors and skips, mutation floor 12 of 12 discriminated and 13 restored, Book 5 gate 41 of
+41, controls green; B6-I0 Paired `42648100136`; B6-I1 Validation `42648199359` 42 of 42; B6-I1
+paired `42648199656` 270 common, 0 base-only, 42 head-only; B5-I9 Factory Gate `42648200387`;
+B5-I9 paired `42648200109`; B5-I8 Audit `42648199369`; B1-I1R `42648199663`.
+
+Ratification authorizes the normal two-parent merge of PR 30 only. B6-I2 through B6-I9 remain
+LOCKED, Book 6 is not complete, G16 stays OPEN under `B5I8-DF05`, the evaluation system remains
+RESERVED_NOT_AUTHORIZED, and no package, publication, cloud, broker, capital or execution
+authority exists. Cost `$0`. NOT MERGE AUTHORIZED no longer applies to this stage, but no later
+stage is authorized by it.
