@@ -36,6 +36,10 @@ TRAVERSAL_INSTALL_GUARD = (
     "        except ValueError:\n"
     '            refuse("REFUSED_PATH_TRAVERSAL", entry["path"])\n'
 )
+IMPORT_GUARD = (
+    "        if root not in PERMITTED_IMPORTS:\n"
+    '            refuse("REFUSED_INVALID_MANIFEST", f"undeclared import: {module}")\n'
+)
 
 MUTATIONS = [
     ("M01", "both path traversal guards removed", ARCHIVE,
@@ -56,13 +60,7 @@ MUTATIONS = [
      "    if profile not in PROFILES:", "    if False:",
      f"{TESTS}/test_block_06_i2_harness.py::test_unknown_profile_refused"),
     ("M06", "undeclared import refusal removed", LOCAL,
-     "        if root not in PERMITTED_IMPORTS:
-"
-     '            refuse("REFUSED_INVALID_MANIFEST", f"undeclared import: {module}")
-',
-     "        if False:
-            pass
-",
+     IMPORT_GUARD, "        if False:\n            pass\n",
      f"{TESTS}/test_block_06_i2_harness.py::test_undeclared_network_call_refused"),
 ]
 
