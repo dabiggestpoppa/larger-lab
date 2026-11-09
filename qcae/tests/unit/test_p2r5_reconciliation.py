@@ -171,10 +171,15 @@ class TestSchemaAuthorityAndMigrationTruth:
         )
         runner = MigrationRunner(c3, clock=lambda: "2026-09-22T00:00:00Z")
         assert runner.current_version() == 4
+        # Clear bootstrap provenance so the migration ledger under test
+        # observes exactly the v4 -> v5 transformation.
+        c3.execute("DELETE FROM schema_migration_ledger")
+        c3.commit()
         runner.migrate_to(5, {5: V4_TO_V5})
         assert runner.current_version() == 5
         entries = runner.ledger()
         assert len(entries) == 1
+        assert (entries[0].from_version, entries[0].to_version) == (4, 5)
         assert entries[0].post_digest != entries[0].pre_digest
         c3.close()
 

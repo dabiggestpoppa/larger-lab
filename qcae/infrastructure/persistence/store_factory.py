@@ -16,9 +16,11 @@ from qcae.infrastructure.persistence.migrations import (
     CURRENT_SCHEMA_VERSION,
     LegacyDatabaseClass,
     MigrationRunner,
+    RUNTIME_DDL_MIGRATION,
     V2_TO_V3,
     V3_TO_V4,
     V4_TO_V5,
+    V5_ADDITIONS_DDL,
     classify_legacy_database,
 )
 from qcae.infrastructure.persistence.sqlite_metadata_store import (
@@ -95,11 +97,54 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
+        # P2-R5R schema law: a fresh DB must be PHYSICALLY complete v5
+        # before it claims version 5. The full v5 shape is P1 metadata DDL
+        # + the true historical v4 DDL (P2-0004, no post-v4 tables) + the
+        # v4->v5 additions. Runtime/queue/budget/governance/approval tables
+        # are imported lazily so this factory stays free of engine imports.
+        from qcae.infrastructure.persistence.sqlite_approval_registry import (
+            APPROVAL_DDL as _APPROVAL_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_budget_ledger import (
+            BUDGET_DDL as _BUDGET_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_policy_log import (
+            GOVERNANCE_DDL as _GOVERNANCE_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_runtime_store import (
+            RUNTIME_DDL as _RUNTIME_TABLES_DDL,
+        )
+        from qcae.infrastructure.queue.sqlite_step_queue import (
+            QUEUE_INTEGRITY_DDL as _QUEUE_DDL,
+        )
         conn.executescript(_SCHEMA_DDL)
         current = conn.execute("PRAGMA user_version").fetchone()[0]
         if current == 0:
-            # Fresh database: create at the canonical version; no migration
-            # history to replay (the DDL above already matches this version).
+            # Fresh database: build the COMPLETE v5 schema transactionally,
+            # record bootstrap provenance, then stamp v5. No composition
+            # root may silently complete the schema afterwards.
+            conn.executescript(RUNTIME_DDL_MIGRATION)
+            conn.executescript(V5_ADDITIONS_DDL)
+            for _ddl in (_RUNTIME_TABLES_DDL, _QUEUE_DDL, _BUDGET_DDL,
+                         _GOVERNANCE_DDL, _APPROVAL_DDL):
+                conn.executescript(_ddl)
+            conn.executescript(
+                "CREATE TABLE IF NOT EXISTS schema_migration_ledger ("
+                " seq INTEGER PRIMARY KEY AUTOINCREMENT,"
+                " from_version INTEGER NOT NULL,"
+                " to_version INTEGER NOT NULL,"
+                " migration_id TEXT NOT NULL,"
+                " applied_at TEXT NOT NULL,"
+                " pre_digest TEXT NOT NULL,"
+                " post_digest TEXT NOT NULL)"
+            )
+            conn.execute(
+                "INSERT INTO schema_migration_ledger (from_version,"
+                " to_version, migration_id, applied_at, pre_digest,"
+                " post_digest) VALUES (0, ?, 'BOOTSTRAP-v5-complete-schema',"
+                " ?, 'none', 'bootstrap-v5')",
+                (CURRENT_SCHEMA_VERSION, _iso_now()),
+            )
             conn.execute(f"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}")
             conn.commit()
         elif current > CURRENT_SCHEMA_VERSION:
@@ -113,15 +158,34 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
             # legacy P2-misversioned databases, migrate via the production
             # chain; unknown hybrid shapes fail closed (P2-R5R policy).
             classification = classify_legacy_database(conn, current)
-            if classification == LegacyDatabaseClass.UNKNOWN_HYBRID and current < CURRENT_SCHEMA_VERSION:
-                # Only refuse pre-chain unknown shapes; if on the production
-                # chain, still attempt migration below.
-                if current not in _PRODUCTION_MIGRATIONS and (current + 1) not in _PRODUCTION_MIGRATIONS and current not in (2, 3, 4):
-                    raise QcaeValidationError(
-                        f"unknown hybrid / legacy misversioned database at schema "
-                        f"{current} cannot be migrated to {CURRENT_SCHEMA_VERSION} "
-                        f"(failing closed)"
-                    )
+            if classification == LegacyDatabaseClass.UNKNOWN_HYBRID:
+                raise QcaeValidationError(
+                    f"unknown hybrid / legacy misversioned database at schema "
+                    f"{current} cannot be migrated to {CURRENT_SCHEMA_VERSION} "
+                    f"(failing closed)"
+                )
+            if classification == LegacyDatabaseClass.CURRENT_V5:
+                # Already physically v5; nothing to replay.
+                return conn
+            if classification == LegacyDatabaseClass.KNOWN_P2_MISVERSIONED:
+                # Historical bug: physical P2 tables with stamp 1. The
+                # v2->v3 migration rebuilds evidence_artifact, which a
+                # P2-physical DB may not have in v1 shape; normalize the
+                # stamp onto the production chain first: a v5-physical
+                # mis-stamp normalizes to v4 (v4->v5 is idempotent), else
+                # to v2 (v2->v3->v4->v5), preserving all rows.
+                from qcae.infrastructure.persistence.migrations import (
+                    _table_names as _legacy_tables,
+                )
+                _names = _legacy_tables(conn)
+                if "runtime_execution" in _names and \
+                        "governance_approval_use" in _names:
+                    conn.execute("PRAGMA user_version = 4")
+                    conn.commit()
+                else:
+                    conn.execute("PRAGMA user_version = 2")
+                    conn.commit()
+                current = conn.execute("PRAGMA user_version").fetchone()[0]
             runner = MigrationRunner(conn, clock=_iso_now)
             try:
                 runner.migrate_to(CURRENT_SCHEMA_VERSION, _PRODUCTION_MIGRATIONS)

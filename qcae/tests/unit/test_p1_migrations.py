@@ -22,6 +22,10 @@ def db(tmp_path):
     # (v1 -> v2) are unchanged.
     conn.execute("PRAGMA user_version = 1")
     conn.commit()
+    # Isolate the MigrationRunner mechanism: drop the fresh-bootstrap
+    # provenance row so ledger assertions observe only the test migration.
+    conn.execute("DELETE FROM schema_migration_ledger")
+    conn.commit()
     yield conn
     conn.close()
 
