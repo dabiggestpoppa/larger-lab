@@ -1,0 +1,51 @@
+{
+  "document_id": "OCE-B6-I1-COMPAT-001",
+  "refusal": {
+    "silent_latest": false,
+    "supported_window_in_message": true,
+    "unknown_version": "REFUSED",
+    "unsupported_version": "REFUSED"
+  },
+  "rows": [
+    {
+      "consumer_evidence": "contract and denial nodes in this stage",
+      "section": "C1.S1",
+      "state": "PROVEN",
+      "supported_from": "v1",
+      "supported_to": "v1",
+      "surface": "oce.api.v1.capabilities.get",
+      "version": "v1"
+    },
+    {
+      "consumer_evidence": "SDK contract nodes in this stage",
+      "section": "C1.S2",
+      "state": "PROVEN",
+      "supported_from": "v1",
+      "supported_to": "v1",
+      "surface": "oce.sdk.intents.submit",
+      "version": "v1"
+    },
+    {
+      "consumer_evidence": "unsupported-version refusal nodes in this stage",
+      "section": "C1.S5",
+      "state": "PROVEN",
+      "supported_from": "v1",
+      "supported_to": "v1",
+      "surface": "oce.compat.matrix.check",
+      "version": "v1"
+    }
+  ],
+  "schema": "oce.block_06_i1.compat.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "supported_window": {
+    "max": "v1",
+    "min": "v1",
+    "policy": "additive_minor"
+  },
+  "unproven_elsewhere": {
+    "block_6_sections_total": 25,
+    "proven_in_this_stage": 3,
+    "state": "the remaining 22 rows stay UNPROVEN"
+  }
+}

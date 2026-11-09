@@ -135,7 +135,8 @@ def test_tracked_cache_name_fails(probe):
           "commit", "-qm", "probe"], wt)
     _sync(wt)
     out = _run([sys.executable, str(wt / "infrastructure/control-plane/scripts/"
-                                    "block_06_i0_validate.py"), "--root", str(wt)], wt)
+                                    "block_06_i0_validate.py"), "--root", str(wt),
+                                    "--stage-scope", "auto"], wt)
     _reset(wt, base)
     assert out.returncode != 0, "a tracked file under a cache-like name was invisible"
     assert "boundary/only_allowed_paths" in out.stdout
@@ -148,7 +149,8 @@ def test_untracked_residue_passes(probe):
     residue.write_text("residue\n", encoding="utf-8")
     _sync(wt)
     out = _run([sys.executable, str(wt / "infrastructure/control-plane/scripts/"
-                                    "block_06_i0_validate.py"), "--root", str(wt)], wt)
+                                    "block_06_i0_validate.py"), "--root", str(wt),
+                                    "--stage-scope", "auto"], wt)
     _reset(wt, base)
     assert out.returncode == 0, out.stdout[-1500:]
     assert "status PASS" in out.stdout

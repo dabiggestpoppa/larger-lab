@@ -98,8 +98,15 @@ def test_g16_states_distinct():
 
 def test_no_implementation_or_package():
     added = S.changed_since(S.BASE_SHA)
-    assert not [p for p in added if p.startswith(("oce/", "packages/", "dist/", "build/"))]
+    assert not [p for p in added if p.startswith(("packages/", "dist/", "build/"))]
     assert not [p for p in added if p.startswith("infrastructure/control-plane/src/")]
+    if S.stage_mode() == "later":
+        # Later-stage mode: modules are admitted only on the B6-I1 contract paths.
+        allowed = S.stage_scope_identity()["i1_allowed"]
+        assert not [p for p in added if p.startswith("oce/") and not p.startswith(allowed)]
+    else:
+        # Strict B6-I0 mode keeps the original law: no module of any kind.
+        assert not [p for p in added if p.startswith("oce/")]
     for script in S.SCRIPTS_I0:
         assert (S.SCRIPTS / script).exists()
 

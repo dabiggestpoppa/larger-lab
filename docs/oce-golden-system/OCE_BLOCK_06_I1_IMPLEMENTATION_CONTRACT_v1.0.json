@@ -1,0 +1,198 @@
+{
+  "adjacent_floors": {
+    "b5_i9_nodes": 41,
+    "b5_i9_suite": "infrastructure/control-plane/tests/test_b5_i9_*.py",
+    "b6_i0_nodes": 72,
+    "p0_packet_files": 17
+  },
+  "api_major": 1,
+  "api_version": "v1",
+  "base_sha": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+  "base_tree": "3c2e2a6676e16415a1e2bd326c1fc147e51c2a6d",
+  "capital_authority": "none",
+  "cleanup": {
+    "residue_refused": true,
+    "scratch_prefix": ".b6i1-",
+    "tracked_tree_clean": true
+  },
+  "compatibility": {
+    "silent_latest": false,
+    "supported": [
+      "v1"
+    ],
+    "unknown_refused": true,
+    "verdicts": [
+      "SUPPORTED",
+      "UNSUPPORTED",
+      "UNKNOWN"
+    ]
+  },
+  "cost_usd": 0,
+  "determinism": {
+    "canonical_json": "sort_keys, indent 2, utf-8, LF",
+    "no_host_identity": true,
+    "no_random_ids": true,
+    "no_timestamps": true,
+    "receipt": "sha256 over canonical request and canonical result"
+  },
+  "document_id": "OCE-B6-I1-CONTRACT-001",
+  "envelope": {
+    "extra_keys_refused": true,
+    "forbidden": [
+      "authority",
+      "store",
+      "path",
+      "token",
+      "secret"
+    ],
+    "missing_keys_refused": true,
+    "required": [
+      "version",
+      "operation",
+      "actor",
+      "scopes",
+      "payload"
+    ]
+  },
+  "frozen_before_results": true,
+  "implementation_floor": {
+    "mutations": 6,
+    "source_mutation_floor": 3,
+    "test_nodes": 42
+  },
+  "internal": 0,
+  "locks": {
+    "B6-I2_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "MERGE_AUTHORIZED": true,
+    "RATIFICATION_AUTHORIZED": true,
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED"
+  },
+  "manifest": {
+    "hash": "sha256",
+    "independent_verification": true,
+    "schema": "oce.block_06_i1.manifest.v1",
+    "size": "bytes"
+  },
+  "operations_total": 10,
+  "p0_ratification_sha": "c5d7bfcc5ea99837985ba82a3c91fd1e76d85a81",
+  "paired_comparison": {
+    "base_only_expected": 0,
+    "base_sha": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+    "common_floor": 270,
+    "contract": "docs/oce-golden-system/OCE_BLOCK_06_I1_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+    "head_only_expected": 42
+  },
+  "path_versioned": true,
+  "provenance": {
+    "artifact_binding": "sha256 plus byte size over LF-normalised bytes",
+    "receipt_fields": [
+      "contract_hash",
+      "request_sha256",
+      "result_sha256",
+      "version",
+      "operation",
+      "actor"
+    ]
+  },
+  "public_experimental": 10,
+  "public_stable": 0,
+  "ratification": {
+    "amendment": "B6-I0-STAGE-SCOPE-AMENDMENT-001",
+    "basis": [
+      "B6-I1 Validation 42648199359",
+      "B6-I1 Paired Comparison 42648199656",
+      "B6-I0 Validation 42648199671",
+      "B6-I0 Paired Comparison 42648100136"
+    ],
+    "document": "docs/oce-golden-system/OCE_BLOCK_06_I1_OPERATOR_RATIFICATION_v1.0.md",
+    "merges": "normal two-parent merge commit",
+    "next_stage": "B6-I2 remains LOCKED"
+  },
+  "refusals": [
+    {
+      "class": "F10",
+      "code": "REFUSED_VERSION_UNKNOWN",
+      "meaning": "a version string cannot be resolved"
+    },
+    {
+      "class": "F09",
+      "code": "REFUSED_VERSION_UNSUPPORTED",
+      "meaning": "a resolved version is outside the supported window"
+    },
+    {
+      "class": "F09",
+      "code": "REFUSED_OPERATION_UNKNOWN",
+      "meaning": "the operation is not in the frozen table"
+    },
+    {
+      "class": "F09",
+      "code": "REFUSED_SCOPE",
+      "meaning": "the caller does not hold the declared scope"
+    },
+    {
+      "class": "F09",
+      "code": "REFUSED_SCHEMA",
+      "meaning": "input does not match the declared typed schema"
+    },
+    {
+      "class": "F09",
+      "code": "REFUSED_AUTHORITY",
+      "meaning": "the caller attempted to supply authority"
+    },
+    {
+      "class": "F05",
+      "code": "REFUSED_STORAGE_INTERNAL",
+      "meaning": "the request or result would expose storage internals"
+    },
+    {
+      "class": "F09",
+      "code": "REFUSED_SELF_APPROVAL",
+      "meaning": "the requester attempted to approve their own request"
+    },
+    {
+      "class": "F07",
+      "code": "REFUSED_DUPLICATE_RECEIPT",
+      "meaning": "a receipt id would be reused"
+    }
+  ],
+  "schema": "oce.block_06_i1.contract.v1",
+  "scopes": {
+    "client_supplied_authority": false,
+    "declared": [
+      "read",
+      "propose",
+      "decide"
+    ],
+    "forbidden": [
+      "*",
+      "admin",
+      "authority",
+      "write",
+      "root"
+    ],
+    "wildcard": false
+  },
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "test_inventory": {
+    "collection_equals_execution": true,
+    "derivation": "declared node set equals pytest collection over the six stage modules; duplicates and orphans are refused",
+    "expected_nodes": 42,
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i1_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_denial.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_sdk.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_compat.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_authority_and_boundary.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_evidence_and_cleanup.py"
+    ],
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  }
+}

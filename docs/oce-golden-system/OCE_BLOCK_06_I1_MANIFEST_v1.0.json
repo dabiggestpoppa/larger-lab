@@ -1,0 +1,96 @@
+{
+  "artifacts": [
+    {
+      "bytes": 6112,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_API_AND_SDK_CONTRACT_v1.0.json",
+      "sha256": "edbffb1d4616540f3ee448b1ede114d6dc31618055e6e42f2517a63bea190b4a"
+    },
+    {
+      "bytes": 1322,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_COMPATIBILITY_MATRIX_v1.0.json",
+      "sha256": "0a92348418d2227407b014da1fed2dd0de96c692b5e12ad50427005665892c69"
+    },
+    {
+      "bytes": 1730,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "sha256": "da5858131e4ac8a5ac2193c9eedb2a3f0b2ed7855243618fbc2023c366cbb054"
+    },
+    {
+      "bytes": 5288,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "sha256": "a30b74b2811f311160c11d27b975fd9ea003b3430f42be6cd8f56749d43763f4"
+    },
+    {
+      "bytes": 1033,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+      "sha256": "03bf88a7c68002079f30820c35e0dbc9a681aba3d059ed1dddbd40b477b95d5b"
+    },
+    {
+      "bytes": 3972,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "sha256": "396e9dbb92c9873bf046622355c0d3f220818e0026bd3003aaa4af35f8f4047e"
+    },
+    {
+      "bytes": 4427,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_SCOPE_DERIVATION_v1.0.json",
+      "sha256": "a3ceab2728e96f889982f65d5bc767c6c5023476997503c525310e8a57e8497e"
+    }
+  ],
+  "code": [
+    {
+      "bytes": 60,
+      "path": "oce/api/__init__.py",
+      "sha256": "34a35103dfb0e780ce8ec06cc440d355faf9d8a389c5232ec5abaa0fabdf535b"
+    },
+    {
+      "bytes": 237,
+      "path": "oce/api/v1/__init__.py",
+      "sha256": "90bc2eeea2ea03330c240b6b0df58da7ee360b63f703286fc3b2cb0ec7ca8a5f"
+    },
+    {
+      "bytes": 2740,
+      "path": "oce/api/v1/contract.py",
+      "sha256": "244eeb9e8f84a81d2902ab456eb7d86223c0c5592f49fb423853ab47d5eabd09"
+    },
+    {
+      "bytes": 10532,
+      "path": "oce/api/v1/service.py",
+      "sha256": "4080e7d0d533652f29c77fff9a7ae621363ab37adbe50b24e839ccd80052b80b"
+    },
+    {
+      "bytes": 70,
+      "path": "oce/compat/__init__.py",
+      "sha256": "2951dda7c23cd5c77b0612d002846e58b2d2c88bba1deb25268e97b68e98f0c2"
+    },
+    {
+      "bytes": 1220,
+      "path": "oce/compat/matrix.py",
+      "sha256": "deb7a2dabab2d5589a6bde80d8af7648e1f408c067791b2e85091273bf416464"
+    },
+    {
+      "bytes": 57,
+      "path": "oce/sdk/__init__.py",
+      "sha256": "a88145f102f8e7705dbec4a2ee3de2b565e485447475169c09eecffb8bbd6973"
+    },
+    {
+      "bytes": 3249,
+      "path": "oce/sdk/client.py",
+      "sha256": "1d730cb3e89f2f5bb38bc40a939c1b1581ada71cb7741db566984832220e34f8"
+    },
+    {
+      "bytes": 660,
+      "path": "oce/sdk/examples/one_worked_request.py",
+      "sha256": "4ed3131d0f06a58dadc4b5996f8e39845c295874f5f2f41d1a32378038f4ee0c"
+    }
+  ],
+  "document_id": "OCE-B6-I1-MANIFEST-001",
+  "hash": "sha256",
+  "schema": "oce.block_06_i1.manifest.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "totals": {
+    "artifacts": 7,
+    "code_files": 9
+  },
+  "verification": "recomputed by a second code path in the validator and in a test node"
+}

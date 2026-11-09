@@ -20,6 +20,9 @@ import re
 import subprocess
 import sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import block_06_stage_scope as stage_scope  # noqa: E402
+
 DOCS = "docs/oce-golden-system"
 I0 = "OCE_BLOCK_06_I0_"
 P0 = "OCE_BLOCK_06_P0_"
@@ -466,9 +469,44 @@ def check_registry(c: Checker) -> None:
            "later-stage node referenced")
 
 
-def check_boundary(c: Checker) -> None:
+def check_boundary(c: Checker, scope: dict) -> None:
     if not (c.root / ".git").exists():
         c.ok("git/skipped_scratch_root")
+        return
+    if scope.get("mode") == "later":
+        allowed = tuple(dict.fromkeys(tuple(ALLOWED_PREFIXES) + tuple(scope["allowed"])))
+        i1_allowed = tuple(scope["i1_allowed"])
+        amendment = set(scope["amendment"])
+        code, base = git(c, ["rev-parse", "origin/main"])
+        c.need("git/base", code == 0 and base == stage_scope.I0_MERGE, base)
+        code, out = git(c, ["diff", "--name-only", f"{BASE_SHA}..HEAD"])
+        changed = [x for x in out.splitlines() if x.strip()]
+        c.need("boundary/changed", bool(changed), changed)
+        outside = [p for p in changed if not p.startswith(allowed)]
+        c.need("boundary/only_allowed_paths", not outside, outside)
+        forbidden = tuple(p for p in PROHIBITED_PREFIXES if p != "oce/")
+        blocked = [p for p in changed if p.startswith(forbidden) and p not in amendment]
+        c.need("boundary/no_prohibited_surface", not blocked, blocked)
+        rogue = [p for p in changed if p.startswith("oce/") and not p.startswith(i1_allowed)]
+        c.need("boundary/oce_within_i1_contract", not rogue, rogue)
+        code, p0 = git(c, ["diff", "--name-only", f"{P0_SHA}..HEAD", "--", DOCS])
+        p0_changed = [x for x in p0.splitlines() if x.strip() and f"{P0}" in x]
+        c.need("boundary/p0_packet_untouched", not p0_changed, p0_changed)
+        code, i0 = git(c, ["diff", "--name-only", f"{stage_scope.I0_HEAD}..HEAD", "--", DOCS])
+        i0_changed = [x for x in i0.splitlines()
+                     if x.strip() and f"{I0}" in x and x not in amendment]
+        c.need("boundary/i0_packet_frozen", not i0_changed, i0_changed)
+        code, extra = git(c, ["diff", "--name-only", f"{P0_SHA}..HEAD", "--",
+                              "infrastructure/control-plane/scripts/block_06_p0_validate.py"])
+        c.need("boundary/p0_validator_untouched", not extra.strip(), extra)
+        code, status = git(c, ["status", "--porcelain"])
+        c.need("boundary/tracked_clean", not status.strip(), status[:400])
+        code, out = git(c, ["diff", "--check", f"{BASE_SHA}..HEAD"])
+        c.need("boundary/diff_check", code == 0, out)
+        return
+    if scope.get("mode") != "i0":
+        code, status = git(c, ["status", "--porcelain"])
+        c.need("boundary/tracked_clean", not status.strip(), status[:400])
         return
     code, base = git(c, ["rev-parse", "origin/main"])
     c.need("git/base", code == 0 and base == BASE_SHA, base)
@@ -481,9 +519,9 @@ def check_boundary(c: Checker) -> None:
     code, p0 = git(c, ["diff", "--name-only", f"{P0_SHA}..HEAD", "--", DOCS])
     p0_changed = [x for x in p0.splitlines() if x.strip() and f"{I0}" not in x]
     c.need("boundary/p0_packet_untouched", not p0_changed, p0_changed)
-    code, v = git(c, ["diff", "--name-only", f"{P0_SHA}..HEAD", "--",
-                      "infrastructure/control-plane/scripts/block_06_p0_validate.py"])
-    c.need("boundary/p0_validator_untouched", not v.strip(), v)
+    code, extra = git(c, ["diff", "--name-only", f"{P0_SHA}..HEAD", "--",
+                          "infrastructure/control-plane/scripts/block_06_p0_validate.py"])
+    c.need("boundary/p0_validator_untouched", not extra.strip(), extra)
     code, status = git(c, ["status", "--porcelain"])
     c.need("boundary/tracked_clean", not status.strip(), status[:400])
     code, out = git(c, ["diff", "--check", f"{BASE_SHA}..HEAD"])
@@ -550,9 +588,26 @@ def check_g16(c: Checker) -> None:
            "independence" in " ".join(handoff["g16"]["blocks"]), handoff["g16"])
 
 
-def check_no_implementation(c: Checker) -> None:
+def check_no_implementation(c: Checker, scope: dict) -> None:
     if not (c.root / ".git").exists():
         c.ok("impl/skipped_scratch_root")
+        return
+    if scope.get("mode") == "later":
+        i1_allowed = tuple(scope["i1_allowed"])
+        code, out = git(c, ["diff", "--name-only", "--diff-filter=A", f"{BASE_SHA}..HEAD"])
+        added = [f for f in out.splitlines() if f.strip()]
+        packages = [f for f in added if f.startswith(("packages/", "dist/", "build/"))
+                    or f.endswith((".whl", ".egg-info", ".tar.gz"))]
+        c.need("impl/no_packages", not packages, packages)
+        rogue = [f for f in added if f.startswith(("oce/", "infrastructure/control-plane/src/"))
+                 and not f.startswith(i1_allowed)]
+        c.need("impl/no_book6_modules", not rogue, rogue)
+        later = [f for f in added if any(f"block_06_i{i}" in f for i in range(2, 10))]
+        c.need("impl/no_later_stage_modules", not later, later)
+        code, files = git(c, ["ls-files"])
+        c.need("impl/tracked_paths_stable", bool(files.strip()), "empty inventory")
+        return
+    if scope.get("mode") != "i0":
         return
     code, out = git(c, ["diff", "--name-only", "--diff-filter=A", f"{BASE_SHA}..HEAD"])
     added = [f for f in out.splitlines() if f.strip()]
@@ -565,13 +620,24 @@ def check_no_implementation(c: Checker) -> None:
     c.need("impl/tracked_paths_stable", bool(files.strip()), "empty inventory")
 
 
-def run(root: pathlib.Path) -> dict:
+def run(root: pathlib.Path, stage_scope_mode: str = "i0") -> dict:
     c = Checker(root)
-    for fn in (check_files, check_canonical, check_containment, check_manifest, check_scope, check_contract,
-               check_decisions, check_api, check_compat, check_failures, check_registry,
-               check_boundary, check_hygiene, check_documents, check_g16,
+    try:
+        scope = stage_scope.resolve(root, stage_scope_mode)
+    except stage_scope.StageScopeError as exc:
+        c.failures.append({"check": exc.check, "detail": exc.detail})
+        scope = {"mode": "fail"}
+    except Exception as exc:  # pragma: no cover - defensive fail-closed
+        c.failures.append({"check": "stage/identity_unknown", "detail": str(exc)})
+        scope = {"mode": "fail"}
+    for fn in (check_files, check_canonical, check_containment, check_manifest, check_scope,
+               check_contract, check_decisions, check_api, check_compat, check_failures,
+               check_registry, check_boundary, check_hygiene, check_documents, check_g16,
                check_no_implementation):
-        fn(c)
+        if fn in (check_boundary, check_no_implementation):
+            fn(c, scope)
+        else:
+            fn(c)
     payload = {
         "validator": "block_06_i0_validate.py",
         "status": "PASS" if not c.failures else "FAIL",
@@ -579,6 +645,8 @@ def run(root: pathlib.Path) -> dict:
         "failures": len(c.failures),
         "failure_detail": c.failures,
         "stage": "AUTHORIZED_STAGE=B6-I0",
+        "stage_scope": {"requested": stage_scope_mode, "resolved": scope.get("mode"),
+                        "stage": scope.get("stage", "B6-I0")},
         "base_sha": BASE_SHA,
         "root": "." if root == repo_root() else "<scratch>",
     }
@@ -593,9 +661,10 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=None)
     ap.add_argument("--json", default=None)
+    ap.add_argument("--stage-scope", default="i0", choices=list(stage_scope.MODES))
     args = ap.parse_args(argv)
     root = pathlib.Path(args.root).resolve() if args.root else repo_root()
-    payload = run(root)
+    payload = run(root, args.stage_scope)
     text = json.dumps(payload, sort_keys=True, indent=2, ensure_ascii=False) + "\n"
     if args.json:
         pathlib.Path(args.json).write_text(text, encoding="utf-8", newline="\n")

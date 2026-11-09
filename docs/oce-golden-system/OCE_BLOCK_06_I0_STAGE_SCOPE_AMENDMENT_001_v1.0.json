@@ -1,0 +1,149 @@
+{
+  "amendment_id": "B6-I0-STAGE-SCOPE-AMENDMENT-001",
+  "authority": {
+    "does_not_permit": [
+      "B6-I2 through B6-I9",
+      "package publication",
+      "cloud hosting",
+      "evaluation system",
+      "broker, capital or execution authority",
+      "waiving any check"
+    ],
+    "granted_by": "operator mission: B6-I1 prior-stage validation repair, final proof audit, operator ratification and normal merge",
+    "permits": [
+      "stage-scoped validator repair",
+      "stage-scoped node repair",
+      "amendment negative controls"
+    ]
+  },
+  "authorized_paths": [
+    "docs/oce-golden-system/OCE_BLOCK_06_I0_STAGE_SCOPE_AMENDMENT_001_v1.0.json",
+    "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+    "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+    "infrastructure/control-plane/tests/block_06_i0_support.py",
+    "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
+    "infrastructure/control-plane/tests/stage_scope/test_i0_stage_scope_amendment_controls.py",
+    ".github/workflows/block-06-i0-validation.yml",
+    "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py"
+  ],
+  "document_id": "OCE-B6-I0-STAGE-SCOPE-AMENDMENT-001",
+  "frozen_before_modification": true,
+  "identity": {
+    "later_stage": "B6-I1",
+    "refusals": [
+      "stage/identity_missing",
+      "stage/identity_unknown",
+      "stage/identity_spoofed",
+      "stage/identity_tampered",
+      "stage/base_moved",
+      "stage/unknown_mode",
+      "stage/later_stage_absent"
+    ],
+    "requirements": [
+      "present at HEAD",
+      "tracked",
+      "clean against HEAD",
+      "stage exactly B6-I1",
+      "status FROZEN",
+      "HEAD descends from the B6-I0 merge",
+      "origin/main still the B6-I0 merge",
+      "no B6-I2 through B6-I9 artifact present"
+    ],
+    "sources": [
+      "OCE_BLOCK_06_I1_SCOPE_DERIVATION_v1.0.json",
+      "OCE_BLOCK_06_I1_IMPLEMENTATION_CONTRACT_v1.0.json"
+    ]
+  },
+  "locks": {
+    "B6_I2_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0,
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED"
+  },
+  "modes": {
+    "auto": "fail-closed stage-aware validation; requires a committed, clean, hash-pinned identity",
+    "i0": "strict original B6-I0 validation, byte-identical laws, default for historical replay"
+  },
+  "negative_controls": [
+    "pristine later-stage head passes auto mode",
+    "i0 mode still fails on a later-stage head",
+    "missing identity fails",
+    "unknown stage identity fails",
+    "dirty or untracked identity fails",
+    "tampered amendment allowlist fails",
+    "unlisted oce path fails",
+    "B6-I2 artifact fails",
+    "P0 byte change fails",
+    "I0 byte change fails",
+    "package or build path fails",
+    "moved base fails",
+    "workflow contains no waiver, no skip and no continue-on-error"
+  ],
+  "problem": {
+    "classification": {
+      "boundary/no_prohibited_surface": "I0-local: the oce/ prohibition bound B6-I0 only",
+      "boundary/only_allowed_paths": "later-stage immutability plus authorized B6-I1 paths",
+      "boundary/p0_packet_untouched": "actual validator defect: the check filters I0 names instead of P0 names",
+      "git/base": "later-stage immutability: main legitimately advanced to the B6-I0 merge",
+      "impl/no_book6_modules": "I0-local: B6-I0 added no modules; B6-I1 is authorized to"
+    },
+    "evidence": [
+      "B6-I0 Validation run 42624339342",
+      "B6-I0 Validation run 42625336873"
+    ],
+    "failing_checks": [
+      "git/base",
+      "boundary/only_allowed_paths",
+      "boundary/no_prohibited_surface",
+      "boundary/p0_packet_untouched",
+      "impl/no_book6_modules"
+    ],
+    "identical_failure_sets": true
+  },
+  "revision": 2,
+  "revision_note": "Revision 2 adds the B5 regression probe module, whose validator invocation must pass the resolved stage mode; no validation law, allowlist entry or lock changes.",
+  "schema": "oce.block_06_i0.stage_scope_amendment.v1",
+  "stage": "B6-I0",
+  "stage_local_checks_rescoped": {
+    "boundary/no_prohibited_surface": "later mode keeps packages, dist, build, src, console, P0 and dependency files prohibited",
+    "boundary/only_allowed_paths": "later mode admits the I0 prefixes, the B6-I1 contract paths and the amendment paths only",
+    "boundary/p0_packet_untouched": "later mode filters P0 names, not I0 names",
+    "git/base": "later mode requires origin/main == the B6-I0 merge and HEAD descending from it",
+    "impl/no_book6_modules": "later mode admits only oce/ paths authorized by the B6-I1 contract"
+  },
+  "status": "FROZEN",
+  "superseded_validator": {
+    "blob": "6648043b24b0010f6bd405e0ea6098097b4de78d",
+    "i0_base": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+    "i0_head": "c5d7bfcc5ea99837985ba82a3c91fd1e76d85a81",
+    "i0_merge": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+    "path": "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+    "sha256": "a6ed3314881c1a0ed4587b8dfc1a09c18da2b34c29d86b7406c66bbd50a0c6e1"
+  },
+  "timeless_checks_preserved": [
+    "files/*",
+    "json/*",
+    "boundary/no_symlinked_artifacts",
+    "boundary/no_links_in_packet_dir",
+    "manifest/*",
+    "scope/*",
+    "contract/*",
+    "dec/*",
+    "api/*",
+    "compat/*",
+    "fail/*",
+    "threat/*",
+    "reg/*",
+    "security/*",
+    "governance/*",
+    "text/*",
+    "docs/*",
+    "g16/*"
+  ]
+}

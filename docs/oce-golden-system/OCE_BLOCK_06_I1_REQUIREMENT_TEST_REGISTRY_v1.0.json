@@ -1,0 +1,135 @@
+{
+  "document_id": "OCE-B6-I1-REGISTRY-001",
+  "failure_classes": [
+    "F05",
+    "F06",
+    "F07",
+    "F08",
+    "F09",
+    "F10"
+  ],
+  "inventory": {
+    "declared": "collected at CI; equality and uniqueness are asserted",
+    "expected_nodes": 42,
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i1_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_denial.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_sdk.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_compat.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_authority_and_boundary.py",
+      "infrastructure/control-plane/tests/test_block_06_i1_evidence_and_cleanup.py"
+    ]
+  },
+  "mutation_floor": {
+    "source": 3,
+    "stage": 6
+  },
+  "requirements": [
+    {
+      "claim": "A versioned v1 surface exists with an explicit operation table",
+      "id": "API-01",
+      "proved_by": "test_block_06_i1_contract.py",
+      "section": "C1.S1"
+    },
+    {
+      "claim": "No storage internal, path or raw store is exposed by any response",
+      "id": "API-02",
+      "proved_by": "test_block_06_i1_denial.py",
+      "section": "C1.S1"
+    },
+    {
+      "claim": "Every operation declares and enforces exactly one scope",
+      "id": "API-03",
+      "proved_by": "test_block_06_i1_sdk.py",
+      "section": "C1.S1"
+    },
+    {
+      "claim": "No caller can supply, widen or inherit authority",
+      "id": "API-04",
+      "proved_by": "test_block_06_i1_compat.py",
+      "section": "C1.S1"
+    },
+    {
+      "claim": "Unknown versions are refused and never coerced to the latest",
+      "id": "API-05",
+      "proved_by": "test_block_06_i1_authority_and_boundary.py",
+      "section": "C1.S1"
+    },
+    {
+      "claim": "The typed client invokes the canonical API only",
+      "id": "SDK-01",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S2"
+    },
+    {
+      "claim": "The SDK duplicates no business rule and no state transition",
+      "id": "SDK-02",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S2"
+    },
+    {
+      "claim": "The SDK surfaces typed refusals without rewriting them",
+      "id": "SDK-03",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S2"
+    },
+    {
+      "claim": "A compatibility matrix check returns supported, unsupported or unknown",
+      "id": "CMP-01",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S5"
+    },
+    {
+      "claim": "Unsupported and unknown versions carry the supported window",
+      "id": "CMP-02",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S5"
+    },
+    {
+      "claim": "Identical input yields byte-identical canonical output",
+      "id": "DET-01",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S2"
+    },
+    {
+      "claim": "Every receipt binds request, result, version and contract hash",
+      "id": "PROV-01",
+      "proved_by": "test_block_06_i1_evidence_and_cleanup.py",
+      "section": "C1.S1"
+    }
+  ],
+  "requirements_total": 12,
+  "schema": "oce.block_06_i1.registry.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "threats": [
+    {
+      "description": "storage or path disclosure through an API result",
+      "id": "T04"
+    },
+    {
+      "description": "authority widening through a client-supplied field",
+      "id": "T05"
+    },
+    {
+      "description": "version confusion or silent downgrade",
+      "id": "T07"
+    },
+    {
+      "description": "cross-actor approval or self-approval",
+      "id": "T08"
+    },
+    {
+      "description": "duplicate or replayed receipt",
+      "id": "T09"
+    },
+    {
+      "description": "untyped refusal hiding the supported window",
+      "id": "T14"
+    },
+    {
+      "description": "SDK reimplementation of canonical rules",
+      "id": "T20"
+    }
+  ]
+}

@@ -103,12 +103,45 @@ jobs:
               raise SystemExit("regeneration is not deterministic")
           REGEN
 
+      - name: Resolve stage identity
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python - "$EVIDENCE_DIR/stage-scope.json" <<'SCOPE'
+          import json, pathlib, sys
+          sys.path.insert(0, "infrastructure/control-plane/scripts")
+          import block_06_stage_scope as scope
+          resolved = scope.resolve(pathlib.Path("."), "auto")
+          doc = {
+              "requested": "auto",
+              "mode": resolved["mode"],
+              "stage": resolved["stage"],
+              "i1_prefixes": list(resolved["i1_allowed"]),
+              "amendment_paths": list(resolved["amendment"]),
+              "identity": resolved.get("identity", {}),
+          }
+          pathlib.Path(sys.argv[1]).write_text(
+              json.dumps(doc, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+          print(json.dumps({"mode": doc["mode"], "stage": doc["stage"]}, indent=2))
+          SCOPE
+
       - name: Conformance validator
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
           python infrastructure/control-plane/scripts/block_06_i0_validate.py \
+            --stage-scope auto \
             --json "$EVIDENCE_DIR/validator.json" | tee "$EVIDENCE_DIR/validator.txt"
+
+      - name: Stage-scope amendment negative controls
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python -m pytest \
+            infrastructure/control-plane/tests/stage_scope/test_i0_stage_scope_amendment_controls.py \
+            -q --no-header -p no:cacheprovider \
+            --junitxml="$EVIDENCE_DIR/amendment-controls-junit.xml" \
+            | tee "$EVIDENCE_DIR/amendment-controls.txt"
 
       - name: Node inventory equals collection
         env:
