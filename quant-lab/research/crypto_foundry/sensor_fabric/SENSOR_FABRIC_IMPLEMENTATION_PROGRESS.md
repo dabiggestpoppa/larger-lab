@@ -9003,3 +9003,16 @@ ratified; research frozen. This closes one of the audit's two blocking findings 
 entry-parity and enforcing-consumer boundaries remain open for the next implementation
 checkpoint. Evidence: BLOC_05_I09P2DR2_ENVIRONMENT_RECOVERY_EVIDENCE.md. Independent P2dR1
 re-audit against this commit is Agent 2's, not this agent's; no self-ratification.
+
+## 200 - SENSOR-B5-I09P2dR2-G2: RECOVERED AUDIT PUBLICATION AND CORRECTED GATE ADJUDICATION
+
+- Checkpoint ID: `SENSOR-B5-I09P2dR2-G2`. Numeric position is not authority; see the reconciliation note.
+- Branch: `agent/crypto-sensor-fabric-audit-p2dr2-recovered`, a direct child of `f199a7e3f7d92ce555fb436343d24bd42907c3a8`.
+- Original P2dR2 audit commit `8f870be20191c5627c910ae0fde72f510d37677a` was parented at `0114309fba` on the QCAE lineage (merge-base `7e7ef7222c`), contained only the audit document, and was never published. It is retained unmodified as a historical artifact; this branch does not cherry-pick it.
+- Transplanted document is byte-identical: blob `1828c12b606ef80184b3f58c54a92b452fad2c93`, 18,589 bytes.
+- Corrected adjudication: P2D-01 FAIL and P2D-24 FAIL for the original commit (not descended from production; no remote ref); both PASS prospectively for this commit. Original record: 17 PASS / 5 PARTIAL / 2 FAIL.
+- Carried unchanged: P2D-03, P2D-07, P2D-11 and P2D-16 remain PARTIAL; disposition remains `I09P2D_IMPLEMENTATION_PARTIAL`.
+- Independently re-established at `f199a7e3`: 4,616 tests collected; 83/83 focused P2c/P2d tests; 1,095 tracked `.py`; governance `python_files_scanned: 1095`; manifest sha `3d707c59...` with `artifacts == {}`; frozen planning-doc diff empty.
+- Inherited, not re-run: the 11-partition canonical execution (4,605 passed / 11 skipped / 0 failed). The 14-versus-11 skip discrepancy remains unresolved.
+- Ledger reconciliation: sections 197 and 198 are untouched; section 199 is claimed by the P2e branch (`d587e74af1`); this entry takes 200 to avoid an ambiguous duplicate. Future merges order by checkpoint ID, never by section number, and no existing section may be renumbered or dropped.
+- No source, test, provider approval, QCAE or P2e change. No ratification, no I11/I12/Bloc 6 advance, no merge to production.
