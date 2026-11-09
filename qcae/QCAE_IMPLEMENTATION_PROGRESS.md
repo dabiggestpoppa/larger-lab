@@ -906,6 +906,11 @@ P2-R5R-FREEZE (new canonical freeze, blocks `[]`).
 (`test_crash_after_lease_resume_does_not_repeat_committed`) must be
 investigated and classified before freeze.
 
+**P2-R5R-C05 (typed outcome regression):** canonical `JobMissingOutcome` / 
+`StepNotReadyOutcome` model preserved (R5 `NoRunnableStep` not ported per 
+decision). Reconciliation + P2R3 CLI typed-error + P2 CLI app tests pass 
+(34 tests). Regression green.
+
 ## Blockers
 
 None.
