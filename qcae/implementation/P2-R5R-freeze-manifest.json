@@ -1,0 +1,110 @@
+{
+  "phase": "P2-R5R \u2014 Canonical substrate reconciliation beneath preserved P3-R4 (schema v5 authority, legacy P2 classifier, live ApprovalBinding, provider boundary/resolver, backup/restore row counts, typed outcome regression)",
+  "base_canonical_head": "8212b59d0ad5afd708d939d34a2564571f6ee285",
+  "branch": "agent/qcae-p2-r5-canonical-reconcile",
+  "head_commit": "6a4c40cd8a1da411d23c82745c4ff5b791938d99",
+  "tested_commit": "6a4c40cd8a1da411d23c82745c4ff5b791938d99",
+  "canon_version": "0.1",
+  "active_amendments": [
+    "A-001 v1.0"
+  ],
+  "reconciliation_policy": {
+    "no_merge_rebase_cherry_pick_local_review": true,
+    "no_cherry_pick_local_freeze": true,
+    "p3_r4_preserved": true,
+    "p3_capability_paused_during_repair": true,
+    "local_review_reference_only": "agent/qcae-p2-r5-review@7ca0adbeea86f9658ed633423b997daa02a55e0b (not merged)"
+  },
+  "phase_commits": {
+    "p2_r5r_i0_ledger_correction": [
+      "0114309fb"
+    ],
+    "p2_r5r_c01_schema_v5_legacy_classifier": [
+      "839a0090c"
+    ],
+    "p2_r5r_c02_c03_binding_and_resolver": [
+      "349b1999f"
+    ],
+    "p2_r5r_c04_backup_restore_row_counts": [
+      "1d19fcd28"
+    ],
+    "p2_r5r_c05_typed_outcome_regression": [
+      "627e7ea16"
+    ],
+    "p2_r5r_t01_adversarial_p3r4_regression": [
+      "6a4c40cd8a"
+    ]
+  },
+  "intervening_non_qcae_commits_on_branch": [
+    {
+      "commit": "54a8c91f8",
+      "note": "SENSOR-B5-I09P2eR1 audit record (unrelated to QCAE P2-R5R; present in branch history)"
+    }
+  ],
+  "supersedes": {
+    "r4_freeze_artifact": "qcae/implementation/P2-R4-freeze-manifest.json",
+    "relationship": "superseding canonical reconciliation manifest; P2-R4/P2-R3/P2-R2/P2-R1/P2 freezes preserved as historical truth; R5 local-review freeze (7ca0adbeea) is not merged/cherry-picked"
+  },
+  "repairs": {
+    "c01_schema_v5_historical_v4_legacy_classifier": {
+      "finding": "Canonical substrate lacked CURRENT_SCHEMA_VERSION=5, V4_TO_V5, legacy P2 misversioned classifier, and schema-version alignment (hidden schema completion context).",
+      "repair": "CURRENT_SCHEMA_VERSION=5 + V4_TO_V5 (governance_approval_use step index) + production migration chain {2->3,3->4,4->5} via open_metadata_db; LegacyDatabaseClass/classify_legacy_database migrates known legacy P2 misversioned DBs and fails closed on unknown hybrid; sqlite_metadata_store SCHEMA_VERSION and RuntimeIdentity aligned.",
+      "tests": [
+        "qcae/tests/unit/test_p1_migrations.py",
+        "qcae/tests/unit/test_p1_backup_restore.py",
+        "qcae/tests/unit/test_p2_migration_backup.py",
+        "qcae/tests/unit/test_p2r5_reconciliation.py"
+      ]
+    },
+    "c02_live_approval_binding": {
+      "finding": "Grant admission not bound to live verdict binding digest before consumption.",
+      "repair": "binding_digest on StepAuthorityVerdict and ApprovalDecision; verdict-based _grant_admits compares live vs approved binding before consumption; stale mismatch refuses without consuming.",
+      "tests": [
+        "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
+        "qcae/tests/unit/test_p2r4_t01_adversarial.py"
+      ]
+    },
+    "c03_provider_boundary_resolver": {
+      "finding": "Engine coupled to governance.standalone; duplicated authority-request lookup.",
+      "repair": "ApprovalAdmissionProvider port, ApprovalRequestResolver.latest_for_step single source of truth, consume_grant on SqliteApprovalRegistry, runtime_service uses resolver.",
+      "tests": [
+        "qcae/tests/unit/test_p2r5_c04_architecture.py",
+        "qcae/tests/unit/test_p2r2_c02_approval_round_trip.py",
+        "qcae/tests/unit/test_p2r2_t01_governance_adversarial.py"
+      ]
+    },
+    "c04_backup_restore_row_counts": {
+      "repair": "runtime_execution and governance_approval_use included in backup manifest registry row counts.",
+      "tests": [
+        "qcae/tests/unit/test_p1_backup_restore.py",
+        "qcae/tests/unit/test_p2_migration_backup.py"
+      ]
+    },
+    "c05_typed_outcome_regression": {
+      "repair": "Canonical JobMissingOutcome/StepNotReadyOutcome preserved; R5 NoRunnableStep not ported.",
+      "tests": [
+        "qcae/tests/unit/test_p2r5_reconciliation.py",
+        "qcae/tests/unit/test_p2r3_c05_cli_typed_errors.py",
+        "qcae/tests/unit/test_p2_cli_app.py"
+      ]
+    }
+  },
+  "test_evidence": {
+    "full_suite": {
+      "command": "python -m pytest qcae/tests -q",
+      "result": "1375 passed, 0 failed",
+      "duration_s": 39.94
+    },
+    "p3_r4_regression": {
+      "result": "238 passed (P3 unit suite subset) and included in full suite green"
+    },
+    "crash_after_lease_invariant": {
+      "test": "qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::test_crash_after_lease_resume_does_not_repeat_committed",
+      "result": "passed",
+      "note": "Test isolation repaired (removed ambient tempdir placeholder incompatible with fail-closed legacy policy); invariant preserved."
+    }
+  },
+  "blockers": [],
+  "p3_status": "PAUSED during reconciliation; P3-R4 work preserved; resume P3 only after this freeze.",
+  "freeze_note": "P2-R5R-FREEZE commit adds this manifest on top of the tested T01 commit."
+}
