@@ -1,0 +1,46 @@
+{
+  "document_id": "OCE-B6-I2-API-001",
+  "prohibitions": [
+    "no wildcard scope",
+    "no stable private symbol",
+    "no silent latest",
+    "no client supplied authority",
+    "no socket opened by the harness",
+    "no cloud dependency"
+  ],
+  "schema": "oce.block_06_i2.api.v1",
+  "stage": "B6-I2",
+  "status": "FROZEN",
+  "symbols": [
+    {
+      "classification": "deferred",
+      "compatibility": "not_published",
+      "documentation": "template README",
+      "error_behavior": "refuse_invalid_manifest",
+      "example": "generated app",
+      "exported": false,
+      "section": "C1.S3",
+      "symbol": "template:oce-app-skeleton",
+      "tests": "generated app starts",
+      "version": "B6-I2"
+    },
+    {
+      "classification": "public_experimental",
+      "compatibility": "additive_minor",
+      "documentation": "harness README",
+      "error_behavior": "refuse_missing_service",
+      "example": "one profile",
+      "exported": true,
+      "section": "C1.S4",
+      "symbol": "oce.harness.local.up",
+      "tests": "fresh-machine path",
+      "typed_inputs": [
+        "profile"
+      ],
+      "typed_outputs": [
+        "endpoint_set"
+      ],
+      "version": "B6-I2"
+    }
+  ]
+}

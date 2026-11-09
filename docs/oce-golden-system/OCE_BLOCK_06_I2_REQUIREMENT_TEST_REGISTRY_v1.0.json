@@ -1,0 +1,263 @@
+{
+  "arithmetic": {
+    "pass_claims": 0
+  },
+  "document_id": "OCE-B6-I2-REGISTRY-001",
+  "inventory": {
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i2_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_templates.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_archive_safety.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_harness.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_determinism_and_compat.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_evidence_and_cleanup.py"
+    ],
+    "nodes": [
+      "test_block_06_i2_contract.py::test_inventory_equals_collection",
+      "test_block_06_i2_contract.py::test_contract_frozen_before_results",
+      "test_block_06_i2_contract.py::test_scope_binds_construction_sequence",
+      "test_block_06_i2_contract.py::test_locks_and_cost",
+      "test_block_06_i2_contract.py::test_allowed_and_forbidden_paths_declared",
+      "test_block_06_i2_templates.py::test_generated_app_starts_locally",
+      "test_block_06_i2_templates.py::test_template_declares_inherited_versions",
+      "test_block_06_i2_templates.py::test_deterministic_build_byte_identical",
+      "test_block_06_i2_templates.py::test_invalid_manifest_refused",
+      "test_block_06_i2_templates.py::test_template_readme_present",
+      "test_block_06_i2_templates.py::test_cloud_dependency_declared_absent",
+      "test_block_06_i2_archive_safety.py::test_path_traversal_refused",
+      "test_block_06_i2_archive_safety.py::test_symlink_escape_refused",
+      "test_block_06_i2_archive_safety.py::test_malformed_archive_refused",
+      "test_block_06_i2_archive_safety.py::test_absolute_entry_refused",
+      "test_block_06_i2_archive_safety.py::test_oversized_archive_refused",
+      "test_block_06_i2_archive_safety.py::test_digest_mismatch_refused",
+      "test_block_06_i2_harness.py::test_up_returns_endpoint_set",
+      "test_block_06_i2_harness.py::test_missing_service_refused",
+      "test_block_06_i2_harness.py::test_unknown_profile_refused",
+      "test_block_06_i2_harness.py::test_undeclared_network_call_refused",
+      "test_block_06_i2_harness.py::test_evidence_capture_deterministic",
+      "test_block_06_i2_harness.py::test_environment_fingerprint_stable",
+      "test_block_06_i2_determinism_and_compat.py::test_no_silent_latest",
+      "test_block_06_i2_determinism_and_compat.py::test_compat_rows_remain_unproven",
+      "test_block_06_i2_determinism_and_compat.py::test_private_symbol_not_stable",
+      "test_block_06_i2_determinism_and_compat.py::test_dirty_build_input_refused",
+      "test_block_06_i2_evidence_and_cleanup.py::test_manifest_hashes_recompute",
+      "test_block_06_i2_evidence_and_cleanup.py::test_cleanup_no_scratch_residue",
+      "test_block_06_i2_evidence_and_cleanup.py::test_prior_stage_artifacts_unchanged"
+    ]
+  },
+  "requirements": [
+    {
+      "binding_node": "test_block_06_i2_contract.py::test_inventory_equals_collection",
+      "category": "test_block_06_i2_contract.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-01",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_contract.py::test_contract_frozen_before_results",
+      "category": "test_block_06_i2_contract.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-02",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_contract.py::test_scope_binds_construction_sequence",
+      "category": "test_block_06_i2_contract.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-03",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_contract.py::test_locks_and_cost",
+      "category": "test_block_06_i2_contract.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-04",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_contract.py::test_allowed_and_forbidden_paths_declared",
+      "category": "test_block_06_i2_contract.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-05",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_templates.py::test_generated_app_starts_locally",
+      "category": "test_block_06_i2_templates.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-06",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_templates.py::test_template_declares_inherited_versions",
+      "category": "test_block_06_i2_templates.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-07",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_templates.py::test_deterministic_build_byte_identical",
+      "category": "test_block_06_i2_templates.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-08",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_templates.py::test_invalid_manifest_refused",
+      "category": "test_block_06_i2_templates.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-09",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_templates.py::test_template_readme_present",
+      "category": "test_block_06_i2_templates.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-10",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_templates.py::test_cloud_dependency_declared_absent",
+      "category": "test_block_06_i2_templates.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-11",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_archive_safety.py::test_path_traversal_refused",
+      "category": "test_block_06_i2_archive_safety.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-12",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_archive_safety.py::test_symlink_escape_refused",
+      "category": "test_block_06_i2_archive_safety.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-13",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_archive_safety.py::test_malformed_archive_refused",
+      "category": "test_block_06_i2_archive_safety.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-14",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_archive_safety.py::test_absolute_entry_refused",
+      "category": "test_block_06_i2_archive_safety.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-15",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_archive_safety.py::test_oversized_archive_refused",
+      "category": "test_block_06_i2_archive_safety.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-16",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_archive_safety.py::test_digest_mismatch_refused",
+      "category": "test_block_06_i2_archive_safety.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-17",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_harness.py::test_up_returns_endpoint_set",
+      "category": "test_block_06_i2_harness.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-18",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_harness.py::test_missing_service_refused",
+      "category": "test_block_06_i2_harness.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-19",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_harness.py::test_unknown_profile_refused",
+      "category": "test_block_06_i2_harness.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-20",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_harness.py::test_undeclared_network_call_refused",
+      "category": "test_block_06_i2_harness.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-21",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_harness.py::test_evidence_capture_deterministic",
+      "category": "test_block_06_i2_harness.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-22",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_harness.py::test_environment_fingerprint_stable",
+      "category": "test_block_06_i2_harness.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-23",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_determinism_and_compat.py::test_no_silent_latest",
+      "category": "test_block_06_i2_determinism_and_compat.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-24",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_determinism_and_compat.py::test_compat_rows_remain_unproven",
+      "category": "test_block_06_i2_determinism_and_compat.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-25",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_determinism_and_compat.py::test_private_symbol_not_stable",
+      "category": "test_block_06_i2_determinism_and_compat.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-26",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_determinism_and_compat.py::test_dirty_build_input_refused",
+      "category": "test_block_06_i2_determinism_and_compat.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-27",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_evidence_and_cleanup.py::test_manifest_hashes_recompute",
+      "category": "test_block_06_i2_evidence_and_cleanup.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-28",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_evidence_and_cleanup.py::test_cleanup_no_scratch_residue",
+      "category": "test_block_06_i2_evidence_and_cleanup.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-29",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "test_block_06_i2_evidence_and_cleanup.py::test_prior_stage_artifacts_unchanged",
+      "category": "test_block_06_i2_evidence_and_cleanup.py",
+      "claim": "NONE until evidence",
+      "id": "B6I2-30",
+      "state": "PLANNED"
+    }
+  ],
+  "requirements_total": 30,
+  "schema": "oce.block_06_i2.registry.v1",
+  "stage": "B6-I2"
+}

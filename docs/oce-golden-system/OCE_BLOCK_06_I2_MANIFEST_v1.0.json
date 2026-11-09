@@ -1,0 +1,67 @@
+{
+  "artifacts": [
+    {
+      "bytes": 3039,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_SCOPE_DERIVATION_v1.0.json",
+      "sha256": "bd769aa8f319ad4582f5508449a2fe408356d0a8818fb5cc293d6cd92b250d06"
+    },
+    {
+      "bytes": 8233,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "sha256": "6eb9351dc3fd21924482870124b2c5691e2d51606415d39a03df15017f4db8c9"
+    },
+    {
+      "bytes": 1207,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_API_TEMPLATE_AND_HARNESS_CONTRACT_v1.0.json",
+      "sha256": "b4979e6c4c9a70b3bfbd740f28b71c40433990aa6511fad38fa1d86432f0b7b6"
+    },
+    {
+      "bytes": 984,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_COMPATIBILITY_MATRIX_v1.0.json",
+      "sha256": "8bc11e917728544a44d508d631eade0ebe1b7271fa53e84c57fcb2574f62db98"
+    },
+    {
+      "bytes": 10356,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "sha256": "583d9af7772df8ea06e1cb17a3e46a11dd76802063411224f292149a5006f2d2"
+    },
+    {
+      "bytes": 8185,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "sha256": "c7ec2fb10acab54da43e7b64c1b7eacfd777d696dbf3a7f053a4c54965ab1f51"
+    },
+    {
+      "bytes": 2757,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_ACCOUNTING_CORRECTION_v1.0.json",
+      "sha256": "b0a4e1074696e3674165b2e6e4121e5742571445d0a02e13b48d1613c5283e1c"
+    },
+    {
+      "bytes": 2246,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json",
+      "sha256": "e0b790e228be10c7376056035967e162639e5e50119489accf453fde288fa1a9"
+    }
+  ],
+  "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
+  "code": [],
+  "document_id": "OCE-B6-I2-MANIFEST-001",
+  "hash": "sha256",
+  "locks": {
+    "B6-I3_through_I9": "LOCKED",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "schema": "oce.block_06_i2.manifest.v1",
+  "size": "bytes",
+  "stage": "B6-I2",
+  "status": "FROZEN",
+  "totals": {
+    "artifacts": 8,
+    "code": 0
+  },
+  "verification": {
+    "excludes_manifest": true,
+    "independent": true
+  }
+}

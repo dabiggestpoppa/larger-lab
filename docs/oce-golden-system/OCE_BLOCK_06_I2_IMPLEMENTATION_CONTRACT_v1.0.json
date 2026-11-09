@@ -1,0 +1,266 @@
+{
+  "adjacent_floors": {
+    "b5_i9_nodes": 41,
+    "b6_i0_nodes": 72,
+    "b6_i1_nodes": 42,
+    "common_regression_nodes": 208
+  },
+  "api_rules": {
+    "harness": {
+      "classification": "public_experimental",
+      "compatibility": "additive_minor",
+      "error_behavior": "refuse_missing_service",
+      "exported": true,
+      "typed_inputs": [
+        "profile"
+      ],
+      "typed_outputs": [
+        "endpoint_set"
+      ]
+    },
+    "template": {
+      "classification": "deferred",
+      "compatibility": "not_published",
+      "error_behavior": "refuse_invalid_manifest",
+      "exported": false
+    }
+  },
+  "api_symbols": [
+    "template:oce-app-skeleton",
+    "oce.harness.local.up"
+  ],
+  "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
+  "base_tree": "c6638bde3e9c8f71482f4d96fde42d0484d9a624",
+  "bounds": {
+    "archive_bytes": 1048576,
+    "entries": 256,
+    "entry_bytes": 262144,
+    "input_bytes": 65536
+  },
+  "capital_authority": "none",
+  "cleanup": {
+    "residue_refused": true,
+    "scratch_prefix": ".b6i2-"
+  },
+  "compatibility": {
+    "consumer_evidence": "none",
+    "rows": [
+      "C1.S3",
+      "C1.S4"
+    ],
+    "silent_latest": false,
+    "state": "UNPROVEN",
+    "unknown_refused": true
+  },
+  "cost_usd": 0,
+  "determinism": {
+    "byte_identical_rebuild": true,
+    "canonical_json": true,
+    "no_random_ids": true,
+    "no_timestamps": true,
+    "sorted_entries": true
+  },
+  "document_id": "OCE-B6-I2-CONTRACT-001",
+  "frozen_before_results": true,
+  "harness": {
+    "endpoint_set": "logical local endpoints plus environment fingerprint",
+    "opens_sockets": false,
+    "profiles": {
+      "local": {
+        "cloud": false,
+        "network": false,
+        "services": [
+          "app",
+          "db",
+          "queue",
+          "evidence"
+        ]
+      },
+      "minimal": {
+        "cloud": false,
+        "network": false,
+        "services": [
+          "app"
+        ]
+      }
+    },
+    "refuses_undeclared_network_calls": true,
+    "services": [
+      "app",
+      "db",
+      "queue",
+      "evidence"
+    ]
+  },
+  "i0_ratification_sha": "c5d7bfcc5ea99837985ba82a3c91fd1e76d85a81",
+  "i1_ratification_sha": "96e3b81714321f4eea7abcb300ef471e93be0962",
+  "implementation_floor": {
+    "mutations": 6,
+    "source_mutation_floor": 3,
+    "test_nodes": 30
+  },
+  "locks": {
+    "B6-I3_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "paired_comparison": {
+    "base_only_expected": 0,
+    "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
+    "common_floor": 208,
+    "head_only_expected": 30
+  },
+  "provenance": {
+    "app_declares_inherited_versions": true,
+    "evidence_canonical": true,
+    "manifest": "sha256 plus byte size over LF-normalised bytes",
+    "no_timestamp_or_host_identity": true
+  },
+  "refusals": [
+    {
+      "class": "F13",
+      "code": "REFUSED_PATH_TRAVERSAL",
+      "meaning": "entry escapes the root"
+    },
+    {
+      "class": "F14",
+      "code": "REFUSED_SYMLINK_ESCAPE",
+      "meaning": "link resolves outside the root"
+    },
+    {
+      "class": "F15",
+      "code": "REFUSED_NONDETERMINISTIC_BUILD",
+      "meaning": "two builds differ"
+    },
+    {
+      "class": "F16",
+      "code": "REFUSED_NETWORK",
+      "meaning": "undeclared network call"
+    },
+    {
+      "class": "F19",
+      "code": "REFUSED_DIRTY_INPUT",
+      "meaning": "unclean build input"
+    },
+    {
+      "class": "F21",
+      "code": "REFUSED_MALFORMED_ARCHIVE",
+      "meaning": "archive cannot be parsed safely"
+    },
+    {
+      "class": "F13",
+      "code": "REFUSED_ABSOLUTE_ENTRY",
+      "meaning": "absolute entry path"
+    },
+    {
+      "class": "T15",
+      "code": "REFUSED_OVERSIZE",
+      "meaning": "payload over the declared bound"
+    },
+    {
+      "class": "T06",
+      "code": "REFUSED_DIGEST",
+      "meaning": "digest mismatch"
+    },
+    {
+      "class": "F16",
+      "code": "REFUSED_UNKNOWN_PROFILE",
+      "meaning": "profile not declared"
+    },
+    {
+      "class": "F16",
+      "code": "REFUSED_MISSING_SERVICE",
+      "meaning": "declared service missing"
+    },
+    {
+      "class": "F21",
+      "code": "REFUSED_INVALID_MANIFEST",
+      "meaning": "manifest invalid"
+    },
+    {
+      "class": "T19",
+      "code": "REFUSED_LATER_STAGE",
+      "meaning": "B6-I3 through B6-I9 remain locked"
+    },
+    {
+      "class": "T19",
+      "code": "REFUSED_CLOUD",
+      "meaning": "cloud is not authorized"
+    }
+  ],
+  "requirements": [
+    "B6-P0-SEC-03",
+    "B6-P0-SEC-04"
+  ],
+  "schema": "oce.block_06_i2.contract.v1",
+  "stage": "B6-I2",
+  "status": "FROZEN",
+  "template": {
+    "archive": "safe tar with traversal, symlink, absolute, malformed, oversize and digest refusals",
+    "cloud_dependency": false,
+    "emitted": [
+      "app.json",
+      "README.md",
+      "migrations/0001_init.sql",
+      "tests/test_app.py",
+      "telemetry.json",
+      "deploy.json"
+    ],
+    "start": "in-process validation of manifest, migrations, tests, telemetry and deployment declaration; no socket and no network"
+  },
+  "test_inventory": {
+    "collection_equals_execution": true,
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i2_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_templates.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_archive_safety.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_harness.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_determinism_and_compat.py",
+      "infrastructure/control-plane/tests/test_block_06_i2_evidence_and_cleanup.py"
+    ],
+    "node_total": 30,
+    "nodes": [
+      "test_block_06_i2_contract.py::test_inventory_equals_collection",
+      "test_block_06_i2_contract.py::test_contract_frozen_before_results",
+      "test_block_06_i2_contract.py::test_scope_binds_construction_sequence",
+      "test_block_06_i2_contract.py::test_locks_and_cost",
+      "test_block_06_i2_contract.py::test_allowed_and_forbidden_paths_declared",
+      "test_block_06_i2_templates.py::test_generated_app_starts_locally",
+      "test_block_06_i2_templates.py::test_template_declares_inherited_versions",
+      "test_block_06_i2_templates.py::test_deterministic_build_byte_identical",
+      "test_block_06_i2_templates.py::test_invalid_manifest_refused",
+      "test_block_06_i2_templates.py::test_template_readme_present",
+      "test_block_06_i2_templates.py::test_cloud_dependency_declared_absent",
+      "test_block_06_i2_archive_safety.py::test_path_traversal_refused",
+      "test_block_06_i2_archive_safety.py::test_symlink_escape_refused",
+      "test_block_06_i2_archive_safety.py::test_malformed_archive_refused",
+      "test_block_06_i2_archive_safety.py::test_absolute_entry_refused",
+      "test_block_06_i2_archive_safety.py::test_oversized_archive_refused",
+      "test_block_06_i2_archive_safety.py::test_digest_mismatch_refused",
+      "test_block_06_i2_harness.py::test_up_returns_endpoint_set",
+      "test_block_06_i2_harness.py::test_missing_service_refused",
+      "test_block_06_i2_harness.py::test_unknown_profile_refused",
+      "test_block_06_i2_harness.py::test_undeclared_network_call_refused",
+      "test_block_06_i2_harness.py::test_evidence_capture_deterministic",
+      "test_block_06_i2_harness.py::test_environment_fingerprint_stable",
+      "test_block_06_i2_determinism_and_compat.py::test_no_silent_latest",
+      "test_block_06_i2_determinism_and_compat.py::test_compat_rows_remain_unproven",
+      "test_block_06_i2_determinism_and_compat.py::test_private_symbol_not_stable",
+      "test_block_06_i2_determinism_and_compat.py::test_dirty_build_input_refused",
+      "test_block_06_i2_evidence_and_cleanup.py::test_manifest_hashes_recompute",
+      "test_block_06_i2_evidence_and_cleanup.py::test_cleanup_no_scratch_residue",
+      "test_block_06_i2_evidence_and_cleanup.py::test_prior_stage_artifacts_unchanged"
+    ],
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "conformance": {
+    "declaration_without_test": "UNPROVEN",
+    "default_state": "UNPROVEN",
+    "vocabulary": [
+      "PASS",
+      "FAIL",
+      "UNPROVEN",
+      "REFUSED"
+    ]
+  },
+  "document_id": "OCE-B6-I2-COMPAT-001",
+  "observed": {
+    "proven_rows": 0
+  },
+  "refusal": {
+    "rule": "an unknown version is refused; latest is never assumed",
+    "silent_latest": false,
+    "unknown_version": "REFUSED"
+  },
+  "rows": [
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "UNPROVEN",
+      "supported_to": "UNPROVEN",
+      "surface": "C1.S3"
+    },
+    {
+      "consumer_evidence": "none",
+      "discriminating_test": null,
+      "state": "UNPROVEN",
+      "supported_from": "UNPROVEN",
+      "supported_to": "UNPROVEN",
+      "surface": "C1.S4"
+    }
+  ],
+  "rows_total": 2,
+  "schema": "oce.block_06_i2.compat.v1",
+  "stage": "B6-I2",
+  "window": {
+    "from": "v1",
+    "to": "v1"
+  }
+}

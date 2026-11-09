@@ -1,0 +1,231 @@
+{
+  "document_id": "OCE-B6-I2-FAIL-001",
+  "failure_classes": [
+    {
+      "expected_refusal": "extraction refused",
+      "id": "F13",
+      "name": "path_traversal",
+      "negative_control": "plant the path_traversal condition and require F13 refusal",
+      "observable": "entry named",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "cause removed and rerun",
+      "refusal_code": "REFUSED_PATH_TRAVERSAL",
+      "stage": "B6-I2",
+      "trigger": "an archive entry escapes the root"
+    },
+    {
+      "expected_refusal": "extraction refused",
+      "id": "F14",
+      "name": "symlink_escape",
+      "negative_control": "plant the symlink_escape condition and require F14 refusal",
+      "observable": "link named",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "cause removed and rerun",
+      "refusal_code": "REFUSED_SYMLINK_ESCAPE",
+      "stage": "B6-I2",
+      "trigger": "a symlink points outside the root"
+    },
+    {
+      "expected_refusal": "build refused",
+      "id": "F15",
+      "name": "nondeterministic_build",
+      "negative_control": "plant the nondeterministic_build condition and require F15 refusal",
+      "observable": "differing files listed",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "cause removed and rerun",
+      "refusal_code": "REFUSED_NONDETERMINISTIC_BUILD",
+      "stage": "B6-I2",
+      "trigger": "two builds differ byte-wise"
+    },
+    {
+      "expected_refusal": "run refused",
+      "id": "F16",
+      "name": "hidden_network_call",
+      "negative_control": "plant the hidden_network_call condition and require F16 refusal",
+      "observable": "call site named",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "cause removed and rerun",
+      "refusal_code": "REFUSED_NETWORK",
+      "stage": "B6-I2",
+      "trigger": "a unit performs an undeclared network call"
+    },
+    {
+      "expected_refusal": "build refused",
+      "id": "F19",
+      "name": "dirty_build_input",
+      "negative_control": "plant the dirty_build_input condition and require F19 refusal",
+      "observable": "input listed",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "cause removed and rerun",
+      "refusal_code": "REFUSED_DIRTY_INPUT",
+      "stage": "B6-I2",
+      "trigger": "a build uses an unclean or untracked input"
+    },
+    {
+      "expected_refusal": "install refused",
+      "id": "F21",
+      "name": "malformed_archive",
+      "negative_control": "plant the malformed_archive condition and require F21 refusal",
+      "observable": "format error shown",
+      "proof_state": "BOUND_PENDING_EVIDENCE",
+      "recovery": "cause removed and rerun",
+      "refusal_code": "REFUSED_MALFORMED_ARCHIVE",
+      "stage": "B6-I2",
+      "trigger": "an archive cannot be parsed safely"
+    }
+  ],
+  "failure_classes_total": 6,
+  "policy": {
+    "cloud_refused": true,
+    "no_later_stage_pulled_forward": true,
+    "structural_parsing_required": true
+  },
+  "schema": "oce.block_06_i2.failures.v1",
+  "stage": "B6-I2",
+  "threats": [
+    {
+      "asset": "filesystem",
+      "attacker_capability": "crafted archive entry",
+      "id": "T01",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T01 adversarial fixture refused by the named boundary check",
+      "required_refusal": "reject entry",
+      "stage": "B6-I2",
+      "threat": "path traversal"
+    },
+    {
+      "asset": "filesystem",
+      "attacker_capability": "crafted symlink",
+      "id": "T02",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T02 adversarial fixture refused by the named boundary check",
+      "required_refusal": "reject link",
+      "stage": "B6-I2",
+      "threat": "symlink escape"
+    },
+    {
+      "asset": "build host",
+      "attacker_capability": "hostile archive",
+      "id": "T03",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T03 adversarial fixture refused by the named boundary check",
+      "required_refusal": "reject archive",
+      "stage": "B6-I2",
+      "threat": "malicious archive contents"
+    },
+    {
+      "asset": "artifact identity",
+      "attacker_capability": "serving a different artifact",
+      "id": "T06",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T06 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse on digest mismatch",
+      "stage": "B6-I2",
+      "threat": "package substitution"
+    },
+    {
+      "asset": "runtime",
+      "attacker_capability": "hostile payload",
+      "id": "T10",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T10 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse untyped decode",
+      "stage": "B6-I2",
+      "threat": "unsafe deserialization"
+    },
+    {
+      "asset": "runtime",
+      "attacker_capability": "import by attacker string",
+      "id": "T11",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T11 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse undeclared import",
+      "stage": "B6-I2",
+      "threat": "dynamic imports"
+    },
+    {
+      "asset": "runtime",
+      "attacker_capability": "unregistered plugin",
+      "id": "T12",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T12 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse uncertified plugin",
+      "stage": "B6-I2",
+      "threat": "plugin injection"
+    },
+    {
+      "asset": "host",
+      "attacker_capability": "executed payload",
+      "id": "T13",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T13 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse execution surface",
+      "stage": "B6-I2",
+      "threat": "arbitrary code execution"
+    },
+    {
+      "asset": "resources",
+      "attacker_capability": "oversized payload",
+      "id": "T15",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T15 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse over limit",
+      "stage": "B6-I2",
+      "threat": "unbounded inputs"
+    },
+    {
+      "asset": "availability",
+      "attacker_capability": "resource exhaustion",
+      "id": "T16",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T16 adversarial fixture refused by the named boundary check",
+      "required_refusal": "bound and quarantine",
+      "stage": "B6-I2",
+      "threat": "denial of service"
+    },
+    {
+      "asset": "evidence",
+      "attacker_capability": "unstable ordering or clock",
+      "id": "T17",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T17 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse differing rebuild",
+      "stage": "B6-I2",
+      "threat": "nondeterministic outputs"
+    },
+    {
+      "asset": "compatibility",
+      "attacker_capability": "outdated matrix",
+      "id": "T18",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "builder",
+      "planned_proof": "T18 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse unsupported claim",
+      "stage": "B6-I2",
+      "threat": "stale compatibility metadata"
+    },
+    {
+      "asset": "release",
+      "attacker_capability": "publish without hold release",
+      "id": "T19",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "operator",
+      "planned_proof": "T19 adversarial fixture refused by the named boundary check",
+      "required_refusal": "refuse publication",
+      "stage": "B6-I2",
+      "threat": "unauthorized publication"
+    }
+  ],
+  "threats_total": 13
+}
