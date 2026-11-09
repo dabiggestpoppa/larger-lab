@@ -40,5 +40,6 @@
     "no_new_skips_in_common": true
   },
   "schema": "oce.block_06_i0.paired_comparison_contract.v1",
-  "stage": "AUTHORIZED_STAGE=B6-I0"
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "status": "FROZEN"
 }
