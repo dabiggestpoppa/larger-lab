@@ -911,6 +911,8 @@ investigated and classified before freeze.
 decision). Reconciliation + P2R3 CLI typed-error + P2 CLI app tests pass 
 (34 tests). Regression green.
 
+**P2-R5R-T01 (adversarial + P3-R4 regression):** full `python -m pytest qcae/tests -q` -> **1375 passed, 0 failed** (39.94s). P3-R4 regression green (238 P3 tests in suite). Crash-after-lease invariant green (`test_crash_after_lease_resume_does_not_repeat_committed`). Exit gate blockers `[]`.
+
 ## Blockers
 
 None.
