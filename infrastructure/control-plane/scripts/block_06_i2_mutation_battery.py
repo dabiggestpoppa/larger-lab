@@ -26,8 +26,11 @@ TESTS = "infrastructure/control-plane/tests"
 FLOOR = 6
 
 MUTATIONS = [
-    ("M01", "path traversal check removed", ARCHIVE,
-     '    if any(part in ("..", ".") for part in parts):', "    if False:",
+    ("M01", "path traversal segments normalized instead of refused", ARCHIVE,
+     '    parts = path.split("/")\n'
+     '    if any(part in ("..", ".") for part in parts):\n'
+     '        refuse("REFUSED_PATH_TRAVERSAL", path)\n',
+     '    parts = [part for part in path.split("/") if part not in ("..", ".")]\n',
      f"{TESTS}/test_block_06_i2_archive_safety.py::test_path_traversal_refused"),
     ("M02", "symlink refusal removed", ARCHIVE,
      '        if entry["mode"] == "symlink":', "        if False:",
