@@ -76,6 +76,7 @@ __all__ = [
     "SemanticAuthority",
     "SemanticAuthorityRefusal",
     "parse_approval_manifest",
+    "pit_availability_refusal",
     "resolve_authority_inputs",
     "load_semantic_authority",
     "manifest_digest",
@@ -173,6 +174,12 @@ class AuthorityRefusal(_StrEnum):
     PROVENANCE_MISSING = "PROVENANCE_MISSING"
     #: A record's declared provenance contradicts the trusted authority.
     PROVENANCE_MISMATCH = "PROVENANCE_MISMATCH"
+    #: SENSOR-B5-I09P2e: the approval states neither availability field, so no
+    #: cutoff can be shown to postdate it; it is admissible at no instant.
+    PIT_AVAILABILITY_MISSING = "PIT_AVAILABILITY_MISSING"
+    #: SENSOR-B5-I09P2e: a date-only availability certifies a calendar day, not
+    #: an instant inside it, so a same-day intraday cutoff is ambiguous.
+    INTRADAY_PIT_AMBIGUOUS = "INTRADAY_PIT_AMBIGUOUS"
 
 
 class SemanticAuthorityRefusal(ValueError):
@@ -182,6 +189,60 @@ class SemanticAuthorityRefusal(ValueError):
         self.refusal = refusal
         self.detail = detail
         super().__init__(f"{refusal.value}: {detail}")
+
+
+def pit_availability_refusal(
+    *,
+    available_at: str | None,
+    available_at_instant: str | None,
+    evaluation_at: datetime | date | None,
+) -> AuthorityRefusal | None:
+    """The ONE point-in-time availability rule for approval admissibility.
+
+    SENSOR-B5-I09P2e: the record-level verifiers refused an approval that states
+    no availability at all, and refused a date-only approval on its own day,
+    while :func:`verify_mapping_provenance` admitted both (P2dR1 F02).  Every PIT
+    verification entry point now calls this function, so a caller cannot obtain
+    the weaker answer by choosing a different public verifier.
+
+    The rule, in order:
+
+    * no cutoff -> ``None``: approval authentication alone is not a point-in-time
+      claim, and the loader already refuses to project an approval that HAS
+      availability without a cutoff;
+    * an instant-precise basis is ordered against an offset-aware cutoff, and
+      equality is admissible because the approval is operative at that instant;
+    * a date-only basis certifies a calendar day, not an instant inside it, so a
+      same-day intraday cutoff is ambiguous and refuses while a later day passes;
+    * a bare-date cutoff keeps the frozen date-granular contract;
+    * neither field -> the approval is admissible at no instant.
+    """
+    if evaluation_at is None:
+        return None
+    if available_at_instant is not None:
+        if (
+            not isinstance(evaluation_at, datetime)
+            or evaluation_at.tzinfo is None
+            or evaluation_at.utcoffset() is None
+        ):
+            return AuthorityRefusal.EVALUATION_TIME_REQUIRED
+        if evaluation_at < _parse_offset_instant(available_at_instant):
+            return AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE
+        return None
+    if available_at is not None:
+        day = date.fromisoformat(available_at)
+        if isinstance(evaluation_at, datetime):
+            if evaluation_at.tzinfo is None or evaluation_at.utcoffset() is None:
+                return AuthorityRefusal.EVALUATION_TIME_REQUIRED
+            if evaluation_at.date() < day:
+                return AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE
+            if evaluation_at.date() == day:
+                return AuthorityRefusal.INTRADAY_PIT_AMBIGUOUS
+            return None
+        if evaluation_at < day:
+            return AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE
+        return None
+    return AuthorityRefusal.PIT_AVAILABILITY_MISSING
 
 
 def _reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -883,6 +944,18 @@ def verify_mapping_provenance(
             refusal,
             "the approved row is not attested by the trusted root; the record "
             "claims an admission the approval does not cover",
+        )
+    availability = pit_availability_refusal(
+        available_at=authority.available_at,
+        available_at_instant=authority.available_at_instant,
+        evaluation_at=evaluation_at,
+    )
+    if availability is not None:
+        raise SemanticAuthorityRefusal(
+            availability,
+            "the approval does not support a point-in-time admission at the "
+            "evaluated instant; the record-level verifiers apply this same rule, "
+            "so no public verifier answers differently (SENSOR-B5-I09P2e)",
         )
 
 

@@ -409,6 +409,10 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
         # PIT-fail-closure security suite is a distinct checkpoint file under
         # the same authority prefix family, admitted by its own named entry.
         "tests/crypto_sensor_fabric/normalization/test_b5_i09p2d_",
+        # DISCLOSED SENSOR-B5-I09P2e: the PIT entry-parity probe suite is a
+        # distinct checkpoint file under the same authority prefix family, so it
+        # is admitted by its own named entry rather than by widening a prefix.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2e_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
         "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
         # DISCLOSED B5-I11R1 (independent audit): the audit suite is a

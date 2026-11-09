@@ -9003,3 +9003,65 @@ ratified; research frozen. This closes one of the audit's two blocking findings 
 entry-parity and enforcing-consumer boundaries remain open for the next implementation
 checkpoint. Evidence: BLOC_05_I09P2DR2_ENVIRONMENT_RECOVERY_EVIDENCE.md. Independent P2dR1
 re-audit against this commit is Agent 2's, not this agent's; no self-ratification.
+
+## 199 - SENSOR-B5-I09P2e: PIT ENTRY PARITY AND TRUST-CONSUMER CONTRACT SPECIFICATION
+
+Branch agent/crypto-sensor-fabric-pit-parity (isolated worktree) from
+f199a7e3f7d92ce555fb436343d24bd42907c3a8; primary branch not modified.
+
+ENVIRONMENT, disclosed before results: the volume was near full after a prior canonical
+run, so isolation used a sparse checkout, and the checkout carried core.autocrlf=true,
+which rewrote committed bytes on checkout (1005 of 1054 materialised files differed from
+their blobs). That alone breaks the pinned manifest hash and is not a code defect;
+core.autocrlf was set false for the repository and the pinned artifacts re-materialised
+from their blobs before anything was measured.
+
+RECONSTRUCTION: verify_trade_record and verify_liquidation_record already fail closed on
+approval availability through _assert_intraday_pit, while verify_mapping_provenance --
+and verify_liquidation_admission_provenance by delegation -- applied no availability rule
+at all, and load_semantic_authority as a date-granular loader admits a same-day intraday
+cutoff and admits silently when neither availability field exists.
+
+RED, before any source change: the new probe suite
+test_b5_i09p2e_pit_entry_parity.py reproduced 11 failures of 24 against the base -- an
+availability-less approval verified clean at any cutoff, a date-only approval verified
+clean at 00:30/09:30/15:30/23:30 on its own day, a naive cutoff verified clean, and the
+liquidation entry point agreed with the mapping entry point in admitting both.
+
+REPAIR, minimal and shared: authority.pit_availability_refusal() now owns the rule, with
+new closed refusals PIT_AVAILABILITY_MISSING and INTRADAY_PIT_AMBIGUOUS;
+verify_mapping_provenance calls it after attests; verify_liquidation_admission_provenance
+inherits it by delegation; and the record layer's _assert_intraday_pit now delegates to
+the same function and only translates the refusal, so the two layers cannot drift apart.
+The loader stays date-granular deliberately: a generic loader call is not a point-in-time
+decision, and that boundary is pinned by test_p2e_16. Diff: authority +73 lines,
+verification.py +41/-26, committed line endings preserved.
+
+GREEN: 24/24 parity probes; 139 passed across the P2a-P2d suites; 4 governance binding
+tests after the mechanical republish; 30 passed in the I05 scope audit; the I10 scope
+audit admits the new suite by its own named entry, matching the per-checkpoint pattern
+every prior checkpoint used (no prefix widened).
+
+GOVERNANCE INVENTORY: one new tracked Python file moves the count 1095 -> 1096, so the
+artifact was regenerated through UPDATE_I11R2_EVIDENCE=1 -- exactly one line changed, all
+predicates, allowlists, hit sets, row verdicts and frozen pins byte-identical, and a
+no-override rerun is byte-stable. No hand edit.
+
+SPECIFICATION: BLOC_05_I09P2E_TRUST_CONSUMER_CONTRACT.md states, without building any of
+it, the four mandatory inspections of a RecordVerification, revalidation of copied or
+deserialised verdicts, the distinction between approved economic field binding and record
+authenticity, rebinding of verified bytes at consumption, the separation of PIT
+admissibility from I05 replay eligibility, and the permanence of unverified acquisition
+lineage.
+
+NOT RUN, disclosed: the full canonical universe. Agent 2 holds priority for the
+independent regression of f199a7e3, and a sparse checkout cannot host the
+evidence-determinism and regeneration-byte tests honestly (they hash the working tree, so
+a sparse tree reports committed_bytes_mismatch for environmental reasons). Those failures
+are recorded as environment-limited, not adjudicated, and must be re-run in a full
+checkout before merge.
+
+NONINTERFERENCE: no ingestion application, initializer, custody service, provider
+approval, liquidation transformation, manifest change, I05 replay change, I11/I12/Bloc 6
+advance, or primary-branch write. INTEGRATION_STATE remains INTEGRATION_REQUIRED. No
+self-ratification; independent review required before merge.

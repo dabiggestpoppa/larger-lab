@@ -53,7 +53,7 @@ specified and tested, not deployed.
 
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import datetime
 from enum import Enum
 from typing import Any, Protocol, runtime_checkable
 
@@ -68,6 +68,7 @@ from ..authority import (
     manifest_digest,
     SemanticAuthorityRefusal,
     load_trusted_authority,
+    pit_availability_refusal,
 )
 from ..common.methodologies import NormalizationMethodologyRegistry
 from ..common.semantic_registry import ProviderSemanticMapping
@@ -555,35 +556,49 @@ def _require_cutoff(knowledge_cutoff: datetime | None) -> None:
 def _assert_intraday_pit(
     authority: SemanticAuthority, knowledge_cutoff: datetime | None
 ) -> None:
-    """Fail closed on ambiguous availability, at instant precision."""
-    instant = getattr(authority, "available_at_instant", None)
-    assert knowledge_cutoff is not None  # _require_cutoff has already run
-    if instant is not None:
-        available = datetime.fromisoformat(str(instant).replace("Z", "+00:00"))
-        if knowledge_cutoff < available:
-            raise RecordVerificationError(
-                RecordVerificationRefusal.APPROVAL_NOT_YET_AVAILABLE,
-                f"the approval became operative at {instant}, after the evaluated "
-                f"instant {knowledge_cutoff.isoformat()}",
-            )
+    """Apply the ONE shared PIT availability rule (SENSOR-B5-I09P2e).
+
+    P2d implemented this rule here, at the record layer, while
+    ``verify_mapping_provenance`` had no equivalent, so an approval carrying no
+    availability stayed admissible through the mapping entry point (P2dR1 F02).
+    The rule now lives in the authority module and every PIT verification entry
+    point calls it; this function only translates the refusal into the record
+    vocabulary, so the two layers cannot drift apart again.
+    """
+    refusal = pit_availability_refusal(
+        available_at=getattr(authority, "available_at", None),
+        available_at_instant=getattr(authority, "available_at_instant", None),
+        evaluation_at=knowledge_cutoff,
+    )
+    if refusal is None:
         return
-    available_date = getattr(authority, "available_at", None)
-    if available_date is None:
-        raise RecordVerificationError(
-            RecordVerificationRefusal.PIT_AVAILABILITY_MISSING,
+    mapped = _map_refusal(refusal)
+    if mapped is RecordVerificationRefusal.APPROVAL_NOT_YET_AVAILABLE:
+        detail = (
+            "the approval became operative at "
+            f"{getattr(authority, 'available_at_instant', None) or getattr(authority, 'available_at', None)}"
+            f", after the evaluated instant {knowledge_cutoff.isoformat()}"
+        )
+    elif mapped is RecordVerificationRefusal.INTRADAY_PIT_AMBIGUOUS:
+        detail = (
+            "the approval states only the date "
+            f"{getattr(authority, 'available_at', None)}; it cannot certify an "
+            "instant on that same day (SENSOR-B5-I09P2bR1 F4). Verification "
+            "requires a later day or an instant-precise availability"
+        )
+    elif mapped is RecordVerificationRefusal.PIT_AVAILABILITY_MISSING:
+        detail = (
             "the approval states neither available_at nor available_at_instant, so "
-            "no cutoff can be shown to postdate it; an approval with no availability "
-            "is admissible at no instant (P2cR1 F-R1-04)",
+            "no cutoff can be shown to postdate it; an approval with no "
+            "availability is admissible at no instant (P2cR1 F-R1-04)"
         )
-    if knowledge_cutoff.date() <= date.fromisoformat(str(available_date)):
-        raise RecordVerificationError(
-            RecordVerificationRefusal.INTRADAY_PIT_AMBIGUOUS,
-            f"the approval states only the date {available_date}; it cannot "
-            "certify an instant on that same day, and the previous checkpoint "
-            "truncated the cutoff to a date and admitted 09:00 and 15:00 "
-            "(SENSOR-B5-I09P2bR1 F4). Verification requires a later day or an "
-            "instant-precise availability",
+    else:
+        detail = (
+            "an instant-precise availability requires an offset-aware evaluation "
+            "instant; a bare date or a naive datetime is refused rather than "
+            "assumed to be UTC midnight"
         )
+    raise RecordVerificationError(mapped, detail)
 
 
 def _custody_verified(
