@@ -34,12 +34,14 @@ ALLOWED_PREFIXES = (
     f"{TESTS}/test_block_06_i2_",
     f"{TESTS}/stage_scope/test_block_06_i2_",
     f"{TESTS}/test_block_06_i0_stage_contract.py",
+    f"{TESTS}/test_block_06_i1_authority_and_boundary.py",
     f"{SCRIPTS}/block_06_stage_scope.py",
     f"{SCRIPTS}/block_06_i0_validate.py",
     f"{SCRIPTS}/block_06_i1_validate.py",
     f"{TESTS}/stage_scope/test_i0_stage_scope_amendment_controls.py",
     ".github/workflows/block-06-i2-validation.yml",
     ".github/workflows/block-06-i2-paired-comparison.yml",
+    ".github/workflows/block-06-i1-validation.yml",
     "oce/templates/", "oce/harness/",
 )
 FORBIDDEN_PREFIXES = (
@@ -47,7 +49,6 @@ FORBIDDEN_PREFIXES = (
     "infrastructure/control-plane/src/", "infrastructure/console/src/",
     f"{DOCS}/OCE_BLOCK_06_P0_", f"{DOCS}/OCE_BLOCK_06_I0_", f"{DOCS}/OCE_BLOCK_06_I1_",
     "oce/api/", "oce/sdk/", "oce/compat/",
-    ".github/workflows/block-06-i0-", ".github/workflows/block-06-i1-",
 )
 FORBIDDEN_TOKENS = ("B6_I2_RATIFIED", "B6_I2_MERGED", "PACKAGE_PUBLISHED",
                     "BOOK_6_COMPLETE = true", "MERGE_AUTHORIZED = true")
