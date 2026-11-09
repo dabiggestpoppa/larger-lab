@@ -71,7 +71,7 @@ def probe(shared):
 
 def test_pristine_later_stage_head_passes(probe):
     rc, fails, doc = run(probe)
-    assert doc["stage_scope"]["resolved"] == "later"
+    assert doc["stage_scope"]["resolved"] in ("later", "i2")
     assert rc == 0 and fails == set() and doc["status"] == "PASS"
 
 
@@ -128,7 +128,7 @@ def test_unlisted_oce_path_fails(probe):
 
 
 def test_later_stage_artifact_fails(probe):
-    later = probe / DOCS_REL / "OCE_BLOCK_06_I2_SCOPE_DERIVATION_v1.0.json"
+    later = probe / DOCS_REL / "OCE_BLOCK_06_I3_SCOPE_DERIVATION_v1.0.json"
     later.write_text("{}\n", encoding="utf-8")
     commit(probe)
     _, fails, _ = run(probe)

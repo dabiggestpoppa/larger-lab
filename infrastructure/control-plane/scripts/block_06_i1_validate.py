@@ -52,6 +52,9 @@ FORBIDDEN_TOKENS = ("B6_I1_RATIFIED", "B6_I1_MERGED", "PACKAGE_PUBLISHED",
                     "BOOK_6_COMPLETE = true", "MERGE_AUTHORIZED = true")
 LEDGER_TOKENS = ("B6I1", "G16", "B5I8-DF05", "PASS", "READY_FOR_OPERATOR_REVIEW",
                  "NOT MERGE AUTHORIZED")
+I1_HEAD = "96e3b81714321f4eea7abcb300ef471e93be0962"
+# Set only by --stage-scope auto when a committed B6-I2 identity is present.
+I2_PREFIXES: tuple = ()
 
 
 def canonical(obj) -> bytes:
@@ -199,8 +202,14 @@ def check_manifest(c: Checker) -> None:
 def check_boundary(c: Checker) -> None:
     changed = [p for p in git(c.root, "diff", "--name-only", f"{BASE_SHA}..HEAD").splitlines() if p]
     c.need("boundary/changed", bool(changed), changed)
-    outside = [p for p in changed if not p.startswith(ALLOWED_PREFIXES)]
+    allowed = tuple(ALLOWED_PREFIXES) + tuple(I2_PREFIXES)
+    outside = [p for p in changed if not p.startswith(allowed)]
     c.need("boundary/only_allowed_paths", not outside, outside)
+    if I2_PREFIXES:
+        frozen = [p for p in git(c.root, "diff", "--name-only", f"{I1_HEAD}..HEAD",
+                                 "--", DOCS).splitlines()
+                  if "OCE_BLOCK_06_I1_" in p or "OCE_BLOCK_06_I0_" in p]
+        c.need("boundary/prior_packets_frozen", not frozen, frozen)
     blocked = [p for p in changed
                if p.startswith(FORBIDDEN_PREFIXES) and p not in AMENDMENT_SURFACES]
     c.need("boundary/no_prohibited_surface", not blocked, blocked)
@@ -235,8 +244,20 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--root", default=None)
     ap.add_argument("--json", default=None)
+    ap.add_argument("--stage-scope", default="i1", choices=("i1", "auto"))
     args = ap.parse_args(argv)
     root = pathlib.Path(args.root).resolve() if args.root else pathlib.Path(__file__).resolve().parents[3]
+    global I2_PREFIXES
+    I2_PREFIXES = ()
+    if args.stage_scope == "auto":
+        sys.path.insert(0, str(root / "infrastructure/control-plane/scripts"))
+        import block_06_stage_scope as stage_scope  # noqa: PLC0415
+        resolved = stage_scope.resolve(root, "auto")
+        if resolved.get("mode") == "i2":
+            registration = json.loads((root / DOCS /
+                                       "OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json")
+                                      .read_text(encoding="utf-8"))
+            I2_PREFIXES = tuple(registration["this_stage"]["allowed_prefixes"])
     c = Checker(root)
     for check in (check_packet, check_api, check_compat, check_registry, check_failures,
                   check_manifest, check_boundary, check_locks_and_text):

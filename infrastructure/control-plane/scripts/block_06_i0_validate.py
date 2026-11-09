@@ -473,12 +473,13 @@ def check_boundary(c: Checker, scope: dict) -> None:
     if not (c.root / ".git").exists():
         c.ok("git/skipped_scratch_root")
         return
-    if scope.get("mode") == "later":
+    if scope.get("mode") in ("later", "i2"):
         allowed = tuple(dict.fromkeys(tuple(ALLOWED_PREFIXES) + tuple(scope["allowed"])))
         i1_allowed = tuple(scope["i1_allowed"])
         amendment = set(scope["amendment"])
         code, base = git(c, ["rev-parse", "origin/main"])
-        c.need("git/base", code == 0 and base == stage_scope.I0_MERGE, base)
+        expected_base = scope.get("i0_merge", stage_scope.I0_MERGE)
+        c.need("git/base", code == 0 and base == expected_base, base)
         code, out = git(c, ["diff", "--name-only", f"{BASE_SHA}..HEAD"])
         changed = [x for x in out.splitlines() if x.strip()]
         c.need("boundary/changed", bool(changed), changed)
@@ -592,7 +593,7 @@ def check_no_implementation(c: Checker, scope: dict) -> None:
     if not (c.root / ".git").exists():
         c.ok("impl/skipped_scratch_root")
         return
-    if scope.get("mode") == "later":
+    if scope.get("mode") in ("later", "i2"):
         i1_allowed = tuple(scope["i1_allowed"])
         code, out = git(c, ["diff", "--name-only", "--diff-filter=A", f"{BASE_SHA}..HEAD"])
         added = [f for f in out.splitlines() if f.strip()]
@@ -602,7 +603,9 @@ def check_no_implementation(c: Checker, scope: dict) -> None:
         rogue = [f for f in added if f.startswith(("oce/", "infrastructure/control-plane/src/"))
                  and not f.startswith(i1_allowed)]
         c.need("impl/no_book6_modules", not rogue, rogue)
-        later = [f for f in added if any(f"block_06_i{i}" in f for i in range(2, 10))]
+        first_later = 3 if scope.get("mode") == "i2" else 2
+        later = [f for f in added
+                 if any(f"block_06_i{i}" in f for i in range(first_later, 10))]
         c.need("impl/no_later_stage_modules", not later, later)
         code, files = git(c, ["ls-files"])
         c.need("impl/tracked_paths_stable", bool(files.strip()), "empty inventory")
