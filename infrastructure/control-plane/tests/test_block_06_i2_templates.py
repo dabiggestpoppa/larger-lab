@@ -80,4 +80,4 @@ def test_cloud_dependency_declared_absent(tmp_path: pathlib.Path) -> None:
     app_path.write_text(json.dumps(app, sort_keys=True, indent=2) + "\n", encoding="utf-8")
     with pytest.raises(refusals.Refused) as exc:
         skeleton.start(tmp_path / "app")
-    assert exc.value.code == "REFUSED_CLOUD_DEPENDENCY"
+    assert exc.value.code == "REFUSED_CLOUD"

@@ -50,7 +50,7 @@ def test_malformed_archive_refused(tmp_path: pathlib.Path) -> None:
 
 def test_absolute_entry_refused(tmp_path: pathlib.Path) -> None:
     for bad in ("/etc/passwd", "\\windows\\x", "C:/tmp/x"):
-        assert code(archive.validate, manifest([entry(bad)])).code == "REFUSED_ABSOLUTE_PATH"
+        assert code(archive.validate, manifest([entry(bad)])).code == "REFUSED_ABSOLUTE_ENTRY"
 
 
 def test_oversized_archive_refused(tmp_path: pathlib.Path) -> None:
@@ -64,7 +64,7 @@ def test_oversized_archive_refused(tmp_path: pathlib.Path) -> None:
 def test_digest_mismatch_refused(tmp_path: pathlib.Path) -> None:
     doc = manifest([entry("app.txt")])
     doc["payload_digest"] = "0" * 64
-    assert code(archive.validate, doc).code == "REFUSED_DIGEST_MISMATCH"
+    assert code(archive.validate, doc).code == "REFUSED_DIGEST"
     good = skeleton.manifest()
     assert archive.install(good, tmp_path / "dest")["installed"] == 6
     assert code(archive.install, good, tmp_path / "dest").code == "REFUSED_DIRTY_INPUT"

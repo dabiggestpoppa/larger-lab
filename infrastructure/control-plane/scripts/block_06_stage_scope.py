@@ -137,8 +137,10 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
     prefixes = tuple(this.get("allowed_prefixes") or ())
     if not prefixes or "oce/templates/" not in prefixes or "oce/harness/" not in prefixes:
         raise StageScopeError("stage/identity_unknown", "B6-I2 registration declares no authority")
-    for label, head in (("I0", I0_HEAD), ("I1", I1_HEAD)):
-        code, diff = _git(root, "diff", "--name-only", f"{head}..HEAD", "--", DOCS)
+    # The B6-I1 ratification head is the frozen baseline for both prior packets: the B6-I0
+    # amendment was legitimately revised at B6-I1, so I0_HEAD is not the immutable baseline.
+    for label in ("I0", "I1"):
+        code, diff = _git(root, "diff", "--name-only", f"{I1_HEAD}..HEAD", "--", DOCS)
         if code != 0:
             raise StageScopeError("stage/identity_missing", f"cannot compare {label} packet")
         frozen = [line for line in diff.splitlines()
@@ -147,7 +149,12 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
             raise StageScopeError("stage/identity_tampered", frozen)
     _reject_later_artifacts(root)
     allowed = tuple(dict.fromkeys(prefixes + I2_PINNED))
+    i1_scope = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
+    i1_owned = tuple(i1_scope.get("allowed_paths") or ())
     i2_owned = tuple(p for p in allowed if p.startswith("oce/"))
+    # The I0 validator's later-stage mode treats this as the complete oce authority of the stage
+    # chain, so the B6-I1 surfaces stay admitted and only the I2 surfaces are added.
+    oce_authority = tuple(dict.fromkeys(i1_owned + i2_owned))
     return {
         "mode": "i2",
         "requested": "auto",
@@ -161,7 +168,7 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
             "i1_merge": I1_MERGE,
         },
         "allowed": allowed,
-        "i1_allowed": i2_owned,
+        "i1_allowed": oce_authority,
         "amendment": I2_PINNED,
         "i0_merge": I1_MERGE,
     }

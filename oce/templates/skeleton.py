@@ -130,7 +130,7 @@ def start(dest) -> dict:
     deploy = json.loads((root / "deploy.json").read_text(encoding="utf-8"))
     telemetry = json.loads((root / "telemetry.json").read_text(encoding="utf-8"))
     if app.get("cloud") is not False or deploy.get("requires_cloud") is not False:
-        refuse("REFUSED_CLOUD_DEPENDENCY", "app declares a cloud requirement")
+        refuse("REFUSED_CLOUD", "app declares a cloud requirement")
     if telemetry.get("network") is not False:
         refuse("REFUSED_NETWORK", "telemetry declares a network sink")
     if deploy.get("publication") != "NOT_AUTHORIZED":

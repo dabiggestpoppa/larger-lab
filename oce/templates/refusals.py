@@ -6,22 +6,25 @@ Bounds are frozen here so the archive and harness cannot drift apart.
 """
 from __future__ import annotations
 
+# The first fourteen codes are the frozen contract vocabulary; the last two are implementation
+# detail for version refusal and duplicate-entry refusal, which the contract folds into F21.
 CODES = (
-    "REFUSED_INVALID_MANIFEST",
-    "REFUSED_MALFORMED_ARCHIVE",
-    "REFUSED_UNKNOWN_VERSION",
     "REFUSED_PATH_TRAVERSAL",
     "REFUSED_SYMLINK_ESCAPE",
-    "REFUSED_ABSOLUTE_PATH",
-    "REFUSED_DUPLICATE_ENTRY",
-    "REFUSED_OVERSIZE",
-    "REFUSED_DIGEST_MISMATCH",
-    "REFUSED_DIRTY_INPUT",
     "REFUSED_NONDETERMINISTIC_BUILD",
-    "REFUSED_CLOUD_DEPENDENCY",
+    "REFUSED_NETWORK",
+    "REFUSED_DIRTY_INPUT",
+    "REFUSED_MALFORMED_ARCHIVE",
+    "REFUSED_ABSOLUTE_ENTRY",
+    "REFUSED_OVERSIZE",
+    "REFUSED_DIGEST",
     "REFUSED_UNKNOWN_PROFILE",
     "REFUSED_MISSING_SERVICE",
-    "REFUSED_NETWORK",
+    "REFUSED_INVALID_MANIFEST",
+    "REFUSED_LATER_STAGE",
+    "REFUSED_CLOUD",
+    "REFUSED_UNKNOWN_VERSION",
+    "REFUSED_DUPLICATE_ENTRY",
 )
 
 MAX_ENTRIES = 256

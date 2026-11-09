@@ -424,14 +424,18 @@ def main(argv=None) -> int:
                      "sha256": hashlib.sha256(raw).hexdigest(),
                      "bytes": len(raw)})
     code = []
-    if args.head:
-        for rel in CODE_PATHS:
+    for rel in CODE_PATHS:
+        if args.head:
             proc = subprocess.run(["git", "show", f"{args.head}:{rel}"],
                                   capture_output=True)
-            if proc.returncode == 0:
-                code.append({"path": rel,
-                             "sha256": hashlib.sha256(proc.stdout).hexdigest(),
-                             "bytes": len(proc.stdout)})
+            data = proc.stdout if proc.returncode == 0 else None
+        else:
+            path = pathlib.Path(rel)
+            data = path.read_bytes() if path.is_file() else None
+        if data is not None:
+            code.append({"path": rel,
+                         "sha256": hashlib.sha256(data).hexdigest(),
+                         "bytes": len(data)})
     manifest = {
         "schema": "oce.block_06_i2.manifest.v1",
         "document_id": "OCE-B6-I2-MANIFEST-001",

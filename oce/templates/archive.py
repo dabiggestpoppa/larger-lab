@@ -42,7 +42,7 @@ def _check_path(path: object) -> str:
     if len(path) > MAX_PATH_CHARS:
         refuse("REFUSED_OVERSIZE", f"entry path longer than {MAX_PATH_CHARS}")
     if path.startswith("/") or path.startswith("\\") or ":" in path.split("/")[0]:
-        refuse("REFUSED_ABSOLUTE_PATH", path)
+        refuse("REFUSED_ABSOLUTE_ENTRY", path)
     if "\\" in path:
         refuse("REFUSED_PATH_TRAVERSAL", f"backslash separator: {path}")
     parts = path.split("/")
@@ -94,7 +94,7 @@ def validate(manifest: object) -> list:
     if total > MAX_TOTAL_BYTES:
         refuse("REFUSED_OVERSIZE", f"archive is {total} bytes")
     if manifest["payload_digest"] != payload_digest(checked):
-        refuse("REFUSED_DIGEST_MISMATCH", manifest["payload_digest"])
+        refuse("REFUSED_DIGEST", manifest["payload_digest"])
     return checked
 
 

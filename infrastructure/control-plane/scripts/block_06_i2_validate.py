@@ -110,8 +110,14 @@ def check_packet(c: Checker) -> None:
            contract["template"]["cloud_dependency"] is False)
     c.need("contract/harness", contract["harness"]["opens_sockets"] is False
            and contract["harness"]["refuses_undeclared_network_calls"] is True)
-    c.need("contract/refusal_codes", {row["class"] for row in contract["refusals"]}
-           == {"F13", "F14", "F15", "F16", "F19", "F21"})
+    c.need("contract/refusal_classes", {row["class"] for row in contract["refusals"]}
+           >= {"F13", "F14", "F15", "F16", "F19", "F21"})
+    sys.path.insert(0, str(c.root))
+    from oce.templates import refusals  # noqa: PLC0415
+    declared_codes = {row["code"] for row in contract["refusals"]}
+    c.need("contract/refusal_codes_bound", declared_codes <= set(refusals.CODES),
+           sorted(declared_codes - set(refusals.CODES)))
+    c.need("contract/refusal_codes_unique", len(declared_codes) == len(contract["refusals"]))
 
 
 def check_api(c: Checker) -> None:
@@ -232,8 +238,10 @@ def check_boundary(c: Checker) -> None:
     c.need("boundary/only_allowed_paths", not outside, outside)
     blocked = [p for p in changed if p.startswith(FORBIDDEN_PREFIXES)]
     c.need("boundary/no_prohibited_surface", not blocked, blocked)
-    for label, head in (("i0", I0_HEAD), ("i1", I1_HEAD)):
-        code, diff = git(c.root, "diff", "--name-only", f"{head}..HEAD", "--", DOCS)
+    # Both prior packets are frozen at the B6-I1 ratification head; the I0 amendment was amended
+    # there, so I0_HEAD is not the immutable baseline.
+    for label in ("i0", "i1"):
+        code, diff = git(c.root, "diff", "--name-only", f"{I1_HEAD}..HEAD", "--", DOCS)
         frozen = [line for line in diff.splitlines()
                   if f"OCE_BLOCK_06_{label.upper()}_" in line]
         c.need(f"boundary/{label}_packet_frozen", not frozen, frozen)
