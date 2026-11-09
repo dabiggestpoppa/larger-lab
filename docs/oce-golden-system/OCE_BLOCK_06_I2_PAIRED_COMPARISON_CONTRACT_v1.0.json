@@ -1,0 +1,47 @@
+{
+  "schema": "oce.block_06_i2.paired_contract.v1",
+  "document_id": "OCE-B6-I2-PAIRED-001",
+  "stage": "B6-I2",
+  "status": "FROZEN",
+  "endpoints": {
+    "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
+    "base_tree": "c6638bde3e9c8f71482f4d96fde42d0484d9a624",
+    "head_sha": "4eb14659c32cb295f294f2573f23a1693d402e5b",
+    "head_tree": "8e05020aba4791f02583b8e1ba3bb3b678a5d715"
+  },
+  "population": {
+    "common_floor": 208,
+    "head_only_expected": 30,
+    "base_only_expected": 0,
+    "common_files_base": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
+    "common_files_head": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
+    "head_only_files": "infrastructure/control-plane/tests/test_block_06_i2_*.py"
+  },
+  "setup": {
+    "python_version": "3.12",
+    "install": "pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt",
+    "identical_setup_both_endpoints": true,
+    "clean_isolated_clones": true
+  },
+  "fail_closed_on": [
+    "contract_not_frozen",
+    "endpoint_identity_mismatch",
+    "zero_common_nodes",
+    "common_below_floor",
+    "base_only_nodes",
+    "common_regression",
+    "new_skip_on_common_node",
+    "head_only_count_mismatch",
+    "head_only_not_green",
+    "duplicate_node_ids",
+    "overlapping_sets",
+    "cleanup_failure"
+  ],
+  "locks": {
+    "B6-I3_through_I9": "LOCKED",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cost_usd": 0,
+    "capital_authority": "none"
+  }
+}
