@@ -72,7 +72,7 @@ def baseline_action_for_step(step) -> str:
 class StepAuthorityVerdict(SerializableRecord):
     """Typed result of one step-authority evaluation (13.2 decision record)."""
 
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
 
     step_id: str
     job_id: str
@@ -92,25 +92,43 @@ class StepAuthorityVerdict(SerializableRecord):
 
     #: The step's declared requirement, verbatim ("" when undeclared).
     requirement: str = ""
+    #: Live budget context for this evaluation (P2-R5R §12: budget is part
+    #: of the binding; a verdict without a budget is incomplete and can never
+    #: admit a grant under the strengthened law).
+    budget_ref: str = ""
 
     _COERCIONS = {
         "decision": lambda v: coerce_enum(v, StepAuthorityDecision),
     }
 
-    def binding_digest(self) -> str:
-        """Digest of the authority binding this verdict admits.
+    def approval_binding(self):
+        """The live canonical ApprovalBinding this verdict authorizes.
 
-        principal -> action -> resource -> scope, verbatim.
-        Used to detect stale grants whose binding no longer matches the
-        live verdict (P2-R5-C03: live binding digest must equal approved
-        binding digest before any grant consumption).
+        Provider-neutral: imported from ``qcae.core`` (the orchestrator never
+        imports ``qcae.governance.standalone``).
         """
-        import hashlib
+        from qcae.core.approval_binding import ApprovalBinding
 
-        material = (
-            f"{self.principal}|{self.action}|{self.resource}|{self.scope}"
-        ).encode("utf-8")
-        return hashlib.sha256(material).hexdigest()
+        return ApprovalBinding(
+            principal=self.principal,
+            action=self.action,
+            resource=self.resource,
+            scope=self.scope,
+            budget_ref=self.budget_ref,
+            authority_requirement=self.requirement,
+            policy_version=self.policy_version,
+            constraints=tuple(self.constraints),
+        )
+
+    def binding_digest(self) -> str:
+        """Digest of the full live authority binding (P2-R5R §10).
+
+        Canonical ApprovalBinding serialization over the seven semantic
+        fields (principal/action/resource/scope/budget/requirement/policy
+        version + constraints). A stale grant whose binding no longer
+        matches the live verdict refuses admission WITHOUT consumption.
+        """
+        return self.approval_binding().binding_digest()
 
     def validate(self) -> None:
         require_identifier(self.step_id, "step_id")
@@ -215,19 +233,21 @@ class FailClosedStepAuthorityGate:
     policy_version = "fail-closed"
 
     def evaluate_step_authority(self, step, job, *, worker_id: str) -> StepAuthorityVerdict:
+        _scope = job.authority_context_ref or f"job:{job.job_id}"
         return StepAuthorityVerdict(
             step_id=step.step_id,
             job_id=job.job_id,
             principal=worker_id,
             action=baseline_action_for_step(step),
             resource=job.subject_ref,
-            scope=job.authority_context_ref or f"job:{job.job_id}",
+            scope=_scope,
             decision=StepAuthorityDecision.DENY,
             decision_ref="fail-closed:no-gate-configured",
             policy_version=self.policy_version,
             evaluated_at=step.created_at or "1970-01-01T00:00:00Z",
             reason="no authority provider configured; failing closed",
             requirement=step.authority_requirement,
+            budget_ref=_scope,
         )
 
 
@@ -262,19 +282,21 @@ class PermissiveStepAuthorityGate:
             decision = StepAuthorityDecision.ALLOW
             ref = f"{self.policy_version}:baseline"
             reason = "test gate: baseline worker action permitted"
+        _scope = job.authority_context_ref or f"job:{job.job_id}"
         return StepAuthorityVerdict(
             step_id=step.step_id,
             job_id=job.job_id,
             principal=worker_id,
             action=declared or f"execute.{step.step_type}",
             resource=job.subject_ref,
-            scope=job.authority_context_ref or f"job:{job.job_id}",
+            scope=_scope,
             decision=decision,
             decision_ref=ref,
             policy_version=self.policy_version,
             evaluated_at=step.created_at or "1970-01-01T00:00:00Z",
             reason=reason,
             requirement=declared,
+            budget_ref=_scope,
         )
 
 
@@ -322,6 +344,7 @@ class StaticStepAuthorityGate:
                 reason=reason,
                 constraints=constraints,
                 requirement=step.authority_requirement,
+                budget_ref=scope,
             )
 
         for pattern in self._require_approval:

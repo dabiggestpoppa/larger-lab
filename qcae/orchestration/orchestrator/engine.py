@@ -696,11 +696,15 @@ class OrchestratorEngine:
         registry wired the answer is NO — fail closed; grants cannot live
         in process memory.
 
-        Live grant binding (P2-R5-C03): the binding the verdict currently
-        authorizes (principal -> action -> resource -> scope) must digest-
-        equal the approved decision's binding before any consumption. A
-        stale mismatch (different principal/action/resource/scope) refuses
-        admission and does NOT consume the grant.
+        Live grant binding (P2-R5R §10-15): the verdict's full canonical
+        ApprovalBinding (principal/action/resource/scope/budget_ref/
+        authority_requirement/policy_version + constraints) must digest-equal
+        the approved decision's binding before any consumption. A stale
+        mismatch (different principal/action/resource/scope/budget/
+        requirement/policy version) refuses admission and does NOT consume
+        the grant. Legacy/incomplete bindings (empty budget, requirement, or
+        policy version on either side) NEVER authorize: they remain
+        historical evidence only.
 
         Consumption semantics: exactly one use row per grant decision.
         The first admitted attempt consumes it; a second attempt under the
@@ -729,6 +733,13 @@ class OrchestratorEngine:
             return False
         # Identity binding: the grant admits the requesting principal only.
         if request.principal != principal:
+            return False
+        # Strengthened R5R law: incomplete bindings never authorize.
+        if not verdict.approval_binding().is_complete():
+            return False
+        if not request.is_complete_binding():
+            return False
+        if not grant.is_complete_binding(request.principal):
             return False
         # Live binding digest == approved binding digest before consumption.
         # A stale mismatch refuses admission and does not consume the grant.

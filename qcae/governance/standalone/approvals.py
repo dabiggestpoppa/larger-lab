@@ -29,10 +29,19 @@ from qcae.core.validation import (
     require_no_duplicates,
 )
 
+#: Provider-neutral binding (shared with the orchestrator; never imported
+#: back into orchestration from here). Re-exported for governance callers.
+from qcae.core.approval_binding import (  # noqa: E402
+    POLICY_VERSION_BOUND,
+    ApprovalBinding,
+)
+
 __all__ = [
     "ApprovalState",
     "EscalationState",
     "EscalationTrigger",
+    "ApprovalBinding",
+    "POLICY_VERSION_BOUND",
     "ApprovalRequest",
     "ApprovalDecision",
     "GrantUse",
@@ -77,7 +86,7 @@ class EscalationTrigger(StrEnum):
 class ApprovalRequest(SerializableRecord):
     """What is being asked, by whom, for exactly what scope."""
 
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
 
     request_id: str
     principal: str
@@ -90,6 +99,27 @@ class ApprovalRequest(SerializableRecord):
 
     # Approval windows are explicit; empty means "must be decided in-policy".
     expires_at: str = ""
+    # P2-R5R: the full live approval semantics, durable. Records written
+    # before this schema (missing/empty fields) remain readable but are
+    # legacy/incomplete: they are historical evidence only and MUST NOT
+    # authorize a new execution under the strengthened R5R law.
+    authority_requirement: str = ""
+    policy_version: str = ""
+
+    def binding(self) -> ApprovalBinding:
+        return ApprovalBinding(
+            principal=self.principal,
+            action=self.action,
+            resource=self.resource,
+            scope=self.scope,
+            budget_ref=self.budget_ref,
+            authority_requirement=self.authority_requirement,
+            policy_version=self.policy_version,
+            constraints=(),
+        )
+
+    def is_complete_binding(self) -> bool:
+        return self.binding().is_complete()
 
     def validate(self) -> None:
         require_identifier(self.request_id, "request_id")
@@ -106,7 +136,7 @@ class ApprovalRequest(SerializableRecord):
 class ApprovalDecision(SerializableRecord):
     """The operator's answer — a separate artifact from the request."""
 
-    SCHEMA_VERSION = 1
+    SCHEMA_VERSION = 2
 
     decision_id: str
     request_ref: str
@@ -114,31 +144,45 @@ class ApprovalDecision(SerializableRecord):
 
     decided_by: str
     decided_at: str
-    # Exact binding the grant covers; must equal the request's binding.
+    # Exact binding the grant covers; must equal the request's full binding
+    # (P2-R5R: seven fields). Decisions written before this schema
+    # (missing/empty requirement/policy fields) are legacy/incomplete:
+    # historical evidence only, never authorizing under the R5R law.
     bound_action: str
     bound_resource: str
     bound_scope: str
     bound_budget_ref: str
+    bound_authority_requirement: str = ""
+    bound_policy_version: str = ""
 
     reason: str = ""
     constraints: Tuple[str, ...] = ()
 
     _COERCIONS = {"state": lambda v: coerce_enum(v, ApprovalState)}
 
+    def binding(self, principal: str) -> "ApprovalBinding":
+        return ApprovalBinding(
+            principal=principal,
+            action=self.bound_action,
+            resource=self.bound_resource,
+            scope=self.bound_scope,
+            budget_ref=self.bound_budget_ref,
+            authority_requirement=self.bound_authority_requirement,
+            policy_version=self.bound_policy_version,
+            constraints=tuple(self.constraints),
+        )
+
+    def is_complete_binding(self, principal: str) -> bool:
+        return self.binding(principal).is_complete()
+
     def binding_digest(self, principal: str) -> str:
-        """Digest of the binding this granted decision covers.
+        """Digest of the full binding this granted decision covers.
 
-        principal -> bound_action -> bound_resource -> bound_scope.
-        Must equal the live verdict's binding digest before the grant
-        may be consumed (P2-R5-C03).
+        Canonical ApprovalBinding serialization (P2-R5R §10), never
+        ``'|'``-joined concatenation. Must equal the live verdict's binding
+        digest before the grant may be consumed.
         """
-        import hashlib
-
-        material = (
-            f"{principal}|{self.bound_action}|{self.bound_resource}|"
-            f"{self.bound_scope}"
-        ).encode("utf-8")
-        return hashlib.sha256(material).hexdigest()
+        return self.binding(principal).binding_digest()
 
     def validate(self) -> None:
         require_identifier(self.decision_id, "decision_id")

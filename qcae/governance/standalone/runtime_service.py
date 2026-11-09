@@ -304,6 +304,8 @@ class LocalRuntimeService:
             "bound_resource": request.resource,
             "bound_scope": request.scope,
             "bound_budget_ref": request.budget_ref,
+            "bound_authority_requirement": request.authority_requirement,
+            "bound_policy_version": request.policy_version,
         }
         self._approvals.record_decision(
             ApprovalDecision(
@@ -370,14 +372,28 @@ class LocalRuntimeService:
             )
         if grant.state is not ApprovalState.GRANTED:
             raise QcaeValidationError("grant is not GRANTED; refusing release")
-        # Exact binding (directive §14): every bound element must equal the
-        # request the step raised. A grant for another action/scope/budget
-        # cannot release this step.
+        # Exact FULL binding (P2-R5R §10-15): all seven bound elements must
+        # equal the request the step raised (principal via request identity +
+        # action/resource/scope/budget/requirement/policy version). A grant
+        # for another budget, requirement, or policy version cannot release
+        # this step. Legacy/incomplete bindings cannot release either.
+        if not request.is_complete_binding():
+            raise QcaeValidationError(
+                "authority request carries a legacy/incomplete binding; "
+                "fresh approval required under the strengthened law"
+            )
+        if not grant.is_complete_binding(request.principal):
+            raise QcaeValidationError(
+                "grant carries a legacy/incomplete binding; "
+                "fresh approval required under the strengthened law"
+            )
         if (
             grant.bound_action != request.action
             or grant.bound_resource != request.resource
             or grant.bound_scope != request.scope
             or grant.bound_budget_ref != request.budget_ref
+            or grant.bound_authority_requirement != request.authority_requirement
+            or grant.bound_policy_version != request.policy_version
         ):
             raise QcaeValidationError(
                 "grant binding does not match the step's request; "
