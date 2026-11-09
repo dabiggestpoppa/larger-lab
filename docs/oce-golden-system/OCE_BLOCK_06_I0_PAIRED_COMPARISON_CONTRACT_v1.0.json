@@ -1,0 +1,45 @@
+{
+  "authorizes_merge": false,
+  "authorizes_next_stage": false,
+  "authorizes_publication": false,
+  "defect": "The stage handoff cited a green paired-comparison run that is pinned to B5-I9 endpoints, not to B6-I0 base and head. This contract freezes the exact comparison the stage owes.",
+  "endpoints": {
+    "base_sha": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+    "base_tree": "34fef9633a2fe496ed2bef352858b3994b91b4e2",
+    "evidence_head_sha": "7922a3d41a9850186538511f4ce226c064f4a6ec",
+    "head_sha": "6aa168f1ecc9f831a39bc150e42157d61601672e",
+    "head_tree": "5a7fb3cd7b25c9b7f95415ec3170baee6d3bfc10"
+  },
+  "evidence_head_delta": {
+    "paths": [
+      "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md"
+    ],
+    "statement": "the evidence head differs from the compared implementation head by one documentation file, so the pinned head tree is the implementation tree"
+  },
+  "population": {
+    "base_only_expected": 0,
+    "common_floor": 41,
+    "common_pattern": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
+    "head_only_expected": 72,
+    "head_only_modules": [
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py"
+    ]
+  },
+  "requirements": {
+    "base_only_must_be_empty": true,
+    "cleanup": "both endpoint clones and the evidence root are removed after the run",
+    "common_floor_source": "the frozen Book 5 suite is 41 nodes at the base endpoint and is the smallest source-backed common population",
+    "common_must_keep_status": true,
+    "head_only_must_be_green": true,
+    "identical_setup": "one pinned toolchain, one dependency lock, one runner image, separate clones",
+    "no_new_skips_in_common": true
+  },
+  "schema": "oce.block_06_i0.paired_comparison_contract.v1",
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "status": "FROZEN"
+}

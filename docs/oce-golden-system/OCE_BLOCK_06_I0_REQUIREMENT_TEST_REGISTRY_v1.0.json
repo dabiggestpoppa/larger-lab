@@ -1,0 +1,442 @@
+{
+  "arithmetic": {
+    "by_state": {
+      "BLOCKED": 1,
+      "DEFERRED_WITH_OWNER": 0,
+      "PLANNED": 18
+    },
+    "pass_claims": 0,
+    "requirements_total": 19
+  },
+  "base_sha": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+  "document_id": "OCE-B6-I0-REGISTRY-001",
+  "inventory": {
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py"
+    ],
+    "node_total": 72,
+    "nodes": [
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_negative_control_per_law",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_1",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_2",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_3",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_4",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_5",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_6",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_7",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_8",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_symlink_cannot_hide_tracked_path",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_symlink_cleanup",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_symlink_escape_refused",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_traversal_refused",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_authorized_paths_pass",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_b5_i9_41_nodes",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_fake_amendment_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_post_anchor_change_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_tracked_cache_name_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_unauthorized_mutation_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_untracked_residue_passes",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_conformance_vocabulary_closed",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_declaration_without_test_not_proven",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_deprecation_and_removal_declared",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_each_failure_has_trigger_and_refusal",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_failure_classes_six",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_fingerprint_deterministic",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_later_threats_remain_planned",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_matrix_25_rows_unproven",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_no_new_failure_ids",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_no_silent_latest",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_recovery_declared",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_schema_identifiers_pinned",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_threats_seven_bound",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_unknown_version_fails_closed",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_arithmetic_rederived",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_candidate_total_27",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_census_30_rows",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_eligibility_scan",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_environment_authority_absent",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_exported_at_p0_historical",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_limitations_binding",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_no_authority_bearing_admitted",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_no_wildcard_or_private_reexport",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_operator_decision_pending",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_prohibited_symbols_absent",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_public_stable_zero",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_public_surface_contract_fields",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_reference_only_not_copied",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_zero_extracted_files",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_canonical_bytes",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_double_generation_identical",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_failure_evidence_uploaded",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_linux_symlink_job",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_manifest_independent_verify",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_no_environment_fields",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_no_secrets_or_providers",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_node_inventory_selected",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_p0_validator_green_at_its_head",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_pinned_actions",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_workflow_present",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_contract_declares_zero_extraction",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_contract_frozen_before_evidence",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_g16_condition_verbatim",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_g16_open_and_blocker",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_g16_states_distinct",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_no_implementation_or_package",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_no_independence_claim",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_no_packaging_artifacts",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_operator_hold_intact",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_p0_packet_unchanged",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_requirement_inventory_19",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_scope_bindings_match_p0_sources"
+    ]
+  },
+  "kind": "book6_i0_requirement_test_registry",
+  "requirements": [
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_arithmetic_rederived",
+      "category": "classification_integrity",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "any class count drifts",
+      "id": "B6-P0-CLS-01",
+      "negative_control": "relabel one row and require the arithmetic check to fail",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_eligibility_scan",
+      "category": "classification_integrity",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a forbidden class is marked eligible",
+      "id": "B6-P0-CLS-02",
+      "negative_control": "mark an authority-bearing row eligible and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_reference_only_not_copied",
+      "category": "classification_integrity",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a reference-only path appears in an extraction unit",
+      "id": "B6-P0-CLS-03",
+      "negative_control": "plant a reference-only copy and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_g16_open_and_blocker",
+      "category": "handoff_and_g16",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "G16 is reported closed or renamed",
+      "id": "B6-P0-G16-01",
+      "negative_control": "set G16 to CLOSED in a scratch copy and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_g16_condition_verbatim",
+      "category": "handoff_and_g16",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "condition text is weakened or dropped",
+      "id": "B6-P0-G16-02",
+      "negative_control": "paraphrase the condition and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_no_independence_claim",
+      "category": "handoff_and_g16",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "an independence claim appears",
+      "id": "B6-P0-G16-03",
+      "negative_control": "plant an independence claim and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "BLOCKED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_g16_states_distinct",
+      "category": "handoff_and_g16",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "states are collapsed or authorization is implied",
+      "id": "B6-P0-G16-04",
+      "negative_control": "collapse two states and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_no_implementation_or_package",
+      "category": "governance_hold",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "an implementation artifact exists",
+      "id": "B6-P0-HOLD-01",
+      "negative_control": "plant a package and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_operator_hold_intact",
+      "category": "governance_hold",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "P0 is treated as ratified without an operator act",
+      "id": "B6-P0-HOLD-02",
+      "negative_control": "mark P0 ratified and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_1",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-1 is accepted",
+      "id": "B6-P0-NP-01",
+      "negative_control": "plant the NP-1 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_2",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-2 is accepted",
+      "id": "B6-P0-NP-02",
+      "negative_control": "plant the NP-2 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_3",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-3 is accepted",
+      "id": "B6-P0-NP-03",
+      "negative_control": "plant the NP-3 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_4",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-4 is accepted",
+      "id": "B6-P0-NP-04",
+      "negative_control": "plant the NP-4 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_5",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-5 is accepted",
+      "id": "B6-P0-NP-05",
+      "negative_control": "plant the NP-5 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_6",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-6 is accepted",
+      "id": "B6-P0-NP-06",
+      "negative_control": "plant the NP-6 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_7",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-7 is accepted",
+      "id": "B6-P0-NP-07",
+      "negative_control": "plant the NP-7 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_8",
+      "category": "extraction_boundary",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a planted violation of NP-8 is accepted",
+      "id": "B6-P0-NP-08",
+      "negative_control": "plant the NP-8 violation and require the named scan to reject it",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_no_packaging_artifacts",
+      "category": "packaging_publication",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "a package artifact exists",
+      "id": "B6-P0-PKG-01",
+      "negative_control": "plant a wheel and require rejection",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    },
+    {
+      "binding_node": "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_unknown_version_fails_closed",
+      "category": "developer_surface",
+      "claim": "NONE — a binding is not a result; execution evidence lives in the ledger",
+      "evidence_path": "docs/oce-golden-system/OCE_BLOCK_06_I0_PROGRESS_EVIDENCE_LEDGER_v1.0.md",
+      "failure_observable": "Old supported consumer passes; unsupported version fails clearly",
+      "id": "B6-P0-SEC-05",
+      "negative_control": "a fixture that violates C1.S5's boundary must be refused by the planned proof",
+      "owner": "builder",
+      "source_authority": "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "state": "PLANNED"
+    }
+  ],
+  "requirements_total": 19,
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "stage_proofs": {
+    "C1.S5 conformance": [
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_matrix_25_rows_unproven",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_conformance_vocabulary_closed",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_fingerprint_deterministic"
+    ],
+    "F01 unauthorized_candidate": [
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_eligibility_scan"
+    ],
+    "F02 prohibited_candidate": [
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_no_authority_bearing_admitted",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_reference_only_not_copied"
+    ],
+    "F03 authority_bearing_candidate": [
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_4",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_8"
+    ],
+    "F04 private_api": [
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_no_wildcard_or_private_reexport",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_prohibited_symbols_absent"
+    ],
+    "F17 secret_reference": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_no_secrets_or_providers"
+    ],
+    "F20 unlicensed_dependency": [
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_7",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_2"
+    ],
+    "T04 dependency confusion": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_no_secrets_or_providers",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_2"
+    ],
+    "T05 namespace collision": [
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_traversal_refused"
+    ],
+    "T07 manifest tampering": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_manifest_independent_verify"
+    ],
+    "T08 provenance forgery": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_manifest_independent_verify",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_double_generation_identical"
+    ],
+    "T09 secret leakage": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_no_secrets_or_providers"
+    ],
+    "T14 environment variable authority": [
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_environment_authority_absent"
+    ],
+    "T20 authority-bearing extraction": [
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_zero_extracted_files",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_np_1"
+    ],
+    "boundary": [
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_b5_i9_41_nodes",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_authorized_paths_pass",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_unauthorized_mutation_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_tracked_cache_name_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_untracked_residue_passes",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_fake_amendment_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py::test_post_anchor_change_fails",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_symlink_escape_refused",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_symlink_cannot_hide_tracked_path"
+    ],
+    "ci": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_workflow_present",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_pinned_actions",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_node_inventory_selected",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_failure_evidence_uploaded",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_linux_symlink_job"
+    ],
+    "contract": [
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_contract_frozen_before_evidence",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_scope_bindings_match_p0_sources",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_requirement_inventory_19",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_contract_declares_zero_extraction",
+      "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py::test_p0_packet_unchanged"
+    ],
+    "reproducibility": [
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_no_environment_fields",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_canonical_bytes",
+      "infrastructure/control-plane/tests/test_block_06_i0_reproducibility_and_ci.py::test_p0_validator_green_at_its_head"
+    ],
+    "stage_surface": [
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_negative_control_per_law",
+      "infrastructure/control-plane/tests/test_block_06_i0_authority_and_boundary.py::test_symlink_cleanup",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_declaration_without_test_not_proven",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_deprecation_and_removal_declared",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_each_failure_has_trigger_and_refusal",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_failure_classes_six",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_later_threats_remain_planned",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_no_new_failure_ids",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_no_silent_latest",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_recovery_declared",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_schema_identifiers_pinned",
+      "infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py::test_threats_seven_bound",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_candidate_total_27",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_census_30_rows",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_exported_at_p0_historical",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_limitations_binding",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_operator_decision_pending",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_public_stable_zero",
+      "infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py::test_public_surface_contract_fields"
+    ]
+  },
+  "state_vocabulary": {
+    "BLOCKED": "obligation cannot be satisfied until an external condition changes; owner and condition recorded",
+    "DEFERRED_WITH_OWNER": "binding=deferred; owner, future stage, observable disposition and evidence obligation recorded",
+    "PASS": "reserved; zero PASS claims are permitted in P0",
+    "PLANNED": "obligation accepted at P0; binding is static, attestation or doc_check; no implementation claim"
+  },
+  "version": "1.0.0"
+}

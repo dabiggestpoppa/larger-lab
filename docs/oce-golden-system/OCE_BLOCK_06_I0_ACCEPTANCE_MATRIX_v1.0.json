@@ -1,0 +1,261 @@
+{
+  "authorizes_merge": true,
+  "authorizes_next_stage": false,
+  "authorizes_publication": false,
+  "endpoints": {
+    "base_sha": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+    "base_tree": "34fef9633a2fe496ed2bef352858b3994b91b4e2",
+    "implementation_sha": "6aa168f1ecc9f831a39bc150e42157d61601672e",
+    "implementation_tree": "5a7fb3cd7b25c9b7f95415ec3170baee6d3bfc10",
+    "p0_ratification_sha": "e2aa8ac71dc9f0de4287fbcaa8a17ff127d5356f"
+  },
+  "gates": [
+    {
+      "evidence": "base and P0 SHAs, PR parents, branch head",
+      "gate": "reality lock held at the frozen endpoints",
+      "id": "G01",
+      "result": "PASS"
+    },
+    {
+      "evidence": "ten linear commits, zero merges",
+      "gate": "ladder reconstructed from git objects",
+      "id": "G02",
+      "result": "PASS"
+    },
+    {
+      "evidence": "19 requirements, one section C1.S5",
+      "gate": "scope derived from merged P0 sources",
+      "id": "G03",
+      "result": "PASS"
+    },
+    {
+      "evidence": "raised 0 to 12 in the contract commit before results",
+      "gate": "mutation floor governance",
+      "id": "G04",
+      "result": "PASS"
+    },
+    {
+      "evidence": "no production surface",
+      "gate": "changed-file boundary exact",
+      "id": "G05",
+      "result": "PASS"
+    },
+    {
+      "evidence": "12 admitted, 15 refused",
+      "gate": "27 candidates reconcile",
+      "id": "G06",
+      "result": "PASS"
+    },
+    {
+      "evidence": "12 admitted, 15 refused, 0 extracted",
+      "gate": "admitted/refused/extracted arithmetic",
+      "id": "G07",
+      "result": "PASS"
+    },
+    {
+      "evidence": "30 rows, public stable 0",
+      "gate": "API firewall",
+      "id": "G08",
+      "result": "PASS"
+    },
+    {
+      "evidence": "observed exports 0",
+      "gate": "public stable remains zero",
+      "id": "G09",
+      "result": "PASS"
+    },
+    {
+      "evidence": "25 rows, all UNPROVEN",
+      "gate": "compatibility rows truthful",
+      "id": "G10",
+      "result": "PASS"
+    },
+    {
+      "evidence": "compat/unknown_refused",
+      "gate": "unknown versions fail closed",
+      "id": "G11",
+      "result": "PASS"
+    },
+    {
+      "evidence": "19 requirements, 72 nodes, one binding each",
+      "gate": "requirement registry closes",
+      "id": "G12",
+      "result": "PASS"
+    },
+    {
+      "evidence": "run 42615539707 totals 72/0/0/0",
+      "gate": "72 nodes pass in Linux CI",
+      "id": "G13",
+      "result": "PASS"
+    },
+    {
+      "evidence": "three POSIX nodes executed in CI",
+      "gate": "symlink controls execute and pass",
+      "id": "G14",
+      "result": "PASS"
+    },
+    {
+      "evidence": "12/12 discriminated and restored",
+      "gate": "12 mutations discriminate",
+      "id": "G15",
+      "result": "PASS"
+    },
+    {
+      "evidence": "double generation byte identical",
+      "gate": "deterministic regeneration",
+      "id": "G16",
+      "result": "PASS"
+    },
+    {
+      "evidence": "second code path re-hashes every artifact",
+      "gate": "manifest verifies independently",
+      "id": "G17",
+      "result": "PASS"
+    },
+    {
+      "evidence": "tracked clean, no scratch residue",
+      "gate": "cleanup",
+      "id": "G18",
+      "result": "PASS"
+    },
+    {
+      "evidence": "frozen gate run 42615539988",
+      "gate": "frozen Book 5 suite remains 41/41",
+      "id": "G19",
+      "result": "PASS"
+    },
+    {
+      "evidence": "content-layer gate over unchanged packet",
+      "gate": "P0 validator remains green",
+      "id": "G20",
+      "result": "PASS"
+    },
+    {
+      "evidence": "run 42615539729 verdict PASS",
+      "gate": "exact B6-I0 paired comparison",
+      "id": "G21",
+      "result": "PASS"
+    },
+    {
+      "evidence": "common 270, zero regressions",
+      "gate": "no common regression",
+      "id": "G22",
+      "result": "PASS"
+    },
+    {
+      "evidence": "run 42531536214 totals and symlink output",
+      "gate": "evidence-head artifacts parsed",
+      "id": "G23",
+      "result": "PASS"
+    },
+    {
+      "evidence": "recorded in the evidence rung",
+      "gate": "ratification-head artifacts parsed",
+      "id": "G24",
+      "result": "PASS"
+    },
+    {
+      "evidence": "OPEN under B5I8-DF05",
+      "gate": "G16 remains OPEN",
+      "id": "G25",
+      "result": "PASS"
+    },
+    {
+      "evidence": "no later-stage implementation",
+      "gate": "B6-I1 through B6-I9 locked",
+      "id": "G26",
+      "result": "PASS"
+    },
+    {
+      "evidence": "zero packages, zero registries",
+      "gate": "no package or publication",
+      "id": "G27",
+      "result": "PASS"
+    },
+    {
+      "evidence": "RESERVED_NOT_AUTHORIZED",
+      "gate": "evaluation system unauthorized",
+      "id": "G28",
+      "result": "PASS"
+    },
+    {
+      "evidence": "NP-01 through NP-08 proofs green",
+      "gate": "no authority introduced",
+      "id": "G29",
+      "result": "PASS"
+    },
+    {
+      "evidence": "no oce/, packages/, dist/, build/ path",
+      "gate": "no production surface touched",
+      "id": "G30",
+      "result": "PASS"
+    },
+    {
+      "evidence": "lockfiles unchanged",
+      "gate": "no dependency addition",
+      "id": "G31",
+      "result": "PASS"
+    },
+    {
+      "evidence": "base 5e76dc12, head 6aa168f1",
+      "gate": "paired endpoints pinned",
+      "id": "G32",
+      "result": "PASS"
+    },
+    {
+      "evidence": "both clones removed before the verdict",
+      "gate": "comparison endpoint cleanup",
+      "id": "G33",
+      "result": "PASS"
+    },
+    {
+      "evidence": "PR #29 checks CLEAN",
+      "gate": "PR state draft, open, mergeable",
+      "id": "G34",
+      "result": "PASS"
+    },
+    {
+      "evidence": "no open defect",
+      "gate": "no unresolved blocker",
+      "id": "G35",
+      "result": "PASS"
+    }
+  ],
+  "gates_passed": 35,
+  "gates_total": 35,
+  "locks": {
+    "b6_i1": "LOCKED - REQUIRES FRESH AUTHORIZED_STAGE",
+    "b6_i2_through_i9": "LOCKED",
+    "book_6_complete": false,
+    "extraction_execution": "NOT_BEGUN",
+    "g16": "OPEN",
+    "package_publication": "NOT_BEGUN",
+    "post_book_6_evaluation_system": "RESERVED_NOT_AUTHORIZED"
+  },
+  "paired_comparison": {
+    "base_only": 0,
+    "base_total": 270,
+    "common_error": 0,
+    "common_fail": 0,
+    "common_floor": 41,
+    "common_pass": 270,
+    "common_skip": 0,
+    "common_total": 270,
+    "head_common_total": 270,
+    "head_only_expected": 72,
+    "head_only_total": 72,
+    "run": "42615539729",
+    "status": "PASS"
+  },
+  "schema": "oce.block_06_i0.acceptance_matrix.v1",
+  "score": {
+    "aggregate": 9.0,
+    "correctness": 9,
+    "design": 9,
+    "label": "SAME-AGENT - NOT ORGANIZATIONALLY INDEPENDENT",
+    "quality": 9,
+    "spec": 9
+  },
+  "stage": "AUTHORIZED_STAGE=B6-I0",
+  "status": "OPERATOR_ACCEPTED"
+}
