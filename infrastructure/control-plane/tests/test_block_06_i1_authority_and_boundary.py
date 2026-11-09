@@ -41,9 +41,13 @@ def test_no_private_store_or_path_in_any_result() -> None:
          "scopes": ["read"], "payload": {"artifact_id": "artifact-1"}},
     ]
     for call in calls:
+        response = api.handle(call)
         keys: set[str] = set()
-        walk(api.handle(call), keys)
+        walk(response, keys)
         assert not keys & FORBIDDEN_KEYS, keys & FORBIDDEN_KEYS
+        lowered = {key.lower() for key in keys}
+        assert not [k for k in lowered if "store" in k or k.endswith("path")], lowered
+        assert "/srv/" not in json.dumps(response) and "store.db" not in json.dumps(response)
 
 
 def test_receipt_binds_contract_hash_and_hashes() -> None:
