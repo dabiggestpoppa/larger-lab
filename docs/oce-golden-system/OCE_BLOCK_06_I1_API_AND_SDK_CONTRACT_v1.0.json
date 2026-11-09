@@ -1,0 +1,248 @@
+{
+  "api_version": "v1",
+  "compat": {
+    "module": "oce/compat/matrix.py",
+    "verdicts": [
+      "SUPPORTED",
+      "UNSUPPORTED",
+      "UNKNOWN"
+    ]
+  },
+  "deny_by_default": true,
+  "document_id": "OCE-B6-I1-API-001",
+  "export_policy": "public_experimental only; no stable symbol and no wildcard export",
+  "operations": [
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S1",
+      "symbol": "oce.api.v1.identity.get",
+      "typed_inputs": [
+        "actor_id"
+      ],
+      "typed_outputs": [
+        "actor_id",
+        "capabilities"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S1",
+      "symbol": "oce.api.v1.capabilities.get",
+      "typed_inputs": [
+        "actor_id",
+        "scope"
+      ],
+      "typed_outputs": [
+        "capability_set"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "propose",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "propose",
+      "section": "C1.S2",
+      "symbol": "oce.sdk.intents.submit",
+      "typed_inputs": [
+        "intent",
+        "actor"
+      ],
+      "typed_outputs": [
+        "receipt"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S2",
+      "symbol": "oce.api.v1.intents.get",
+      "typed_inputs": [
+        "intent_id"
+      ],
+      "typed_outputs": [
+        "intent"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S2",
+      "symbol": "oce.api.v1.tasks.get",
+      "typed_inputs": [
+        "task_id"
+      ],
+      "typed_outputs": [
+        "task"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "propose",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "propose",
+      "section": "C1.S2",
+      "symbol": "oce.api.v1.events.append",
+      "typed_inputs": [
+        "task_id",
+        "event"
+      ],
+      "typed_outputs": [
+        "receipt"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S2",
+      "symbol": "oce.api.v1.artifacts.get",
+      "typed_inputs": [
+        "artifact_id"
+      ],
+      "typed_outputs": [
+        "artifact"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S2",
+      "symbol": "oce.api.v1.evidence.list",
+      "typed_inputs": [],
+      "typed_outputs": [
+        "evidence"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "decide",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "decide",
+      "section": "C1.S2",
+      "symbol": "oce.api.v1.approvals.decide",
+      "typed_inputs": [
+        "approval_id",
+        "decision"
+      ],
+      "typed_outputs": [
+        "approval"
+      ],
+      "version": "v1"
+    },
+    {
+      "authority_class": "read",
+      "classification": "public_experimental",
+      "compatibility_promise": "additive_minor",
+      "deterministic": true,
+      "refusal_codes": [
+        "REFUSED_SCOPE",
+        "REFUSED_SCHEMA",
+        "REFUSED_AUTHORITY"
+      ],
+      "scope_required": "read",
+      "section": "C1.S5",
+      "symbol": "oce.compat.matrix.check",
+      "typed_inputs": [
+        "consumer_version"
+      ],
+      "typed_outputs": [
+        "verdict"
+      ],
+      "version": "v1"
+    }
+  ],
+  "prohibitions": [
+    "no storage path",
+    "no store object",
+    "no raw secret",
+    "no client authority",
+    "no silent latest",
+    "no stable claim"
+  ],
+  "schema": "oce.block_06_i1.api_sdk.v1",
+  "sdk": {
+    "duplicates_rules": false,
+    "example": "oce/sdk/examples/one_worked_request.py",
+    "invokes": "the canonical dispatcher only",
+    "module": "oce/sdk/client.py",
+    "typed_refusals": true
+  },
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "transport": "in-process canonical call returning canonical JSON; no socket, no network"
+}

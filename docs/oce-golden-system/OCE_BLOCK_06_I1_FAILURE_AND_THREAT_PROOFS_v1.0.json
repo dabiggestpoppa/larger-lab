@@ -1,0 +1,67 @@
+{
+  "classes": [
+    {
+      "bound": true,
+      "expected_refusal": "REFUSED_VERSION_UNSUPPORTED",
+      "id": "F09",
+      "name": "incompatible_version",
+      "trigger": "a consumer requests an unsupported version"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "REFUSED_VERSION_UNKNOWN",
+      "id": "F10",
+      "name": "unknown_version",
+      "trigger": "a version cannot be resolved"
+    },
+    {
+      "bound": true,
+      "expected_refusal": "REFUSED_DUPLICATE_RECEIPT",
+      "id": "F07",
+      "name": "duplicate_symbol",
+      "trigger": "two operations claim one symbol or receipt id"
+    }
+  ],
+  "document_id": "OCE-B6-I1-FAILURES-001",
+  "negative_controls": [
+    "unsupported version refused with the supported window",
+    "unknown version refused and never coerced",
+    "scope-free call refused",
+    "authority-bearing call refused",
+    "storage-internal read refused",
+    "self-approval refused"
+  ],
+  "schema": "oce.block_06_i1.failures.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "threat_controls": [
+    {
+      "description": "storage or path disclosure through an API result",
+      "id": "T04"
+    },
+    {
+      "description": "authority widening through a client-supplied field",
+      "id": "T05"
+    },
+    {
+      "description": "version confusion or silent downgrade",
+      "id": "T07"
+    },
+    {
+      "description": "cross-actor approval or self-approval",
+      "id": "T08"
+    },
+    {
+      "description": "duplicate or replayed receipt",
+      "id": "T09"
+    },
+    {
+      "description": "untyped refusal hiding the supported window",
+      "id": "T14"
+    },
+    {
+      "description": "SDK reimplementation of canonical rules",
+      "id": "T20"
+    }
+  ]
+}

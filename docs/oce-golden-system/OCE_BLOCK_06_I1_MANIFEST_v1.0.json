@@ -1,0 +1,45 @@
+{
+  "artifacts": [
+    {
+      "bytes": 6112,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_API_AND_SDK_CONTRACT_v1.0.json",
+      "sha256": "edbffb1d4616540f3ee448b1ede114d6dc31618055e6e42f2517a63bea190b4a"
+    },
+    {
+      "bytes": 1322,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_COMPATIBILITY_MATRIX_v1.0.json",
+      "sha256": "0a92348418d2227407b014da1fed2dd0de96c692b5e12ad50427005665892c69"
+    },
+    {
+      "bytes": 1730,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "sha256": "da5858131e4ac8a5ac2193c9eedb2a3f0b2ed7855243618fbc2023c366cbb054"
+    },
+    {
+      "bytes": 4849,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "sha256": "7ed917d46394ea14fe8138f764ccaba10438f5b3e07c230b427fd5cdd71452fe"
+    },
+    {
+      "bytes": 3972,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "sha256": "396e9dbb92c9873bf046622355c0d3f220818e0026bd3003aaa4af35f8f4047e"
+    },
+    {
+      "bytes": 4427,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_SCOPE_DERIVATION_v1.0.json",
+      "sha256": "a3ceab2728e96f889982f65d5bc767c6c5023476997503c525310e8a57e8497e"
+    }
+  ],
+  "code": [],
+  "document_id": "OCE-B6-I1-MANIFEST-001",
+  "hash": "sha256",
+  "schema": "oce.block_06_i1.manifest.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN",
+  "totals": {
+    "artifacts": 6,
+    "code_files": 0
+  },
+  "verification": "recomputed by a second code path in the validator and in a test node"
+}

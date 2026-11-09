@@ -1,0 +1,120 @@
+{
+  "allowed_paths": [
+    "oce/api/",
+    "oce/sdk/",
+    "oce/compat/",
+    "docs/oce-golden-system/OCE_BLOCK_06_I1_",
+    "infrastructure/control-plane/scripts/block_06_i1_",
+    "infrastructure/control-plane/tests/test_block_06_i1_",
+    "infrastructure/control-plane/tests/block_06_i1_support.py",
+    ".github/workflows/block-06-i1-validation.yml",
+    ".github/workflows/block-06-i1-paired-comparison.yml"
+  ],
+  "authority_sources": [
+    {
+      "claim": "B6-I1 kind=implementation, purpose='C1 API/SDK', surfaces ['api','sdk'], scope 'C1.S1, C1.S2, C1.S5', tests ['contract','denial'], mutation_floor 3",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json"
+    },
+    {
+      "claim": "B6-I1 stage name 'C1 API and SDK', gate 'canonical path and compatibility pass'",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_PLAN_v1.0.md"
+    },
+    {
+      "claim": "versioned API exposing OCE functions without storage internals or authority bypass",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S1"
+    },
+    {
+      "claim": "typed local clients for identity, intents, tasks, events, artifacts, evidence, approvals",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S2"
+    },
+    {
+      "claim": "compatibility matrix check; unsupported version fails clearly",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S5"
+    },
+    {
+      "claim": "three symbols are pre-admitted at B6-I1: capabilities.get, sdk.intents.submit, compat.matrix.check, all public_experimental and deny_by_default",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_P0_PUBLIC_PRIVATE_API_FIREWALL_v1.0.json"
+    },
+    {
+      "claim": "path-versioned v1; additive inside a major; unknown refused; no silent latest",
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_P0_VERSIONING_AND_COMPATIBILITY_CONTRACT_v1.0.md"
+    }
+  ],
+  "base_sha": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+  "base_tree": "3c2e2a6676e16415a1e2bd326c1fc147e51c2a6d",
+  "capital_authority": "none",
+  "cost_usd": 0,
+  "document_id": "OCE-B6-I1-SCOPE-001",
+  "forbidden_paths": [
+    "packages/",
+    "dist/",
+    "build/",
+    "pyproject.toml",
+    "uv.lock",
+    "poetry.lock",
+    "package.json",
+    "infrastructure/control-plane/src/",
+    "infrastructure/console/src/",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_",
+    "docs/oce-golden-system/OCE_BLOCK_06_I0_",
+    ".github/workflows/b1-i1r-validation.yml",
+    ".github/workflows/b5-i8-audit-validation.yml",
+    ".github/workflows/b5-i9-factory-gate-validation.yml",
+    ".github/workflows/block-06-i0-validation.yml"
+  ],
+  "identity": {
+    "authorizes_consumer_construction": false,
+    "authorizes_design_of_extraction_candidates": false,
+    "authorizes_packaging": false,
+    "authorizes_publication": false,
+    "authorizes_source_extraction": false,
+    "gate": "canonical path and compatibility pass",
+    "note": "B6-I0 admitted 12 candidates for later design; B6-I1 does not copy or extract them, and the non-goal 'templates' defers B6-I2 surfaces.",
+    "sections": [
+      "C1.S1",
+      "C1.S2"
+    ],
+    "stage_name": "C1 API and SDK",
+    "surfaces": [
+      "api",
+      "sdk"
+    ]
+  },
+  "locks": {
+    "B6-I2": "LOCKED",
+    "B6-I3": "LOCKED",
+    "B6-I4": "LOCKED",
+    "B6-I5": "LOCKED",
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "broker_execution_capital_authority": "none",
+    "cloud_hosting": "NOT_BEGUN",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_BEGUN"
+  },
+  "non_goals": [
+    "templates",
+    "extraction of candidates",
+    "packaging",
+    "publication",
+    "consumer application",
+    "cloud hosting",
+    "evaluation service"
+  ],
+  "outputs": [
+    "versioned v1 operation contract with typed inputs, outputs and scopes",
+    "canonical in-process API service enforcing the contract",
+    "typed SDK client invoking only the canonical API",
+    "compatibility matrix check with explicit refusal semantics",
+    "one worked example request",
+    "contract and denial proofs with discriminating mutations"
+  ],
+  "schema": "oce.block_06_i1.scope.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN"
+}
