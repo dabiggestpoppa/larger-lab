@@ -28,7 +28,7 @@ SUPERSEDED_BLOB = "6648043b24b0010f6bd405e0ea6098097b4de78d"
 SUPERSEDED_SHA256 = "a6ed3314881c1a0ed4587b8dfc1a09c18da2b34c29d86b7406c66bbd50a0c6e1"
 MODES = ("i0", "auto")
 KNOWN_LATER_STAGES = ("B6-I1",)
-LATER_STAGES = tuple(f"B6-I{i}" for i in range(2, 10))
+LATER_STAGES = tuple(f"I{i}" for i in range(2, 10))
 # Pinned: a committed amendment cannot widen its own allowlist.
 AMENDMENT_PATHS = (
     AMENDMENT,

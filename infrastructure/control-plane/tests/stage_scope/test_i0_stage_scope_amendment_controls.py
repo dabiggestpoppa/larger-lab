@@ -116,13 +116,14 @@ def test_tampered_allowlist_fails(probe):
 
 
 def test_unlisted_oce_path_fails(probe):
-    rogue = probe / "oce" / "api" / "v1" / "rogue.py"
+    rogue = probe / "oce" / "rogue" / "new.py"
     rogue.parent.mkdir(parents=True, exist_ok=True)
     rogue.write_text("x = 1\n", encoding="utf-8")
     commit(probe)
     _, fails, _ = run(probe)
     assert "boundary/oce_within_i1_contract" in fails
     assert "boundary/only_allowed_paths" in fails
+    assert "boundary/changed" not in fails
 
 
 def test_later_stage_artifact_fails(probe):
@@ -159,18 +160,22 @@ def test_package_path_fails(probe):
 
 
 def test_moved_base_fails():
+    sys.path.insert(0, str(ROOT / "infrastructure/control-plane/scripts"))
+    import block_06_stage_scope as scope
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-base-"))
     try:
         repo = tmp / "repo"
         repo.mkdir()
         assert git(repo, "init", "-q").returncode == 0
-        (repo / "README.md").write_text("probe\n", encoding="utf-8")
+        (repo / "README.md").write_text("probe
+", encoding="utf-8")
         assert git(repo, "add", "-A").returncode == 0
         assert git(repo, "-c", "user.email=ci@example.com", "-c", "user.name=ci",
                    "commit", "-qm", "probe").returncode == 0
         assert git(repo, "update-ref", "refs/remotes/origin/main", "HEAD").returncode == 0
-        _, fails, _ = run(repo)
-        assert "stage/base_moved" in fails
+        with pytest.raises(scope.StageScopeError) as exc:
+            scope.resolve(repo, "auto")
+        assert exc.value.check == "stage/base_moved"
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
