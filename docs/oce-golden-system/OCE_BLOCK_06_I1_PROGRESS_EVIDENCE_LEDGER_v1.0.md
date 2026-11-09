@@ -53,6 +53,8 @@ execution authority exists.
 
 ## 7. Status
 
+Stage tag: `B6I1`.
+
 The target handoff state is `READY_FOR_OPERATOR_REVIEW`, asserted only in the evidence rung once
 the exact-head workflows are green and their raw artifacts have been parsed. Until that rung is
 committed, this ledger records implementation in progress and claims no PASS it has not observed.

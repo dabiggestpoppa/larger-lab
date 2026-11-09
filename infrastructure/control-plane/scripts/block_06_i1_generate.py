@@ -405,7 +405,7 @@ def build(out: pathlib.Path, with_code: bool, head_sha: str | None = None) -> di
         payload = paired_contract(head_sha, head_tree)
         path = out / DOCS / f"{PREFIX}PAIRED_COMPARISON_CONTRACT_v1.0.json"
         path.write_bytes(canonical(payload))
-        written[str(path.relative_to(out))] = path.read_bytes()
+        written[path.relative_to(out).as_posix()] = path.read_bytes()
         manifest["artifacts"] = [{"path": k, "sha256": hashlib.sha256(v).hexdigest(),
                                   "bytes": len(v)} for k, v in sorted(written.items())]
         manifest["totals"]["artifacts"] = len(written)

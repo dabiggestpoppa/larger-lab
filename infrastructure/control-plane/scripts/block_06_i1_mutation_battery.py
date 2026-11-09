@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """B6-I1 mutation battery.
 
-Each mutation edits one live implementation invariant in an isolated scratch copy, must turn a
-named governed node red, and must restore the pristine bytes exactly. The authority floor is 3;
-this stage freezes 6 and never lowers it.
+Each mutation edits one live implementation invariant inside an isolated detached Git worktree,
+must turn a named governed node red, and must restore the pristine bytes exactly. A detached
+worktree (rather than a plain copy) keeps the boundary node meaningful, because the checkout has
+real Git topology. The authority floor is 3; this stage freezes 6 and never lowers it.
 
 Usage:
   python infrastructure/control-plane/scripts/block_06_i1_mutation_battery.py [--json out.json]
@@ -14,7 +15,6 @@ import argparse
 import hashlib
 import json
 import pathlib
-import shutil
 import subprocess
 import sys
 import tempfile
@@ -51,24 +51,10 @@ MUTATIONS = [
      f"{TESTS}/test_block_06_i1_denial.py::test_client_authority_field_refused"),
 ]
 
-COPY = ("oce", TESTS, "docs/oce-golden-system")
 
-
-def scratch(root: pathlib.Path, dst: pathlib.Path) -> pathlib.Path:
-    for rel in COPY:
-        src = root / rel
-        target = dst / rel
-        if src.is_dir():
-            shutil.copytree(src, target)
-            if rel == TESTS:
-                for extra in target.glob("test_*.py"):
-                    if not extra.name.startswith("test_block_06_i1_"):
-                        extra.unlink()
-    return dst
-
-
-def run_node(root: pathlib.Path, node: str) -> tuple[int, str]:
-    proc = subprocess.run([sys.executable, "-m", "pytest", node, "-q", "-p", "no:cacheprovider",
+def run_node(root: pathlib.Path, nodes) -> tuple[int, str]:
+    args = [nodes] if isinstance(nodes, str) else list(nodes)
+    proc = subprocess.run([sys.executable, "-m", "pytest", *args, "-q", "-p", "no:cacheprovider",
                            "-o", "addopts="], cwd=str(root), capture_output=True, text=True)
     return proc.returncode, proc.stdout + proc.stderr
 
@@ -81,33 +67,40 @@ def main(argv=None) -> int:
     root = pathlib.Path(args.root).resolve() if args.root else pathlib.Path(__file__).resolve().parents[3]
     results = []
     with tempfile.TemporaryDirectory(prefix="b6i1-mut-") as tmp:
-        work = scratch(root, pathlib.Path(tmp) / "repo")
-        all_nodes = [str(p) for p in sorted((work / TESTS).glob("test_block_06_i1_*.py"))]
-        code, out = run_node(work, " ".join(all_nodes))
-        if code != 0:
-            print(out[-3000:])
-            print("pristine copy is red; refusing to mutate")
-            return 2
-        for mid, label, old, new, node in MUTATIONS:
-            target = work / SERVICE
-            pristine = target.read_bytes()
-            text = pristine.decode("utf-8")
-            if old not in text:
+        work = pathlib.Path(tmp) / "wt"
+        subprocess.run(["git", "-C", str(root), "worktree", "add", "--detach", "--quiet", str(work)],
+                       check=True)
+        try:
+            all_nodes = [str(p) for p in sorted((work / TESTS).glob("test_block_06_i1_*.py"))]
+            code, out = run_node(work, all_nodes)
+            if code != 0:
+                print(out[-3000:])
+                print("pristine worktree is red; refusing to mutate")
+                return 2
+            for mid, label, old, new, node in MUTATIONS:
+                target = work / SERVICE
+                pristine = target.read_bytes()
+                text = pristine.decode("utf-8")
+                if old not in text:
+                    results.append({"id": mid, "mutation": label, "expected_node": node,
+                                    "discriminated": False, "restored": True,
+                                    "error": "anchor not found"})
+                    continue
+                target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
+                code, out = run_node(work, node)
+                target.write_bytes(pristine)
+                restored = (hashlib.sha256(target.read_bytes()).hexdigest()
+                            == hashlib.sha256(pristine).hexdigest())
                 results.append({"id": mid, "mutation": label, "expected_node": node,
-                                "discriminated": False, "restored": True,
-                                "error": "anchor not found"})
-                continue
-            target.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
-            code, out = run_node(work, node)
-            target.write_bytes(pristine)
-            restored = hashlib.sha256(target.read_bytes()).hexdigest() == hashlib.sha256(pristine).hexdigest()
-            results.append({"id": mid, "mutation": label, "expected_node": node,
-                            "observed_rc": code, "discriminated": code != 0,
-                            "restored": restored,
-                            "pre_sha256": hashlib.sha256(pristine).hexdigest(),
-                            "post_sha256": hashlib.sha256(target.read_bytes()).hexdigest()})
-        code, out = run_node(work, " ".join(all_nodes))
-        pristine_green = code == 0
+                                "observed_rc": code, "discriminated": code != 0,
+                                "restored": restored,
+                                "pre_sha256": hashlib.sha256(pristine).hexdigest(),
+                                "post_sha256": hashlib.sha256(target.read_bytes()).hexdigest()})
+            code, out = run_node(work, all_nodes)
+            pristine_green = code == 0
+        finally:
+            subprocess.run(["git", "-C", str(root), "worktree", "remove", "--force", str(work)],
+                           check=False)
     payload = {
         "battery": "block_06_i1_mutation_battery.py",
         "floor": FLOOR,

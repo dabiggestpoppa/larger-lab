@@ -21,6 +21,11 @@
       "sha256": "7ed917d46394ea14fe8138f764ccaba10438f5b3e07c230b427fd5cdd71452fe"
     },
     {
+      "bytes": 1033,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+      "sha256": "7d2c18e4211ec32be72b5cd1cb506f4bff203b3eb5c40fac43e46b32114bc285"
+    },
+    {
       "bytes": 3972,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_REQUIREMENT_TEST_REGISTRY_v1.0.json",
       "sha256": "396e9dbb92c9873bf046622355c0d3f220818e0026bd3003aaa4af35f8f4047e"
@@ -29,11 +34,6 @@
       "bytes": 4427,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I1_SCOPE_DERIVATION_v1.0.json",
       "sha256": "a3ceab2728e96f889982f65d5bc767c6c5023476997503c525310e8a57e8497e"
-    },
-    {
-      "bytes": 1033,
-      "path": "docs\\oce-golden-system\\OCE_BLOCK_06_I1_PAIRED_COMPARISON_CONTRACT_v1.0.json",
-      "sha256": "7d2c18e4211ec32be72b5cd1cb506f4bff203b3eb5c40fac43e46b32114bc285"
     }
   ],
   "code": [
