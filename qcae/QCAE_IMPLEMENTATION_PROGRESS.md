@@ -873,6 +873,39 @@ Location: `qcae/implementation/decisions/`
 
 None. All derived points above refine within canon; none contradict a frozen invariant.
 
+### P2-R5R — Canonical substrate reconciliation (OPEN)
+
+P2-R5R repairs the P2 substrate underneath preserved P3-R4 work on canonical
+head `8212b59d0ad5afd708d939d34a2564571f6ee285`, following the operator's
+25-step reconciliation directive. P3 capability development is PAUSED during
+repair; P3-R4 work is PRESERVED and must not be discarded.
+
+**Correction to prior claim.** The P2-R5-I0R entry above marks
+schema authority + migration truth as **PROVEN**, but the code audit shows
+stronger R5 requirements not present in code: no `CURRENT_SCHEMA_VERSION=5`,
+no V4_TO_V5 migration, no legacy P2 misversioned classifier, hidden schema
+completion in `build_local_runtime` (`schema_version=4` stamp +
+raw executescripts after `open_metadata_db`), and `governance_approval_use`
+omitted from `_registry_row_counts`. The PROVEN claim is overstated and is
+corrected here by append-only ledger entry (the prior claim is not deleted;
+the correction stands beside it).
+
+**Local review branch `agent/qcae-p2-r5-review` (`7ca0adbeea86f9658ed633423b997daa02a55e0b`)** is NOT merged,
+NOT rebased, NOT cherry-picked into canonical. Its R5 work is a separate
+line; canonical reconciliation regenerates evidence from the reconciled
+canonical commit rather than copying from the local 1336-run.
+
+**Commit sequence:** P2-R5R-I0 (ledger correction, this entry) →
+P2-R5R-C01 (schema v5 / historical v4 / legacy P2 classifier) →
+P2-R5R-C02 (live ApprovalBinding) → P2-R5R-C03 (provider boundary/resolver)
+→ P2-R5R-C04 (backup/restore row counts) → P2-R5R-C05 (typed outcome
+regression) → P2-R5R-T01 (adversarial + P3-R4 regression) →
+P2-R5R-FREEZE (new canonical freeze, blocks `[]`).
+
+**Blockers during repair:** none open yet; failure B
+(`test_crash_after_lease_resume_does_not_repeat_committed`) must be
+investigated and classified before freeze.
+
 ## Blockers
 
 None.
