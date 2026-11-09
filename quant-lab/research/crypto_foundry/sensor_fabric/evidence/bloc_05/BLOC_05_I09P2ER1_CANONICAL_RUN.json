@@ -1,0 +1,150 @@
+{
+ "audited_commit": "d587e74af1019afef9a87bd9836f5c6431ebad1f",
+ "python": "3.11.9",
+ "platform": "Windows-10-10.0.26200-SP0",
+ "collection": {
+  "count": 4640,
+  "unique": 4640
+ },
+ "execution": {
+  "cases_recorded": 4640,
+  "duplicates": 4639,
+  "unmapped": 4640,
+  "unique": 0,
+  "missing_count": 4640,
+  "extra_count": 0,
+  "missing_sample": [
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_canonical_bytes_stable_across_calls",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[adapter_version]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[provider]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[raw_checksum]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[raw_object_uri]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[schema_version]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[venue]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[adapter_version]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[provider]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[raw_checksum]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[raw_object_uri]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[schema_version]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[venue]",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t02_instrument_native_empty_fails",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t02_instrument_native_required",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t03_unresolved_identity_with_flag_validates",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t03_unresolved_identity_without_flag_fails",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t04_all_datetime_fields_aware_after_validation",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t04_aware_datetimes_normalized_to_utc",
+   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t04_naive_datetime_fails"
+  ],
+  "extra_sample": [],
+  "tests": 4640,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 11
+ },
+ "groups": [
+  {
+   "group": "g01",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 2,
+   "xml_sha256": "53a48d38461fe7dd236ae85bc3941f103adae92e631c2bb66fa66ec9802517d2"
+  },
+  {
+   "group": "g02",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "82d3aff40e07706e95475e95335544f2735dbef53a159b48ae69cef27eee7a7d"
+  },
+  {
+   "group": "g03",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 2,
+   "xml_sha256": "2ae0f8b75600dcc6fd32556353681c34d20cf4d68f7be01b8d38bb6d886de5e4"
+  },
+  {
+   "group": "g04",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 1,
+   "xml_sha256": "b8f9d9bc09ae4d8ab6403a371ada34ba63f0ac188c4c14439f2f50d1da5d5163"
+  },
+  {
+   "group": "g05",
+   "tests": 386,
+   "failures": 1,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "3b9a082d5335ace1ee31896071e4cdfeb7c482ea56d252b4ea3f4021577091e5"
+  },
+  {
+   "group": "g06",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 4,
+   "xml_sha256": "dd6052a9f06d514c383a075a9722e2deb78d380321ef4ecb2b81ee5b6d1592f9"
+  },
+  {
+   "group": "g07",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "d16f9286c6ba60a29bb5e91d37bab86b11be3226dd08283d52319c575deb81ce"
+  },
+  {
+   "group": "g08",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "58b8b0dccbd82057864e60ef5fd0cccbe9efa0afc28478d1a979a0e34b90c91e"
+  },
+  {
+   "group": "g09",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 1,
+   "xml_sha256": "37078d549608269a4f2c3aa8e4fb4421938486e520ac52be94cf79cbd4976204"
+  },
+  {
+   "group": "g10",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "bd7870f9b79aa92e686e5af939af3f587181080a0aa1ac5c18b336feb750d9df"
+  },
+  {
+   "group": "g11",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "32860004f82bdad722c6b231ecf480fdf6774f14bc2c2ba4ce460a964423c8dd"
+  },
+  {
+   "group": "g12",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 1,
+   "xml_sha256": "53f60a65b002d44ddcb287addf1d23bba3f33e0d7c067b392435619dc4fe85b1"
+  }
+ ],
+ "failures": [
+  {
+   "test": null,
+   "type": null,
+   "message": "AssertionError: {\"artifact_sha256\": \"0ae3d4e31bd2de2fff56abb7d240973fd531f8d36170e5164babf1c5e93a3464\", \"case_series\": \"SEM-01..SEM-36 (SEM-26/35 test-owned) + SEM-A01\", \"error\": \"committed_bytes_mismatch\", \"fail\": 0, \"pass\": 35, \"rows\": 35, \"unresolved\": 3}\r\n  \nassert 3 == 0\n +  where 3 = CompletedProcess(args=['C:\\\\Users\\\\wifik\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe', 'C:\\\\User"
+  }
+ ],
+ "verdict": "INCOMPLETE"
+}

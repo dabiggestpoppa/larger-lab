@@ -9065,3 +9065,18 @@ NONINTERFERENCE: no ingestion application, initializer, custody service, provide
 approval, liquidation transformation, manifest change, I05 replay change, I11/I12/Bloc 6
 advance, or primary-branch write. INTEGRATION_STATE remains INTEGRATION_REQUIRED. No
 self-ratification; independent review required before merge.
+
+## 201 - SENSOR-B5-I09P2eR1-G1: RECOVERED P2E AUDIT, CANONICAL RUN AND I09 PIN REGRESSION
+
+- Checkpoint ID: `SENSOR-B5-I09P2eR1-G1`. Ordering is by checkpoint ID; section numbers are not authority.
+- Branch: `agent/crypto-sensor-fabric-audit-p2er1-recovered`, a direct child of `d587e74af1019afef9a87bd9836f5c6431ebad1f`.
+- Original P2eR1 audit commit `54a8c91f84` was parented at `839a0090c6` on the QCAE lineage (merge-base `7e7ef7222c`), contained the audit document only, carried no ledger, and was never published. It is retained unmodified; this branch does not cherry-pick it.
+- Transplanted audit document is byte-identical: blob `eb715832dbd0e80d7aa00203cdcabced1daaf86e`, 71 lines, 5,510 bytes.
+- Canonical regression executed in full from a clean, non-sparse checkout: 4,640 collected, 4,640 executed (0 omitted, 0 duplicated), 4,628 passed, 1 failed, 0 errors, 11 skipped, in 12 balanced processes. A single monolithic run OOM-killed this host at 7.4 GB RAM; the partition scheme and its node-id union proof are recorded in the addendum.
+- FAILING GATE: `test_b5_i09_scope_audit.py::test_sem_a08_semantic_validation_evidence_is_deterministic` reports `committed_bytes_mismatch`. The I09 artifact pins `authority/__init__.py` = `6bdc4697...`, but the audited commit hashes it to `e27089cd...`: P2e modified the module without regenerating the artifact that pins it. The test passes at `f199a7e3` and fails at `d587e74af1`, so this is a P2e regression, not an environment artifact.
+- Verified: governance 1,096 == `git ls-files '*.py'` with `unexpected_hits == {}` and a one-line mechanical diff; frozen Bloc 5 plans unchanged; manifest `artifacts == {}`, sha `3d707c59...`; no `.gitattributes` change; `core.autocrlf=false`; 8-file diff, +973/-27, two source files.
+- Security: all 24 P2e parity probes and 83 P2d probes pass; one shared availability rule is answered identically by mapping, liquidation and record entry points, and the loader is pinned as not a PIT decision point.
+- Corrected matrix: 21 PASS / 1 PARTIAL / 2 FAIL (P2E-22 canonical, P2E-23 I09 pin). Disposition `I09P2E_IMPLEMENTATION_PARTIAL` with ratification on hold.
+- Required remediation, NOT executed here: regenerate `bloc_05_semantic_validation.json` from a full checkout and commit it with P2e, then re-run the canonical universe and re-audit.
+- Ledger reconciliation: sections 197-199 untouched; section 200 belongs to the recovered P2dR2 audit branch and is not present or renumbered here; this entry takes 201.
+- No source, test, provider approval, manifest or governance-artifact change. No ratification, no I11/I12/Bloc 6 advance, no trust consumer, no merge to the primary branch.
