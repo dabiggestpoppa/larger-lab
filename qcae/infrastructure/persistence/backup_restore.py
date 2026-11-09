@@ -122,10 +122,12 @@ class BackupService:
             # P2 runtime + governance state (directive §38: restore must
             # preserve jobs/steps/events/checkpoints/approvals/budgets).
             "runtime_job", "runtime_step", "runtime_job_event",
-            "runtime_checkpoint", "runtime_idempotency", "runtime_queue_claim",
+            "runtime_checkpoint", "runtime_idempotency", "runtime_execution",
+            "runtime_queue_claim",
             "runtime_budget",
             "governance_policy_request", "governance_policy_decision",
             "governance_approval_request", "governance_approval_decision",
+            "governance_approval_use",
             "governance_escalation", "governance_escalation_decision",
         )
         counts: Dict[str, int] = {}
