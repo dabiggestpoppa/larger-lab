@@ -103,3 +103,21 @@ Local gates on the same tree: conformance validator `PASS` (131 checks), mutatio
 `12/12 discriminated, 12/12 restored, pristine green`, focused suite `70 passed, 2 skipped`
 (the two skips are the POSIX-only symlink controls, which execute in Linux CI), frozen Book 5
 suite `41 passed`, deterministic double generation byte-identical.
+
+## 11. Ratification
+
+`B6-I0 = OPERATOR_ACCEPTED`; the stage is complete for B6-I0 only. Base `5e76dc12207b`,
+implementation head `6aa168f1ecc9`, evidence head `7922a3d4`. Audit result: 72/72 nodes in Linux CI,
+12/12 mutations discriminated and restored, deterministic regeneration and independent manifest
+verification green, frozen Book 5 gate 41/41, P0 content gate green, cleanup green.
+
+The exact paired comparison now pins its own endpoints: base total 270, head common
+total 270, common 270 against a floor of
+41, base-only 0, head-only 72 of
+72 expected, common 270 pass and 0 skip with zero
+regressions. Verdict `PASS` in run `42615539729`.
+
+Defects repaired in this audit: X3 added the missing exact comparison, X4 froze the contract status
+field, X5 restored the pre-stage main ref in the endpoint clones. X1 and X2 remain visible from the
+implementation rung. `G16` stays OPEN under `B5I8-DF05`; B6-I1 through B6-I9 stay locked; no
+package, no publication, no evaluation system, cost `$0`, `capital.authority = none`.
