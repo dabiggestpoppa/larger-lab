@@ -880,15 +880,50 @@ head `8212b59d0ad5afd708d939d34a2564571f6ee285`, following the operator's
 25-step reconciliation directive. P3 capability development is PAUSED during
 repair; P3-R4 work is PRESERVED and must not be discarded.
 
-**Correction to prior claim.** The P2-R5-I0R entry above marks
-schema authority + migration truth as **PROVEN**, but the code audit shows
-stronger R5 requirements not present in code: no `CURRENT_SCHEMA_VERSION=5`,
-no V4_TO_V5 migration, no legacy P2 misversioned classifier, hidden schema
-completion in `build_local_runtime` (`schema_version=4` stamp +
-raw executescripts after `open_metadata_db`), and `governance_approval_use`
-omitted from `_registry_row_counts`. The PROVEN claim is overstated and is
-corrected here by append-only ledger entry (the prior claim is not deleted;
-the correction stands beside it).
+**Correction to prior claim (append-only; the P2-R5-I0R claim above is not
+deleted).** The earlier canonical reconciliation proved several PRIOR laws:
+
+- durable single-use grant consumption;
+- generic migration infrastructure;
+- generic backup/restore integrity;
+- typed NOT_READY operator behavior.
+
+It did NOT prove the stronger R5 requirements:
+
+- production schema authority at ONE physical version;
+- a historically correct v4→v5 migration;
+- live approval binding against CURRENT verdict semantics;
+- backup/restore coverage of `runtime_execution` + grant consumption;
+- an R5 freeze.
+
+The PROVEN claim is therefore overstated and is corrected here.
+
+```
+P2-R5R = OPEN
+P3-R4  = PRESERVED / PAUSED
+```
+
+**Source histories recorded:** canonical `8212b59d0ad5afd708d939d34a2564571f6ee285`;
+local review `7ca0adbeea86f9658ed633423b997daa02a55e0b` (review-only source,
+not merged/rebase-target/cherry-picked).
+
+**Schema law adopted.** `PRAGMA user_version == 5` means the complete v5
+schema is physically present. The true historical v4 is the original P2
+migration `P2-0004-runtime-governance-tables` at commit
+`61488273699dd5f6835c49b8b9f070489a7e5b42`, which contains NEITHER
+`runtime_execution` NOR `governance_approval_use`; those are post-v4 and now
+created by the real `V4_TO_V5`. A fresh database is bootstrapped to the
+complete v5 shape with bootstrap provenance BEFORE the version stamp, and
+`build_local_runtime` performs no schema completion at all (it verifies and
+fails closed).
+
+**Approval binding law adopted (POLICY_VERSION_BOUND).** One provider-neutral
+immutable `ApprovalBinding` over seven semantic fields — principal, action,
+resource, scope, budget_ref, authority_requirement, policy_version (plus
+constraints) — serialized canonically as sorted-key JSON, digested with
+sha256. An approval binds the policy version it was evaluated under; a
+policy-version change needs a fresh approval. Legacy/incomplete approvals stay
+readable historical evidence and never authorize.
 
 **Local review branch `agent/qcae-p2-r5-review` (`7ca0adbeea86f9658ed633423b997daa02a55e0b`)** is NOT merged,
 NOT rebased, NOT cherry-picked into canonical. Its R5 work is a separate
@@ -906,12 +941,36 @@ P2-R5R-FREEZE (new canonical freeze, blocks `[]`).
 (`test_crash_after_lease_resume_does_not_repeat_committed`) must be
 investigated and classified before freeze.
 
-**P2-R5R-C05 (typed outcome regression):** canonical `JobMissingOutcome` / 
-`StepNotReadyOutcome` model preserved (R5 `NoRunnableStep` not ported per 
-decision). Reconciliation + P2R3 CLI typed-error + P2 CLI app tests pass 
-(34 tests). Regression green.
+**Pre-existing failure review (independent reproduction on untouched
+canonical `8212b59d`, in a detached worktree):**
 
-**P2-R5R-T01 (adversarial + P3-R4 regression):** full `python -m pytest qcae/tests -q` -> **1375 passed, 0 failed** (39.94s). P3-R4 regression green (238 P3 tests in suite). Crash-after-lease invariant green (`test_crash_after_lease_resume_does_not_repeat_committed`). Exit gate blockers `[]`.
+- **A — `test_p0_topology.py::test_second_level_package_exists_and_imports[proving-build]`**
+  reproduces on untouched canonical. Root cause is a repository defect, not
+  an environment artifact: `qcae/proving/build/__init__.py` exists on disk but
+  is IGNORED by `.gitignore`'s `build/` rule, so no clean checkout contains
+  the canon subpackage the test requires. Repaired by versioning the file
+  (forced add); the tracked file makes a clean checkout green. It is
+  unrelated to P2 substrate, and is recorded as such.
+- **B — `test_p2_c07rt_repair_qualification::…test_crash_after_lease_resume_does_not_repeat_committed`**
+  passes in isolation on untouched canonical. The canonical test body opens an
+  AMBIENT file — `tempfile.gettempdir()/unused.sqlite3` — as a “placeholder”
+  restart, which on this machine is a leftover v1 database. That is a test
+  isolation defect (an unowned path shared with the OS temp dir), not a
+  runtime regression: the real restart it then performs already uses its own
+  temporary directory. Repaired truthfully by making the test self-contained
+  (the vestigial placeholder removed); the invariant assertion is unchanged
+  and green. **P2-R5R does not freeze while B is red** — it is green here.
+
+**P2-R5R-C05 (typed outcome regression — tests/ledger only, no code change
+required):** canonical `JobMissingOutcome` / `StepNotReadyOutcome` remain the
+sole no-work model (the local `NoRunnableStep` is not ported). New matrix
+proves: unknown job → exit 2; future schedule →
+`SCHEDULE_NOT_ELAPSED`; `WAITING_POLICY`, `WAITING_INPUT`, retry-scheduled and
+no-eligible-step → typed NOT_READY; worker missing → `WorkerUnavailable`, exit
+3 (canon exit code unchanged); no state/lease/budget mutation. 10 tests green.
+
+**P2-R5R-T01 (adversarial matrix + current P3-R4 regression):** see the
+evidence block below; full suite green at this commit.
 
 ## Blockers
 
