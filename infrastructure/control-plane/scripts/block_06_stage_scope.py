@@ -68,6 +68,9 @@ I2_PINNED = (
     "infrastructure/control-plane/scripts/block_06_i2_stage_controls.py",
     "infrastructure/control-plane/scripts/block_06_i2_generate.py",
     "infrastructure/control-plane/tests/stage_scope/test_i0_stage_scope_amendment_controls.py",
+    # The B6-I0 stage-contract suite must recognise the later-stage mode; adapting that one
+    # assertion is part of admitting the B6-I2 identity without weakening the strict I0 replay.
+    "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
     ".github/workflows/block-06-i0-validation.yml",
     ".github/workflows/block-06-i1-validation.yml",
     ".github/workflows/block-06-i2-validation.yml",
@@ -115,8 +118,15 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
     code, _ = _git(root, "merge-base", "--is-ancestor", I1_MERGE, "HEAD")
     if code != 0:
         raise StageScopeError("stage/base_moved", "HEAD does not descend from the B6-I1 merge")
-    for rel in (I2_REG, I2_SCOPE, I2_CONTRACT, I1_SCOPE, I1_CONTRACT):
+    for rel in (I2_REG, I2_SCOPE, I2_CONTRACT, I1_SCOPE, I1_CONTRACT, AMENDMENT):
         _require_identity_file(root, rel)
+    amendment = json.loads((root / AMENDMENT).read_text(encoding="utf-8"))
+    if amendment.get("amendment_id") != AMENDMENT_ID or amendment.get("status") != "FROZEN":
+        raise StageScopeError("stage/identity_unknown", amendment.get("amendment_id"))
+    declared = tuple(amendment.get("authorized_paths", ()))
+    if len(declared) != len(AMENDMENT_PATHS) or set(declared) != set(AMENDMENT_PATHS):
+        raise StageScopeError("stage/identity_tampered",
+                              "amendment allowlist differs from the pin")
     i1_identity = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
     i1_contract_identity = json.loads((root / I1_CONTRACT).read_text(encoding="utf-8"))
     if i1_identity.get("stage") not in KNOWN_LATER_STAGES:
