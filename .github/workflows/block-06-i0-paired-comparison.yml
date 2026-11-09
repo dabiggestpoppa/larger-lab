@@ -91,6 +91,11 @@ jobs:
           test "$(git rev-parse HEAD)" = "$BASE_SHA" || { echo "FATAL base sha"; exit 61; }
           test "$(git rev-parse 'HEAD^{tree}')" = "$BASE_TREE" || { echo "FATAL base tree"; exit 62; }
           test -z "$(git status --porcelain)" || { echo "FATAL base dirty"; exit 63; }
+          # A local clone does not carry the source's remote-tracking refs. Restore the true
+          # pre-stage main ref so the frozen validators see the same topology authoritative CI
+          # sees; the value is the pinned base, not a manufactured escape.
+          git update-ref refs/remotes/origin/main "$BASE_SHA"
+          test "$(git rev-parse origin/main)" = "$BASE_SHA" || { echo "FATAL base ref"; exit 65; }
           shopt -s nullglob
           B6=(infrastructure/control-plane/tests/test_block_06_i0_*.py)
           if [ "${#B6[@]}" -ne 0 ]; then
@@ -139,6 +144,9 @@ jobs:
           test "$(git rev-parse HEAD)" = "$HEAD_SHA" || { echo "FATAL head sha"; exit 71; }
           test "$(git rev-parse 'HEAD^{tree}')" = "$HEAD_TREE" || { echo "FATAL head tree"; exit 72; }
           test -z "$(git status --porcelain)" || { echo "FATAL head dirty"; exit 73; }
+          # Same topology as authoritative CI: main was at the pinned base when this stage ran.
+          git update-ref refs/remotes/origin/main "$BASE_SHA"
+          test "$(git rev-parse origin/main)" = "$BASE_SHA" || { echo "FATAL head ref"; exit 75; }
           shopt -s nullglob
           B6=(infrastructure/control-plane/tests/test_block_06_i0_*.py)
           if [ "${#B6[@]}" -ne 6 ]; then
