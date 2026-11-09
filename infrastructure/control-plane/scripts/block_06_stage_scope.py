@@ -148,9 +148,11 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
         if frozen:
             raise StageScopeError("stage/identity_tampered", frozen)
     _reject_later_artifacts(root)
-    allowed = tuple(dict.fromkeys(prefixes + I2_PINNED))
     i1_scope = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
     i1_owned = tuple(i1_scope.get("allowed_paths") or ())
+    # The stage chain is cumulative: the B6-I2 identity admits the B6-I1 surface set unchanged and
+    # adds only the B6-I2 paths proven by its contract.
+    allowed = tuple(dict.fromkeys(i1_owned + prefixes + I2_PINNED))
     i2_owned = tuple(p for p in allowed if p.startswith("oce/"))
     # The I0 validator's later-stage mode treats this as the complete oce authority of the stage
     # chain, so the B6-I1 surfaces stay admitted and only the I2 surfaces are added.
@@ -169,7 +171,7 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
         },
         "allowed": allowed,
         "i1_allowed": oce_authority,
-        "amendment": I2_PINNED,
+        "amendment": tuple(dict.fromkeys(AMENDMENT_PATHS + I2_PINNED)),
         "i0_merge": I1_MERGE,
     }
 
