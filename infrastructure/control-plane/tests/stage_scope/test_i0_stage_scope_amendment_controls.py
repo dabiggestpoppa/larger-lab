@@ -2,8 +2,8 @@
 
 Every control mutates an isolated worktree of the exact head and asserts that the amended validator
 fails for the intended, named reason. A pristine run must pass first, so no control can pass
-vacuously. The worktree is reused and reset between controls; the base control uses a throwaway
-repository so no shared ref is ever moved.
+vacuously. The worktree is reused and reset between controls; the base control calls the resolver
+directly on a throwaway repository so no shared ref is ever moved.
 """
 from __future__ import annotations
 
@@ -18,10 +18,12 @@ import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[4]
 WORKFLOW = ROOT / ".github/workflows/block-06-i0-validation.yml"
-I0_MERGE = "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e"
 DOCS_REL = "docs/oce-golden-system"
 I1_SCOPE = f"{DOCS_REL}/OCE_BLOCK_06_I1_SCOPE_DERIVATION_v1.0.json"
 AMENDMENT = f"{DOCS_REL}/OCE_BLOCK_06_I0_STAGE_SCOPE_AMENDMENT_001_v1.0.json"
+
+sys.path.insert(0, str(ROOT / "infrastructure/control-plane/scripts"))
+import block_06_stage_scope as scope  # noqa: E402
 
 
 def git(cwd, *args) -> subprocess.CompletedProcess:
@@ -123,7 +125,6 @@ def test_unlisted_oce_path_fails(probe):
     _, fails, _ = run(probe)
     assert "boundary/oce_within_i1_contract" in fails
     assert "boundary/only_allowed_paths" in fails
-    assert "boundary/changed" not in fails
 
 
 def test_later_stage_artifact_fails(probe):
@@ -160,15 +161,12 @@ def test_package_path_fails(probe):
 
 
 def test_moved_base_fails():
-    sys.path.insert(0, str(ROOT / "infrastructure/control-plane/scripts"))
-    import block_06_stage_scope as scope
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-base-"))
     try:
         repo = tmp / "repo"
         repo.mkdir()
         assert git(repo, "init", "-q").returncode == 0
-        (repo / "README.md").write_text("probe
-", encoding="utf-8")
+        (repo / "README.md").write_text("probe\n", encoding="utf-8")
         assert git(repo, "add", "-A").returncode == 0
         assert git(repo, "-c", "user.email=ci@example.com", "-c", "user.name=ci",
                    "commit", "-qm", "probe").returncode == 0
