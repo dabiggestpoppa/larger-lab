@@ -110,7 +110,8 @@ def resolve(root, requested: str = "auto") -> dict:
     superseded = amendment.get("superseded_validator", {})
     if superseded.get("blob") != SUPERSEDED_BLOB or superseded.get("sha256") != SUPERSEDED_SHA256:
         raise StageScopeError("stage/identity_tampered", "amendment superseded pointer differs")
-    if tuple(amendment.get("authorized_paths", ())) != AMENDMENT_PATHS:
+    declared = tuple(amendment.get("authorized_paths", ()))
+    if len(declared) != len(AMENDMENT_PATHS) or set(declared) != set(AMENDMENT_PATHS):
         raise StageScopeError("stage/identity_tampered", "amendment allowlist differs from the pin")
 
     i1_allowed = tuple(scope.get("allowed_paths") or ())

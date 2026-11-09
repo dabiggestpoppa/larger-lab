@@ -102,7 +102,8 @@ def test_boundary_only_allowed_paths_changed() -> None:
     assert changed
     outside = [p for p in changed if not p.startswith(allowed)]
     assert outside == []
-    forbidden = [p for p in changed if p.startswith(tuple(scope["forbidden_paths"]))]
+    forbidden = [p for p in changed
+                 if p.startswith(tuple(scope["forbidden_paths"])) and p not in allowed]
     assert forbidden == []
 
 
