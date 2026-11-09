@@ -263,19 +263,21 @@ class TestApprovalAdversarial:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "id-worker-runtime")
         engine.execute_step(lease, worker_id="id-worker-runtime")
-        rid = engine._latest_authority_request_for_step("job-12345678", SID)
+        rid = engine._resolver.latest_for_step("job-12345678", SID)
         service.decide_approval(
             request_id=rid, decision="GRANTED", decided_by="id-operator-1",
             job_id="job-12345678", reason="ok")
         service.release_granted_step("job-12345678", SID)
         # First admission consumes (12); durable row exists.
-        assert engine._grant_admits(
-            job_id="job-12345678", step_id=SID, principal="id-worker-runtime")
+        gate = StaticStepAuthorityGate(require_approval=("execute.GENERIC",))
+        verdict = gate.evaluate_step_authority(
+            store.get_step(SID), store.get_job("job-12345678"),
+            worker_id="id-worker-runtime")
+        assert engine._grant_admits(verdict=verdict)
         decision = approvals.decisions_for_request(rid)[-1]
         assert len(approvals.uses_for_decision(decision.decision_id)) == 1
         # Second use refused (13) and durable (14: survives restart).
-        assert not engine._grant_admits(
-            job_id="job-12345678", step_id=SID, principal="id-worker-runtime")
+        assert not engine._grant_admits(verdict=verdict)
         conn.commit()
         conn.close()
         conn2 = open_metadata_db(tmp_path / "a.sqlite3")
@@ -321,7 +323,7 @@ class TestApprovalAdversarial:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "id-worker-runtime")
         engine.execute_step(lease, worker_id="id-worker-runtime")
-        rid = engine._latest_authority_request_for_step("job-12345678", SID)
+        rid = engine._resolver.latest_for_step("job-12345678", SID)
         service = LocalRuntimeService(
             runtime_store=store, queue=queue, engine=engine,
             identity_provider=_identities(), policy_provider=None,
@@ -332,8 +334,11 @@ class TestApprovalAdversarial:
             request_id=rid, decision="GRANTED", decided_by="id-operator-1",
             job_id="job-12345678", reason="ok")
         clock.advance(7200)  # grant window elapsed
-        assert not engine._grant_admits(
-            job_id="job-12345678", step_id=SID, principal="id-worker-runtime")
+        gate = StaticStepAuthorityGate(require_approval=("execute.GENERIC",))
+        verdict = gate.evaluate_step_authority(
+            store.get_step(SID), store.get_job("job-12345678"),
+            worker_id="id-worker-runtime")
+        assert not engine._grant_admits(verdict=verdict)
 
     def test_17_denial_still_immutable(self):
         clock = _Clock()
@@ -346,7 +351,7 @@ class TestApprovalAdversarial:
         engine.ready_steps("job-12345678")
         lease = engine.lease_next("job-12345678", "id-worker-runtime")
         engine.execute_step(lease, worker_id="id-worker-runtime")
-        rid = engine._latest_authority_request_for_step("job-12345678", SID)
+        rid = engine._resolver.latest_for_step("job-12345678", SID)
         service.decide_approval(
             request_id=rid, decision="DENIED", decided_by="id-operator-1",
             job_id="job-12345678", reason="no")

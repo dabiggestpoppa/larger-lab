@@ -28,17 +28,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Protocol, Tuple, runtime_checkable
+from typing import Optional, Protocol, Tuple, runtime_checkable
 
 from qcae.core.errors import QcaeValidationError
 from qcae.core.serialization import SerializableRecord, coerce_enum
 from qcae.core.validation import require_identifier, require_non_empty_str
+from qcae.orchestration.jobs.runtime import JobEventType
 
 __all__ = [
     "StepAuthorityDecision",
     "StepAuthorityVerdict",
     "StepAuthorityGate",
     "AuthorityRequestSink",
+    "ApprovalAdmissionProvider",
+    "ApprovalRequestResolver",
     "FailClosedStepAuthorityGate",
     "StaticStepAuthorityGate",
     "baseline_action_for_step",
@@ -94,6 +97,21 @@ class StepAuthorityVerdict(SerializableRecord):
         "decision": lambda v: coerce_enum(v, StepAuthorityDecision),
     }
 
+    def binding_digest(self) -> str:
+        """Digest of the authority binding this verdict admits.
+
+        principal -> action -> resource -> scope, verbatim.
+        Used to detect stale grants whose binding no longer matches the
+        live verdict (P2-R5-C03: live binding digest must equal approved
+        binding digest before any grant consumption).
+        """
+        import hashlib
+
+        material = (
+            f"{self.principal}|{self.action}|{self.resource}|{self.scope}"
+        ).encode("utf-8")
+        return hashlib.sha256(material).hexdigest()
+
     def validate(self) -> None:
         require_identifier(self.step_id, "step_id")
         require_identifier(self.job_id, "job_id")
@@ -120,16 +138,75 @@ class StepAuthorityGate(Protocol):
 
     def evaluate_step_authority(self, step, job, *, worker_id: str) -> StepAuthorityVerdict:
         """Evaluate authority for executing ``step`` of ``job`` as ``worker_id``."""
-        ...
-
-
-@runtime_checkable
+        ...@runtime_checkable
 class AuthorityRequestSink(Protocol):
     """Port for persisting a durable authority request on REQUIRE_APPROVAL."""
 
     def record_authority_request(self, verdict: StepAuthorityVerdict) -> str:
         """Persist the request; return its durable request_id."""
         ...
+
+
+@runtime_checkable
+class ApprovalAdmissionProvider(Protocol):
+    """Provider-neutral port for live grant admission.
+
+    The orchestrator depends on this port, never on a concrete governance
+    registry (no ``qcae.governance.standalone`` import). Methods take and
+    return provider-neutral primitives / duck-typed records.
+    """
+
+    def get_request(self, request_id: str):
+        """The durable authority request for ``request_id`` (duck-typed; has .principal)."""
+        ...
+
+    def effective_grant(self, request_id: str, *, now: str):
+        """The live GRANTED decision for ``request_id`` (duck-typed; has
+        .decision_id and .binding_digest(principal))."""
+        ...
+
+    def consume_grant(
+        self,
+        *,
+        use_id: str,
+        decision_ref: str,
+        step_id: str,
+        used_at: str,
+    ) -> bool:
+        """Atomically record single-use consumption; True iff this call won."""
+        ...
+
+
+class ApprovalRequestResolver:
+    """Resolve the durable authority request id for one (job, step).
+
+    Single source of truth used by both grant release verification
+    (runtime service) and execution-time admission (engine). Reads the
+    job's APPROVAL_REQUESTED events through an injected ``events_for_job``
+    accessor so neither side touches store internals directly.
+    """
+
+    def __init__(self, events_for_job) -> None:
+        self._events_for_job = events_for_job
+
+    def latest_for_step(self, job_id: str, step_id: str) -> Optional[str]:
+        """The request id from the step's latest APPROVAL_REQUESTED event."""
+        import json
+
+        for _seq, _ev, payload in reversed(self._events_for_job(job_id)):
+            if (
+                _ev.event_type is JobEventType.APPROVAL_REQUESTED
+                and _ev.step_id == step_id
+                and payload
+            ):
+                try:
+                    data = json.loads(payload)
+                except ValueError:
+                    continue
+                rid = data.get("authority_request_id", "")
+                if rid and rid != "unsinked":
+                    return rid
+        return None
 
 
 class FailClosedStepAuthorityGate:
