@@ -45,6 +45,7 @@ ALLOWED_PREFIXES = (
     "infrastructure/control-plane/tests/test_block_06_i0_",
     "infrastructure/control-plane/tests/block_06_i0_support.py",
     ".github/workflows/block-06-i0-validation.yml",
+    ".github/workflows/block-06-i0-paired-comparison.yml",
 )
 PROHIBITED_PREFIXES = (
     "infrastructure/control-plane/src/", "infrastructure/console/src/", "oce/",
