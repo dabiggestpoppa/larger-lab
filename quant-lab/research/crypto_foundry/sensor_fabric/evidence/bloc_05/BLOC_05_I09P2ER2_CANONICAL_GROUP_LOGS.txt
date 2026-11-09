@@ -1,0 +1,165 @@
+===== g01.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+............ss.............                                              [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_i11_postgres_metadata.py:83: real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_i11_postgres_metadata.py:100: real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN
+385 passed, 2 skipped in 77.53s (0:01:17)
+
+===== g02.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+387 passed in 82.77s (0:01:22)
+
+===== g03.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+...s......................s............................................. [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_i15r2_path_canonicalization.py:262: Windows filesystem is case-insensitive here
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_recovery.py:607: POSIX symlink semantics required
+385 passed, 2 skipped in 149.26s (0:02:29)
+
+===== g04.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+.....................s.................................................. [ 74%]
+........................................................................ [ 93%]
+..........................                                               [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_json_catalog.py:215: POSIX permission semantics
+385 passed, 1 skipped in 109.79s (0:01:49)
+
+===== g05.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+..........................                                               [100%]
+386 passed in 197.41s (0:03:17)
+
+===== g06.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................ss.............................. [ 55%]
+.............................................................s.......... [ 74%]
+......................................s................................. [ 93%]
+..........................                                               [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_i13_export_restore.py:596: symlink privilege unavailable on this platform
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_i13_export_restore.py:622: symlink privilege unavailable on this platform
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_blob_store_namespace.py:231: platform has no os.pathconf
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_i15r2_concurrent_publication.py:490: Windows cannot create symlinks without privilege (1314)
+382 passed, 4 skipped in 138.01s (0:02:18)
+
+===== g07.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+387 passed in 69.99s (0:01:09)
+
+===== g08.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+387 passed in 115.33s (0:01:55)
+
+===== g09.log =====
+........................................................................ [ 18%]
+.................................s...................................... [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\storage\test_blob_store.py:498: POSIX mode bits do not apply on Windows
+386 passed, 1 skipped in 168.17s (0:02:48)
+
+===== g10.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+============================== warnings summary ===============================
+quant-lab/tests/crypto_sensor_fabric/storage/test_manifest_concurrency.py::TestPointerVisibility::test_readers_never_observe_partial_pointer
+  C:\Users\wifik\AppData\Local\Programs\Python\Python311\Lib\site-packages\_pytest\threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-26 (reader)
+  
+  Traceback (most recent call last):
+    File "C:\Users\wifik\Desktop\larger-lab\.worktrees\p2e-r2\quant-lab\src\crypto_sensor_fabric\storage\manifests.py", line 600, in read_current_pointer
+      text = path.read_text(encoding="utf-8")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\wifik\AppData\Local\Programs\Python\Python311\Lib\pathlib.py", line 1058, in read_text
+      with self.open(mode='r', encoding=encoding, errors=errors) as f:
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\wifik\AppData\Local\Programs\Python\Python311\Lib\pathlib.py", line 1044, in open
+      return io.open(self, mode, buffering, encoding, errors, newline)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  PermissionError: [Errno 13] Permission denied: 'C:\\Users\\wifik\\AppData\\Local\\Temp\\pytest-of-wifik\\pytest-158\\test_readers_never_observe_par0\\catalogs\\current\\partitions\\07c1d4ba4c04ec675b4761b4db90c660.json'
+  
+  The above exception was the direct cause of the following exception:
+  
+  Traceback (most recent call last):
+    File "C:\Users\wifik\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 1045, in _bootstrap_inner
+      self.run()
+    File "C:\Users\wifik\AppData\Local\Programs\Python\Python311\Lib\threading.py", line 982, in run
+      self._target(*self._args, **self._kwargs)
+    File "C:\Users\wifik\Desktop\larger-lab\.worktrees\p2e-r2\quant-lab\tests\crypto_sensor_fabric\storage\test_manifest_concurrency.py", line 239, in reader
+      current = repo.get_current_manifest(PK)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\wifik\Desktop\larger-lab\.worktrees\p2e-r2\quant-lab\src\crypto_sensor_fabric\storage\manifests.py", line 690, in get_current_manifest
+      pointer = self._read_validated_pointer(partition_key)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\wifik\Desktop\larger-lab\.worktrees\p2e-r2\quant-lab\src\crypto_sensor_fabric\storage\manifests.py", line 663, in _read_validated_pointer
+      pointer = self.read_current_pointer(partition_key)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "C:\Users\wifik\Desktop\larger-lab\.worktrees\p2e-r2\quant-lab\src\crypto_sensor_fabric\storage\manifests.py", line 602, in read_current_pointer
+      raise CurrentPointerCorrupt(
+  crypto_sensor_fabric.storage.manifests.CurrentPointerCorrupt: current pointer C:\Users\wifik\AppData\Local\Temp\pytest-of-wifik\pytest-158\test_readers_never_observe_par0\catalogs\current\partitions\07c1d4ba4c04ec675b4761b4db90c660.json unreadable: [Errno 13] Permission denied: 'C:\\Users\\wifik\\AppData\\Local\\Temp\\pytest-of-wifik\\pytest-158\\test_readers_never_observe_par0\\catalogs\\current\\partitions\\07c1d4ba4c04ec675b4761b4db90c660.json'
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+387 passed, 1 warning in 405.05s (0:06:45)
+
+===== g11.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+...........................                                              [100%]
+387 passed in 80.73s (0:01:20)
+
+===== g12.log =====
+........................................................................ [ 18%]
+........................................................................ [ 37%]
+........................................................................ [ 55%]
+........................................................................ [ 74%]
+........................................................................ [ 93%]
+.........................s                                               [100%]
+=========================== short test summary info ===========================
+SKIPPED [1] quant-lab\tests\crypto_sensor_fabric\providers\test_network_smoke_live.py:59: SENSOR_NETWORK_SMOKE not set; live network smoke disabled
+385 passed, 1 skipped in 83.21s (0:01:23)

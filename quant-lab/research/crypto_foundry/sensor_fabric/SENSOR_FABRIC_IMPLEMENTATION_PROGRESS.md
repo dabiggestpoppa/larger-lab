@@ -9065,3 +9065,17 @@ NONINTERFERENCE: no ingestion application, initializer, custody service, provide
 approval, liquidation transformation, manifest change, I05 replay change, I11/I12/Bloc 6
 advance, or primary-branch write. INTEGRATION_STATE remains INTEGRATION_REQUIRED. No
 self-ratification; independent review required before merge.
+
+## 202 - SENSOR-B5-I09P2eR2: I09 SOURCE-PIN REPAIR AND COMMITTED-TREE REGRESSION CLOSURE
+
+- Checkpoint ID: `SENSOR-B5-I09P2eR2`. Ordering is by checkpoint ID; section numbers are not authority.
+- Branch: `agent/crypto-sensor-fabric-pit-parity-r2`, a direct child of `d587e74af1019afef9a87bd9836f5c6431ebad1f`; the primary branch is not modified.
+- Defect, independently reported by `agent/crypto-sensor-fabric-audit-p2er1-recovered @ e9f5391db`: `b5_i09_semantics.py --check` exits 3 with `committed_bytes_mismatch`, because the artifact pinned `authority/__init__.py` at `6bdc4697...` while the audited commit hashes it to `e27089cd...`. P2e modified the module without republishing the artifact.
+- Repair: the documented producer was re-run in write mode. Exactly one parsed field changed (that digest); all 35 semantic rows, the `pass 35 / fail 0` summary and the three historical unresolved states are preserved. No hand-edited hash, no source, test, allowlist, frozen-plan or approval change, and no new tracked `.py` file.
+- GREEN: producer `--check` exits 0, and `test_sem_a08_semantic_validation_evidence_is_deterministic` passes.
+- Committed-tree regression: 4,640 collected, 4,640 executed (0 missing, 0 extra, 0 duplicates), 4,629 passed, 0 failed, 0 errors, 11 skipped, node-id union verdict COMPLETE, in 12 memory-bounded processes. Focused I05/I06/I09/I10 plus P2a-P2e suites: 435 passed.
+- Environment, disclosed: a monolithic canonical run OOM-kills this 7.4 GB host; the suite is non-hermetic (producers rewrite tracked evidence), so each group starts from a restored tree and unrelated evidence is restored before publication.
+- Disposition unchanged at `I09P2E_IMPLEMENTATION_PARTIAL`: this closes an evidence defect, not the missing consuming application (P2D-07), the mapping-level residual (P2D-16) or the unverified pre-repair RED (P2E-03).
+- Ledger reconciliation: sections 197-199 untouched; section 200 belongs to the recovered P2dR2 audit branch and section 201 to the recovered P2eR1 audit branch; this record takes 202 and integrates neither.
+- Evidence: `BLOC_05_I09P2ER2_REPAIR_EVIDENCE.md`, `BLOC_05_I09P2ER2_CANONICAL_RUN.json`, `BLOC_05_I09P2ER2_CANONICAL_GROUP_LOGS.txt`.
+- No merge to primary, no trust consumer, no provider certification, no I11/I12/I17 or Bloc 6 advancement, no program-gate promotion, no self-ratification.
