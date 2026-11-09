@@ -37,7 +37,7 @@ AMENDMENT_PATHS = (
     "infrastructure/control-plane/scripts/block_06_i1_validate.py",
     "infrastructure/control-plane/tests/block_06_i0_support.py",
     "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
-    "infrastructure/control-plane/tests/stage_scope/test_b6_i0_amendment_controls.py",
+    "infrastructure/control-plane/tests/stage_scope/test_i0_stage_scope_amendment_controls.py",
     ".github/workflows/block-06-i0-validation.yml",
 )
 

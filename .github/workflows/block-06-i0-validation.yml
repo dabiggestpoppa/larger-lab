@@ -138,7 +138,7 @@ jobs:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
           python -m pytest \
-            infrastructure/control-plane/tests/stage_scope/test_b6_i0_amendment_controls.py \
+            infrastructure/control-plane/tests/stage_scope/test_i0_stage_scope_amendment_controls.py \
             -q --no-header -p no:cacheprovider \
             --junitxml="$EVIDENCE_DIR/amendment-controls-junit.xml" \
             | tee "$EVIDENCE_DIR/amendment-controls.txt"'

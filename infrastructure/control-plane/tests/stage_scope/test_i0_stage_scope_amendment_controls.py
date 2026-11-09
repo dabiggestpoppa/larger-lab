@@ -1,7 +1,8 @@
 """Non-vacuous negative controls for B6-I0-STAGE-SCOPE-AMENDMENT-001.
 
-Each control mutates an isolated clone of the exact head and asserts that the amended validator
-fails for the intended, named reason. A pristine run must pass, so no control can pass vacuously.
+Every control mutates an isolated clone of the exact head and asserts that the amended validator
+fails for the intended, named reason. A pristine run must pass first, so no control can pass
+vacuously. One clone is reused and reset between controls to keep the suite fast.
 """
 from __future__ import annotations
 
@@ -15,7 +16,6 @@ import tempfile
 import pytest
 
 ROOT = pathlib.Path(__file__).resolve().parents[4]
-VALIDATOR = ROOT / "infrastructure/control-plane/scripts/block_06_i0_validate.py"
 WORKFLOW = ROOT / ".github/workflows/block-06-i0-validation.yml"
 I0_MERGE = "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e"
 DOCS_REL = "docs/oce-golden-system"
@@ -36,34 +36,39 @@ def commit(wt: pathlib.Path) -> None:
 
 def run(wt: pathlib.Path, mode: str = "auto") -> tuple[int, set[str], dict]:
     out = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-out-")) / "validator.json"
-    proc = subprocess.run([sys.executable, str(wt / "infrastructure/control-plane/scripts/"
-                                               "block_06_i0_validate.py"),
-                           "--root", str(wt), "--stage-scope", mode, "--json", str(out)],
-                          cwd=str(wt), capture_output=True, text=True)
+    proc = subprocess.run(
+        [sys.executable, str(wt / "infrastructure/control-plane/scripts/block_06_i0_validate.py"),
+         "--root", str(wt), "--stage-scope", mode, "--json", str(out)],
+        cwd=str(wt), capture_output=True, text=True)
     doc = json.loads(out.read_text(encoding="utf-8"))
     shutil.rmtree(out.parent, ignore_errors=True)
     return proc.returncode, {f["check"] for f in doc["failure_detail"]}, doc
 
 
-@pytest.fixture()
-def probe():
+@pytest.fixture(scope="session")
+def clone():
     tmp = pathlib.Path(tempfile.mkdtemp(prefix="b6i0-amend-"))
     wt = tmp / "wt"
-    assert git(ROOT, "clone", "-q", "--no-local", ".", str(wt)).returncode == 0
     head = git(ROOT, "rev-parse", "HEAD").stdout.strip()
+    assert git(ROOT, "clone", "-q", "--no-local", ".", str(wt)).returncode == 0
     assert git(wt, "checkout", "-q", "--detach", head).returncode == 0
+    yield wt, head
+    shutil.rmtree(tmp, ignore_errors=True)
+
+
+@pytest.fixture()
+def probe(clone):
+    wt, head = clone
+    assert git(wt, "reset", "-q", "--hard", head).returncode == 0
+    assert git(wt, "clean", "-qfdx").returncode == 0
     assert git(wt, "update-ref", "refs/remotes/origin/main", I0_MERGE).returncode == 0
-    try:
-        yield wt
-    finally:
-        shutil.rmtree(tmp, ignore_errors=True)
+    return wt
 
 
 def test_pristine_later_stage_head_passes(probe):
     rc, fails, doc = run(probe)
     assert doc["stage_scope"]["resolved"] == "later"
-    assert rc == 0, sorted(fails)
-    assert fails == set() and doc["status"] == "PASS"
+    assert rc == 0 and fails == set() and doc["status"] == "PASS"
 
 
 def test_i0_mode_remains_strict_on_later_head(probe):
@@ -161,6 +166,6 @@ def test_workflow_has_no_waiver():
     text = WORKFLOW.read_text(encoding="utf-8")
     assert "--stage-scope auto" in text
     assert "stage-scope.json" in text
-    assert "test_b6_i0_amendment_controls.py" in text
+    assert "test_i0_stage_scope_amendment_controls.py" in text
     assert "continue-on-error" not in text
     assert "|| true" not in text
