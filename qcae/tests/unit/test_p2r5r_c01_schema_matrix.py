@@ -444,6 +444,75 @@ class TestNoHiddenCompletion:
             rt.conn.close()
 
 
+class TestOnePhysicalSchema:
+    """v5 must be ONE physical schema, however it was reached."""
+
+    _AUTHORITY_DDL = (
+        RUNTIME_DDL_MIGRATION,
+        V5_ADDITIONS_DDL,
+    )
+
+    def _authority_ddl(self) -> tuple:
+        from qcae.infrastructure.persistence.sqlite_approval_registry import (
+            APPROVAL_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_budget_ledger import BUDGET_DDL
+        from qcae.infrastructure.persistence.sqlite_policy_log import GOVERNANCE_DDL
+        from qcae.infrastructure.persistence.sqlite_runtime_store import RUNTIME_DDL
+        from qcae.infrastructure.queue.sqlite_step_queue import QUEUE_INTEGRITY_DDL
+
+        return self._AUTHORITY_DDL + (
+            RUNTIME_DDL, QUEUE_INTEGRITY_DDL, BUDGET_DDL, GOVERNANCE_DDL,
+            APPROVAL_DDL,
+        )
+
+    def _authority_shape(self, conn) -> set:
+        tables = set()
+        for ddl in self._authority_ddl():
+            scratch = open_raw_connection(":memory:")
+            try:
+                scratch.executescript(ddl)
+                tables |= {
+                    r[0] for r in scratch.execute(
+                        "SELECT name FROM sqlite_master WHERE type='table'")
+                }
+            finally:
+                scratch.close()
+        shape = set()
+        for kind, name, sql in conn.execute(
+            "SELECT type, name, sql FROM sqlite_master"
+            " WHERE name NOT LIKE 'sqlite_%'"
+        ).fetchall():
+            text = (sql or "").strip()
+            if kind == "table" and name in tables:
+                shape.add((kind, name, text))
+            elif kind == "index" and any(t in text for t in tables):
+                shape.add((kind, name, text))
+        return shape
+
+    def test_fresh_v5_and_migrated_v5_are_the_same_physical_schema(
+        self, tmp_path
+    ) -> None:
+        fresh = open_metadata_db(tmp_path / "fresh5.sqlite3")
+        fresh_shape = self._authority_shape(fresh)
+        fresh.close()
+
+        db = tmp_path / "migrated5.sqlite3"
+        _true_v4(db)
+        conn = open_raw_connection(db)
+        conn.execute("DELETE FROM schema_migration_ledger")
+        conn.commit()
+        MigrationRunner(conn, clock=lambda: "t").migrate_to(5, {5: V4_TO_V5})
+        migrated_shape = self._authority_shape(conn)
+        conn.close()
+
+        assert fresh_shape, "authority schema empty"
+        assert fresh_shape == migrated_shape, (
+            f"only fresh: {sorted(fresh_shape - migrated_shape)}; "
+            f"only migrated: {sorted(migrated_shape - fresh_shape)}"
+        )
+
+
 class TestV5Additions:
     def test_v5_creates_only_genuinely_post_v4_structures(self) -> None:
         conn = open_raw_connection(":memory:")
