@@ -79,7 +79,7 @@ class Checker:
 
 def check_packet(c: Checker) -> None:
     files = sorted(p.name for p in (c.root / DOCS).glob(f"{PREFIX}*.json"))
-    c.need("packet/count", len(files) == 9, files)
+    c.need("packet/count", len(files) == 10, files)
     for name in files:
         raw = (c.root / DOCS / name).read_bytes()
         c.need(f"packet/canonical/{name}", raw == canonical(json.loads(raw)))
