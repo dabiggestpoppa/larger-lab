@@ -65,8 +65,8 @@
     "B6-I2_through_I9": "LOCKED",
     "BOOK_6_COMPLETE": false,
     "G16": "OPEN",
-    "MERGE_AUTHORIZED": false,
-    "RATIFICATION_AUTHORIZED": false,
+    "MERGE_AUTHORIZED": true,
+    "RATIFICATION_AUTHORIZED": true,
     "evaluation_system": "RESERVED_NOT_AUTHORIZED"
   },
   "manifest": {
@@ -98,6 +98,18 @@
   },
   "public_experimental": 10,
   "public_stable": 0,
+  "ratification": {
+    "amendment": "B6-I0-STAGE-SCOPE-AMENDMENT-001",
+    "basis": [
+      "B6-I1 Validation 42648199359",
+      "B6-I1 Paired Comparison 42648199656",
+      "B6-I0 Validation 42648199671",
+      "B6-I0 Paired Comparison 42648100136"
+    ],
+    "document": "docs/oce-golden-system/OCE_BLOCK_06_I1_OPERATOR_RATIFICATION_v1.0.md",
+    "merges": "normal two-parent merge commit",
+    "next_stage": "B6-I2 remains LOCKED"
+  },
   "refusals": [
     {
       "class": "F10",

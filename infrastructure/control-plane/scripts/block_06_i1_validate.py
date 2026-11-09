@@ -106,9 +106,17 @@ def check_packet(c: Checker) -> None:
            and contract["scopes"]["wildcard"] is False
            and contract["scopes"]["client_supplied_authority"] is False)
     c.need("contract/no_stable", contract["public_stable"] == 0)
-    c.need("contract/holds", contract["locks"]["MERGE_AUTHORIZED"] is False
-           and contract["locks"]["RATIFICATION_AUTHORIZED"] is False
-           and contract["locks"]["BOOK_6_COMPLETE"] is False)
+    locks = contract["locks"]
+    ratification = contract.get("ratification") or {}
+    ratification_doc = c.root / DOCS / f"{PREFIX}OPERATOR_RATIFICATION_v1.0.md"
+    held = locks["MERGE_AUTHORIZED"] is False and locks["RATIFICATION_AUTHORIZED"] is False
+    ratified = (locks["MERGE_AUTHORIZED"] is True and locks["RATIFICATION_AUTHORIZED"] is True
+                and ratification_doc.exists()
+                and ratification.get("amendment") == "B6-I0-STAGE-SCOPE-AMENDMENT-001"
+                and bool(ratification.get("basis")))
+    c.need("contract/holds", (held or ratified) and locks["BOOK_6_COMPLETE"] is False)
+    c.need("contract/next_stage_locked",
+           ("B6-I2 remains LOCKED" in str(ratification.get("next_stage", ""))) if ratified else True)
     c.need("contract/g16", contract["locks"]["G16"] == "OPEN")
     c.need("contract/cost", contract["cost_usd"] == 0
            and contract["capital_authority"] == "none")
