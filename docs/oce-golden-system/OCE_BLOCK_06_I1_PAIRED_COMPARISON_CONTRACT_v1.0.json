@@ -1,0 +1,35 @@
+{
+  "document_id": "OCE-B6-I1-PAIRED-001",
+  "endpoints": {
+    "base_sha": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+    "base_tree": "3c2e2a6676e16415a1e2bd326c1fc147e51c2a6d",
+    "head_sha": "7250c52206db4491bb3b3b5a05efe42e75226b17",
+    "head_tree": "4fa55d45f45bfb5b6349295a446e6101690c1460"
+  },
+  "frozen_before_results": true,
+  "population": {
+    "base_only_expected": 0,
+    "common_floor": 270,
+    "common_glob": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
+    "head_only_expected": 42,
+    "head_only_glob": "infrastructure/control-plane/tests/test_block_06_i1_*.py"
+  },
+  "rules": {
+    "cleanup_before_verdict": true,
+    "fail_closed": [
+      "zero common population",
+      "below floor",
+      "endpoint mismatch",
+      "absent ref",
+      "uncollected suite",
+      "common regression",
+      "head-only not green",
+      "cleanup failure"
+    ],
+    "identical_setup": true,
+    "separate_clones": true
+  },
+  "schema": "oce.block_06_i1.paired.v1",
+  "stage": "B6-I1",
+  "status": "FROZEN"
+}
