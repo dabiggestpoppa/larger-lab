@@ -63,3 +63,63 @@ committed, this ledger records implementation in progress and claims no PASS it 
 
 Any later repair is committed forward as its own rung and disclosed here with its failed run.
 No history is rewritten, amended, squashed or force-pushed.
+
+## 9. Evidence rung
+
+### 9.1 Exact-head CI at implementation tip `ae2d80e7`
+
+| Workflow | Run | Result |
+|---|---|---|
+| B6-I1 Validation | `42624339612` | success |
+| B6-I1 Paired Comparison | `42624339355` | success |
+| B5-I9 Factory Gate Validation | `42624339319` | success |
+| B5-I9 Post-Merge Paired Comparison | `42624339460` | success |
+| B5-I8 Audit Validation | `42624339306` | success |
+| B1-I1R Validation | `42624339341` | success |
+
+Parsed raw artifacts: 42 collected, 42 executed, 42 passed, 0 failures, 0 errors, 0 skipped,
+`rc 0`; validator `PASS 164/164`; mutation battery `floor 6, discriminated 6, restored 6,
+pristine_green_after true`; frozen Book 5 gate 41/41; adjacent suites green; cleanup clean.
+
+### 9.2 Exact paired comparison
+
+Run `42624339355`, verdict `PASS` over 19 checks: base `6783bf76` (tree `3c2e2a66`) versus
+implementation head `d0f1be21` (tree `781ed580`), 270 common nodes (270 pass, 0 skip, 0 fail,
+0 error), base-only 0, head-only 42 of 42 expected and all green, common floor 270 satisfied,
+both endpoint clones removed before the verdict, dependency lock and runner image identical.
+
+### 9.3 B6-I0 ladder-count discrepancy resolved
+
+B6-I0 has 14 branch commits before the merge, 0 merge commits inside the branch, and exactly one
+final main merge. The earlier phrase "all 15 ladder commits reachable" counted the merge commit as
+a ladder rung; 14 is the correct rung count and the merge is the separate two-parent join at
+`6783bf76`. Classification: bookkeeping wording, not a lineage or ancestry error. It is corrected
+here append-only; no B6-I0 byte and no history is rewritten.
+
+### 9.4 Repairs committed forward
+
+X1 normalized manifest paths to POSIX and moved the mutation battery onto a detached worktree.
+X2 re-pinned the paired comparison. X3 strengthened the storage-leak proof after mutation M04
+showed the old assertion accepted `store_path` by exact-name comparison. X4 re-pinned the paired
+contract to the strengthened head. No history was amended, squashed, rebased, reset or
+force-pushed.
+
+### 9.5 Limit and structural conflict disclosed
+
+`B6-I0 Validation` run `42624339342` is red at this head, and it cannot be made green here. Its
+frozen validator applies B6-I0's own stage-scoped laws outside their window: `git/base` expects
+main to still be `5e76dc12`; `boundary/only_allowed_paths` accepts only B6-I0 prefixes;
+`boundary/no_prohibited_surface` forbids `oce/`, which B6-I1 is explicitly authorized to extend
+with `oce/api/`, `oce/sdk/` and `oce/compat/`; `impl/no_book6_modules` forbids those modules; and
+`boundary/p0_packet_untouched` filters changed paths by `I0` instead of `P0`, so B6-I1 packet files
+are reported as P0 modifications. Repairing this requires an operator decision to rescope or
+retire a ratified prior-stage workflow; B6-I1 holds no amendment authority, and the B6-I1 contract
+forbids editing B6-I0 artifacts. This is a governance defect in the prior stage, not a B6-I1 proof
+failure, and it is recorded rather than hidden.
+
+### 9.6 Locks unchanged
+
+`MERGE_AUTHORIZED = false`; `RATIFICATION_AUTHORIZED = false`; `B6-I2`–`B6-I9` LOCKED;
+`BOOK_6_COMPLETE = false`; `G16` OPEN under `B5I8-DF05`; evaluation system
+`RESERVED_NOT_AUTHORIZED`; no package, publication, registry, cloud, broker, capital or execution
+authority; cost `$0`.
