@@ -141,7 +141,7 @@ jobs:
             infrastructure/control-plane/tests/stage_scope/test_i0_stage_scope_amendment_controls.py \
             -q --no-header -p no:cacheprovider \
             --junitxml="$EVIDENCE_DIR/amendment-controls-junit.xml" \
-            | tee "$EVIDENCE_DIR/amendment-controls.txt"'
+            | tee "$EVIDENCE_DIR/amendment-controls.txt"
 
       - name: Node inventory equals collection
         env:
