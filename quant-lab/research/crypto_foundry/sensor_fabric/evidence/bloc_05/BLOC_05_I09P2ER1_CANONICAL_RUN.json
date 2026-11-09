@@ -1,5 +1,6 @@
 {
- "audited_commit": "c47ce036a99f4399c4c708cb200a7f22281276b4",
+ "audited_commit": "d587e74af1019afef9a87bd9836f5c6431ebad1f",
+ "audit_branch_head": "2cd58d7803ac1ba6ed41da76af7e64430b9a4517",
  "python": "3.11.9",
  "platform": "Windows-10-10.0.26200-SP0",
  "collection": {
@@ -8,33 +9,12 @@
  },
  "execution": {
   "cases_recorded": 4640,
-  "duplicates": 4639,
-  "unmapped": 4640,
-  "unique": 0,
-  "missing_count": 4640,
+  "duplicates": 0,
+  "unmapped": 0,
+  "unique": 4640,
+  "missing_count": 0,
   "extra_count": 0,
-  "missing_sample": [
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_canonical_bytes_stable_across_calls",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[adapter_version]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[provider]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[raw_checksum]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[raw_object_uri]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[schema_version]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_empty_strings_fail[venue]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[adapter_version]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[provider]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[raw_checksum]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[raw_object_uri]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[schema_version]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t01_required_provenance_fields[venue]",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t02_instrument_native_empty_fails",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t02_instrument_native_required",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t03_unresolved_identity_with_flag_validates",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t03_unresolved_identity_without_flag_fails",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t04_all_datetime_fields_aware_after_validation",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t04_aware_datetimes_normalized_to_utc",
-   "quant-lab/tests/crypto_sensor_fabric/contracts/test_base.py::test_t04_naive_datetime_fails"
-  ],
+  "missing_sample": [],
   "extra_sample": [],
   "tests": 4640,
   "failures": 1,
@@ -141,10 +121,10 @@
  ],
  "failures": [
   {
-   "test": null,
+   "test": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py::test_sem_a08_semantic_validation_evidence_is_deterministic",
    "type": null,
    "message": "AssertionError: {\"artifact_sha256\": \"0ae3d4e31bd2de2fff56abb7d240973fd531f8d36170e5164babf1c5e93a3464\", \"case_series\": \"SEM-01..SEM-36 (SEM-26/35 test-owned) + SEM-A01\", \"error\": \"committed_bytes_mismatch\", \"fail\": 0, \"pass\": 35, \"rows\": 35, \"unresolved\": 3}\r\n  \nassert 3 == 0\n +  where 3 = CompletedProcess(args=['C:\\\\Users\\\\wifik\\\\AppData\\\\Local\\\\Programs\\\\Python\\\\Python311\\\\python.exe', 'C:\\\\User"
   }
  ],
- "verdict": "INCOMPLETE"
+ "verdict": "COMPLETE"
 }
