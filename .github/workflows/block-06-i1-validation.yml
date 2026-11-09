@@ -76,6 +76,7 @@ jobs:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
           python infrastructure/control-plane/scripts/block_06_i1_validate.py \
+            --stage-scope auto \
             --json "$EVIDENCE_DIR/validator.json" | tee "$EVIDENCE_DIR/validator.txt"
 
       - name: Node inventory equals collection

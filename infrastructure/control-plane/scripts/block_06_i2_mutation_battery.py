@@ -55,8 +55,14 @@ MUTATIONS = [
     ("M05", "unknown profile fallback", LOCAL,
      "    if profile not in PROFILES:", "    if False:",
      f"{TESTS}/test_block_06_i2_harness.py::test_unknown_profile_refused"),
-    ("M06", "network import refusal removed", LOCAL,
-     "        if root in NETWORK_MODULES:", "        if False:",
+    ("M06", "undeclared import refusal removed", LOCAL,
+     "        if root not in PERMITTED_IMPORTS:
+"
+     '            refuse("REFUSED_INVALID_MANIFEST", f"undeclared import: {module}")
+',
+     "        if False:
+            pass
+",
      f"{TESTS}/test_block_06_i2_harness.py::test_undeclared_network_call_refused"),
 ]
 

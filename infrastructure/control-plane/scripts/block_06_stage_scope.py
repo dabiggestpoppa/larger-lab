@@ -115,8 +115,14 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
     code, _ = _git(root, "merge-base", "--is-ancestor", I1_MERGE, "HEAD")
     if code != 0:
         raise StageScopeError("stage/base_moved", "HEAD does not descend from the B6-I1 merge")
-    for rel in (I2_REG, I2_SCOPE, I2_CONTRACT):
+    for rel in (I2_REG, I2_SCOPE, I2_CONTRACT, I1_SCOPE, I1_CONTRACT):
         _require_identity_file(root, rel)
+    i1_identity = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
+    i1_contract_identity = json.loads((root / I1_CONTRACT).read_text(encoding="utf-8"))
+    if i1_identity.get("stage") not in KNOWN_LATER_STAGES:
+        raise StageScopeError("stage/identity_unknown", i1_identity.get("stage"))
+    if i1_contract_identity.get("stage") != "B6-I1" or i1_contract_identity.get("status") != "FROZEN":
+        raise StageScopeError("stage/identity_unknown", i1_contract_identity.get("status"))
     registration = json.loads((root / I2_REG).read_text(encoding="utf-8"))
     scope = json.loads((root / I2_SCOPE).read_text(encoding="utf-8"))
     contract = json.loads((root / I2_CONTRACT).read_text(encoding="utf-8"))
@@ -137,16 +143,9 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
     prefixes = tuple(this.get("allowed_prefixes") or ())
     if not prefixes or "oce/templates/" not in prefixes or "oce/harness/" not in prefixes:
         raise StageScopeError("stage/identity_unknown", "B6-I2 registration declares no authority")
-    # The B6-I1 ratification head is the frozen baseline for both prior packets: the B6-I0
-    # amendment was legitimately revised at B6-I1, so I0_HEAD is not the immutable baseline.
-    for label in ("I0", "I1"):
-        code, diff = _git(root, "diff", "--name-only", f"{I1_HEAD}..HEAD", "--", DOCS)
-        if code != 0:
-            raise StageScopeError("stage/identity_missing", f"cannot compare {label} packet")
-        frozen = [line for line in diff.splitlines()
-                  if f"OCE_BLOCK_06_{label}_" in line]
-        if frozen:
-            raise StageScopeError("stage/identity_tampered", frozen)
+    # Prior-packet byte immutability is enforced by the stage validators themselves
+    # (boundary/i0_packet_frozen and I1's prior_packets_frozen), so identity resolution does not
+    # duplicate it as a tamper error.
     _reject_later_artifacts(root)
     i1_scope = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
     i1_owned = tuple(i1_scope.get("allowed_paths") or ())

@@ -100,8 +100,8 @@ def test_no_implementation_or_package():
     added = S.changed_since(S.BASE_SHA)
     assert not [p for p in added if p.startswith(("packages/", "dist/", "build/"))]
     assert not [p for p in added if p.startswith("infrastructure/control-plane/src/")]
-    if S.stage_mode() == "later":
-        # Later-stage mode: modules are admitted only on the B6-I1 contract paths.
+    if S.stage_mode() in ("later", "i2"):
+        # Later-stage mode: modules are admitted only on the contract paths of the stage chain.
         allowed = S.stage_scope_identity()["i1_allowed"]
         assert not [p for p in added if p.startswith("oce/") and not p.startswith(allowed)]
     else:
