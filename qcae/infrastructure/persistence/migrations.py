@@ -19,7 +19,12 @@ from typing import Callable, Dict, List, Optional
 from qcae.core.errors import QcaeValidationError
 
 __all__ = ["Migration", "MigrationLedgerEntry", "MigrationRunner", "MIGRATION_LEDGER_DDL",
-           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4"]
+           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4", "V4_TO_V5",
+           "CURRENT_SCHEMA_VERSION", "LegacyDatabaseClass",
+           "classify_legacy_database"]
+
+#: Current build schema version: fresh databases are physically at v5.
+CURRENT_SCHEMA_VERSION = 5
 
 MIGRATION_LEDGER_DDL = """
 CREATE TABLE IF NOT EXISTS schema_migration_ledger (
@@ -413,3 +418,86 @@ V3_TO_V4 = Migration(
         "and governance policy/approval/escalation tables (additive)"
     ),
 )
+def _apply_v5(conn: sqlite3.Connection) -> None:
+    """P2-R5: additive grant-use admission indexes (v4 -> v5).
+
+    Purely additive; no existing row or table is altered. The new index on
+    ``governance_approval_use(step_id)`` supports the live grant-binding
+    admission lookup (which step consumed a grant) without touching the
+    historical single-use unique index on ``decision_ref``.
+    """
+    conn.execute(
+        "CREATE INDEX IF NOT EXISTS ix_approval_use_step "
+        "ON governance_approval_use(step_id)"
+    )
+
+
+V4_TO_V5 = Migration(
+    from_version=4,
+    to_version=5,
+    migration_id="P2-R5-0005-grant-use-admission-index",
+    apply=_apply_v5,
+    description=(
+        "P2-R5: adds governance_approval_use(step_id) index for live "
+        "grant-binding admission lookups (additive; single-use law unchanged)"
+    ),
+)
+
+
+class LegacyDatabaseClass:
+    """Classification of a legacy/misversioned database for P2-R5R policy.
+
+    MIGRATE KNOWN LEGACY P2 MISVERSIONED DATABASES; unknown hybrid fails closed.
+    """
+
+    KNOWN_P2_MISVERSIONED = "KNOWN_P2_MISVERSIONED"
+    UNKNOWN_HYBRID = "UNKNOWN_HYBRID"
+    NOT_LEGACY = "NOT_LEGACY"
+
+
+_P2_RUNTIME_TABLES = frozenset(
+    {
+        "runtime_job",
+        "runtime_step",
+        "runtime_job_event",
+        "governance_approval_decision",
+        "governance_approval_use",
+    }
+)
+
+
+def classify_legacy_database(
+    conn: sqlite3.Connection, current_version: int
+) -> str:
+    """Classify a database at ``current_version`` for legacy migration policy.
+
+    Returns a ``LegacyDatabaseClass`` value. Known P2-misversioned databases
+    (recognizable P2-era schema shape that can be brought to the current
+    version via the production migration chain) are migrated; unknown hybrid
+    shapes fail closed.
+    """
+    if current_version >= CURRENT_SCHEMA_VERSION:
+        return LegacyDatabaseClass.NOT_LEGACY
+    if current_version <= 0:
+        return LegacyDatabaseClass.NOT_LEGACY
+    try:
+        rows = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()
+    except Exception:
+        return LegacyDatabaseClass.UNKNOWN_HYBRID
+    names = {r[0] for r in rows}
+    has_p2 = bool(names & _P2_RUNTIME_TABLES)
+    has_p1 = "evidence_artifact" in names or "artifact_record" in names
+    # Production chain supports 2->3->4->5 (and v4->v5). A DB at v3 or v4 is
+    # on/near the production chain and is a known migratable shape.
+    if current_version in (3, 4):
+        return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+    # v2 with recognizable P1/P2 structure can follow v2->3->4->5.
+    if current_version == 2 and (has_p1 or has_p2):
+        return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+    # v1 or any shape we cannot confidently place on the production chain is
+    # unknown/hybrid relative to production migration: fail closed.
+    if has_p2 and not has_p1 and current_version == 1:
+        return LegacyDatabaseClass.UNKNOWN_HYBRID
+    return LegacyDatabaseClass.UNKNOWN_HYBRID

@@ -16,7 +16,10 @@ from qcae.infrastructure.persistence.sqlite_lineage_store import (
     LINEAGE_DDL,
 )
 from qcae.infrastructure.persistence.sqlite_metadata_store import SqliteEvidenceRepository
-from qcae.infrastructure.persistence.store_factory import open_metadata_db
+from qcae.infrastructure.persistence.store_factory import (
+    CURRENT_SCHEMA_VERSION,
+    open_metadata_db,
+)
 
 from qcae.tests.unit.test_p1_sqlite_store import _artifact
 
@@ -74,8 +77,8 @@ class TestBackupRestore:
         rlineage = SqliteLineageRepository(rconn)
         supers = rlineage.supersession_chain("ev-1")
         assert len(supers) == 1 and supers[0].edge_type is LineageEdgeType.SUPERSEDES
-        # schema version survives
-        assert new_conn.schema_version == 1
+        # schema version survives (canonical version is now 5, C02)
+        assert new_conn.schema_version == CURRENT_SCHEMA_VERSION
         rconn.close()
 
     def test_restore_verifies_every_artifact_digest(self, tmp_path) -> None:

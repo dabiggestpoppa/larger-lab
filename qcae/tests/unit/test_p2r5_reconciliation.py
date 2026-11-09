@@ -138,15 +138,45 @@ class TestSchemaAuthorityAndMigrationTruth:
             EvidenceRef.from_dict(bad)
 
     def test_user_version_pins_schema_and_ledger_is_append_only(self, tmp_path) -> None:
+        # P2-R5R: fresh databases are created at CURRENT_SCHEMA_VERSION (=5)
+        # by open_metadata_db; migration truth is verified by migrating a v4
+        # database to v5 via the production V4_TO_V5 step and recording an
+        # append-only ledger entry with distinct pre/post digests.
+        from qcae.infrastructure.persistence.migrations import (
+            CURRENT_SCHEMA_VERSION,
+            V4_TO_V5,
+        )
+        from qcae.infrastructure.persistence.sqlite_approval_registry import APPROVAL_DDL
+        from qcae.infrastructure.persistence.sqlite_runtime_store import RUNTIME_DDL
+        from qcae.infrastructure.persistence.store_factory import open_raw_connection
+
         conn = open_metadata_db(tmp_path / "r5.db")
-        runner = MigrationRunner(conn, clock=lambda: "2026-09-22T00:00:00Z")
-        assert runner.current_version() == 1
-        runner.migrate_to(2, {2: TEST_V1_TO_V2})
-        assert runner.current_version() == 2
+        assert conn.execute("PRAGMA user_version").fetchone()[0] == CURRENT_SCHEMA_VERSION
+        conn.close()
+
+        # Build a v4-shaped database and migrate it to v5.
+        db = tmp_path / "r5v4.db"
+        c2 = open_metadata_db(db)
+        c2.executescript(RUNTIME_DDL)
+        c2.executescript(APPROVAL_DDL)
+        c2.execute("PRAGMA user_version = 4")
+        c2.commit()
+        c2.close()
+        c3 = open_raw_connection(str(db))
+        c3.executescript(
+            "CREATE TABLE IF NOT EXISTS schema_migration_ledger ("
+            "seq INTEGER PRIMARY KEY AUTOINCREMENT, from_version INTEGER, "
+            "to_version INTEGER, migration_id TEXT, applied_at TEXT, "
+            "pre_digest TEXT, post_digest TEXT)"
+        )
+        runner = MigrationRunner(c3, clock=lambda: "2026-09-22T00:00:00Z")
+        assert runner.current_version() == 4
+        runner.migrate_to(5, {5: V4_TO_V5})
+        assert runner.current_version() == 5
         entries = runner.ledger()
         assert len(entries) == 1
         assert entries[0].post_digest != entries[0].pre_digest
-        conn.close()
+        c3.close()
 
 
 # --------------------------------------------------------------------------
