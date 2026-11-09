@@ -1,0 +1,118 @@
+{
+  "phase": "P2-R5R",
+  "generated_at": "2026-11-09T14:24:02Z",
+  "tested_commit": "ef1fbf154422dbb26c24300958be9da0ff59cd4f",
+  "environment": "local developer machine (no CI available for this repo)",
+  "blocks": {
+    "operator_loop": {
+      "command": "python -m pytest qcae/tests/acceptance/test_p2_operator_loop.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 5
+      },
+      "summary_line": "5 passed in 2.39s"
+    },
+    "grant_journey": {
+      "command": "python -m pytest qcae/tests/acceptance/test_p2_grant_journey.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 2
+      },
+      "summary_line": "2 passed in 0.49s"
+    },
+    "process_crash": {
+      "command": "python -m pytest qcae/tests/acceptance/test_p2_process_crash.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 7
+      },
+      "summary_line": "7 passed in 4.92s"
+    },
+    "schema_r5r": {
+      "command": "python -m pytest qcae/tests/unit/test_p2r5r_c01_schema_matrix.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 19
+      },
+      "summary_line": "19 passed in 3.44s"
+    },
+    "binding_r5r": {
+      "command": "python -m pytest qcae/tests/unit/test_p2r5r_c02_grant_binding.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 26
+      },
+      "summary_line": "26 passed in 3.36s"
+    },
+    "boundary_r5r": {
+      "command": "python -m pytest qcae/tests/unit/test_p2r5r_c03_provider_boundary.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 8
+      },
+      "summary_line": "8 passed in 0.47s"
+    },
+    "backup_r5r": {
+      "command": "python -m pytest qcae/tests/unit/test_p2r5r_c04_backup_disaster.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 6
+      },
+      "summary_line": "6 passed in 1.06s"
+    },
+    "typed_r5r": {
+      "command": "python -m pytest qcae/tests/unit/test_p2r5r_c05_typed_outcomes.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 10
+      },
+      "summary_line": "10 passed in 1.57s"
+    },
+    "p3_r4_regression": {
+      "command": "python -m pytest qcae/tests/unit -k p3_ -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 238
+      },
+      "summary_line": "238 passed, 1165 deselected in 1.61s"
+    },
+    "crash_after_lease": {
+      "command": "python -m pytest qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::test_crash_after_lease_resume_does_not_repeat_committed -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 1
+      },
+      "summary_line": "1 passed in 0.39s"
+    },
+    "topology": {
+      "command": "python -m pytest qcae/tests/unit/test_p0_topology.py -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 78
+      },
+      "summary_line": "78 passed in 0.30s"
+    },
+    "full_qcae": {
+      "command": "python -m pytest qcae/tests -q",
+      "exit_code": 0,
+      "ok": true,
+      "counts": {
+        "passed": 1440
+      },
+      "summary_line": "1440 passed in 46.06s"
+    }
+  },
+  "all_blocks_green": true,
+  "note": "Per-block counts are the actual counts each invocation printed; no aggregate is copied into a per-file block."
+}

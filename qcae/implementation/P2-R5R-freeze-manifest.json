@@ -1,110 +1,173 @@
 {
-  "phase": "P2-R5R \u2014 Canonical substrate reconciliation beneath preserved P3-R4 (schema v5 authority, legacy P2 classifier, live ApprovalBinding, provider boundary/resolver, backup/restore row counts, typed outcome regression)",
-  "base_canonical_head": "8212b59d0ad5afd708d939d34a2564571f6ee285",
-  "branch": "agent/qcae-p2-r5-canonical-reconcile",
-  "head_commit": "6a4c40cd8a1da411d23c82745c4ff5b791938d99",
-  "tested_commit": "6a4c40cd8a1da411d23c82745c4ff5b791938d99",
-  "canon_version": "0.1",
-  "active_amendments": [
-    "A-001 v1.0"
-  ],
-  "reconciliation_policy": {
-    "no_merge_rebase_cherry_pick_local_review": true,
-    "no_cherry_pick_local_freeze": true,
-    "p3_r4_preserved": true,
-    "p3_capability_paused_during_repair": true,
-    "local_review_reference_only": "agent/qcae-p2-r5-review@7ca0adbeea86f9658ed633423b997daa02a55e0b (not merged)"
+  "phase": "P2-R5R — Canonical substrate reconciliation (true schema authority, historical v4, canonical live ApprovalBinding, provider boundary, durable-authority backup truth)",
+  "supersedes": {
+    "phase": "P2-R5 (local review freeze)",
+    "review_freeze_commit": "7ca0adbeea86f9658ed633423b997daa02a55e0b",
+    "relationship": "the local review freeze is NOT canonical and is NOT merged, rebased or cherry-picked; P2-R4/P2-R3/P2-R2/P2-R1/P2 freezes remain historical truth",
+    "earlier_reconcile_freeze": "c70667dee (superseded by this regenerated manifest)"
   },
-  "phase_commits": {
-    "p2_r5r_i0_ledger_correction": [
-      "0114309fb"
+  "provenance": {
+    "canonical_base": "8212b59d0ad5afd708d939d34a2564571f6ee285",
+    "canonical_branch": "agent/qcae-p2-r5-canonical-reconcile",
+    "review_source": "agent/qcae-p2-r5-review@7ca0adbeea86f9658ed633423b997daa02a55e0b (read-only reference; never merged)",
+    "common_ancestor": "a1ed4b842992c72935c62aa16e6b2dfc7bbb3375",
+    "ported_concepts": [
+      "local C02 direction: schema-version authority + v4->v5 migration (reimplemented, not cherry-picked)",
+      "local C03 direction: live grant binding (reimplemented with a seven-field canonical binding, NOT its four-field digest)",
+      "local C04: provider-neutral ApprovalAdmissionProvider + ApprovalRequestResolver (adapted)",
+      "local C05: backup/restore coverage of execution + grant consumption with disaster tests (adapted)"
     ],
-    "p2_r5r_c01_schema_v5_legacy_classifier": [
-      "839a0090c"
-    ],
-    "p2_r5r_c02_c03_binding_and_resolver": [
-      "349b1999f"
-    ],
-    "p2_r5r_c04_backup_restore_row_counts": [
-      "1d19fcd28"
-    ],
-    "p2_r5r_c05_typed_outcome_regression": [
-      "627e7ea16"
-    ],
-    "p2_r5r_t01_adversarial_p3r4_regression": [
-      "6a4c40cd8a"
+    "deliberately_not_ported": [
+      "local NoRunnableStep (canonical keeps StepNotReadyOutcome/JobMissingOutcome)",
+      "local FREEZE artifact (regenerated here from reconciled canonical history)"
     ]
   },
-  "intervening_non_qcae_commits_on_branch": [
-    {
-      "commit": "54a8c91f8",
-      "note": "SENSOR-B5-I09P2eR1 audit record (unrelated to QCAE P2-R5R; present in branch history)"
-    }
-  ],
-  "supersedes": {
-    "r4_freeze_artifact": "qcae/implementation/P2-R4-freeze-manifest.json",
-    "relationship": "superseding canonical reconciliation manifest; P2-R4/P2-R3/P2-R2/P2-R1/P2 freezes preserved as historical truth; R5 local-review freeze (7ca0adbeea) is not merged/cherry-picked"
+  "head_commit": "ef1fbf154422dbb26c24300958be9da0ff59cd4f",
+  "tested_commit": "ef1fbf154422dbb26c24300958be9da0ff59cd4f",
+  "canon_version": "0.1",
+  "active_amendments": ["A-001 v1.0"],
+  "phase_commits": {
+    "p2_r5r_i0_ledger_correction": ["d39f1a125"],
+    "p2_r5r_c01_schema_v5_historical_v4": ["9d24b79ac", "ef1fbf154"],
+    "p2_r5r_c02_live_approval_binding": ["0eb54a22d"],
+    "p2_r5r_c03_provider_boundary_resolver": ["5110f1253"],
+    "p2_r5r_c04_backup_durable_authority": ["5a6f1b763"],
+    "p2_r5r_c05_typed_outcome_convergence": ["080973a99"],
+    "p2_r5r_t01_adversarial_preexisting_p3r4": ["25c46a940"]
   },
-  "repairs": {
-    "c01_schema_v5_historical_v4_legacy_classifier": {
-      "finding": "Canonical substrate lacked CURRENT_SCHEMA_VERSION=5, V4_TO_V5, legacy P2 misversioned classifier, and schema-version alignment (hidden schema completion context).",
-      "repair": "CURRENT_SCHEMA_VERSION=5 + V4_TO_V5 (governance_approval_use step index) + production migration chain {2->3,3->4,4->5} via open_metadata_db; LegacyDatabaseClass/classify_legacy_database migrates known legacy P2 misversioned DBs and fails closed on unknown hybrid; sqlite_metadata_store SCHEMA_VERSION and RuntimeIdentity aligned.",
-      "tests": [
-        "qcae/tests/unit/test_p1_migrations.py",
-        "qcae/tests/unit/test_p1_backup_restore.py",
-        "qcae/tests/unit/test_p2_migration_backup.py",
-        "qcae/tests/unit/test_p2r5_reconciliation.py"
-      ]
+  "schema": {
+    "current_version": 5,
+    "schema_law": "PRAGMA user_version == 5 means the complete v5 schema is physically present; a fresh v5 and a v4-migrated v5 are proven to be the same physical authority schema",
+    "true_v4_source": "P2-0004-runtime-governance-tables, verbatim from commit 61488273699dd5f6835c49b8b9f070489a7e5b42 (P2-C12)",
+    "historical_v4_ddl_sha256": "sha256:e92ab35e708fe23a399d80d1de4f5d2b0d971cc658fedc1b022e2bc29ce724c0",
+    "true_v4_schema_digest": "sha256:b75f663d669b9ea2d2e04b049aed6b9affc403151dae3216a72b914f52f7b78b",
+    "v5_schema_digest": "sha256:12450483087d44339ad1d02ed749432015735aa9cab5aba67671988f4cc13ff8",
+    "v4_original_tables": 13,
+    "v5_only_tables": ["runtime_execution", "governance_approval_use"],
+    "v5_added_indexes": ["ux_approval_use_decision", "ix_approval_use_step", "ix_runtime_execution_job"],
+    "fresh_bootstrap": "complete v5 shape built transactionally, then BOOTSTRAP-v5-complete-schema provenance row, then the version stamp",
+    "hidden_completion": "none — build_local_runtime verifies the physical shape and fails closed; it executes no schema DDL",
+    "legacy_p2_reconciliation": "known legacy P2 misversioned databases (physical P2 tables, stamp 1) are fingerprinted strictly and migrated to physical v5 with every row preserved",
+    "unknown_hybrid": "refused (fail closed); no blanket version stamp is ever written",
+    "newer_schema": "refused (forward-compat guard)"
+  },
+  "grant_binding": {
+    "schema": "qcae.core.approval_binding.ApprovalBinding (provider-neutral, immutable)",
+    "schema_version": 1,
+    "request_schema_version": 2,
+    "decision_schema_version": 2,
+    "verdict_schema_version": 2,
+    "fields": [
+      "principal",
+      "action",
+      "resource",
+      "scope",
+      "budget_ref",
+      "authority_requirement",
+      "policy_version",
+      "constraints (optional)"
+    ],
+    "digest": "sha256 over canonical sorted-key JSON (never '|'-joined concatenation)",
+    "policy_law": "POLICY_VERSION_BOUND: an approval binds the policy version under which the request was evaluated; a policy-version change requires fresh approval",
+    "changed_budget": "refused, not consumed",
+    "changed_requirement": "refused, not consumed",
+    "changed_policy_version": "refused, not consumed",
+    "mismatch_consumption": "no mismatch consumes the grant; consumption happens only after the digest match",
+    "legacy_approvals": "readable historical evidence only; never authorize a strengthened R5R execution"
+  },
+  "architecture": {
+    "admission_port": "ApprovalAdmissionProvider (get_request / effective_grant / consume_grant)",
+    "request_resolver": "ApprovalRequestResolver.latest_for_step — the only owner of (job, step) -> request, used by both admission and release",
+    "standalone_imports": "none in qcae/orchestration (AST guard over every module, including deferred and literal dynamic imports)"
+  },
+  "backup": {
+    "runtime_execution": "counted in the backup manifest and verified on restore",
+    "approval_use": "counted in the backup manifest and verified on restore",
+    "legacy_approvals": "preserved and restored as historical evidence; cannot authorize",
+    "disaster_tests": [
+      "journey A: consumed grant + COMMITTED execution survive destroy/restore and cannot replay",
+      "journey B: unconsumed matching grant survives and is usable exactly once",
+      "journey C: legacy/incomplete grant restores but cannot authorize"
+    ]
+  },
+  "typed_outcome": {
+    "owner": "qcae/governance/standalone/typed_outcomes.py",
+    "unknown_job": "JobMissingOutcome (exit 2)",
+    "not_ready": "StepNotReadyOutcome with the five typed reasons",
+    "worker_unavailable": "WorkerUnavailable (exit 3, canonical exit code unchanged)",
+    "local_norunnablestep": "not ported"
+  },
+  "pre_existing_failure_review": {
+    "topology": {
+      "test": "qcae/tests/unit/test_p0_topology.py::test_second_level_package_exists_and_imports[proving-build]",
+      "reproduced_on": "8212b59d (detached worktree)",
+      "classification": "repository defect, unrelated to P2 substrate: the required qcae/proving/build/__init__.py was ignored by .gitignore's build/ rule and therefore absent from every clean checkout",
+      "repair": "file versioned; clean-checkout suite green (1439 passed at T01)"
     },
-    "c02_live_approval_binding": {
-      "finding": "Grant admission not bound to live verdict binding digest before consumption.",
-      "repair": "binding_digest on StepAuthorityVerdict and ApprovalDecision; verdict-based _grant_admits compares live vs approved binding before consumption; stale mismatch refuses without consuming.",
-      "tests": [
-        "qcae/tests/unit/test_p2r4_c03_durable_grants.py",
-        "qcae/tests/unit/test_p2r4_t01_adversarial.py"
-      ]
-    },
-    "c03_provider_boundary_resolver": {
-      "finding": "Engine coupled to governance.standalone; duplicated authority-request lookup.",
-      "repair": "ApprovalAdmissionProvider port, ApprovalRequestResolver.latest_for_step single source of truth, consume_grant on SqliteApprovalRegistry, runtime_service uses resolver.",
-      "tests": [
-        "qcae/tests/unit/test_p2r5_c04_architecture.py",
-        "qcae/tests/unit/test_p2r2_c02_approval_round_trip.py",
-        "qcae/tests/unit/test_p2r2_t01_governance_adversarial.py"
-      ]
-    },
-    "c04_backup_restore_row_counts": {
-      "repair": "runtime_execution and governance_approval_use included in backup manifest registry row counts.",
-      "tests": [
-        "qcae/tests/unit/test_p1_backup_restore.py",
-        "qcae/tests/unit/test_p2_migration_backup.py"
-      ]
-    },
-    "c05_typed_outcome_regression": {
-      "repair": "Canonical JobMissingOutcome/StepNotReadyOutcome preserved; R5 NoRunnableStep not ported.",
-      "tests": [
-        "qcae/tests/unit/test_p2r5_reconciliation.py",
-        "qcae/tests/unit/test_p2r3_c05_cli_typed_errors.py",
-        "qcae/tests/unit/test_p2_cli_app.py"
-      ]
+    "crash_after_lease": {
+      "test": "qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::test_crash_after_lease_resume_does_not_repeat_committed",
+      "reproduced_on": "8212b59d (detached worktree) — passes in isolation",
+      "classification": "test-isolation defect: the canonical body opened an ambient tempfile.gettempdir()/unused.sqlite3 as a 'placeholder' restart, shared with the OS temp dir; not a runtime regression",
+      "repair": "test made self-contained; the invariant assertion is unchanged and green"
     }
+  },
+  "p3_r4_regression": {
+    "result": "238 P3 unit tests pass",
+    "scope_preserved": [
+      "executed-query binding",
+      "requested/internal/external/executed scope separation",
+      "negative observation identity",
+      "immutability/deep-freeze repairs",
+      "typed saturation/STOP accounting",
+      "discovery report/history behavior",
+      "P3 architecture guards"
+    ],
+    "capability_expansion": "none"
   },
   "test_evidence": {
-    "full_suite": {
-      "command": "python -m pytest qcae/tests -q",
-      "result": "1375 passed, 0 failed",
-      "duration_s": 39.94
+    "artifact": "qcae/implementation/P2-R5R-test-evidence.json",
+    "generator": "qcae/implementation/tools/gen_p2r5r_evidence.py",
+    "environment": "local developer machine; this repository has no CI",
+    "method": "each block is its own pytest invocation; counts and exit status are the ones that run printed (no aggregate relabeling, no hardcoded booleans)",
+    "blocks": {
+      "operator_loop": {"passed": 5, "exit_code": 0},
+      "grant_journey": {"passed": 2, "exit_code": 0},
+      "process_crash": {"passed": 7, "exit_code": 0},
+      "schema_r5r": {"passed": 19, "exit_code": 0},
+      "binding_r5r": {"passed": 26, "exit_code": 0},
+      "boundary_r5r": {"passed": 8, "exit_code": 0},
+      "backup_r5r": {"passed": 6, "exit_code": 0},
+      "typed_r5r": {"passed": 10, "exit_code": 0},
+      "p3_r4_regression": {"passed": 238, "deselected": 1165, "exit_code": 0},
+      "crash_after_lease": {"passed": 1, "exit_code": 0},
+      "topology": {"passed": 78, "exit_code": 0},
+      "full_qcae": {"passed": 1440, "failed": 0, "exit_code": 0}
     },
-    "p3_r4_regression": {
-      "result": "238 passed (P3 unit suite subset) and included in full suite green"
-    },
-    "crash_after_lease_invariant": {
-      "test": "qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::test_crash_after_lease_resume_does_not_repeat_committed",
-      "result": "passed",
-      "note": "Test isolation repaired (removed ambient tempdir placeholder incompatible with fail-closed legacy policy); invariant preserved."
-    }
+    "clean_checkout_verification": "full suite green (1439 passed) in a detached worktree at 25c46a940, proving no reliance on untracked local files"
+  },
+  "exit_gate": {
+    "original_v4_meaning_restored": true,
+    "true_v4_to_v5_works": true,
+    "fresh_db_physically_v5_before_claiming_v5": true,
+    "build_local_runtime_no_hidden_completion": true,
+    "known_legacy_p2_misversioned_migrates": true,
+    "unknown_hybrid_refused": true,
+    "binding_includes_budget": true,
+    "binding_includes_requirement": true,
+    "binding_includes_policy_version": true,
+    "mismatches_do_not_consume": true,
+    "orchestration_has_no_standalone_import": true,
+    "one_request_resolver": true,
+    "runtime_execution_survives_restore": true,
+    "grant_use_survives_restore": true,
+    "canonical_typed_outcomes_are_sole_no_work_model": true,
+    "crash_after_lease_green": true,
+    "p3_r4_regression_green": true,
+    "full_qcae_green": true,
+    "evidence_counts_independently_observed": true,
+    "blockers": []
   },
   "blockers": [],
-  "p3_status": "PAUSED during reconciliation; P3-R4 work preserved; resume P3 only after this freeze.",
-  "freeze_note": "P2-R5R-FREEZE commit adds this manifest on top of the tested T01 commit."
+  "p3_status": "PRESERVED / PAUSED — resume P3 only after operator review of this freeze",
+  "next": "Operator review, then resume P3 capability development."
 }
