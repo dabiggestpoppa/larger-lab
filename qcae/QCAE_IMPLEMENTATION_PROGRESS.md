@@ -969,8 +969,15 @@ proves: unknown job → exit 2; future schedule →
 no-eligible-step → typed NOT_READY; worker missing → `WorkerUnavailable`, exit
 3 (canon exit code unchanged); no state/lease/budget mutation. 10 tests green.
 
-**P2-R5R-T01 (adversarial matrix + current P3-R4 regression):** see the
-evidence block below; full suite green at this commit.
+**P2-R5R-T01 (adversarial matrix + current P3-R4 regression):**
+`qcae/implementation/P2-R5R-test-evidence.json` is generated at the tested
+commit by `qcae/implementation/tools/gen_p2r5r_evidence.py`; every block is
+its own pytest invocation with its own observed counts and exit status (no
+aggregate relabeling, no hardcoded booleans). Blocks: operator_loop 5,
+grant_journey 2, process_crash 7, schema_r5r 18, binding_r5r 26,
+boundary_r5r 8, backup_r5r 6, typed_r5r 10, P3-R4 regression 238,
+crash-after-lease 1, topology 78, full qcae suite 1439 — all green.
+Environment: local developer machine; this repository has no CI.
 
 ## Blockers
 
