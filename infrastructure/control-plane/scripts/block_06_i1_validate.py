@@ -22,6 +22,17 @@ PREFIX = "OCE_BLOCK_06_I1_"
 BASE_SHA = "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e"
 BASE_TREE = "3c2e2a6676e16415a1e2bd326c1fc147e51c2a6d"
 TESTS = "infrastructure/control-plane/tests"
+AMENDMENT_DOC = f"{DOCS}/OCE_BLOCK_06_I0_STAGE_SCOPE_AMENDMENT_001_v1.0.json"
+AMENDMENT_SURFACES = (
+    AMENDMENT_DOC,
+    "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+    "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+    f"{TESTS}/block_06_i0_support.py",
+    f"{TESTS}/test_block_06_i0_stage_contract.py",
+    f"{TESTS}/stage_scope/test_b6_i0_amendment_controls.py",
+    ".github/workflows/block-06-i0-validation.yml",
+)
 ALLOWED_PREFIXES = (
     f"{DOCS}/{PREFIX}",
     "infrastructure/control-plane/scripts/block_06_i1_",
@@ -30,7 +41,7 @@ ALLOWED_PREFIXES = (
     ".github/workflows/block-06-i1-validation.yml",
     ".github/workflows/block-06-i1-paired-comparison.yml",
     "oce/api/", "oce/sdk/", "oce/compat/",
-)
+) + AMENDMENT_SURFACES
 FORBIDDEN_PREFIXES = (
     "packages/", "dist/", "build/", "pyproject.toml", "uv.lock", "poetry.lock", "package.json",
     "infrastructure/control-plane/src/", "infrastructure/console/src/",
@@ -181,10 +192,13 @@ def check_boundary(c: Checker) -> None:
     c.need("boundary/changed", bool(changed), changed)
     outside = [p for p in changed if not p.startswith(ALLOWED_PREFIXES)]
     c.need("boundary/only_allowed_paths", not outside, outside)
-    blocked = [p for p in changed if p.startswith(FORBIDDEN_PREFIXES)]
+    blocked = [p for p in changed
+               if p.startswith(FORBIDDEN_PREFIXES) and p not in AMENDMENT_SURFACES]
     c.need("boundary/no_prohibited_surface", not blocked, blocked)
     c.need("boundary/p0_untouched",
-           not [p for p in changed if f"{DOCS}/OCE_BLOCK_06_P0_" in p or f"{DOCS}/OCE_BLOCK_06_I0_" in p])
+           not [p for p in changed
+                if (f"{DOCS}/OCE_BLOCK_06_P0_" in p
+                    or (f"{DOCS}/OCE_BLOCK_06_I0_" in p and p not in AMENDMENT_SURFACES))])
     c.need("boundary/no_dependency", not [p for p in changed
                                           if p in ("pyproject.toml", "uv.lock", "package.json")])
 

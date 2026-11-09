@@ -93,3 +93,15 @@ def changed_since(base: str) -> list[str]:
 
 def pytest_paths() -> list[str]:
     return [str(TESTS / name) for name in I0_MODULES]
+
+
+def stage_mode() -> str:
+    """Resolved stage mode: "later" when a committed B6-I1 identity is present, else "i0"."""
+    try:
+        return V.stage_scope.resolve(ROOT, "auto")["mode"]
+    except Exception:
+        return "i0"
+
+
+def stage_scope_identity() -> dict:
+    return V.stage_scope.resolve(ROOT, "auto")
