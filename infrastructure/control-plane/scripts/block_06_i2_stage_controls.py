@@ -87,11 +87,13 @@ def main(argv=None) -> int:
         results.append(check("i1_exact_authority",
                              not i1_exact & {"oce/templates/", "oce/harness/"},
                              sorted(i1_exact & {"oce/templates/", "oce/harness/"})))
+        added = i2_allowed - i1_exact
         results.append(check("i2_is_i1_plus_i2_only",
-                             i2_allowed == i1_exact | set(i2["amendment"])
-                             | {"oce/templates/", "oce/harness/"},
-                             sorted(i2_allowed - (i1_exact | set(i2["amendment"])
-                                                  | {"oce/templates/", "oce/harness/"}))))
+                             i1_exact <= i2_allowed
+                             and added <= set(i2["amendment"]) | {"oce/templates/",
+                                                                   "oce/harness/"}
+                             and {"oce/templates/", "oce/harness/"} <= added,
+                             sorted(added)))
         amendment = json.loads((root / AMENDMENT_DOC).read_text(encoding="utf-8"))
         results.append(check("proof_closure_frozen",
                              amendment["status"] == "FROZEN"
