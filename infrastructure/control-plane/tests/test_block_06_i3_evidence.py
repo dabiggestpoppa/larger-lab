@@ -74,3 +74,13 @@ def test_deterministic_sample():
     first = sample_nodes(nodes, root, 3)
     second = sample_nodes(list(reversed(nodes)), root, 3)
     assert first == second and len(first) == 3 and len(set(first)) == 3
+
+
+def test_duplicate_node_refused():
+    nodes, manifest, sources, root = chain()
+    nodes[1]["id"] = nodes[0]["id"]
+    nodes[1]["sha256"] = nodes[0]["sha256"]
+    nodes[1]["bytes"] = nodes[0]["bytes"]
+    with pytest.raises(OperatorRefusal) as exc:
+        reconcile_chain(nodes, manifest, sources, root)
+    assert exc.value.code == "REFUSED_BROKEN_CHAIN"

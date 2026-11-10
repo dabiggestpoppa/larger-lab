@@ -76,7 +76,7 @@ def check_packet(c: Checker) -> None:
     c.need("contract/frozen", contract["status"] == "FROZEN"
            and contract["frozen_before_results"] is True)
     c.need("contract/floors", contract["implementation_floor"]
-           == {"mutations": 6, "source_mutation_floor": 3, "test_nodes": 27})
+           == {"mutations": 6, "source_mutation_floor": 3, "test_nodes": 28})
     c.need("contract/paired", contract["paired_comparison"]
            == {"base_only_expected": 0, "base_sha": BASE_SHA, "common_floor": 208,
                "head_only_expected": 27})
@@ -94,8 +94,8 @@ def check_packet(c: Checker) -> None:
 def check_registry(c: Checker) -> None:
     registry = c.load("REQUIREMENT_TEST_REGISTRY_v1.0.json")
     nodes = registry["inventory"]["nodes"]
-    c.need("registry/total", registry["requirements_total"] == len(nodes) == 27)
-    c.need("registry/unique", len(set(nodes)) == 27)
+    c.need("registry/total", registry["requirements_total"] == len(nodes) == 28)
+    c.need("registry/unique", len(set(nodes)) == 28)
     c.need("registry/modules", len(registry["inventory"]["modules"]) == 4)
     c.need("registry/bindings", {r["binding_node"] for r in registry["requirements"]} == set(nodes))
     c.need("registry/sections", {r["section"] for r in registry["requirements"]}

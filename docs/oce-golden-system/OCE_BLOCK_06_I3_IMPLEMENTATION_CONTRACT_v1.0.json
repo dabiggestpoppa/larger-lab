@@ -101,7 +101,7 @@
   "implementation_floor": {
     "mutations": 6,
     "source_mutation_floor": 3,
-    "test_nodes": 27
+    "test_nodes": 28
   },
   "locks": {
     "B6-I4_through_I9": "LOCKED",

@@ -8,7 +8,7 @@
       "infrastructure/control-plane/tests/test_block_06_i3_approvals.py",
       "infrastructure/control-plane/tests/test_block_06_i3_evidence.py"
     ],
-    "node_total": 27,
+    "node_total": 28,
     "nodes": [
       "test_block_06_i3_contract.py::test_inventory_equals_collection",
       "test_block_06_i3_contract.py::test_contract_frozen_before_results",
@@ -36,7 +36,8 @@
       "test_block_06_i3_evidence.py::test_broken_link_refused",
       "test_block_06_i3_evidence.py::test_source_spoof_refused",
       "test_block_06_i3_evidence.py::test_unknown_node_refused",
-      "test_block_06_i3_evidence.py::test_deterministic_sample"
+      "test_block_06_i3_evidence.py::test_deterministic_sample",
+      "test_block_06_i3_evidence.py::test_duplicate_node_refused"
     ],
     "zero": [
       "failures",
@@ -261,9 +262,17 @@
       "negative_control": "reordered nodes change the sample",
       "section": "C2.S3",
       "statement": "Sampling is deterministic and order independent"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_duplicate_node_refused",
+      "failure_class": "F11",
+      "id": "B6I3-R28",
+      "negative_control": "two nodes share one manifest id",
+      "section": "C2.S3",
+      "statement": "Duplicate node identifiers are refused"
     }
   ],
-  "requirements_total": 27,
+  "requirements_total": 28,
   "schema": "oce.block_06_i3.registry.v1",
   "stage": "B6-I3",
   "status": "FROZEN"

@@ -13,7 +13,7 @@
     {
       "bytes": 6192,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_IMPLEMENTATION_CONTRACT_v1.0.json",
-      "sha256": "119ac34b304e7b9139962098fbce604fc5456a02dea0b4e141165922e1e8de4c"
+      "sha256": "7919f87e1478546404a08ac2c4540779df0f43278289f652ba3db01a01093d2b"
     },
     {
       "bytes": 2395,
@@ -26,9 +26,9 @@
       "sha256": "9a5fc27c460a65de182a44eecb9e0b9d1385a155ca766d859f279cda254d74ef"
     },
     {
-      "bytes": 10616,
+      "bytes": 10980,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json",
-      "sha256": "0ed4ad634c003a2f1056bdf773bd3428a04d4665bf770fa718d26ed18ff045d1"
+      "sha256": "092de2b76cd5a023b06522e5042facbf0519e7dbd6b11aa7f1bc6cda87ee7c2a"
     },
     {
       "bytes": 2937,
@@ -66,7 +66,7 @@
     {
       "bytes": 12289,
       "path": "infrastructure/control-plane/scripts/block_06_i3_validate.py",
-      "sha256": "849bc8b40a4535766d34dc4ff566ae768dcaac486989cfef86e0eb7754b8dc15"
+      "sha256": "c696fb858bd196a0b2d0bbd6e86c50896c95a3ca8116dac82b42244166307596"
     },
     {
       "bytes": 672,
@@ -84,9 +84,9 @@
       "sha256": "2148288b8f05bc5dac955798b295c95dd5b190f72387e1e1182fa3e077ccf7af"
     },
     {
-      "bytes": 2307,
+      "bytes": 2484,
       "path": "oce/operator/evidence.py",
-      "sha256": "8a731ce6427887ca80a463c6a9f4d22dcfaf3dff18f6f65236ee40c884d38d0e"
+      "sha256": "9a14e754b97b4822fa246aa17ed86851f50730b33b3d6017403fc4794e869b4d"
     },
     {
       "bytes": 988,

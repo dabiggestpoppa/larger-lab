@@ -13,6 +13,7 @@ def reconcile_chain(nodes, manifest, sources, root=None):
         raise OperatorRefusal("REFUSED_BROKEN_CHAIN", "stage sequence incomplete")
     allowed_sources = set(sources)
     previous = None
+    seen: set[str] = set()
     rows = []
     for node in nodes:
         for key in NODE_FIELDS:
@@ -27,6 +28,9 @@ def reconcile_chain(nodes, manifest, sources, root=None):
             raise OperatorRefusal("REFUSED_SOURCE_SPOOF", node["source"])
         if previous is not None and node["parent"] != previous:
             raise OperatorRefusal("REFUSED_BROKEN_CHAIN", node["id"])
+        if node["id"] in seen:
+            raise OperatorRefusal("REFUSED_BROKEN_CHAIN", f"duplicate node {node['id']}")
+        seen.add(node["id"])
         if previous is None and root is not None and node["parent"] != root:
             raise OperatorRefusal("REFUSED_BROKEN_CHAIN", node["id"])
         rows.append({key: node[key] for key in NODE_FIELDS})

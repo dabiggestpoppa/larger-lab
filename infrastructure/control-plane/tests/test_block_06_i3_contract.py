@@ -25,7 +25,7 @@ def defined_nodes():
 def test_inventory_equals_collection():
     registry = load("OCE_BLOCK_06_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json")
     nodes = registry["inventory"]["nodes"]
-    assert len(nodes) == len(set(nodes)) == registry["inventory"]["node_total"] == 27
+    assert len(nodes) == len(set(nodes)) == registry["inventory"]["node_total"] == 28
     assert set(nodes) == defined_nodes()
     assert len(registry["inventory"]["modules"]) == 4
 
