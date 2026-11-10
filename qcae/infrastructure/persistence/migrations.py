@@ -589,6 +589,126 @@ _P2_RUNTIME_TABLES = frozenset(
 )
 
 
+#: Strict known-P2 physical signatures (P2-R5R-R1). Within the QCAE
+#: runtime/governance namespace the table SET must match exactly: a missing
+#: required table, an unexpected extra runtime_/governance_ table, or a
+#: partial post-v4 combination is UNKNOWN_HYBRID. P1/registry and other
+#: non-QCAE tables may coexist and are ignored here.
+_P2_V4_REQUIRED_COLUMNS = {
+    "runtime_job": ("job_id", "deterministic_id", "status", "job_type",
+                      "payload_json", "payload_digest", "priority",
+                      "queued_at", "not_before"),
+    "runtime_step": ("step_id", "job_id", "status", "step_type",
+                       "payload_json", "payload_digest", "lease_owner",
+                       "lease_token", "lease_expires_at", "not_before"),
+    "runtime_job_event": ("event_seq", "event_id", "event_type",
+                            "job_id", "step_id", "occurred_at", "actor",
+                            "payload_json", "event_digest"),
+    "runtime_checkpoint": ("checkpoint_id", "job_id", "step_id",
+                             "payload_json", "payload_digest", "created_at"),
+    "runtime_idempotency": ("idempotency_key", "job_id", "step_id",
+                              "completed_at"),
+    "runtime_queue_claim": ("step_id", "job_id", "lease_owner",
+                              "lease_token", "leased_at",
+                              "lease_expires_at", "acknowledged"),
+    "runtime_budget": ("budget_id", "owner_kind", "owner_id",
+                         "parent_budget_id", "state", "payload_json",
+                         "payload_digest"),
+    "governance_policy_request": ("request_ref", "principal", "action",
+                                    "resource", "payload_json",
+                                    "payload_digest", "created_at"),
+    "governance_policy_decision": ("decision_id", "request_ref",
+                                      "decision", "payload_json",
+                                      "payload_digest", "created_at"),
+    "governance_approval_request": ("request_id", "principal", "action",
+                                      "payload_json", "payload_digest",
+                                      "created_at"),
+    "governance_approval_decision": ("decision_id", "request_ref",
+                                        "state", "payload_json",
+                                        "payload_digest", "created_at"),
+    "governance_escalation": ("escalation_id", "job_id", "state",
+                                "payload_json", "payload_digest",
+                                "created_at"),
+    "governance_escalation_decision": ("decision_id", "escalation_ref",
+                                          "state", "payload_json",
+                                          "payload_digest", "created_at"),
+}
+
+#: Critical indexes of the true historical v4 shape (from P2-0004).
+_P2_V4_REQUIRED_INDEXES = frozenset({
+    "ix_runtime_job_status", "ix_runtime_job_queue",
+    "ix_runtime_step_job", "ix_runtime_step_status",
+    "ix_runtime_event_id", "ix_runtime_event_job",
+    "ix_checkpoint_job", "ix_queue_claim_expiry",
+    "ix_budget_owner", "ix_gov_decision_request",
+    "ix_approval_decision_request", "ix_escalation_decision_ref",
+})
+
+#: Post-original-v4 additions: both tables together, never one alone.
+_POST_V4_REQUIRED_COLUMNS = {
+    "runtime_execution": ("idempotency_key", "job_id", "step_id",
+                            "state", "replay_safety", "payload_json",
+                            "payload_digest"),
+    "governance_approval_use": ("use_id", "decision_ref", "step_id",
+                                    "used_at"),
+}
+
+_POST_V4_REQUIRED_INDEXES = frozenset({
+    "ix_runtime_execution_job", "ux_approval_use_decision",
+    "ix_approval_use_step",
+})
+
+#: Post-v4 index present in genuine historical P2 builds. The R5R-added
+#: step/job lookup indexes (``ix_approval_use_step``,
+#: ``ix_runtime_execution_job``) are what the v4->v5 migration ADDS, so a
+#: known legacy misversioned database is not required to have them.
+_POST_V4_LEGACY_REQUIRED_INDEXES = frozenset({"ux_approval_use_decision"})
+
+
+def _qcae_namespace_tables(names) -> frozenset:
+    return frozenset(
+        n for n in names
+        if n.startswith("runtime_") or n.startswith("governance_")
+    )
+
+
+def _matches_v4_tables_and_columns(conn: sqlite3.Connection) -> bool:
+    for table, columns in _P2_V4_REQUIRED_COLUMNS.items():
+        if not _has_columns(conn, table, columns):
+            return False
+    for index in _P2_V4_REQUIRED_INDEXES:
+        if not _has_index(conn, index):
+            return False
+    return True
+
+
+def _matches_v4_physical(conn: sqlite3.Connection, names) -> bool:
+    """Exact original-P2 v4 shape: all 13 tables, no post-v4 tables."""
+    if _qcae_namespace_tables(names) != set(_P2_RUNTIME_TABLES):
+        return False
+    return _matches_v4_tables_and_columns(conn)
+
+
+def _matches_post_v4_physical(
+    conn: sqlite3.Connection, names, indexes=_POST_V4_REQUIRED_INDEXES
+) -> bool:
+    """Complete v4 set plus BOTH post-v4 tables (never one alone)."""
+    expected = set(_P2_RUNTIME_TABLES) | frozenset(
+        _POST_V4_REQUIRED_COLUMNS
+    )
+    if _qcae_namespace_tables(names) != expected:
+        return False
+    if not _matches_v4_tables_and_columns(conn):
+        return False
+    for table, columns in _POST_V4_REQUIRED_COLUMNS.items():
+        if not _has_columns(conn, table, columns):
+            return False
+    for index in indexes:
+        if not _has_index(conn, index):
+            return False
+    return True
+
+
 def _table_names(conn: sqlite3.Connection) -> frozenset:
     try:
         rows = conn.execute(
@@ -646,36 +766,24 @@ def classify_legacy_database(
     has_p2 = bool(names & _P2_RUNTIME_TABLES)
     has_execution = "runtime_execution" in names
     has_approval_use = "governance_approval_use" in names
-    has_single_use = _has_index(conn, "ux_approval_use_decision")
     if current_version == CURRENT_SCHEMA_VERSION:
-        if has_execution and has_approval_use and has_single_use:
+        if _matches_post_v4_physical(conn, names):
             return LegacyDatabaseClass.CURRENT_V5
         return LegacyDatabaseClass.UNKNOWN_HYBRID
     if current_version == 1 and has_p2:
-        ok = (
-            _has_columns(conn, "runtime_job", ("job_id", "status", "job_type"))
-            and _has_columns(
-                conn, "runtime_step",
-                ("step_id", "job_id", "status", "step_type"),
-            )
-            and _has_columns(
-                conn, "governance_approval_decision",
-                ("decision_id", "request_ref", "state"),
-            )
-        )
-        if not ok:
-            return LegacyDatabaseClass.UNKNOWN_HYBRID
-        if has_execution and has_approval_use:
-            if _has_columns(
-                conn, "runtime_execution",
-                ("idempotency_key", "job_id", "step_id", "state"),
-            ) and _has_columns(
-                conn, "governance_approval_use",
-                ("use_id", "decision_ref", "step_id"),
-            ):
-                return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
-            return LegacyDatabaseClass.UNKNOWN_HYBRID
-        return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+        # Strict: the complete v4 shape, or the complete v4 shape plus
+        # BOTH post-v4 tables. Anything else (missing table/column/index,
+        # a partial post-v4 combination, an extra QCAE-namespace table)
+        # is UNKNOWN_HYBRID. Legacy builds predate the R5R lookup indexes,
+        # so those are not required of a known misversioned database (the
+        # v4->v5 migration adds them).
+        if _matches_post_v4_physical(
+            conn, names, indexes=_POST_V4_LEGACY_REQUIRED_INDEXES
+        ):
+            return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+        if _matches_v4_physical(conn, names):
+            return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+        return LegacyDatabaseClass.UNKNOWN_HYBRID
     if current_version == 1 and not has_p2:
         return LegacyDatabaseClass.CLEAN_LEGACY_METADATA
     if current_version == 2:
@@ -689,9 +797,7 @@ def classify_legacy_database(
             return LegacyDatabaseClass.KNOWN_V3
         return LegacyDatabaseClass.UNKNOWN_HYBRID
     if current_version == 4:
-        if has_execution or has_approval_use:
-            return LegacyDatabaseClass.UNKNOWN_HYBRID
-        if has_p2 and _has_index(conn, "ix_runtime_event_job"):
+        if _matches_v4_physical(conn, names):
             return LegacyDatabaseClass.TRUE_V4
         return LegacyDatabaseClass.UNKNOWN_HYBRID
     return LegacyDatabaseClass.UNKNOWN_HYBRID
