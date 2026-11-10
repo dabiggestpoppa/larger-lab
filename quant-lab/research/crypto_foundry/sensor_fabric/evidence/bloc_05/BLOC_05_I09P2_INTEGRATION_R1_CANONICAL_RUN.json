@@ -1,0 +1,124 @@
+{
+ "candidate_commit": "ac67ba562e7a7fa285a662635b7254810448c96e",
+ "production_base": "f199a7e3f7d92ce555fb436343d24bd42907c3a8",
+ "python": "3.11.9",
+ "platform": "Windows-10-10.0.26200-SP0",
+ "collection": {
+  "count": 4640,
+  "unique": 4640
+ },
+ "execution": {
+  "cases_recorded": 4640,
+  "duplicates": 0,
+  "unmapped": 0,
+  "unique": 4640,
+  "missing_count": 0,
+  "extra_count": 0,
+  "missing_sample": [],
+  "extra_sample": [],
+  "tests": 4640,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 11
+ },
+ "groups": [
+  {
+   "group": "01",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 2,
+   "xml_sha256": "276a7acbd75cc8f5b0604a51a50ea88e43d6c7e4ed3177f86e146ec9e859685a"
+  },
+  {
+   "group": "02",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "4c08e70f7ea12e19d19a5288b1ec2d8564ba1d7b6a09890a8b1f366953bf3396"
+  },
+  {
+   "group": "03",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 2,
+   "xml_sha256": "85bdeb7283dfccd72e248c194156b4aabe4787ce4786e846429bee9834e38990"
+  },
+  {
+   "group": "04",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 1,
+   "xml_sha256": "165d4b434880e307d3470124ae5c7cfa66b3478b976ab939d0bcf258adb53ce0"
+  },
+  {
+   "group": "05",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "d867a5ad2599d1b3a577bb8be002da9f7618d13bf46c86be57161c2d8d8f8ab5"
+  },
+  {
+   "group": "06",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 4,
+   "xml_sha256": "6a7f6a9a3591142e370aab33bcca46e2329dc7786b0d76384700018d6d7cf867"
+  },
+  {
+   "group": "07",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "3de60cb7ed984120bdc7e9aa90d6cd792d788af2b8dfd500842f51d9e3159f12"
+  },
+  {
+   "group": "08",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "4e8b058329a1a4ec0f9867bb80447f9c3f08d8e39ee3ddf45ee152db76b8dc47"
+  },
+  {
+   "group": "09",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 1,
+   "xml_sha256": "25305502f9ce6a94997a86d083d802464846df78cb769d52a1420421ecf41404"
+  },
+  {
+   "group": "10",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "bf636e903c73b1e8af389b5e5dbb3172d4f7edb6e6f0f476d9feba733543dc54"
+  },
+  {
+   "group": "11",
+   "tests": 387,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 0,
+   "xml_sha256": "818da9b148f2b3290f9b68466502dcb756ae360370712eafa78e7573048d97b0"
+  },
+  {
+   "group": "12",
+   "tests": 386,
+   "failures": 0,
+   "errors": 0,
+   "skipped": 1,
+   "xml_sha256": "471aa0ee51b3f610e8f25bfc8e3d432b1577f6ba5d81b221306735cac7475a39"
+  }
+ ],
+ "failures": [],
+ "verdict": "COMPLETE"
+}

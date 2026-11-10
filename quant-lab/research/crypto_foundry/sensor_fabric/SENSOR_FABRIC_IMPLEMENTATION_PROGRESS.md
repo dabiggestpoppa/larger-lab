@@ -9108,3 +9108,17 @@ self-ratification; independent review required before merge.
 - Ledger reconciliation: sections 197-199 untouched; section 200 belongs to the recovered P2dR2 audit branch and section 201 to the recovered P2eR1 audit branch; this record takes 202 and integrates neither.
 - Evidence: `BLOC_05_I09P2ER2_REPAIR_EVIDENCE.md`, `BLOC_05_I09P2ER2_CANONICAL_RUN.json`, `BLOC_05_I09P2ER2_CANONICAL_GROUP_LOGS.txt`.
 - No merge to primary, no trust consumer, no provider certification, no I11/I12/I17 or Bloc 6 advancement, no program-gate promotion, no self-ratification.
+
+## 203 - SENSOR-B5-I09P2-INTEGRATION-R1: ISOLATED INTEGRATION CANDIDATE AND GOVERNANCE RECONCILIATION
+
+- Checkpoint ID: `SENSOR-B5-I09P2-INTEGRATION-R1`. Ordering is by checkpoint ID; section numbers are not authority.
+- Branch: `agent/crypto-sensor-fabric-integration-r1`, built only from production `f199a7e3`, the recovered P2dR2 audit `42bd94680`, the P2e implementation `d587e74af`, the recovered P2eR1 audit `e9f5391db`, the P2eR2 repair `ca00dfb77` and the P2eR2 independent audit `985e1aa37`. Production itself is untouched.
+- Graph: `985e1aa37` (audited P2eR2 tip) plus ancestry-preserving merges of `42bd94680` (section 200) and `e9f5391db` (section 201). No QCAE-lineage commit, no integration-preparation branch and no local-only audit ref is an ancestor.
+- Ledger: sections 197-202 are each present exactly once and byte-identical to their source commits, ordered 197, 198, 199, 200, 201, 202; this entry takes 203. No historical section was rewritten and no finding was edited because code was later repaired.
+- Excluded by construction: the mis-parented P2dR2 audit (`8f870be2`) and the pre-correction P2eR1 audit (`54a8c91f8`), both local-only and never pushed.
+- Governance: the integrated tree tracks 1,096 Python files, matching `python_files_scanned` 1096 in the Bloc 4 binding audit; the integration adds no Python and no test.
+- Evidence integrity: the I09 semantic artifact is current (`--check` exits 0 with 35 rows, 3 unresolved states), the I10 allowlist is unchanged, frozen Bloc 5 plans hash identically to production, and the provider approval manifest remains empty.
+- Regression: the full canonical universe collects and executes 4,640 tests on the committed candidate with zero failures, zero errors and 11 environment-gated skips; node-id coverage is complete with no duplicates or unmapped cases.
+- Audit records: P2dR2 independent audit plus provenance addendum, P2eR1 independent audit plus corrective addendum and canonical evidence, P2eR2 repair evidence, corrected canonical evidence and independent audit are all present, including their negative findings.
+- Authority: the trust verdict remains advisory (`INTEGRATION_REQUIRED`); no trust consumer is integrated, no provider is certified, no trust dimension is claimed as verified, and no program gate moves.
+- Boundaries: no production merge, no I11/I12/I17 or Bloc 6 advancement, no program-gate promotion, no self-ratification. The candidate is submitted for independent audit only.
