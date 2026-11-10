@@ -135,8 +135,8 @@ jobs:
           suite = root if root.tag == "testsuite" else root.find("testsuite")
           totals = {k: int(suite.get(k) or 0) for k in ("tests", "failures", "errors", "skipped")}
           totals["rc"] = int(sys.argv[2])
-          totals["expected"] = 27
-          totals["zero_problems"] = (totals["tests"] == 27 and totals["rc"] == 0
+          totals["expected"] = 28
+          totals["zero_problems"] = (totals["tests"] == 28 and totals["rc"] == 0
                                      and totals["failures"] == 0 and totals["errors"] == 0
                                      and totals["skipped"] == 0)
           open(sys.argv[3], "w", encoding="utf-8").write(
