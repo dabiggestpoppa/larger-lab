@@ -41,6 +41,7 @@ ALLOWED_PREFIXES = (
     f"{TESTS}/stage_scope/test_i0_stage_scope_amendment_controls.py",
     ".github/workflows/block-06-i2-validation.yml",
     ".github/workflows/block-06-i2-paired-comparison.yml",
+    ".github/workflows/block-06-i0-validation.yml",
     ".github/workflows/block-06-i1-validation.yml",
     "oce/templates/", "oce/harness/",
 )
