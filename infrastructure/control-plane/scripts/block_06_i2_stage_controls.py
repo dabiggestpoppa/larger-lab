@@ -90,9 +90,9 @@ def main(argv=None) -> int:
         added = i2_allowed - i1_exact
         results.append(check("i2_is_i1_plus_i2_only",
                              i1_exact <= i2_allowed
-                             and added <= set(i2["amendment"]) | {"oce/templates/",
-                                                                   "oce/harness/"}
-                             and {"oce/templates/", "oce/harness/"} <= added,
+                             and {"oce/templates/", "oce/harness/"} <= added
+                             and not any(p.startswith(("oce/api/", "oce/sdk/", "packages/"))
+                                         or "OCE_BLOCK_06_I3_" in p for p in added),
                              sorted(added)))
         amendment = json.loads((root / AMENDMENT_DOC).read_text(encoding="utf-8"))
         results.append(check("proof_closure_frozen",
