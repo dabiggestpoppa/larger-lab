@@ -40,7 +40,8 @@ from qcae.core.vocabulary import EvidenceClass
 __all__ = ["SqliteEvidenceRepository", "SqliteLifecycleLogRepository", "SCHEMA_VERSION"]
 
 #: Metadata schema version (see PRAGMA user_version; migration ledger P1-C10).
-SCHEMA_VERSION = 1
+#: Canonical value aligned with migrations.CURRENT_SCHEMA_VERSION (=5).
+SCHEMA_VERSION = 5
 
 _SCHEMA_DDL = """
 CREATE TABLE IF NOT EXISTS evidence_artifact (

@@ -19,7 +19,14 @@ from typing import Callable, Dict, List, Optional
 from qcae.core.errors import QcaeValidationError
 
 __all__ = ["Migration", "MigrationLedgerEntry", "MigrationRunner", "MIGRATION_LEDGER_DDL",
-           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4"]
+           "TEST_V1_TO_V2", "V2_TO_V3", "V3_TO_V4", "V4_TO_V5",
+           "CURRENT_SCHEMA_VERSION", "LegacyDatabaseClass",
+           "classify_legacy_database", "V5_ADDITIONS_DDL",
+           "HISTORICAL_V4_DDL_SHA256", "V5_ONLY_TABLES",
+           "RUNTIME_DDL_MIGRATION", "_table_names"]
+
+#: Current build schema version: fresh databases are physically at v5.
+CURRENT_SCHEMA_VERSION = 5
 
 MIGRATION_LEDGER_DDL = """
 CREATE TABLE IF NOT EXISTS schema_migration_ledger (
@@ -287,17 +294,6 @@ CREATE TABLE IF NOT EXISTS runtime_idempotency (
     completed_at      TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS runtime_execution (
-    idempotency_key   TEXT PRIMARY KEY,
-    job_id            TEXT NOT NULL,
-    step_id           TEXT NOT NULL,
-    state             TEXT NOT NULL,
-    replay_safety     TEXT NOT NULL,
-    payload_json      TEXT NOT NULL,
-    payload_digest    TEXT NOT NULL
-);
-CREATE INDEX IF NOT EXISTS ix_runtime_execution_job ON runtime_execution(job_id);
-
 CREATE TABLE IF NOT EXISTS runtime_queue_claim (
     step_id           TEXT PRIMARY KEY,
     job_id            TEXT NOT NULL,
@@ -362,16 +358,6 @@ CREATE TABLE IF NOT EXISTS governance_approval_decision (
 CREATE INDEX IF NOT EXISTS ix_approval_decision_request
     ON governance_approval_decision(request_ref);
 
-CREATE TABLE IF NOT EXISTS governance_approval_use (
-    use_id            TEXT PRIMARY KEY,
-    decision_ref      TEXT NOT NULL,
-    step_id           TEXT NOT NULL,
-    used_at           TEXT NOT NULL
-);
--- Single-use law (P2-R4-C03 §7): ONE consumption row per grant decision.
-CREATE UNIQUE INDEX IF NOT EXISTS ux_approval_use_decision
-    ON governance_approval_use(decision_ref);
-
 CREATE TABLE IF NOT EXISTS governance_escalation (
     escalation_id     TEXT PRIMARY KEY,
     job_id            TEXT NOT NULL,
@@ -413,3 +399,203 @@ V3_TO_V4 = Migration(
         "and governance policy/approval/escalation tables (additive)"
     ),
 )
+V5_ADDITIONS_DDL = """
+CREATE TABLE IF NOT EXISTS runtime_execution (
+    idempotency_key   TEXT PRIMARY KEY,
+    job_id            TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    state             TEXT NOT NULL,
+    replay_safety     TEXT NOT NULL,
+    payload_json      TEXT NOT NULL,
+    payload_digest    TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS ix_runtime_execution_job ON runtime_execution(job_id);
+
+CREATE TABLE IF NOT EXISTS governance_approval_use (
+    use_id            TEXT PRIMARY KEY,
+    decision_ref      TEXT NOT NULL,
+    step_id           TEXT NOT NULL,
+    used_at           TEXT NOT NULL
+);
+-- Single-use law (P2-R4-C03 section 7): ONE consumption row per grant decision.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_approval_use_decision
+    ON governance_approval_use(decision_ref);
+CREATE INDEX IF NOT EXISTS ix_approval_use_step
+    ON governance_approval_use(step_id);
+"""
+
+
+def _apply_v5(conn: sqlite3.Connection) -> None:
+    """P2-R5: create genuinely post-original-v4 persistence (v4 -> v5).
+
+    The historical P2 v4 DDL (P2-0004, commit 61488273) contains NEITHER
+    ``runtime_execution`` NOR ``governance_approval_use``. Both tables were
+    added later and retroactively folded into the v4 DDL string. P2-R5R
+    restores the true historical v4 and moves those tables here, so
+    ``PRAGMA user_version`` is honest: v4 means exactly the original P2 v4
+    shape, v5 means v4 plus the post-v4 execution + grant-consumption truth.
+    """
+    conn.executescript(V5_ADDITIONS_DDL)
+
+
+V4_TO_V5 = Migration(
+    from_version=4,
+    to_version=5,
+    migration_id="P2-R5-0005-post-v4-execution-and-grant-use",
+    apply=_apply_v5,
+    description=(
+        "P2-R5: creates post-original-v4 runtime_execution and "
+        "governance_approval_use (with single-use unique index and step "
+        "index); additive, preserves all rows"
+    ),
+)
+
+#: sha256 of the historical v4 DDL block text (``RUNTIME_DDL_MIGRATION``
+#: assignment verbatim from P2-C12 commit 61488273). Regression guard: the
+#: historical meaning of migration P2-0004 must never drift again.
+HISTORICAL_V4_DDL_SHA256 = "e92ab35e708fe23a399d80d1de4f5d2b0d971cc658fedc1b022e2bc29ce724c0"
+
+#: Tables that exist ONLY at v5 (post-original-v4 additions).
+V5_ONLY_TABLES = frozenset({"runtime_execution", "governance_approval_use"})
+
+
+class LegacyDatabaseClass:
+    """Classification of a database for the P2-R5R legacy policy.
+
+    OPERATOR DECISION: MIGRATE KNOWN LEGACY P2 MISVERSIONED DATABASES;
+    UNKNOWN_HYBRID fails closed.
+
+    - CLEAN_LEGACY_METADATA: P1-only shape, no runtime/governance tables.
+    - KNOWN_V3: on-chain v3 shape (repository_revision, no runtime tables).
+    - TRUE_V4: exact original-P2 v4 shape (runtime/governance WITHOUT the
+      post-v4 runtime_execution / governance_approval_use tables).
+    - KNOWN_P2_MISVERSIONED: the historical bug shape - physical P2
+      runtime/governance tables exist while PRAGMA user_version == 1.
+    - CURRENT_V5: complete physical v5 (post-v4 tables present).
+    - UNKNOWN_HYBRID: anything else. FAIL CLOSED.
+    """
+
+    CLEAN_LEGACY_METADATA = "CLEAN_LEGACY_METADATA"
+    KNOWN_V3 = "KNOWN_V3"
+    TRUE_V4 = "TRUE_V4"
+    KNOWN_P2_MISVERSIONED = "KNOWN_P2_MISVERSIONED"
+    CURRENT_V5 = "CURRENT_V5"
+    UNKNOWN_HYBRID = "UNKNOWN_HYBRID"
+    NOT_LEGACY = "NOT_LEGACY"
+
+
+_P2_RUNTIME_TABLES = frozenset(
+    {
+        "runtime_job",
+        "runtime_step",
+        "runtime_job_event",
+        "runtime_checkpoint",
+        "runtime_idempotency",
+        "runtime_queue_claim",
+        "runtime_budget",
+        "governance_policy_request",
+        "governance_policy_decision",
+        "governance_approval_request",
+        "governance_approval_decision",
+        "governance_escalation",
+        "governance_escalation_decision",
+    }
+)
+
+
+def _table_names(conn: sqlite3.Connection) -> frozenset:
+    try:
+        rows = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()
+    except Exception:
+        return frozenset()
+    return frozenset(r[0] for r in rows)
+
+
+def _has_columns(conn: sqlite3.Connection, table: str, columns) -> bool:
+    try:
+        info = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    except Exception:
+        return False
+    have = {r[1] for r in info}
+    return all(c in have for c in columns)
+
+
+def _has_index(conn: sqlite3.Connection, index: str) -> bool:
+    try:
+        row = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='index' AND name=?",
+            (index,),
+        ).fetchone()
+    except Exception:
+        return False
+    return row is not None
+
+
+def classify_legacy_database(
+    conn: sqlite3.Connection, current_version: int
+) -> str:
+    """Classify a database at ``current_version`` for legacy migration policy.
+
+    Strict fingerprint (never a single-table check): required tables,
+    required columns on the load-bearing tables, required indexes where
+    meaningful, and explicit absence/presence of the post-v4 structures.
+    Anything that cannot be placed confidently on the production chain is
+    UNKNOWN_HYBRID and the caller must fail closed.
+    """
+    if current_version > CURRENT_SCHEMA_VERSION or current_version <= 0:
+        return LegacyDatabaseClass.NOT_LEGACY
+    names = _table_names(conn)
+    has_p2 = bool(names & _P2_RUNTIME_TABLES)
+    has_execution = "runtime_execution" in names
+    has_approval_use = "governance_approval_use" in names
+    has_single_use = _has_index(conn, "ux_approval_use_decision")
+    if current_version == CURRENT_SCHEMA_VERSION:
+        if has_execution and has_approval_use and has_single_use:
+            return LegacyDatabaseClass.CURRENT_V5
+        return LegacyDatabaseClass.UNKNOWN_HYBRID
+    if current_version == 1 and has_p2:
+        ok = (
+            _has_columns(conn, "runtime_job", ("job_id", "status", "job_type"))
+            and _has_columns(
+                conn, "runtime_step",
+                ("step_id", "job_id", "status", "step_type"),
+            )
+            and _has_columns(
+                conn, "governance_approval_decision",
+                ("decision_id", "request_ref", "state"),
+            )
+        )
+        if not ok:
+            return LegacyDatabaseClass.UNKNOWN_HYBRID
+        if has_execution and has_approval_use:
+            if _has_columns(
+                conn, "runtime_execution",
+                ("idempotency_key", "job_id", "step_id", "state"),
+            ) and _has_columns(
+                conn, "governance_approval_use",
+                ("use_id", "decision_ref", "step_id"),
+            ):
+                return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+            return LegacyDatabaseClass.UNKNOWN_HYBRID
+        return LegacyDatabaseClass.KNOWN_P2_MISVERSIONED
+    if current_version == 1 and not has_p2:
+        return LegacyDatabaseClass.CLEAN_LEGACY_METADATA
+    if current_version == 2:
+        if has_p2 or has_execution or has_approval_use:
+            return LegacyDatabaseClass.UNKNOWN_HYBRID
+        return LegacyDatabaseClass.CLEAN_LEGACY_METADATA
+    if current_version == 3:
+        if has_p2 or has_execution or has_approval_use:
+            return LegacyDatabaseClass.UNKNOWN_HYBRID
+        if "repository_revision" in names:
+            return LegacyDatabaseClass.KNOWN_V3
+        return LegacyDatabaseClass.UNKNOWN_HYBRID
+    if current_version == 4:
+        if has_execution or has_approval_use:
+            return LegacyDatabaseClass.UNKNOWN_HYBRID
+        if has_p2 and _has_index(conn, "ix_runtime_event_job"):
+            return LegacyDatabaseClass.TRUE_V4
+        return LegacyDatabaseClass.UNKNOWN_HYBRID
+    return LegacyDatabaseClass.UNKNOWN_HYBRID

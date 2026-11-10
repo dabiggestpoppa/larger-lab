@@ -102,6 +102,7 @@ class PolicyStepAuthorityGate:
             reason=decision.reason,
             constraints=constraints,
             requirement=declared,
+            budget_ref=scope,
         )
 
 
@@ -154,10 +155,12 @@ class ApprovalRegistrySink:
                 action=verdict.action,
                 resource=verdict.resource,
                 scope=verdict.scope,
-                budget_ref=verdict.scope,  # exact binding; budget joins scope
+                budget_ref=verdict.budget_ref or verdict.scope,
                 justification=verdict.reason or "step requires approval",
                 created_at=self._clock(),
                 expires_at=self._expires_at(),
+                authority_requirement=verdict.requirement,
+                policy_version=verdict.policy_version,
             )
         )
         return request_id

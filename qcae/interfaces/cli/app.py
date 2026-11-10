@@ -22,21 +22,19 @@ from qcae.governance.standalone.step_gate import (
     PolicyStepAuthorityGate,
 )
 from qcae.infrastructure.persistence.sqlite_approval_registry import (
-    APPROVAL_DDL,
     SqliteApprovalRegistry,
 )
-from qcae.infrastructure.persistence.sqlite_budget_ledger import BUDGET_DDL
 from qcae.infrastructure.persistence.sqlite_policy_log import (
-    GOVERNANCE_DDL,
     SqlitePolicyDecisionLog,
 )
 from qcae.infrastructure.persistence.sqlite_runtime_store import (
-    RUNTIME_DDL,
     SqliteRuntimeStore,
 )
-from qcae.infrastructure.persistence.store_factory import open_metadata_db
+from qcae.infrastructure.persistence.store_factory import (
+    CURRENT_SCHEMA_VERSION,
+    open_metadata_db,
+)
 from qcae.infrastructure.queue.sqlite_step_queue import (
-    QUEUE_INTEGRITY_DDL,
     SqliteStepQueue,
 )
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
@@ -147,8 +145,26 @@ def build_local_runtime(
 ) -> LocalRuntime:
     clock = clock or _default_clock()
     conn = open_metadata_db(db_path)
-    for ddl in (RUNTIME_DDL, QUEUE_INTEGRITY_DDL, BUDGET_DDL, GOVERNANCE_DDL, APPROVAL_DDL):
-        conn.executescript(ddl)
+    # P2-R5R schema law: open_metadata_db is the ONLY schema authority. A
+    # DB that claims v5 must already be physically v5; the composition root
+    # performs NO hidden schema completion (no executescript here). Fail
+    # closed if the physical shape is incomplete.
+    _missing = [
+        t for t in ("runtime_job", "runtime_step", "runtime_job_event",
+                    "runtime_checkpoint", "runtime_idempotency",
+                    "runtime_execution", "runtime_queue_claim",
+                    "runtime_budget", "governance_approval_use")
+        if conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
+            (t,),
+        ).fetchone() is None
+    ]
+    if _missing:
+        raise QcaeValidationError(
+            f"metadata database {db_path} claims schema v5 but is missing "
+            f"physical tables {_missing}; refusing to complete schema "
+            f"outside migration provenance (failing closed)"
+        )
 
     store = SqliteRuntimeStore(conn)
     queue = SqliteStepQueue(conn, store, now_fn=clock, lease_ttl_seconds=lease_ttl_seconds)
@@ -191,7 +207,7 @@ def build_local_runtime(
         policy_provider=authority,
         approval_registry=approvals,
         clock=clock,
-        schema_version=4,
+        schema_version=CURRENT_SCHEMA_VERSION,
         policy_version=policy.policy.policy_version,
         storage_location=str(db_path),
     )

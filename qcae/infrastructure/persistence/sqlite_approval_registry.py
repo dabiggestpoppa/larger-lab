@@ -28,7 +28,18 @@ from qcae.governance.standalone.approvals import (
     GrantUse,
 )
 
-__all__ = ["SqliteApprovalRegistry", "APPROVAL_DDL"]
+__all__ = ["SqliteApprovalRegistry", "APPROVAL_DDL",
+           "BACKUP_AUTHORITY_TABLES"]
+
+#: Durable authority tables this adapter owns whose rows a backup manifest
+#: must count (P2-R5R §17: a grant consumption or execution record lost by a
+#: restore is a law violation, not a cosmetic gap).
+BACKUP_AUTHORITY_TABLES = (
+    "runtime_execution",
+    "governance_approval_use",
+    "governance_approval_request",
+    "governance_approval_decision",
+)
 
 APPROVAL_DDL = """
 CREATE TABLE IF NOT EXISTS governance_approval_request (
@@ -154,13 +165,19 @@ class SqliteApprovalRegistry:
             raise QcaeValidationError(
                 f"decision references unknown request {decision.request_ref!r}"
             )
-        # A grant must restate the request's exact binding (no laundering).
+        # A grant must restate the request's exact FULL binding (P2-R5R:
+        # seven fields; no laundering, no silent budget/requirement/policy
+        # widening). Legacy requests may carry empty requirement/policy
+        # fields; a grant restating those empties stays internally
+        # consistent here but can never authorize under the R5R law.
         if decision.state is ApprovalState.GRANTED:
             if (
                 decision.bound_action != request.action
                 or decision.bound_resource != request.resource
                 or decision.bound_scope != request.scope
                 or decision.bound_budget_ref != request.budget_ref
+                or decision.bound_authority_requirement != request.authority_requirement
+                or decision.bound_policy_version != request.policy_version
             ):
                 raise QcaeValidationError(
                     "grant binding does not match the request; approval laundering rejected"
@@ -219,6 +236,28 @@ class SqliteApprovalRegistry:
             return True
         except sqlite3.IntegrityError:
             return False
+
+    def consume_grant(
+        self,
+        *,
+        use_id: str,
+        decision_ref: str,
+        step_id: str,
+        used_at: str,
+    ) -> bool:
+        """Provider-neutral single-use consumption (ApprovalAdmissionProvider).
+
+        Builds the durable GrantUse record internally and delegates to
+        ``mark_grant_used``; True iff this call won the single-use race.
+        """
+        return self.mark_grant_used(
+            GrantUse(
+                use_id=use_id,
+                decision_ref=decision_ref,
+                step_id=step_id,
+                used_at=used_at,
+            )
+        )
 
     def uses_for_decision(self, decision_id: str) -> List[GrantUse]:
         """All consumption records for one grant (oldest first)."""

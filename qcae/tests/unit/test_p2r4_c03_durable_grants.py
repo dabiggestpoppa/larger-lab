@@ -49,6 +49,8 @@ from qcae.infrastructure.queue.sqlite_step_queue import (
 from qcae.orchestration.authority_gate import (
     PermissiveStepAuthorityGate,
     StaticStepAuthorityGate,
+    StepAuthorityDecision,
+    StepAuthorityVerdict,
 )
 from qcae.orchestration.jobs.runtime import RuntimeStepStatus
 from qcae.orchestration.orchestrator.engine import OrchestratorEngine
@@ -78,6 +80,17 @@ def _identities():
     ids.register(LocalIdentity(identity_id="id-worker-runtime", kind=IdentityKind.WORKER))
     return ids
 
+def _admission_verdict(stack, job_id: str, step_id: str, principal: str):
+    """Rebuild the live verdict the gate would emit for this step.
+
+    Mirrors the engine's execution-time authority evaluation so the binding
+    (principal, action, resource, scope) matches the durable request the
+    sink recorded and the grant restates.
+    """
+    gate = StaticStepAuthorityGate(require_approval=("execute.GENERIC",))
+    return gate.evaluate_step_authority(
+        stack.get_step(step_id), stack.get_job(job_id), worker_id=principal)
+
 
 def _service(conn, stack, queue, clock, engine, approvals):
     return LocalRuntimeService(
@@ -95,7 +108,7 @@ def _reach_waiting_policy(stack, queue, engine, clock, job_id="job-12345678"):
     result = engine.execute_step(lease, worker_id="id-worker-runtime")
     assert result.status.value == "BLOCKED_POLICY"
     assert stack.get_step(STEP).status is RuntimeStepStatus.WAITING_POLICY
-    rid = engine._latest_authority_request_for_step(job_id, STEP)
+    rid = engine._resolver.latest_for_step(job_id, STEP)
     assert rid
     return rid
 
@@ -130,9 +143,11 @@ class TestDurableGrantAdmission:
                            approvals, rid)
         # First admission consumes the grant; a second is refused.
         assert engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack, "job-12345678", STEP,
+                                       "id-worker-runtime"))
         assert not engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack, "job-12345678", STEP,
+                                       "id-worker-runtime"))
         # Consumption is durable.
         decision = approvals.decisions_for_request(rid)[-1]
         uses = approvals.uses_for_decision(decision.decision_id)
@@ -166,7 +181,8 @@ class TestDurableGrantAdmission:
         engine2.register_worker_type("GENERIC", DeterministicSuccessWorker())
         # The unreleased grant is still discoverable and admits execution.
         assert engine2._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack2, "job-12345678", STEP,
+                                       "id-worker-runtime"))
         conn2.close()
 
     def test_consumed_grant_cannot_replay_after_restart(self, tmp_path):
@@ -185,7 +201,8 @@ class TestDurableGrantAdmission:
         _grant_and_release(_service(conn, stack, queue, clock, engine, approvals),
                            approvals, rid)
         assert engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack, "job-12345678", STEP,
+                                       "id-worker-runtime"))
         conn.commit()
         conn.close()  # restart AFTER consumption
 
@@ -195,7 +212,8 @@ class TestDurableGrantAdmission:
         engine2 = _engine(stack2, conn2, clock, approvals2)
         # The consumed grant cannot authorize anything in the new process.
         assert not engine2._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack2, "job-12345678", STEP,
+                                       "id-worker-runtime"))
         conn2.close()
 
     def test_expired_grant_admits_nothing(self):
@@ -214,7 +232,8 @@ class TestDurableGrantAdmission:
                            approvals, rid)
         clock.advance(3600)  # past the 60s approval window
         assert not engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack, "job-12345678", STEP,
+                                       "id-worker-runtime"))
 
     def test_wrong_principal_admitted_nothing(self):
         clock = _Clock()
@@ -232,7 +251,8 @@ class TestDurableGrantAdmission:
                            approvals, rid)
         # The grant admits the requesting principal only (identity binding).
         assert not engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-operator-1")
+            verdict=_admission_verdict(stack, "job-12345678", STEP,
+                                       "id-operator-1"))
 
     def test_denied_or_missing_grant_admits_nothing(self):
         clock = _Clock()
@@ -245,9 +265,13 @@ class TestDurableGrantAdmission:
         queue = SqliteStepQueue(conn, stack, now_fn=clock, lease_ttl_seconds=60)
         engine = _engine(stack, conn, clock, approvals)
         engine.register_worker_type("GENERIC", DeterministicSuccessWorker())
-        # No request at all -> nothing admits.
-        assert not engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+        # No request at all -> nothing admits (no durable request).
+        assert not engine._grant_admits(verdict=StepAuthorityVerdict(
+            step_id=STEP, job_id="job-12345678", principal="id-worker-runtime",
+            action="execute.GENERIC", resource="cap-1",
+            scope="job:job-12345678", decision=StepAuthorityDecision.REQUIRE_APPROVAL,
+            decision_ref="ref", policy_version="t", evaluated_at=clock(),
+            requirement=""))
         rid = _reach_waiting_policy(stack, queue, engine, clock)
         service = _service(conn, stack, queue, clock, engine, approvals)
         service.decide_approval(
@@ -255,7 +279,39 @@ class TestDurableGrantAdmission:
             job_id="job-12345678", reason="no",
         )
         assert not engine._grant_admits(
-            job_id="job-12345678", step_id=STEP, principal="id-worker-runtime")
+            verdict=_admission_verdict(stack, "job-12345678", STEP,
+                                       "id-worker-runtime"))
+
+    def test_stale_binding_digest_does_not_consume_grant(self):
+        """P2-R5-C03: live binding digest must equal approved binding digest;
+        a stale mismatch refuses admission and does NOT consume the grant."""
+        clock = _Clock()
+        conn = open_metadata_db(":memory:")
+        for ddl in (RUNTIME_DDL, QUEUE_INTEGRITY_DDL, BUDGET_DDL, GOVERNANCE_DDL,
+                    APPROVAL_DDL):
+            conn.executescript(ddl)
+        stack = SqliteRuntimeStore(conn)
+        approvals = SqliteApprovalRegistry(conn)
+        queue = SqliteStepQueue(conn, stack, now_fn=clock, lease_ttl_seconds=60)
+        engine = _engine(stack, conn, clock, approvals)
+        engine.register_worker_type("GENERIC", DeterministicSuccessWorker())
+        rid = _reach_waiting_policy(stack, queue, engine, clock)
+        _grant_and_release(_service(conn, stack, queue, clock, engine, approvals),
+                           approvals, rid)
+        # Stale verdict: same principal/job/step but a DIFFERENT action,
+        # so its binding digest differs from the approved grant's digest.
+        stale = StepAuthorityVerdict(
+            step_id=STEP, job_id="job-12345678", principal="id-worker-runtime",
+            action="execute.OTHER", resource="cap-1",
+            scope="job:job-12345678", decision=StepAuthorityDecision.REQUIRE_APPROVAL,
+            decision_ref="ref", policy_version="t", evaluated_at=clock(),
+            requirement="")
+        assert stale.binding_digest() != approvals.decisions_for_request(rid)[-1].binding_digest(
+            "id-worker-runtime")
+        # Admission refused; no use row created (grant not consumed).
+        assert not engine._grant_admits(verdict=stale)
+        decision = approvals.decisions_for_request(rid)[-1]
+        assert len(approvals.uses_for_decision(decision.decision_id)) == 0
 
 
 class TestRequestIdentityRestartSafety:

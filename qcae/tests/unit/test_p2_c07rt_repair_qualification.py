@@ -141,30 +141,8 @@ class TestCombinedFlows:
 
     def test_crash_after_lease_resume_does_not_repeat_committed(self, env):
         """R1+R2+R4: crash between steps; committed step never re-executed."""
-        store, queue, engine, clock, conn = env
-        worker = _CountingWorker(ReplaySafety.IDEMPOTENCY_AWARE)
-        engine._workers["GENERIC"] = worker
-        engine.submit(_job(), [
-            _step("s-A"), _step("s-B", deps=("s-A",)), _step("s-C", deps=("s-A",)),
-        ])
-        lease = _drive(store, queue, engine, clock)
-        engine.execute_step(lease)  # s-A commits
-        assert worker.executions == 1
-        engine.ready_steps("job-12345678")
-        lease_b = engine.lease_next("job-12345678", "w-crash")
-        assert lease_b.step_id == "s-B"
-        conn.commit()
-        conn.close()  # process death with durable committed work
-
-        # Restart with a fresh engine over the same DB.
-        clock2 = _Clock()
-        conn2 = open_metadata_db(":memory:")  # placeholder, replaced below
-        conn2.close()
-        conn2 = open_metadata_db(db_path := __import__("pathlib").Path(
-            __import__("tempfile").gettempdir()
-        ) / "unused.sqlite3")
-        conn2.close()
-        # Real restart: reopen the ORIGINAL db file (persisted by conn.commit).
+        # Self-contained: use a dedicated temp DB so this test is independent
+        # of the shared env fixture state and of any ambient tempdir files.
         import tempfile
         from pathlib import Path
 
@@ -194,7 +172,7 @@ class TestCombinedFlows:
             store2 = SqliteRuntimeStore(c2)
             queue2 = SqliteStepQueue(c2, store2, now_fn=clock, lease_ttl_seconds=60)
             engine2 = OrchestratorEngine(store2, queue2, clock=clock, authority_gate=PermissiveStepAuthorityGate())
-            w2 = _CountingWorker(ReplaySafety.IDEMPOTENCY_AWAY if False else ReplaySafety.IDEMPOTENCY_AWARE)
+            w2 = _CountingWorker(ReplaySafety.IDEMPOTENCY_AWARE)
             engine2._workers["GENERIC"] = w2
             clock.advance(120)  # process death outlives the lease TTL
             report = engine2.recover_job("job-12345678")

@@ -873,6 +873,112 @@ Location: `qcae/implementation/decisions/`
 
 None. All derived points above refine within canon; none contradict a frozen invariant.
 
+### P2-R5R — Canonical substrate reconciliation (OPEN)
+
+P2-R5R repairs the P2 substrate underneath preserved P3-R4 work on canonical
+head `8212b59d0ad5afd708d939d34a2564571f6ee285`, following the operator's
+25-step reconciliation directive. P3 capability development is PAUSED during
+repair; P3-R4 work is PRESERVED and must not be discarded.
+
+**Correction to prior claim (append-only; the P2-R5-I0R claim above is not
+deleted).** The earlier canonical reconciliation proved several PRIOR laws:
+
+- durable single-use grant consumption;
+- generic migration infrastructure;
+- generic backup/restore integrity;
+- typed NOT_READY operator behavior.
+
+It did NOT prove the stronger R5 requirements:
+
+- production schema authority at ONE physical version;
+- a historically correct v4→v5 migration;
+- live approval binding against CURRENT verdict semantics;
+- backup/restore coverage of `runtime_execution` + grant consumption;
+- an R5 freeze.
+
+The PROVEN claim is therefore overstated and is corrected here.
+
+```
+P2-R5R = OPEN
+P3-R4  = PRESERVED / PAUSED
+```
+
+**Source histories recorded:** canonical `8212b59d0ad5afd708d939d34a2564571f6ee285`;
+local review `7ca0adbeea86f9658ed633423b997daa02a55e0b` (review-only source,
+not merged/rebase-target/cherry-picked).
+
+**Schema law adopted.** `PRAGMA user_version == 5` means the complete v5
+schema is physically present. The true historical v4 is the original P2
+migration `P2-0004-runtime-governance-tables` at commit
+`61488273699dd5f6835c49b8b9f070489a7e5b42`, which contains NEITHER
+`runtime_execution` NOR `governance_approval_use`; those are post-v4 and now
+created by the real `V4_TO_V5`. A fresh database is bootstrapped to the
+complete v5 shape with bootstrap provenance BEFORE the version stamp, and
+`build_local_runtime` performs no schema completion at all (it verifies and
+fails closed).
+
+**Approval binding law adopted (POLICY_VERSION_BOUND).** One provider-neutral
+immutable `ApprovalBinding` over seven semantic fields — principal, action,
+resource, scope, budget_ref, authority_requirement, policy_version (plus
+constraints) — serialized canonically as sorted-key JSON, digested with
+sha256. An approval binds the policy version it was evaluated under; a
+policy-version change needs a fresh approval. Legacy/incomplete approvals stay
+readable historical evidence and never authorize.
+
+**Local review branch `agent/qcae-p2-r5-review` (`7ca0adbeea86f9658ed633423b997daa02a55e0b`)** is NOT merged,
+NOT rebased, NOT cherry-picked into canonical. Its R5 work is a separate
+line; canonical reconciliation regenerates evidence from the reconciled
+canonical commit rather than copying from the local 1336-run.
+
+**Commit sequence:** P2-R5R-I0 (ledger correction, this entry) →
+P2-R5R-C01 (schema v5 / historical v4 / legacy P2 classifier) →
+P2-R5R-C02 (live ApprovalBinding) → P2-R5R-C03 (provider boundary/resolver)
+→ P2-R5R-C04 (backup/restore row counts) → P2-R5R-C05 (typed outcome
+regression) → P2-R5R-T01 (adversarial + P3-R4 regression) →
+P2-R5R-FREEZE (new canonical freeze, blocks `[]`).
+
+**Blockers during repair:** none open yet; failure B
+(`test_crash_after_lease_resume_does_not_repeat_committed`) must be
+investigated and classified before freeze.
+
+**Pre-existing failure review (independent reproduction on untouched
+canonical `8212b59d`, in a detached worktree):**
+
+- **A — `test_p0_topology.py::test_second_level_package_exists_and_imports[proving-build]`**
+  reproduces on untouched canonical. Root cause is a repository defect, not
+  an environment artifact: `qcae/proving/build/__init__.py` exists on disk but
+  is IGNORED by `.gitignore`'s `build/` rule, so no clean checkout contains
+  the canon subpackage the test requires. Repaired by versioning the file
+  (forced add); the tracked file makes a clean checkout green. It is
+  unrelated to P2 substrate, and is recorded as such.
+- **B — `test_p2_c07rt_repair_qualification::…test_crash_after_lease_resume_does_not_repeat_committed`**
+  passes in isolation on untouched canonical. The canonical test body opens an
+  AMBIENT file — `tempfile.gettempdir()/unused.sqlite3` — as a “placeholder”
+  restart, which on this machine is a leftover v1 database. That is a test
+  isolation defect (an unowned path shared with the OS temp dir), not a
+  runtime regression: the real restart it then performs already uses its own
+  temporary directory. Repaired truthfully by making the test self-contained
+  (the vestigial placeholder removed); the invariant assertion is unchanged
+  and green. **P2-R5R does not freeze while B is red** — it is green here.
+
+**P2-R5R-C05 (typed outcome regression — tests/ledger only, no code change
+required):** canonical `JobMissingOutcome` / `StepNotReadyOutcome` remain the
+sole no-work model (the local `NoRunnableStep` is not ported). New matrix
+proves: unknown job → exit 2; future schedule →
+`SCHEDULE_NOT_ELAPSED`; `WAITING_POLICY`, `WAITING_INPUT`, retry-scheduled and
+no-eligible-step → typed NOT_READY; worker missing → `WorkerUnavailable`, exit
+3 (canon exit code unchanged); no state/lease/budget mutation. 10 tests green.
+
+**P2-R5R-T01 (adversarial matrix + current P3-R4 regression):**
+`qcae/implementation/P2-R5R-test-evidence.json` is generated at the tested
+commit by `qcae/implementation/tools/gen_p2r5r_evidence.py`; every block is
+its own pytest invocation with its own observed counts and exit status (no
+aggregate relabeling, no hardcoded booleans). Blocks: operator_loop 5,
+grant_journey 2, process_crash 7, schema_r5r 18, binding_r5r 26,
+boundary_r5r 8, backup_r5r 6, typed_r5r 10, P3-R4 regression 238,
+crash-after-lease 1, topology 78, full qcae suite 1439 — all green.
+Environment: local developer machine; this repository has no CI.
+
 ## Blockers
 
 None.

@@ -137,7 +137,7 @@ def _reach_waiting_policy(service, store, job, step, worker="id-worker-runtime")
     assert result.status is WorkerStatus.BLOCKED_POLICY
     assert store.get_step(step.step_id).status is RuntimeStepStatus.WAITING_POLICY
     # The durable authority request exists.
-    request_id = service._latest_authority_request_for_step(job.job_id, step.step_id)
+    request_id = service._resolver.latest_for_step(job.job_id, step.step_id)
     assert request_id, "APPROVAL_REQUESTED event must carry the request id"
     return request_id
 

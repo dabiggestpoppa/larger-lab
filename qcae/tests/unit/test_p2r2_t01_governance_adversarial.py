@@ -137,7 +137,7 @@ def _reach_waiting_policy(service, engine, job, step, worker="id-worker-runtime"
     lease = engine.lease_next(job.job_id, worker)
     result = engine.execute_step(lease, worker_id=worker)
     assert result.status is WorkerStatus.BLOCKED_POLICY
-    request_id = service._latest_authority_request_for_step(job.job_id, step.step_id)
+    request_id = service._resolver.latest_for_step(job.job_id, step.step_id)
     assert request_id
     return request_id
 
@@ -213,7 +213,9 @@ class TestApprovalAdversaries:
             state=ApprovalState.GRANTED, decided_by="id-operator-1",
             decided_at=clock(), bound_action=request.action,
             bound_resource=request.resource, bound_scope=request.scope,
-            bound_budget_ref=request.budget_ref, reason="first",
+            bound_budget_ref=request.budget_ref,
+            bound_authority_requirement=request.authority_requirement,
+            bound_policy_version=request.policy_version, reason="first",
         )
         approvals.record_decision(decision)
         with pytest.raises(QcaeValidationError, match="already exists"):

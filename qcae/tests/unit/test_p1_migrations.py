@@ -15,6 +15,17 @@ from qcae.tests.unit.test_p1_sqlite_store import _artifact
 def db(tmp_path):
     path = tmp_path / "mig.db"
     conn = open_metadata_db(path)
+    # These tests exercise the MigrationRunner mechanism starting from
+    # schema v1 (the legacy base). open_metadata_db now creates fresh
+    # databases at CURRENT_SCHEMA_VERSION (=5), so pin this fixture's DB
+    # back to v1 to represent a legacy store under test. The assertions
+    # (v1 -> v2) are unchanged.
+    conn.execute("PRAGMA user_version = 1")
+    conn.commit()
+    # Isolate the MigrationRunner mechanism: drop the fresh-bootstrap
+    # provenance row so ledger assertions observe only the test migration.
+    conn.execute("DELETE FROM schema_migration_ledger")
+    conn.commit()
     yield conn
     conn.close()
 
