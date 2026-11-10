@@ -1,0 +1,92 @@
+{
+  "document_id": "OCE-B6-I3-SURFACE-001",
+  "prohibitions": [
+    "no client supplied authority",
+    "no stable private symbol",
+    "no scaffold or simulation displayed as operational proof",
+    "no wall clock read",
+    "no random ids or random sampling",
+    "no later stage import"
+  ],
+  "schema": "oce.block_06_i3.operator_surface.v1",
+  "section_bindings": {
+    "C2.S1": "oce.operator.capability_view",
+    "C2.S2": "oce.operator.approval_inbox + oce.operator.decide",
+    "C2.S3": "oce.operator.reconcile_chain"
+  },
+  "stage": "B6-I3",
+  "status": "FROZEN",
+  "symbols": [
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unknown_subject_or_simulated_proof",
+      "exported": true,
+      "section": "C2.S1",
+      "symbol": "oce.operator.capability_view",
+      "typed_inputs": [
+        "records",
+        "viewer",
+        "evidence_index"
+      ],
+      "typed_outputs": [
+        "capability_view"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_malformed_request",
+      "exported": true,
+      "section": "C2.S2",
+      "symbol": "oce.operator.approval_inbox",
+      "typed_inputs": [
+        "requests",
+        "viewer",
+        "now"
+      ],
+      "typed_outputs": [
+        "approval_inbox"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_self_approval_replay_stale_wrong_target_scope_cost",
+      "exported": true,
+      "section": "C2.S2",
+      "symbol": "oce.operator.decide",
+      "typed_inputs": [
+        "request",
+        "approver",
+        "decision",
+        "now",
+        "consumed",
+        "evidence_index",
+        "actual_target_sha256"
+      ],
+      "typed_outputs": [
+        "approval_decision"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_digest_link_source_unknown_node",
+      "exported": true,
+      "section": "C2.S3",
+      "symbol": "oce.operator.reconcile_chain",
+      "typed_inputs": [
+        "nodes",
+        "manifest",
+        "sources",
+        "root"
+      ],
+      "typed_outputs": [
+        "evidence_reconciliation"
+      ]
+    }
+  ],
+  "view_invariants": {
+    "approval_inbox_sorted": "expires_at then request_id",
+    "canonical_digest_present": true,
+    "capability_rows_sorted": true,
+    "evidence_chain_ordered": true
+  }
+}

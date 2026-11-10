@@ -1,0 +1,89 @@
+{
+  "document_id": "OCE-B6-I3-FAILURE-001",
+  "failure_classes": [
+    {
+      "id": "F03",
+      "nodes": [
+        "test_block_06_i3_approvals.py::test_self_approval_refused",
+        "test_block_06_i3_approvals.py::test_replay_refused",
+        "test_block_06_i3_approvals.py::test_stale_refused",
+        "test_block_06_i3_approvals.py::test_wrong_target_refused",
+        "test_block_06_i3_approvals.py::test_out_of_scope_refused",
+        "test_block_06_i3_approvals.py::test_cost_ceiling_refused"
+      ],
+      "observable": "Replay, stale, wrong-target and self-approval are refused",
+      "proof_state": "BOUND",
+      "title": "Approval authority bypass"
+    },
+    {
+      "id": "F11",
+      "nodes": [
+        "test_block_06_i3_evidence.py::test_chain_reconciles",
+        "test_block_06_i3_evidence.py::test_digest_mismatch_refused",
+        "test_block_06_i3_evidence.py::test_broken_link_refused",
+        "test_block_06_i3_evidence.py::test_source_spoof_refused",
+        "test_block_06_i3_evidence.py::test_unknown_node_refused",
+        "test_block_06_i3_evidence.py::test_deterministic_sample"
+      ],
+      "observable": "Random samples reconcile to immutable manifests",
+      "proof_state": "BOUND",
+      "title": "Evidence reconciliation failure"
+    },
+    {
+      "id": "F23",
+      "nodes": [
+        "test_block_06_i3_capability.py::test_proven_requires_evidence",
+        "test_block_06_i3_capability.py::test_simulated_proof_refused",
+        "test_block_06_i3_capability.py::test_unproven_active_refused",
+        "test_block_06_i3_contract.py::test_inventory_equals_collection"
+      ],
+      "observable": "No scaffold or simulation displayed as operational proof",
+      "proof_state": "BOUND",
+      "title": "Operational truth inflation"
+    }
+  ],
+  "failure_classes_total": 3,
+  "policy": {
+    "cloud_refused": true,
+    "later_stage_refused": true,
+    "randomness_refused": true,
+    "simulation_refused": true,
+    "wall_clock_refused": true
+  },
+  "schema": "oce.block_06_i3.failures.v1",
+  "stage": "B6-I3",
+  "status": "FROZEN",
+  "threats": [
+    {
+      "control": "viewer subject required; no request-supplied authority",
+      "id": "T02",
+      "proof_state": "BOUND",
+      "title": "Spoofed operator identity"
+    },
+    {
+      "control": "sha256 and byte size reconciled per node",
+      "id": "T06",
+      "proof_state": "BOUND",
+      "title": "Manifest or digest substitution"
+    },
+    {
+      "control": "single-use nonce ledger",
+      "id": "T10",
+      "proof_state": "BOUND",
+      "title": "Approval replay"
+    },
+    {
+      "control": "effective ceiling is the minimum of record and grant",
+      "id": "T13",
+      "proof_state": "BOUND",
+      "title": "Authority ceiling escalation"
+    },
+    {
+      "control": "I4-I9 artifacts absent and imports refused",
+      "id": "T19",
+      "proof_state": "BOUND",
+      "title": "Later-stage leakage"
+    }
+  ],
+  "threats_total": 5
+}

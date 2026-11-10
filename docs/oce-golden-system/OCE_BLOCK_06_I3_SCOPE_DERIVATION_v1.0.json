@@ -1,0 +1,92 @@
+{
+  "api_symbols": [
+    "oce.operator.capability_view",
+    "oce.operator.approval_inbox",
+    "oce.operator.decide",
+    "oce.operator.reconcile_chain"
+  ],
+  "authority_sources": [
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I3",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_PLAN_v1.0.md#B6-I3",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S1",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S2",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S3",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-06",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-07",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-08"
+  ],
+  "base_sha": "018b164f249bbf075334d5d03ad37e80dcbbede0",
+  "base_tree": "65c3713ad70e527a6a5657347c53f8663a2ccb20",
+  "capital_authority": "none",
+  "common_regression_floor": 208,
+  "cost_usd": 0,
+  "document_id": "OCE-B6-I3-SCOPE-001",
+  "exit_gate": "operator truth and authority tests pass",
+  "failure_classes": [
+    "F03",
+    "F11",
+    "F23"
+  ],
+  "implementation_surfaces": [
+    "operator_surface"
+  ],
+  "locks": {
+    "B6-I4": "LOCKED",
+    "B6-I5": "LOCKED",
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "minimum_nodes": 27,
+  "mutation_floor": {
+    "source": 3,
+    "stage": 6
+  },
+  "non_goals": [
+    "incident and cost"
+  ],
+  "outputs": [
+    "operator views"
+  ],
+  "provenance_obligations": [
+    "every capability row carries subject, version, ceiling, status and an evidence link",
+    "a scaffold or simulation can never be presented as operational proof",
+    "an approval binds action, target digest, effect digest, cost, reversibility, expiry and evidence",
+    "approval nonces are single-use and decisions are deterministic",
+    "the evidence chain reconciles intent to plan to task to artifact to evaluation to gate",
+    "sample selection is deterministic from the manifest digest and uses no randomness",
+    "prior stage artifacts remain byte-identical"
+  ],
+  "purpose": "C2 capability, approval and evidence views",
+  "requirements": [
+    "B6-P0-SEC-06",
+    "B6-P0-SEC-07",
+    "B6-P0-SEC-08"
+  ],
+  "schema": "oce.block_06_i3.scope.v1",
+  "sections": [
+    "C2.S1",
+    "C2.S2",
+    "C2.S3"
+  ],
+  "stage": "B6-I3",
+  "stop_conditions": [
+    "stop on self-approval"
+  ],
+  "threats": [
+    "T02",
+    "T06",
+    "T10",
+    "T13",
+    "T19"
+  ]
+}

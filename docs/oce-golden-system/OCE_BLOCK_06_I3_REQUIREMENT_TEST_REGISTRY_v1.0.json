@@ -1,0 +1,279 @@
+{
+  "document_id": "OCE-B6-I3-REGISTRY-001",
+  "inventory": {
+    "collection_equals_execution": true,
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i3_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i3_capability.py",
+      "infrastructure/control-plane/tests/test_block_06_i3_approvals.py",
+      "infrastructure/control-plane/tests/test_block_06_i3_evidence.py"
+    ],
+    "node_total": 28,
+    "nodes": [
+      "test_block_06_i3_contract.py::test_inventory_equals_collection",
+      "test_block_06_i3_contract.py::test_contract_frozen_before_results",
+      "test_block_06_i3_contract.py::test_scope_binds_construction_sequence",
+      "test_block_06_i3_contract.py::test_locks_and_cost",
+      "test_block_06_i3_contract.py::test_operator_symbols_declared",
+      "test_block_06_i3_contract.py::test_no_later_stage_dependency",
+      "test_block_06_i3_capability.py::test_proven_requires_evidence",
+      "test_block_06_i3_capability.py::test_simulated_proof_refused",
+      "test_block_06_i3_capability.py::test_unproven_active_refused",
+      "test_block_06_i3_capability.py::test_ceiling_intersection",
+      "test_block_06_i3_capability.py::test_unknown_subject_refused",
+      "test_block_06_i3_capability.py::test_deterministic_view",
+      "test_block_06_i3_capability.py::test_status_vocabulary",
+      "test_block_06_i3_approvals.py::test_self_approval_refused",
+      "test_block_06_i3_approvals.py::test_replay_refused",
+      "test_block_06_i3_approvals.py::test_stale_refused",
+      "test_block_06_i3_approvals.py::test_wrong_target_refused",
+      "test_block_06_i3_approvals.py::test_out_of_scope_refused",
+      "test_block_06_i3_approvals.py::test_cost_ceiling_refused",
+      "test_block_06_i3_approvals.py::test_deny_recorded",
+      "test_block_06_i3_approvals.py::test_approval_binds_effect_and_evidence",
+      "test_block_06_i3_evidence.py::test_chain_reconciles",
+      "test_block_06_i3_evidence.py::test_digest_mismatch_refused",
+      "test_block_06_i3_evidence.py::test_broken_link_refused",
+      "test_block_06_i3_evidence.py::test_source_spoof_refused",
+      "test_block_06_i3_evidence.py::test_unknown_node_refused",
+      "test_block_06_i3_evidence.py::test_deterministic_sample",
+      "test_block_06_i3_evidence.py::test_duplicate_node_refused"
+    ],
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  },
+  "requirements": [
+    {
+      "binding_node": "test_block_06_i3_contract.py::test_inventory_equals_collection",
+      "failure_class": "F23",
+      "id": "B6I3-R01",
+      "negative_control": "remove a node from the inventory and the check fails",
+      "section": "C2.S1",
+      "statement": "Declared inventory equals collected and executed nodes"
+    },
+    {
+      "binding_node": "test_block_06_i3_contract.py::test_contract_frozen_before_results",
+      "failure_class": "F23",
+      "id": "B6I3-R02",
+      "negative_control": "a results-first contract fails",
+      "section": "C2.S1",
+      "statement": "Contract is frozen before any result is recorded"
+    },
+    {
+      "binding_node": "test_block_06_i3_contract.py::test_scope_binds_construction_sequence",
+      "failure_class": "F23",
+      "id": "B6I3-R03",
+      "negative_control": "an extra section or purpose fails",
+      "section": "C2.S1",
+      "statement": "Scope binds the construction sequence exactly"
+    },
+    {
+      "binding_node": "test_block_06_i3_contract.py::test_locks_and_cost",
+      "failure_class": "F23",
+      "id": "B6I3-R04",
+      "negative_control": "an unlocked later stage fails",
+      "section": "C2.S1",
+      "statement": "Later stages stay locked and cost is zero"
+    },
+    {
+      "binding_node": "test_block_06_i3_contract.py::test_operator_symbols_declared",
+      "failure_class": "F23",
+      "id": "B6I3-R05",
+      "negative_control": "a missing export fails",
+      "section": "C2.S1",
+      "statement": "Operator symbols are declared and exported"
+    },
+    {
+      "binding_node": "test_block_06_i3_contract.py::test_no_later_stage_dependency",
+      "failure_class": "T19",
+      "id": "B6I3-R06",
+      "negative_control": "an I4 import fails",
+      "section": "C2.S3",
+      "statement": "No later-stage dependency is imported or referenced"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_proven_requires_evidence",
+      "failure_class": "F23",
+      "id": "B6I3-R07",
+      "negative_control": "proven true without evidence is refused",
+      "section": "C2.S1",
+      "statement": "A proven capability requires indexed evidence"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_simulated_proof_refused",
+      "failure_class": "F23",
+      "id": "B6I3-R08",
+      "negative_control": "a simulated PROVEN row is refused",
+      "section": "C2.S1",
+      "statement": "A scaffold or simulation is never operational proof"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_unproven_active_refused",
+      "failure_class": "F23",
+      "id": "B6I3-R09",
+      "negative_control": "ACTIVE with proven false is refused",
+      "section": "C2.S1",
+      "statement": "An active capability must be proven"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_ceiling_intersection",
+      "failure_class": "T13",
+      "id": "B6I3-R10",
+      "negative_control": "a grant cannot raise a record ceiling",
+      "section": "C2.S1",
+      "statement": "Effective ceiling is the minimum of record and grant"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_unknown_subject_refused",
+      "failure_class": "T02",
+      "id": "B6I3-R11",
+      "negative_control": "an empty viewer is refused",
+      "section": "C2.S1",
+      "statement": "An unknown viewer subject is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_deterministic_view",
+      "failure_class": "F23",
+      "id": "B6I3-R12",
+      "negative_control": "reordered input changes the digest",
+      "section": "C2.S1",
+      "statement": "The capability view is deterministic"
+    },
+    {
+      "binding_node": "test_block_06_i3_capability.py::test_status_vocabulary",
+      "failure_class": "F23",
+      "id": "B6I3-R13",
+      "negative_control": "an invented status is refused",
+      "section": "C2.S1",
+      "statement": "Only the declared status vocabulary is accepted"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_self_approval_refused",
+      "failure_class": "F03",
+      "id": "B6I3-R14",
+      "negative_control": "requester equals approver",
+      "section": "C2.S2",
+      "statement": "Self-approval is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_replay_refused",
+      "failure_class": "F03",
+      "id": "B6I3-R15",
+      "negative_control": "the same nonce approves twice",
+      "section": "C2.S2",
+      "statement": "A consumed nonce is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_stale_refused",
+      "failure_class": "F03",
+      "id": "B6I3-R16",
+      "negative_control": "now equals expiry",
+      "section": "C2.S2",
+      "statement": "An expired request is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_wrong_target_refused",
+      "failure_class": "F03",
+      "id": "B6I3-R17",
+      "negative_control": "approval targets a different artifact",
+      "section": "C2.S2",
+      "statement": "A wrong target digest is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_out_of_scope_refused",
+      "failure_class": "F03",
+      "id": "B6I3-R18",
+      "negative_control": "no grant for the action",
+      "section": "C2.S2",
+      "statement": "An action outside the approver grant is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_cost_ceiling_refused",
+      "failure_class": "F03",
+      "id": "B6I3-R19",
+      "negative_control": "cost exceeds the ceiling by one",
+      "section": "C2.S2",
+      "statement": "Cost above the approver ceiling is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_deny_recorded",
+      "failure_class": "F03",
+      "id": "B6I3-R20",
+      "negative_control": "a silent deny leaves no record",
+      "section": "C2.S2",
+      "statement": "Deny is recorded and consumes the nonce"
+    },
+    {
+      "binding_node": "test_block_06_i3_approvals.py::test_approval_binds_effect_and_evidence",
+      "failure_class": "F03",
+      "id": "B6I3-R21",
+      "negative_control": "a decision without the effect digest fails",
+      "section": "C2.S2",
+      "statement": "A decision binds action, target, effect and evidence"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_chain_reconciles",
+      "failure_class": "F11",
+      "id": "B6I3-R22",
+      "negative_control": "a missing stage fails",
+      "section": "C2.S3",
+      "statement": "The full evidence chain reconciles to the manifest"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_digest_mismatch_refused",
+      "failure_class": "F11",
+      "id": "B6I3-R23",
+      "negative_control": "one byte of the artifact differs",
+      "section": "C2.S3",
+      "statement": "A digest or size mismatch is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_broken_link_refused",
+      "failure_class": "F11",
+      "id": "B6I3-R24",
+      "negative_control": "a node points at the wrong parent",
+      "section": "C2.S3",
+      "statement": "A broken parent link is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_source_spoof_refused",
+      "failure_class": "F11",
+      "id": "B6I3-R25",
+      "negative_control": "an unlisted source attests a node",
+      "section": "C2.S3",
+      "statement": "A spoofed source identity is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_unknown_node_refused",
+      "failure_class": "F11",
+      "id": "B6I3-R26",
+      "negative_control": "an unmanifested node is presented",
+      "section": "C2.S3",
+      "statement": "A node absent from the manifest is refused"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_deterministic_sample",
+      "failure_class": "F11",
+      "id": "B6I3-R27",
+      "negative_control": "reordered nodes change the sample",
+      "section": "C2.S3",
+      "statement": "Sampling is deterministic and order independent"
+    },
+    {
+      "binding_node": "test_block_06_i3_evidence.py::test_duplicate_node_refused",
+      "failure_class": "F11",
+      "id": "B6I3-R28",
+      "negative_control": "two nodes share one manifest id",
+      "section": "C2.S3",
+      "statement": "Duplicate node identifiers are refused"
+    }
+  ],
+  "requirements_total": 28,
+  "schema": "oce.block_06_i3.registry.v1",
+  "stage": "B6-I3",
+  "status": "FROZEN"
+}

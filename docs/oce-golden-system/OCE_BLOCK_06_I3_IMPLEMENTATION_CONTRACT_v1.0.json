@@ -1,0 +1,227 @@
+{
+  "adjacent_floors": {
+    "b5_i9_nodes": 41,
+    "b6_i0_nodes": 72,
+    "b6_i1_nodes": 42,
+    "b6_i2_nodes": 30,
+    "common_regression_nodes": 208
+  },
+  "approval_rules": {
+    "decision_fields": [
+      "decision_id",
+      "request_id",
+      "decision",
+      "actor",
+      "requester",
+      "action",
+      "target",
+      "target_sha256",
+      "effect_sha256",
+      "evidence_sha256",
+      "cost_usd",
+      "reversibility",
+      "nonce",
+      "decided_at"
+    ],
+    "deny_is_recorded": true,
+    "refusals": [
+      "REFUSED_SELF_APPROVAL",
+      "REFUSED_REPLAY",
+      "REFUSED_STALE",
+      "REFUSED_WRONG_TARGET",
+      "REFUSED_OUT_OF_SCOPE",
+      "REFUSED_COST_CEILING",
+      "REFUSED_EVIDENCE_MISSING"
+    ],
+    "request_fields": [
+      "request_id",
+      "requester",
+      "action",
+      "target",
+      "target_sha256",
+      "effect",
+      "cost_usd",
+      "reversibility",
+      "expires_at",
+      "evidence_sha256",
+      "nonce",
+      "required_ceiling"
+    ],
+    "self_approval_denied": true
+  },
+  "base_sha": "018b164f249bbf075334d5d03ad37e80dcbbede0",
+  "base_tree": "65c3713ad70e527a6a5657347c53f8663a2ccb20",
+  "capability_rules": {
+    "ceilings": [
+      "none",
+      "read",
+      "propose",
+      "execute",
+      "admin"
+    ],
+    "effective_ceiling": "minimum of record ceiling and viewer grant",
+    "proven_requires_evidence": true,
+    "statuses": [
+      "ACTIVE",
+      "SUSPENDED",
+      "REVOKED",
+      "UNPROVEN"
+    ],
+    "unproven_may_not_be_active": true,
+    "withheld_rows": "capabilities outside the viewer grant are counted, never displayed"
+  },
+  "compatibility": {
+    "consumer_evidence": "none",
+    "rows": [
+      "C2.S1",
+      "C2.S2",
+      "C2.S3"
+    ],
+    "silent_latest": false,
+    "state": "OPERATOR_SURFACE_ONLY",
+    "unknown_refused": true
+  },
+  "document_id": "OCE-B6-I3-CONTRACT-001",
+  "evidence_rules": {
+    "chain_link": "each node parent equals the previous node sha256",
+    "manifest_reconciliation": "node sha256 and bytes must equal the immutable manifest entry",
+    "sampling": "deterministic ranking from the manifest digest; no random module",
+    "source_identity": "node source must be an allowed source identity",
+    "stages": [
+      "intent",
+      "plan",
+      "task",
+      "artifact",
+      "evaluation",
+      "gate"
+    ]
+  },
+  "frozen_before_results": true,
+  "i2_ratification_sha": "9bf76df45dca676ae7cafc4877f117a7dd64c3d2",
+  "implementation_floor": {
+    "mutations": 6,
+    "source_mutation_floor": 3,
+    "test_nodes": 28
+  },
+  "locks": {
+    "B6-I4_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "operator": {
+    "authority_source": "viewer grants only; request, record or environment never grant authority",
+    "clock_source": "explicit integer time supplied by the caller; no wall clock read",
+    "cost": "request cost must not exceed the approver cost ceiling",
+    "determinism": "canonical JSON with sorted keys and no timestamps, host or random ids",
+    "evidence": "every proven capability and every approval names an indexed evidence digest",
+    "later_stage": "B6-I4 through B6-I9 remain locked and are never consulted",
+    "nonce": "single-use; a consumed nonce refuses replay",
+    "simulation": "scaffold and simulation kinds can never be operational proof"
+  },
+  "paired_comparison": {
+    "base_only_expected": 0,
+    "base_sha": "018b164f249bbf075334d5d03ad37e80dcbbede0",
+    "common_floor": 208,
+    "head_only_expected": 27
+  },
+  "refusals": [
+    {
+      "class": "F03",
+      "code": "REFUSED_SELF_APPROVAL",
+      "meaning": "requester and approver are the same subject"
+    },
+    {
+      "class": "F03",
+      "code": "REFUSED_REPLAY",
+      "meaning": "nonce already consumed"
+    },
+    {
+      "class": "F03",
+      "code": "REFUSED_STALE",
+      "meaning": "approval request expired"
+    },
+    {
+      "class": "F03",
+      "code": "REFUSED_WRONG_TARGET",
+      "meaning": "target digest differs from the request"
+    },
+    {
+      "class": "F03",
+      "code": "REFUSED_OUT_OF_SCOPE",
+      "meaning": "action or ceiling outside the approver grant"
+    },
+    {
+      "class": "F03",
+      "code": "REFUSED_COST_CEILING",
+      "meaning": "request cost above the approver ceiling"
+    },
+    {
+      "class": "F11",
+      "code": "REFUSED_DIGEST",
+      "meaning": "evidence digest or size mismatch"
+    },
+    {
+      "class": "F11",
+      "code": "REFUSED_BROKEN_CHAIN",
+      "meaning": "evidence parent link is broken"
+    },
+    {
+      "class": "F11",
+      "code": "REFUSED_SOURCE_SPOOF",
+      "meaning": "evidence source is not allowed"
+    },
+    {
+      "class": "F11",
+      "code": "REFUSED_UNKNOWN_NODE",
+      "meaning": "evidence node absent from the manifest"
+    },
+    {
+      "class": "F23",
+      "code": "REFUSED_SIMULATED_PROOF",
+      "meaning": "scaffold or simulation claimed as operational"
+    },
+    {
+      "class": "F23",
+      "code": "REFUSED_UNPROVEN_ACTIVE",
+      "meaning": "capability active without proof"
+    },
+    {
+      "class": "F23",
+      "code": "REFUSED_EVIDENCE_MISSING",
+      "meaning": "proven claim without indexed evidence"
+    },
+    {
+      "class": "T13",
+      "code": "REFUSED_UNKNOWN_SUBJECT",
+      "meaning": "viewer or approver identity missing"
+    },
+    {
+      "class": "T19",
+      "code": "REFUSED_LATER_STAGE",
+      "meaning": "B6-I4 through B6-I9 remain locked"
+    }
+  ],
+  "schema": "oce.block_06_i3.contract.v1",
+  "stage": "B6-I3",
+  "status": "FROZEN",
+  "test_inventory": {
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i3_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i3_capability.py",
+      "infrastructure/control-plane/tests/test_block_06_i3_approvals.py",
+      "infrastructure/control-plane/tests/test_block_06_i3_evidence.py"
+    ],
+    "node_total": 27,
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  }
+}

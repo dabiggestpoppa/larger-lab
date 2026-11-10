@@ -33,6 +33,11 @@ I1_MERGE = "4496d548078660efd7ad4f93e7fff461d34ea538"
 I2_SCOPE = f"{DOCS}/OCE_BLOCK_06_I2_SCOPE_DERIVATION_v1.0.json"
 I2_CONTRACT = f"{DOCS}/OCE_BLOCK_06_I2_IMPLEMENTATION_CONTRACT_v1.0.json"
 I2_REG = f"{DOCS}/OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json"
+I2_HEAD = "9bf76df45dca676ae7cafc4877f117a7dd64c3d2"
+I2_MERGE = "018b164f249bbf075334d5d03ad37e80dcbbede0"
+I3_SCOPE = f"{DOCS}/OCE_BLOCK_06_I3_SCOPE_DERIVATION_v1.0.json"
+I3_CONTRACT = f"{DOCS}/OCE_BLOCK_06_I3_IMPLEMENTATION_CONTRACT_v1.0.json"
+I3_REG = f"{DOCS}/OCE_BLOCK_06_I3_STAGE_SCOPE_REGISTRATION_v1.0.json"
 AMENDMENT = f"{DOCS}/OCE_BLOCK_06_I0_STAGE_SCOPE_AMENDMENT_001_v1.0.json"
 AMENDMENT_ID = "B6-I0-STAGE-SCOPE-AMENDMENT-001"
 SUPERSEDED_BLOB = "6648043b24b0010f6bd405e0ea6098097b4de78d"
@@ -76,6 +81,27 @@ I2_PINNED = (
     ".github/workflows/block-06-i2-validation.yml",
     ".github/workflows/block-06-i2-paired-comparison.yml",
 )
+# Pinned: the surfaces the B6-I3 registration itself is allowed to author or amend.
+I3_PINNED = (
+    I3_REG,
+    I3_SCOPE,
+    I3_CONTRACT,
+    f"{DOCS}/OCE_BLOCK_06_I3_MANIFEST_v1.0.json",
+    f"{DOCS}/OCE_BLOCK_06_I3_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+    "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+    "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i2_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i2_stage_controls.py",
+    "infrastructure/control-plane/scripts/block_06_i3_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i3_generate.py",
+    "infrastructure/control-plane/scripts/block_06_i3_mutation_battery.py",
+    "infrastructure/control-plane/scripts/block_06_i3_stage_controls.py",
+    "infrastructure/control-plane/scripts/block_06_i3_paired.py",
+    ".github/workflows/block-06-i3-validation.yml",
+    ".github/workflows/block-06-i3-paired-comparison.yml",
+    ".github/workflows/block-06-i2-validation.yml",
+)
 
 
 class StageScopeError(Exception):
@@ -102,12 +128,13 @@ def _require_identity_file(root: pathlib.Path, rel: str) -> None:
         raise StageScopeError("stage/identity_spoofed", f"working copy differs from HEAD: {rel}")
 
 
-def _reject_later_artifacts(root: pathlib.Path) -> None:
+def _reject_later_artifacts(root: pathlib.Path, start: int = 3) -> None:
     code, tree = _git(root, "ls-tree", "-r", "--name-only", "HEAD")
     if code != 0:
         raise StageScopeError("stage/identity_missing", "HEAD tree is unreadable")
+    stages = tuple(f"I{i}" for i in range(start, 10))
     later = [p for p in tree.splitlines()
-             if any(f"OCE_BLOCK_06_{stage}_" in p for stage in LATER_STAGES)]
+             if any(f"OCE_BLOCK_06_{stage}_" in p for stage in stages)]
     if later:
         raise StageScopeError("stage/later_stage_absent", later)
 
@@ -182,6 +209,85 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
         "i1_allowed": oce_authority,
         "amendment": tuple(dict.fromkeys(AMENDMENT_PATHS + I2_PINNED)),
         "i0_merge": I1_MERGE,
+    }
+
+
+def _resolve_i3(root: pathlib.Path, base: str) -> dict:
+    if base != I2_MERGE:
+        raise StageScopeError("stage/base_moved", base)
+    code, _ = _git(root, "merge-base", "--is-ancestor", I2_MERGE, "HEAD")
+    if code != 0:
+        raise StageScopeError("stage/base_moved", "HEAD does not descend from the B6-I2 merge")
+    for rel in (I3_REG, I3_SCOPE, I3_CONTRACT, I2_REG, I2_SCOPE, I1_SCOPE, I1_CONTRACT,
+                AMENDMENT):
+        _require_identity_file(root, rel)
+    amendment = json.loads((root / AMENDMENT).read_text(encoding="utf-8"))
+    if amendment.get("amendment_id") != AMENDMENT_ID or amendment.get("status") != "FROZEN":
+        raise StageScopeError("stage/identity_unknown", amendment.get("amendment_id"))
+    declared = tuple(amendment.get("authorized_paths", ()))
+    if len(declared) != len(AMENDMENT_PATHS) or set(declared) != set(AMENDMENT_PATHS):
+        raise StageScopeError("stage/identity_tampered",
+                              "amendment allowlist differs from the pin")
+    i1_identity = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
+    if i1_identity.get("stage") not in KNOWN_LATER_STAGES:
+        raise StageScopeError("stage/identity_unknown", i1_identity.get("stage"))
+    i2_registration = json.loads((root / I2_REG).read_text(encoding="utf-8"))
+    i2_scope = json.loads((root / I2_SCOPE).read_text(encoding="utf-8"))
+    if (i2_registration.get("document_id") != "OCE-B6-I2-STAGE-SCOPE-REGISTRATION-001"
+            or i2_registration.get("status") != "FROZEN"):
+        raise StageScopeError("stage/identity_unknown", i2_registration.get("status"))
+    if i2_scope.get("stage") != "B6-I2":
+        raise StageScopeError("stage/identity_unknown", i2_scope.get("stage"))
+    registration = json.loads((root / I3_REG).read_text(encoding="utf-8"))
+    scope = json.loads((root / I3_SCOPE).read_text(encoding="utf-8"))
+    contract = json.loads((root / I3_CONTRACT).read_text(encoding="utf-8"))
+    if (registration.get("document_id") != "OCE-B6-I3-STAGE-SCOPE-REGISTRATION-001"
+            or registration.get("status") != "FROZEN"
+            or registration.get("frozen_before_results") is not True):
+        raise StageScopeError("stage/identity_unknown", registration.get("document_id"))
+    if scope.get("stage") != "B6-I3" or contract.get("stage") != "B6-I3":
+        raise StageScopeError("stage/identity_unknown", (scope.get("stage"),
+                                                         contract.get("stage")))
+    if contract.get("status") != "FROZEN" or contract.get("frozen_before_results") is not True:
+        raise StageScopeError("stage/identity_unknown", contract.get("status"))
+    prior = registration.get("prior_stages") or {}
+    if (prior.get("B6-I0", {}).get("head") != I0_HEAD
+            or prior.get("B6-I1", {}).get("head") != I1_HEAD
+            or prior.get("B6-I2", {}).get("head") != I2_HEAD):
+        raise StageScopeError("stage/identity_tampered", prior)
+    this = registration.get("this_stage") or {}
+    if this.get("base") != I2_MERGE or this.get("base_tree") != scope.get("base_tree"):
+        raise StageScopeError("stage/identity_tampered", this.get("base"))
+    prefixes = tuple(this.get("allowed_prefixes") or ())
+    if not prefixes or "oce/operator/" not in prefixes:
+        raise StageScopeError("stage/identity_unknown", "B6-I3 registration declares no authority")
+    _reject_later_artifacts(root, start=4)
+    i1_scope = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
+    i1_owned = tuple(i1_scope.get("allowed_paths") or ())
+    # The stage chain is cumulative: I1 law, the frozen I0 amendment, the I2 surfaces and pins,
+    # then the I3 registration and pins. No later-stage path is ever inherited.
+    allowed = tuple(dict.fromkeys(i1_owned + AMENDMENT_PATHS
+                                  + tuple(i2_registration["this_stage"]["allowed_prefixes"])
+                                  + I2_PINNED + prefixes + I3_PINNED))
+    oce_authority = tuple(dict.fromkeys(i1_owned + tuple(p for p in allowed
+                                                         if p.startswith("oce/"))))
+    return {
+        "mode": "i3",
+        "requested": "auto",
+        "stage": "B6-I3",
+        "identity": {
+            "registration_sha256": hashlib.sha256((root / I3_REG).read_bytes()).hexdigest(),
+            "scope_sha256": hashlib.sha256((root / I3_SCOPE).read_bytes()).hexdigest(),
+            "contract_sha256": hashlib.sha256((root / I3_CONTRACT).read_bytes()).hexdigest(),
+            "i0_head": I0_HEAD,
+            "i1_head": I1_HEAD,
+            "i2_head": I2_HEAD,
+            "i2_merge": I2_MERGE,
+        },
+        "allowed": allowed,
+        "i1_allowed": oce_authority,
+        "amendment": tuple(dict.fromkeys(AMENDMENT_PATHS + I2_PINNED + I3_PINNED)),
+        "i0_merge": I2_MERGE,
     }
 
 
@@ -260,6 +366,8 @@ def resolve(root, requested: str = "auto") -> dict:
     if code != 0:
         raise StageScopeError("stage/identity_missing", "origin/main is not resolvable")
 
+    if (root / I3_REG).exists():
+        return _resolve_i3(root, base)
     if (root / I2_REG).exists():
         return _resolve_i2(root, base)
     if (root / I1_SCOPE).exists():
