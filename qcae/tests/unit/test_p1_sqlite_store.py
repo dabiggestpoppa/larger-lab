@@ -216,7 +216,7 @@ class TestPersistenceRestart:
         c.execute("PRAGMA user_version = 999")
         c.commit()
         c.close()
-        with pytest.raises(QcaeValidationError, match="newer than this build"):
+        with pytest.raises(QcaeValidationError, match="not openable by this build"):
             open_metadata_db(db)
 
 

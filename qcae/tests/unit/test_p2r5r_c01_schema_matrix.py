@@ -376,7 +376,7 @@ class TestFailClosed:
         conn.execute("PRAGMA user_version = 6")
         conn.commit()
         conn.close()
-        with pytest.raises(QcaeValidationError, match="newer than this build"):
+        with pytest.raises(QcaeValidationError, match="not openable by this build"):
             open_metadata_db(db)
 
     def test_failed_migration_rolls_back(self, tmp_path) -> None:

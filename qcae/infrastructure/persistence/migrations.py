@@ -473,6 +473,9 @@ class LegacyDatabaseClass:
       runtime/governance tables exist while PRAGMA user_version == 1.
     - CURRENT_V5: complete physical v5 (post-v4 tables present).
     - UNKNOWN_HYBRID: anything else. FAIL CLOSED.
+    - FRESH_EMPTY: user_version 0 with no application tables.
+    - UNVERSIONED_EXISTING: user_version 0 with existing tables. FAIL
+      CLOSED (no recognized historical fingerprint).
     """
 
     CLEAN_LEGACY_METADATA = "CLEAN_LEGACY_METADATA"
@@ -482,6 +485,8 @@ class LegacyDatabaseClass:
     CURRENT_V5 = "CURRENT_V5"
     UNKNOWN_HYBRID = "UNKNOWN_HYBRID"
     NOT_LEGACY = "NOT_LEGACY"
+    FRESH_EMPTY = "FRESH_EMPTY"
+    UNVERSIONED_EXISTING = "UNVERSIONED_EXISTING"
 
 
 _P2_RUNTIME_TABLES = frozenset(
@@ -544,9 +549,19 @@ def classify_legacy_database(
     Anything that cannot be placed confidently on the production chain is
     UNKNOWN_HYBRID and the caller must fail closed.
     """
-    if current_version > CURRENT_SCHEMA_VERSION or current_version <= 0:
+    if current_version > CURRENT_SCHEMA_VERSION:
         return LegacyDatabaseClass.NOT_LEGACY
     names = _table_names(conn)
+    if current_version == 0:
+        # user_version 0 is NOT automatically fresh: only a database with
+        # NO application tables is FRESH_EMPTY. Any existing tables make it
+        # UNVERSIONED_EXISTING, which fails closed unless some other
+        # recognized historical fingerprint matches (none currently does).
+        if not names:
+            return LegacyDatabaseClass.FRESH_EMPTY
+        return LegacyDatabaseClass.UNVERSIONED_EXISTING
+    if current_version < 0:
+        return LegacyDatabaseClass.NOT_LEGACY
     has_p2 = bool(names & _P2_RUNTIME_TABLES)
     has_execution = "runtime_execution" in names
     has_approval_use = "governance_approval_use" in names

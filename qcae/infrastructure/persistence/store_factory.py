@@ -95,13 +95,12 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
             target.parent.mkdir(parents=True, exist_ok=True)
         conn = sqlite3.connect(label)
         conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=WAL")
-        conn.execute("PRAGMA foreign_keys=ON")
-        # P2-R5R schema law: a fresh DB must be PHYSICALLY complete v5
-        # before it claims version 5. The full v5 shape is P1 metadata DDL
-        # + the true historical v4 DDL (P2-0004, no post-v4 tables) + the
-        # v4->v5 additions. Runtime/queue/budget/governance/approval tables
-        # are imported lazily so this factory stays free of engine imports.
+        # P2-R5R-R1 custody law: CLASSIFY FIRST, mutate only when
+        # authorized. No schema DDL runs before this point, so an unknown,
+        # hybrid, newer, or unversioned-existing database is refused with
+        # its durable schema and user_version byte-identical to before.
+        # Runtime/queue/budget/governance/approval tables are imported
+        # lazily so this factory stays free of engine imports.
         from qcae.infrastructure.persistence.sqlite_approval_registry import (
             APPROVAL_DDL as _APPROVAL_DDL,
         )
@@ -117,12 +116,28 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
         from qcae.infrastructure.queue.sqlite_step_queue import (
             QUEUE_INTEGRITY_DDL as _QUEUE_DDL,
         )
-        conn.executescript(_SCHEMA_DDL)
         current = conn.execute("PRAGMA user_version").fetchone()[0]
-        if current == 0:
-            # Fresh database: build the COMPLETE v5 schema transactionally,
-            # record bootstrap provenance, then stamp v5. No composition
-            # root may silently complete the schema afterwards.
+        classification = classify_legacy_database(conn, current)
+        if classification == LegacyDatabaseClass.UNVERSIONED_EXISTING:
+            raise QcaeValidationError(
+                f"database at schema {current} has existing tables but no"
+                f" schema version: refusing to bootstrap over unversioned"
+                f" data (failing closed)"
+            )
+        if classification == LegacyDatabaseClass.NOT_LEGACY:
+            raise QcaeValidationError(
+                f"database schema version {current} is not openable by this"
+                f" build (supports up to {CURRENT_SCHEMA_VERSION}); refusing"
+                f" to open (forward-compat guard)"
+            )
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        if classification == LegacyDatabaseClass.FRESH_EMPTY:
+            # Fresh database: build the COMPLETE v5 schema, record
+            # bootstrap provenance, then stamp v5. (P2-R5R-R1-C02 makes
+            # this one explicit transaction with real digests; the shape
+            # law already holds: nothing may silently complete it after.)
+            conn.executescript(_SCHEMA_DDL)
             conn.executescript(RUNTIME_DDL_MIGRATION)
             conn.executescript(V5_ADDITIONS_DDL)
             for _ddl in (_RUNTIME_TABLES_DDL, _QUEUE_DDL, _BUDGET_DDL,
@@ -147,17 +162,10 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
             )
             conn.execute(f"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}")
             conn.commit()
-        elif current > CURRENT_SCHEMA_VERSION:
-            raise QcaeValidationError(
-                f"database schema version {current} is newer than this build "
-                f"supports ({CURRENT_SCHEMA_VERSION}); refusing to open "
-                f"(forward-compat guard)"
-            )
         else:
-            # 0 < current <= CURRENT_SCHEMA_VERSION: classify and, for known
-            # legacy P2-misversioned databases, migrate via the production
-            # chain; unknown hybrid shapes fail closed (P2-R5R policy).
-            classification = classify_legacy_database(conn, current)
+            # 0 < current <= CURRENT_SCHEMA_VERSION: for known legacy
+            # P2-misversioned databases, migrate via the production chain;
+            # unknown hybrid shapes fail closed (P2-R5R policy).
             if classification == LegacyDatabaseClass.UNKNOWN_HYBRID:
                 raise QcaeValidationError(
                     f"unknown hybrid / legacy misversioned database at schema "
