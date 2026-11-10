@@ -1,127 +1,100 @@
 {
-  "phase": "P2-R5R — Canonical substrate reconciliation (true schema authority, historical v4, canonical live ApprovalBinding, provider boundary, durable-authority backup truth)",
+  "phase": "P2-R5R-R1 — Final Schema/Custody Closure (bootstrap atomicity, strict legacy fingerprint, clean custody seal)",
   "supersedes": {
-    "phase": "P2-R5 (local review freeze)",
-    "review_freeze_commit": "7ca0adbeea86f9658ed633423b997daa02a55e0b",
-    "relationship": "the local review freeze is NOT canonical and is NOT merged, rebased or cherry-picked; P2-R4/P2-R3/P2-R2/P2-R1/P2 freezes remain historical truth",
-    "earlier_reconcile_freeze": "c70667dee (superseded by this regenerated manifest)"
+    "phase": "P2-R5R (reconciled freeze)",
+    "reconciled_freeze_commit": "dca2e34f901c921d200cf693cef6fd61a197343a",
+    "relationship": "the R5R tree is the semantic source; this branch replays its QCAE content on clean canonical ancestry and repairs the six accepted R1 defects. No merge, no cherry-pick, no shared history."
   },
   "provenance": {
     "canonical_base": "8212b59d0ad5afd708d939d34a2564571f6ee285",
-    "canonical_branch": "agent/qcae-p2-r5-canonical-reconcile",
-    "review_source": "agent/qcae-p2-r5-review@7ca0adbeea86f9658ed633423b997daa02a55e0b (read-only reference; never merged)",
-    "common_ancestor": "a1ed4b842992c72935c62aa16e6b2dfc7bbb3375",
-    "ported_concepts": [
-      "local C02 direction: schema-version authority + v4->v5 migration (reimplemented, not cherry-picked)",
-      "local C03 direction: live grant binding (reimplemented with a seven-field canonical binding, NOT its four-field digest)",
-      "local C04: provider-neutral ApprovalAdmissionProvider + ApprovalRequestResolver (adapted)",
-      "local C05: backup/restore coverage of execution + grant consumption with disaster tests (adapted)"
-    ],
-    "deliberately_not_ported": [
-      "local NoRunnableStep (canonical keeps StepNotReadyOutcome/JobMissingOutcome)",
-      "local FREEZE artifact (regenerated here from reconciled canonical history)"
-    ]
+    "final_branch": "agent/qcae-p2-r5r-final",
+    "ancestry": "8212b59d -> R0 seed -> R1-I0 -> R1-C01 -> R1-C02 -> R1-C03 -> R1-C04 -> R1-T01 -> R1-FREEZE",
+    "source_reconciliation_tree": "dca2e34f901c921d200cf693cef6fd61a197343a (read-only semantic source; history NOT merged)",
+    "full_18_commit_custody_map": {
+      "qcae_r5r_replayed": ["d39f1a125", "9d24b79ac", "0eb54a22d", "5110f1253", "5a6f1b763", "080973a99", "25c46a940", "ef1fbf154", "dca2e34f9"],
+      "superseded_qcae_r5r_attempt_not_replayed": ["0114309f", "839a0090", "349b1999", "1d19fcd2", "627e7ea1", "6a4c40cd", "c70667de"],
+      "unrelated_sensor_crypto_excluded": ["8f870be2", "54a8c91f8"],
+      "excluded_roots": ["quant-lab/research/crypto_foundry/sensor_fabric/"]
+    },
+    "qcae_only": "git diff 8212b59d..FINAL_HEAD shows qcae/ and nothing else",
+    "history_claim": "semantic QCAE reconciliation, NOT identical Git history"
   },
-  "head_commit": "ef1fbf154422dbb26c24300958be9da0ff59cd4f",
-  "tested_commit": "ef1fbf154422dbb26c24300958be9da0ff59cd4f",
-  "canon_version": "0.1",
+  "head_commit": "9cbec7d4c12f2fa7a2e0588fd33174240783616a (R1-T01; the FREEZE commit adds evidence + manifest only, no production code change after the tested commit)",
+  "tested_commit": "9cbec7d4c12f2fa7a2e0588fd33174240783616a",
   "active_amendments": ["A-001 v1.0"],
   "phase_commits": {
-    "p2_r5r_i0_ledger_correction": ["d39f1a125"],
-    "p2_r5r_c01_schema_v5_historical_v4": ["9d24b79ac", "ef1fbf154"],
-    "p2_r5r_c02_live_approval_binding": ["0eb54a22d"],
-    "p2_r5r_c03_provider_boundary_resolver": ["5110f1253"],
-    "p2_r5r_c04_backup_durable_authority": ["5a6f1b763"],
-    "p2_r5r_c05_typed_outcome_convergence": ["080973a99"],
-    "p2_r5r_t01_adversarial_preexisting_p3r4": ["25c46a940"]
+    "p2_r5r_r1_r0_qcae_tree_seed": ["82772000b"],
+    "p2_r5r_r1_i0_custody_map_replay_lock": ["2e766c0d9"],
+    "p2_r5r_r1_c01_nonmutating_classification": ["cd302c0a3"],
+    "p2_r5r_r1_c02_atomic_bootstrap_digests": ["ff9719f1b"],
+    "p2_r5r_r1_c03_strict_fingerprint": ["d935d07d2"],
+    "p2_r5r_r1_c04_constraint_guard": ["44f3c67d2"],
+    "p2_r5r_r1_t01_matrix_regression": ["9cbec7d4c"]
+  },
+  "schema_classification": {
+    "mutation_before_classification": "none — classification reads PRAGMA user_version + physical schema with SELECTs only; the first write on any authorized path is the WAL pragma or the bootstrap/migration itself",
+    "fresh_empty": "user_version 0 AND no application tables -> atomic v5 bootstrap",
+    "unversioned_existing": "user_version 0 WITH existing tables -> refused, fail closed (proven: version + schema fingerprint identical before/after)",
+    "unknown_hybrid": "refused, fail closed (proven: version + schema fingerprint identical before/after)",
+    "newer_schema": "refused, forward-compat guard"
+  },
+  "bootstrap": {
+    "transaction_boundary": "ONE explicit transaction: BEGIN IMMEDIATE ... per-statement DDL (no executescript inside) ... bootstrap provenance INSERT ... PRAGMA user_version = 5 ... COMMIT; any exception -> ROLLBACK (restores the pre-bootstrap isolation level)",
+    "executescript_discipline": "executescript implicitly COMMITs any pending transaction (verified on this Python), so it never appears inside an explicit transaction; schema scripts run statement-by-statement via _execute_statements, which never commits",
+    "pre_digest": "real sha256 of the empty schema (64 lowercase hex)",
+    "post_digest": "real sha256 of the complete v5 schema, computed after all DDL, equal to the actual schema fingerprint (the ledger ROW is data and cannot move the digest)",
+    "digest_method": "sha256 over repr() of plain (type, name, sql) tuples from sqlite_master ordered by name, excluding sqlite_% and sqlite_sequence (row inserts, including AUTOINCREMENT bookkeeping, cannot move the digest)",
+    "failure_rollback": "proven: injected mid-bootstrap failure leaves user_version 0 and zero application tables",
+    "wording": "the manifest calls this transactional only because it is one explicit transaction"
   },
   "schema": {
     "current_version": 5,
-    "schema_law": "PRAGMA user_version == 5 means the complete v5 schema is physically present; a fresh v5 and a v4-migrated v5 are proven to be the same physical authority schema",
-    "true_v4_source": "P2-0004-runtime-governance-tables, verbatim from commit 61488273699dd5f6835c49b8b9f070489a7e5b42 (P2-C12)",
+    "true_v4_source": "P2-0004-runtime-governance-tables, verbatim from commit 61488273 (contains NEITHER runtime_execution NOR governance_approval_use)",
     "historical_v4_ddl_sha256": "sha256:e92ab35e708fe23a399d80d1de4f5d2b0d971cc658fedc1b022e2bc29ce724c0",
-    "true_v4_schema_digest": "sha256:b75f663d669b9ea2d2e04b049aed6b9affc403151dae3216a72b914f52f7b78b",
-    "v5_schema_digest": "sha256:12450483087d44339ad1d02ed749432015735aa9cab5aba67671988f4cc13ff8",
-    "v4_original_tables": 13,
-    "v5_only_tables": ["runtime_execution", "governance_approval_use"],
-    "v5_added_indexes": ["ux_approval_use_decision", "ix_approval_use_step", "ix_runtime_execution_job"],
-    "fresh_bootstrap": "complete v5 shape built transactionally, then BOOTSTRAP-v5-complete-schema provenance row, then the version stamp",
-    "hidden_completion": "none — build_local_runtime verifies the physical shape and fails closed; it executes no schema DDL",
-    "legacy_p2_reconciliation": "known legacy P2 misversioned databases (physical P2 tables, stamp 1) are fingerprinted strictly and migrated to physical v5 with every row preserved",
-    "unknown_hybrid": "refused (fail closed); no blanket version stamp is ever written",
-    "newer_schema": "refused (forward-compat guard)"
+    "true_v4_schema_digest": "sha256:7cab53a55433fd227709dc9df2c0feb62267dad5796d2c40f8ab1a1c7057f562",
+    "v5_schema_digest": "sha256:65619300c460eed8dffb5b4bbe5193a5b0e24370e113c7f65b298b65c303cc58",
+    "fresh_bootstrap": "complete v5 shape in one transaction, then BOOTSTRAP-v5-complete-schema provenance row with real digests, then the version stamp",
+    "hidden_completion": "none — build_local_runtime verifies the physical shape and fails closed; it executes no schema DDL"
+  },
+  "legacy": {
+    "v4_fingerprint": "exact 13-table original-P2 set, all load-bearing columns, all 12 critical indexes, no post-v4 tables",
+    "post_v4_fingerprint": "complete v4 set plus BOTH runtime_execution and governance_approval_use with their columns and the single-use unique index (legacy builds predate the R5R lookup indexes, which migration adds)",
+    "partial_shape_result": "UNKNOWN_HYBRID, refused without mutation — proven by the section-9 counterexample (three key tables alone), missing-table, and missing-index fixtures",
+    "row_preservation": "all historical rows preserved through legacy migration (proven per accepted shape)",
+    "migration_is_not_reconstruction": "an incomplete schema is never accepted merely because migration DDL could CREATE IF NOT EXISTS the missing pieces"
   },
   "grant_binding": {
-    "schema": "qcae.core.approval_binding.ApprovalBinding (provider-neutral, immutable)",
-    "schema_version": 1,
-    "request_schema_version": 2,
-    "decision_schema_version": 2,
-    "verdict_schema_version": 2,
-    "fields": [
-      "principal",
-      "action",
-      "resource",
-      "scope",
-      "budget_ref",
-      "authority_requirement",
-      "policy_version",
-      "constraints (optional)"
-    ],
-    "digest": "sha256 over canonical sorted-key JSON (never '|'-joined concatenation)",
-    "policy_law": "POLICY_VERSION_BOUND: an approval binds the policy version under which the request was evaluated; a policy-version change requires fresh approval",
-    "changed_budget": "refused, not consumed",
-    "changed_requirement": "refused, not consumed",
-    "changed_policy_version": "refused, not consumed",
-    "mismatch_consumption": "no mismatch consumes the grant; consumption happens only after the digest match",
-    "legacy_approvals": "readable historical evidence only; never authorize a strengthened R5R execution"
+    "schema": "qcae.core.ApprovalBinding (provider-neutral, immutable), seven semantic fields",
+    "fields": ["principal", "action", "resource", "scope", "budget_ref", "authority_requirement", "policy_version", "constraints (optional)"],
+    "policy_law": "POLICY_VERSION_BOUND",
+    "mismatch_law": "changed budget / requirement / policy -> refused, never consumed",
+    "constraint_preservation": "the durable ApprovalRequest schema cannot preserve per-request constraints, so record_authority_request fails closed on a constrained REQUIRE_APPROVAL verdict instead of silently narrowing it; the gate emits constraints == () and the guard pins that invariant",
+    "all_binding_tests": "green (26 binding_r5r + 2 constraint_r1)"
   },
   "architecture": {
-    "admission_port": "ApprovalAdmissionProvider (get_request / effective_grant / consume_grant)",
-    "request_resolver": "ApprovalRequestResolver.latest_for_step — the only owner of (job, step) -> request, used by both admission and release",
-    "standalone_imports": "none in qcae/orchestration (AST guard over every module, including deferred and literal dynamic imports)"
+    "admission_port": "ApprovalAdmissionProvider",
+    "request_resolver": "ApprovalRequestResolver.latest_for_step — the only owner, used by both admission and release",
+    "standalone_imports": "none in qcae/orchestration (AST guard)"
   },
   "backup": {
-    "runtime_execution": "counted in the backup manifest and verified on restore",
-    "approval_use": "counted in the backup manifest and verified on restore",
-    "legacy_approvals": "preserved and restored as historical evidence; cannot authorize",
-    "disaster_tests": [
-      "journey A: consumed grant + COMMITTED execution survive destroy/restore and cannot replay",
-      "journey B: unconsumed matching grant survives and is usable exactly once",
-      "journey C: legacy/incomplete grant restores but cannot authorize"
-    ]
+    "runtime_execution": "counted and verified on restore",
+    "approval_use": "counted and verified on restore",
+    "legacy_approvals": "preserved and restored as historical evidence only; never authorize",
+    "disaster_tests": "consumed-stays-consumed, unconsumed-usable-once, legacy-never-authorizes (6 backup_r5r green)"
   },
   "typed_outcome": {
     "owner": "qcae/governance/standalone/typed_outcomes.py",
     "unknown_job": "JobMissingOutcome (exit 2)",
     "not_ready": "StepNotReadyOutcome with the five typed reasons",
-    "worker_unavailable": "WorkerUnavailable (exit 3, canonical exit code unchanged)",
-    "local_norunnablestep": "not ported"
+    "worker_unavailable": "WorkerUnavailable (exit 3, canon exit code unchanged)"
   },
-  "pre_existing_failure_review": {
-    "topology": {
-      "test": "qcae/tests/unit/test_p0_topology.py::test_second_level_package_exists_and_imports[proving-build]",
-      "reproduced_on": "8212b59d (detached worktree)",
-      "classification": "repository defect, unrelated to P2 substrate: the required qcae/proving/build/__init__.py was ignored by .gitignore's build/ rule and therefore absent from every clean checkout",
-      "repair": "file versioned; clean-checkout suite green (1439 passed at T01)"
-    },
-    "crash_after_lease": {
-      "test": "qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::test_crash_after_lease_resume_does_not_repeat_committed",
-      "reproduced_on": "8212b59d (detached worktree) — passes in isolation",
-      "classification": "test-isolation defect: the canonical body opened an ambient tempfile.gettempdir()/unused.sqlite3 as a 'placeholder' restart, shared with the OS temp dir; not a runtime regression",
-      "repair": "test made self-contained; the invariant assertion is unchanged and green"
-    }
+  "crash_recovery": {
+    "crash_after_lease": "green (1 test)",
+    "process_crash": "green (7 tests)",
+    "operator_loop": "green (5 tests)"
   },
   "p3_r4_regression": {
     "result": "238 P3 unit tests pass",
-    "scope_preserved": [
-      "executed-query binding",
-      "requested/internal/external/executed scope separation",
-      "negative observation identity",
-      "immutability/deep-freeze repairs",
-      "typed saturation/STOP accounting",
-      "discovery report/history behavior",
-      "P3 architecture guards"
-    ],
     "capability_expansion": "none"
   },
   "test_evidence": {
@@ -138,36 +111,39 @@
       "boundary_r5r": {"passed": 8, "exit_code": 0},
       "backup_r5r": {"passed": 6, "exit_code": 0},
       "typed_r5r": {"passed": 10, "exit_code": 0},
-      "p3_r4_regression": {"passed": 238, "deselected": 1165, "exit_code": 0},
+      "schema_r1": {"passed": 11, "exit_code": 0},
+      "constraint_r1": {"passed": 2, "exit_code": 0},
+      "p3_r4_regression": {"passed": 238, "exit_code": 0},
       "crash_after_lease": {"passed": 1, "exit_code": 0},
       "topology": {"passed": 78, "exit_code": 0},
-      "full_qcae": {"passed": 1440, "failed": 0, "exit_code": 0}
-    },
-    "clean_checkout_verification": "full suite green (1439 passed) in a detached worktree at 25c46a940, proving no reliance on untracked local files"
+      "full_qcae": {"passed": 1453, "failed": 0, "exit_code": 0}
+    }
   },
   "exit_gate": {
-    "original_v4_meaning_restored": true,
-    "true_v4_to_v5_works": true,
-    "fresh_db_physically_v5_before_claiming_v5": true,
-    "build_local_runtime_no_hidden_completion": true,
-    "known_legacy_p2_misversioned_migrates": true,
-    "unknown_hybrid_refused": true,
-    "binding_includes_budget": true,
-    "binding_includes_requirement": true,
-    "binding_includes_policy_version": true,
-    "mismatches_do_not_consume": true,
-    "orchestration_has_no_standalone_import": true,
-    "one_request_resolver": true,
-    "runtime_execution_survives_restore": true,
-    "grant_use_survives_restore": true,
-    "canonical_typed_outcomes_are_sole_no_work_model": true,
-    "crash_after_lease_green": true,
+    "clean_qcae_only_ancestry_from_canonical": true,
+    "no_unrelated_sensor_crypto_files": true,
+    "classification_does_not_mutate_before_decision": true,
+    "fresh_vs_unversioned_existing_distinguished": true,
+    "bootstrap_genuinely_atomic": true,
+    "bootstrap_provenance_uses_real_digests": true,
+    "failed_bootstrap_rolls_back": true,
+    "strict_legacy_fingerprint_proven": true,
+    "partial_p2_shape_refused": true,
+    "true_historical_v4_preserved": true,
+    "v4_to_v5_correct": true,
+    "known_misversioned_dbs_migrate": true,
+    "unknown_hybrid_unchanged_and_refused": true,
+    "seven_field_binding_unchanged_and_green": true,
+    "no_binding_semantics_silently_discarded": true,
+    "backup_restore_laws_green": true,
+    "crash_recovery_laws_green": true,
+    "typed_outcomes_green": true,
     "p3_r4_regression_green": true,
-    "full_qcae_green": true,
-    "evidence_counts_independently_observed": true,
+    "full_qcae_suite_green": true,
+    "final_branch_exists_remotely": "to be verified after push",
     "blockers": []
   },
   "blockers": [],
-  "p3_status": "PRESERVED / PAUSED — resume P3 only after operator review of this freeze",
-  "next": "Operator review, then resume P3 capability development."
+  "p3_status": "PRESERVED / PAUSED — resume only after operator review of this freeze",
+  "next": "Operator review, then P3 resume candidate pending acceptance."
 }
