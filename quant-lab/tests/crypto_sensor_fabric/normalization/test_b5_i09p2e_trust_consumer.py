@@ -19,13 +19,18 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable
+from zoneinfo import ZoneInfo
 
 import pytest
 
-from crypto_sensor_fabric.normalization.authority import evidence_digest
+from crypto_sensor_fabric.normalization.authority import (
+    AuthorityRefusal,
+    evidence_digest,
+    pit_availability_refusal,
+)
 from crypto_sensor_fabric.normalization.sensors.verification import (
     INTEGRATION_STATE,
     TRUST_SCOPE_ECONOMIC_FIELD_BINDING,
@@ -732,6 +737,110 @@ class TestPITReplaySeparation:
             ConsumerDecision.ACCEPT_FIELD_BINDING,
             ConsumerDecision.REFUSE,
         )
+
+
+class TestPITOffsetAndDST:
+    """Attack items 14 (offset-aware equality) and 15 (DST edge cases).
+
+    These drive the reused ``pit_availability_refusal`` rule directly: the
+    consumer must never duplicate it, and it must order true instants rather
+    than local wall-clock text.  Equality is admissible; a naive cutoff is a
+    caller error; a DST fold resolves by instant, not by local time.
+    """
+
+    # -- 14: offset-aware equality ------------------------------------------
+
+    def test_14_same_instant_in_different_offset_is_equal(self) -> None:
+        # 14:00+02:00 is exactly 12:00+00:00; equality is admissible.
+        out = pit_availability_refusal(
+            available_at=None,
+            available_at_instant="2026-06-01T12:00:00+00:00",
+            evaluation_at=datetime(2026, 6, 1, 14, 0, tzinfo=timezone(timedelta(hours=2))),
+        )
+        assert out is None
+
+    def test_14_same_instant_written_as_z_is_equal(self) -> None:
+        out = pit_availability_refusal(
+            available_at=None,
+            available_at_instant="2026-06-01T12:00:00Z",
+            evaluation_at=datetime(2026, 6, 1, 12, 0, tzinfo=UTC),
+        )
+        assert out is None
+
+    def test_14_one_minute_before_in_positive_offset_refused(self) -> None:
+        # 13:59+02:00 == 11:59Z, one minute before 12:00Z.
+        out = pit_availability_refusal(
+            available_at=None,
+            available_at_instant="2026-06-01T12:00:00+00:00",
+            evaluation_at=datetime(2026, 6, 1, 13, 59, tzinfo=timezone(timedelta(hours=2))),
+        )
+        assert out == AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE
+
+    def test_14_offset_equality_is_not_string_equality(self) -> None:
+        # A wall-clock-equal but instant-earlier cutoff in a negative offset
+        # must still be refused: 12:00-05:00 == 17:00Z, before 18:00Z.
+        out = pit_availability_refusal(
+            available_at=None,
+            available_at_instant="2026-06-01T18:00:00+00:00",
+            evaluation_at=datetime(2026, 6, 1, 12, 0, tzinfo=timezone(timedelta(hours=-5))),
+        )
+        assert out == AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE
+
+    def test_14_naive_instant_basis_text_refused(self) -> None:
+        # A naive available_at_instant cannot be ordered against a cutoff.
+        with pytest.raises(ValueError):
+            pit_availability_refusal(
+                available_at=None,
+                available_at_instant="2026-06-01T12:00:00",
+                evaluation_at=datetime(2026, 6, 1, 12, 0, tzinfo=UTC),
+            )
+
+    # -- 15: DST edge cases --------------------------------------------------
+
+    def test_15_dst_fall_back_resolves_by_true_instant(self) -> None:
+        # America/New_York 2026-11-01 01:30 occurs twice: 05:30Z (EDT, fold=0)
+        # and 06:30Z (EST, fold=1).  The rule must compare instants, so the same
+        # local wall time flips admissibility across the fold.
+        ny = ZoneInfo("America/New_York")
+        availability = "2026-11-01T06:00:00+00:00"
+        before_fold = pit_availability_refusal(
+            available_at=None,
+            available_at_instant=availability,
+            evaluation_at=datetime(2026, 11, 1, 1, 30, tzinfo=ny, fold=0),
+        )
+        after_fold = pit_availability_refusal(
+            available_at=None,
+            available_at_instant=availability,
+            evaluation_at=datetime(2026, 11, 1, 1, 30, tzinfo=ny, fold=1),
+        )
+        assert before_fold == AuthorityRefusal.APPROVAL_NOT_YET_AVAILABLE
+        assert after_fold is None
+
+    def test_15_dst_spring_forward_naive_local_refused(self) -> None:
+        # A naive local time in a DST-observing zone carries no instant.
+        out = pit_availability_refusal(
+            available_at=None,
+            available_at_instant="2026-03-08T07:00:00+00:00",
+            evaluation_at=datetime(2026, 3, 8, 2, 30),
+        )
+        assert out == AuthorityRefusal.EVALUATION_TIME_REQUIRED
+
+    def test_15_dst_same_day_date_only_is_ambiguous(self) -> None:
+        # A date-only basis certifies a day, not an instant on a DST-transition day.
+        out = pit_availability_refusal(
+            available_at="2026-11-01",
+            available_at_instant=None,
+            evaluation_at=datetime(2026, 11, 1, 12, 0, tzinfo=ZoneInfo("America/New_York")),
+        )
+        assert out == AuthorityRefusal.INTRADAY_PIT_AMBIGUOUS
+
+    def test_15_dst_later_day_date_only_passes(self) -> None:
+        out = pit_availability_refusal(
+            available_at="2026-11-01",
+            available_at_instant=None,
+            evaluation_at=datetime(2026, 11, 2, 0, 30, tzinfo=ZoneInfo("America/New_York")),
+        )
+        assert out is None
 
 
 class TestAdversarial:

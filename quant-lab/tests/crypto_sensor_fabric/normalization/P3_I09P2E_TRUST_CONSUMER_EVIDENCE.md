@@ -29,13 +29,13 @@ The branch descends directly from the pinned R1 HEAD; `3e53a6589` is an ancestor
 - **Copied/deserialized verdict revalidation (§4):** re-derivation against the policy's own trusted context; comparison of `approval_id`, `registry_digest`, `artifact_id`, `trust_scope`, `fields_verified`, `custody_source_authorized`; refusal on any divergence.
 - **Evidence-byte rebinding (§7):** re-reads actual store bytes at consumption, re-hashes with `evidence_digest`, refuses missing/mismatched/digest-only custody.
 - **PIT/replay separation (§6):** reuses `verify_trade_record`, `pit_availability_refusal`, `ReplayEligibility`, `assess_replay_eligibility` without duplicating their rules; all four PIT/replay combinations tested.
-- **Adversarial test suite:** 24 attack families covering forged scope, empty unverified dimensions, unauthorized custody source, missing/substituted evidence bytes, approval/registry/artifact/field-allowlist forgery, cached verdict after revocation, same-day date-only PIT ambiguity, naive cutoff, PIT/replay disagreement, sibling-field substitution, false liquidation transformation claim, mixed batch, retry bypass, unauthenticated acquisition lineage, forged instrument identity, no-cutoff-auth-as-PIT-approval.
+- **Adversarial test suite:** 24 attack families (plus expanded offset-aware-equality and DST-boundary cases) covering forged scope, empty unverified dimensions, unauthorized custody source, missing/substituted evidence bytes, approval/registry/artifact/field-allowlist forgery, cached verdict after revocation, same-day date-only PIT ambiguity, naive cutoff, offset-aware equality, DST folds, PIT/replay disagreement, sibling-field substitution, false liquidation transformation claim, mixed batch, retry bypass, unauthenticated acquisition lineage, forged instrument identity, no-cutoff-auth-as-PIT-approval.
 - **Multipath conformance:** identical policy across single-record, cached, deserialized, evidence-reread, and refusal-handling paths.
 - **Governance scope:** `INTEGRATION_STATE` unchanged (`INTEGRATION_REQUIRED`), no custody authority created, no whole-record trust assertion, approval manifest remains empty.
 
 ### Remaining (not done by this workstream; deliberately deferred)
 
-- **Focused regression on existing P2a–P2e / I05 / I06 / I09 / I10 / I11 suites:** could not be executed in this sparse checkout because those test files are tracked but not materialized on disk (5051 `D` entries in worktree status). Agent 2 owns the full canonical regression slot; this workstream's isolated suite (61 tests) passes.
+- **Focused regression on existing P2a–P2e / I05 / I06 / I09 / I10 / I11 suites:** could not be executed in this sparse checkout because those test files are tracked but not materialized on disk (5051 `D` entries in worktree status). Agent 2 owns the full canonical regression slot; this workstream's isolated suite (70 tests) passes.
 - **Canonical full-HEAD regression:** deferred to Agent 2's audit gate; not inherited as this workstream's result.
 - **Production integration:** explicitly out of scope — no ingestion application, no custody service, no provider approval, no application initializer. Documented as a deferred dependency (§6 of the contract).
 
@@ -51,7 +51,7 @@ The branch descends directly from the pinned R1 HEAD; `3e53a6589` is an ancestor
 
 ```
 quant-lab/tests/crypto_sensor_fabric/normalization/
-├── test_b5_i09p2e_trust_consumer.py   (implementation + 61 tests)
+├── test_b5_i09p2e_trust_consumer.py   (implementation + 70 tests)
 └── P3_I09P2E_TRUST_CONSUMER_EVIDENCE.md  (this document)
 ```
 
@@ -128,7 +128,7 @@ All four combinations tested:
 
 ## 8. Attack matrix and results
 
-61 tests, **61 passed**. Adversarial families (24):
+70 tests, **70 passed**. Adversarial families (24), including explicit offset-aware-equality and DST-boundary cases that drive the reused `pit_availability_refusal` rule:
 
 | # | Attack | Result |
 |---|---|---|
@@ -145,17 +145,19 @@ All four combinations tested:
 | 11 | Same-day date-only PIT ambiguity | REFUSE `PIT_INADMISSIBLE` |
 | 12 | Missing approval availability | REFUSE `PIT_INADMISSIBLE` |
 | 13 | Naive evaluation cutoff | REFUSE `VERIFICATION_FAILED` (`PIT_CUTOFF_REQUIRED`) |
-| 14 | PIT admissible but replay blocked | REFUSE `REPLAY_BLOCKED`, `pit_status=ADMISSIBLE` |
-| 15 | Replay eligible but PIT inadmissible | REFUSE `PIT_INADMISSIBLE` |
-| 16 | Unlisted canonical field required | REFUSE `FIELD_NOT_IN_ALLOWLIST` |
-| 17 | Sibling canonical field substitution (`trade_volume` for `trade_price`) | REFUSE `FIELD_NOT_IN_ALLOWLIST` |
-| 18 | Liquidation record claiming verified economic transformation | `record_transformation_verified=False`, `downstream_trusted=False`, INTEGRATION_REQUIRED |
-| 19 | Mixed-acceptance batch (one good, one forged) | per-record independent outcomes; forged refused |
-| 20 | Refusal incorrectly retried as transient | same digest-mismatch refusal on retry — not transient |
-| 21 | Unauthenticated source lineage promotion | model construction raises (contradictory state) |
-| 22 | Forged instrument identity | `instrument_authenticated=False`, `instrument_authentication_ref=None` |
-| 23 | Missing acquisition lineage | `SOURCE_LINEAGE` / `ACQUISITION_LINEAGE` in unverified_dimensions; not synthesized |
-| 24 | No-cutoff authentication presented as PIT approval | REFUSE `PIT_INADMISSIBLE` |
+| 14 | Offset-aware equality (same instant, different offset) | admissible (`None`); one-minute-before refused `APPROVAL_NOT_YET_AVAILABLE`; naive basis text `ValueError` |
+| 15 | DST edge cases (fall-back fold, spring-forward naive local, DST same-day date-only) | fold resolves by true instant (fold=0 refused, fold=1 admissible); naive local refused `EVALUATION_TIME_REQUIRED`; same-day date-only `INTRADAY_PIT_AMBIGUOUS` |
+| 16 | PIT admissible but replay blocked | REFUSE `REPLAY_BLOCKED`, `pit_status=ADMISSIBLE` |
+| 17 | Replay eligible but PIT inadmissible | REFUSE `PIT_INADMISSIBLE` |
+| 18 | Unlisted canonical field required | REFUSE `FIELD_NOT_IN_ALLOWLIST` |
+| 19 | Sibling canonical field substitution (`trade_volume` for `trade_price`) | REFUSE `FIELD_NOT_IN_ALLOWLIST` |
+| 20 | Liquidation record claiming verified economic transformation | `record_transformation_verified=False`, `downstream_trusted=False`, INTEGRATION_REQUIRED |
+| 21 | Mixed-acceptance batch (one good, one forged) | per-record independent outcomes; forged refused |
+| 22 | Refusal incorrectly retried as transient | same digest-mismatch refusal on retry — not transient |
+| 23 | Unauthenticated source lineage promotion | model construction raises (contradictory state) |
+| 24 | Forged instrument identity | `instrument_authenticated=False`, `instrument_authentication_ref=None` |
+| 25 | Missing acquisition lineage | `SOURCE_LINEAGE` / `ACQUISITION_LINEAGE` in unverified_dimensions; not synthesized |
+| 26 | No-cutoff authentication presented as PIT approval | REFUSE `PIT_INADMISSIBLE` |
 
 Plus multipath conformance tests (single, cached, deserialized, evidence reread, typed refusal handling) and governance scope tests (integration state unchanged, trust scope constant, no custody authority created, no whole-record trust assertion).
 
@@ -163,7 +165,7 @@ Plus multipath conformance tests (single, cached, deserialized, evidence reread,
 
 | Suite | Result |
 |---|---|
-| New P3 conformance suite (`test_b5_i09p2e_trust_consumer.py`) | **61 passed** |
+| New P3 conformance suite (`test_b5_i09p2e_trust_consumer.py`) | **70 passed** |
 | P2a–P2e, I05/I06 replay, I09 semantic determinism, I10 scope, I11 nonregression | Not executed — sparse checkout; those test files are tracked but not materialized (5051 `D` entries). Agent 2 owns the full canonical regression slot. |
 | Relevant governance predicates | `INTEGRATION_STATE == INTEGRATION_REQUIRED` verified in-test; approval manifest empty verified in-worktree |
 
@@ -171,7 +173,7 @@ No source modules were modified by this workstream, so there is no source-level 
 
 ## 10. Canonical regression status
 
-**Not run by this workstream.** The full canonical regression of the integration candidate is Agent 2's responsibility and requires a full (non-sparse) checkout. This workstream's result is limited to its own isolated suite (61 passed). Reported explicitly as incomplete rather than adjudicated.
+**Not run by this workstream.** The full canonical regression of the integration candidate is Agent 2's responsibility and requires a full (non-sparse) checkout. This workstream's result is limited to its own isolated suite (70 passed). Reported explicitly as incomplete rather than adjudicated.
 
 ## 11. Governance and source scope
 
