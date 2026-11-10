@@ -25,6 +25,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Prepare the replay worktree
+        run: |
+          cd "${REPLAY_WT:-.}"
+          git worktree add --detach "$RUNNER_TEMP/b6i2-replay" 9bf76df45dca676ae7cafc4877f117a7dd64c3d2
+          git update-ref refs/remotes/origin/main 4496d548078660efd7ad4f93e7fff461d34ea538
+          echo "REPLAY_WT=$RUNNER_TEMP/b6i2-replay" >> "$GITHUB_ENV"
+
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:
@@ -32,12 +39,14 @@ jobs:
 
       - name: Install pinned CI dependencies
         run: |
+          cd "${REPLAY_WT:-.}"
           pip install --require-hashes --only-binary ':all:' \
             -r infrastructure/control-plane/requirements-ci.lock.txt
 
       - name: Prepare evidence directory
         id: run_id
         run: |
+          cd "${REPLAY_WT:-.}"
           OCE_RUN_ID=$(python -c "import secrets; print(secrets.token_hex(6))")
           echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
           EVIDENCE_DIR="$RUNNER_TEMP/b6-i2-evidence-$OCE_RUN_ID"
@@ -49,6 +58,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/identity.json" <<'IDENT'
           import json, os, subprocess, sys
           def git(*a):
@@ -76,6 +86,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i2_validate.py \
             --json "$EVIDENCE_DIR/validator.json" | tee "$EVIDENCE_DIR/validator.txt"
 
@@ -83,6 +94,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/stage-scope.json" <<'SCOPE'
           import json, pathlib, sys
           sys.path.insert(0, "infrastructure/control-plane/scripts")
@@ -100,6 +112,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/inventory.json" <<'INV'
           import json, pathlib, subprocess, sys
           registry = json.loads(pathlib.Path(
@@ -129,6 +142,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python -m pytest infrastructure/control-plane/tests/test_block_06_i2_*.py \
             -v --tb=short -o addopts= \
             --junitxml="$EVIDENCE_DIR/b6-i2-junit.xml" \
@@ -154,6 +168,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i2_mutation_battery.py \
             --json "$EVIDENCE_DIR/mutations.json"
 
@@ -161,6 +176,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i2_stage_controls.py \
             --json "$EVIDENCE_DIR/stage-controls.json"
 
@@ -168,6 +184,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i0_validate.py \
             --stage-scope auto --json "$EVIDENCE_DIR/i0-validator.json"
 
@@ -175,6 +192,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i1_validate.py \
             --stage-scope auto --json "$EVIDENCE_DIR/i1-validator.json"
 
@@ -182,6 +200,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i0_gate.py \
             --json "$EVIDENCE_DIR/book5-gate.json" | tee "$EVIDENCE_DIR/book5-gate.txt"
 
@@ -189,6 +208,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python -m pytest \
             infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py \
             infrastructure/control-plane/tests/test_b5_i7_governed_change.py \
@@ -213,6 +233,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/cleanup.json" <<'CLEAN'
           import json, pathlib, subprocess, sys
           status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"],
@@ -231,6 +252,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR" <<'SUM'
           import json, pathlib, sys
           ev = pathlib.Path(sys.argv[1])

@@ -253,7 +253,7 @@ def main(argv=None) -> int:
         sys.path.insert(0, str(root / "infrastructure/control-plane/scripts"))
         import block_06_stage_scope as stage_scope  # noqa: PLC0415
         resolved = stage_scope.resolve(root, "auto")
-        if resolved.get("mode") == "i2":
+        if resolved.get("mode") in ("i2", "i3"):
             registration = json.loads((root / DOCS /
                                        "OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json")
                                       .read_text(encoding="utf-8"))

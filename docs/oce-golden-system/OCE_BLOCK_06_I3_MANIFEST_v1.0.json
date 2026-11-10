@@ -1,0 +1,124 @@
+{
+  "artifacts": [
+    {
+      "bytes": 1353,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_COMPATIBILITY_MATRIX_v1.0.json",
+      "sha256": "6f0231a639180fe04d0e08ee03a5720b675b2e8bbb4bc7ecb9af3b8fee5ea803"
+    },
+    {
+      "bytes": 2953,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "sha256": "cf50675237baa7fbea1b20b0f5fbefa9b134d42f63405fa0253003ffd088835d"
+    },
+    {
+      "bytes": 6192,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "sha256": "119ac34b304e7b9139962098fbce604fc5456a02dea0b4e141165922e1e8de4c"
+    },
+    {
+      "bytes": 2395,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_OPERATOR_SURFACE_CONTRACT_v1.0.json",
+      "sha256": "854e623f407d0be27a240a9628a9edaefa5e18bc2fc50815a431ad82704734aa"
+    },
+    {
+      "bytes": 1406,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+      "sha256": "6520a7339743a48fa5e80fac7b83b654eb9940c0c9625bfb194e0a2a7a888e40"
+    },
+    {
+      "bytes": 10616,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "sha256": "0ed4ad634c003a2f1056bdf773bd3428a04d4665bf770fa718d26ed18ff045d1"
+    },
+    {
+      "bytes": 2937,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_SCOPE_DERIVATION_v1.0.json",
+      "sha256": "9a834cc9b6e7059065449eb84aee593d2be3a2a29d1c1b8edd8782d256e347e7"
+    },
+    {
+      "bytes": 2336,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I3_STAGE_SCOPE_REGISTRATION_v1.0.json",
+      "sha256": "3bf5d9a03dee4c469d7685a25a9a86a1618f41573ed810772b36a22e6cc76585"
+    }
+  ],
+  "base_sha": "018b164f249bbf075334d5d03ad37e80dcbbede0",
+  "code": [
+    {
+      "bytes": 2522,
+      "path": "infrastructure/control-plane/scripts/block_06_i3_generate.py",
+      "sha256": "2da578b1d9098a10ff5e803bb9b9b8b0755d273c9e30709cee941567c87953ca"
+    },
+    {
+      "bytes": 6124,
+      "path": "infrastructure/control-plane/scripts/block_06_i3_mutation_battery.py",
+      "sha256": "823aa358f0d1f51b64e219ca597e1a41e4b800af1496f3977c903e650a847310"
+    },
+    {
+      "bytes": 5234,
+      "path": "infrastructure/control-plane/scripts/block_06_i3_paired.py",
+      "sha256": "6da84c9fbdb6ed4fc63be9d3d8f8cd81ed8d8623d9398ec1569f317e7d34475a"
+    },
+    {
+      "bytes": 6762,
+      "path": "infrastructure/control-plane/scripts/block_06_i3_stage_controls.py",
+      "sha256": "bd2396e6d2548e7ac40e3b77a198d14c4df2a91f145bae68f2ec08a8450b8152"
+    },
+    {
+      "bytes": 12289,
+      "path": "infrastructure/control-plane/scripts/block_06_i3_validate.py",
+      "sha256": "849bc8b40a4535766d34dc4ff566ae768dcaac486989cfef86e0eb7754b8dc15"
+    },
+    {
+      "bytes": 672,
+      "path": "oce/operator/__init__.py",
+      "sha256": "2d32ca04230b721485e9ab68794a278cd8b22dce2541a3c91616584aaa13356b"
+    },
+    {
+      "bytes": 4610,
+      "path": "oce/operator/approvals.py",
+      "sha256": "664758aef697acb1f14e281d103ab083649cba7dfe3adb500eb65e6f4a5b8ca8"
+    },
+    {
+      "bytes": 3348,
+      "path": "oce/operator/capability.py",
+      "sha256": "2148288b8f05bc5dac955798b295c95dd5b190f72387e1e1182fa3e077ccf7af"
+    },
+    {
+      "bytes": 2307,
+      "path": "oce/operator/evidence.py",
+      "sha256": "8a731ce6427887ca80a463c6a9f4d22dcfaf3dff18f6f65236ee40c884d38d0e"
+    },
+    {
+      "bytes": 988,
+      "path": "oce/operator/model.py",
+      "sha256": "6a6398241f72c65feb39c85fc3f7aa8f54013444547b2a1e484f9b88dd1dda78"
+    },
+    {
+      "bytes": 643,
+      "path": "oce/operator/refusals.py",
+      "sha256": "aa329849d5654536d25a3da10f1898e423a1d01655dc34e78314c30eed1dfaf2"
+    }
+  ],
+  "document_id": "OCE-B6-I3-MANIFEST-001",
+  "hash": "sha256",
+  "locks": {
+    "B6-I4_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "schema": "oce.block_06_i3.manifest.v1",
+  "size": "bytes",
+  "stage": "B6-I3",
+  "status": "FROZEN",
+  "totals": {
+    "artifacts": 8,
+    "code": 11
+  },
+  "verification": {
+    "excludes_manifest": true,
+    "independent": true
+  }
+}
