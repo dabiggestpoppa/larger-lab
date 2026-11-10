@@ -66,12 +66,9 @@ def main(argv=None) -> int:
         results.append(check("i2_no_operator", not any(p.startswith("oce/operator/")
                                                        for p in i2_prefixes)))
         added = {p for p in allowed if p.startswith("oce/")
-                 and not p.startswith(tuple(i1_allowed))}
-        results.append(check("i3_is_i2_plus_operator",
-                             "oce/operator/" in added
-                             and not any(p.startswith(("oce/api/", "oce/sdk/", "oce/templates/",
-                                                       "oce/harness/", "packages/"))
-                                         for p in added), sorted(added)))
+                 and not p.startswith(tuple(i1_allowed))
+                 and not p.startswith(tuple(i2_prefixes))}
+        results.append(check("i3_is_i2_plus_operator", added == {"oce/operator/"}, sorted(added)))
         prior = git(root, "diff", "--quiet", f"{BASE}..HEAD", "--",
                     "infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
                     "infrastructure/control-plane/tests/test_block_06_i1_authority_and_boundary.py",

@@ -258,6 +258,12 @@ def main(argv=None) -> int:
                                        "OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json")
                                       .read_text(encoding="utf-8"))
             I2_PREFIXES = tuple(registration["this_stage"]["allowed_prefixes"])
+            if resolved.get("mode") == "i3":
+                i3_registration = json.loads((root / DOCS /
+                    "OCE_BLOCK_06_I3_STAGE_SCOPE_REGISTRATION_v1.0.json")
+                    .read_text(encoding="utf-8"))
+                I2_PREFIXES = tuple(dict.fromkeys(
+                    I2_PREFIXES + tuple(i3_registration["this_stage"]["allowed_prefixes"])))
     c = Checker(root)
     for check in (check_packet, check_api, check_compat, check_registry, check_failures,
                   check_manifest, check_boundary, check_locks_and_text):
