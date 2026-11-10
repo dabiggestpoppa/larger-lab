@@ -66,5 +66,5 @@ def test_digest_mismatch_refused(tmp_path: pathlib.Path) -> None:
     doc["payload_digest"] = "0" * 64
     assert code(archive.validate, doc).code == "REFUSED_DIGEST"
     good = skeleton.manifest()
-    assert archive.install(good, tmp_path / "dest")["installed"] == 6
+    assert archive.install(good, tmp_path / "dest")["installed"] == 8
     assert code(archive.install, good, tmp_path / "dest").code == "REFUSED_DIRTY_INPUT"

@@ -71,4 +71,4 @@ def test_dirty_build_input_refused(tmp_path: pathlib.Path) -> None:
     assert (dest / "leftover.txt").read_text(encoding="utf-8") == "stale\n"
     clean = tmp_path / "clean"
     clean.mkdir()
-    assert skeleton.write(clean)["installed"] == 6
+    assert skeleton.write(clean)["installed"] == 8

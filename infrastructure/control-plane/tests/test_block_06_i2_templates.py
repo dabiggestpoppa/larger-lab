@@ -18,14 +18,25 @@ def write(dest: pathlib.Path, name: str = "app") -> dict:
 
 
 def test_generated_app_starts_locally(tmp_path: pathlib.Path) -> None:
-    write(tmp_path / "app")
-    record = skeleton.start(tmp_path / "app")
-    assert record["started"] is True
-    assert record["transport"] == "in-process"
-    assert record["network"] is False
-    assert record["artifacts"] == sorted(skeleton.FILES)
-    assert [row["address"] for row in record["endpoints"]] == ["local://api"]
-    assert len(record["digest"]) == 64
+    dest = tmp_path / "fresh"
+    write(dest)
+    assert not [p for p in dest.rglob("*.pyc")]
+    first = skeleton.start(dest)
+    second = skeleton.start(dest)
+    for record in (first, second):
+        assert record["started"] is True
+        assert record["transport"] == "subprocess"
+        assert record["network"] is False
+        assert record["readiness"] == "READY app"
+        assert record["shutdown"] == "STOPPED"
+        assert record["exit_code"] == 0
+        assert record["artifacts"] == sorted(skeleton.FILES)
+        assert len(record["digest"]) == 64
+    assert first["digest"] == second["digest"]
+    entry = (dest / "app" / "__main__.py").read_text(encoding="utf-8")
+    for forbidden in ("socket", "urllib", "http.client", "requests", "aiohttp"):
+        assert forbidden not in entry
+    assert not [p for p in dest.rglob("*.pyc")]
 
 
 def test_template_declares_inherited_versions(tmp_path: pathlib.Path) -> None:
@@ -67,7 +78,8 @@ def test_template_readme_present(tmp_path: pathlib.Path) -> None:
     write(tmp_path / "app")
     readme = (tmp_path / "app" / "README.md").read_text(encoding="utf-8")
     assert "OCE Book 6 skeleton" in readme
-    assert "in-process" in readme
+    assert "python app/__main__.py" in readme
+    assert "READY app" in readme
     assert "cloud" in readme
 
 

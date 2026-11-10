@@ -39,6 +39,11 @@
       "bytes": 2246,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json",
       "sha256": "e0b790e228be10c7376056035967e162639e5e50119489accf453fde288fa1a9"
+    },
+    {
+      "bytes": 7519,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I2_PROOF_CLOSURE_AMENDMENT_v1.0.json",
+      "sha256": "ed44519ce00a9073ac1b2677fa65d05414b6a919d266da059b2e472e44856690"
     }
   ],
   "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
@@ -49,9 +54,9 @@
       "sha256": "9dd3eab79a7d2cb39de3c4864da0ab609e0a66bf8751de796ac1fde15fc1b9ca"
     },
     {
-      "bytes": 1602,
+      "bytes": 1631,
       "path": "oce/templates/refusals.py",
-      "sha256": "07f08325bd6999108b1d24a7651c98ba0160de3339936aefcfa92fbd75b5ed92"
+      "sha256": "16693d891fc17c678b75b827af3f7d0d2b6844b8f29a47e6d6d1874b9a8e6609"
     },
     {
       "bytes": 5292,
@@ -59,9 +64,9 @@
       "sha256": "368ae993c33f3a1bc23adabe8db9e52c6ff8bdc655b9a1a11e9eb82d09d23079"
     },
     {
-      "bytes": 4869,
+      "bytes": 8011,
       "path": "oce/templates/skeleton.py",
-      "sha256": "39e92fffac38d4eeeba5140a63b506c532f794e2670ed14e56ba0b11e86f7b08"
+      "sha256": "e2a05bb3dd25fd8211930c0903d7b985f1586e2b11e89873b4d356fa56359073"
     },
     {
       "bytes": 160,
@@ -93,7 +98,7 @@
   "stage": "B6-I2",
   "status": "FROZEN",
   "totals": {
-    "artifacts": 8,
+    "artifacts": 9,
     "code": 7
   },
   "verification": {

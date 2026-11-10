@@ -25,7 +25,7 @@ def test_manifest_hashes_recompute() -> None:
     manifest = load("MANIFEST_v1.0.json")
     assert manifest["status"] == "FROZEN"
     assert manifest["base_sha"] == "4496d548078660efd7ad4f93e7fff461d34ea538"
-    assert manifest["totals"]["artifacts"] == 8
+    assert manifest["totals"]["artifacts"] == 9
     rows = manifest["artifacts"] + manifest["code"]
     assert len(rows) >= 15
     for row in rows:
@@ -48,6 +48,11 @@ def test_cleanup_no_scratch_residue() -> None:
 
 
 def test_prior_stage_artifacts_unchanged() -> None:
+    for rel in ("infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
+                "infrastructure/control-plane/tests/test_block_06_i1_authority_and_boundary.py"):
+        code = subprocess.run(["git", "-C", str(ROOT), "diff", "--quiet",
+                               "4496d548078660efd7ad4f93e7fff461d34ea538..HEAD", "--", rel])
+        assert code.returncode == 0, rel
     for prefix in ("OCE_BLOCK_06_I0_", "OCE_BLOCK_06_I1_", "OCE_BLOCK_06_P0_"):
         changed = [line for line in git("diff", "--name-only", f"{I1_HEAD}..HEAD", "--",
                                         "docs/oce-golden-system").splitlines()

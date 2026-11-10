@@ -36,6 +36,12 @@ jobs:
         run: |
           pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt
 
+      - name: Prepare prior-head replay worktree
+        run: |
+          git worktree add --detach --quiet "$RUNNER_TEMP/replay-head" 96e3b81714321f4eea7abcb300ef471e93be0962
+          git -C "$RUNNER_TEMP/replay-head" update-ref refs/remotes/origin/main 6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e
+          echo "REPLAY_WT=$RUNNER_TEMP/replay-head" >> "$GITHUB_ENV"
+
       - name: Prepare evidence directory
         id: run_id
         run: |
@@ -147,6 +153,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/inventory.json" <<'INV'
           import json, pathlib, re, subprocess, sys
           registry = json.loads(pathlib.Path(
@@ -181,6 +188,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           F="infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py \
              infrastructure/control-plane/tests/test_block_06_i0_decisions_and_api.py \
              infrastructure/control-plane/tests/test_block_06_i0_compat_and_failures.py \

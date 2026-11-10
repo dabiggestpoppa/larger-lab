@@ -80,7 +80,7 @@ class Checker:
 
 def check_packet(c: Checker) -> None:
     files = sorted(p.name for p in (c.root / DOCS).glob(f"{PREFIX}*.json"))
-    c.need("packet/count", len(files) == 10, files)
+    c.need("packet/count", len(files) == 11, files)
     for name in files:
         raw = (c.root / DOCS / name).read_bytes()
         c.need(f"packet/canonical/{name}", raw == canonical(json.loads(raw)))
@@ -208,11 +208,47 @@ def check_correction_and_registration(c: Checker) -> None:
         c.need(f"registration/locked/{stage_id}", registration["locks"][stage_id] == "LOCKED")
 
 
+def check_amendment(c: Checker) -> None:
+    amendment = c.load("PROOF_CLOSURE_AMENDMENT_v1.0.json")
+    c.need("amendment/frozen", amendment["status"] == "FROZEN"
+           and amendment["frozen_before_results"] is True)
+    c.need("amendment/supersedes", len(amendment["supersedes"]) == 2
+           and {row["clause"] for row in amendment["supersedes"]}
+           == {"IMPLEMENTATION_CONTRACT_v1.0.template.start",
+               "ACCOUNTING_CORRECTION_v1.0.authoritative_mutation_population"})
+    m13 = amendment["m13"]
+    correction = c.load("ACCOUNTING_CORRECTION_v1.0.json")["authoritative_mutation_population"]
+    c.need("amendment/m13_disposition", m13["disposition"] == "POSIX_ENVIRONMENTAL_PROBE"
+           and m13["governed_rows"] == 12 and m13["probe_rows"] == 1
+           and m13["floor"] == correction["floor"] == 12
+           and m13["governed_rows"] + m13["probe_rows"] == correction["rows_total"] == 13)
+    c.need("amendment/m13_probe_not_claimed", m13["probe_discriminated_linux"] is False
+           and m13["governed_discriminated_linux"] == 12)
+    start = amendment["local_start"]
+    c.need("amendment/local_start", start["mode"] == "SUBPROCESS_START_WITH_READINESS"
+           and start["evidence_node"]
+           == "test_block_06_i2_templates.py::test_generated_app_starts_locally"
+           and start["exit_code"] == 0 and start["network"] is False)
+    dispositions = {key: row["disposition"] for key, row in amendment["compatibility"].items()}
+    c.need("amendment/compat", dispositions == {"C1.S3": "UNPROVEN_BUT_EXIT_GATE_ALLOWS",
+                                                "C1.S4": "UNPROVEN_BUT_EXIT_GATE_ALLOWS"})
+    c.need("amendment/prior_tests_restored",
+           set(amendment["prior_stage_preservation"]["restored_byte_identical"])
+           == {"infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
+               "infrastructure/control-plane/tests/test_block_06_i1_authority_and_boundary.py"})
+    c.need("amendment/floors", amendment["floors"] == {"test_nodes": 30, "stage_mutations": 6,
+                                                       "i0_governed_mutations": 12,
+                                                       "common_regression_nodes": 208})
+    c.need("amendment/locks", amendment["locks"]["B6-I3_through_I9"] == "LOCKED"
+           and amendment["locks"]["MERGE_AUTHORIZED"] is False
+           and amendment["locks"]["BOOK_6_COMPLETE"] is False)
+
+
 def check_manifest(c: Checker) -> None:
     manifest = c.load("MANIFEST_v1.0.json")
     c.need("manifest/status", manifest["status"] == "FROZEN")
     c.need("manifest/base", manifest["base_sha"] == BASE_SHA)
-    c.need("manifest/artifacts", manifest["totals"]["artifacts"] == 8)
+    c.need("manifest/artifacts", manifest["totals"]["artifacts"] == 9)
     c.need("manifest/code", manifest["totals"]["code"] >= 7)
     for row in manifest["artifacts"] + manifest["code"]:
         path = c.root / row["path"]
@@ -249,6 +285,10 @@ def check_boundary(c: Checker) -> None:
     code, diff = git(c.root, "diff", "--name-only", f"{BASE_SHA}..HEAD", "--",
                      "docs/oce-golden-system/OCE_BLOCK_06_P0_")
     c.need("boundary/p0_frozen", not diff.strip(), diff)
+    for rel in ("infrastructure/control-plane/tests/test_block_06_i0_stage_contract.py",
+                "infrastructure/control-plane/tests/test_block_06_i1_authority_and_boundary.py"):
+        code, _ = git(c.root, "diff", "--quiet", f"{BASE_SHA}..HEAD", "--", rel)
+        c.need(f"boundary/prior_test_bytes/{rel.rsplit('/', 1)[-1]}", code == 0)
     code, later = git(c.root, "ls-tree", "-r", "--name-only", "HEAD")
     forbidden = [p for p in later.splitlines()
                  if any(f"OCE_BLOCK_06_I{i}_" in p for i in range(3, 10))]
@@ -294,7 +334,8 @@ def main(argv=None) -> int:
             else pathlib.Path(__file__).resolve().parents[3])
     c = Checker(root)
     for check in (check_packet, check_api, check_compat, check_registry, check_failures,
-                  check_correction_and_registration, check_manifest, check_boundary, check_text):
+                  check_correction_and_registration, check_amendment, check_manifest,
+                  check_boundary, check_text):
         try:
             check(c)
         except Exception as exc:  # a missing artifact is a failure, not a crash
