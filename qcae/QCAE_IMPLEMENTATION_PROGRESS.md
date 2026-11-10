@@ -979,9 +979,45 @@ boundary_r5r 8, backup_r5r 6, typed_r5r 10, P3-R4 regression 238,
 crash-after-lease 1, topology 78, full qcae suite 1439 — all green.
 Environment: local developer machine; this repository has no CI.
 
+## P2-R5R-R1 — Bootstrap Atomicity + Strict Legacy Fingerprint + Clean Custody Seal
+
+**Custody (full 18-commit map of `8212b59d..dca2e34f9`):**
+
+- QCAE R5R (9, replayed here): `d39f1a125` I0, `9d24b79ac` C01,
+  `0eb54a22d` C02, `5110f1253` C03, `5a6f1b763` C04, `080973a99` C05,
+  `25c46a940` T01, `ef1fbf154` C01-addendum, `dca2e34f9` FREEZE.
+- SUPERSEDED QCAE R5R attempt (7): `0114309f` I0, `839a0090` C01,
+  `349b1999` C02/C03, `1d19fcd2` C04, `627e7ea1` C05, `6a4c40cd` T01,
+  `c70667de` FREEZE. Not replayed; their defects (four-field digest,
+  startup-completion, index-only v5) were repaired in the R5R commits.
+- UNRELATED SENSOR/CRYPTO (2, excluded): `8f870be2`, `54a8c91f8`
+  (`quant-lab/research/crypto_foundry/sensor_fabric/…` audit records).
+- This branch `agent/qcae-p2-r5r-final` is cut from canonical `8212b59d`
+  and carries QCAE files only (`git diff 8212b59d..HEAD` shows `qcae/`
+  and nothing else). Source reconciliation tree `dca2e34f9`, seeded at
+  R0 `82772000b`; this is a semantic replay, not identical Git history.
+
+**Commit sequence:** P2-R5R-R1-R0 (QCAE tree seed) → P2-R5R-R1-I0
+(custody map + replay lock, this entry) → P2-R5R-R1-C01 (non-mutating
+classification; fresh/unversioned distinction) → P2-R5R-R1-C02 (true
+atomic v5 bootstrap; real provenance digests) → P2-R5R-R1-C03 (strict
+known-P2 fingerprint; hybrid refusal) → P2-R5R-R1-C04
+(REQUIRE_APPROVAL constraint preservation) → P2-R5R-R1-T01 (matrix +
+regression) → P2-R5R-R1-FREEZE (fresh evidence on clean ancestry).
+
+**R1 defects accepted for repair:** (A) `open_metadata_db()` executes
+schema DDL before classifying, mutating unknown/hybrid DBs; (B)
+`user_version == 0` with existing tables is bootstrapped over instead of
+refused; (C) fresh bootstrap is several `executescript()` calls + one
+commit, mis-described as one transaction; (D) bootstrap provenance uses
+sentinel strings (`"none"`, `"bootstrap-v5"`), not digests; (E)
+`KNOWN_P2_MISVERSIONED` checks only three column sets, so a partial shape
+passes; (F) `ApprovalRegistrySink` persists no constraints, so a
+constrained REQUIRE_APPROVAL verdict could be silently narrowed.
+
 ## Blockers
 
-None.
+P2 FINAL FREEZE held for R1; P3 not authorized.
 
 ## Next Action
 
