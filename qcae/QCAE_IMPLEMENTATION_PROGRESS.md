@@ -1015,6 +1015,18 @@ sentinel strings (`"none"`, `"bootstrap-v5"`), not digests; (E)
 passes; (F) `ApprovalRegistrySink` persists no constraints, so a
 constrained REQUIRE_APPROVAL verdict could be silently narrowed.
 
+**P2-R5R-R1-T01 (matrix + regression):** red-before-repair observed on the
+C01 tree (all C02/C03/C04-law R1 tests failed there; C01-law tests passed).
+C02 closed the bootstrap/digest reds (tests 01/04/05/06/07); C03 closed
+the strict-fingerprint reds (tests 11/12/13, incl. the §9 counterexample);
+C04 closed the constraint-guard red. New R1 files:
+`test_p2r5r_r1_schema_custody.py` (11 tests: fresh/unversioned distinction,
+no-mutation refusal, atomic bootstrap, real digests, strict shapes, row
+preservation) and `test_p2r5r_r1_constraint_guard.py` (2 tests: constrained
+REQUIRE_APPROVAL fails closed with nothing recorded; unconstrained still
+records). Evidence generator extended with `schema_r1` / `constraint_r1`
+blocks; per-block counts observed, no hardcoded booleans.
+
 ## Blockers
 
 P2 FINAL FREEZE held for R1; P3 not authorized.

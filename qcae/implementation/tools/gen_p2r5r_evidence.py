@@ -25,6 +25,8 @@ BLOCKS = [
     ("boundary_r5r", ["qcae/tests/unit/test_p2r5r_c03_provider_boundary.py"]),
     ("backup_r5r", ["qcae/tests/unit/test_p2r5r_c04_backup_disaster.py"]),
     ("typed_r5r", ["qcae/tests/unit/test_p2r5r_c05_typed_outcomes.py"]),
+    ("schema_r1", ["qcae/tests/unit/test_p2r5r_r1_schema_custody.py"]),
+    ("constraint_r1", ["qcae/tests/unit/test_p2r5r_r1_constraint_guard.py"]),
     ("p3_r4_regression", ["qcae/tests/unit", "-k", "p3_"]),
     ("crash_after_lease", [
         "qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::"
