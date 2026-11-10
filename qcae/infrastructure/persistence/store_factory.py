@@ -155,6 +155,12 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
                 f" build (supports up to {CURRENT_SCHEMA_VERSION}); refusing"
                 f" to open (forward-compat guard)"
             )
+        if classification == LegacyDatabaseClass.UNKNOWN_HYBRID:
+            raise QcaeValidationError(
+                f"unknown hybrid / legacy misversioned database at schema "
+                f"{current} cannot be migrated to {CURRENT_SCHEMA_VERSION} "
+                f"(failing closed)"
+            )
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
         if classification == LegacyDatabaseClass.FRESH_EMPTY:
@@ -166,14 +172,7 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
             bootstrap_v5_schema(conn, _fresh_v5_scripts(), _iso_now)
         else:
             # 0 < current <= CURRENT_SCHEMA_VERSION: for known legacy
-            # P2-misversioned databases, migrate via the production chain;
-            # unknown hybrid shapes fail closed (P2-R5R policy).
-            if classification == LegacyDatabaseClass.UNKNOWN_HYBRID:
-                raise QcaeValidationError(
-                    f"unknown hybrid / legacy misversioned database at schema "
-                    f"{current} cannot be migrated to {CURRENT_SCHEMA_VERSION} "
-                    f"(failing closed)"
-                )
+            # P2-misversioned databases, migrate via the production chain.
             if classification == LegacyDatabaseClass.CURRENT_V5:
                 # Already physically v5; nothing to replay.
                 return conn
