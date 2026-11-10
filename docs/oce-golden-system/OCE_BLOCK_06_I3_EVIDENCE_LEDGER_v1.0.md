@@ -18,7 +18,7 @@ Status: **EVIDENCE FROZEN — NOT RATIFIED, NOT MERGED.** Operator review requir
 
 | Gate | Result |
 |---|---|
-| Conformance validator | PASS 134/134 |
+| Conformance validator | PASS 136/136 at this ledger head (134/134 at the implementation head, before the two ledger-presence checks) |
 | Node inventory vs registry | 27 collected, 27 unique, 4 modules |
 | Executed nodes | 27 tests, 0 failures, 0 errors, 0 skipped |
 | Mutation battery | floor 6, 6 mutations, 6 discriminated, 6 restored, pristine green True |
