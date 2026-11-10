@@ -1,0 +1,256 @@
+# OCE — B6-I2 validation: exact-head selection for the templates/local-harness stage.
+#
+# Additive: the frozen Book 5, B6-I0 and B6-I1 workflows are untouched. This workflow selects the
+# 30 B6-I2 nodes, the conformance validator, the six-mutation battery, the stage-scope negative
+# controls, the B6-I0 and B6-I1 validators in later-stage mode, the frozen Book 5 gate and the
+# adjacent suites. Cost: $0. No secret, provider, cloud resource or telemetry is used.
+
+name: B6-I2 Validation
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  block-06-i2-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact head
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Install pinned CI dependencies
+        run: |
+          pip install --require-hashes --only-binary ':all:' \
+            -r infrastructure/control-plane/requirements-ci.lock.txt
+
+      - name: Prepare evidence directory
+        id: run_id
+        run: |
+          OCE_RUN_ID=$(python -c "import secrets; print(secrets.token_hex(6))")
+          echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
+          EVIDENCE_DIR="$RUNNER_TEMP/b6-i2-evidence-$OCE_RUN_ID"
+          mkdir -p "$EVIDENCE_DIR"
+          echo "evidence_dir=$EVIDENCE_DIR" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=b6-i2-evidence-$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Bind head, tree and merge-ref identity
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python - "$EVIDENCE_DIR/identity.json" <<'IDENT'
+          import json, os, subprocess, sys
+          def git(*a):
+              return subprocess.run(["git", *a], capture_output=True, text=True).stdout.strip()
+          ident = {
+              "workflow": os.environ.get("GITHUB_WORKFLOW", ""),
+              "run_id": os.environ.get("GITHUB_RUN_ID", ""),
+              "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", ""),
+              "event_name": os.environ.get("GITHUB_EVENT_NAME", ""),
+              "tested_sha": git("rev-parse", "HEAD"),
+              "tested_tree": git("rev-parse", "HEAD^{tree}"),
+              "merge_ref": git("rev-parse", "HEAD"),
+              "merge_first_parent": git("rev-parse", "HEAD^1"),
+              "merge_second_parent": git("rev-parse", "HEAD^2"),
+              "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
+              "i1_ratification_sha": "96e3b81714321f4eea7abcb300ef471e93be0962",
+              "cost_usd": 0,
+          }
+          open(sys.argv[1], "w", encoding="utf-8").write(
+              json.dumps(ident, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(ident, indent=2, sort_keys=True))
+          IDENT
+
+      - name: Conformance validator
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python infrastructure/control-plane/scripts/block_06_i2_validate.py \
+            --json "$EVIDENCE_DIR/validator.json" | tee "$EVIDENCE_DIR/validator.txt"
+
+      - name: Stage-scope resolver identity
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python - "$EVIDENCE_DIR/stage-scope.json" <<'SCOPE'
+          import json, pathlib, sys
+          sys.path.insert(0, "infrastructure/control-plane/scripts")
+          import block_06_stage_scope as stage_scope
+          doc = stage_scope.resolve(pathlib.Path("."), "auto")
+          out = {"mode": doc["mode"], "stage": doc["stage"],
+                 "allowed": len(doc["allowed"]), "identity": doc["identity"]}
+          open(sys.argv[1], "w", encoding="utf-8").write(
+              json.dumps(out, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(out, indent=2, sort_keys=True))
+          raise SystemExit(0 if doc["mode"] == "i2" else 1)
+          SCOPE
+
+      - name: Node inventory equals collection
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python - "$EVIDENCE_DIR/inventory.json" <<'INV'
+          import json, pathlib, subprocess, sys
+          registry = json.loads(pathlib.Path(
+              "docs/oce-golden-system/OCE_BLOCK_06_I2_REQUIREMENT_TEST_REGISTRY_v1.0.json"
+          ).read_text(encoding="utf-8"))
+          modules = sorted(pathlib.Path("infrastructure/control-plane/tests").glob(
+              "test_block_06_i2_*.py"))
+          out = subprocess.run([sys.executable, "-m", "pytest", *map(str, modules),
+                                "--collect-only", "-q", "-p", "no:cacheprovider",
+                                "-o", "addopts="],
+                               capture_output=True, text=True).stdout
+          nodes = [l.strip() for l in out.splitlines()
+                   if l.startswith("infrastructure/") and "::" in l]
+          doc = {"declared": len(registry["inventory"]["nodes"]),
+                 "collected": len(nodes), "unique": len(set(nodes)),
+                 "modules": len(modules),
+                 "expected_modules": len(registry["inventory"]["modules"])}
+          doc["ok"] = (doc["collected"] == doc["declared"] == doc["unique"]
+                       and doc["modules"] == doc["expected_modules"] == 6)
+          open(sys.argv[1], "w", encoding="utf-8").write(
+              json.dumps(doc, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(doc, indent=2, sort_keys=True))
+          raise SystemExit(0 if doc["ok"] else 1)
+          INV
+
+      - name: Execute the 30 B6-I2 nodes
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python -m pytest infrastructure/control-plane/tests/test_block_06_i2_*.py \
+            -v --tb=short -o addopts= \
+            --junitxml="$EVIDENCE_DIR/b6-i2-junit.xml" \
+            > "$EVIDENCE_DIR/b6-i2-pytest-output.txt" 2>&1; rc=$?
+          tail -30 "$EVIDENCE_DIR/b6-i2-pytest-output.txt"
+          python - "$EVIDENCE_DIR/b6-i2-junit.xml" "$rc" "$EVIDENCE_DIR/b6-i2-totals.json" <<'TOT'
+          import json, sys, xml.etree.ElementTree as ET
+          root = ET.parse(sys.argv[1]).getroot()
+          suite = root if root.tag == "testsuite" else root.find("testsuite")
+          totals = {k: int(suite.get(k) or 0) for k in ("tests", "failures", "errors", "skipped")}
+          totals["rc"] = int(sys.argv[2])
+          totals["expected"] = 30
+          totals["zero_problems"] = (totals["tests"] == 30 and totals["rc"] == 0
+                                     and totals["failures"] == 0 and totals["errors"] == 0
+                                     and totals["skipped"] == 0)
+          open(sys.argv[3], "w", encoding="utf-8").write(
+              json.dumps(totals, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(totals, indent=2, sort_keys=True))
+          raise SystemExit(0 if totals["zero_problems"] else 1)
+          TOT
+
+      - name: Mutation battery
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python infrastructure/control-plane/scripts/block_06_i2_mutation_battery.py \
+            --json "$EVIDENCE_DIR/mutations.json"
+
+      - name: Stage-scope negative controls
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python infrastructure/control-plane/scripts/block_06_i2_stage_controls.py \
+            --json "$EVIDENCE_DIR/stage-controls.json"
+
+      - name: B6-I0 validator in later-stage mode
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python infrastructure/control-plane/scripts/block_06_i0_validate.py \
+            --stage-scope auto --json "$EVIDENCE_DIR/i0-validator.json"
+
+      - name: B6-I1 validator in later-stage mode
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python infrastructure/control-plane/scripts/block_06_i1_validate.py \
+            --stage-scope auto --json "$EVIDENCE_DIR/i1-validator.json"
+
+      - name: Frozen Book 5 gate (41 nodes)
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python infrastructure/control-plane/scripts/block_06_i0_gate.py \
+            --json "$EVIDENCE_DIR/book5-gate.json" | tee "$EVIDENCE_DIR/book5-gate.txt"
+
+      - name: Adjacent frozen Book 5 suites
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python -m pytest \
+            infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py \
+            infrastructure/control-plane/tests/test_b5_i7_governed_change.py \
+            infrastructure/control-plane/tests/test_b5_i8_evidence_laws.py \
+            infrastructure/control-plane/tests/test_b5_i8_independent_audit.py \
+            infrastructure/control-plane/tests/test_b5_i8_adversarial.py \
+            -q --no-header -o addopts= \
+            --junitxml="$EVIDENCE_DIR/b5-adjacent-junit.xml" \
+            | tee "$EVIDENCE_DIR/b5-adjacent-output.txt"
+          python - "$EVIDENCE_DIR/b5-adjacent-junit.xml" "$EVIDENCE_DIR/b5-adjacent-totals.json" <<'ADJ'
+          import json, sys, xml.etree.ElementTree as ET
+          root = ET.parse(sys.argv[1]).getroot()
+          suite = root if root.tag == "testsuite" else root.find("testsuite")
+          totals = {k: int(suite.get(k) or 0) for k in ("tests", "failures", "errors", "skipped")}
+          open(sys.argv[2], "w", encoding="utf-8").write(
+              json.dumps(totals, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(totals, indent=2, sort_keys=True))
+          raise SystemExit(0 if not (totals["failures"] or totals["errors"]) else 1)
+          ADJ
+
+      - name: Cleanup proof
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python - "$EVIDENCE_DIR/cleanup.json" <<'CLEAN'
+          import json, pathlib, subprocess, sys
+          status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"],
+                                  capture_output=True, text=True).stdout.strip()
+          residue = [str(p) for p in pathlib.Path(".").rglob(".b6i2-*")]
+          doc = {"tracked_tree_clean": status == "", "status_porcelain": status,
+                 "scratch_residue": residue, "cleanup_ok": status == "" and not residue}
+          open(sys.argv[1], "w", encoding="utf-8").write(
+              json.dumps(doc, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(doc, indent=2, sort_keys=True))
+          raise SystemExit(0 if doc["cleanup_ok"] else 1)
+          CLEAN
+
+      - name: Summarize evidence
+        if: always()
+        env:
+          EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
+        run: |
+          python - "$EVIDENCE_DIR" <<'SUM'
+          import json, pathlib, sys
+          ev = pathlib.Path(sys.argv[1])
+          summary = {}
+          for name in ("identity", "validator", "stage-scope", "inventory", "b6-i2-totals",
+                       "mutations", "stage-controls", "i0-validator", "i1-validator",
+                       "book5-gate", "b5-adjacent-totals", "cleanup"):
+              path = ev / (name + ".json")
+              if path.exists():
+                  summary[name] = json.loads(path.read_text(encoding="utf-8"))
+          (ev / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True),
+                                           encoding="utf-8")
+          print(json.dumps(summary.get("b6-i2-totals", {}), sort_keys=True))
+          SUM
+
+      - name: Upload evidence artifact
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
+        with:
+          name: ${{ steps.run_id.outputs.artifact_name }}
+          path: ${{ steps.run_id.outputs.evidence_dir }}
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,117 @@
+{
+  "adjacent_floors": {
+    "b5_i9_nodes": 41,
+    "b6_i0_nodes": 72,
+    "b6_i1_nodes": 42,
+    "common_regression_nodes": 208
+  },
+  "api_symbols": [
+    "template:oce-app-skeleton",
+    "oce.harness.local.up"
+  ],
+  "authority_sources": [
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I2",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_PLAN_v1.0.md#B6-I2",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S3",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C1.S4",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-03",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-04"
+  ],
+  "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
+  "base_tree": "c6638bde3e9c8f71482f4d96fde42d0484d9a624",
+  "capital_authority": "none",
+  "common_regression_floor": 208,
+  "compatibility_rows": [
+    "C1.S3",
+    "C1.S4"
+  ],
+  "cost_usd": 0,
+  "document_id": "OCE-B6-I2-SCOPE-001",
+  "exit_gate": "fresh generated app starts locally",
+  "failure_classes": [
+    "F13",
+    "F14",
+    "F15",
+    "F16",
+    "F19",
+    "F21"
+  ],
+  "implementation_surfaces": [
+    "templates",
+    "harness"
+  ],
+  "locks": {
+    "B6-I3": "LOCKED",
+    "B6-I4": "LOCKED",
+    "B6-I5": "LOCKED",
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "minimum_nodes": 30,
+  "mutation_floor": {
+    "source": 3,
+    "stage": 6
+  },
+  "non_goals": [
+    "cloud dependency"
+  ],
+  "outputs": [
+    "template",
+    "harness"
+  ],
+  "provenance_obligations": [
+    "template manifest binds sha256 and byte size of every emitted file",
+    "generated app declares inherited API, schema and harness versions",
+    "harness endpoint set is deterministic and carries an environment fingerprint",
+    "evidence capture is canonical JSON with no timestamp, host or user identity",
+    "archive install verifies digest before any entry is written",
+    "prior stage artifacts remain byte-identical and are never re-hashed as new"
+  ],
+  "purpose": "C1 templates and local harness",
+  "requirements": [
+    "B6-P0-SEC-03",
+    "B6-P0-SEC-04"
+  ],
+  "schema": "oce.block_06_i2.scope.v1",
+  "sections": [
+    "C1.S3",
+    "C1.S4"
+  ],
+  "stage": "B6-I2",
+  "stop_conditions": [
+    "stop if cloud is required"
+  ],
+  "test_categories": [
+    "contract",
+    "generated app start",
+    "archive safety",
+    "harness",
+    "determinism and compatibility",
+    "evidence and cleanup"
+  ],
+  "threats": [
+    "T01",
+    "T02",
+    "T03",
+    "T06",
+    "T10",
+    "T11",
+    "T12",
+    "T13",
+    "T15",
+    "T16",
+    "T17",
+    "T18",
+    "T19"
+  ]
+}

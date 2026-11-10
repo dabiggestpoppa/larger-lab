@@ -1,0 +1,59 @@
+{
+  "append_only": true,
+  "applies_to": [
+    "B6-I0 mutation accounting",
+    "B6-I0-STAGE-SCOPE-AMENDMENT-001 revision 2"
+  ],
+  "authoritative_mutation_population": {
+    "discriminated_linux": 12,
+    "floor": 12,
+    "governed_json_mutations": 12,
+    "i1_battery_is_separate": {
+      "discriminated": 6,
+      "floor": 6,
+      "restored": 6,
+      "rows": 6
+    },
+    "posix_symlink_probe": 1,
+    "pristine_rerun_counts_as_mutation": false,
+    "restored": 13,
+    "rows_total": 13
+  },
+  "document_id": "OCE-B6-I1-ACCOUNTING-CORRECTION-001",
+  "findings": [
+    {
+      "classification": "BOOKKEEPING_WORDING",
+      "correction": "state the population as 13 rows with floor 12, and state that M13 did not produce its named check in Linux CI because the validator raised on the symlinked scope artifact before reporting boundary/no_symlinked_artifacts; the battery passed because the floor is 12 and every row restored.",
+      "finding": "the mutation population is 13 rows: twelve governed JSON mutations M01..M12 plus one POSIX-only symlink probe M13. 'restored' sums rows whose bytes returned to their pre-mutation digest; it is not a count of restoration events and not a pristine rerun.",
+      "id": "C-01",
+      "question": "what '13 restored' counts",
+      "records": [
+        "B6-I0 mutation battery payload",
+        "B6-I0 evidence 42648199671"
+      ],
+      "severity": "record clarity only; no floor was lowered and no mutation was added"
+    },
+    {
+      "classification": "AUTHORITATIVE_RECORD_DEFECT",
+      "correction": "read revision 1 as a rename and revision 2 as an addition of one admitted path; the pinned set is exactly the nine committed paths, and no validation law, floor or lock changed in either revision.",
+      "finding": "revision 2 added infrastructure/control-plane/tests/test_block_06_i0_book5_regression.py to authorized_paths, which is the same list the resolver pins as AMENDMENT_PATHS and admits as authority; revision 1 also renamed an entry. The 'surface list' is therefore the authority allowlist, not a separate test inventory, and the revision note claiming no allowlist entry changed is inaccurate.",
+      "id": "C-02",
+      "question": "did the amendment allowlist change across revisions",
+      "records": [
+        "OCE_BLOCK_06_I0_STAGE_SCOPE_AMENDMENT_001_v1.0.json"
+      ],
+      "severity": "no authority was exercised beyond the pinned set; the record is corrected"
+    }
+  ],
+  "locks": {
+    "B6-I3_through_I9": "LOCKED",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "rewrites_history": false,
+  "schema": "oce.block_06.correction.v1",
+  "stage": "B6-I2",
+  "status": "SUPERSEDING_CORRECTION"
+}

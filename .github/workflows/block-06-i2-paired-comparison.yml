@@ -1,0 +1,210 @@
+# OCE — B6-I2 exact base/head paired comparison.
+#
+# Ordinary merge-ref CI runs one tree. This workflow runs both endpoints under one toolchain in
+# separate clones: base = the exact pre-stage main SHA (the B6-I1 merge), head = the exact B6-I2
+# implementation head this contract pins. It fails closed on any endpoint, population, regression,
+# skip, head-only or cleanup deviation.
+#
+# Cost: $0. No secret, provider, cloud resource or telemetry is used.
+
+name: B6-I2 Paired Comparison
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BASE_SHA: 4496d548078660efd7ad4f93e7fff461d34ea538
+  BASE_TREE: c6638bde3e9c8f71482f4d96fde42d0484d9a624
+  HEAD_SHA: 18e7d6be134c9fab62685ff5254185a5c109d26d
+  HEAD_TREE: eccdd93cf070143af71592c8739c0d1f7f35d7ec
+  CONTRACT_PATH: docs/oce-golden-system/OCE_BLOCK_06_I2_PAIRED_COMPARISON_CONTRACT_v1.0.json
+  GIT_LFS_SKIP_SMUDGE: "1"
+
+jobs:
+  paired:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout stage branch
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11  # v4.1.1
+        with:
+          fetch-depth: 0
+          lfs: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: '3.12'
+
+      - name: Prepare artifacts and verify the frozen contract
+        run: |
+          set -euo pipefail
+          ART="$RUNNER_TEMP/b6i2-paired-art"
+          mkdir -p "$ART"
+          echo "ART=$ART" >> "$GITHUB_ENV"
+          python3 - "$CONTRACT_PATH" "$BASE_SHA" "$BASE_TREE" "$HEAD_SHA" "$HEAD_TREE" <<'PY'
+          import json, sys
+          contract = json.load(open(sys.argv[1], encoding="utf-8"))
+          base_sha, base_tree, head_sha, head_tree = sys.argv[2:6]
+          assert contract["stage"] == "B6-I2", contract["stage"]
+          assert contract["status"] == "FROZEN", contract["status"]
+          assert contract["endpoints"]["base_sha"] == base_sha
+          assert contract["endpoints"]["base_tree"] == base_tree
+          assert contract["endpoints"]["head_sha"] == head_sha
+          assert contract["endpoints"]["head_tree"] == head_tree
+          assert contract["population"]["common_floor"] > 0
+          assert contract["population"]["head_only_expected"] == 30
+          assert contract["population"]["base_only_expected"] == 0
+          print("contract-ok floor", contract["population"]["common_floor"])
+          PY
+
+      - name: Install the pinned toolchain once
+        run: |
+          set -euo pipefail
+          python3 -m pip install --upgrade pip
+          pip install --require-hashes --only-binary ':all:' \
+            -r infrastructure/control-plane/requirements-ci.lock.txt
+          python3 --version | tee "$ART/python-version.txt"
+          pip freeze --all | LC_ALL=C sort | tee "$ART/pip-freeze.txt" | sha256sum \
+            | awk '{print $1}' > "$ART/pip-freeze-sha.txt"
+
+      - name: BASE endpoint — isolated clone
+        run: |
+          set -euo pipefail
+          W="$RUNNER_TEMP/b6i2-base"
+          rm -rf "$W"
+          git clone --quiet --no-hardlinks "file://$(pwd)" "$W"
+          cd "$W"
+          git checkout --quiet --detach "$BASE_SHA"
+          test "$(git rev-parse HEAD)" = "$BASE_SHA" || { echo "FATAL base sha"; exit 61; }
+          test "$(git rev-parse 'HEAD^{tree}')" = "$BASE_TREE" || { echo "FATAL base tree"; exit 62; }
+          test -z "$(git status --porcelain)" || { echo "FATAL base dirty"; exit 63; }
+          git update-ref refs/remotes/origin/main "$BASE_SHA"
+          shopt -s nullglob
+          B6=(infrastructure/control-plane/tests/test_block_06_i2_*.py)
+          if [ "${#B6[@]}" -ne 0 ]; then echo "FATAL: stage files at base: ${B6[*]}"; exit 64; fi
+          F=(infrastructure/control-plane/tests/test_b5_i[2-9]*.py)
+          printf '%s\n' "${F[@]}" > "$ART/base-files.txt"
+          rc=0
+          python3 -m pytest "${F[@]}" -q --tb=short -o addopts= \
+            --junitxml="$ART/junit-base.xml" > "$ART/pytest-base.txt" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-run-base.txt"
+          python3 - "$ART/meta-base.json" "$BASE_SHA" "$BASE_TREE" "$ART" <<'PY'
+          import hashlib, json, pathlib, sys
+          out, sha, tree, art = sys.argv[1], sys.argv[2], sys.argv[3], pathlib.Path(sys.argv[4])
+          files = art.joinpath("base-files.txt").read_text(encoding="utf-8").split()
+          meta = {"role": "base", "sha": sha, "tree": tree, "identity_verified": True,
+                  "runner_image": "ubuntu-24.04",
+                  "os_release_sha256": hashlib.sha256(
+                      pathlib.Path("/etc/os-release").read_bytes()).hexdigest(),
+                  "dependency_lock_sha256": hashlib.sha256(pathlib.Path(
+                      "infrastructure/control-plane/requirements-ci.lock.txt").read_bytes()
+                  ).hexdigest(),
+                  "pip_freeze_sha256": art.joinpath("pip-freeze-sha.txt").read_text().strip(),
+                  "files": files, "file_count": len(files), "worktree_clean": True}
+          pathlib.Path(out).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n",
+                                       encoding="utf-8")
+          PY
+          cd "$RUNNER_TEMP"
+          rm -rf "$W"
+          test "$(cat "$ART/exit-run-base.txt")" = "0"
+
+      - name: HEAD endpoint — common population and head-only nodes
+        run: |
+          set -euo pipefail
+          W="$RUNNER_TEMP/b6i2-head"
+          rm -rf "$W"
+          git clone --quiet --no-hardlinks "file://$(pwd)" "$W"
+          cd "$W"
+          git checkout --quiet --detach "$HEAD_SHA"
+          test "$(git rev-parse HEAD)" = "$HEAD_SHA" || { echo "FATAL head sha"; exit 71; }
+          test "$(git rev-parse 'HEAD^{tree}')" = "$HEAD_TREE" || { echo "FATAL head tree"; exit 72; }
+          test -z "$(git status --porcelain)" || { echo "FATAL head dirty"; exit 73; }
+          git update-ref refs/remotes/origin/main "$BASE_SHA"
+          shopt -s nullglob
+          B6=(infrastructure/control-plane/tests/test_block_06_i2_*.py)
+          if [ "${#B6[@]}" -ne 6 ]; then echo "FATAL: expected six stage modules: ${B6[*]}"; exit 74; fi
+          F=(infrastructure/control-plane/tests/test_b5_i[2-9]*.py)
+          printf '%s\n' "${F[@]}" > "$ART/head-common-files.txt"
+          rc=0
+          python3 -m pytest "${F[@]}" -q --tb=short -o addopts= \
+            --junitxml="$ART/junit-head-common.xml" > "$ART/pytest-head-common.txt" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-run-head-common.txt"
+          printf '%s\n' "${B6[@]}" > "$ART/head-only-files.txt"
+          rc2=0
+          python3 -m pytest "${B6[@]}" -q --tb=short -o addopts= \
+            --junitxml="$ART/junit-head-only.xml" > "$ART/pytest-head-only.txt" 2>&1 || rc2=$?
+          echo "$rc2" > "$ART/exit-run-head-only.txt"
+          python3 - "$ART/meta-head.json" "$HEAD_SHA" "$HEAD_TREE" "$ART" <<'PY'
+          import hashlib, json, pathlib, sys
+          out, sha, tree, art = sys.argv[1], sys.argv[2], sys.argv[3], pathlib.Path(sys.argv[4])
+          files = art.joinpath("head-common-files.txt").read_text(encoding="utf-8").split()
+          meta = {"role": "head", "sha": sha, "tree": tree, "identity_verified": True,
+                  "runner_image": "ubuntu-24.04",
+                  "os_release_sha256": hashlib.sha256(
+                      pathlib.Path("/etc/os-release").read_bytes()).hexdigest(),
+                  "dependency_lock_sha256": hashlib.sha256(pathlib.Path(
+                      "infrastructure/control-plane/requirements-ci.lock.txt").read_bytes()
+                  ).hexdigest(),
+                  "pip_freeze_sha256": art.joinpath("pip-freeze-sha.txt").read_text().strip(),
+                  "files": files, "file_count": len(files), "worktree_clean": True}
+          pathlib.Path(out).write_text(json.dumps(meta, indent=2, sort_keys=True) + "\n",
+                                       encoding="utf-8")
+          PY
+          cd "$RUNNER_TEMP"
+          rm -rf "$W"
+          test "$(cat "$ART/exit-run-head-common.txt")" = "0"
+          test "$(cat "$ART/exit-run-head-only.txt")" = "0"
+
+      - name: Cleanup proof (before the verdict)
+        if: always()
+        run: |
+          set -uo pipefail
+          rc=0
+          removed=()
+          for W in "$RUNNER_TEMP/b6i2-base" "$RUNNER_TEMP/b6i2-head"; do
+            if [ -e "$W" ]; then rm -rf "$W" && removed+=("$W") || rc=1; fi
+          done
+          residuals=()
+          for W in "$RUNNER_TEMP/b6i2-base" "$RUNNER_TEMP/b6i2-head"; do
+            [ -e "$W" ] && residuals+=("$W")
+          done
+          CLEANUP_RC="$rc" REMOVED="$(IFS=';'; echo "${removed[*]}")" \
+          RESIDUAL="$(IFS=';'; echo "${residuals[*]}")" \
+          python3 - "$ART/cleanup.json" <<'PY'
+          import json, os, sys
+          doc = {"cleanup_exit_code": int(os.environ.get("CLEANUP_RC", "1")),
+                 "paths_removed": [p for p in os.environ.get("REMOVED", "").split(";") if p],
+                 "residual_paths": [p for p in os.environ.get("RESIDUAL", "").split(";") if p]}
+          doc["cleanup_ok"] = doc["cleanup_exit_code"] == 0 and not doc["residual_paths"]
+          open(sys.argv[1], "w", encoding="utf-8").write(
+              json.dumps(doc, indent=2, sort_keys=True) + "\n")
+          print(json.dumps(doc, indent=2, sort_keys=True))
+          PY
+          exit 0
+
+      - name: Compare paired results (fail-closed)
+        if: always()
+        run: |
+          set -uo pipefail
+          rc=0
+          python3 infrastructure/control-plane/scripts/block_06_i2_paired.py \
+            --artifacts "$ART" --contract "$CONTRACT_PATH" --json "$ART/pairing.json" \
+            > "$ART/compare.log" 2>&1 || rc=$?
+          echo "$rc" > "$ART/exit-compare.txt"
+          cat "$ART/compare.log"
+          exit "$rc"
+
+      - name: Upload paired-comparison evidence
+        if: always()
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808  # v4.3.3
+        with:
+          name: b6-i2-paired-${{ github.run_id }}
+          path: ${{ env.ART }}/
+          if-no-files-found: warn
