@@ -24,8 +24,8 @@ Status: **EVIDENCE FROZEN — NOT RATIFIED, NOT MERGED.** Operator review requir
 | Mutation battery | floor 6, 6 mutations, 6 discriminated, 6 restored, pristine green True |
 | Stage-scope controls | 14/14 PASS |
 | B6-I0 validator at later stage | PASS 136/136 |
-| B6-I1 validator at later stage | PASS None/None |
-| Frozen Book 5 gate | None / |
+| B6-I1 validator at later stage | PASS 168/168 |
+| Frozen Book 5 gate | PASS 41/41 nodes (ok=true) |
 | Adjacent Book 5 suites | 53 tests, 0 failures, 0 errors |
 | Cleanup | tree clean True, residue [] |
 
@@ -43,7 +43,7 @@ Status: **EVIDENCE FROZEN — NOT RATIFIED, NOT MERGED.** Operator review requir
 |---|---|
 | B6-I2 Validation (replay `9bf76df4`, main `4496d548`) | PASS 172 checks |
 | B6-I0 Validation at later stage | PASS 136 |
-| B6-I1 Validation at later stage | PASS None |
+| B6-I1 Validation at later stage | PASS 168 |
 
 ## Auditor parse
 
