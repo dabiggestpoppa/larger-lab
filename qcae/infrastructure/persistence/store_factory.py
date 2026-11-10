@@ -177,23 +177,54 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
                 # Already physically v5; nothing to replay.
                 return conn
             if classification == LegacyDatabaseClass.KNOWN_P2_MISVERSIONED:
-                # Historical bug: physical P2 tables with stamp 1. The
-                # v2->v3 migration rebuilds evidence_artifact, which a
-                # P2-physical DB may not have in v1 shape; normalize the
-                # stamp onto the production chain first: a v5-physical
-                # mis-stamp normalizes to v4 (v4->v5 is idempotent), else
-                # to v2 (v2->v3->v4->v5), preserving all rows.
+                # Historical bug: physical P2 tables with stamp 1. Normalize
+                # the stamp onto the production chain with durable
+                # reconciliation provenance: a v5-physical mis-stamp
+                # normalizes to v4 (v4->v5 is idempotent), else to v2
+                # (v2->v3->v4->v5), preserving all rows.
                 from qcae.infrastructure.persistence.migrations import (
+                    _schema_fingerprint,
                     _table_names as _legacy_tables,
                 )
                 _names = _legacy_tables(conn)
+                observed_user_version = current  # == 1
                 if "runtime_execution" in _names and \
                         "governance_approval_use" in _names:
-                    conn.execute("PRAGMA user_version = 4")
-                    conn.commit()
+                    normalized_user_version = 4
                 else:
-                    conn.execute("PRAGMA user_version = 2")
+                    normalized_user_version = 2
+                # Ensure the migration ledger exists for the reconciliation
+                # record (a v1-stamped legacy DB predates the ledger table).
+                conn.execute(MIGRATION_LEDGER_DDL)
+                # Durable reconciliation provenance + user_version change:
+                # atomic (rollback on failure); MigrationRunner continues
+                # from the normalized version (Finding B).
+                pre_digest = _schema_fingerprint(conn)
+                conn.execute("BEGIN IMMEDIATE")
+                try:
+                    conn.execute(
+                        "INSERT INTO schema_migration_ledger"
+                        " (from_version, to_version, migration_id,"
+                        " applied_at, pre_digest, post_digest)"
+                        " VALUES (?, ?, ?, ?, ?, ?)",
+                        (
+                            observed_user_version,
+                            normalized_user_version,
+                            f"P2-R5R-RECONCILE-STAMP-v"
+                            f"{observed_user_version}->v"
+                            f"{normalized_user_version}",
+                            _iso_now(),
+                            pre_digest,
+                            pre_digest,
+                        ),
+                    )
+                    conn.execute(
+                        f"PRAGMA user_version = {normalized_user_version}"
+                    )
                     conn.commit()
+                except BaseException:
+                    conn.rollback()
+                    raise
                 current = conn.execute("PRAGMA user_version").fetchone()[0]
             runner = MigrationRunner(conn, clock=_iso_now)
             try:
