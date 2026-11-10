@@ -96,11 +96,6 @@ def test_boundary_only_allowed_paths_changed() -> None:
     amendment = json.loads((DOCS / "OCE_BLOCK_06_I0_STAGE_SCOPE_AMENDMENT_001_v1.0.json")
                           .read_text(encoding="utf-8"))
     allowed = tuple(scope["allowed_paths"]) + tuple(amendment["authorized_paths"])
-    registration = DOCS / "OCE_BLOCK_06_I2_STAGE_SCOPE_REGISTRATION_v1.0.json"
-    if registration.exists():
-        # A later stage may only change paths its own frozen registration declares.
-        allowed += tuple(json.loads(registration.read_text(encoding="utf-8"))
-                         ["this_stage"]["allowed_prefixes"])
     base = scope["base_sha"]
     changed = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", f"{base}..HEAD"],
                              capture_output=True, text=True, check=True).stdout.split()
