@@ -9122,3 +9122,18 @@ self-ratification; independent review required before merge.
 - Audit records: P2dR2 independent audit plus provenance addendum, P2eR1 independent audit plus corrective addendum and canonical evidence, P2eR2 repair evidence, corrected canonical evidence and independent audit are all present, including their negative findings.
 - Authority: the trust verdict remains advisory (`INTEGRATION_REQUIRED`); no trust consumer is integrated, no provider is certified, no trust dimension is claimed as verified, and no program gate moves.
 - Boundaries: no production merge, no I11/I12/I17 or Bloc 6 advancement, no program-gate promotion, no self-ratification. The candidate is submitted for independent audit only.
+
+## 204 - SENSOR-B5-I09P2-INTEGRATION-R1-AUDIT: INDEPENDENT ACCEPTANCE OF THE INTEGRATED CANDIDATE
+
+- Checkpoint ID: `SENSOR-B5-I09P2-INTEGRATION-R1-AUDIT`. Ordering is by checkpoint ID; section numbers are not authority.
+- Independent audit HEAD: `3e53a65897283b32d42dfe6d879e7acf389fd873`, branch `agent/crypto-sensor-fabric-integration-r1-audit`, descended from the isolated integration candidate. Production `f199a7e3` is untouched.
+- Reproduction, not ratification: every finding was re-derived from the committed tree; no prior agent summary was accepted as evidence.
+- Integration diff: 22 changed paths from `f199a7e3`; the only code changes are the P2e-authorized `authority/__init__.py` (+73), `sensors/verification.py` (+41/-26), the new P2e parity test, and a disclosed additive named-prefix entry in `test_b5_i10_scope_audit.py`. No test assertion was weakened; the Bloc 4 governance binding audit changes only `python_files_scanned` 1095 to 1096.
+- Ledger: sections 197-203 are each present exactly once. Section 198 is content-identical to production after normalizing the single inter-section separator newline; the raw difference is one trailing blank line only.
+- Evidence integrity: I09 semantic artifact `--check` exits 0 with `artifact_sha256` 0ae3d4e31bd2de2fff56abb7d240973fd531f8d36170e5164babf1c5e93a3464, 35 rows, 35 pass, 3 unresolved.
+- Canonical evidence: the integration run pins M2 `ac67ba562` with 4,640 collected/unique, zero failures, zero errors and 11 environment-gated skips, verdict COMPLETE; the M2-to-HEAD delta is additive evidence and documentation only.
+- Independent regression: 137 governance and PIT-entry-parity tests pass (I05, I06 replay safety, I08, I09, I10, I11 scope audits, P2e parity) with EXIT=0; Python inventory independently recounted at 1096.
+- Governance: provider approval manifest empty, no consumer application, no program gate promoted, no I11/I12/I17 or Bloc 6 advancement, no production merge, no self-ratification.
+- Acceptance matrix: 26 measured gates all PASS. Deferred and bounded: full canonical universe re-run at HEAD (verdict carried from the pinned M2 run on an additive-only delta), consumer trust enforcement (`INTEGRATION_REQUIRED`, specification only), provider certification, and program-gate advancement.
+- Disposition: `INTEGRATION_R1_ACCEPTABLE_WITH_EXPLICIT_DEFERRED_BOUNDARIES` - bounded acceptance of the integrated tree, not deployment authorization.
+- Audit document: `evidence/bloc_05/BLOC_05_I09P2_INTEGRATION_R1_INDEPENDENT_AUDIT.md`.
