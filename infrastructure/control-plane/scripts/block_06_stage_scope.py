@@ -161,7 +161,7 @@ def _resolve_i2(root: pathlib.Path, base: str) -> dict:
     i1_owned = tuple(i1_scope.get("allowed_paths") or ())
     # The stage chain is cumulative: the B6-I2 identity admits the B6-I1 surface set unchanged and
     # adds only the B6-I2 paths proven by its contract.
-    allowed = tuple(dict.fromkeys(i1_owned + prefixes + I2_PINNED))
+    allowed = tuple(dict.fromkeys(i1_owned + AMENDMENT_PATHS + prefixes + I2_PINNED))
     i2_owned = tuple(p for p in allowed if p.startswith("oce/"))
     # The I0 validator's later-stage mode treats this as the complete oce authority of the stage
     # chain, so the B6-I1 surfaces stay admitted and only the I2 surfaces are added.
