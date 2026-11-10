@@ -137,6 +137,20 @@ class ApprovalRegistrySink:
         )
 
     def record_authority_request(self, verdict: StepAuthorityVerdict) -> str:
+        # P2-R5R-R1: the durable ApprovalRequest schema cannot preserve
+        # per-request constraints, so a REQUIRE_APPROVAL verdict carrying
+        # non-empty constraints MUST fail closed here rather than be
+        # silently narrowed into an unconstrained request. The policy gate
+        # currently emits REQUIRE_APPROVAL with constraints == (); this
+        # guard pins that invariant against any future gate change.
+        if verdict.decision is StepAuthorityDecision.REQUIRE_APPROVAL and tuple(
+            verdict.constraints or ()
+        ):
+            raise QcaeValidationError(
+                "REQUIRE_APPROVAL verdict carries constraints the durable"
+                " ApprovalRequest cannot preserve; refusing to silently"
+                " narrow the binding (failing closed)"
+            )
         # P2-R4-C03 (directive §8): request identity is RESTART-SAFE — an
         # in-memory counter resets on restart and can collide with durable
         # rows. The id is a digest over the request's exact semantics plus a
