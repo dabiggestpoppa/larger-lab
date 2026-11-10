@@ -1,5 +1,5 @@
 {
-  "phase": "P2-R5R-R1 — Final Schema/Custody Closure (bootstrap atomicity, strict legacy fingerprint, clean custody seal)",
+  "phase": "P2-R5R-R2 — Final Custody Seal (zero-mutation refusal ordering, durable atomic legacy reconciliation provenance, clean custody seal)",
   "supersedes": {
     "phase": "P2-R5R (reconciled freeze)",
     "reconciled_freeze_commit": "dca2e34f901c921d200cf693cef6fd61a197343a",
@@ -19,8 +19,8 @@
     "qcae_only": "git diff 8212b59d..FINAL_HEAD shows qcae/ and nothing else",
     "history_claim": "semantic QCAE reconciliation, NOT identical Git history"
   },
-  "head_commit": "9cbec7d4c12f2fa7a2e0588fd33174240783616a (R1-T01; the FREEZE commit adds evidence + manifest only, no production code change after the tested commit)",
-  "tested_commit": "9cbec7d4c12f2fa7a2e0588fd33174240783616a",
+  "head_commit": "edfb6d91c8289a6816e1c4ecc1f3518c3ed33133 (R2-FREEZE; evidence + manifest only, no production code change after the tested commit)",
+  "tested_commit": "edfb6d91c8289a6816e1c4ecc1f3518c3ed33133",
   "active_amendments": ["A-001 v1.0"],
   "phase_commits": {
     "p2_r5r_r1_r0_qcae_tree_seed": ["82772000b"],
@@ -29,7 +29,10 @@
     "p2_r5r_r1_c02_atomic_bootstrap_digests": ["ff9719f1b"],
     "p2_r5r_r1_c03_strict_fingerprint": ["d935d07d2"],
     "p2_r5r_r1_c04_constraint_guard": ["44f3c67d2"],
-    "p2_r5r_r1_t01_matrix_regression": ["9cbec7d4c"]
+    "p2_r5r_r1_t01_matrix_regression": ["9cbec7d4c"],
+    "p2_r5r_r2_c01_refusal_ordering": ["b6c880f3a"],
+    "p2_r5r_r2_c02_reconciliation_provenance": ["0ca72c41c"],
+    "p2_r5r_r2_t01_regression_evidence": ["edfb6d91c"]
   },
   "schema_classification": {
     "mutation_before_classification": "none — classification reads PRAGMA user_version + physical schema with SELECTs only; the first write on any authorized path is the WAL pragma or the bootstrap/migration itself",
@@ -116,7 +119,7 @@
       "p3_r4_regression": {"passed": 238, "exit_code": 0},
       "crash_after_lease": {"passed": 1, "exit_code": 0},
       "topology": {"passed": 78, "exit_code": 0},
-      "full_qcae": {"passed": 1453, "failed": 0, "exit_code": 0}
+      "full_qcae": {"passed": 1459, "failed": 0, "exit_code": 0}
     }
   },
   "exit_gate": {
@@ -140,7 +143,9 @@
     "typed_outcomes_green": true,
     "p3_r4_regression_green": true,
     "full_qcae_suite_green": true,
-    "final_branch_exists_remotely": "to be verified after push",
+    "review_branch_remote_verified": true,
+    "verified_ref": "agent/qcae-p2-r5r-final",
+    "verified_tested_commit": "edfb6d91c8289a6816e1c4ecc1f3518c3ed33133",
     "blockers": []
   },
   "blockers": [],
