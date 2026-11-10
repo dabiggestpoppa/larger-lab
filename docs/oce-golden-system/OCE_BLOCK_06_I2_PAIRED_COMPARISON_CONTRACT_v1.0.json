@@ -3,8 +3,8 @@
   "endpoints": {
     "base_sha": "4496d548078660efd7ad4f93e7fff461d34ea538",
     "base_tree": "c6638bde3e9c8f71482f4d96fde42d0484d9a624",
-    "head_sha": "696472da03834b23e20d19e99cce517fcffe8c32",
-    "head_tree": "98fb45d68989c63f387a98881f6f5251c25849c1"
+    "head_sha": "0060230f9bc632015855893eda10ba4062e767dd",
+    "head_tree": "f614b357c5c4187c5d8fa288550cf796c0c4d79b"
   },
   "fail_closed_on": [
     "contract_not_frozen",
