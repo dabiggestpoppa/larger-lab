@@ -14,8 +14,10 @@ from typing import Optional, Union
 from qcae.core.errors import QcaeValidationError
 from qcae.infrastructure.persistence.migrations import (
     CURRENT_SCHEMA_VERSION,
+    MIGRATION_LEDGER_DDL,
     LegacyDatabaseClass,
     MigrationRunner,
+    bootstrap_v5_schema,
     RUNTIME_DDL_MIGRATION,
     V2_TO_V3,
     V3_TO_V4,
@@ -59,6 +61,46 @@ def _iso_now() -> str:
     return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 
+#: Ordered authority DDL for a fresh v5 bootstrap (P1 metadata, true
+#: historical v4, v5 additions, runtime/queue/budget/governance/approval
+#: tables, migration ledger last). Built lazily so this factory stays free
+#: of engine imports at module load; tests may replace this global to
+#: inject a bootstrap failure and prove all-or-nothing rollback.
+_FRESH_V5_BOOTSTRAP_SCRIPTS = None
+
+
+def _fresh_v5_scripts():
+    global _FRESH_V5_BOOTSTRAP_SCRIPTS
+    if _FRESH_V5_BOOTSTRAP_SCRIPTS is None:
+        from qcae.infrastructure.persistence.sqlite_approval_registry import (
+            APPROVAL_DDL as _APPROVAL_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_budget_ledger import (
+            BUDGET_DDL as _BUDGET_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_policy_log import (
+            GOVERNANCE_DDL as _GOVERNANCE_DDL,
+        )
+        from qcae.infrastructure.persistence.sqlite_runtime_store import (
+            RUNTIME_DDL as _RUNTIME_TABLES_DDL,
+        )
+        from qcae.infrastructure.queue.sqlite_step_queue import (
+            QUEUE_INTEGRITY_DDL as _QUEUE_DDL,
+        )
+        _FRESH_V5_BOOTSTRAP_SCRIPTS = [
+            _SCHEMA_DDL,
+            RUNTIME_DDL_MIGRATION,
+            V5_ADDITIONS_DDL,
+            _RUNTIME_TABLES_DDL,
+            _QUEUE_DDL,
+            _BUDGET_DDL,
+            _GOVERNANCE_DDL,
+            _APPROVAL_DDL,
+            MIGRATION_LEDGER_DDL,
+        ]
+    return _FRESH_V5_BOOTSTRAP_SCRIPTS
+
+
 def open_raw_connection(path: Union[str, Path]) -> sqlite3.Connection:
     """Open a raw connection to an existing SQLite file (test/repair tooling).
 
@@ -99,23 +141,6 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
         # authorized. No schema DDL runs before this point, so an unknown,
         # hybrid, newer, or unversioned-existing database is refused with
         # its durable schema and user_version byte-identical to before.
-        # Runtime/queue/budget/governance/approval tables are imported
-        # lazily so this factory stays free of engine imports.
-        from qcae.infrastructure.persistence.sqlite_approval_registry import (
-            APPROVAL_DDL as _APPROVAL_DDL,
-        )
-        from qcae.infrastructure.persistence.sqlite_budget_ledger import (
-            BUDGET_DDL as _BUDGET_DDL,
-        )
-        from qcae.infrastructure.persistence.sqlite_policy_log import (
-            GOVERNANCE_DDL as _GOVERNANCE_DDL,
-        )
-        from qcae.infrastructure.persistence.sqlite_runtime_store import (
-            RUNTIME_DDL as _RUNTIME_TABLES_DDL,
-        )
-        from qcae.infrastructure.queue.sqlite_step_queue import (
-            QUEUE_INTEGRITY_DDL as _QUEUE_DDL,
-        )
         current = conn.execute("PRAGMA user_version").fetchone()[0]
         classification = classify_legacy_database(conn, current)
         if classification == LegacyDatabaseClass.UNVERSIONED_EXISTING:
@@ -133,35 +158,12 @@ def open_metadata_db(path: Union[str, Path]) -> sqlite3.Connection:
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA foreign_keys=ON")
         if classification == LegacyDatabaseClass.FRESH_EMPTY:
-            # Fresh database: build the COMPLETE v5 schema, record
-            # bootstrap provenance, then stamp v5. (P2-R5R-R1-C02 makes
-            # this one explicit transaction with real digests; the shape
-            # law already holds: nothing may silently complete it after.)
-            conn.executescript(_SCHEMA_DDL)
-            conn.executescript(RUNTIME_DDL_MIGRATION)
-            conn.executescript(V5_ADDITIONS_DDL)
-            for _ddl in (_RUNTIME_TABLES_DDL, _QUEUE_DDL, _BUDGET_DDL,
-                         _GOVERNANCE_DDL, _APPROVAL_DDL):
-                conn.executescript(_ddl)
-            conn.executescript(
-                "CREATE TABLE IF NOT EXISTS schema_migration_ledger ("
-                " seq INTEGER PRIMARY KEY AUTOINCREMENT,"
-                " from_version INTEGER NOT NULL,"
-                " to_version INTEGER NOT NULL,"
-                " migration_id TEXT NOT NULL,"
-                " applied_at TEXT NOT NULL,"
-                " pre_digest TEXT NOT NULL,"
-                " post_digest TEXT NOT NULL)"
-            )
-            conn.execute(
-                "INSERT INTO schema_migration_ledger (from_version,"
-                " to_version, migration_id, applied_at, pre_digest,"
-                " post_digest) VALUES (0, ?, 'BOOTSTRAP-v5-complete-schema',"
-                " ?, 'none', 'bootstrap-v5')",
-                (CURRENT_SCHEMA_VERSION, _iso_now()),
-            )
-            conn.execute(f"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}")
-            conn.commit()
+            # Fresh database: build the COMPLETE v5 schema in ONE explicit
+            # transaction with real provenance digests, then stamp v5. No
+            # composition root may silently complete the schema afterwards.
+            # (executescript is forbidden here: it implicitly COMMITs any
+            # pending transaction, which would break atomicity.)
+            bootstrap_v5_schema(conn, _fresh_v5_scripts(), _iso_now)
         else:
             # 0 < current <= CURRENT_SCHEMA_VERSION: for known legacy
             # P2-misversioned databases, migrate via the production chain;

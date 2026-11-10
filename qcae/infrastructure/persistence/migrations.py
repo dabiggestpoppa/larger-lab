@@ -23,7 +23,8 @@ __all__ = ["Migration", "MigrationLedgerEntry", "MigrationRunner", "MIGRATION_LE
            "CURRENT_SCHEMA_VERSION", "LegacyDatabaseClass",
            "classify_legacy_database", "V5_ADDITIONS_DDL",
            "HISTORICAL_V4_DDL_SHA256", "V5_ONLY_TABLES",
-           "RUNTIME_DDL_MIGRATION", "_table_names"]
+           "RUNTIME_DDL_MIGRATION", "_table_names",
+           "bootstrap_v5_schema"]
 
 #: Current build schema version: fresh databases are physically at v5.
 CURRENT_SCHEMA_VERSION = 5
@@ -66,19 +67,99 @@ def _schema_fingerprint(conn: sqlite3.Connection) -> str:
     """Digest of table/DDL shape for provenance (content, not row data)."""
     import hashlib
 
-    rows = conn.execute(
-        "SELECT type, name, sql FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'"
-        " ORDER BY name"
-    ).fetchall()
+    rows = [
+        tuple(row)
+        for row in conn.execute(
+            "SELECT type, name, sql FROM sqlite_master"
+            " WHERE name NOT LIKE 'sqlite_%' AND name <> 'sqlite_sequence'"
+            " ORDER BY name"
+        ).fetchall()
+    ]
     material = repr(rows).encode("utf-8")
     return hashlib.sha256(material).hexdigest()
+
+
+def _split_schema_statements(script: str) -> List[str]:
+    """Split a QCAE schema script into individual statements.
+
+    QCAE schema scripts are plain CREATE TABLE / CREATE INDEX sequences
+    with full-line ``--`` comments and no semicolons inside literals, so a
+    comment-stripping split on ``;`` is exact here. This exists because
+    ``sqlite3.Connection.executescript`` implicitly COMMITs any pending
+    transaction first (verified on this project's Python: tables created
+    by executescript survive a later ROLLBACK), so executescript can NEVER
+    appear inside an explicit transaction. Every statement returned here
+    runs through ``Connection.execute`` inside the caller's transaction.
+    """
+    lines = [
+        line for line in script.splitlines()
+        if not line.strip().startswith("--")
+    ]
+    statements = []
+    for chunk in chr(10).join(lines).split(";"):
+        text = chunk.strip()
+        if text:
+            statements.append(text)
+    return statements
+
+
+def _execute_statements(conn: sqlite3.Connection, script: str) -> None:
+    """Run every statement of ``script`` on ``conn`` without committing.
+
+    Joins the caller's explicit transaction (or autocommit when none is
+    open); never commits, never rolls back. See ``_split_schema_statements``
+    for why executescript is forbidden here.
+    """
+    for statement in _split_schema_statements(script):
+        conn.execute(statement)
+
+
+def bootstrap_v5_schema(
+    conn: sqlite3.Connection, scripts, clock: Callable[[], str]
+) -> tuple:
+    """Create the COMPLETE v5 schema in ONE explicit transaction.
+
+    ``scripts`` is the ordered authority DDL (P1 metadata, true historical
+    v4, v5 additions, runtime/queue/budget/governance/approval tables, and
+    the migration ledger DDL last). Returns ``(pre_digest, post_digest)``:
+    real sha256 schema fingerprints, where ``pre_digest`` is the empty
+    schema before creation and ``post_digest`` is the complete v5 schema.
+    The ledger ROW is data, not schema, so inserting it cannot change the
+    digest. ``PRAGMA user_version = 5`` is stamped inside the same
+    transaction. Any failure rolls back EVERYTHING: no partial schema, no
+    stamp, no provenance row.
+    """
+    pre_digest = _schema_fingerprint(conn)
+    previous_isolation = conn.isolation_level
+    conn.isolation_level = None
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        try:
+            for script in scripts:
+                _execute_statements(conn, script)
+            post_digest = _schema_fingerprint(conn)
+            conn.execute(
+                "INSERT INTO schema_migration_ledger (from_version,"
+                " to_version, migration_id, applied_at, pre_digest,"
+                " post_digest) VALUES (0, ?,"
+                " 'BOOTSTRAP-v5-complete-schema', ?, ?, ?)",
+                (CURRENT_SCHEMA_VERSION, clock(), pre_digest, post_digest),
+            )
+            conn.execute(f"PRAGMA user_version = {CURRENT_SCHEMA_VERSION}")
+            conn.commit()
+        except BaseException:
+            conn.rollback()
+            raise
+    finally:
+        conn.isolation_level = previous_isolation
+    return pre_digest, post_digest
 
 
 class MigrationRunner:
     def __init__(self, conn: sqlite3.Connection, clock: Callable[[], str]) -> None:
         self._conn = conn
         self._clock = clock
-        conn.executescript(MIGRATION_LEDGER_DDL)
+        _execute_statements(conn, MIGRATION_LEDGER_DDL)
 
     def current_version(self) -> int:
         return int(self._conn.execute("PRAGMA user_version").fetchone()[0])
@@ -203,7 +284,7 @@ def _apply_v3(conn: sqlite3.Connection) -> None:
     record is created for each existing repository_record observation so
     identity/revision history is preserved through the migration itself.
     """
-    conn.executescript(REPOSITORY_REVISION_DDL)
+    _execute_statements(conn, REPOSITORY_REVISION_DDL)
     rows = conn.execute(
         "SELECT payload_json, payload_digest FROM repository_record"
     ).fetchall()
@@ -386,7 +467,7 @@ def _apply_v4(conn: sqlite3.Connection) -> None:
     Purely additive: P1 registry/evidence data is untouched. All runtime
     tables start empty; the P2 runtime populates them after migration.
     """
-    conn.executescript(RUNTIME_DDL_MIGRATION)
+    _execute_statements(conn, RUNTIME_DDL_MIGRATION)
 
 
 V3_TO_V4 = Migration(
@@ -435,7 +516,7 @@ def _apply_v5(conn: sqlite3.Connection) -> None:
     ``PRAGMA user_version`` is honest: v4 means exactly the original P2 v4
     shape, v5 means v4 plus the post-v4 execution + grant-consumption truth.
     """
-    conn.executescript(V5_ADDITIONS_DDL)
+    _execute_statements(conn, V5_ADDITIONS_DDL)
 
 
 V4_TO_V5 = Migration(

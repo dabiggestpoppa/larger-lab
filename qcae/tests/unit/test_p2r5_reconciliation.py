@@ -147,18 +147,18 @@ class TestSchemaAuthorityAndMigrationTruth:
             V4_TO_V5,
         )
         from qcae.infrastructure.persistence.sqlite_approval_registry import APPROVAL_DDL
-        from qcae.infrastructure.persistence.sqlite_runtime_store import RUNTIME_DDL
         from qcae.infrastructure.persistence.store_factory import open_raw_connection
 
         conn = open_metadata_db(tmp_path / "r5.db")
         assert conn.execute("PRAGMA user_version").fetchone()[0] == CURRENT_SCHEMA_VERSION
         conn.close()
 
-        # Build a v4-shaped database and migrate it to v5.
+        # Build a TRUE v4-shaped database (no post-v4 tables) and migrate
+        # it to v5, so the migration genuinely changes the schema shape.
         db = tmp_path / "r5v4.db"
         c2 = open_metadata_db(db)
-        c2.executescript(RUNTIME_DDL)
-        c2.executescript(APPROVAL_DDL)
+        c2.execute("DROP TABLE governance_approval_use")
+        c2.execute("DROP TABLE runtime_execution")
         c2.execute("PRAGMA user_version = 4")
         c2.commit()
         c2.close()
