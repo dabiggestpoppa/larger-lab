@@ -116,3 +116,20 @@ history was rewritten.
 - Evidence is witnessed CI output plus local runs; no independent reproduction was performed.
 - The resolver pins two prior-stage test surfaces adapted for the later-stage mode; that widened
   authority is deliberate and disclosed here for operator review.
+
+## 12. Proof closure and ratification (X7)
+
+- Defect PC-01: the generated app had no runnable entrypoint. Repair: `app/__main__.py` emits
+  `READY app`, accepts `stop`, prints `STOPPED`, exits 0; `start()` executes it in a subprocess.
+- Defect PC-02: M13 never produced `boundary/no_symlinked_artifacts`. Final classification:
+  POSIX environmental probe, excluded from the governed population; 12 governed mutations,
+  floor 12 unchanged, 13 physical rows restored.
+- Defect PC-03: two prior-stage test files were adapted. Both are restored byte-identical to
+  `4496d548`; the prior workflows replay at `96e3b817` with `origin/main` rewound to `6783bf76`.
+- Defect PC-04: compatibility rows had no disposition. C1.S3 and C1.S4 are
+  UNPROVEN_BUT_EXIT_GATE_ALLOWS with owner B6-I7.
+
+Exact-head evidence on `1be58fd9`: B6-I2 `42809713938` (30/30, validator 168/168, mutations 6/6,
+controls 15/15), B6-I2 Paired `42809713955` (270/0/30, 20 checks, PASS), B6-I0 `42809714005`
+(72/72, validator 136/136, 12 governed), B6-I1 `42809713956` (42/42), plus paired, gate, audit and
+runner workflows. Locks unchanged; cost `$0`.
