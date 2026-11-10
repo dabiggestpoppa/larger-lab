@@ -1,7 +1,7 @@
 {
   "phase": "P2-R5R",
-  "generated_at": "2026-11-10T13:39:32Z",
-  "tested_commit": "9cbec7d4c12f2fa7a2e0588fd33174240783616a",
+  "generated_at": "2026-11-10T23:13:25Z",
+  "tested_commit": "0ca72c41cb9a2f0f6a6710bc996db1b6dda04e03",
   "environment": "local developer machine (no CI available for this repo)",
   "blocks": {
     "operator_loop": {
@@ -11,7 +11,7 @@
       "counts": {
         "passed": 5
       },
-      "summary_line": "5 passed in 2.47s"
+      "summary_line": "5 passed in 3.41s"
     },
     "grant_journey": {
       "command": "python -m pytest qcae/tests/acceptance/test_p2_grant_journey.py -q",
@@ -20,7 +20,7 @@
       "counts": {
         "passed": 2
       },
-      "summary_line": "2 passed in 0.41s"
+      "summary_line": "2 passed in 0.57s"
     },
     "process_crash": {
       "command": "python -m pytest qcae/tests/acceptance/test_p2_process_crash.py -q",
@@ -29,7 +29,7 @@
       "counts": {
         "passed": 7
       },
-      "summary_line": "7 passed in 5.18s"
+      "summary_line": "7 passed in 7.55s"
     },
     "schema_r5r": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_c01_schema_matrix.py -q",
@@ -38,7 +38,7 @@
       "counts": {
         "passed": 19
       },
-      "summary_line": "19 passed in 0.82s"
+      "summary_line": "19 passed in 1.94s"
     },
     "binding_r5r": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_c02_grant_binding.py -q",
@@ -47,7 +47,7 @@
       "counts": {
         "passed": 26
       },
-      "summary_line": "26 passed in 1.08s"
+      "summary_line": "26 passed in 2.03s"
     },
     "boundary_r5r": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_c03_provider_boundary.py -q",
@@ -56,7 +56,7 @@
       "counts": {
         "passed": 8
       },
-      "summary_line": "8 passed in 0.52s"
+      "summary_line": "8 passed in 0.92s"
     },
     "backup_r5r": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_c04_backup_disaster.py -q",
@@ -65,7 +65,7 @@
       "counts": {
         "passed": 6
       },
-      "summary_line": "6 passed in 0.68s"
+      "summary_line": "6 passed in 1.05s"
     },
     "typed_r5r": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_c05_typed_outcomes.py -q",
@@ -74,7 +74,7 @@
       "counts": {
         "passed": 10
       },
-      "summary_line": "10 passed in 1.78s"
+      "summary_line": "10 passed in 1.77s"
     },
     "schema_r1": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_r1_schema_custody.py -q",
@@ -83,7 +83,7 @@
       "counts": {
         "passed": 11
       },
-      "summary_line": "11 passed in 1.03s"
+      "summary_line": "11 passed in 1.07s"
     },
     "constraint_r1": {
       "command": "python -m pytest qcae/tests/unit/test_p2r5r_r1_constraint_guard.py -q",
@@ -92,7 +92,7 @@
       "counts": {
         "passed": 2
       },
-      "summary_line": "2 passed in 0.23s"
+      "summary_line": "2 passed in 0.44s"
     },
     "p3_r4_regression": {
       "command": "python -m pytest qcae/tests/unit -k p3_ -q",
@@ -101,7 +101,7 @@
       "counts": {
         "passed": 238
       },
-      "summary_line": "238 passed, 1178 deselected in 2.36s"
+      "summary_line": "238 passed, 1184 deselected in 2.89s"
     },
     "crash_after_lease": {
       "command": "python -m pytest qcae/tests/unit/test_p2_c07rt_repair_qualification.py::TestCombinedFlows::test_crash_after_lease_resume_does_not_repeat_committed -q",
@@ -110,7 +110,7 @@
       "counts": {
         "passed": 1
       },
-      "summary_line": "1 passed in 0.40s"
+      "summary_line": "1 passed in 0.50s"
     },
     "topology": {
       "command": "python -m pytest qcae/tests/unit/test_p0_topology.py -q",
@@ -119,16 +119,16 @@
       "counts": {
         "passed": 78
       },
-      "summary_line": "78 passed in 0.48s"
+      "summary_line": "78 passed in 0.62s"
     },
     "full_qcae": {
       "command": "python -m pytest qcae/tests -q",
       "exit_code": 0,
       "ok": true,
       "counts": {
-        "passed": 1453
+        "passed": 1459
       },
-      "summary_line": "1453 passed in 31.49s"
+      "summary_line": "1459 passed in 51.12s"
     }
   },
   "all_blocks_green": true,
