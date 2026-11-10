@@ -36,6 +36,7 @@ jobs:
 
       - name: Prepare prior-head replay worktree
         run: |
+          cd "${REPLAY_WT:-.}"
           git worktree add --detach --quiet "$RUNNER_TEMP/replay-head" 96e3b81714321f4eea7abcb300ef471e93be0962
           git -C "$RUNNER_TEMP/replay-head" update-ref refs/remotes/origin/main 6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e
           echo "REPLAY_WT=$RUNNER_TEMP/replay-head" >> "$GITHUB_ENV"
@@ -43,6 +44,7 @@ jobs:
       - name: Prepare evidence directory
         id: run_id
         run: |
+          cd "${REPLAY_WT:-.}"
           OCE_RUN_ID=$(python -c "import secrets; print(secrets.token_hex(6))")
           echo "oce_run_id=$OCE_RUN_ID" >> "$GITHUB_OUTPUT"
           EVIDENCE_DIR="$RUNNER_TEMP/b6-i1-evidence-$OCE_RUN_ID"
@@ -54,6 +56,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/identity.json" <<'IDENT'
           import json, os, subprocess, sys
           def git(*a):
@@ -81,6 +84,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i1_validate.py \
             --stage-scope auto \
             --json "$EVIDENCE_DIR/validator.json" | tee "$EVIDENCE_DIR/validator.txt"
@@ -144,6 +148,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i1_mutation_battery.py \
             --json "$EVIDENCE_DIR/mutations.json"
 
@@ -151,6 +156,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python infrastructure/control-plane/scripts/block_06_i0_gate.py \
             --json "$EVIDENCE_DIR/book5-gate.json" | tee "$EVIDENCE_DIR/book5-gate.txt"
 
@@ -158,6 +164,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python -m pytest \
             infrastructure/control-plane/tests/test_b5_i7_evidence_laws.py \
             infrastructure/control-plane/tests/test_b5_i7_governed_change.py \
@@ -182,6 +189,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR/cleanup.json" <<'CLEAN'
           import json, pathlib, subprocess, sys
           status = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"],
@@ -200,6 +208,7 @@ jobs:
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
+          cd "${REPLAY_WT:-.}"
           python - "$EVIDENCE_DIR" <<'SUM'
           import json, pathlib, sys
           ev = pathlib.Path(sys.argv[1])
