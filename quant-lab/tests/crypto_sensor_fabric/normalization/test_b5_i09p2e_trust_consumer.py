@@ -733,10 +733,17 @@ class TestPITReplaySeparation:
             replay_evaluation=_replay_evaluation(replay),
             evidence_references={REF: DOC_SHA},
         )
-        assert out.decision in (
-            ConsumerDecision.ACCEPT_FIELD_BINDING,
-            ConsumerDecision.REFUSE,
+        expected = (
+            ConsumerDecision.ACCEPT_FIELD_BINDING
+            if (pit_ok and replay_ok)
+            else ConsumerDecision.REFUSE
         )
+        assert out.decision == expected
+        if not replay_ok:
+            assert out.refusal_reason in (
+                ConsumerRefusalReason.REPLAY_BLOCKED,
+                ConsumerRefusalReason.PIT_INADMISSIBLE,
+            )
 
 
 class TestPITOffsetAndDST:
@@ -1166,11 +1173,9 @@ class TestMultiPathConformance:
             required_fields=("trade_price",),
             evidence_references={REF: DOC_SHA},
         )
-        assert out.decision in (
-            ConsumerDecision.ACCEPT_FIELD_BINDING,
-            ConsumerDecision.INTEGRATION_REQUIRED,
-            ConsumerDecision.REFUSE,
-        )
+        assert out.decision == ConsumerDecision.ACCEPT_FIELD_BINDING
+        assert out.custody_source_authorized is True
+        assert out.unverified_dimensions == base.unverified_dimensions
 
     def test_deserialized_path(self) -> None:
         policy = ConsumerPolicy(store=_store_with_evidence())

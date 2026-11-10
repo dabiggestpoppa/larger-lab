@@ -51,8 +51,10 @@ The branch descends directly from the pinned R1 HEAD; `3e53a6589` is an ancestor
 
 ```
 quant-lab/tests/crypto_sensor_fabric/normalization/
-├── test_b5_i09p2e_trust_consumer.py   (implementation + 70 tests)
-└── P3_I09P2E_TRUST_CONSUMER_EVIDENCE.md  (this document)
+└── test_b5_i09p2e_trust_consumer.py   (implementation + 70 tests)
+
+quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/
+└── P3_I09P2E_TRUST_CONSUMER_EVIDENCE.md  (this document, in the allowlisted evidence prefix)
 ```
 
 The implementation lives entirely in one test-only module:
@@ -166,8 +168,8 @@ Plus multipath conformance tests (single, cached, deserialized, evidence reread,
 | Suite | Result |
 |---|---|
 | New P3 conformance suite (`test_b5_i09p2e_trust_consumer.py`) | **70 passed** |
-| P2a–P2e, I05/I06 replay, I09 semantic determinism, I10 scope, I11 nonregression | Not executed — sparse checkout; those test files are tracked but not materialized (5051 `D` entries). Agent 2 owns the full canonical regression slot. |
-| Relevant governance predicates | `INTEGRATION_STATE == INTEGRATION_REQUIRED` verified in-test; approval manifest empty verified in-worktree |
+| P2a–P2e, I05/I06 replay, I09 semantic determinism, I10 scope, I11 nonregression | **436 passed, 1 failed** in the R3 run (see §15). The one failure is the I10 audit's *unstaged* worktree-deletion assertion, caused solely by the partial checkout (missing data files appear as deletions); its staged-path assertion passes. |
+| Relevant governance predicates | `INTEGRATION_STATE == INTEGRATION_REQUIRED` verified in-test; approval manifest `artifacts == {}` verified from the shipped file |
 
 No source modules were modified by this workstream, so there is no source-level regression to detect from this change. Dependent primitives were reused unchanged.
 
@@ -224,5 +226,66 @@ Before any consumer built on this engine is promoted:
 
 ---
 
+## 15. R3 closure addendum (full-checkout governance / conformance validation)
+
+**Starting SHA:** `c0e3440bf4b0ed09156be360be0bdeeeb00d3460`
+**Final SHA:** recorded by the R3 commit that follows this document (see branch HEAD).
+**Ancestry:** P3 descends from Integration R1 `3e53a6589` (verified).
+
+### 15.1 Full-checkout status — BLOCKED by host disk exhaustion
+
+A full, non-sparse worktree at the exact P3 HEAD could not be materialized. The tracked tree is 196.0 MB (6,773 files), but the host volume was at 98–100% capacity and a concurrent process consumed gigabytes during each attempt. Three attempts (`git worktree add`, `checkout-index -a -f`, `git archive | tar -x`) each aborted with `No space left on device` after writing several thousand files; each partial tree was removed and the disk returned to its prior free space. To avoid filling the user's system disk, no further full materialization was attempted.
+
+What was done instead, at the exact P3 HEAD:
+* inventory verified from Git objects (authoritative, checkout-free);
+* the complete `quant-lab/tests/crypto_sensor_fabric/` (341 files), `quant-lab/config/crypto_sensor_fabric/` (26), `evidence/bloc_05/` (95), `scripts/` (11) and the frozen `research/.../bloc_05` plan were materialized into the isolated worktree;
+* focused regression executed against those.
+
+This is a partial-tree verification, not the full-checkout proof Phase 0 requires. It is reported as blocked, not satisfied.
+
+### 15.2 Python inventory (checkout-free, exact)
+
+| Commit | Tracked `.py` |
+|---|---|
+| Integration R1 `3e53a6589` | 1,096 |
+| P3 HEAD `c0e3440bf` | **1,097** |
+
+Exactly one `.py` was added between them: `quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09p2e_trust_consumer.py`. No other `.py` was added, deleted or renamed. The 1,097 figure is confirmed; no publisher/allowlist widening was performed.
+
+### 15.3 Governance publisher
+
+No committed artifact encodes a Python-file-count inventory for the sensor-fabric checkpoint (the I11R2 governance-binding audit governs dashboard/ledger readers, not file counts), so there was nothing to re-publish. No hashes were hand-edited and no allowlist was widened.
+
+### 15.4 I10 scope outcome
+
+Running the frozen I10 scope audit surfaced one genuine governance finding: the evidence document previously lived under `tests/crypto_sensor_fabric/normalization/`, which the frozen `allowed` prefix list does **not** admit. Rather than widen the allowlist, the document was relocated into the already-admitted `research/crypto_foundry/sensor_fabric/evidence/bloc_05/` prefix. After relocation the audit's **staged-path** assertion passes. The audit's **unstaged** assertion still reports the partial checkout's missing data files as deletions; that is an environment artifact, not an unauthorized change (no data file was modified).
+
+### 15.5 Focused regression (actual counts)
+
+* P2a–P2e + P3: **233 passed**.
+* I05 availability/replay, I06 replay-safety, I09 semantics, I10 scope, I11 liquidation/scope: **203 passed, 1 failed** (the I10 unstaged-deletion artifact above).
+* Combined focused run: **436 passed, 1 failed**, 0 errors, 0 skips.
+* P3 suite after the R3 tightenings: **70 passed**.
+
+### 15.6 Reattack results (Phase 3)
+
+* Shipped `approval_manifest.json` has `artifacts == {}`; `INTEGRATION_STATE == INTEGRATION_REQUIRED`.
+* The P3 module never loads the shipped manifest or a real trusted authority: every `ACCEPT_FIELD_BINDING` outcome is gated on an explicitly synthetic `custody_source_authorized=True` fixture blown on a synthetic policy context. No fixture represents a real approved provider.
+* Two loose assertions that merely *permitted* ACCEPT were tightened to deterministic expectations (the 2x2 PIT/replay matrix now expects ACCEPT only when both are satisfied, and the cached-path test now requires ACCEPT exactly), so a boundary regression can no longer pass silently.
+
+### 15.7 Full canonical regression
+
+Not run by this workstream. Agent 2 owns the memory-intensive final-HEAD slot, and the partial tree cannot host evidence-determinism tests. Status: **incomplete / delegated**.
+
+### 15.8 Remaining acceptance requirements
+
+1. Materialize a full non-sparse checkout on a host with sufficient free space and run the canonical suite there.
+2. Confirm the canonical node-id universe (previous 4,640 tests plus the 70 P3 tests) with no missing or duplicated IDs.
+3. Confirm the I10 audit's unstaged assertion is green in that full checkout.
+4. Operator records custody-source authorization before any economic use.
+5. Authenticated acquisition lineage before `ACQUISITION_LINEAGE` leaves `unverified_dimensions`.
+
+---
+
 **Signed off:** Agent 1 — Implementation Lead
-**Status:** `P3_R1_IMPLEMENTATION_READY_FOR_INDEPENDENT_AUDIT` — experimental, fail-closed, test-only; no production authority claimed.
+**Status:** `P3_R1_IMPLEMENTATION_READY_FOR_INDEPENDENT_AUDIT` (full-checkout regression still outstanding, reported as blocked) — experimental, fail-closed, test-only; no production authority claimed.
