@@ -1,0 +1,46 @@
+{
+  "document_id": "OCE-B6-I3-COMPAT-001",
+  "locks": {
+    "B6-I4_through_I9": "LOCKED",
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "observed": {
+    "consumer_rows": 0,
+    "proven_rows": 3
+  },
+  "refusal": {
+    "silent_latest": false,
+    "unknown_version": "REFUSED"
+  },
+  "rows": [
+    {
+      "consumer_evidence": "none",
+      "disposition": "EXIT_GATE_PROVES_SURFACE",
+      "proof": "test_block_06_i3_capability.py",
+      "state": "OPERATOR_SURFACE_ONLY",
+      "statement": "Identities, proven capabilities, ceilings, status, versions and evidence links",
+      "surface": "C2.S1"
+    },
+    {
+      "consumer_evidence": "none",
+      "disposition": "EXIT_GATE_PROVES_SURFACE",
+      "proof": "test_block_06_i3_approvals.py",
+      "state": "OPERATOR_SURFACE_ONLY",
+      "statement": "Action, target, effect, cost, reversibility, expiry and evidence with scoped approve/deny",
+      "surface": "C2.S2"
+    },
+    {
+      "consumer_evidence": "none",
+      "disposition": "EXIT_GATE_PROVES_SURFACE",
+      "proof": "test_block_06_i3_evidence.py",
+      "state": "OPERATOR_SURFACE_ONLY",
+      "statement": "Intent to plan to task to artifact to evaluation to gate with hashes",
+      "surface": "C2.S3"
+    }
+  ],
+  "rows_total": 3,
+  "schema": "oce.block_06_i3.compatibility.v1",
+  "stage": "B6-I3",
+  "status": "FROZEN"
+}
