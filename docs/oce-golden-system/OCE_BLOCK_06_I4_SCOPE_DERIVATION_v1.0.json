@@ -1,18 +1,18 @@
 {
   "api_symbols": [
-    "oce.operator.incident_view",
-    "oce.operator.assess_drill",
-    "oce.operator.cost_ledger",
-    "oce.operator.budget_alerts",
-    "oce.services.identity_registry",
-    "oce.services.resolve_identity",
-    "oce.services.define_workflow",
-    "oce.services.start_run",
-    "oce.services.acquire_lease",
-    "oce.services.advance_run",
-    "oce.services.cancel_run",
-    "oce.services.retry_run",
-    "oce.operator.failure_cost_trace"
+    "oce.operator.incident.incident_view",
+    "oce.operator.incident.assess_drill",
+    "oce.operator.cost.cost_ledger",
+    "oce.operator.cost.budget_alerts",
+    "oce.services.identity.identity_registry",
+    "oce.services.identity.resolve_identity",
+    "oce.services.workflow.define_workflow",
+    "oce.services.workflow.start_run",
+    "oce.services.workflow.acquire_lease",
+    "oce.services.workflow.advance_run",
+    "oce.services.workflow.cancel_run",
+    "oce.services.workflow.retry_run",
+    "oce.operator.trace.failure_cost_trace"
   ],
   "authority_sources": [
     "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I4",

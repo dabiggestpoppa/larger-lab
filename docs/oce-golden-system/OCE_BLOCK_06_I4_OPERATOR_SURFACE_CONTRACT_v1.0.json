@@ -14,7 +14,7 @@
     "C2.S5": "oce.operator.cost_ledger + oce.operator.budget_alerts",
     "C3.S1": "oce.services.identity_registry + oce.services.resolve_identity",
     "C3.S2": "oce.services.define_workflow + start_run + acquire_lease + advance_run + cancel_run + retry_run",
-    "trace": "oce.operator.failure_cost_trace"
+    "trace": "oce.operator.trace.failure_cost_trace"
   },
   "stage": "B6-I4",
   "status": "FROZEN",
@@ -24,7 +24,7 @@
       "error_behavior": "refuse_unknown_subject_severity_timeline_unresolved_risk",
       "exported": true,
       "section": "C2.S4",
-      "symbol": "oce.operator.incident_view",
+      "symbol": "oce.operator.incident.incident_view",
       "typed_inputs": [
         "incidents",
         "viewer"
@@ -38,7 +38,7 @@
       "error_behavior": "refuse_broken_timeline",
       "exported": true,
       "section": "C2.S4",
-      "symbol": "oce.operator.assess_drill",
+      "symbol": "oce.operator.incident.assess_drill",
       "typed_inputs": [
         "drill",
         "latency_limit"
@@ -52,7 +52,7 @@
       "error_behavior": "refuse_unknown_category_invalid_cost",
       "exported": true,
       "section": "C2.S5",
-      "symbol": "oce.operator.cost_ledger",
+      "symbol": "oce.operator.cost.cost_ledger",
       "typed_inputs": [
         "entries"
       ],
@@ -65,7 +65,7 @@
       "error_behavior": "refuse_unknown_category_unknown_app",
       "exported": true,
       "section": "C2.S5",
-      "symbol": "oce.operator.budget_alerts",
+      "symbol": "oce.operator.cost.budget_alerts",
       "typed_inputs": [
         "ledger",
         "budgets",
@@ -80,7 +80,7 @@
       "error_behavior": "refuse_raw_secret_duplicate_identity",
       "exported": true,
       "section": "C3.S1",
-      "symbol": "oce.services.identity_registry",
+      "symbol": "oce.services.identity.identity_registry",
       "typed_inputs": [
         "records"
       ],
@@ -93,7 +93,7 @@
       "error_behavior": "refuse_unknown_cross_app_revoked",
       "exported": true,
       "section": "C3.S1",
-      "symbol": "oce.services.resolve_identity",
+      "symbol": "oce.services.identity.resolve_identity",
       "typed_inputs": [
         "registry",
         "identity_id",
@@ -109,7 +109,7 @@
       "error_behavior": "refuse_invalid_workflow",
       "exported": true,
       "section": "C3.S2",
-      "symbol": "oce.services.define_workflow",
+      "symbol": "oce.services.workflow.define_workflow",
       "typed_inputs": [
         "definition"
       ],
@@ -122,7 +122,7 @@
       "error_behavior": "refuse_invalid_workflow",
       "exported": true,
       "section": "C3.S2",
-      "symbol": "oce.services.start_run",
+      "symbol": "oce.services.workflow.start_run",
       "typed_inputs": [
         "definition",
         "run_id",
@@ -137,7 +137,7 @@
       "error_behavior": "refuse_lease_held_cancelled",
       "exported": true,
       "section": "C3.S2",
-      "symbol": "oce.services.acquire_lease",
+      "symbol": "oce.services.workflow.acquire_lease",
       "typed_inputs": [
         "run",
         "owner",
@@ -153,7 +153,7 @@
       "error_behavior": "refuse_illegal_transition_lease_owner_cancelled",
       "exported": true,
       "section": "C3.S2",
-      "symbol": "oce.services.advance_run",
+      "symbol": "oce.services.workflow.advance_run",
       "typed_inputs": [
         "definition",
         "run",
@@ -171,7 +171,7 @@
       "error_behavior": "refuse_cancelled",
       "exported": true,
       "section": "C3.S2",
-      "symbol": "oce.services.cancel_run",
+      "symbol": "oce.services.workflow.cancel_run",
       "typed_inputs": [
         "run",
         "actor",
@@ -186,7 +186,7 @@
       "error_behavior": "refuse_retry_exceeded_cancelled",
       "exported": true,
       "section": "C3.S2",
-      "symbol": "oce.services.retry_run",
+      "symbol": "oce.services.workflow.retry_run",
       "typed_inputs": [
         "run",
         "max_retries"
@@ -200,7 +200,7 @@
       "error_behavior": "refuse_broken_trace_cross_app_unknown",
       "exported": true,
       "section": "C2.S4",
-      "symbol": "oce.operator.failure_cost_trace",
+      "symbol": "oce.operator.trace.failure_cost_trace",
       "typed_inputs": [
         "nodes",
         "registry",
