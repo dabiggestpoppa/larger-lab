@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass
+from pathlib import Path
 from datetime import UTC, datetime, timedelta, timezone
 from enum import Enum
 from typing import Any, Callable
@@ -27,8 +28,12 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from crypto_sensor_fabric.normalization.authority import (
+    TRUSTED_MANIFEST_RELPATH,
     AuthorityRefusal,
+    SemanticAuthority,
+    SemanticAuthorityRefusal,
     evidence_digest,
+    parse_approval_manifest,
     pit_availability_refusal,
 )
 from crypto_sensor_fabric.normalization.sensors.verification import (
@@ -120,6 +125,121 @@ class DeterministicEvidenceStore:
 # --------------------------------------------------------------------------- #
 
 
+# --------------------------------------------------------------------------- #
+# Policy-owned custody authority capability (R5)                              #
+# --------------------------------------------------------------------------- #
+
+
+class AuthorityBasis(str, Enum):
+    """Where a custody-authority decision came from.
+
+    An unverified caller claim is not a category here: it is the absence of a
+    capability, which is why AT53's forged boolean can no longer be honoured.
+    """
+
+    ATTESTED_OPERATOR = "ATTESTED_OPERATOR"
+    SYNTHETIC_TEST_ONLY = "SYNTHETIC_TEST_ONLY"
+
+
+@dataclass(frozen=True)
+class CustodyAuthorityCapability:
+    """Externally bound proof that a custody source is authorized for THIS record.
+
+    SENSOR-B5-I09P3-R5 repair of AT43/AT53-AT57.  The capability belongs to the
+    policy, never to the record producer, and is bound to:
+
+    * the reviewed root -- a ``TrustedAuthorityContext`` re-validated through
+      ``from_reviewed_root``, so a ``model_construct``-forged context dies here;
+    * a loader-issued ``SemanticAuthority``, constructible only by
+      ``load_semantic_authority`` over approved manifest bytes and carrying a
+      private issuance seal, so a caller cannot type one into existence;
+    * the record identity (artifact / approval / registry digest, record kind),
+      so AT56 cross-record reuse cannot carry authorization over;
+    * the knowledge cutoff, so cross-cutoff reuse re-runs PIT and replay instead
+      of inheriting them.
+
+    This repository ships an EMPTY approval manifest (``"artifacts": {}``), so no
+    ``ATTESTED_OPERATOR`` capability can be minted: the authorization gate returns
+    ``INTEGRATION_REQUIRED`` until an approved operator-authority mechanism
+    exists.  ``SYNTHETIC_TEST_ONLY`` exists only to keep downstream field-scope
+    logic testable and is never reported as ``AUTHORIZED``.
+
+    Bounded claim: this is a data boundary inside one process.  It does not resist
+    code running with the application's privileges (``model_construct`` skips
+    validators), exactly as ``authority``'s own loader docstring states.
+    """
+
+    basis: AuthorityBasis
+    artifact_id: str
+    approval_id: str
+    registry_digest: str
+    record_kind: str | None
+    knowledge_cutoff: datetime | None
+    manifest_sha256: str | None = None
+
+    @classmethod
+    def from_reviewed_context(
+        cls,
+        *,
+        context: TrustedAuthorityContext,
+        semantic_authority: Any,
+        knowledge_cutoff: datetime | None = None,
+        record_kind: str | None = None,
+    ) -> "CustodyAuthorityCapability":
+        """Mint operator authority -- impossible while the manifest is empty."""
+        if not isinstance(context, TrustedAuthorityContext):
+            raise RecordVerificationError(
+                RecordVerificationRefusal.TRUSTED_CONTEXT_MISMATCH,
+                "custody authority requires a TrustedAuthorityContext over the "
+                "reviewed root",
+            )
+        reviewed = TrustedAuthorityContext.from_reviewed_root(
+            manifest_bytes=context.manifest_bytes, artifact_id=context.artifact_id
+        )
+        if not isinstance(semantic_authority, SemanticAuthority):
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.NO_APPROVAL,
+                "no loader-issued approval covers this artifact; the shipped "
+                "manifest approves nothing, so no custody source is authorized",
+            )
+        if semantic_authority.artifact_id != reviewed.artifact_id:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.UNTRUSTED_AUTHORITY,
+                f"the approval names {semantic_authority.artifact_id!r}; the "
+                f"reviewed context names {reviewed.artifact_id!r}",
+            )
+        return cls(
+            basis=AuthorityBasis.ATTESTED_OPERATOR,
+            artifact_id=semantic_authority.artifact_id,
+            approval_id=semantic_authority.approval_id,
+            registry_digest=semantic_authority.registry_digest,
+            record_kind=record_kind,
+            knowledge_cutoff=knowledge_cutoff,
+            manifest_sha256=reviewed.manifest_sha256,
+        )
+
+    @classmethod
+    def synthetic_for_field_scope_tests(
+        cls,
+        *,
+        artifact_id: str,
+        approval_id: str,
+        registry_digest: str,
+        record_kind: str | None = None,
+        knowledge_cutoff: datetime | None = None,
+    ) -> "CustodyAuthorityCapability":
+        """Non-authoritative capability for downstream field-scope tests only."""
+        return cls(
+            basis=AuthorityBasis.SYNTHETIC_TEST_ONLY,
+            artifact_id=artifact_id,
+            approval_id=approval_id,
+            registry_digest=registry_digest,
+            record_kind=record_kind,
+            knowledge_cutoff=knowledge_cutoff,
+            manifest_sha256=None,
+        )
+
+
 class ConsumerPolicy:
     """Central fail-closed evaluation policy for trust-consumer verdicts.
 
@@ -132,9 +252,48 @@ class ConsumerPolicy:
         *,
         context: TrustedAuthorityContext | None = None,
         store: DeterministicEvidenceStore | None = None,
+        custody_authority: CustodyAuthorityCapability | None = None,
     ) -> None:
         self.context = context
         self.store = store or DeterministicEvidenceStore()
+        self._custody_authority = custody_authority
+
+    # -- custody authority (R5) ------------------------------------------------
+
+    def _custody_grant(
+        self, derived: RecordVerification, knowledge_cutoff: datetime | None
+    ) -> tuple[bool, str]:
+        """Decide custody-source authority from the POLICY's own capability.
+
+        ``derived.custody_source_authorized`` is deliberately never consulted: it
+        is a claim carried on the record, and AT53 showed that honouring it turns
+        any callback into an approval.
+        """
+        capability = self._custody_authority
+        if capability is None:
+            return False, "INTEGRATION_REQUIRED"
+        if capability.knowledge_cutoff != knowledge_cutoff:
+            return False, "INTEGRATION_REQUIRED"
+        if (
+            capability.record_kind is not None
+            and capability.record_kind != derived.record_kind
+        ):
+            return False, "INTEGRATION_REQUIRED"
+        if (
+            capability.artifact_id,
+            capability.approval_id,
+            capability.registry_digest,
+        ) != (
+            derived.artifact_id,
+            derived.approval_id,
+            derived.registry_digest,
+        ):
+            return False, "INTEGRATION_REQUIRED"
+        if capability.basis is AuthorityBasis.ATTESTED_OPERATOR:
+            return True, "AUTHORIZED"
+        if capability.basis is AuthorityBasis.SYNTHETIC_TEST_ONLY:
+            return True, "SYNTHETIC_TEST_ONLY"
+        return False, "INTEGRATION_REQUIRED"
 
     # -- replay status ---------------------------------------------------------
 
@@ -188,10 +347,8 @@ class ConsumerPolicy:
             pit_status="ADMISSIBLE" if derived.pit_admissible else "INADMISSIBLE",
             replay_status=self._replay_status(replay_evaluation),
             custody_status="VERIFIED" if derived.custody_verified else "UNVERIFIED",
-            custody_source_authorized=derived.custody_source_authorized,
-            custody_source_authorization_status=(
-                "AUTHORIZED" if derived.custody_source_authorized else "UNAUTHORIZED"
-            ),
+            custody_source_authorized=False,
+            custody_source_authorization_status="UNAUTHORIZED",
             refusal_reason=reason,
             refusal_detail=detail,
         )
@@ -204,6 +361,7 @@ class ConsumerPolicy:
         required_fields: tuple[str, ...],
         replay_evaluation: Any,
         evidence_references: dict[str, str] | None,
+        knowledge_cutoff: datetime | None = None,
     ) -> ConsumerVerdict:
         pit_status = "ADMISSIBLE" if derived.pit_admissible else "INADMISSIBLE"
         custody_status = "VERIFIED" if derived.custody_verified else "UNVERIFIED"
@@ -247,23 +405,8 @@ class ConsumerPolicy:
                     f"required field {rf!r} not in verified field allowlist",
                 )
 
-        # Inspection 3 — custody_source_authorized is its own fact.
-        if not derived.custody_source_authorized:
-            return ConsumerVerdict(
-                decision=ConsumerDecision.INTEGRATION_REQUIRED,
-                verified_field_allowlist=derived.fields_verified,
-                unverified_dimensions=derived.unverified_dimensions,
-                trust_scope=derived.trust_scope,
-                pit_status=pit_status,
-                replay_status=replay_status,
-                custody_status=custody_status,
-                custody_source_authorized=False,
-                custody_source_authorization_status="INTEGRATION_REQUIRED",
-                refusal_reason=None,
-                refusal_detail="custody source not authorized",
-            )
-
-        # PIT and replay are separate (§6).  Neither overrides custody auth.
+        # PIT and replay are separate (§6) and are adjudicated BEFORE authority:
+        # an inadmissible record is refused whatever the custody source claims.
         if not derived.pit_admissible:
             return self._refuse(
                 derived,
@@ -285,6 +428,26 @@ class ConsumerPolicy:
                 "replay blocked",
             )
 
+        # Inspection 3 (R5) — custody authority is decided by the policy's own
+        # capability, never by the record's flag or a caller-supplied rederive.
+        granted, authority_status = self._custody_grant(derived, knowledge_cutoff)
+        if not granted:
+            return ConsumerVerdict(
+                decision=ConsumerDecision.INTEGRATION_REQUIRED,
+                verified_field_allowlist=derived.fields_verified,
+                unverified_dimensions=derived.unverified_dimensions,
+                trust_scope=derived.trust_scope,
+                pit_status=pit_status,
+                replay_status=replay_status,
+                custody_status=custody_status,
+                custody_source_authorized=False,
+                custody_source_authorization_status="INTEGRATION_REQUIRED",
+                refusal_reason=None,
+                refusal_detail=(
+                    "custody source not authorized by policy-owned authority"
+                ),
+            )
+
         return ConsumerVerdict(
             decision=ConsumerDecision.ACCEPT_FIELD_BINDING,
             verified_field_allowlist=derived.fields_verified,
@@ -293,8 +456,8 @@ class ConsumerPolicy:
             pit_status=pit_status,
             replay_status=replay_status,
             custody_status=custody_status,
-            custody_source_authorized=derived.custody_source_authorized,
-            custody_source_authorization_status="AUTHORIZED",
+            custody_source_authorized=authority_status == "AUTHORIZED",
+            custody_source_authorization_status=authority_status,
             refusal_reason=None,
             refusal_detail=None,
         )
@@ -308,6 +471,7 @@ class ConsumerPolicy:
         required_fields: tuple[str, ...] = (),
         replay_evaluation: Any = None,
         evidence_references: dict[str, str] | None = None,
+        knowledge_cutoff: datetime | None = None,
     ) -> ConsumerVerdict:
         """Evaluate a verdict, re-deriving it before any inspection.
 
@@ -356,7 +520,13 @@ class ConsumerPolicy:
                         f"{name}: candidate={a!r} derived={b!r}",
                     )
 
-        return self._apply(derived, required_fields, replay_evaluation, evidence_references)
+        return self._apply(
+            derived,
+            required_fields,
+            replay_evaluation,
+            evidence_references,
+            knowledge_cutoff,
+        )
 
     def evaluate_cached(
         self,
@@ -365,10 +535,16 @@ class ConsumerPolicy:
         required_fields: tuple[str, ...] = (),
         replay_evaluation: Any = None,
         evidence_references: dict[str, str] | None = None,
+        knowledge_cutoff: datetime | None = None,
     ) -> ConsumerVerdict:
         """Explicit cached-verdict path (§4) — alias for ``evaluate``."""
         return self.evaluate(
-            candidate, rederive, required_fields, replay_evaluation, evidence_references
+            candidate,
+            rederive,
+            required_fields,
+            replay_evaluation,
+            evidence_references,
+            knowledge_cutoff,
         )
 
 
@@ -429,6 +605,25 @@ def _replay_evaluation(eligibility: ReplayEligibility) -> Any:
             self.reasons = ("synthetic",)
 
     return _R(eligibility)
+
+
+def _synthetic_capability(**overrides: Any) -> "CustodyAuthorityCapability":
+    """Explicit, non-authoritative capability used only to drive downstream
+    field-scope logic (R5).  It can never be presented as an operator decision."""
+    kwargs: dict[str, Any] = {
+        "artifact_id": ARTIFACT_ID,
+        "approval_id": APPROVAL_ID,
+        "registry_digest": REGISTRY_DIGEST,
+        "record_kind": "TRADE",
+        "knowledge_cutoff": None,
+    }
+    kwargs.update(overrides)
+    return CustodyAuthorityCapability.synthetic_for_field_scope_tests(**kwargs)
+
+
+def _shipped_manifest_bytes() -> bytes:
+    root = Path(__file__).resolve().parents[3]
+    return (root / TRUSTED_MANIFEST_RELPATH).read_bytes()
 
 
 # --------------------------------------------------------------------------- #
@@ -560,7 +755,9 @@ class TestCachedVerdictRevalidation:
         assert out.refusal_reason == ConsumerRefusalReason.CACHED_VERDICT_DIVERGENCE
 
     def test_cached_verdict_matching_derived_passes_inspections(self) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         base = _base_verdict(custody_source_authorized=True)
         out = policy.evaluate_cached(
             base,
@@ -599,7 +796,9 @@ class TestEvidenceByteRebinding:
         assert out.refusal_reason == ConsumerRefusalReason.EVIDENCE_BYTES_MISMATCH
 
     def test_correct_bytes_pass(self) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         v = _base_verdict(custody_source_authorized=True)
         out = policy.evaluate(
             v,
@@ -625,7 +824,7 @@ class TestEvidenceByteRebinding:
 
     def test_evidence_reread_detects_tamper(self) -> None:
         store = _store_with_evidence()
-        policy = ConsumerPolicy(store=store)
+        policy = ConsumerPolicy(store=store, custody_authority=_synthetic_capability())
         v = _base_verdict(custody_source_authorized=True)
         out1 = policy.evaluate(
             v,
@@ -700,7 +899,9 @@ class TestPITReplaySeparation:
         assert out.replay_status == ReplayEligibility.BLOCKED_TIMESTAMP.value
 
     def test_pit_admissible_replay_eligible_accepts(self) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         v = _base_verdict(custody_source_authorized=True)
         eligible = _replay_evaluation(ReplayEligibility.ELIGIBLE)
         out = policy.evaluate(
@@ -717,7 +918,9 @@ class TestPITReplaySeparation:
     @pytest.mark.parametrize("pit_ok", [True, False])
     @pytest.mark.parametrize("replay_ok", [True, False])
     def test_four_combinations(self, pit_ok: bool, replay_ok: bool) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         v = _base_verdict(
             custody_source_authorized=True,
             pit_admissible=pit_ok,
@@ -1083,7 +1286,9 @@ class TestAdversarial:
         assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
 
     def test_19_batch_mixed_trusted_and_refused(self) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         good = _base_verdict(custody_source_authorized=True)
         bad = _forged_verdict(trust_scope="FULL_RECORD_TRUST")
         results = [
@@ -1153,7 +1358,9 @@ class TestAdversarial:
 
 class TestMultiPathConformance:
     def test_single_record_path(self) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         v = _base_verdict(custody_source_authorized=True)
         out = policy.evaluate(
             v,
@@ -1165,7 +1372,9 @@ class TestMultiPathConformance:
         assert out.unverified_dimensions
 
     def test_cached_path(self) -> None:
-        policy = ConsumerPolicy(store=_store_with_evidence())
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
         base = _base_verdict(custody_source_authorized=True)
         out = policy.evaluate_cached(
             base,
@@ -1174,7 +1383,8 @@ class TestMultiPathConformance:
             evidence_references={REF: DOC_SHA},
         )
         assert out.decision == ConsumerDecision.ACCEPT_FIELD_BINDING
-        assert out.custody_source_authorized is True
+        assert out.custody_source_authorization_status == "SYNTHETIC_TEST_ONLY"
+        assert out.custody_source_authorized is False
         assert out.unverified_dimensions == base.unverified_dimensions
 
     def test_deserialized_path(self) -> None:
@@ -1192,7 +1402,7 @@ class TestMultiPathConformance:
 
     def test_evidence_reread(self) -> None:
         store = _store_with_evidence()
-        policy = ConsumerPolicy(store=store)
+        policy = ConsumerPolicy(store=store, custody_authority=_synthetic_capability())
         v = _base_verdict(custody_source_authorized=True)
         out1 = policy.evaluate(
             v,
@@ -1236,6 +1446,140 @@ class TestGovernanceScope:
         v = _base_verdict()
         assert v.downstream_trusted is not True or bool(v.fields_verified)
         assert v.trust_scope == TRUST_SCOPE_ECONOMIC_FIELD_BINDING
+
+
+
+class TestCustodyAuthorityBoundary:
+    """SENSOR-B5-I09P3-R5 — custody authorization is policy-owned, not caller-asserted.
+
+    RED before the repair: AT43/AT53/AT55/AT56 produced ``ACCEPT_FIELD_BINDING``
+    because ``ConsumerPolicy`` treated ``custody_source_authorized`` returned by a
+    caller-supplied ``rederive`` callback as authority to accept.
+    """
+
+    @staticmethod
+    def _authoritative(**overrides: Any) -> RecordVerification:
+        return _base_verdict(custody_source_authorized=True, **overrides)
+
+    def test_at53_caller_supplied_true_cannot_grant_acceptance(self) -> None:
+        policy = ConsumerPolicy(store=_store_with_evidence())
+        v = self._authoritative()
+        out = policy.evaluate(
+            v,
+            rederive=lambda: v,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+        assert out.custody_source_authorized is False
+        assert out.custody_source_authorization_status == "INTEGRATION_REQUIRED"
+
+    def test_at43_synthetic_fixture_flag_is_not_authority(self) -> None:
+        policy = ConsumerPolicy(store=_store_with_evidence())
+        v = self._authoritative()
+        out = policy.evaluate(
+            v,
+            rederive=lambda: v,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision != ConsumerDecision.ACCEPT_FIELD_BINDING
+        assert out.custody_source_authorization_status != "AUTHORIZED"
+
+    def test_at54_forged_trusted_context_cannot_mint_authority(self) -> None:
+        forged = TrustedAuthorityContext.model_construct(
+            manifest_sha256="0" * 64,
+            artifact_id=ARTIFACT_ID,
+            manifest_bytes=b'{"artifacts": {}}',
+        )
+        with pytest.raises((RecordVerificationError, ValueError)):
+            CustodyAuthorityCapability.from_reviewed_context(
+                context=forged, semantic_authority=None, knowledge_cutoff=CUTOFF
+            )
+
+    def test_at55_matching_forged_cached_and_rederived_cannot_grant(self) -> None:
+        policy = ConsumerPolicy(store=_store_with_evidence())
+        forged = self._authoritative()
+        out = policy.evaluate_cached(
+            forged,
+            rederive=lambda: forged,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+        assert out.custody_source_authorization_status != "AUTHORIZED"
+
+    def test_at56_cross_record_substitution_cannot_preserve_acceptance(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
+        other = self._authoritative(
+            artifact_id="OTHER_ARTIFACT",
+            approval_id="APPROVAL-OTHER",
+            registry_digest="b" * 64,
+        )
+        out = policy.evaluate(
+            other,
+            rederive=lambda: other,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_cross_cutoff_reuse_re_evaluates_pit_and_replay(self) -> None:
+        capability = _synthetic_capability(knowledge_cutoff=CUTOFF)
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=capability
+        )
+        v = self._authoritative()
+        later = CUTOFF + timedelta(days=1)
+        out = policy.evaluate(
+            v,
+            rederive=lambda: v,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+            knowledge_cutoff=later,
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_synthetic_authority_is_never_presented_as_attested(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
+        v = self._authoritative()
+        out = policy.evaluate(
+            v,
+            rederive=lambda: v,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.ACCEPT_FIELD_BINDING
+        assert out.custody_source_authorization_status == "SYNTHETIC_TEST_ONLY"
+        assert out.custody_source_authorization_status != "AUTHORIZED"
+        assert out.custody_source_authorized is False
+
+    def test_empty_shipped_manifest_never_establishes_approval(self) -> None:
+        manifest = _shipped_manifest_bytes()
+        parsed = parse_approval_manifest(manifest)
+        assert not parsed.artifacts
+        context = TrustedAuthorityContext.from_reviewed_root(
+            manifest_bytes=manifest, artifact_id=ARTIFACT_ID
+        )
+        with pytest.raises((RecordVerificationError, ValueError)):
+            CustodyAuthorityCapability.from_reviewed_context(
+                context=context, semantic_authority=None, knowledge_cutoff=CUTOFF
+            )
+
+    def test_at39_verified_evidence_bytes_do_not_authorize_source(self) -> None:
+        policy = ConsumerPolicy(store=_store_with_evidence())
+        v = self._authoritative()
+        out = policy.evaluate(
+            v,
+            rederive=lambda: v,
+            required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
 
 
 if __name__ == "__main__":

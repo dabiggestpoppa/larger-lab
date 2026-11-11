@@ -287,5 +287,110 @@ Not run by this workstream. Agent 2 owns the memory-intensive final-HEAD slot, a
 
 ---
 
+## 16. R5 addendum (governance recovery, custody-authority repair, controlled publication)
+
+**Starting SHA:** `5ce62c26da8a63dd84160f21694e5eceef406018`
+**Final SHA:** recorded by the R5 commit that follows this document (see branch HEAD).
+**Ancestry:** P3 descends from Integration R1 `3e53a6589`; the R5 commits sit directly on the R4 starting SHA above.
+
+### 16.1 Environment and storage state
+
+The R4 disk exhaustion did not recur: the volume was at **55 GB free (78 % of 238 GB)** when R5 began. Worktree registrations had been reclaimed between runs, and the R4 worktree no longer existed, so nothing from R4 survived. All R4 results below were therefore **re-produced from scratch**, not inherited.
+
+`.worktrees/trust-consumer-r1` was created at the starting SHA and `git worktree add` materialized **all 6,773 tracked files (100 %)**, leaving zero missing tracked files and zero worktree deletions. This is the first full, non-sparse checkout this workstream has achieved; R3's §15.1 blocker is closed as an environment condition, without weakening any assertion that depended on it.
+
+No bulk `checkout-index` was used while storage was unstable, and no shared `.git`, cache, worktree or process data was deleted or altered.
+
+### 16.2 Governance publisher (Phase 1)
+
+```
+UPDATE_I11R2_EVIDENCE=1 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=quant-lab/src \
+  python3 -m pytest -p no:cacheprovider -q \
+  quant-lab/tests/crypto_sensor_fabric/storage/test_i11r2_binding_audit.py::test_governance_binding_audit_is_measured_and_committed
+```
+
+Result: `1 passed`. The publisher recomputes the whole payload (scan → allowlist → hit sets → row verdicts → frozen provenance pin) from the tree; no JSON was hand-edited.
+
+Measured diff — the entire change:
+
+```
+@@ -78 +78 @@
+-  "python_files_scanned": 1096,
++  "python_files_scanned": 1097,
+```
+
+1 insertion, 1 deletion. Because the diff is a single JSON count value, every allowlist, hit set, row verdict and the frozen I07R1I provenance pin are byte-identical by construction. `1097` equals `git ls-files '*.py' | wc -l` at this HEAD.
+
+The new P3 module trips **zero** of the three governance predicates (`## Current state`, `SENSOR_FABRIC_IMPLEMENTATION_PROGRESS`, `Current checkpoint`), so **no allowlist was widened** to accommodate it; the module is admitted by the existing `test_b5_i09` named prefix. This artifact was staged and committed **first**, as `8360c9dd1`, before any further work.
+
+### 16.3 Confirmed RED counterexamples (Phase 2/3)
+
+Nine negative tests were written first and run against the unmodified policy: **9 failed**. Four failed with the unsafe behaviour actually **observed**, on the one code path the traceback proved:
+
+| Attack | Controlled input | Observed before repair | Required |
+|---|---|---|---|
+| AT53 | caller `rederive` returns `custody_source_authorized=True` | `ACCEPT_FIELD_BINDING` (asserted `INTEGRATION_REQUIRED`, got accept) | `INTEGRATION_REQUIRED` |
+| AT43 | synthetic fixture flag promoted | `ACCEPT_FIELD_BINDING` | never `AUTHORIZED` |
+| AT55 | forged cached and forged re-derived verdicts agree True | `ACCEPT_FIELD_BINDING` | `INTEGRATION_REQUIRED` |
+| AT39 | evidence bytes verified, digest matches | `ACCEPT_FIELD_BINDING` | bytes ≠ source authority |
+
+The remaining five failed because the mechanism they test did not exist yet, which is itself the finding: there was no policy-owned authority object, no record binding and no cutoff binding to attack.
+
+| Attack | Reason for RED | Required |
+|---|---|---|
+| AT54 | no capability existed to refuse a forged context | reject |
+| AT56 | no record binding existed (red-team AT56 independently reproduced `ACCEPT`) | `INTEGRATION_REQUIRED` |
+| cross-cutoff | no cutoff binding existed | re-evaluate PIT/replay |
+| empty manifest | no approved-authority mechanism existed | never establishes approval |
+| synthetic-not-attested | no authority category existed | distinguishable status |
+
+### 16.4 Security repair behaviour
+
+Custody-source authority is now a **policy-owned capability** (`CustodyAuthorityCapability`), never a value the record or a callback supplies:
+
+* mintable only through `from_reviewed_context`, which re-validates the manifest through `TrustedAuthorityContext.from_reviewed_root` (a `model_construct`-forged context dies there) and requires a **loader-issued `SemanticAuthority`** carrying the authority module's private issuance seal;
+* bound to record identity (artifact / approval / registry digest and record kind) and to the knowledge cutoff;
+* `ConsumerPolicy._custody_grant` **never consults** `derived.custody_source_authorized`.
+
+Consequences, all enforced by tests: a caller `rederive` cannot accept; agreement between two forged verdicts cannot accept; cross-record and cross-cutoff reuse cannot accept; verified evidence bytes do not authorize a source.
+
+**Empty manifest ⇒ no operator authority.** The shipped `approval_manifest.json` has `"artifacts": {}`, so `ATTESTED_OPERATOR` cannot be minted: the authorization gate returns `INTEGRATION_REQUIRED`. `SYNTHETIC_TEST_ONLY` capability exists solely so downstream field-scope logic stays testable, reports `custody_source_authorization_status="SYNTHETIC_TEST_ONLY"`, and can never report `AUTHORIZED` or `custody_source_authorized=True`.
+
+**Frozen model untouched.** No `authority_origin` field was added to `RecordVerification`; the authority lives externally, as the frozen plan requires.
+
+**Ordering.** PIT and replay are adjudicated before the authority gate, so an inadmissible record is still `REFUSE`d regardless of what any custody source claims, while authorization itself can only yield `INTEGRATION_REQUIRED` or an attested `ACCEPT`.
+
+### 16.5 Test results (Phase 4)
+
+| Suite | Result |
+|---|---|
+| P3 conformance module | **79 passed** — the original 70 preserved unmodified in behaviour, plus 9 new authority-boundary tests |
+| `tests/crypto_sensor_fabric/normalization` (P2a–P2e, I05, I09, I10 scope, P3) | **1310 passed**, 0 failed, 0 errors |
+| `tests/crypto_sensor_fabric/storage` targeted set — I05 evidence/adversarial/retry, I06, I09 evidence/admission/quota, I10 evidence/schema/relations, I11R2 governance + evidence | **265 passed**, 0 failed |
+
+The whole `storage` directory was attempted first and abandoned: it ran at roughly 4 %/min and stalled in slow database-backed modules, so the required I05/I06/I09/I10/I11 set was run explicitly instead. That is a deliberate scope decision, not a substitute claim: modules outside that set (`test_i11_postgres_*`, `test_i11r1_postgres_integration`, `test_i11r1_defect_reproduction`) were **not** executed here and are reported as unrun rather than passed.
+
+I05 and I10 scope audits are green in this full checkout, including their previously blocking **unstaged** assertions — the R3/R4 failures were the partial-checkout deletions, confirmed by their disappearance rather than by relaxing the tests.
+
+Historical positive-path fixtures were updated only to the new bounded model: they now construct the policy with an explicitly non-authoritative synthetic capability, and the cached-path test asserts `SYNTHETIC_TEST_ONLY` rather than `AUTHORIZED`.
+
+### 16.6 Changed paths
+
+* `quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09p2e_trust_consumer.py` — capability repair + 9 boundary tests
+* `quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json` — publisher output, one count line
+* this evidence document
+
+No source module under `quant-lab/src/` was modified.
+
+### 16.7 Remaining unverified authority dimensions
+
+1. **No approved operator-authority mechanism exists.** `ATTESTED_OPERATOR` is unreachable while the shipped manifest approves nothing; wiring one requires a reviewed manifest plus operator review, which is out of scope here.
+2. **In-process data boundary only.** The capability is not a signature scheme and does not resist code running with the application's privileges (`model_construct` skips validators) — the `authority` loader's own bounded claim.
+3. **`custody_status` remains report-only** and still reflects the record's own claim; it is not authority.
+4. No production consumer, provider certification, custody authorization or program-gate promotion exists; `INTEGRATION_STATE` remains `INTEGRATION_REQUIRED`.
+5. The red-team branch's own adversarial file is not part of this implementation branch, so those cases are not counted here.
+
+---
+
 **Signed off:** Agent 1 — Implementation Lead
 **Status:** `P3_R1_IMPLEMENTATION_READY_FOR_INDEPENDENT_AUDIT` (full-checkout regression still outstanding, reported as blocked) — experimental, fail-closed, test-only; no production authority claimed.
