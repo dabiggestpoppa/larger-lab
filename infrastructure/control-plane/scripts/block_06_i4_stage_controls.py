@@ -82,7 +82,8 @@ def main(argv=None) -> int:
                              not [p for p in frozen.stdout.splitlines()
                                   if "OCE_BLOCK_06_I3_" in p], frozen.stdout))
         i3_wf = (root / ".github/workflows/block-06-i3-validation.yml").read_text(encoding="utf-8")
-        results.append(check("i3_workflow_replays", I3_HEAD in i3_wf and "REPLAY_WT" in i3_wf))
+        results.append(check("i3_workflow_present_frozen",
+                             "B6-I3" in i3_wf and "018b164f249bbf075334d5d03ad37e80dcbbede0" in i3_wf))
         add = git(root, "worktree", "add", "--detach", "--quiet", str(work), "HEAD")
         results.append(check("worktree_ready", add.returncode == 0, add.stderr[-300:]))
         if add.returncode == 0:
