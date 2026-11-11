@@ -104,6 +104,54 @@ I3_PINNED = (
 )
 
 
+I3_MERGE = "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14"
+I3_HEAD = "eda33f43e6d058891a8009e98e968c9f00252220"
+I4_SCOPE = f"{DOCS}/OCE_BLOCK_06_I4_SCOPE_DERIVATION_v1.0.json"
+I4_CONTRACT = f"{DOCS}/OCE_BLOCK_06_I4_IMPLEMENTATION_CONTRACT_v1.0.json"
+I4_REG = f"{DOCS}/OCE_BLOCK_06_I4_STAGE_SCOPE_REGISTRATION_v1.0.json"
+I3_PREFIXES = (
+    "oce/operator/",
+    f"{DOCS}/OCE_BLOCK_06_I3_",
+    "infrastructure/control-plane/scripts/block_06_i3_",
+    "infrastructure/control-plane/tests/test_block_06_i3_",
+    "infrastructure/control-plane/tests/stage_scope/test_block_06_i3_",
+    ".github/workflows/block-06-i3-validation.yml",
+    ".github/workflows/block-06-i3-paired-comparison.yml",
+)
+# Pinned: the surfaces the B6-I4 registration itself is allowed to author or amend.
+I4_PINNED = (
+    I4_REG,
+    I4_SCOPE,
+    I4_CONTRACT,
+    f"{DOCS}/OCE_BLOCK_06_I4_MANIFEST_v1.0.json",
+    f"{DOCS}/OCE_BLOCK_06_I4_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+    f"{DOCS}/OCE_BLOCK_06_I4_COMPATIBILITY_MATRIX_v1.0.json",
+    f"{DOCS}/OCE_BLOCK_06_I4_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+    f"{DOCS}/OCE_BLOCK_06_I4_OPERATOR_SURFACE_CONTRACT_v1.0.json",
+    f"{DOCS}/OCE_BLOCK_06_I4_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+    "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+    "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i4_validate.py",
+    "infrastructure/control-plane/scripts/block_06_i4_generate.py",
+    "infrastructure/control-plane/scripts/block_06_i4_mutation_battery.py",
+    "infrastructure/control-plane/scripts/block_06_i4_stage_controls.py",
+    "infrastructure/control-plane/scripts/block_06_i4_paired.py",
+    ".github/workflows/block-06-i4-validation.yml",
+    ".github/workflows/block-06-i4-paired-comparison.yml",
+)
+I4_PREFIXES = (
+    "oce/operator/",
+    "oce/services/",
+    f"{DOCS}/OCE_BLOCK_06_I4_",
+    "infrastructure/control-plane/scripts/block_06_i4_",
+    "infrastructure/control-plane/tests/test_block_06_i4_",
+    "infrastructure/control-plane/tests/stage_scope/test_block_06_i4_",
+    ".github/workflows/block-06-i4-validation.yml",
+    ".github/workflows/block-06-i4-paired-comparison.yml",
+)
+
+
 class StageScopeError(Exception):
     def __init__(self, check: str, detail) -> None:
         super().__init__(f"{check}: {detail}")
@@ -291,6 +339,83 @@ def _resolve_i3(root: pathlib.Path, base: str) -> dict:
     }
 
 
+def _resolve_i4(root: pathlib.Path, base: str) -> dict:
+    if base != I3_MERGE:
+        raise StageScopeError("stage/base_moved", base)
+    code, _ = _git(root, "merge-base", "--is-ancestor", I3_MERGE, "HEAD")
+    if code != 0:
+        raise StageScopeError("stage/base_moved", "HEAD does not descend from the B6-I3 merge")
+    for rel in (I4_REG, I4_SCOPE, I4_CONTRACT, I3_REG, I3_SCOPE, I3_CONTRACT, I2_REG, I2_SCOPE,
+                I1_SCOPE, I1_CONTRACT, AMENDMENT):
+        _require_identity_file(root, rel)
+    amendment = json.loads((root / AMENDMENT).read_text(encoding="utf-8"))
+    if amendment.get("amendment_id") != AMENDMENT_ID or amendment.get("status") != "FROZEN":
+        raise StageScopeError("stage/identity_unknown", amendment.get("amendment_id"))
+    declared = tuple(amendment.get("authorized_paths", ()))
+    if len(declared) != len(AMENDMENT_PATHS) or set(declared) != set(AMENDMENT_PATHS):
+        raise StageScopeError("stage/identity_tampered", "amendment allowlist differs from the pin")
+    i3_registration = json.loads((root / I3_REG).read_text(encoding="utf-8"))
+    i3_scope = json.loads((root / I3_SCOPE).read_text(encoding="utf-8"))
+    if (i3_registration.get("document_id") != "OCE-B6-I3-STAGE-SCOPE-REGISTRATION-001"
+            or i3_registration.get("status") != "FROZEN"):
+        raise StageScopeError("stage/identity_unknown", i3_registration.get("status"))
+    if i3_scope.get("stage") != "B6-I3":
+        raise StageScopeError("stage/identity_unknown", i3_scope.get("stage"))
+    registration = json.loads((root / I4_REG).read_text(encoding="utf-8"))
+    scope = json.loads((root / I4_SCOPE).read_text(encoding="utf-8"))
+    contract = json.loads((root / I4_CONTRACT).read_text(encoding="utf-8"))
+    if (registration.get("document_id") != "OCE-B6-I4-STAGE-SCOPE-REGISTRATION-001"
+            or registration.get("status") != "FROZEN"
+            or registration.get("frozen_before_results") is not True):
+        raise StageScopeError("stage/identity_unknown", registration.get("document_id"))
+    if scope.get("stage") != "B6-I4" or contract.get("stage") != "B6-I4":
+        raise StageScopeError("stage/identity_unknown", (scope.get("stage"),
+                                                         contract.get("stage")))
+    if contract.get("status") != "FROZEN" or contract.get("frozen_before_results") is not True:
+        raise StageScopeError("stage/identity_unknown", contract.get("status"))
+    prior = registration.get("prior_stages") or {}
+    if (prior.get("B6-I0", {}).get("head") != I0_HEAD
+            or prior.get("B6-I1", {}).get("head") != I1_HEAD
+            or prior.get("B6-I2", {}).get("head") != I2_HEAD
+            or prior.get("B6-I3", {}).get("head") != I3_HEAD):
+        raise StageScopeError("stage/identity_tampered", prior)
+    this = registration.get("this_stage") or {}
+    if this.get("base") != I3_MERGE or this.get("base_tree") != scope.get("base_tree"):
+        raise StageScopeError("stage/identity_tampered", this.get("base"))
+    prefixes = tuple(this.get("allowed_prefixes") or ())
+    if "oce/services/" not in prefixes or "oce/operator/" not in prefixes:
+        raise StageScopeError("stage/identity_unknown", "B6-I4 registration declares no authority")
+    _reject_later_artifacts(root, start=5)
+    i1_scope = json.loads((root / I1_SCOPE).read_text(encoding="utf-8"))
+    i1_owned = tuple(i1_scope.get("allowed_paths") or ())
+    i2_prefixes = tuple(json.loads((root / I2_REG).read_text(encoding="utf-8"))
+                        ["this_stage"]["allowed_prefixes"])
+    i3_prefixes = tuple(i3_registration["this_stage"]["allowed_prefixes"])
+    allowed = tuple(dict.fromkeys(i1_owned + AMENDMENT_PATHS + i2_prefixes + I2_PINNED
+                                  + i3_prefixes + I3_PINNED + prefixes + I4_PINNED))
+    oce_authority = tuple(dict.fromkeys(i1_owned + tuple(p for p in allowed
+                                                         if p.startswith("oce/"))))
+    return {
+        "mode": "i4",
+        "requested": "auto",
+        "stage": "B6-I4",
+        "identity": {
+            "registration_sha256": hashlib.sha256((root / I4_REG).read_bytes()).hexdigest(),
+            "scope_sha256": hashlib.sha256((root / I4_SCOPE).read_bytes()).hexdigest(),
+            "contract_sha256": hashlib.sha256((root / I4_CONTRACT).read_bytes()).hexdigest(),
+            "i0_head": I0_HEAD,
+            "i1_head": I1_HEAD,
+            "i2_head": I2_HEAD,
+            "i3_head": I3_HEAD,
+            "i3_merge": I3_MERGE,
+        },
+        "allowed": allowed,
+        "i1_allowed": oce_authority,
+        "amendment": tuple(dict.fromkeys(AMENDMENT_PATHS + I2_PINNED + I3_PINNED + I4_PINNED)),
+        "i0_merge": I3_MERGE,
+    }
+
+
 def _resolve_i1(root: pathlib.Path, base: str) -> dict:
     if base != I0_MERGE:
         raise StageScopeError("stage/base_moved", base)
@@ -366,6 +491,8 @@ def resolve(root, requested: str = "auto") -> dict:
     if code != 0:
         raise StageScopeError("stage/identity_missing", "origin/main is not resolvable")
 
+    if (root / I4_REG).exists():
+        return _resolve_i4(root, base)
     if (root / I3_REG).exists():
         return _resolve_i3(root, base)
     if (root / I2_REG).exists():

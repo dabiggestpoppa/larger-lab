@@ -1,0 +1,144 @@
+{
+  "artifacts": [
+    {
+      "bytes": 541,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_COMPATIBILITY_MATRIX_v1.0.json",
+      "sha256": "ab1da2314f4533219bfc6595b945f3ede7b2e126d3db71537f82d2c030366756"
+    },
+    {
+      "bytes": 2654,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "sha256": "7e7bc14ee51d190807b22889a43315db30bd2aee3cc5e86bc8140d551bdb95de"
+    },
+    {
+      "bytes": 5813,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "sha256": "8c5adae9cd1a6ecc2d93dacd939fec3d08e364772f432e91c27c0da373a4478c"
+    },
+    {
+      "bytes": 5787,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_OPERATOR_SURFACE_CONTRACT_v1.0.json",
+      "sha256": "04bb93de50e1883e74263643acee0f067d9e39872d95e563a75c805ef98e16f9"
+    },
+    {
+      "bytes": 1366,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+      "sha256": "52a0564282858865f5247e280b3e052b84bdd143461d8f2d926ee0c7c0463aee"
+    },
+    {
+      "bytes": 13615,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "sha256": "15f26a22ebf34469c4b4f397a7852e8e51b64899e8a7937c6e8a9498eb86a0d4"
+    },
+    {
+      "bytes": 3343,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_SCOPE_DERIVATION_v1.0.json",
+      "sha256": "9bc988479850432d6121952af00c4f0ef0cf0f4fa3636b4c4a86ee80fdfbfcb4"
+    },
+    {
+      "bytes": 2244,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_STAGE_SCOPE_REGISTRATION_v1.0.json",
+      "sha256": "1ebc11bb2647cc191caaafb59769f97cc9d7e8de137460fbb14f972eb564be91"
+    }
+  ],
+  "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+  "code": [
+    {
+      "bytes": 3396,
+      "path": "infrastructure/control-plane/scripts/block_06_i4_generate.py",
+      "sha256": "aeb1b383112a0b078d9b97f6b436ea98d29d479b486f7e9f74d9da0b64f975e6"
+    },
+    {
+      "bytes": 6148,
+      "path": "infrastructure/control-plane/scripts/block_06_i4_mutation_battery.py",
+      "sha256": "d2988c27a16b5aa54b49f728ce5568c9c35025e3a04d3b18fcc1adac7fd84650"
+    },
+    {
+      "bytes": 5139,
+      "path": "infrastructure/control-plane/scripts/block_06_i4_paired.py",
+      "sha256": "6bb4cff9bc820e78cbe6d04e4a609cf7f09b6c24c52b5baaa225c06232a51bbe"
+    },
+    {
+      "bytes": 6646,
+      "path": "infrastructure/control-plane/scripts/block_06_i4_stage_controls.py",
+      "sha256": "2dda435ff7d999b1dd46534e02d93a3df0f035361115f64d5fe4f90863961a79"
+    },
+    {
+      "bytes": 13133,
+      "path": "infrastructure/control-plane/scripts/block_06_i4_validate.py",
+      "sha256": "671e2230e21f176c0d755860dad3a6f4b1778ab5c0b24a6a470f6d649dd2dce1"
+    },
+    {
+      "bytes": 27738,
+      "path": "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+      "sha256": "90e7586340c93c1b70ca9ba64c2b6575d277f2ec53f5f8338bcf70c02b6f97b5"
+    },
+    {
+      "bytes": 35760,
+      "path": "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+      "sha256": "d2c20190654705cd21ec09e580a19e3f43379178f9b1efbaac70b1a50a2a8af8"
+    },
+    {
+      "bytes": 15193,
+      "path": "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+      "sha256": "799390b506687e4cd256ffcd82eedd7cfab5268639a2f16e29e984675eeb5470"
+    },
+    {
+      "bytes": 4493,
+      "path": "oce/operator/incident.py",
+      "sha256": "851db3c1b136151179dc93a284bdaeaab8020cd1d70060463f8ae606ac25ad57"
+    },
+    {
+      "bytes": 4472,
+      "path": "oce/operator/cost.py",
+      "sha256": "f04466c6b7ad60a9179ecabed5a7b90ea710ff9ab35f7152540fd130156e9010"
+    },
+    {
+      "bytes": 3142,
+      "path": "oce/operator/trace.py",
+      "sha256": "232f5df4e929ed4757145f02fbaa7bd351ddca3244ee7a25838c8ac7da80503a"
+    },
+    {
+      "bytes": 629,
+      "path": "oce/services/__init__.py",
+      "sha256": "cf28f979b3c9622d24ca75447e0df86f4f206029e00f77ea9af62c261e74ef50"
+    },
+    {
+      "bytes": 3605,
+      "path": "oce/services/identity.py",
+      "sha256": "b3376e70c617fd89c6f9dd907d5fac7fa3e4758405cb9d906bd3c502793d3b38"
+    },
+    {
+      "bytes": 5715,
+      "path": "oce/services/workflow.py",
+      "sha256": "761f8701a380c87e8238fa87da4b4d208aa204e4253fadfe9458a01994ec8f21"
+    },
+    {
+      "bytes": 699,
+      "path": "oce/services/refusals.py",
+      "sha256": "1ebd55b0a944dc9361a91b53bd755dc85dcb3dfcdb29477c9c21e488265bf779"
+    }
+  ],
+  "document_id": "OCE-B6-I4-MANIFEST-001",
+  "hash": "sha256",
+  "locks": {
+    "B6-I5_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "schema": "oce.block_06_i4.manifest.v1",
+  "size": "bytes",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "totals": {
+    "artifacts": 8,
+    "code": 15
+  },
+  "verification": {
+    "excludes_manifest": true,
+    "independent": true
+  }
+}
