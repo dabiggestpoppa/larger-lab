@@ -69,9 +69,9 @@
       "sha256": "671e2230e21f176c0d755860dad3a6f4b1778ab5c0b24a6a470f6d649dd2dce1"
     },
     {
-      "bytes": 27738,
+      "bytes": 27790,
       "path": "infrastructure/control-plane/scripts/block_06_stage_scope.py",
-      "sha256": "90e7586340c93c1b70ca9ba64c2b6575d277f2ec53f5f8338bcf70c02b6f97b5"
+      "sha256": "3e4bc38f004886b13816366ca081684454917d59833a021b619d4884bd1d8dbc"
     },
     {
       "bytes": 35760,

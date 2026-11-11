@@ -139,6 +139,7 @@ I4_PINNED = (
     "infrastructure/control-plane/scripts/block_06_i4_paired.py",
     ".github/workflows/block-06-i4-validation.yml",
     ".github/workflows/block-06-i4-paired-comparison.yml",
+    ".github/workflows/block-06-i3-validation.yml",
 )
 I4_PREFIXES = (
     "oce/operator/",
