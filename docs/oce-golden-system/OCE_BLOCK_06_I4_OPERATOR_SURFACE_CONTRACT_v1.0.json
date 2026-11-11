@@ -1,0 +1,224 @@
+{
+  "document_id": "OCE-B6-I4-SURFACE-001",
+  "prohibitions": [
+    "no client supplied authority",
+    "no raw secret stored in clients",
+    "no wall clock read",
+    "no random ids or random sampling",
+    "no later stage import",
+    "no cloud or network access"
+  ],
+  "schema": "oce.block_06_i4.operator_surface.v1",
+  "section_bindings": {
+    "C2.S4": "oce.operator.incident_view + oce.operator.assess_drill",
+    "C2.S5": "oce.operator.cost_ledger + oce.operator.budget_alerts",
+    "C3.S1": "oce.services.identity_registry + oce.services.resolve_identity",
+    "C3.S2": "oce.services.define_workflow + start_run + acquire_lease + advance_run + cancel_run + retry_run",
+    "trace": "oce.operator.failure_cost_trace"
+  },
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "symbols": [
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unknown_subject_severity_timeline_unresolved_risk",
+      "exported": true,
+      "section": "C2.S4",
+      "symbol": "oce.operator.incident_view",
+      "typed_inputs": [
+        "incidents",
+        "viewer"
+      ],
+      "typed_outputs": [
+        "incident_view"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_broken_timeline",
+      "exported": true,
+      "section": "C2.S4",
+      "symbol": "oce.operator.assess_drill",
+      "typed_inputs": [
+        "drill",
+        "latency_limit"
+      ],
+      "typed_outputs": [
+        "drill_assessment"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unknown_category_invalid_cost",
+      "exported": true,
+      "section": "C2.S5",
+      "symbol": "oce.operator.cost_ledger",
+      "typed_inputs": [
+        "entries"
+      ],
+      "typed_outputs": [
+        "cost_ledger"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unknown_category_unknown_app",
+      "exported": true,
+      "section": "C2.S5",
+      "symbol": "oce.operator.budget_alerts",
+      "typed_inputs": [
+        "ledger",
+        "budgets",
+        "projections"
+      ],
+      "typed_outputs": [
+        "budget_alerts"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_raw_secret_duplicate_identity",
+      "exported": true,
+      "section": "C3.S1",
+      "symbol": "oce.services.identity_registry",
+      "typed_inputs": [
+        "records"
+      ],
+      "typed_outputs": [
+        "identity_registry"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unknown_cross_app_revoked",
+      "exported": true,
+      "section": "C3.S1",
+      "symbol": "oce.services.resolve_identity",
+      "typed_inputs": [
+        "registry",
+        "identity_id",
+        "app",
+        "now"
+      ],
+      "typed_outputs": [
+        "identity_resolution"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_invalid_workflow",
+      "exported": true,
+      "section": "C3.S2",
+      "symbol": "oce.services.define_workflow",
+      "typed_inputs": [
+        "definition"
+      ],
+      "typed_outputs": [
+        "workflow_definition"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_invalid_workflow",
+      "exported": true,
+      "section": "C3.S2",
+      "symbol": "oce.services.start_run",
+      "typed_inputs": [
+        "definition",
+        "run_id",
+        "now"
+      ],
+      "typed_outputs": [
+        "workflow_run"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_lease_held_cancelled",
+      "exported": true,
+      "section": "C3.S2",
+      "symbol": "oce.services.acquire_lease",
+      "typed_inputs": [
+        "run",
+        "owner",
+        "now",
+        "ttl"
+      ],
+      "typed_outputs": [
+        "workflow_run"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_illegal_transition_lease_owner_cancelled",
+      "exported": true,
+      "section": "C3.S2",
+      "symbol": "oce.services.advance_run",
+      "typed_inputs": [
+        "definition",
+        "run",
+        "event_id",
+        "event",
+        "actor",
+        "now"
+      ],
+      "typed_outputs": [
+        "workflow_run"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_cancelled",
+      "exported": true,
+      "section": "C3.S2",
+      "symbol": "oce.services.cancel_run",
+      "typed_inputs": [
+        "run",
+        "actor",
+        "now"
+      ],
+      "typed_outputs": [
+        "workflow_run"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_retry_exceeded_cancelled",
+      "exported": true,
+      "section": "C3.S2",
+      "symbol": "oce.services.retry_run",
+      "typed_inputs": [
+        "run",
+        "max_retries"
+      ],
+      "typed_outputs": [
+        "workflow_run"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_broken_trace_cross_app_unknown",
+      "exported": true,
+      "section": "C2.S4",
+      "symbol": "oce.operator.failure_cost_trace",
+      "typed_inputs": [
+        "nodes",
+        "registry",
+        "incidents",
+        "runs",
+        "cost_refs",
+        "app",
+        "root"
+      ],
+      "typed_outputs": [
+        "failure_cost_trace"
+      ]
+    }
+  ],
+  "view_invariants": {
+    "canonical_digest_present": true,
+    "cost_estimate_actual_separate": true,
+    "incident_rows_sorted": "severity then id",
+    "trace_chain_ordered": true
+  }
+}
