@@ -84,12 +84,16 @@ def main(argv=None) -> int:
         i3_wf = (root / ".github/workflows/block-06-i3-validation.yml").read_text(encoding="utf-8")
         i3_base = "018b164f249bbf075334d5d03ad37e80dcbbede0"
         i3_head = "eda33f43e6d058891a8009e98e968c9f00252220"
+        replay = i3_wf.split("name: Replay the frozen B6-I3 head", 1)
+        replay_block = replay[1].split("- name:", 1)[0] if len(replay) == 2 else ""
         results.append(check("i3_workflow_present_frozen",
                              "B6-I3 Validation" in i3_wf
                              and "block-06-i3-validation" in i3_wf
-                             and i3_base in i3_wf and i3_head in i3_wf,
+                             and i3_base in replay_block and i3_head in replay_block,
                              {"label": "B6-I3 Validation" in i3_wf,
-                              "base": i3_base in i3_wf, "head": i3_head in i3_wf}))
+                              "replay_block": bool(replay_block),
+                              "base": i3_base in replay_block,
+                              "head": i3_head in replay_block}))
         registrations = json.loads((root / I4_REG).read_text(encoding="utf-8"))
         results.append(check("i3_workflow_registered",
                              ".github/workflows/block-06-i3-validation.yml"
