@@ -1,0 +1,56 @@
+SENSOR-B5-I09P2-INTEGRATION-R2-AUDIT — INDEPENDENT CANONICAL RUN GROUP LOGS
+audited_sha=3e53a65897283b32d42dfe6d879e7acf389fd873  production_base=f199a7e3f7d92ce555fb436343d24bd42907c3a8
+python=3.11.9  platform=Windows-10-10.0.26200-SP0
+collection=4640 unique=4640
+method: 10 bounded partitions; every partition started from a clean committed tree
+        (git restore to HEAD before each); junit XML per partition; node ids mapped back
+        from (classname,name) against the same collection, so ids are proven, not counted.
+
+PER-GROUP RESULTS
+  chunk01: collected=486 executed=486 passed=486 exit=0 dur=8.0s junit_sha256=fe59360c0c17f00a3a23dc78d3985caca82f9755686fa8e6f5b43d09bb628292
+  chunk02: collected=507 executed=507 passed=507 exit=0 dur=49.4s junit_sha256=f087300454cb08ca3ae41f7947011b58ed1d87a3a4093614579066f651a36c9f
+  chunk03: collected=509 executed=509 passed=509 exit=0 dur=9.9s junit_sha256=3af0e1e0689be6817e596becba0cfa8097fefef32b5f93f5d9445f8ef9fc2cab
+  chunk04: collected=502 executed=502 passed=502 exit=0 dur=10.7s junit_sha256=50e0bb02d2160c93ce7e7a84467a9e223c6af06913f06fca0bb44bb19daa1069
+  chunk05: collected=504 executed=504 passed=503 skipped=1 exit=0 dur=46.3s junit_sha256=2d5613fa9a989ba7dfa8b6b43e4ebf6db3d17518ae079e405d9cbb0308e869a0
+  chunk06: collected=507 executed=507 passed=505 skipped=2 exit=0 dur=302.5s junit_sha256=e744f58117388388ab609e1ffad5138c9b07b723dbf5371e146d746d52324ec1
+  chunk07: collected=519 executed=519 passed=515 skipped=4 exit=0 dur=645.2s junit_sha256=8505dd6f2501b5409879eed3a4c557561fbedbba6b9eb3a52664443112af1889
+  chunk08: collected=477 executed=477 passed=474 skipped=3 exit=0 dur=290.7s junit_sha256=d365b44d2c69d638de37e25ea9f96db1fe8d49f6217b7e7f145043b0d998230f
+  chunk09: collected=509 executed=509 passed=508 skipped=1 exit=0 dur=41.6s junit_sha256=c57101f49dd325f1365a8ab6b70f773df395be0064d8a5e76c13b4968cf2a8ba
+  chunk10: collected=120 executed=120 passed=120 exit=0 dur=68.1s junit_sha256=38ad965c0e2919f2b82dd62f09ad5d56983620f9e07871f9788c9fc590e1e686
+
+TOTALS passed=4629 skipped=11 failed=0 errors=0
+COVERAGE collected=4640 executed=4640 missing=0 extra=0 duplicates=0 unmapped=0
+
+FULL SKIP LEDGER (every skipped node id, with its own reason)
+  SKIP quant-lab/tests/crypto_sensor_fabric/providers/test_network_smoke_live.py::test_live_production_network_smoke
+       reason: SENSOR_NETWORK_SMOKE not set; live network smoke disabled
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store.py::TestPermissions::test_final_not_world_writable
+       reason: POSIX mode bits do not apply on Windows
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNameMaxProbe::test_posix_probe_failure_fails_closed
+       reason: platform has no os.pathconf
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_integration_is_explicitly_opt_in
+       reason: real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_failed_refresh_rolls_back_previous_snapshot
+       reason: real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_restore_symlinked_destination_component_refused
+       reason: symlink privilege unavailable on this platform
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_verify_symlinked_pack_object_refused
+       reason: symlink privilege unavailable on this platform
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_concurrent_publication.py::TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed
+       reason: Windows cannot create symlinks without privilege (1314)
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_path_canonicalization.py::TestCaseLaw::test_distinct_posix_directories_are_not_merged
+       reason: Windows filesystem is case-insensitive here
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_json_catalog.py::TestCorruptionFailClosed::test_unreadable_fragment_fails_closed
+       reason: POSIX permission semantics
+  SKIP quant-lab/tests/crypto_sensor_fabric/storage/test_recovery.py::test_symlink_escape_rejected
+       reason: POSIX symlink semantics required
+
+NON-HERMETIC PRODUCER NOTE
+  chunk01 began with 7 modified tracked paths left by an earlier partition-less attempt;
+  they were restored to HEAD before the first partition ran, and every later partition was
+  preceded by the same check. No canonical result was measured on a dirty tree.
+
+REPRODUCTION
+  git checkout --detach 3e53a65897283b32d42dfe6d879e7acf389fd873
+  PYTHONPATH=quant-lab/src python -m pytest quant-lab/tests --collect-only -q   # 4640
+  PYTHONPATH=quant-lab/src python -m pytest <partition paths> -v --junitxml=<file>.xml

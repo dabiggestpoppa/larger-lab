@@ -1,0 +1,166 @@
+{
+  "checkpoint": "SENSOR-B5-I09P2-INTEGRATION-R2-AUDIT",
+  "execution_kind": "NEW_INDEPENDENT_EXECUTION",
+  "audited_sha": "3e53a65897283b32d42dfe6d879e7acf389fd873",
+  "production_base": "f199a7e3f7d92ce555fb436343d24bd42907c3a8",
+  "previous_pinned_run_commit": "ac67ba562e7a7fa285a662635b7254810448c96e",
+  "python": "3.11.9",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "generated_utc": "2026-11-12T14:47:46Z",
+  "tree_state": "clean committed tree at audited_sha; restored to HEAD between every partition (suite is non-hermetic: 7 tracked paths were rewritten during chunk01 and restored)",
+  "collection": {
+    "count": 4640,
+    "unique": 4640,
+    "source": "pytest quant-lab/tests --collect-only -q"
+  },
+  "execution": {
+    "recorded": 4640,
+    "unique": 4640,
+    "missing": 0,
+    "extra": 0,
+    "duplicates": 0,
+    "unmapped_junit_cases": 0,
+    "node_id_mapping": "junit classname+name -> nodeid index built from the same collection"
+  },
+  "totals": {
+    "passed": 4629,
+    "skipped": 11,
+    "failed": 0,
+    "errors": 0
+  },
+  "groups": [
+    {
+      "group": "chunk01",
+      "files": 15,
+      "collected": 486,
+      "executed": 486,
+      "status": {
+        "PASSED": 486
+      },
+      "exit_status": 0,
+      "duration_seconds": 8.0,
+      "junit_xml_sha256": "fe59360c0c17f00a3a23dc78d3985caca82f9755686fa8e6f5b43d09bb628292"
+    },
+    {
+      "group": "chunk02",
+      "files": 19,
+      "collected": 507,
+      "executed": 507,
+      "status": {
+        "PASSED": 507
+      },
+      "exit_status": 0,
+      "duration_seconds": 49.4,
+      "junit_xml_sha256": "f087300454cb08ca3ae41f7947011b58ed1d87a3a4093614579066f651a36c9f"
+    },
+    {
+      "group": "chunk03",
+      "files": 23,
+      "collected": 509,
+      "executed": 509,
+      "status": {
+        "PASSED": 509
+      },
+      "exit_status": 0,
+      "duration_seconds": 9.9,
+      "junit_xml_sha256": "3af0e1e0689be6817e596becba0cfa8097fefef32b5f93f5d9445f8ef9fc2cab"
+    },
+    {
+      "group": "chunk04",
+      "files": 16,
+      "collected": 502,
+      "executed": 502,
+      "status": {
+        "PASSED": 502
+      },
+      "exit_status": 0,
+      "duration_seconds": 10.7,
+      "junit_xml_sha256": "50e0bb02d2160c93ce7e7a84467a9e223c6af06913f06fca0bb44bb19daa1069"
+    },
+    {
+      "group": "chunk05",
+      "files": 21,
+      "collected": 504,
+      "executed": 504,
+      "status": {
+        "PASSED": 503,
+        "SKIPPED": 1
+      },
+      "exit_status": 0,
+      "duration_seconds": 46.3,
+      "junit_xml_sha256": "2d5613fa9a989ba7dfa8b6b43e4ebf6db3d17518ae079e405d9cbb0308e869a0"
+    },
+    {
+      "group": "chunk06",
+      "files": 38,
+      "collected": 507,
+      "executed": 507,
+      "status": {
+        "PASSED": 505,
+        "SKIPPED": 2
+      },
+      "exit_status": 0,
+      "duration_seconds": 302.5,
+      "junit_xml_sha256": "e744f58117388388ab609e1ffad5138c9b07b723dbf5371e146d746d52324ec1"
+    },
+    {
+      "group": "chunk07",
+      "files": 42,
+      "collected": 519,
+      "executed": 519,
+      "status": {
+        "PASSED": 515,
+        "SKIPPED": 4
+      },
+      "exit_status": 0,
+      "duration_seconds": 645.2,
+      "junit_xml_sha256": "8505dd6f2501b5409879eed3a4c557561fbedbba6b9eb3a52664443112af1889"
+    },
+    {
+      "group": "chunk08",
+      "files": 26,
+      "collected": 477,
+      "executed": 477,
+      "status": {
+        "PASSED": 474,
+        "SKIPPED": 3
+      },
+      "exit_status": 0,
+      "duration_seconds": 290.7,
+      "junit_xml_sha256": "d365b44d2c69d638de37e25ea9f96db1fe8d49f6217b7e7f145043b0d998230f"
+    },
+    {
+      "group": "chunk09",
+      "files": 16,
+      "collected": 509,
+      "executed": 509,
+      "status": {
+        "PASSED": 508,
+        "SKIPPED": 1
+      },
+      "exit_status": 0,
+      "duration_seconds": 41.6,
+      "junit_xml_sha256": "c57101f49dd325f1365a8ab6b70f773df395be0064d8a5e76c13b4968cf2a8ba"
+    },
+    {
+      "group": "chunk10",
+      "files": 5,
+      "collected": 120,
+      "executed": 120,
+      "status": {
+        "PASSED": 120
+      },
+      "exit_status": 0,
+      "duration_seconds": 68.1,
+      "junit_xml_sha256": "38ad965c0e2919f2b82dd62f09ad5d56983620f9e07871f9788c9fc590e1e686"
+    }
+  ],
+  "skip_ledger_count": 11,
+  "verdict": "COMPLETE",
+  "baseline_comparison": {
+    "baseline_collected": 4640,
+    "baseline_passed": 4629,
+    "baseline_skipped": 11,
+    "match": true
+  }
+}
