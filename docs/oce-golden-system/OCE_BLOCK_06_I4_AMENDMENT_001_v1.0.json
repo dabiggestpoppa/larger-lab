@@ -1,0 +1,178 @@
+{
+  "amended_inventory": {
+    "modules": 6,
+    "mutations": 14,
+    "requirements": 41,
+    "source_mutation_floor": 4,
+    "test_nodes": 41
+  },
+  "amendment": "001",
+  "append_only": true,
+  "cost_usd": 0,
+  "deferred": [
+    {
+      "authority": "cross-stage",
+      "blocking": false,
+      "detail": "B6-I4 failure class F18 is currently unbound. It is not silently accepted as corrected and does not authorize B6-I5.",
+      "id": "F2",
+      "item": "inherited failure/threat mapping convention",
+      "owner": "Book 6 governance-correction stage",
+      "stage": "FUTURE_BOOK_6_GOVERNANCE_CORRECTION"
+    }
+  ],
+  "document_id": "OCE-B6-I4-AMENDMENT-001",
+  "findings": [
+    {
+      "change": "STAGE_SCOPE_REGISTRATION explicitly declares the B6-I3 validation workflow",
+      "disposition": "REPAIR_NOW",
+      "id": "B1"
+    },
+    {
+      "change": "i3_workflow_present_frozen asserts base and head endpoints and workflow label",
+      "disposition": "REPAIR_NOW",
+      "id": "C1"
+    },
+    {
+      "change": "advance_run refuses a definition id or version mismatch before transition",
+      "disposition": "REPAIR_NOW",
+      "id": "E1"
+    },
+    {
+      "change": "cost surfaces accept only non-negative exact integers",
+      "disposition": "REPAIR_NOW",
+      "id": "E3"
+    },
+    {
+      "change": "secret-key detection recurses through nested mappings and sequences",
+      "disposition": "REPAIR_NOW",
+      "id": "E4"
+    },
+    {
+      "change": "incident ownership binding and duplicate incident refusal",
+      "disposition": "HARDEN_THROUGH_F1",
+      "id": "E5"
+    },
+    {
+      "change": "retry and cancellation lease behavior is contract-conformant",
+      "disposition": "NO_CHANGE",
+      "id": "E6"
+    },
+    {
+      "change": "I3 own-head replay retained; successor-tree protection is advisory",
+      "disposition": "NO_PRODUCT_CHANGE",
+      "id": "E7"
+    },
+    {
+      "change": "failure and cost trace binds identity to incident ownership",
+      "disposition": "HARDEN_NOW",
+      "id": "F1"
+    },
+    {
+      "change": "failure/threat mapping convention moves to a governance-correction stage",
+      "disposition": "DEFER",
+      "id": "F2"
+    }
+  ],
+  "locks": {
+    "B6-I5_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "new_nodes": [
+    "test_block_06_i4_cost.py::test_fractional_cost_refused",
+    "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+    "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+    "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+    "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
+    "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
+    "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused"
+  ],
+  "new_requirements": [
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
+      "failure_class": "F11",
+      "id": "B6I4-R35",
+      "negative_control": "trace identity ref is not an incident owner",
+      "section": "C2.S4",
+      "statement": "A trace cannot return TRACE_OK unless the identity is an authorized incident owner"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+      "failure_class": "F23",
+      "id": "B6I4-R36",
+      "negative_control": "two accepted incident rows share one id",
+      "section": "C2.S4",
+      "statement": "Duplicate incident ids are refused deterministically before projection"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
+      "failure_class": "F03",
+      "id": "B6I4-R37",
+      "negative_control": "advance a v1 run with a v2 definition",
+      "section": "C3.S2",
+      "statement": "advance_run refuses a definition id or version mismatch before any transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_fractional_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R38",
+      "negative_control": "fractional 0.9 is silently coerced to 0",
+      "section": "C2.S5",
+      "statement": "Fractional cost or capacity values are refused, never coerced to an integer"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R39",
+      "negative_control": "boolean, string, non-finite or null cost is accepted",
+      "section": "C2.S5",
+      "statement": "Non-integer cost and capacity values raise a governed refusal, not a bare error"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R40",
+      "negative_control": "a secret key nested inside a mapping is dropped",
+      "section": "C3.S1",
+      "statement": "Secret-key detection recurses through nested mappings"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R41",
+      "negative_control": "a secret key nested inside a sequence is dropped",
+      "section": "C3.S1",
+      "statement": "Secret-key detection recurses through nested sequences"
+    }
+  ],
+  "prior_evidence": "The 9ff8dfc33 evidence and all earlier runs remain historical; no prior commit, artifact or run is rewritten or deleted.",
+  "prior_inventory": {
+    "modules": 6,
+    "mutations": 6,
+    "requirements": 34,
+    "source_mutation_floor": 4,
+    "test_nodes": 34
+  },
+  "reason": "SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT demonstrated missing incident-owner binding, duplicate incident acceptance, definition version drift, silent cost coercion and shallow secret scanning. The operator authorized one narrow append-only hardening cycle on the audited head.",
+  "reviewed_without_change": [
+    {
+      "detail": "retry and cancellation lease behavior reviewed, not defective",
+      "id": "E6"
+    },
+    {
+      "detail": "I3 own-head replay is acceptable; successor-tree protection rests on the I3 replay, the I4 validator and frozen packet and test immutability controls",
+      "id": "E7"
+    }
+  ],
+  "schema": "oce.block_06_i4.amendment.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "trigger": {
+    "audit_token": "SECOND_AGENT_AUDIT_ACCEPT_FOR_EVIDENCE_SEALING_B6_I4",
+    "audited_head": "9ff8dfc33ac8cf9ffeccc266ce9ea90165b70e7e",
+    "operator_decision": "A"
+  }
+}
