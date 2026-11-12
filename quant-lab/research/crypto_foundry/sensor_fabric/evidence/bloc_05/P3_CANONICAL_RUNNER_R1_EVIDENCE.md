@@ -155,13 +155,98 @@ independent claims, and the runner refuses to conflate them.
 
 ## 7. Actual canonical execution
 
-Recorded in §8 from the evidence bundle produced by this branch.
+```
+python quant-lab/research/crypto_foundry/sensor_fabric/scripts/canonical_runner.py run \
+    --workers 2 --timeout 2400 --run-id canonical-p3-r1
+```
+
+| Field | Value |
+|---|---|
+| Run ID | `canonical-p3-r1` |
+| Candidate commit | `725fa4d1526dc08d27a1cacbb20c8275d40c8d22` |
+| Branch | `agent/crypto-sensor-fabric-p3-canonical-r1` |
+| Python / pytest | 3.11.9 / pytest 9.0.3 |
+| Collected nodes | **4,719** (`468a66ae…`) |
+| Executed unique nodes | **4,719** (`468a66ae…` — identical digest) |
+| Missing / extra / duplicate | **0 / 0 / 0** |
+| Groups | 13 |
+| Free space before → after | 42 GB → 40.8 GB |
+
+| Partition | Nodes | Status | Passed | Skipped | Failed | Errors | Wall clock | JUnit |
+|---|---|---|---|---|---|---|---|---|
+| 0 | 2,360 | ok | 2,354 | 6 | 0 | 0 | 659 s | 410,563 B |
+| 1 | 2,359 | ok | 2,354 | 5 | 0 | 0 | 831 s | 402,682 B |
+| **Total** | **4,719** | — | **4,708** | **11** | **0** | **0** | ~25 min wall | 813,245 B |
+
+Every intended node executed exactly once: the executed digest equals the
+digested collection, so there is no coverage gap to explain away.
 
 ---
 
 ## 8. Results
 
-_Pending the canonical run; filled from `evidence.json` before publication._
+### 8.1 Verdict
+
+```json
+{
+  "disposition": "COMPLETE",
+  "test_outcome": "GREEN",
+  "reasons": [],
+  "missing_count": 0,
+  "extra_count": 0,
+  "counts": {"passed": 4708, "failed": 0, "errored": 0, "skipped": 11}
+}
+```
+
+Coverage is complete **and** the test outcome is green. These are reported as
+separate claims because either can be true while the other is false.
+
+### 8.2 Evidence containment during the real run
+
+The suite did mutate tracked evidence, exactly as predicted: **21 partition-level
+modifications** were detected (10 in partition 0, 11 in partition 1), restored
+from Git after both partitions finished, and then **re-hashed and verified**. The
+worktree was clean afterwards. Without this guard, the run would have left the
+next candidate holding another checkpoint's artifact bytes.
+
+### 8.3 The eleven skips
+
+These are skipped by their own platform or opt-in guards, **not** deselected by
+the runner, and they are listed by node ID rather than summarised away:
+
+| Category | Count | Reason |
+|---|---|---|
+| Symlink / POSIX permission semantics | 6 | require `os.symlink` or POSIX mode bits; this host is Windows |
+| Real PostgreSQL integration | 2 | explicitly opt-in; no database infrastructure available |
+| Live network smoke | 1 | requires real provider network access; opt-in |
+| POSIX directory canonicalisation | 1 | POSIX-specific path semantics |
+| Unreadable-fragment fail-closed | 1 | depends on POSIX permission denial |
+
+<details>
+<summary>Exact skipped node IDs</summary>
+
+```
+quant-lab/tests/crypto_sensor_fabric/providers/test_network_smoke_live.py::test_live_production_network_smoke
+quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store.py::TestPermissions::test_final_not_world_writable
+quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNameMaxProbe::test_posix_probe_failure_fails_closed
+quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_failed_refresh_rolls_back_previous_snapshot
+quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_integration_is_explicitly_opt_in
+quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_restore_symlinked_destination_component_refused
+quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_verify_symlinked_pack_object_refused
+quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_concurrent_publication.py::TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed
+quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_path_canonicalization.py::TestCaseLaw::test_distinct_posix_directories_are_not_merged
+quant-lab/tests/crypto_sensor_fabric/storage/test_json_catalog.py::TestCorruptionFailClosed::test_unreadable_fragment_fails_closed
+quant-lab/tests/crypto_sensor_fabric/storage/test_recovery.py::test_symlink_escape_rejected
+```
+
+</details>
+
+### 8.4 What the universe now contains
+
+The 4,719-node universe includes the P3 conformance suite (79 nodes: the 70
+preserved plus the 9 R5 authority-boundary tests) and the I11R2 governance
+audit, both green inside this run. The previously quoted 4,640 baseline is stale
+and must not be reused.
 
 ---
 
