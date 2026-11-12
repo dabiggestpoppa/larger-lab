@@ -607,6 +607,21 @@ RG05's refusal leg (cross-cutoff reuse) still passes.
 The adversary's test file was **not** modified and **not** committed; the conflict is
 reported rather than silenced by editing their assertion.
 
+### 18.4b Canonical coverage status
+
+The test universe changed at R6, so the R5 canonical bundle is **not** carried
+across. Re-collected at R6 HEAD with the pinned runner revision (`collect` only):
+
+| Field | R5 | R6 |
+|---|---|---|
+| Nodes | 4,719 | **4,733** |
+| Digest | `468a66ae…` | `1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837` |
+| Duplicates / malformed / collection errors | 0 | 0 |
+
++14 nodes = the 14 new R6 tests, exactly. A full canonical **execution** at R6 was
+not run in this pass (the runner's independent acceptance is still pending, per
+directive). What is claimed is the measured universe, not a green result.
+
 ### 18.5 New negative tests (14)
 
 Forged capability with correct identity · replaced basis · wrong manifest digest ·
