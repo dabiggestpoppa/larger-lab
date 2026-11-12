@@ -64,7 +64,7 @@ class Checker:
 def check_packet(c: Checker) -> None:
     sys.path.insert(0, str(c.root))
     files = sorted(p.name for p in (c.root / DOCS).glob(f"{PREFIX}*.json"))
-    c.need("packet/count", len(files) == 9, files)
+    c.need("packet/count", len(files) == 10, files)
     for name in files:
         raw = (c.root / DOCS / name).read_bytes()
         c.need(f"packet/canonical/{name}", raw == canonical(json.loads(raw)))
@@ -82,8 +82,9 @@ def check_packet(c: Checker) -> None:
            and scope["base_tree"] == contract["base_tree"] == BASE_TREE)
     c.need("contract/frozen", contract["status"] == "FROZEN"
            and contract["frozen_before_results"] is True)
+    registry_total = c.load("REQUIREMENT_TEST_REGISTRY_v1.0.json")["inventory"]["node_total"]
     c.need("contract/floors", contract["implementation_floor"]
-           == {"test_nodes": 34, "source_mutation_floor": 4, "mutations": 6})
+           == {"test_nodes": registry_total, "source_mutation_floor": 4, "mutations": 6})
     c.need("contract/paired", contract["paired_comparison"]
            == {"base_sha": BASE_SHA, "common_floor": 208, "base_only_expected": 0,
                "head_only_expected": 34})
@@ -104,8 +105,9 @@ def check_packet(c: Checker) -> None:
 def check_registry(c: Checker) -> None:
     registry = c.load("REQUIREMENT_TEST_REGISTRY_v1.0.json")
     nodes = registry["inventory"]["nodes"]
-    c.need("registry/total", registry["requirements_total"] == len(nodes) == 34)
-    c.need("registry/unique", len(set(nodes)) == 34)
+    total = registry["inventory"]["node_total"]
+    c.need("registry/total", registry["requirements_total"] == len(nodes) == total)
+    c.need("registry/unique", len(set(nodes)) == total)
     c.need("registry/modules", len(registry["inventory"]["modules"]) == 6)
     c.need("registry/bindings",
            {r["binding_node"] for r in registry["requirements"]} == set(nodes))
@@ -148,6 +150,12 @@ def check_registration(c: Checker) -> None:
     c.need("registration/base", this["base"] == BASE_SHA and this["base_tree"] == BASE_TREE)
     c.need("registration/operator", "oce/operator/" in this["allowed_prefixes"])
     c.need("registration/services", "oce/services/" in this["allowed_prefixes"])
+    c.need("registration/i3_workflow",
+           ".github/workflows/block-06-i3-validation.yml" in this["allowed_prefixes"])
+    amendment = c.load("AMENDMENT_001_v1.0.json")
+    c.need("registration/amendment", amendment["amendment"] == "001"
+           and amendment["prior_inventory"]["test_nodes"] == 34
+           and amendment["amended_inventory"]["test_nodes"] == 41)
     c.need("registration/locks", all(registration["locks"][f"B6-I{i}"] == "LOCKED"
                                      for i in range(5, 10)))
     scope = c.load("SCOPE_DERIVATION_v1.0.json")

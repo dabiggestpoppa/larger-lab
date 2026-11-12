@@ -82,8 +82,18 @@ def main(argv=None) -> int:
                              not [p for p in frozen.stdout.splitlines()
                                   if "OCE_BLOCK_06_I3_" in p], frozen.stdout))
         i3_wf = (root / ".github/workflows/block-06-i3-validation.yml").read_text(encoding="utf-8")
+        i3_base = "018b164f249bbf075334d5d03ad37e80dcbbede0"
+        i3_head = "eda33f43e6d058891a8009e98e968c9f00252220"
         results.append(check("i3_workflow_present_frozen",
-                             "B6-I3" in i3_wf and "018b164f249bbf075334d5d03ad37e80dcbbede0" in i3_wf))
+                             "B6-I3 Validation" in i3_wf
+                             and "block-06-i3-validation" in i3_wf
+                             and i3_base in i3_wf and i3_head in i3_wf,
+                             {"label": "B6-I3 Validation" in i3_wf,
+                              "base": i3_base in i3_wf, "head": i3_head in i3_wf}))
+        registrations = json.loads((root / I4_REG).read_text(encoding="utf-8"))
+        results.append(check("i3_workflow_registered",
+                             ".github/workflows/block-06-i3-validation.yml"
+                             in registrations["this_stage"]["allowed_prefixes"]))
         add = git(root, "worktree", "add", "--detach", "--quiet", str(work), "HEAD")
         results.append(check("worktree_ready", add.returncode == 0, add.stderr[-300:]))
         if add.returncode == 0:
