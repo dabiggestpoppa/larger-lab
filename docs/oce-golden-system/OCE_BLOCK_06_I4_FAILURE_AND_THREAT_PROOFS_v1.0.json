@@ -9,7 +9,8 @@
         "test_block_06_i4_workflow.py::test_lease_owner_required",
         "test_block_06_i4_workflow.py::test_lease_reacquire_after_expiry",
         "test_block_06_i4_workflow.py::test_cancelled_run_advance_refused",
-        "test_block_06_i4_workflow.py::test_retry_bounded"
+        "test_block_06_i4_workflow.py::test_retry_bounded",
+        "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused"
       ],
       "proof_state": "BOUND"
     },
@@ -21,7 +22,12 @@
         "test_block_06_i4_identity.py::test_raw_secret_refused",
         "test_block_06_i4_workflow.py::test_replay_preserves_state",
         "test_block_06_i4_trace.py::test_trace_end_to_end_ok",
-        "test_block_06_i4_trace.py::test_trace_broken_link_refused"
+        "test_block_06_i4_trace.py::test_trace_broken_link_refused",
+        "test_block_06_i4_cost.py::test_fractional_cost_refused",
+        "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+        "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+        "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+        "test_block_06_i4_trace.py::test_trace_requires_incident_owner"
       ],
       "proof_state": "BOUND"
     },
@@ -41,7 +47,8 @@
         "test_block_06_i4_identity.py::test_identity_registry_canonical",
         "test_block_06_i4_identity.py::test_duplicate_identity_refused",
         "test_block_06_i4_identity.py::test_resolution_deterministic",
-        "test_block_06_i4_workflow.py::test_definition_versioned_and_valid"
+        "test_block_06_i4_workflow.py::test_definition_versioned_and_valid",
+        "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused"
       ],
       "proof_state": "BOUND"
     }

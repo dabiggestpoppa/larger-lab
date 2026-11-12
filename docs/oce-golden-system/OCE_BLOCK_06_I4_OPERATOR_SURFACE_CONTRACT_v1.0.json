@@ -49,7 +49,7 @@
     },
     {
       "classification": "public_experimental",
-      "error_behavior": "refuse_unknown_category_invalid_cost",
+      "error_behavior": "refuse_unknown_category_invalid_cost_non_integer",
       "exported": true,
       "section": "C2.S5",
       "symbol": "oce.operator.cost.cost_ledger",
@@ -77,7 +77,7 @@
     },
     {
       "classification": "public_experimental",
-      "error_behavior": "refuse_raw_secret_duplicate_identity",
+      "error_behavior": "refuse_raw_secret_nested_duplicate_identity",
       "exported": true,
       "section": "C3.S1",
       "symbol": "oce.services.identity.identity_registry",
@@ -150,7 +150,7 @@
     },
     {
       "classification": "public_experimental",
-      "error_behavior": "refuse_illegal_transition_lease_owner_cancelled",
+      "error_behavior": "refuse_illegal_transition_lease_owner_cancelled_definition_mismatch",
       "exported": true,
       "section": "C3.S2",
       "symbol": "oce.services.workflow.advance_run",
@@ -197,7 +197,7 @@
     },
     {
       "classification": "public_experimental",
-      "error_behavior": "refuse_broken_trace_cross_app_unknown",
+      "error_behavior": "refuse_broken_trace_cross_app_unknown_unowned_duplicate_incident",
       "exported": true,
       "section": "C2.S4",
       "symbol": "oce.operator.trace.failure_cost_trace",

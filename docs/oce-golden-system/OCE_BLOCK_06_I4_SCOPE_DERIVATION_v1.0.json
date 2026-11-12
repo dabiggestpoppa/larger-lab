@@ -1,4 +1,9 @@
 {
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "prior_nodes": 34
+  },
   "api_symbols": [
     "oce.operator.incident.incident_view",
     "oce.operator.incident.assess_drill",
@@ -55,7 +60,7 @@
     "evaluation_system": "RESERVED_NOT_AUTHORIZED",
     "package_publication": "NOT_AUTHORIZED"
   },
-  "minimum_nodes": 34,
+  "minimum_nodes": 41,
   "mutation_floor": {
     "source": 4,
     "stage": 6
@@ -75,7 +80,9 @@
     "identity resolution is scoped to one application and refuses raw secret material",
     "workflow leases, retries and cancellations preserve a legal state under replay",
     "the failure and cost trace reconciles incident, identity, workflow and cost end-to-end",
-    "prior stage artifacts remain byte-identical"
+    "prior stage artifacts remain byte-identical",
+    "the trace refuses an identity that is not an authorized owner of the incident",
+    "duplicate incident ids are refused deterministically before projection"
   ],
   "purpose": "C2 incident and cost plus C3 identity and workflow",
   "requirements": [

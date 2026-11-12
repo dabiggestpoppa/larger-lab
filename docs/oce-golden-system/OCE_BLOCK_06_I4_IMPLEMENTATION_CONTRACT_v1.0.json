@@ -7,6 +7,12 @@
     "b6_i3_nodes": 28,
     "common_regression_nodes": 208
   },
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_AMENDMENT_001_v1.0.json",
+    "prior_nodes": 34
+  },
   "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
   "base_tree": "5e15ea448b929269193dc904ec0677687df077e4",
   "clock": "explicit integer time supplied by the caller; no wall clock read",
@@ -35,7 +41,8 @@
       "storage",
       "ci"
     ],
-    "estimate_actual": "separate"
+    "estimate_actual": "separate",
+    "integer_only": true
   },
   "determinism": "canonical JSON with sorted keys and no timestamps, host or random ids",
   "document_id": "OCE-B6-I4-CONTRACT-001",
@@ -49,13 +56,14 @@
       "service",
       "app"
     ],
+    "nested_secret_refused": true,
     "raw_secret_refused": true,
     "revoked_refused": true
   },
   "implementation_floor": {
     "mutations": 6,
     "source_mutation_floor": 4,
-    "test_nodes": 34
+    "test_nodes": 41
   },
   "incident_rules": {
     "drill_latency": "legible only when visible_at - detected_at <= limit",
@@ -185,6 +193,21 @@
       "code": "REFUSED_BROKEN_TRACE",
       "failure_class": "F11",
       "meaning": "trace link or digest mismatch"
+    },
+    {
+      "code": "REFUSED_UNOWNED_INCIDENT",
+      "failure_class": "F11",
+      "meaning": "trace identity is not an authorized incident owner"
+    },
+    {
+      "code": "REFUSED_DUPLICATE_INCIDENT",
+      "failure_class": "F23",
+      "meaning": "duplicate incident id"
+    },
+    {
+      "code": "REFUSED_WORKFLOW_MISMATCH",
+      "failure_class": "F03",
+      "meaning": "run definition id or version differs from the supplied definition"
     }
   ],
   "schema": "oce.block_06_i4.contract.v1",
@@ -199,7 +222,7 @@
       "infrastructure/control-plane/tests/test_block_06_i4_workflow.py",
       "infrastructure/control-plane/tests/test_block_06_i4_trace.py"
     ],
-    "node_total": 34,
+    "node_total": 41,
     "zero": [
       "failures",
       "errors",
@@ -207,8 +230,13 @@
       "xfail"
     ]
   },
+  "trace_rules": {
+    "duplicate_incident_refused": true,
+    "incident_owner_binding": true
+  },
   "workflow_rules": {
     "cancel_terminal": true,
+    "definition_version_bound": true,
     "illegal_transition_refused": true,
     "lease_single_owner": true,
     "replay_idempotent": true,

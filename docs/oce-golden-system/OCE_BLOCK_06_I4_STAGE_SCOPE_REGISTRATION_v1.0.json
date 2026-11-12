@@ -1,4 +1,9 @@
 {
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "prior_nodes": 34
+  },
   "document_id": "OCE-B6-I4-STAGE-SCOPE-REGISTRATION-001",
   "frozen_before_results": true,
   "locks": {
@@ -55,7 +60,8 @@
       "infrastructure/control-plane/scripts/block_06_i0_validate.py",
       "infrastructure/control-plane/scripts/block_06_i1_validate.py",
       ".github/workflows/block-06-i4-validation.yml",
-      ".github/workflows/block-06-i4-paired-comparison.yml"
+      ".github/workflows/block-06-i4-paired-comparison.yml",
+      ".github/workflows/block-06-i3-validation.yml"
     ],
     "base": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
     "base_tree": "5e15ea448b929269193dc904ec0677687df077e4",

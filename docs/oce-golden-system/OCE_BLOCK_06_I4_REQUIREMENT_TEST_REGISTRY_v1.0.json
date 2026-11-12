@@ -1,4 +1,9 @@
 {
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "prior_nodes": 34
+  },
   "document_id": "OCE-B6-I4-REGISTRY-001",
   "inventory": {
     "collection_equals_execution": true,
@@ -10,7 +15,7 @@
       "infrastructure/control-plane/tests/test_block_06_i4_workflow.py",
       "infrastructure/control-plane/tests/test_block_06_i4_trace.py"
     ],
-    "node_total": 34,
+    "node_total": 41,
     "nodes": [
       "test_block_06_i4_contract.py::test_inventory_equals_collection",
       "test_block_06_i4_contract.py::test_contract_frozen_before_results",
@@ -45,7 +50,14 @@
       "test_block_06_i4_workflow.py::test_retry_bounded",
       "test_block_06_i4_trace.py::test_trace_end_to_end_ok",
       "test_block_06_i4_trace.py::test_trace_broken_link_refused",
-      "test_block_06_i4_trace.py::test_trace_cross_app_refused"
+      "test_block_06_i4_trace.py::test_trace_cross_app_refused",
+      "test_block_06_i4_cost.py::test_fractional_cost_refused",
+      "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+      "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+      "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+      "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
+      "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
+      "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused"
     ],
     "zero": [
       "failures",
@@ -326,9 +338,65 @@
       "negative_control": "owner identity belongs to another app",
       "section": "C3.S1",
       "statement": "A cross-app trace owner is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
+      "failure_class": "F11",
+      "id": "B6I4-R35",
+      "negative_control": "trace identity ref is not an incident owner",
+      "section": "C2.S4",
+      "statement": "A trace cannot return TRACE_OK unless the identity is an authorized incident owner"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+      "failure_class": "F23",
+      "id": "B6I4-R36",
+      "negative_control": "two accepted incident rows share one id",
+      "section": "C2.S4",
+      "statement": "Duplicate incident ids are refused deterministically before projection"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
+      "failure_class": "F03",
+      "id": "B6I4-R37",
+      "negative_control": "advance a v1 run with a v2 definition",
+      "section": "C3.S2",
+      "statement": "advance_run refuses a definition id or version mismatch before any transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_fractional_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R38",
+      "negative_control": "fractional 0.9 is silently coerced to 0",
+      "section": "C2.S5",
+      "statement": "Fractional cost or capacity values are refused, never coerced to an integer"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R39",
+      "negative_control": "boolean, string, non-finite or null cost is accepted",
+      "section": "C2.S5",
+      "statement": "Non-integer cost and capacity values raise a governed refusal, not a bare error"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R40",
+      "negative_control": "a secret key nested inside a mapping is dropped",
+      "section": "C3.S1",
+      "statement": "Secret-key detection recurses through nested mappings"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R41",
+      "negative_control": "a secret key nested inside a sequence is dropped",
+      "section": "C3.S1",
+      "statement": "Secret-key detection recurses through nested sequences"
     }
   ],
-  "requirements_total": 34,
+  "requirements_total": 41,
   "schema": "oce.block_06_i4.registry.v1",
   "stage": "B6-I4",
   "status": "FROZEN"
