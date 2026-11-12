@@ -61,7 +61,13 @@ NODE_REQUIRED = "::"
 SCRIPTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPTS_DIR.parents[4]
 EVIDENCE_TREE = "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs"
-DEFAULT_GUARD_PREFIXES: tuple[str, ...] = ("quant-lab/research",)
+#: The known mutation surface is the evidence trees, not all of ``research``.
+#: Hashing 5,161 tracked research files (many of them large parquet) made the
+#: safety mechanism itself the bottleneck, and every side-effecting writer in
+#: this suite lives under ``evidence/``.
+DEFAULT_GUARD_PREFIXES: tuple[str, ...] = (
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence",
+)
 DEFAULT_MIN_FREE_BYTES = 2 * 1024**3
 DEFAULT_TIMEOUT_SECONDS = 900
 DEFAULT_MAX_ARTIFACT_BYTES = 64 * 1024**2
@@ -334,12 +340,21 @@ def partition(nodes: Sequence[str], workers: int) -> list[dict[str, Any]]:
 # --------------------------------------------------------------------------- #
 
 
+MAX_GUARD_FILES = 2000
+
+
 def snapshot_guarded(cwd: Path, prefixes: Sequence[str]) -> dict[str, str]:
     tracked = [
         path
         for path in _git(cwd, "ls-files", "-z", "--", *prefixes).split("\0")
         if path.strip()
     ]
+    if len(tracked) > MAX_GUARD_FILES:
+        raise SystemExit(
+            f"refusing: guard prefixes cover {len(tracked)} tracked files, above the "
+            f"{MAX_GUARD_FILES}-file ceiling; tighten --guard-prefixes rather than "
+            "turning the containment guard into the bottleneck"
+        )
     hashes: dict[str, str] = {}
     for path in tracked:
         candidate = cwd / path
