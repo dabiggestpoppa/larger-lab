@@ -1,0 +1,356 @@
+{
+  "checkpoint": "SENSOR-B5-P3-CANONICAL-R1-AUDIT",
+  "role": "Agent 2 - independent verification",
+  "investigated": {
+    "runner_branch_head": "b7dfa3b9ef126b533f6bf6d4b1772fb7c871b038",
+    "recorded_execution_commit": "725fa4d1526dc08d27a1cacbb20c8275d40c8d22",
+    "security_baseline": "49e081c5da5affba9f421e2e5c61d3bfe3acb780",
+    "security_baseline_parent_implementation": "ea1fdeb7714b57f07085eb6dfadefafccd7658bb"
+  },
+  "committed_run": {
+    "run_id": "canonical-p3-r1",
+    "owned_branch": "agent/crypto-sensor-fabric-p3-canonical-r1",
+    "owned_commit": "725fa4d1526dc08d27a1cacbb20c8275d40c8d22",
+    "started_at": "2026-11-12T00:33:20+00:00",
+    "finished_at": "2026-11-12T00:47:13+00:00",
+    "environment": {
+      "python": "3.11.9",
+      "pytest": "pytest 9.0.3",
+      "platform": "Windows-10-10.0.26200-SP0"
+    },
+    "verdict_recorded": {
+      "disposition": "COMPLETE",
+      "test_outcome": "GREEN",
+      "reasons": [],
+      "missing_nodes": [],
+      "missing_count": 0,
+      "extra_nodes": [],
+      "extra_count": 0,
+      "counts": {
+        "passed": 4708,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      }
+    },
+    "collection": {
+      "count": 4719,
+      "count_recorded": 4719,
+      "digest": "468a66ae161a13df23b00f07b4d552b4facebdd56d5b2d4ee5cad4d7a8d2328c",
+      "digest_recorded": "468a66ae161a13df23b00f07b4d552b4facebdd56d5b2d4ee5cad4d7a8d2328c",
+      "duplicates": 0,
+      "malformed": 0,
+      "collection_errors": [],
+      "groups": 13
+    },
+    "execution": {
+      "unique_nodes": 4719,
+      "digest": "468a66ae161a13df23b00f07b4d552b4facebdd56d5b2d4ee5cad4d7a8d2328c",
+      "recomputed_counts": {
+        "passed": 4708,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "recorded_counts": {
+        "passed": 4708,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "missing": [],
+      "extra": [],
+      "duplicate_executions": [],
+      "unparsable_records": 0
+    },
+    "partitions": [
+      {
+        "index": 0,
+        "files": 111,
+        "intended": 2360,
+        "executed": 2360,
+        "status": "ok",
+        "exit_code": 0,
+        "seconds": 659.2,
+        "junit_cases": 2360,
+        "junit_failures": 0,
+        "junit_errors": 0,
+        "junit_skipped": 6,
+        "junit_bytes": 410563,
+        "junit_sha256": "930c547ae394b2e0faf5b71538a7bb305406538b4e730975f11cf91175cef61b",
+        "junit_sha256_recorded": "930c547ae394b2e0faf5b71538a7bb305406538b4e730975f11cf91175cef61b",
+        "modified_paths": [
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+        ]
+      },
+      {
+        "index": 1,
+        "files": 111,
+        "intended": 2359,
+        "executed": 2359,
+        "status": "ok",
+        "exit_code": 0,
+        "seconds": 831.1,
+        "junit_cases": 2359,
+        "junit_failures": 0,
+        "junit_errors": 0,
+        "junit_skipped": 5,
+        "junit_bytes": 402682,
+        "junit_sha256": "a82fa5e81105d18b6b673c8a5744c23d29305f8f29998be99a9097ea40fa0f46",
+        "junit_sha256_recorded": "a82fa5e81105d18b6b673c8a5744c23d29305f8f29998be99a9097ea40fa0f46",
+        "modified_paths": [
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+        ]
+      }
+    ],
+    "guarded": {
+      "files": 415,
+      "modified_union": [
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+      ],
+      "partition_level_modifications": 21,
+      "restoration": {
+        "attempted": true,
+        "verified": true,
+        "failed": []
+      },
+      "restoration_paths": 11
+    },
+    "tree": {
+      "clean_after": true,
+      "dirty_paths": []
+    },
+    "artifact_sha256": {
+      "collection.json": "22f34e48c5d1e1faa66d0748f4d730d8fac3652e95dae229ef99a4d0bdbd857c",
+      "evidence.json": "344ad844e9e107179ef60b0f72a0a61aba624f8e9d2173333a23775363af7821",
+      "guard_baseline.json": "ccc08ae1f5832660fc08732d3620daa771fdb53c2678c1db365cf6a2f8a37f86",
+      "results_0.jsonl": "95f97a466bd51ab92bd7025e85c36954c63cdc01815e995deb3791e3b91ab5ac",
+      "results_1.jsonl": "d59d4d35f97b427548fcca765516d8e39a4dc2d184d08043f9ab0fa23f515c44",
+      "junit_0.xml": "930c547ae394b2e0faf5b71538a7bb305406538b4e730975f11cf91175cef61b",
+      "junit_1.xml": "a82fa5e81105d18b6b673c8a5744c23d29305f8f29998be99a9097ea40fa0f46",
+      "partition_0.json": "2e3adda05679307a5186f6aa874b55dd48197fdb9e6000a808ba25f052352567",
+      "partition_1.json": "17b11248659014502f368e5b1beeff6d209595975c20fd5236d65c037a107b39"
+    }
+  },
+  "independent_run": {
+    "run_id": "canonical-p3-r1-audit-independent",
+    "owned_branch": "agent/crypto-sensor-fabric-p3-canonical-r1-audit",
+    "owned_commit": "a9b1d197bcd084f956d5bc974f11baba94d493a3",
+    "started_at": "2026-11-12T15:39:05+00:00",
+    "finished_at": "2026-11-12T15:50:48+00:00",
+    "environment": {
+      "python": "3.11.9",
+      "pytest": "pytest 9.0.3",
+      "platform": "Windows-10-10.0.26200-SP0"
+    },
+    "verdict_recorded": {
+      "disposition": "COMPLETE",
+      "test_outcome": "GREEN",
+      "reasons": [],
+      "missing_nodes": [],
+      "missing_count": 0,
+      "extra_nodes": [],
+      "extra_count": 0,
+      "counts": {
+        "passed": 4708,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      }
+    },
+    "collection": {
+      "count": 4719,
+      "count_recorded": 4719,
+      "digest": "468a66ae161a13df23b00f07b4d552b4facebdd56d5b2d4ee5cad4d7a8d2328c",
+      "digest_recorded": "468a66ae161a13df23b00f07b4d552b4facebdd56d5b2d4ee5cad4d7a8d2328c",
+      "duplicates": 0,
+      "malformed": 0,
+      "collection_errors": [],
+      "groups": 13
+    },
+    "execution": {
+      "unique_nodes": 4719,
+      "digest": "468a66ae161a13df23b00f07b4d552b4facebdd56d5b2d4ee5cad4d7a8d2328c",
+      "recomputed_counts": {
+        "passed": 4708,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "recorded_counts": {
+        "passed": 4708,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "missing": [],
+      "extra": [],
+      "duplicate_executions": [],
+      "unparsable_records": 0
+    },
+    "partitions": [
+      {
+        "index": 0,
+        "files": 111,
+        "intended": 2360,
+        "executed": 2360,
+        "status": "ok",
+        "exit_code": 0,
+        "seconds": 592.2,
+        "junit_cases": 2360,
+        "junit_failures": 0,
+        "junit_errors": 0,
+        "junit_skipped": 6,
+        "junit_bytes": 410598,
+        "junit_sha256": "fb3971817e76a24b05c166d0bbae05da38d0cf477b166740c0679c9b24b4eab8",
+        "junit_sha256_recorded": "fb3971817e76a24b05c166d0bbae05da38d0cf477b166740c0679c9b24b4eab8",
+        "modified_paths": [
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+        ]
+      },
+      {
+        "index": 1,
+        "files": 111,
+        "intended": 2359,
+        "executed": 2359,
+        "status": "ok",
+        "exit_code": 0,
+        "seconds": 701.4,
+        "junit_cases": 2359,
+        "junit_failures": 0,
+        "junit_errors": 0,
+        "junit_skipped": 5,
+        "junit_bytes": 402711,
+        "junit_sha256": "c68cfceba7b1a67f982d3f68b266deffca478be5a700157244a16c8fb927eef9",
+        "junit_sha256_recorded": "c68cfceba7b1a67f982d3f68b266deffca478be5a700157244a16c8fb927eef9",
+        "modified_paths": [
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json",
+          "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+        ]
+      }
+    ],
+    "guarded": {
+      "files": 424,
+      "modified_union": [
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json",
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+      ],
+      "partition_level_modifications": 21,
+      "restoration": {
+        "attempted": true,
+        "verified": true,
+        "failed": []
+      },
+      "restoration_paths": 11
+    },
+    "tree": {
+      "clean_after": true,
+      "dirty_paths": []
+    },
+    "artifact_sha256": {
+      "collection.json": "92c24bfeeee7d25731494e13c4c68ecfbc51d3c12639e04261482998ed1ed900",
+      "evidence.json": "8f2b5ba796861553f14f615bbf9369ff70591c986f8610c2c0f9047df0df1b74",
+      "guard_baseline.json": "df9b0862bd25f1685dc562458655be7c678d58f73b7d4e97be94352982d223f6",
+      "results_0.jsonl": "5accbe9c9b144b7da49635f9e217ed5268d16f466598448cfc05e74c20ceba0c",
+      "results_1.jsonl": "8bd6743f45e94b4ac53efc09402c3562e216ecf2f0c672ddfd39ecb03a92c5c4",
+      "junit_0.xml": "fb3971817e76a24b05c166d0bbae05da38d0cf477b166740c0679c9b24b4eab8",
+      "junit_1.xml": "c68cfceba7b1a67f982d3f68b266deffca478be5a700157244a16c8fb927eef9",
+      "partition_0.json": "2e3adda05679307a5186f6aa874b55dd48197fdb9e6000a808ba25f052352567",
+      "partition_1.json": "17b11248659014502f368e5b1beeff6d209595975c20fd5236d65c037a107b39"
+    }
+  },
+  "reconciliation": {
+    "collection_digest_equal": true,
+    "executed_digest_equal": true,
+    "counts_equal": true,
+    "recomputed_matches_recorded_committed": true,
+    "recomputed_matches_recorded_independent": true,
+    "missing_zero_both": true,
+    "extra_zero_both": true,
+    "duplicate_executions_zero_both": true
+  },
+  "audit_suites": {
+    "runner_self_tests": {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/test_canonical_runner.py",
+      "count": 24,
+      "result": "24 passed",
+      "in_canonical_collection": false
+    },
+    "independent_attack_suite": {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/test_canonical_runner_audit_attacks.py",
+      "count": 30,
+      "result": "30 passed",
+      "in_canonical_collection": false
+    }
+  },
+  "governance": {
+    "i09_check_exit": 0,
+    "i09_rows": 35,
+    "i09_pass": 35,
+    "i09_unresolved": 3,
+    "i09_artifact_sha256": "0ae3d4e31bd2de2fff56abb7d240973fd531f8d36170e5164babf1c5e93a3464",
+    "python_inventory_before": 1100,
+    "python_inventory_after": 1101,
+    "python_inventory_artifact": "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json",
+    "governance_tests_passed": 75,
+    "provider_approval_artifacts": {},
+    "r5_source_unchanged": true,
+    "allowlists_modified": false
+  }
+}
