@@ -54,9 +54,9 @@
       "sha256": "aeb1b383112a0b078d9b97f6b436ea98d29d479b486f7e9f74d9da0b64f975e6"
     },
     {
-      "bytes": 11470,
+      "bytes": 11813,
       "path": "infrastructure/control-plane/scripts/block_06_i4_mutation_battery.py",
-      "sha256": "d2ac43c40dbff5d9601ec6dfd10036eca881568db9f17ef962f05f76b6dcb7e0"
+      "sha256": "e6d7a6bf9957e2fe984d60f3286cbee3776f3e48525285e85cd40d3ed05281e9"
     },
     {
       "bytes": 5139,
@@ -64,9 +64,9 @@
       "sha256": "6bb4cff9bc820e78cbe6d04e4a609cf7f09b6c24c52b5baaa225c06232a51bbe"
     },
     {
-      "bytes": 7650,
+      "bytes": 7973,
       "path": "infrastructure/control-plane/scripts/block_06_i4_stage_controls.py",
-      "sha256": "84ded109651ddb3626fe894a2711dccccc7826982224dd16f68bdf73e277264a"
+      "sha256": "e17bc1f1bc8f7f34b3902c0443a73fce0cb56bc4949ed6108a8540ea454ac0f3"
     },
     {
       "bytes": 13670,

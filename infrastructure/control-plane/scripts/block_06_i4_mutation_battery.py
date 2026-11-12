@@ -20,6 +20,7 @@ IDENTITY = "oce/services/identity.py"
 WORKFLOW = "oce/services/workflow.py"
 TRACE = "oce/operator/trace.py"
 I3_WORKFLOW = ".github/workflows/block-06-i3-validation.yml"
+I4_REGISTRATION = "docs/oce-golden-system/OCE_BLOCK_06_I4_STAGE_SCOPE_REGISTRATION_v1.0.json"
 TESTS = "infrastructure/control-plane/tests"
 CONTROLS = "infrastructure/control-plane/scripts/block_06_i4_stage_controls.py"
 FLOOR = 6
@@ -86,6 +87,10 @@ MUTATIONS = [
              "          git update-ref refs/remotes/origin/main "
              "eda33f43e6d058891a8009e98e968c9f00252220"),
      "kind": "controls", "target": "i3_workflow_present_frozen"},
+    {"id": "M15", "label": "I3 workflow registration declaration omitted",
+     "file": I4_REGISTRATION,
+     "old": ',\n      ".github/workflows/block-06-i3-validation.yml"', "new": "",
+     "kind": "controls", "target": "i3_workflow_registered"},
 ]
 
 
