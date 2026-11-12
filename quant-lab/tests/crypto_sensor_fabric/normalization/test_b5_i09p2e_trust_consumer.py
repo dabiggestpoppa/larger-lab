@@ -29,6 +29,7 @@ import pytest
 
 from crypto_sensor_fabric.normalization.authority import (
     TRUSTED_MANIFEST_RELPATH,
+    TRUSTED_MANIFEST_SHA256,
     AuthorityRefusal,
     SemanticAuthority,
     SemanticAuthorityRefusal,
@@ -46,6 +47,10 @@ from crypto_sensor_fabric.normalization.sensors.verification import (
     verify_trade_record,
 )
 from crypto_sensor_fabric.normalization.time.enums import ReplayEligibility
+from crypto_sensor_fabric.normalization.time.replay_gate import (
+    ReplayEvidence,
+    assess_replay_eligibility,
+)
 CUTOFF = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
 DOC_BYTES = b"synthetic p2e consumer document bytes"
 DOC_SHA = hashlib.sha256(DOC_BYTES).hexdigest()
@@ -142,6 +147,26 @@ class AuthorityBasis(str, Enum):
 
 
 @dataclass(frozen=True)
+class ReplayAdjudication:
+    """The policy's own replay verdict for one consumption (R6 RG08).
+
+    Not an authority token: it exists so a verdict can report why replay blocked,
+    and its ``blocked`` flag is derived only from I05 evidence the policy applied
+    itself.  A caller-supplied object is flattened to ``NOT_POLICY_DERIVED``.
+    """
+
+    status: str
+    blocked: bool
+    detail: str = ""
+
+
+#: Module-private issuance marker.  It is deliberately NOT a dataclass field, so
+#: ``dataclasses.replace`` cannot carry it onto a promoted copy, and ordinary
+#: construction cannot supply it.
+_ISSUANCE_MARKER = object()
+
+
+@dataclass(frozen=True)
 class CustodyAuthorityCapability:
     """Externally bound proof that a custody source is authorized for THIS record.
 
@@ -176,6 +201,19 @@ class CustodyAuthorityCapability:
     record_kind: str | None
     knowledge_cutoff: datetime | None
     manifest_sha256: str | None = None
+    provider: str | None = None
+
+    @classmethod
+    def _issue(cls, **kwargs: Any) -> "CustodyAuthorityCapability":
+        """The only path that marks a capability as policy-issued (R6)."""
+        issued = cls(**kwargs)
+        object.__setattr__(issued, "_issued", _ISSUANCE_MARKER)
+        return issued
+
+    @property
+    def is_issued(self) -> bool:
+        """True only for an object this module issued, never for a reconstruction."""
+        return getattr(self, "_issued", None) is _ISSUANCE_MARKER
 
     @classmethod
     def from_reviewed_context(
@@ -208,7 +246,13 @@ class CustodyAuthorityCapability:
                 f"the approval names {semantic_authority.artifact_id!r}; the "
                 f"reviewed context names {reviewed.artifact_id!r}",
             )
-        return cls(
+        if record_kind is None:
+            raise SemanticAuthorityRefusal(
+                AuthorityRefusal.UNTRUSTED_AUTHORITY,
+                "an attested capability must name the record kind it authorizes; a "
+                "wildcard kind would authorize every kind (CAP12)",
+            )
+        return cls._issue(
             basis=AuthorityBasis.ATTESTED_OPERATOR,
             artifact_id=semantic_authority.artifact_id,
             approval_id=semantic_authority.approval_id,
@@ -216,6 +260,7 @@ class CustodyAuthorityCapability:
             record_kind=record_kind,
             knowledge_cutoff=knowledge_cutoff,
             manifest_sha256=reviewed.manifest_sha256,
+            provider=semantic_authority.registry.provider,
         )
 
     @classmethod
@@ -227,9 +272,10 @@ class CustodyAuthorityCapability:
         registry_digest: str,
         record_kind: str | None = None,
         knowledge_cutoff: datetime | None = None,
+        provider: str | None = None,
     ) -> "CustodyAuthorityCapability":
         """Non-authoritative capability for downstream field-scope tests only."""
-        return cls(
+        return cls._issue(
             basis=AuthorityBasis.SYNTHETIC_TEST_ONLY,
             artifact_id=artifact_id,
             approval_id=approval_id,
@@ -237,6 +283,7 @@ class CustodyAuthorityCapability:
             record_kind=record_kind,
             knowledge_cutoff=knowledge_cutoff,
             manifest_sha256=None,
+            provider=provider,
         )
 
 
@@ -272,12 +319,31 @@ class ConsumerPolicy:
         capability = self._custody_authority
         if capability is None:
             return False, "INTEGRATION_REQUIRED"
+        # R6 CAP01/CAP03 — an object is not an issuance.  A directly constructed
+        # capability, or one produced by ``dataclasses.replace``, carries no
+        # marker and therefore authorizes nothing.
+        if not getattr(capability, "is_issued", False):
+            return False, "INTEGRATION_REQUIRED"
         if capability.knowledge_cutoff != knowledge_cutoff:
             return False, "INTEGRATION_REQUIRED"
+        if capability.basis is AuthorityBasis.ATTESTED_OPERATOR:
+            # R6 CAP02 — an attested capability must name the reviewed root.
+            if capability.manifest_sha256 != TRUSTED_MANIFEST_SHA256:
+                return False, "INTEGRATION_REQUIRED"
+            # R6 CAP12 — an explicit record kind is required; no wildcard.
+            if capability.record_kind is None:
+                return False, "INTEGRATION_REQUIRED"
+            # R6 CAP08b — provider is part of record identity; None never matches.
+            if capability.provider is None:
+                return False, "INTEGRATION_REQUIRED"
+        # Identity binding applies to every basis; a synthetic capability may omit
+        # provider/kind (it certifies nothing), but where it names them they bind.
         if (
             capability.record_kind is not None
             and capability.record_kind != derived.record_kind
         ):
+            return False, "INTEGRATION_REQUIRED"
+        if capability.provider is not None and capability.provider != derived.provider:
             return False, "INTEGRATION_REQUIRED"
         if (
             capability.artifact_id,
@@ -295,15 +361,43 @@ class ConsumerPolicy:
             return True, "SYNTHETIC_TEST_ONLY"
         return False, "INTEGRATION_REQUIRED"
 
-    # -- replay status ---------------------------------------------------------
+    # -- replay adjudication (R6 RG08) ------------------------------------------
+
+    def _adjudicate_replay(
+        self, replay_evidence: Any, replay_evaluation: Any
+    ) -> "ReplayAdjudication | None":
+        """Replay is decided by the POLICY, from I05 evidence, never by the caller.
+
+        A supplied ``replay_evaluation`` is not proof of anything: RG08 showed that
+        any object with an ``eligibility`` attribute was accepted as eligible.  The
+        gate is now applied here, by the policy, to frozen ``ReplayEvidence``.
+        """
+        if replay_evidence is not None:
+            evaluation = assess_replay_eligibility(replay_evidence)
+            blocked = evaluation.eligibility != ReplayEligibility.ELIGIBLE
+            return ReplayAdjudication(
+                status=evaluation.eligibility.value,
+                blocked=blocked,
+                detail="; ".join(evaluation.reasons) if blocked else "",
+            )
+        if replay_evaluation is None:
+            return None
+        return ReplayAdjudication(
+            status="NOT_POLICY_DERIVED",
+            blocked=True,
+            detail=(
+                "a caller-supplied replay claim is not replay proof; supply "
+                "replay_evidence so the policy applies the I05 gate itself"
+            ),
+        )
 
     def _replay_status(self, replay_evaluation: Any) -> str:
         if replay_evaluation is None:
             return "NOT_APPLICABLE"
-        eligibility = getattr(replay_evaluation, "eligibility", None)
-        if eligibility is None:
-            return str(replay_evaluation)
-        return eligibility.value
+        status = getattr(replay_evaluation, "status", None)
+        if isinstance(status, str):
+            return status
+        return "NOT_POLICY_DERIVED"
 
     # -- evidence-byte rebinding (§7) ------------------------------------------
 
@@ -415,17 +509,13 @@ class ConsumerPolicy:
                 "PIT inadmissible",
             )
 
-        replay_blocked = (
-            replay_evaluation is not None
-            and getattr(replay_evaluation, "eligibility", None) is not None
-            and replay_evaluation.eligibility != ReplayEligibility.ELIGIBLE
-        )
+        replay_blocked = bool(getattr(replay_evaluation, "blocked", False))
         if replay_blocked:
             return self._refuse(
                 derived,
                 replay_evaluation,
                 ConsumerRefusalReason.REPLAY_BLOCKED,
-                "replay blocked",
+                getattr(replay_evaluation, "detail", "") or "replay blocked",
             )
 
         # Inspection 3 (R5) — custody authority is decided by the policy's own
@@ -472,6 +562,7 @@ class ConsumerPolicy:
         replay_evaluation: Any = None,
         evidence_references: dict[str, str] | None = None,
         knowledge_cutoff: datetime | None = None,
+        replay_evidence: ReplayEvidence | None = None,
     ) -> ConsumerVerdict:
         """Evaluate a verdict, re-deriving it before any inspection.
 
@@ -523,7 +614,7 @@ class ConsumerPolicy:
         return self._apply(
             derived,
             required_fields,
-            replay_evaluation,
+            self._adjudicate_replay(replay_evidence, replay_evaluation),
             evidence_references,
             knowledge_cutoff,
         )
@@ -536,6 +627,7 @@ class ConsumerPolicy:
         replay_evaluation: Any = None,
         evidence_references: dict[str, str] | None = None,
         knowledge_cutoff: datetime | None = None,
+        replay_evidence: ReplayEvidence | None = None,
     ) -> ConsumerVerdict:
         """Explicit cached-verdict path (§4) — alias for ``evaluate``."""
         return self.evaluate(
@@ -545,6 +637,7 @@ class ConsumerPolicy:
             replay_evaluation,
             evidence_references,
             knowledge_cutoff,
+            replay_evidence,
         )
 
 
@@ -896,24 +989,32 @@ class TestPITReplaySeparation:
         )
         assert out.decision == ConsumerDecision.REFUSE
         assert out.pit_status == "INADMISSIBLE"
-        assert out.replay_status == ReplayEligibility.BLOCKED_TIMESTAMP.value
+        # A caller-supplied replay claim is not derivable proof, so its status is
+        # reported as such rather than echoing the claimed eligibility (RG08).
+        assert out.replay_status == "NOT_POLICY_DERIVED"
 
-    def test_pit_admissible_replay_eligible_accepts(self) -> None:
+    def test_pit_admissible_replay_not_applicable_accepts(self) -> None:
+        """R6/RG08: replay is only ever the policy's own adjudication.
+
+        The previous form of this test asserted acceptance by handing the policy a
+        duck-typed ELIGIBLE object -- exactly the forgery RG08 reported.  Replay
+        inputs are no longer accepted from callers, so acceptance is asserted with
+        replay not applicable, and the derived path is covered by
+        ``TestReplayAdjudication`` below.
+        """
         policy = ConsumerPolicy(
             store=_store_with_evidence(), custody_authority=_synthetic_capability()
         )
         v = _base_verdict(custody_source_authorized=True)
-        eligible = _replay_evaluation(ReplayEligibility.ELIGIBLE)
         out = policy.evaluate(
             v,
             rederive=lambda: v,
             required_fields=("trade_price",),
-            replay_evaluation=eligible,
             evidence_references={REF: DOC_SHA},
         )
         assert out.decision == ConsumerDecision.ACCEPT_FIELD_BINDING
         assert out.pit_status == "ADMISSIBLE"
-        assert out.replay_status == ReplayEligibility.ELIGIBLE.value
+        assert out.replay_status == "NOT_APPLICABLE"
 
     @pytest.mark.parametrize("pit_ok", [True, False])
     @pytest.mark.parametrize("replay_ok", [True, False])
@@ -926,14 +1027,14 @@ class TestPITReplaySeparation:
             pit_admissible=pit_ok,
             downstream_trusted=pit_ok,
         )
-        replay = (
-            ReplayEligibility.ELIGIBLE if replay_ok else ReplayEligibility.BLOCKED_TIMESTAMP
-        )
+        # R6/RG08: an eligible replay claim cannot be supplied by the caller, so
+        # only the blocked leg passes a replay object; the eligible leg omits it.
+        replay = None if replay_ok else _replay_evaluation(ReplayEligibility.BLOCKED_TIMESTAMP)
         out = policy.evaluate(
             v,
             rederive=lambda: v,
             required_fields=("trade_price",),
-            replay_evaluation=_replay_evaluation(replay),
+            replay_evaluation=replay,
             evidence_references={REF: DOC_SHA},
         )
         expected = (
@@ -1580,6 +1681,242 @@ class TestCustodyAuthorityBoundary:
             evidence_references={REF: DOC_SHA},
         )
         assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+
+
+# --------------------------------------------------------------------------- #
+# R6 — the six independent findings, and the invariants behind them           #
+# --------------------------------------------------------------------------- #
+
+
+def _forged_operator_capability(**overrides: Any) -> Any:
+    """A capability built the way a caller would try to build one (CAP01/CAP02)."""
+    kwargs: dict[str, Any] = {
+        "basis": AuthorityBasis.ATTESTED_OPERATOR,
+        "artifact_id": ARTIFACT_ID,
+        "approval_id": APPROVAL_ID,
+        "registry_digest": REGISTRY_DIGEST,
+        "record_kind": "TRADE",
+        "knowledge_cutoff": None,
+        "manifest_sha256": None,
+    }
+    kwargs.update(overrides)
+    return CustodyAuthorityCapability(**kwargs)
+
+
+def _blocked_replay_evidence() -> Any:
+    """Real I05 evidence with no revision evaluation: the gate itself must block."""
+    from crypto_sensor_fabric.normalization.enums import (
+        AvailabilityBasis,
+        LineageState,
+        NormalizationQualityFlag,
+    )
+
+    return ReplayEvidence(
+        identity_pit_resolved=True,
+        timestamp_semantics_verified=True,
+        source_evidence_refs=("provider-docs:synthetic",),
+        availability_basis=AvailabilityBasis.PUBLIC_INTERVAL_CLOSE,
+        availability_confidence="EVIDENCE_BACKED_DECLARATION",
+        market_available_at="2026-06-01T12:00:00+00:00",
+        interval_complete=True,
+        revision=None,
+        lineage=LineageState.LINEAGE_COMPLETE,
+        quality_flags=(NormalizationQualityFlag.LINEAGE_COMPLETE,),
+    )
+
+
+class TestR6AuthorityInvariants:
+    """RED at R5: CAP01, CAP02, CAP03, CAP08b, CAP12, RG08 all granted authority."""
+
+    def test_r6_01_forged_capability_with_correct_identity_is_refused(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_forged_operator_capability()
+        )
+        v = _base_verdict()
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+        assert out.custody_source_authorization_status != "AUTHORIZED"
+
+    def test_r6_02_replaced_basis_cannot_escalate(self) -> None:
+        import dataclasses
+
+        synthetic = _synthetic_capability(provider="VENUE_A")
+        promoted = dataclasses.replace(synthetic, basis=AuthorityBasis.ATTESTED_OPERATOR)
+        assert promoted.is_issued is False, "replace must not carry the issuance marker"
+        policy = ConsumerPolicy(store=_store_with_evidence(), custody_authority=promoted)
+        v = _base_verdict()
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_03_incorrect_manifest_digest_is_refused(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(),
+            custody_authority=_forged_operator_capability(manifest_sha256="0" * 64),
+        )
+        v = _base_verdict()
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_04_provider_substitution_is_refused(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability(provider="VENUE_A")
+        )
+        v = _base_verdict(custody_source_authorized=True, provider="VENUE_B")
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_05_record_kind_omission_is_refused(self) -> None:
+        # An attested capability must name its kind; construction without the
+        # issuance marker is refused regardless, so the rule is asserted on a
+        # synthetic capability that names a kind and is used for another kind.
+        for capability in (
+            _forged_operator_capability(record_kind=None),
+            _synthetic_capability(record_kind="TRADE"),
+        ):
+            policy = ConsumerPolicy(store=_store_with_evidence(), custody_authority=capability)
+            v = _forged_verdict(record_kind="LIQUIDATION", downstream_trusted=False)
+            out = policy.evaluate(
+                v, rederive=lambda: v, required_fields=("trade_price",),
+                evidence_references={REF: DOC_SHA},
+            )
+            assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_06_cross_record_reuse_is_refused(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
+        other = _base_verdict(artifact_id="OTHER_ARTIFACT")
+        out = policy.evaluate(
+            other, rederive=lambda: other, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_07_cross_cutoff_reuse_is_refused(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(),
+            custody_authority=_synthetic_capability(knowledge_cutoff=CUTOFF),
+        )
+        v = _base_verdict(custody_source_authorized=True)
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+            knowledge_cutoff=CUTOFF + timedelta(days=1),
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_08_forged_replay_eligibility_is_refused(self) -> None:
+        class _Forged:
+            eligibility = ReplayEligibility.ELIGIBLE
+            reasons = ("caller asserts eligible",)
+
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
+        v = _base_verdict(custody_source_authorized=True)
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            replay_evaluation=_Forged(), evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.REFUSE
+        assert out.refusal_reason == ConsumerRefusalReason.REPLAY_BLOCKED
+        assert out.replay_status == "NOT_POLICY_DERIVED"
+
+    def test_r6_09_cached_forged_verdicts_cannot_authorize(self) -> None:
+        policy = ConsumerPolicy(store=_store_with_evidence())
+        forged = _base_verdict(custody_source_authorized=True)
+        out = policy.evaluate_cached(
+            forged, rederive=lambda: forged, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_10_synthetic_is_never_attested(self) -> None:
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
+        v = _base_verdict(custody_source_authorized=True)
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.custody_source_authorization_status == "SYNTHETIC_TEST_ONLY"
+        assert out.custody_source_authorized is False
+
+    def test_r6_11_correct_digest_with_unauthorized_custody_is_refused(self) -> None:
+        policy = ConsumerPolicy(store=_store_with_evidence())
+        v = _base_verdict(custody_source_authorized=True)
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_12_empty_manifest_mints_no_capability(self) -> None:
+        manifest = _shipped_manifest_bytes()
+        context = TrustedAuthorityContext.from_reviewed_root(
+            manifest_bytes=manifest, artifact_id=ARTIFACT_ID
+        )
+        with pytest.raises((RecordVerificationError, ValueError)):
+            CustodyAuthorityCapability.from_reviewed_context(
+                context=context, semantic_authority=None, knowledge_cutoff=None,
+                record_kind="TRADE",
+            )
+
+    def test_r6_14_same_cutoff_is_honoured_under_synthetic_semantics(self) -> None:
+        """The cutoff-binding property RG05 asserts, without the CAP01 bypass.
+
+        RG05's positive leg requires a directly constructed ATTESTED_OPERATOR
+        capability to be honoured at its own cutoff -- which is exactly the
+        CAP01 bypass.  The binding is therefore demonstrated on a synthetic
+        (non-authoritative) capability, where acceptance means
+        SYNTHETIC_TEST_ONLY and never operator authority.
+        """
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(),
+            custody_authority=_synthetic_capability(knowledge_cutoff=CUTOFF),
+        )
+        v = _base_verdict(custody_source_authorized=True)
+        same = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA}, knowledge_cutoff=CUTOFF,
+        )
+        later = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            evidence_references={REF: DOC_SHA},
+            knowledge_cutoff=CUTOFF + timedelta(days=1),
+        )
+        assert same.decision == ConsumerDecision.ACCEPT_FIELD_BINDING
+        assert same.custody_source_authorization_status == "SYNTHETIC_TEST_ONLY"
+        assert later.decision == ConsumerDecision.INTEGRATION_REQUIRED
+
+    def test_r6_13_policy_derives_replay_from_i05_evidence(self) -> None:
+        """The derived path exists: the policy applies the I05 gate itself."""
+        policy = ConsumerPolicy(
+            store=_store_with_evidence(), custody_authority=_synthetic_capability()
+        )
+        v = _base_verdict(custody_source_authorized=True)
+        out = policy.evaluate(
+            v, rederive=lambda: v, required_fields=("trade_price",),
+            replay_evidence=_blocked_replay_evidence(),
+            evidence_references={REF: DOC_SHA},
+        )
+        assert out.decision == ConsumerDecision.REFUSE
+        assert out.refusal_reason == ConsumerRefusalReason.REPLAY_BLOCKED
+        assert out.replay_status == ReplayEligibility.BLOCKED_REVISION.value
 
 
 if __name__ == "__main__":

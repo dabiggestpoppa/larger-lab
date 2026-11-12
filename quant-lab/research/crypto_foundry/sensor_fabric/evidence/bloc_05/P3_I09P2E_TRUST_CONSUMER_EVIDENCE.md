@@ -535,5 +535,107 @@ and no production authority is claimed.
 
 ---
 
+## 18. R6 addendum (six independent findings executed to repair)
+
+**Starting HEAD:** `e3cf47ff5b9f089ff02ff64db70f6d25922ebbd2`
+**Branch:** `agent/crypto-sensor-fabric-trust-consumer-r6`
+**Independent findings:** reattack branch `49e081c5da5affba9f421e2e5c61d3bfe3acb780`
+
+### 18.1 The six findings are real
+
+Reproduced against unmodified R5 with the adversary's own test file, executed as a
+transient overlay (never committed, deleted before any governance run):
+
+```
+6 failed, 23 passed in 2.33s
+FAILED ...::TestR3Replay::test_rg08_forged_replay_eligibility_cannot_authorize
+FAILED ...::TestCapabilityForgery::test_cap01_direct_construction_with_attested_operator
+FAILED ...::TestCapabilityForgery::test_cap02_manifest_digest_is_never_validated
+FAILED ...::TestCapabilityForgery::test_cap03_basis_is_plain_replaceable_data
+FAILED ...::TestCapabilityForgery::test_cap08b_provider_substitution
+FAILED ...::TestCapabilityForgery::test_cap12_record_kind_substitution
+```
+
+CAP12's failure text is the clearest statement of the defect:
+
+```
+decision=ACCEPT_FIELD_BINDING (authorized=True, status='AUTHORIZED')
+```
+
+R5's "policy-owned capability" was a public dataclass. Constructing it, or
+`dataclasses.replace`-ing it, was enough to mint operator authority — AT53's
+attacker was relocated, not removed.
+
+### 18.2 Repairs
+
+| Finding | Repair |
+|---|---|
+| CAP01 direct construction | Issuance is marked by a module-private object stored **outside** the dataclass fields (``object.__setattr__`` in ``_issue``); ``_custody_grant`` requires that marker. Ordinary construction carries none. |
+| CAP03 ``replace`` promotion | Because the marker is not a field, ``dataclasses.replace`` cannot carry it onto a promoted copy, so the copy authorizes nothing. |
+| CAP02 unvalidated digest | An attested capability must carry ``manifest_sha256 == TRUSTED_MANIFEST_SHA256``. |
+| CAP08b provider substitution | ``provider`` is bound into the grant and compared with the record's provider; ``None`` never matches. |
+| CAP12 kind wildcard | ``record_kind`` is required for an attested grant and compared exactly; the ``None`` wildcard is gone. |
+| RG08 forged replay | Replay is adjudicated by the policy from frozen ``ReplayEvidence`` via I05's ``assess_replay_eligibility``. A caller-supplied object is flattened to ``NOT_POLICY_DERIVED`` and **refused**; it can never unlock acceptance. |
+
+The capability is still a dataclass (so ``replace`` remains usable), but issuance — not
+shape — is what grants authority. With the shipped manifest empty, no path can mint
+``ATTESTED_OPERATOR``, so genuine operator authority remains **unavailable by construction**.
+
+### 18.3 Post-repair results
+
+| Suite | Result |
+|---|---|
+| Adversary overlay — the six + 23 R3 gates | **28 passed, 1 failed** (see 18.4) |
+| P3 conformance module | **93 passed** (79 preserved + 14 new R6 tests) |
+| `tests/crypto_sensor_fabric/normalization` | **1324 passed** |
+| Storage governed set (I05/I06, I09, I10, I11R2) | **265 passed**, 0 failed, 0 errors |
+
+Each of the six now fails closed with ``INTEGRATION_REQUIRED`` (or ``REFUSE`` for RG08),
+never ``AUTHORIZED``.
+
+### 18.4 One disclosed conflict: RG05
+
+``test_rg05_cutoff_binding_exists_and_is_enforced`` asserts that a **directly
+constructed ATTESTED_OPERATOR capability must be honoured at its own cutoff**
+(``ACCEPT_FIELD_BINDING``). That positive leg *is* the CAP01 bypass: satisfying it and
+satisfying CAP01 are mutually exclusive. The security finding wins. The cutoff-binding
+property is preserved and re-asserted under synthetic semantics in
+``test_r6_14_same_cutoff_is_honoured_under_synthetic_semantics`` (same cutoff →
+``SYNTHETIC_TEST_ONLY`` acceptance; later cutoff → ``INTEGRATION_REQUIRED``).
+RG05's refusal leg (cross-cutoff reuse) still passes.
+
+The adversary's test file was **not** modified and **not** committed; the conflict is
+reported rather than silenced by editing their assertion.
+
+### 18.5 New negative tests (14)
+
+Forged capability with correct identity · replaced basis · wrong manifest digest ·
+provider substitution · record-kind mismatch · cross-record reuse · cross-cutoff reuse ·
+forged replay object · cached forged verdicts · synthetic-never-attested ·
+correct digest with unauthorized custody · empty manifest mints nothing ·
+policy-derived replay from real evidence · same-cutoff binding under synthetic semantics.
+
+### 18.6 Governance
+
+* Frozen Bloc 5 plans unchanged; manifest ``artifacts == {}``.
+* Tracked ``.py`` = **1,097**, matching the published I11R2 count exactly (no publisher run needed: no file added or removed).
+* I05/I10 scope audits green inside the 1324-test run.
+* No production module modified; no live consumer; historical evidence untouched.
+* The red-team overlay was transient and is absent from the tree.
+
+### 18.7 Remaining limitations
+
+1. The issuance marker is an in-process data boundary. Code that reaches ``object.__setattr__`` with module internals is outside the model — the same bound the ``authority`` loader documents.
+2. ``custody_status`` remains report-only.
+3. ``ATTESTED_OPERATOR`` is unreachable while the manifest is empty; that is intended, not pending work.
+4. Replay-eligible acceptance is no longer asserted from a caller object anywhere; ELIGIBLE classification is proven by the I05 gate's own suite, which the policy now calls directly.
+
+### 18.8 Disposition
+
+`R6_READY_FOR_INDEPENDENT_REATTACK` — the six reported grants are closed and verified by
+the adversary's own tests, with one mutually-exclusive test documented rather than edited.
+
+---
+
 **Signed off:** Agent 1 — Implementation Lead
 **Status:** `P3_R1_IMPLEMENTATION_READY_FOR_INDEPENDENT_AUDIT` (full-checkout regression still outstanding, reported as blocked) — experimental, fail-closed, test-only; no production authority claimed.
