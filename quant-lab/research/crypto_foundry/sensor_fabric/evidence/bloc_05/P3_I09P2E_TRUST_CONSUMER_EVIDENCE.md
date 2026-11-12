@@ -392,5 +392,148 @@ No source module under `quant-lab/src/` was modified.
 
 ---
 
+## 17. R2 directive recovery addendum (parallel trust-consumer build)
+
+**Starting HEAD:** `ea1fdeb7714b57f07085eb6dfadefafccd7658bb`
+**Final HEAD:** recorded by the commit that follows this section.
+**Reference base:** Integration R1 `3e53a6589` (ancestor of every commit below).
+
+### 17.1 What recovery found
+
+The SENSOR-B5-I09P3-R2 directive arrived after this branch had already completed
+R3 and R5. Phase 0 recovery therefore found **no unbuilt requirement and no
+unfinished work**: the R2 phases are a subset of what is already committed.
+Recovery also found three dirty tracked artifacts in the worktree
+(`BLOC_04_I15*`), which were non-hermetic side effects of an earlier suite run —
+restored, verified clean, and **not** committed.
+
+| Commit | Scope |
+|---|---|
+| `03da8e4c9` | conformance engine + adversarial suite |
+| `aa784c114` | implementation evidence document |
+| `c0e3440bf` | offset-aware equality and DST boundaries |
+| `5ce62c26d` | R3 governance conformance closure |
+| `8360c9dd1` | R5 governance count republish (1,097) |
+| `ea1fdeb77` | R5 custody-authority repair |
+
+### 17.2 Four mandatory inspections (Phase 1)
+
+All four run in one central `_apply`, so every path — single, batch, cached,
+deserialized, evidence-reread — is subject to the same policy.
+
+| Inspection | Enforcement |
+|---|---|
+| 1. Trust scope | `derived.trust_scope` must be `ECONOMIC_FIELD_BINDING`, else `REFUSE / FORGED_TRUST_SCOPE` |
+| 2. Unverified dimensions | non-empty required on every verdict, else `REFUSE / EMPTY_UNVERIFIED_DIMENSIONS`; preserved on all exit paths |
+| 3. Custody-source authorization | decided by a policy-owned capability (R5) — `custody_verified` and the record's own `custody_source_authorized` flag confer nothing; no capability ⇒ `INTEGRATION_REQUIRED` |
+| 4. Field allowlist | every required field must appear in `fields_verified`, else `REFUSE / FIELD_NOT_IN_ALLOWLIST`; sibling fields are not substitutes |
+
+`custody_verified=True` never implies `custody_source_authorized=True`, and the
+in-memory `DeterministicEvidenceStore` cannot create authorization: it is a
+fixture for byte rebinding only.
+
+### 17.3 Copied verdicts and bytes (Phase 2)
+
+`evaluate` re-derives through the consumer's own `rederive` and compares
+`approval_id`, `registry_digest`, `artifact_id`, `trust_scope`,
+`fields_verified` and `custody_source_authorized`; any divergence is
+`REFUSE / CACHED_VERDICT_DIVERGENCE`. At consumption the bytes are re-read from
+the store and re-hashed: missing bytes are `EVIDENCE_BYTES_MISSING`, substituted
+bytes are `EVIDENCE_BYTES_MISMATCH`. A digest alone, with no bytes, is refused.
+
+R5 sharpened this further: matching cached and re-derived verdicts are *not*
+authority either, because the authority lives outside the verdict entirely.
+
+### 17.4 PIT and replay independence (Phase 3)
+
+The engine reuses `pit_availability_refusal` and the I05
+`ReplayEligibility`/`assess_replay_eligibility` gate; it duplicates neither rule.
+Both are adjudicated **before** the custody gate, so an inadmissible record is
+`REFUSE`d regardless of what any custody source claims. The 2x2 matrix
+(PIT × replay) is asserted directly, and refusal reasons stay independently
+applicable and separately reported.
+
+### 17.5 Attack matrix (Phase 4) — 24 of 24 present
+
+| # | Attack | Test |
+|---|---|---|
+| 1 | Forged verdict scope | `test_01_forged_trust_scope` |
+| 2 | Missing unverified dimensions | `test_02_empty_unverified_dimension_set` |
+| 3 | Unauthorized custody source | `test_04_unauthorized_custody_source` |
+| 4 | Missing evidence bytes | `test_07_evidence_missing_at_consumption` |
+| 5 | Digest mismatch | `test_06_evidence_byte_substitution` |
+| 6 | Approval ID substitution | `test_08_copied_verdict_forged_approval_id` |
+| 7 | Registry digest substitution | `test_09_copied_verdict_forged_registry_digest` |
+| 8 | Artifact ID substitution | `test_forged_artifact_id` |
+| 9 | Forged verified-field list | `test_forged_field_allowlist` |
+| 10 | Cached verdict after revocation | `test_10_cached_verdict_after_approval_revocation` |
+| 11 | Same-day date-only PIT ambiguity | `test_11_same_day_date_only_pit_ambiguity` |
+| 12 | Missing PIT availability | `test_12_missing_approval_availability` |
+| 13 | Naive cutoff | `test_13_naive_evaluation_cutoff_refused` |
+| 14 | Offset-aware equality | `test_14_*` (5 cases) |
+| 15 | DST edge cases | `test_15_*` (4 cases) |
+| 16 | PIT/replay disagreement | `test_14_pit_admissible_but_replay_blocked`, `test_15_replay_eligible_but_pit_inadmissible`, 2x2 matrix |
+| 17 | Unverified sibling field | `test_17_sibling_canonical_field_substitution` |
+| 18 | False liquidation transformation | `test_18_liquidation_record_claiming_verified_economic_transformation` |
+| 19 | Mixed-acceptance batch | `test_19_batch_mixed_trusted_and_refused` |
+| 20 | Serialization dropping limitations | `test_03_unverified_dimensions_omitted_during_serialization` |
+| 21 | Unauthenticated acquisition lineage | `test_21_unauthenticated_source_lineage_promotion`, `test_23_missing_acquisition_lineage` |
+| 22 | Forged instrument/revision identity | `test_22_forged_instrument_identity` |
+| 23 | Refusal retry bypass | `test_20_refusal_incorrectly_retried_as_transient` |
+| 24 | Cutoff auth mistaken for PIT | `test_24_no_cutoff_authentication_presented_as_pit_admission` |
+
+Beyond the 24, R5 added 9 authority-boundary tests (AT43, AT53–AT56, cross-cutoff,
+synthetic-not-attested, empty-manifest, evidence-bytes-≠-authority).
+
+### 17.6 Multipath consistency (Phase 5)
+
+One `ConsumerPolicy` with typed `ConsumerDecision` outcomes serves single,
+cached, deserialized and evidence-reread paths; `TestMultiPathConformance`
+asserts the same verdicts on each. There is no second, drifting policy.
+
+### 17.7 Focused regression (Phase 7)
+
+| Suite | Result |
+|---|---|
+| P3 conformance module | **79 passed** |
+| `tests/crypto_sensor_fabric/normalization` (P2a–P2e, I05, I09, I10 scope, P3) | **1310 passed** |
+| Storage governed set (I05/I06, I09, I10, I11R2) | **265 passed**, 0 failed, 0 errors |
+
+### 17.8 Canonical regression status
+
+A **COMPLETE** canonical run of the full 4,719-node universe exists
+(`canonical-p3-r1`, disposition `COMPLETE`, outcome GREEN, 4,708 passed / 0
+failed / 11 platform skips, collected digest = executed digest), produced by the
+hermetic runner on the dedicated canonical branch at commit `725fa4d15`.
+
+**Scope caveat, stated plainly:** that run executed on
+the canonical branch, whose *test tree* is identical to this HEAD's (the
+differences are the runner scripts, the governance count and documentation). It
+is therefore strong evidence for this code and P3's 79 nodes were green inside
+it, but it is not a run of this branch's HEAD and is not presented as one.
+
+### 17.9 Governance and scope (Phase 6)
+
+* Approval manifest remains empty: `"artifacts": {}`.
+* Tracked `.py` = **1,097**, matching the published governance count exactly.
+* No allowlist widened; no production module modified; `quant-lab/src/` untouched by this directive.
+* The engine stays in the experimental test-only namespace — no ingestion wiring.
+* Agent 2 branches untouched: `p3-redteam-r1` `532e11e2b`, `p3-redteam-r2` `982492766`, `p3-redteam-r3` `d829e0e69`, `p3-r5-reattack` `49e081c5d`.
+
+### 17.10 Remaining unverified dimensions
+
+1. No approved operator-authority mechanism exists, so `ATTESTED_OPERATOR` cannot be minted; the gate returns `INTEGRATION_REQUIRED` by design.
+2. The capability is an in-process data boundary, not a signature scheme.
+3. `custody_status` remains report-only.
+4. Production integration remains deferred and out of scope.
+
+### 17.11 Disposition
+
+`P3_R1_IMPLEMENTATION_READY_FOR_INDEPENDENT_AUDIT` — the implementation and its
+attack matrix are complete and green on this branch; nothing is self-ratified
+and no production authority is claimed.
+
+---
+
 **Signed off:** Agent 1 — Implementation Lead
 **Status:** `P3_R1_IMPLEMENTATION_READY_FOR_INDEPENDENT_AUDIT` (full-checkout regression still outstanding, reported as blocked) — experimental, fail-closed, test-only; no production authority claimed.
