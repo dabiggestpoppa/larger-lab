@@ -7,6 +7,34 @@
 
 ---
 
+## 0. Phase 0 manifest (reference lock)
+
+| Item | Value |
+|---|---|
+| Reference P3 candidate (R5) | `ea1fdeb7714b57f07085eb6dfadefafccd7658bb` — verified on the remote, never modified |
+| Worktree | `.worktrees/p3-canonical-r1` (new, separate, registered) |
+| Owned branch | `agent/crypto-sensor-fabric-p3-canonical-r1` |
+| Git index state at run start | clean (0 entries) |
+| Disk availability | 42 GB free (81 % of 238 GB) |
+| Tracked files | 6,786 |
+| Python inventory | 1,100 tracked `.py` |
+| pytest config | `pythonpath = ["quant-lab/src"]`, `testpaths = ["quant-lab/tests"]`, `addopts = --import-mode=importlib`, marker `sensor_network_smoke` (opt-in via `SENSOR_NETWORK_SMOKE=1`) |
+| Pre-existing canonical partitioning | **none found** — no canonical runner, driver or partition manifest exists in the tree; this runner introduces partitioning and does not replace anything |
+
+Frozen Bloc 5 plan hashes (SHA-256, first 16 hex):
+
+| Plan file | Digest |
+|---|---|
+| `01_PIT_IDENTITY_AND_LIFECYCLE_ARCHITECTURE.md` | `b2c4504016a3725a` |
+| `02_TIMESTAMP_REVISION_AND_AVAILABILITY_TRUTH.md` | `4ecc2ded584c4304` |
+| `03_COMMON_UNIT_AND_SEMANTIC_NORMALIZATION_CONTRACTS.md` | `1f32169236256b72` |
+| `04_SENSOR_SPECIFIC_NORMALIZATION_RULES.md` | `c7be73c14cfa9306` |
+| `05_T1_LINEAGE_DUPLICATES_QUALITY_AND_STORAGE.md` | `fb80468ea84ee29d` |
+| `06_ACCEPTANCE_TESTS_AND_STAGED_IMPLEMENTATION_COMMITS.md` | `cc07ee4c0dfb5e1a` |
+| `07_BLOC_05_FREEZE_MANIFEST.md` | `5ac2795ce589f3e3` |
+
+---
+
 ## 1. Why this exists
 
 Every recent validation attempt on this repository failed for operational
