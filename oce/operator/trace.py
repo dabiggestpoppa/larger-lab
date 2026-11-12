@@ -17,11 +17,16 @@ def failure_cost_trace(nodes, registry, incidents, runs, cost_refs, app, root):
     if [node.get("kind") for node in nodes] != list(KINDS):
         raise OperatorRefusal("REFUSED_BROKEN_TRACE", "kind sequence incomplete")
     identities = (registry or {}).get("identities") or {}
-    incident_index = {row["id"]: row for row in incidents}
+    incident_index = {}
+    for row in incidents:
+        if row["id"] in incident_index:
+            raise OperatorRefusal("REFUSED_DUPLICATE_INCIDENT", row["id"])
+        incident_index[row["id"]] = row
     run_index = {row["run_id"]: row for row in runs}
     cost_index = set(cost_refs)
     previous = None
     seen = set()
+    incident_owners = set()
     rows = []
     for node in nodes:
         for key in NODE_FIELDS:
@@ -39,14 +44,18 @@ def failure_cost_trace(nodes, registry, incidents, runs, cost_refs, app, root):
             raise OperatorRefusal("REFUSED_BROKEN_TRACE", f"digest {node['ref']}")
         kind = node["kind"]
         if kind == "incident":
-            if node["ref"] not in incident_index:
+            incident = incident_index.get(node["ref"])
+            if incident is None:
                 raise OperatorRefusal("REFUSED_INVALID_RECORD", node["ref"])
+            incident_owners = set(incident.get("owners") or [])
         elif kind == "identity":
             identity = identities.get(node["ref"])
             if identity is None:
                 raise OperatorRefusal("REFUSED_UNKNOWN_IDENTITY", node["ref"])
             if identity["app"] != app:
                 raise OperatorRefusal("REFUSED_CROSS_APP", f"{identity['app']} != {app}")
+            if node["ref"] not in incident_owners:
+                raise OperatorRefusal("REFUSED_UNOWNED_INCIDENT", node["ref"])
         elif kind == "workflow":
             run = run_index.get(node["ref"])
             if run is None:

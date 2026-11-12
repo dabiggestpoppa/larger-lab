@@ -55,3 +55,27 @@ def test_cost_attributed_to_app_and_task():
     assert app["actual_usd"] == 13
     assert app["tasks"]["task-1"]["actual_usd"] == 8
     assert app["tasks"]["task-2"]["categories"]["model"]["actual_usd"] == 5
+
+
+def test_fractional_cost_refused():
+    for value in (0.9, 0.0, 1.0):
+        with pytest.raises(OperatorRefusal) as exc:
+            cost_ledger([entry(estimate_usd=value)])
+        assert exc.value.code == "REFUSED_INVALID_COST"
+        with pytest.raises(OperatorRefusal) as exc:
+            cost_ledger([entry(actual_usd=value)])
+        assert exc.value.code == "REFUSED_INVALID_COST"
+
+
+def test_non_integer_cost_refused():
+    for value in (True, "5", float("inf"), float("nan"), None):
+        with pytest.raises(OperatorRefusal) as exc:
+            cost_ledger([entry(capacity=value)])
+        assert exc.value.code == "REFUSED_INVALID_COST"
+    ledger = cost_ledger([entry()])
+    with pytest.raises(OperatorRefusal) as exc:
+        budget_alerts(ledger, {"app-a": {"ci": "12"}})
+    assert exc.value.code == "REFUSED_INVALID_COST"
+    with pytest.raises(OperatorRefusal) as exc:
+        budget_alerts(ledger, {"app-a": {"ci": 12}}, {"app-a": {"ci": 0.5}})
+    assert exc.value.code == "REFUSED_INVALID_COST"

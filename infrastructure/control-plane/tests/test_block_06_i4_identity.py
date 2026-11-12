@@ -60,3 +60,19 @@ def test_resolution_deterministic():
     second = resolve_identity(reg, "id:agent", "app-a", 5)
     assert first["digest"] == second["digest"]
     assert first["credential_reference_id"] == "cr-1"
+
+
+def test_nested_map_secret_refused():
+    credential = {"id": "cr-1", "kind": "token", "rotated_at": 0, "revoked": False,
+                  "meta": {"auth": {"token": "sk-live"}}}
+    with pytest.raises(OperatorRefusal) as exc:
+        identity_registry([record(credential_reference=credential)])
+    assert exc.value.code == "REFUSED_RAW_SECRET"
+
+
+def test_nested_sequence_secret_refused():
+    credential = {"id": "cr-1", "kind": "token", "rotated_at": 0, "revoked": False,
+                  "headers": [{"name": "ok"}, {"password": "sk-live"}]}
+    with pytest.raises(OperatorRefusal) as exc:
+        identity_registry([record(credential_reference=credential)])
+    assert exc.value.code == "REFUSED_RAW_SECRET"

@@ -62,3 +62,21 @@ def test_trace_cross_app_refused():
     with pytest.raises(OperatorRefusal) as exc:
         failure_cost_trace(build_nodes(root), registry, [incident], [run], cost_refs, "app-b", root)
     assert exc.value.code == "REFUSED_CROSS_APP"
+
+
+def test_trace_requires_incident_owner():
+    incident, registry, run, cost_refs = fixtures()
+    incident = dict(incident, owners=["id:other"])
+    root = digest(b"trace-root")
+    with pytest.raises(OperatorRefusal) as exc:
+        failure_cost_trace(build_nodes(root), registry, [incident], [run], cost_refs, APP, root)
+    assert exc.value.code == "REFUSED_UNOWNED_INCIDENT"
+
+
+def test_trace_duplicate_incident_refused():
+    incident, registry, run, cost_refs = fixtures()
+    root = digest(b"trace-root")
+    with pytest.raises(OperatorRefusal) as exc:
+        failure_cost_trace(build_nodes(root), registry, [incident, dict(incident)], [run],
+                           cost_refs, APP, root)
+    assert exc.value.code == "REFUSED_DUPLICATE_INCIDENT"

@@ -93,3 +93,17 @@ def test_retry_bounded():
     with pytest.raises(OperatorRefusal) as exc:
         retry_run(once, 1)
     assert exc.value.code == "REFUSED_RETRY_EXCEEDED"
+
+
+def test_advance_definition_mismatch_refused():
+    v1 = define_workflow({**DEFINITION, "version": 1})
+    v2 = define_workflow({**DEFINITION, "version": 2})
+    run = acquire_lease(start_run(v1, "run-1", 0), "id:op", 0, 10)
+    with pytest.raises(OperatorRefusal) as exc:
+        advance_run(v2, run, "e1", "go", "id:op", 1)
+    assert exc.value.code == "REFUSED_WORKFLOW_MISMATCH"
+    assert run["state"] == "new" and run["applied_events"] == [] and run["history"] == []
+    other = define_workflow({**DEFINITION, "id": "wf.other"})
+    with pytest.raises(OperatorRefusal) as exc:
+        advance_run(other, run, "e1", "go", "id:op", 1)
+    assert exc.value.code == "REFUSED_WORKFLOW_MISMATCH"

@@ -84,6 +84,10 @@ def acquire_lease(run, owner, now, ttl):
 
 def advance_run(definition, run, event_id, event, actor, now):
     """Advance a run along one legal transition, idempotent on a replayed event id."""
+    if (run["definition_id"] != definition["id"]
+            or int(run["version"]) != int(definition["version"])):
+        raise OperatorRefusal("REFUSED_WORKFLOW_MISMATCH",
+                              f"{run['definition_id']}@{run['version']}")
     if event_id in run["applied_events"]:
         return dict(run)
     if run["cancelled"]:

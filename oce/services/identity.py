@@ -15,12 +15,16 @@ CREDENTIAL_FIELDS = ("id", "kind", "rotated_at", "revoked")
 SECRET_KEYS = ("secret", "token", "value", "password", "private_key", "key_material", "raw")
 
 
-def _refuse_raw_secret(credential_reference) -> None:
-    if not isinstance(credential_reference, dict):
-        raise OperatorRefusal("REFUSED_INVALID_RECORD", "credential_reference")
-    for key in credential_reference:
-        if str(key).lower() in SECRET_KEYS:
-            raise OperatorRefusal("REFUSED_RAW_SECRET", key)
+def _refuse_raw_secret(value) -> None:
+    """Refuse a secret-bearing key at any depth in a mapping or sequence."""
+    if isinstance(value, dict):
+        for key, nested in value.items():
+            if str(key).lower() in SECRET_KEYS:
+                raise OperatorRefusal("REFUSED_RAW_SECRET", key)
+            _refuse_raw_secret(nested)
+    elif isinstance(value, (list, tuple)):
+        for item in value:
+            _refuse_raw_secret(item)
 
 
 def identity_registry(records):
@@ -37,6 +41,8 @@ def identity_registry(records):
         if record["kind"] not in KINDS:
             raise OperatorRefusal("REFUSED_INVALID_RECORD", record["kind"])
         credential = record["credential_reference"]
+        if not isinstance(credential, dict):
+            raise OperatorRefusal("REFUSED_INVALID_RECORD", "credential_reference")
         _refuse_raw_secret(credential)
         for key in CREDENTIAL_FIELDS:
             if key not in credential:

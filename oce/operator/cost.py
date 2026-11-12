@@ -12,9 +12,9 @@ CATEGORIES = ("provider", "model", "worker", "storage", "ci")
 ENTRY_FIELDS = ("id", "app", "task", "category", "estimate_usd", "actual_usd", "capacity")
 
 
-def _non_negative(value, label):
-    value = int(value)
-    if value < 0:
+def _integer(value, label):
+    """Accept only a non-negative exact integer; booleans, floats and strings are refused."""
+    if type(value) is not int or value < 0:
         raise OperatorRefusal("REFUSED_INVALID_COST", label)
     return value
 
@@ -28,9 +28,9 @@ def cost_ledger(entries):
                 raise OperatorRefusal("REFUSED_INVALID_RECORD", key)
         if entry["category"] not in CATEGORIES:
             raise OperatorRefusal("REFUSED_UNKNOWN_CATEGORY", entry["category"])
-        estimate = _non_negative(entry["estimate_usd"], entry["id"])
-        actual = _non_negative(entry["actual_usd"], entry["id"])
-        capacity = _non_negative(entry["capacity"], entry["id"])
+        estimate = _integer(entry["estimate_usd"], entry["id"])
+        actual = _integer(entry["actual_usd"], entry["id"])
+        capacity = _integer(entry["capacity"], entry["id"])
         app = apps.setdefault(entry["app"], {"estimate_usd": 0, "actual_usd": 0,
                                              "capacity": 0, "tasks": {}})
         task = app["tasks"].setdefault(entry["task"], {"estimate_usd": 0, "actual_usd": 0,
@@ -76,8 +76,9 @@ def budget_alerts(ledger, budgets, projections=None):
             actual = 0
             for task in app_data["tasks"].values():
                 actual += task["categories"].get(category, {}).get("actual_usd", 0)
-            projected = int(projections.get(app, {}).get(category, 0))
-            ceiling = int(ceiling)
+            label = f"{app}:{category}"
+            projected = _integer(projections.get(app, {}).get(category, 0), label)
+            ceiling = _integer(ceiling, label)
             if actual >= ceiling:
                 state = "BREACHED"
             elif projected >= ceiling:
