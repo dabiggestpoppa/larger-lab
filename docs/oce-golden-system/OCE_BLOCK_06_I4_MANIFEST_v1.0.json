@@ -54,9 +54,9 @@
       "sha256": "aeb1b383112a0b078d9b97f6b436ea98d29d479b486f7e9f74d9da0b64f975e6"
     },
     {
-      "bytes": 11813,
+      "bytes": 12464,
       "path": "infrastructure/control-plane/scripts/block_06_i4_mutation_battery.py",
-      "sha256": "e6d7a6bf9957e2fe984d60f3286cbee3776f3e48525285e85cd40d3ed05281e9"
+      "sha256": "1c42faa2f3fed852f1a8904b3b2e2dfb844cda3b4dfc674737321d39ed70bf8f"
     },
     {
       "bytes": 5139,

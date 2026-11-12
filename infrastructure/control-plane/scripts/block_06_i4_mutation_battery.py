@@ -90,8 +90,12 @@ MUTATIONS = [
     {"id": "M15", "label": "I3 workflow registration declaration omitted",
      "file": I4_REGISTRATION,
      "old": ',\n      ".github/workflows/block-06-i3-validation.yml"', "new": "",
-     "kind": "controls", "target": "i3_workflow_registered"},
+     "kind": "controls", "target": "i3_workflow_registered", "commit": True},
 ]
+
+
+def git(cwd, *args) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=str(cwd), capture_output=True, text=True)
 
 
 def run_pytest(root: pathlib.Path, node: str) -> tuple[int, str]:
@@ -138,6 +142,7 @@ def main(argv=None) -> int:
                 print("pristine worktree is red; refusing to mutate")
                 return 2
             for item in MUTATIONS:
+                pre_head = git(work, "rev-parse", "HEAD").stdout.strip()
                 target = work / item["file"]
                 pristine = target.read_bytes()
                 text = pristine.decode("utf-8")
@@ -150,6 +155,10 @@ def main(argv=None) -> int:
                 target.write_text(text.replace(item["old"], item["new"], 1), encoding="utf-8",
                                   newline="\n")
                 applied = target.read_bytes() != pristine
+                if item.get("commit"):
+                    git(work, "add", "-A")
+                    git(work, "-c", "user.email=ci@example.com", "-c", "user.name=ci",
+                        "commit", "-qm", f"mutation-{item['id']}")
                 if item["kind"] == "pytest":
                     observed_rc, out = run_pytest(work, item["target"])
                     discriminated = observed_rc != 0
@@ -158,14 +167,18 @@ def main(argv=None) -> int:
                     observed_rc, out = run_controls(work)
                     discriminated = observed_rc != 0
                     discriminator_ok = control_failed(out, item["target"])
-                target.write_bytes(pristine)
+                if item.get("commit"):
+                    git(work, "reset", "-q", "--hard", pre_head)
+                else:
+                    target.write_bytes(pristine)
                 results.append({
                     "id": item["id"], "mutation": item["label"],
                     "expected_target": item["target"], "applied": applied,
                     "observed_rc": observed_rc, "discriminated": discriminated,
                     "discriminator_ok": discriminator_ok,
-                    "restored": hashlib.sha256(target.read_bytes()).hexdigest()
-                    == hashlib.sha256(pristine).hexdigest(),
+                    "restored": (target.read_bytes() == pristine
+                                 and git(work, "rev-parse", "HEAD").stdout.strip()
+                                 == pre_head),
                     "pre_sha256": hashlib.sha256(pristine).hexdigest(),
                     "post_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
                 })
