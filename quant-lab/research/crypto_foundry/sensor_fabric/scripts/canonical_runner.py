@@ -46,6 +46,7 @@ import os
 import shutil
 import subprocess
 import sys
+import xml.etree.ElementTree as ET
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor
@@ -469,6 +470,7 @@ def run_partition(
         "duration_seconds": 0.0,
         "junit_sha256": None,
         "junit_bytes": None,
+        "junit_case_count": None,
         "free_bytes_before": _free_bytes(cwd),
         "free_bytes_after": None,
         "modified_paths": [],
@@ -544,6 +546,7 @@ def run_partition(
     if junit_path.exists():
         state["junit_bytes"] = junit_path.stat().st_size
         state["junit_sha256"] = _sha256_file(junit_path)
+        state["junit_case_count"] = _junit_case_count(junit_path)
 
     # Infrastructure vs test failure is decided here, not by a red number.
     if state["timed_out"]:
@@ -581,9 +584,246 @@ def run_partition(
 # --------------------------------------------------------------------------- #
 
 
-def evaluate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
-    """Pure verdict function: the only place COMPLETE can be produced."""
+_COUNT_KEYS = ("passed", "failed", "errored", "skipped")
+
+_OUTCOME_TO_COUNT = {
+    "passed": "passed",
+    "failed": "failed",
+    "error": "errored",
+    "skipped": "skipped",
+}
+
+
+def _recompute_counts(outcomes: dict[str, str]) -> dict[str, int]:
+    """Recompute pytest-style totals from a per-node outcome map."""
+    counts = {key: 0 for key in _COUNT_KEYS}
+    for outcome in outcomes.values():
+        counts[_OUTCOME_TO_COUNT.get(outcome, "errored")] += 1
+    return counts
+
+
+def _junit_case_count(path: Path) -> int | None:
+    try:
+        root = ET.parse(path).getroot()
+    except (ET.ParseError, OSError):
+        return None
+    return sum(1 for _ in root.iter("testcase"))
+
+
+def _node_file(node: str) -> str:
+    return node.partition("::")[0]
+
+
+def _reconcile_evidence(
+    bundle: dict[str, Any],
+    *,
+    base_dir: Path | None,
+    expected_count: int | None,
+    expected_digest: str | None,
+) -> dict[str, Any]:
+    """Recompute every published aggregate from the evidence it summarises.
+
+    R2 closes the four R1 counterexamples: nothing a bundle *says* about itself
+    is accepted when it can be derived from what the bundle *contains*.  Three
+    independent authorities are consulted, in increasing order of strength:
+
+    1. the bundle's own node lists (V02: digests and counts),
+    2. the per-partition outcome maps and partition file intent (V01, V03),
+    3. the JUnit artifacts and, when supplied, an external universe anchor
+       (V04, V03).
+
+    A bundle that agrees with all three is internally consistent.  It is not
+    thereby *true* -- only an anchor recorded outside the bundle can establish
+    that -- which is why `expected_count`/`expected_digest` exist.
+    """
+    integrity: list[str] = []
+    coverage: list[str] = []
+    infrastructure: list[str] = []
+    summary: dict[str, Any] = {}
+
+    collection = bundle.get("collection", {}) or {}
+    execution = bundle.get("execution", {}) or {}
+    coll_nodes = list(collection.get("nodes", []) or [])
+    exec_nodes = list(execution.get("nodes", []) or [])
+
+    # -- V02: digests and counts are recomputed, never trusted -------------
+    if collection.get("count") is not None and collection["count"] != len(coll_nodes):
+        integrity.append(
+            "counts_reconciliation_failed: collection.count="
+            f"{collection['count']} but {len(coll_nodes)} nodes are listed"
+        )
+    if collection.get("digest") and collection["digest"] != _digest_node_ids(coll_nodes):
+        integrity.append(
+            "digest_reconciliation_failed: collection.digest does not match the listed nodes"
+        )
+    if (
+        execution.get("unique_count") is not None
+        and execution["unique_count"] != len(exec_nodes)
+    ):
+        integrity.append(
+            "counts_reconciliation_failed: execution.unique_count="
+            f"{execution['unique_count']} but {len(exec_nodes)} nodes are listed"
+        )
+    if execution.get("digest") and execution["digest"] != _digest_node_ids(exec_nodes):
+        integrity.append(
+            "digest_reconciliation_failed: execution.digest does not match the listed nodes"
+        )
+
+    # -- V01: totals are recomputed from per-node outcomes -----------------
+    partitions = execution.get("partitions", []) or []
+    union: dict[str, str] = {}
+    duplicated: list[str] = []
+    for part in partitions:
+        index = part.get("index")
+        outcomes = part.get("outcomes") or {}
+        recomputed = _recompute_counts(outcomes)
+        recorded = part.get("counts")
+        if recorded is not None and dict(recorded) != recomputed:
+            integrity.append(
+                f"counts_reconciliation_failed: partition {index} records {recorded} "
+                f"but its outcomes sum to {recomputed}"
+            )
+        executed = part.get("executed_nodes")
+        if executed is not None and sorted(executed) != sorted(outcomes):
+            coverage.append(
+                f"coverage_reconciliation_failed: partition {index} executed_nodes "
+                "disagree with its per-node outcomes"
+            )
+        for node in outcomes:
+            if node in union:
+                duplicated.append(node)
+            else:
+                union[node] = outcomes[node]
+
+        # -- V03: a partition may only account for the files it ran --------
+        intended = part.get("intended_nodes")
+        if intended is not None:
+            stray = sorted(set(outcomes) - set(intended))
+            if stray:
+                coverage.append(
+                    f"coverage_reconciliation_failed: partition {index} executed "
+                    f"{len(stray)} node(s) it never intended, e.g. {stray[0]}"
+                )
+            if part.get("intended_count") is not None and part["intended_count"] != len(
+                intended
+            ):
+                integrity.append(
+                    f"counts_reconciliation_failed: partition {index} "
+                    f"intended_count={part['intended_count']} but {len(intended)} "
+                    "intended nodes"
+                )
+        else:
+            files = set(part.get("files") or [])
+            foreign = sorted(
+                node for node in outcomes if files and _node_file(node) not in files
+            )
+            if foreign:
+                coverage.append(
+                    f"coverage_reconciliation_failed: partition {index} accounts for "
+                    f"{len(foreign)} node(s) from files it did not run, e.g. {foreign[0]}"
+                )
+
+    if union and sorted(union) != sorted(exec_nodes):
+        outcome_only = len(set(union) - set(exec_nodes))
+        node_only = len(set(exec_nodes) - set(union))
+        coverage.append(
+            "coverage_reconciliation_failed: execution nodes disagree with the "
+            f"per-node outcomes ({outcome_only} outcome-only, {node_only} node-only)"
+        )
+    if duplicated:
+        coverage.append(
+            f"coverage_reconciliation_failed: {len(duplicated)} node(s) reported by "
+            "more than one partition"
+        )
+    if union:
+        totals = _recompute_counts(union)
+        recorded_totals = execution.get("counts")
+        if recorded_totals is not None and dict(recorded_totals) != totals:
+            integrity.append(
+                f"counts_reconciliation_failed: execution.counts {recorded_totals} "
+                f"but the per-node outcomes sum to {totals}"
+            )
+        summary["recomputed_counts"] = totals
+
+    # -- V03: an external universe anchor, when supplied -------------------
+    if expected_count is not None:
+        summary["external_anchor_count"] = expected_count
+        if expected_count != len(coll_nodes):
+            integrity.append(
+                f"digest_reconciliation_failed: external anchor count "
+                f"{expected_count} != {len(coll_nodes)} collected"
+            )
+    if expected_digest is not None:
+        summary["external_anchor_digest_checked"] = True
+        if expected_digest != _digest_node_ids(coll_nodes):
+            integrity.append(
+                "digest_reconciliation_failed: external anchor digest does not "
+                "match the collected nodes"
+            )
+
+    # -- V04: JUnit must agree with the result stream ----------------------
+    if base_dir is not None:
+        for part in partitions:
+            recorded_sha = part.get("junit_sha256")
+            if not recorded_sha:
+                continue
+            index = part.get("index")
+            junit = Path(base_dir) / f"junit_{index}.xml"
+            if not junit.exists():
+                infrastructure.append(
+                    f"junit_missing: partition {index} declares a JUnit artifact "
+                    "that is not present"
+                )
+                continue
+            if _sha256_file(junit) != recorded_sha:
+                infrastructure.append(
+                    f"junit_digest_mismatch: partition {index} JUnit bytes differ "
+                    "from the recorded sha256"
+                )
+                continue
+            cases = _junit_case_count(junit)
+            executed = part.get("executed_nodes") or []
+            if cases is None:
+                infrastructure.append(
+                    f"junit_unreadable: partition {index} JUnit artifact cannot be parsed"
+                )
+            elif cases != len(executed):
+                infrastructure.append(
+                    f"junit_case_count_mismatch: partition {index} JUnit reports "
+                    f"{cases} cases but {len(executed)} nodes were executed"
+                )
+
+    return {
+        "reasons": [*integrity, *coverage, *infrastructure],
+        "integrity": integrity,
+        "coverage": coverage,
+        "infrastructure": infrastructure,
+        "summary": summary,
+    }
+
+
+def evaluate_bundle(
+    bundle: dict[str, Any],
+    *,
+    base_dir: Path | str | None = None,
+    expected_count: int | None = None,
+    expected_digest: str | None = None,
+) -> dict[str, Any]:
+    """Pure verdict function: the only place COMPLETE can be produced.
+
+    R2: the verdict is no longer a read of the bundle's own summary fields.  All
+    derived numbers are recomputed from the evidence they claim to summarise, so
+    a forged total, a forged digest, a silently shrunken universe or a JUnit
+    artifact that disagrees with the result stream cannot verify as COMPLETE.
+    """
     reasons: list[str] = []
+    reconciliation = _reconcile_evidence(
+        bundle,
+        base_dir=Path(base_dir) if base_dir is not None else None,
+        expected_count=expected_count,
+        expected_digest=expected_digest,
+    )
+    reasons.extend(reconciliation["reasons"])
 
     collected = set(bundle.get("collection", {}).get("nodes", []))
     executed = set(bundle.get("execution", {}).get("nodes", []))
@@ -648,10 +888,18 @@ def evaluate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
             infra,
             not restoration_ok,
             not tree_clean_after,
+            reconciliation["infrastructure"],
         )
     ):
         disposition = DISPOSITION_INFRA
-    elif duplicates or duplicate_executions or missing or extra:
+    elif (
+        duplicates
+        or duplicate_executions
+        or missing
+        or extra
+        or reconciliation["integrity"]
+        or reconciliation["coverage"]
+    ):
         disposition = DISPOSITION_COVERAGE
     else:
         disposition = DISPOSITION_COMPLETE
@@ -665,6 +913,7 @@ def evaluate_bundle(bundle: dict[str, Any]) -> dict[str, Any]:
         "extra_nodes": extra[:100],
         "extra_count": len(extra),
         "counts": counts,
+        "reconciliation": reconciliation["summary"],
     }
 
 
@@ -862,7 +1111,12 @@ def cmd_verify(args: argparse.Namespace) -> int:
             )
         )
         return 2
-    verdict = evaluate_bundle(bundle)
+    verdict = evaluate_bundle(
+        bundle,
+        base_dir=path.parent,
+        expected_count=args.expect_count,
+        expected_digest=args.expect_digest,
+    )
     print(json.dumps(verdict, indent=2))
     return 0 if verdict["disposition"] == DISPOSITION_COMPLETE else 1
 
@@ -924,6 +1178,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     verify_parser = sub.add_parser("verify", help="re-evaluate an evidence bundle")
     verify_parser.add_argument("evidence")
+    verify_parser.add_argument(
+        "--expect-count",
+        type=int,
+        default=None,
+        help="external universe anchor: the collected node count to require",
+    )
+    verify_parser.add_argument(
+        "--expect-digest",
+        default=None,
+        help="external universe anchor: the collection digest to require",
+    )
     verify_parser.set_defaults(func=cmd_verify)
     return parser
 
