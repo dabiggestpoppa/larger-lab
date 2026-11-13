@@ -344,6 +344,35 @@ def partition(nodes: Sequence[str], workers: int) -> list[dict[str, Any]]:
 MAX_GUARD_FILES = 2000
 
 
+def snapshot_untracked(cwd: Path, prefixes: Sequence[str]) -> list[str]:
+    """Untracked files under the guarded prefixes (respecting .gitignore)."""
+    raw = _git(cwd, "ls-files", "--others", "--exclude-standard", "-z", "--", *prefixes)
+    return sorted(path for path in raw.split("\0") if path.strip())
+
+
+def detect_new_untracked(
+    cwd: Path,
+    prefixes: Sequence[str],
+    *,
+    tracked_before: Sequence[str] | dict[str, str] | None = None,
+    untracked_before: Sequence[str] = (),
+    exclude_prefixes: Sequence[str] = (),
+) -> list[str]:
+    """New untracked files under guarded prefixes.
+
+    The guard is fail-closed but non-destructive: it reports additions and
+    never deletes anything.  The runner's own output tree is excluded, because
+    the bundle is written there during the run by design.
+    """
+    known = set(untracked_before) | set(tracked_before or ())
+    return [
+        path
+        for path in snapshot_untracked(cwd, prefixes)
+        if path not in known
+        and not any(path.startswith(prefix) for prefix in exclude_prefixes)
+    ]
+
+
 def snapshot_guarded(cwd: Path, prefixes: Sequence[str]) -> dict[str, str]:
     tracked = [
         path
@@ -413,28 +442,75 @@ def _read_results(path: Path) -> list[dict[str, Any]]:
     return records
 
 
-def _outcome_for(records: Sequence[dict[str, Any]]) -> tuple[str, int]:
-    """Collapse per-phase reports into one outcome, pytest-style."""
-    failed = error = skipped = 0
+PHASE_ORDER = ("setup", "call", "teardown")
+SENTINEL_KEY = "record_type"
+SENTINEL_VALUE = "session_end"
+
+
+def _split_stream(
+    records: Sequence[dict[str, Any]],
+) -> tuple[list[dict[str, Any]], dict[str, Any] | None]:
+    """Separate test reports from the session sentinel that closes the stream."""
+    reports: list[dict[str, Any]] = []
+    sentinel: dict[str, Any] | None = None
+    for record in records:
+        if record.get(SENTINEL_KEY) == SENTINEL_VALUE:
+            sentinel = record
+            continue
+        reports.append(record)
+    return reports, sentinel
+
+
+def _account_node(
+    records: Sequence[dict[str, Any]],
+) -> tuple[str, list[str]]:
+    """Derive one node's outcome from its phase reports, refusing to guess.
+
+    R3: a pass is only a pass when the ``call`` phase says so.  Duplicate phase
+    reports, unknown phases, and a missing ``call`` phase are accounting errors
+    rather than a silent promotion.  Skips stay distinguishable: pytest reports
+    a skipped test by failing the ``setup`` phase, never by omitting a pass.
+    """
+    issues: list[str] = []
+    phases: dict[str, str | None] = {}
     for record in records:
         when = record.get("when")
-        outcome = record.get("outcome")
-        if outcome == "failed":
-            if when in ("setup", "collect"):
-                error += 1
-            else:
-                failed += 1
-        elif outcome == "error":
-            error += 1
-        elif outcome == "skipped":
-            skipped += 1
-    if error:
-        return "error", skipped
-    if failed:
-        return "failed", skipped
-    if skipped and not failed and not error:
-        return "skipped", skipped
-    return "passed", skipped
+        if when not in PHASE_ORDER:
+            issues.append(f"unexpected_report_phase:{when}")
+            continue
+        if when in phases:
+            issues.append(f"duplicate_phase_report:{when}")
+            continue
+        phases[when] = record.get("outcome")
+
+    setup = phases.get("setup")
+    call = phases.get("call")
+    teardown = phases.get("teardown")
+
+    if "failed" in (setup, teardown):
+        outcome = "error"
+    elif call == "passed":
+        outcome = "passed"
+    elif call == "failed":
+        outcome = "failed"
+    elif call == "skipped":
+        outcome = "skipped"
+    elif call is None and "skipped" in (setup, teardown):
+        outcome = "skipped"
+    elif call is None:
+        issues.append("missing_call_phase")
+        outcome = "error"
+    else:
+        issues.append(f"unexpected_call_outcome:{call}")
+        outcome = "error"
+    return outcome, issues
+
+
+def _outcome_for(records: Sequence[dict[str, Any]]) -> tuple[str, int]:
+    """Backwards-compatible wrapper: outcome plus the skipped-report count."""
+    outcome, _ = _account_node(records)
+    skipped = sum(1 for record in records if record.get("outcome") == "skipped")
+    return outcome, skipped
 
 
 def run_partition(
@@ -471,6 +547,9 @@ def run_partition(
         "junit_sha256": None,
         "junit_bytes": None,
         "junit_case_count": None,
+        "record_count": 0,
+        "stream": {},
+        "accounting_errors": [],
         "free_bytes_before": _free_bytes(cwd),
         "free_bytes_after": None,
         "modified_paths": [],
@@ -522,18 +601,56 @@ def run_partition(
     state["duration_seconds"] = round(time.time() - started, 1)
     state["free_bytes_after"] = _free_bytes(cwd)
 
-    records = _read_results(results_path)
+    records, sentinel = _split_stream(_read_results(results_path))
     per_node: dict[str, list[dict[str, Any]]] = {}
+    corrupt = 0
     for record in records:
         nodeid = record.get("nodeid")
         if not nodeid:
+            corrupt += 1
             continue
         per_node.setdefault(nodeid, []).append(record)
 
-    state["executed_nodes"] = sorted(per_node)
-    state["outcomes"] = {
-        node: _outcome_for(reports)[0] for node, reports in sorted(per_node.items())
+    accounting: list[str] = []
+    if corrupt:
+        accounting.append(f"corrupt_result_records:{corrupt}")
+
+    state["record_count"] = len(records)
+    state["stream"] = {
+        "records": len(records),
+        "sentinel_present": sentinel is not None,
+        "sentinel_reports": (sentinel or {}).get("reports"),
+        "sentinel_nodes": (sentinel or {}).get("nodes"),
     }
+
+    outcomes: dict[str, str] = {}
+    for node, node_reports in sorted(per_node.items()):
+        outcome, issues = _account_node(node_reports)
+        outcomes[node] = outcome
+        accounting.extend(f"{node}: {issue}" for issue in issues)
+
+    if sentinel is None:
+        accounting.append(
+            "stream_sentinel_missing: the result stream was never closed by a "
+            "session, so it may be truncated"
+        )
+    else:
+        written = sentinel.get("reports")
+        seen_nodes = sentinel.get("nodes")
+        if written is not None and written != len(records):
+            accounting.append(
+                f"stream_report_count_mismatch: {len(records)} reports survived but "
+                f"the session wrote {written}"
+            )
+        if seen_nodes is not None and seen_nodes != len(per_node):
+            accounting.append(
+                f"stream_node_count_mismatch: {len(per_node)} node identities "
+                f"survived but the session saw {seen_nodes}"
+            )
+
+    state["executed_nodes"] = sorted(per_node)
+    state["outcomes"] = outcomes
+    state["accounting_errors"] = accounting
     for outcome in state["outcomes"].values():
         key = {
             "passed": "passed",
@@ -602,12 +719,35 @@ def _recompute_counts(outcomes: dict[str, str]) -> dict[str, int]:
     return counts
 
 
-def _junit_case_count(path: Path) -> int | None:
+def _junit_cases(path: Path) -> list[tuple[str | None, str | None]] | None:
     try:
         root = ET.parse(path).getroot()
     except (ET.ParseError, OSError):
         return None
-    return sum(1 for _ in root.iter("testcase"))
+    return [
+        (case.get("classname"), case.get("name"))
+        for case in root.iter("testcase")
+    ]
+
+
+def _junit_case_count(path: Path) -> int | None:
+    cases = _junit_cases(path)
+    return None if cases is None else len(cases)
+
+
+def _junit_identity(node: str) -> tuple[str, str]:
+    """Rebuild the ``(classname, name)`` pytest's JUnit writer uses for a node.
+
+    pytest mangles a node ID by replacing the path separator with a dot, dropping
+    the ``.py`` suffix, joining class segments, and leaving the final segment --
+    including any parametrisation, spaces and punctuation -- verbatim as the case
+    name.  This is verified against the committed bundle, where the derived set
+    and the observed set are equal for all 4,719 cases.
+    """
+    head, *rest = node.split("::")
+    path = head[:-3] if head.endswith(".py") else head
+    classname = ".".join([path.replace("/", "."), *rest[:-1]]) if rest else path.replace("/", ".")
+    return classname, (rest[-1] if rest else "")
 
 
 def _node_file(node: str) -> str:
@@ -620,6 +760,7 @@ def _reconcile_evidence(
     base_dir: Path | None,
     expected_count: int | None,
     expected_digest: str | None,
+    require_anchor: bool = False,
 ) -> dict[str, Any]:
     """Recompute every published aggregate from the evidence it summarises.
 
@@ -792,6 +933,69 @@ def _reconcile_evidence(
                     f"junit_case_count_mismatch: partition {index} JUnit reports "
                     f"{cases} cases but {len(executed)} nodes were executed"
                 )
+            else:
+                observed = sorted(_junit_cases(junit) or [])
+                expected = sorted(_junit_identity(node) for node in executed)
+                if observed != expected:
+                    mismatched = sum(1 for a, b in zip(observed, expected) if a != b)
+                    infrastructure.append(
+                        f"junit_identity_mismatch: partition {index} reports the "
+                        f"expected case count but {mismatched} case identit(ies) do "
+                        "not map to the executed node IDs"
+                    )
+
+    # -- R3: result-stream accounting reported by the producer -------------
+    for part in partitions:
+        index = part.get("index")
+        errors = part.get("accounting_errors") or []
+        if errors:
+            coverage.append(
+                f"accounting_failed: partition {index} reports {len(errors)} stream "
+                f"accounting error(s), e.g. {errors[0]}"
+            )
+        stream = part.get("stream") or {}
+        if stream:
+            if not stream.get("sentinel_present"):
+                coverage.append(
+                    f"accounting_failed: partition {index} result stream has no "
+                    "session sentinel and may be truncated"
+                )
+            recorded = part.get("record_count")
+            if (
+                recorded is not None
+                and stream.get("sentinel_reports") is not None
+                and recorded != stream["sentinel_reports"]
+            ):
+                coverage.append(
+                    f"accounting_failed: partition {index} kept {recorded} report(s) "
+                    f"of {stream['sentinel_reports']} written"
+                )
+
+    # -- R3: untracked additions under guarded prefixes --------------------
+    untracked_added = (bundle.get("tree", {}) or {}).get("untracked_added") or []
+    if untracked_added:
+        infrastructure.append(
+            f"untracked_evidence_added: {len(untracked_added)} new untracked file(s) "
+            f"under guarded prefixes, e.g. {untracked_added[0]}"
+        )
+
+    # -- R3: assurance level -------------------------------------------------
+    anchored = False
+    recorded_anchor = bundle.get("universe_anchor") or {}
+    if recorded_anchor.get("digest"):
+        anchored = recorded_anchor["digest"] == _digest_node_ids(coll_nodes)
+        summary["recorded_anchor_checked"] = True
+    if expected_count is not None or expected_digest is not None:
+        anchored = anchored or (
+            expected_digest is None or expected_digest == _digest_node_ids(coll_nodes)
+        ) and (expected_count is None or expected_count == len(coll_nodes))
+        summary["external_anchor_checked"] = True
+    summary["anchored"] = bool(anchored)
+    if require_anchor and not anchored:
+        integrity.append(
+            "anchor_required: the bundle is self-consistent but carries no usable "
+            "external universe anchor, so independent completeness is unproven"
+        )
 
     return {
         "reasons": [*integrity, *coverage, *infrastructure],
@@ -808,6 +1012,7 @@ def evaluate_bundle(
     base_dir: Path | str | None = None,
     expected_count: int | None = None,
     expected_digest: str | None = None,
+    require_anchor: bool = False,
 ) -> dict[str, Any]:
     """Pure verdict function: the only place COMPLETE can be produced.
 
@@ -822,6 +1027,7 @@ def evaluate_bundle(
         base_dir=Path(base_dir) if base_dir is not None else None,
         expected_count=expected_count,
         expected_digest=expected_digest,
+        require_anchor=require_anchor,
     )
     reasons.extend(reconciliation["reasons"])
 
@@ -904,8 +1110,16 @@ def evaluate_bundle(
     else:
         disposition = DISPOSITION_COMPLETE
 
+    if disposition != DISPOSITION_COMPLETE:
+        assurance = "NOT_COMPLETE"
+    elif reconciliation["summary"].get("anchored"):
+        assurance = "ANCHORED_COMPLETE"
+    else:
+        assurance = "SELF_CONSISTENT_COMPLETE"
+
     return {
         "disposition": disposition,
+        "assurance": assurance,
         "test_outcome": test_outcome,
         "reasons": reasons,
         "missing_nodes": missing[:100],
@@ -967,6 +1181,7 @@ def run_canonical(args: argparse.Namespace) -> int:
 
     guarded = snapshot_guarded(cwd, args.guard_prefixes)
     write_json(run_dir / "guard_baseline.json", guarded)
+    untracked_before = snapshot_untracked(cwd, args.guard_prefixes)
 
     environment = probe_environment(cwd)
     collection = collect(cwd, args.extra)
@@ -1009,8 +1224,13 @@ def run_canonical(args: argparse.Namespace) -> int:
             "partitions": [],
             "unimplemented_partitions": [],
         },
+        "universe_anchor": (
+            {"count": args.expect_count, "digest": args.expect_digest}
+            if (args.expect_count is not None or args.expect_digest is not None)
+            else {}
+        ),
         "restoration": {"verified": True, "paths": [], "attempted": False},
-        "tree": {"clean_after": True, "dirty_paths": []},
+        "tree": {"clean_after": True, "dirty_paths": [], "untracked_added": []},
         "interrupted": False,
     }
 
@@ -1075,7 +1295,17 @@ def run_canonical(args: argparse.Namespace) -> int:
         }
 
     after = tree_state(cwd, ignore_prefixes=(EVIDENCE_TREE,))
-    bundle["tree"] = {"clean_after": after["clean_before"], "dirty_paths": after["dirty_paths"]}
+    bundle["tree"] = {
+        "clean_after": after["clean_before"],
+        "dirty_paths": after["dirty_paths"],
+        "untracked_added": detect_new_untracked(
+            cwd,
+            args.guard_prefixes,
+            tracked_before=guarded,
+            untracked_before=untracked_before,
+            exclude_prefixes=(EVIDENCE_TREE,),
+        ),
+    }
     bundle["finished_at"] = _now()
     bundle["environment"] = environment | {"free_bytes_after": _free_bytes(cwd)}
 
@@ -1116,6 +1346,7 @@ def cmd_verify(args: argparse.Namespace) -> int:
         base_dir=path.parent,
         expected_count=args.expect_count,
         expected_digest=args.expect_digest,
+        require_anchor=args.require_anchor,
     )
     print(json.dumps(verdict, indent=2))
     return 0 if verdict["disposition"] == DISPOSITION_COMPLETE else 1
@@ -1174,6 +1405,17 @@ def build_parser() -> argparse.ArgumentParser:
     )
     run_parser.add_argument("--guard-prefixes", nargs="+", default=list(DEFAULT_GUARD_PREFIXES))
     run_parser.add_argument("--allow-dirty", action="store_true")
+    run_parser.add_argument(
+        "--expect-count",
+        type=int,
+        default=None,
+        help="external universe anchor recorded into the bundle at run time",
+    )
+    run_parser.add_argument(
+        "--expect-digest",
+        default=None,
+        help="external universe anchor recorded into the bundle at run time",
+    )
     run_parser.set_defaults(func=run_canonical)
 
     verify_parser = sub.add_parser("verify", help="re-evaluate an evidence bundle")
@@ -1188,6 +1430,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--expect-digest",
         default=None,
         help="external universe anchor: the collection digest to require",
+    )
+    verify_parser.add_argument(
+        "--require-anchor",
+        action="store_true",
+        help=(
+            "refuse a self-consistent bundle that carries no external universe "
+            "anchor"
+        ),
     )
     verify_parser.set_defaults(func=cmd_verify)
     return parser
