@@ -3,8 +3,8 @@
   "endpoints": {
     "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
     "base_tree": "5e15ea448b929269193dc904ec0677687df077e4",
-    "head_sha": "97a3a93491147d0b3698e319647619a82ff319aa",
-    "head_tree": "b4ce8cd50b804a6238dd7b1e14cb3beb75baac61"
+    "head_sha": "1ad1a970206106702b2090c1fb082db08fbfc892",
+    "head_tree": "431bfbe3798eccac67f7291afd421e1d52d34be8"
   },
   "fail_closed_on": [
     "contract_not_frozen",
@@ -31,8 +31,13 @@
     "base_only_expected": 0,
     "common_files": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
     "common_floor": 208,
-    "head_only_expected": 34,
+    "head_only_expected": 46,
     "head_only_files": "infrastructure/control-plane/tests/test_block_06_i4_*.py"
+  },
+  "product_head_binding": {
+    "product_head": "1ad1a970206106702b2090c1fb082db08fbfc892",
+    "product_tree": "431bfbe3798eccac67f7291afd421e1d52d34be8",
+    "reason": "Every accepted B6-I4 production and test repair is contained in this commit; the prior R1 endpoint predates the A3 production changes and is insufficient."
   },
   "schema": "oce.block_06_i4.paired_contract.v1",
   "setup": {

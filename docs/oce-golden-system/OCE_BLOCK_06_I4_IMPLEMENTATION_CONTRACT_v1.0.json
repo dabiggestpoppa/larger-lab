@@ -96,7 +96,9 @@
     "base_only_expected": 0,
     "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
     "common_floor": 208,
-    "head_only_expected": 34
+    "head_only_expected": 46,
+    "head_sha": "1ad1a970206106702b2090c1fb082db08fbfc892",
+    "head_tree": "431bfbe3798eccac67f7291afd421e1d52d34be8"
   },
   "refusals": [
     {

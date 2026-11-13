@@ -1,5 +1,5 @@
 # OCE — B6-I4 exact base/head paired comparison.
-# Base = the B6-I3 merge; head = the pinned B6-I4 implementation head. Both endpoints run under one
+# Base = the B6-I3 merge; head = the repaired B6-I4 product head. Both endpoints run under one
 # toolchain in isolated clones. Cost: $0.
 
 name: B6-I4 Paired Comparison
@@ -15,8 +15,8 @@ permissions:
 env:
   BASE_SHA: f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14
   BASE_TREE: 5e15ea448b929269193dc904ec0677687df077e4
-  HEAD_SHA: 97a3a93491147d0b3698e319647619a82ff319aa
-  HEAD_TREE: b4ce8cd50b804a6238dd7b1e14cb3beb75baac61
+  HEAD_SHA: 1ad1a970206106702b2090c1fb082db08fbfc892
+  HEAD_TREE: 431bfbe3798eccac67f7291afd421e1d52d34be8
   CONTRACT_PATH: docs/oce-golden-system/OCE_BLOCK_06_I4_PAIRED_COMPARISON_CONTRACT_v1.0.json
   GIT_LFS_SKIP_SMUDGE: "1"
 
@@ -54,7 +54,7 @@ jobs:
           assert contract["endpoints"]["head_sha"] == head_sha
           assert contract["endpoints"]["head_tree"] == head_tree
           assert contract["population"]["common_floor"] > 0
-          assert contract["population"]["head_only_expected"] == 34
+          assert contract["population"]["head_only_expected"] == 46
           assert contract["population"]["base_only_expected"] == 0
           print("contract-ok floor", contract["population"]["common_floor"])
           PY

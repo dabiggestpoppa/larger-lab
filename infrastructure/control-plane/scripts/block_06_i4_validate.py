@@ -87,7 +87,9 @@ def check_packet(c: Checker) -> None:
            == {"test_nodes": registry_total, "source_mutation_floor": 4, "mutations": 6})
     c.need("contract/paired", contract["paired_comparison"]
            == {"base_sha": BASE_SHA, "common_floor": 208, "base_only_expected": 0,
-               "head_only_expected": 34})
+               "head_only_expected": 46,
+               "head_sha": "1ad1a970206106702b2090c1fb082db08fbfc892",
+               "head_tree": "431bfbe3798eccac67f7291afd421e1d52d34be8"})
     surface = c.load("OPERATOR_SURFACE_CONTRACT_v1.0.json")
     symbols = [row["symbol"] for row in surface["symbols"]]
     c.need("surface/count", len(symbols) == 13 and len(set(symbols)) == 13)
