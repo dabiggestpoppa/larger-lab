@@ -120,7 +120,7 @@ jobs:
           raise SystemExit(0 if doc["ok"] else 1)
           INV
 
-      - name: Execute the 41 B6-I4 nodes
+      - name: Execute the 46 B6-I4 nodes
         env:
           EVIDENCE_DIR: ${{ steps.run_id.outputs.evidence_dir }}
         run: |
@@ -135,8 +135,8 @@ jobs:
           suite = root if root.tag == "testsuite" else root.find("testsuite")
           totals = {k: int(suite.get(k) or 0) for k in ("tests", "failures", "errors", "skipped")}
           totals["rc"] = int(sys.argv[2])
-          totals["expected"] = 41
-          totals["zero_problems"] = (totals["tests"] == 41 and totals["rc"] == 0
+          totals["expected"] = 46
+          totals["zero_problems"] = (totals["tests"] == 46 and totals["rc"] == 0
                                      and totals["failures"] == 0 and totals["errors"] == 0
                                      and totals["skipped"] == 0)
           open(sys.argv[3], "w", encoding="utf-8").write(
