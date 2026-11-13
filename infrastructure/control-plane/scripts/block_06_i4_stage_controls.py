@@ -103,9 +103,17 @@ def main(argv=None) -> int:
         results.append(check("i3_workflow_registered",
                              ".github/workflows/block-06-i3-validation.yml"
                              in registrations["this_stage"]["allowed_prefixes"]))
-        add = git(root, "worktree", "add", "--detach", "--quiet", str(work), "HEAD")
-        results.append(check("worktree_ready", add.returncode == 0, add.stderr[-300:]))
-        if add.returncode == 0:
+        add = git(root, "worktree", "add", "--detach", "--quiet", "--no-checkout",
+                  str(work), "HEAD")
+        ready = add.returncode == 0
+        if ready:
+            # Sparse scratch checkout: the repository carries large unrelated data directories and a
+            # full checkout can exhaust the runner disk.
+            git(work, "sparse-checkout", "init", "--cone")
+            git(work, "sparse-checkout", "set", "oce", "infrastructure", "docs", ".github")
+            ready = git(work, "checkout", "--quiet", "HEAD").returncode == 0
+        results.append(check("worktree_ready", ready, add.stderr[-300:]))
+        if ready:
             before = scope.resolve(work, "auto")
             branch = git(work, "checkout", "-q", "-b", PROBE_BRANCH)
             after = scope.resolve(work, "auto")
