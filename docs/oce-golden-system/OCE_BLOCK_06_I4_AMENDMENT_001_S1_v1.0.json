@@ -1,0 +1,149 @@
+{
+  "append_only": true,
+  "audit_token": "PARALLEL_DELTA_AUDIT_ACCEPTED_B6_I4",
+  "cost_usd": 0,
+  "deferred": [
+    {
+      "authority": "cross-stage",
+      "blocking": false,
+      "detail": "B6-I4 class F18 remains unbound; it is not silently accepted as corrected and does not authorize B6-I5.",
+      "id": "F2",
+      "item": "inherited failure/threat mapping convention",
+      "owner": "Book 6 governance-correction stage",
+      "stage": "FUTURE_BOOK_6_GOVERNANCE_CORRECTION"
+    }
+  ],
+  "document_id": "OCE-B6-I4-AMENDMENT-001-S1",
+  "locks": {
+    "B6-I5_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "mutation_floor_semantics": {
+    "field": "implementation_floor.mutations",
+    "kind": "minimum",
+    "note": "This is a floor, not an exact expected count. The observed battery total is reported separately and must not lower the floor.",
+    "value": 6
+  },
+  "mutation_witnesses": [
+    {
+      "id": "M16",
+      "target": "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "weakens": "missing-field presence check"
+    },
+    {
+      "id": "M17",
+      "target": "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "weakens": "None-field governed refusal"
+    }
+  ],
+  "new_nodes": [
+    "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+    "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+    "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+    "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+    "test_block_06_i4_workflow.py::test_advance_null_version_refused"
+  ],
+  "out_of_scope": [
+    {
+      "boundary": "Bare secret-looking strings without a secret-bearing key are not refused. Only secret-bearing keys at any depth are.",
+      "id": "H09"
+    },
+    {
+      "boundary": "Duplicate incident ids are refused in the trace, not inside incident_view; the view remains a read-only projection.",
+      "id": "H10"
+    }
+  ],
+  "paired_identity": {
+    "prior_endpoint": {
+      "head_sha": "97a3a93491147d0b3698e319647619a82ff319aa",
+      "head_tree": "b4ce8cd50b804a6238dd7b1e14cb3beb75baac61",
+      "insufficient_because": "A3 changed production after R1 (trace, cost, identity, workflow, refusals), so an R1 endpoint does not exercise the repaired product"
+    },
+    "required": {
+      "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+      "head": "the exact product repair commit created before the paired-binding commit",
+      "rule": "Commit the product/test repair first, record its SHA and tree, then pin the paired contract and workflow to that SHA and tree in a later proof/config commit. Documentation-only commits may sit above it."
+    }
+  },
+  "parent_amendment": "001",
+  "planned_additions": {
+    "mutations": 2,
+    "test_nodes": 5
+  },
+  "previous_audited_head": "847e24e2e3bb06e7597d3b7d4c65b136de2c91a9",
+  "prior_evidence": "Every prior commit, artifact and run, including 847e24e2e, remains historical and is not rewritten.",
+  "prior_inventory": {
+    "modules": 6,
+    "mutations": 15,
+    "paired_head": "97a3a93491147d0b3698e319647619a82ff319aa",
+    "requirements": 41,
+    "source_mutation_floor": 4,
+    "test_nodes": 41
+  },
+  "requirements": [
+    {
+      "authority": "C3.S2 workflow identity; frozen implementation_floor and refusal matrix",
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "failure_class": "F23",
+      "id": "R42",
+      "section": "C3.S2",
+      "statement": "A run document missing definition_id is refused with a governed REFUSED_INVALID_RECORD before any replay, lease, transition or mutation"
+    },
+    {
+      "authority": "C3.S2 workflow identity; frozen implementation_floor and refusal matrix",
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+      "failure_class": "F23",
+      "id": "R43",
+      "section": "C3.S2",
+      "statement": "A run document missing version is refused with a governed REFUSED_INVALID_RECORD before any replay, lease, transition or mutation"
+    },
+    {
+      "authority": "Paired comparison contract and operator final-closure decision",
+      "binding_node": null,
+      "failure_class": "F23",
+      "id": "R44",
+      "section": "C3.S2",
+      "statement": "The paired comparator head must contain every B6-I4 production repair accepted for closure, not remain pinned to R1"
+    },
+    {
+      "authority": "Paired comparison contract and operator final-closure decision",
+      "binding_node": null,
+      "failure_class": "F23",
+      "id": "R45",
+      "section": "C3.S2",
+      "statement": "The paired common regression population must execute against that repaired product head"
+    },
+    {
+      "authority": "C3.S2 workflow identity",
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+      "failure_class": "F23",
+      "id": "R46",
+      "section": "C3.S2",
+      "statement": "A run document missing both fields is refused deterministically"
+    },
+    {
+      "authority": "C3.S2 workflow identity",
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "failure_class": "F23",
+      "id": "R47",
+      "section": "C3.S2",
+      "statement": "A None definition_id is refused, never inferred or defaulted"
+    },
+    {
+      "authority": "C3.S2 workflow identity",
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_null_version_refused",
+      "failure_class": "F23",
+      "id": "R48",
+      "section": "C3.S2",
+      "statement": "A None version is refused, never treated as latest or default"
+    }
+  ],
+  "schema": "oce.block_06_i4.amendment_supplement.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "supplement": "S1"
+}
