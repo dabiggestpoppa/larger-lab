@@ -64,7 +64,7 @@ class Checker:
 def check_packet(c: Checker) -> None:
     sys.path.insert(0, str(c.root))
     files = sorted(p.name for p in (c.root / DOCS).glob(f"{PREFIX}*.json"))
-    c.need("packet/count", len(files) == 11, files)
+    c.need("packet/count", len(files) == 12, files)
     for name in files:
         raw = (c.root / DOCS / name).read_bytes()
         c.need(f"packet/canonical/{name}", raw == canonical(json.loads(raw)))
@@ -164,6 +164,21 @@ def check_registration(c: Checker) -> None:
            == "847e24e2e3bb06e7597d3b7d4c65b136de2c91a9"
            and supplement["prior_inventory"]["test_nodes"] == 41
            and len(supplement["new_nodes"]) == 5)
+    s2 = c.load("AMENDMENT_001_S2_v1.0.json")
+    c.need("registration/supplement_s2",
+           s2["supplement"] == "S2" and s2["status"] == "FROZEN"
+           and s2["baseline_head"] == "4c81913d95691e3e884635a9eee9002679afc9b1"
+           and s2["population"] == {"test_nodes": 46, "mutations_observed": 17,
+                                    "mutation_floor": 6,
+                                    "mutation_floor_kind": "minimum"}
+           and s2["product_freeze"]["head_sha"]
+           == "1ad1a970206106702b2090c1fb082db08fbfc892"
+           and s2["locks"]["EVIDENCE_SEAL_AUTHORIZED"] is False)
+    c.need("registration/witness_law",
+           len(s2["mutation_law"]["admissible_mutant"]) == 8
+           and len(s2["mutation_law"]["discrimination"]) == 5
+           and len(s2["mutation_law"]["restoration"]) == 4
+           and s2["blocking_defect"]["id"] == "MUTATION_WITNESS_VACUOUS_M16_M17")
     c.need("registration/locks", all(registration["locks"][f"B6-I{i}"] == "LOCKED"
                                      for i in range(5, 10)))
     scope = c.load("SCOPE_DERIVATION_v1.0.json")

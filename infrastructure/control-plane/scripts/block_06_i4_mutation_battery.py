@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""B6-I4 mutation battery: fourteen governed mutations, source floor 4, stage floor 6.
+"""B6-I4 mutation battery: seventeen governed mutations, source floor 4, stage floor 6.
 
 Each mutation must be applied, discriminate a named node or control, be restored byte-exactly and
 leave the pristine tree green. A mutation that is not applied, stays green or cannot restore fails.
@@ -13,6 +13,7 @@ import pathlib
 import subprocess
 import sys
 import tempfile
+import xml.etree.ElementTree as ET
 
 INCIDENT = "oce/operator/incident.py"
 COST = "oce/operator/cost.py"
@@ -90,13 +91,15 @@ MUTATIONS = [
     {"id": "M16", "label": "run definition_id presence check removed", "file": WORKFLOW,
      "old": ("        if key not in run:\n"
              '            raise OperatorRefusal("REFUSED_INVALID_RECORD", f"run.{key}")'),
-     "new": "        if False:",
+     "new": ("        if key not in run:\n"
+             "            pass"),
      "kind": "pytest",
      "target": f"{TESTS}/test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused"},
     {"id": "M17", "label": "run None-field governed refusal removed", "file": WORKFLOW,
      "old": ("        if run[key] is None:\n"
              '            raise OperatorRefusal("REFUSED_INVALID_RECORD", f"run.{key}=null")'),
-     "new": "        if False:",
+     "new": ("        if run[key] is None:\n"
+             "            pass"),
      "kind": "pytest",
      "target": f"{TESTS}/test_block_06_i4_workflow.py::test_advance_null_definition_id_refused"},
     {"id": "M15", "label": "I3 workflow registration declaration omitted",
@@ -114,6 +117,65 @@ def run_pytest(root: pathlib.Path, node: str) -> tuple[int, str]:
     proc = subprocess.run([sys.executable, "-m", "pytest", node, "-q", "-p", "no:cacheprovider",
                            "-o", "addopts="], cwd=str(root), capture_output=True, text=True)
     return proc.returncode, proc.stdout + proc.stderr
+
+
+COLLECTION_MARKERS = ("found no collectors", "ERROR collecting", "errors during collection")
+
+
+def node_name(node: str) -> str:
+    return node.split("::")[-1]
+
+
+def compile_source(path: pathlib.Path) -> tuple[bool, str]:
+    try:
+        compile(path.read_text(encoding="utf-8"), str(path), "exec")
+    except SyntaxError as exc:
+        return False, f"{type(exc).__name__}: {exc}"
+    return True, ""
+
+
+def collect_node(root: pathlib.Path, node: str) -> tuple[bool, str]:
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", node, "--collect-only", "-q",
+         "-p", "no:cacheprovider", "-o", "addopts="],
+        cwd=str(root), capture_output=True, text=True)
+    out = proc.stdout + proc.stderr
+    ok = (proc.returncode == 0 and node_name(node) in out
+          and not any(marker in out for marker in COLLECTION_MARKERS))
+    return ok, out
+
+
+def junit_case(path: pathlib.Path, name: str) -> tuple[str, str]:
+    if not path.exists():
+        return "absent", ""
+    root = ET.parse(path).getroot()
+    suites = [root] if root.tag == "testsuite" else root.findall("testsuite")
+    for suite in suites:
+        for case in suite.findall("testcase"):
+            if case.get("name") != name:
+                continue
+            failure = case.find("failure")
+            if failure is not None:
+                message = failure.get("message") or (failure.text or "")
+                return "failed", message[:400]
+            if case.find("error") is not None:
+                return "error", ""
+            if case.find("skipped") is not None:
+                return "skipped", ""
+            return "passed", ""
+    return "absent", ""
+
+
+def run_node(root: pathlib.Path, node: str, junit: pathlib.Path):
+    if junit.exists():
+        junit.unlink()
+    proc = subprocess.run(
+        [sys.executable, "-m", "pytest", node, f"--junitxml={junit}", "-q",
+         "-p", "no:cacheprovider", "-o", "addopts="],
+        cwd=str(root), capture_output=True, text=True)
+    out = proc.stdout + proc.stderr
+    status, message = junit_case(junit, node_name(node))
+    return proc.returncode, out, status, message
 
 
 def run_controls(root: pathlib.Path) -> tuple[int, str]:
@@ -140,12 +202,23 @@ def main(argv=None) -> int:
             else pathlib.Path(__file__).resolve().parents[3])
     results = []
     pristine_green = False
+    worktree_clean = False
     with tempfile.TemporaryDirectory(prefix="b6i4-mut-") as tmp:
         work = pathlib.Path(tmp) / "wt"
         subprocess.run(["git", "-C", str(root), "worktree", "add", "--detach", "--quiet",
-                        str(work), "HEAD"], check=True)
+                        "--no-checkout", str(work), "HEAD"], check=True)
+        # Only the governed surfaces are checked out: the repository carries large unrelated data
+        # directories, and a full scratch checkout can exhaust the runner disk.
+        subprocess.run(["git", "-C", str(work), "sparse-checkout", "init", "--cone"],
+                       check=True)
+        subprocess.run(["git", "-C", str(work), "sparse-checkout", "set",
+                        "oce", "infrastructure", "docs", ".github"], check=True)
+        subprocess.run(["git", "-C", str(work), "checkout", "--quiet", "HEAD"], check=True)
         try:
             modules = [str(p) for p in sorted((work / TESTS).glob("test_block_06_i4_*.py"))]
+            if not modules:
+                print("scratch worktree has no focused test modules")
+                return 2
             code = subprocess.run([sys.executable, "-m", "pytest", *modules, "-q",
                                    "-p", "no:cacheprovider", "-o", "addopts="],
                                   cwd=str(work), capture_output=True, text=True)
@@ -171,10 +244,24 @@ def main(argv=None) -> int:
                     git(work, "add", "-A")
                     git(work, "-c", "user.email=ci@example.com", "-c", "user.name=ci",
                         "commit", "-qm", f"mutation-{item['id']}")
+                compiled = collected = executed = None
+                compile_error = collection_error = ""
+                node_status = failure_message = ""
                 if item["kind"] == "pytest":
-                    observed_rc, out = run_pytest(work, item["target"])
-                    discriminated = observed_rc != 0
-                    discriminator_ok = item["target"].split("::")[-1] in out
+                    compiled, compile_error = compile_source(target)
+                    if compiled:
+                        collected, collect_out = collect_node(work, item["target"])
+                        collection_error = next(
+                            (m for m in COLLECTION_MARKERS if m in collect_out), "")
+                        observed_rc, out, node_status, failure_message = run_node(
+                            work, item["target"], work / ".mutation-junit.xml")
+                        executed = node_status == "failed"
+                        discriminated = (observed_rc == 1 and collected and executed
+                                         and not collection_error)
+                        discriminator_ok = discriminated
+                    else:
+                        observed_rc, out = 0, compile_error
+                        discriminated = discriminator_ok = False
                 else:
                     observed_rc, out = run_controls(work)
                     discriminated = observed_rc != 0
@@ -183,14 +270,22 @@ def main(argv=None) -> int:
                     git(work, "reset", "-q", "--hard", pre_head)
                 else:
                     target.write_bytes(pristine)
+                restored = (target.read_bytes() == pristine
+                            and git(work, "rev-parse", "HEAD").stdout.strip() == pre_head)
+                pristine_named_green = None
+                if item["kind"] == "pytest" and restored:
+                    rc_named, _ = run_pytest(work, item["target"])
+                    pristine_named_green = rc_named == 0
                 results.append({
                     "id": item["id"], "mutation": item["label"],
                     "expected_target": item["target"], "applied": applied,
+                    "compiled": compiled, "compile_error": compile_error,
+                    "collected": collected, "collection_error": collection_error,
+                    "executed": executed, "node_status": node_status,
+                    "failure_message": failure_message,
                     "observed_rc": observed_rc, "discriminated": discriminated,
-                    "discriminator_ok": discriminator_ok,
-                    "restored": (target.read_bytes() == pristine
-                                 and git(work, "rev-parse", "HEAD").stdout.strip()
-                                 == pre_head),
+                    "discriminator_ok": discriminator_ok, "restored": restored,
+                    "pristine_named_green": pristine_named_green,
                     "pre_sha256": hashlib.sha256(pristine).hexdigest(),
                     "post_sha256": hashlib.sha256(target.read_bytes()).hexdigest(),
                 })
@@ -198,6 +293,7 @@ def main(argv=None) -> int:
                                    "-p", "no:cacheprovider", "-o", "addopts="],
                                   cwd=str(work), capture_output=True, text=True)
             pristine_green = code.returncode == 0
+            worktree_clean = git(work, "status", "--porcelain").stdout.strip() == ""
         finally:
             subprocess.run(["git", "-C", str(root), "worktree", "remove", "--force", str(work)],
                            check=False)
@@ -209,10 +305,15 @@ def main(argv=None) -> int:
         "discriminated": sum(1 for row in results if row["discriminated"]),
         "restored": sum(1 for row in results if row["restored"]),
         "pristine_green_after": pristine_green,
+        "worktree_clean_after": worktree_clean,
+        "witness_law": "S2: compile, collect, execute, fail with rc=1, restore, pristine",
         "all_ok": (sum(1 for row in results if row["discriminated"]) >= FLOOR
                    and all(row.get("applied") is True for row in results)
                    and all(row.get("discriminator_ok") for row in results)
-                   and all(row["restored"] for row in results) and pristine_green),
+                   and all(row["restored"] for row in results)
+                   and all(row.get("compiled") is not True
+                           or row.get("pristine_named_green") is True for row in results)
+                   and pristine_green and worktree_clean),
         "results": results,
     }
     text = json.dumps(payload, sort_keys=True, indent=2) + "\n"
@@ -220,10 +321,11 @@ def main(argv=None) -> int:
         pathlib.Path(args.json).write_text(text, encoding="utf-8", newline="\n")
     print(f"floor {FLOOR} | mutations {len(results)} | applied {payload['applied']} "
           f"| discriminated {payload['discriminated']} | restored {payload['restored']} "
-          f"| pristine_green {pristine_green}")
+          f"| pristine_green {pristine_green} | clean {worktree_clean}")
     for row in results:
-        ok = row.get("applied") and row["discriminated"] and row.get("discriminator_ok") \
-            and row["restored"]
+        ok = (row.get("applied") and row["discriminated"] and row.get("discriminator_ok")
+              and row["restored"] and (row.get("compiled") is not True
+                                       or row.get("pristine_named_green") is True))
         print(("OK " if ok else "BAD ")
               + f"{row['id']} {row['mutation']} -> {row['expected_target'].split('::')[-1]}")
     return 0 if payload["all_ok"] else 1
