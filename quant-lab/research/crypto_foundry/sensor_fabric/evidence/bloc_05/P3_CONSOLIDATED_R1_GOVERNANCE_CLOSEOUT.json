@@ -1,0 +1,142 @@
+{
+  "schema": "P3_CONSOLIDATED_R1_GOVERNANCE_CLOSEOUT/v1",
+  "checkpoint": "SENSOR-B5-I09P3-CONSOLIDATED-R1-GOVERNANCE-CLOSEOUT",
+  "role": "Canonical Governance Verification Engineer",
+  "base": {
+    "consolidated_candidate": "6de26be9130eb99e0a9b53b340fc5bfaafa4a684",
+    "canonical_evidence": "5c38d0d6396e7cd9b70d5970272475fa975e16e7",
+    "canonical_evidence_branch": "agent/crypto-sensor-fabric-p3-consolidated-r1-canonical",
+    "historical_producer": "03522870d40b839a2eac28eff7841bfb161e05f3",
+    "production": "f199a7e3f7d92ce555fb436343d24bd42907c3a8",
+    "closeout_branch": "agent/crypto-sensor-fabric-p3-consolidated-r1-governance-r1"
+  },
+  "phase_0_reference_lock": {
+    "all_refs_resolve": true,
+    "canonical_evidence_remote_matches": "5c38d0d6396e7cd9b70d5970272475fa975e16e7",
+    "canonical_evidence_unchanged": true,
+    "evidence_paths_dirty": 0,
+    "reconfirmed_from_committed_raw_streams": {
+      "collected": 4733,
+      "executed": 4733,
+      "passed": 4722,
+      "skipped": 11,
+      "failed": 0,
+      "errors": 0,
+      "missing": 0,
+      "duplicates": 0,
+      "collection_digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+      "execution_digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+      "digests_equal": true,
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN"
+    },
+    "evidence_bundle_sha256": "0f7011f28f95698fb20fa86c924fdbbed2ba9d14c5b6129b170a85158500f7f8"
+  },
+  "phase_0_resources": {
+    "disk_free_gb_at_start": 3.4,
+    "disk_free_gb_after_attempt": 0.087,
+    "target_headroom_gb": 20,
+    "measured_requirement_gb": 3.5,
+    "measurement_basis": "observed size of existing full checkouts of this repository (.worktrees/* measure ~3.3 GB each) plus the snapshot producer run; tracked blob sum at the historical commit is 0.19 GB and is not the binding constraint",
+    "sufficient": false,
+    "worktrees_existing": 18,
+    "worktrees_deleted": 0,
+    "user_files_deleted": 0
+  },
+  "phase_1_historical_producer": {
+    "script": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/verify_historical_producer.py",
+    "procedure_replaced": false,
+    "command": "PYTHONIOENCODING=utf-8 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=quant-lab/src python3 quant-lab/research/crypto_foundry/sensor_fabric/scripts/verify_historical_producer.py --json",
+    "exit_status": 1,
+    "verdict": "FAIL",
+    "historical_sha_resolution": {
+      "ref_exists": true,
+      "ref_is_immutable_commit": true,
+      "resolved_commit": "03522870d40b839a2eac28eff7841bfb161e05f3"
+    },
+    "producer_source_identity": {
+      "producer": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i08_units.py",
+      "runs_against": "the historical snapshot worktree, not the current tree"
+    },
+    "expected_digest": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4",
+    "actual_digest": null,
+    "digest_comparison_performed": false,
+    "producer_output_equivalence": "NOT ESTABLISHED",
+    "environmental_errors": [
+      "cannot materialize the snapshot: git worktree add failed repeatedly with 'No space left on device' while checking out 6,701 files",
+      "checkout reached 57% (3,820/6,701) before the volume hit 0 bytes free",
+      "the harness could not remove its own temporary worktree: \"fatal: '<tmp>/snapshot' is not a working tree\""
+    ],
+    "worktree_creation_removal_accounting": {
+      "created": false,
+      "removed": false,
+      "leaked_temp_worktree_cleaned_by_operator": true,
+      "leaked_temp_path_pattern": "$TEMP/b5i08-repro-*",
+      "worktree_prune_run": true,
+      "project_worktrees_removed": 0
+    },
+    "classification": "ENVIRONMENT BLOCKER",
+    "not_a_governance_failure_because": "no digest was measured at all; a missing disk resource prevented the comparison from occurring, and no mismatch was observed",
+    "attempts_on_this_host": [
+      {"context": "canonical execution checkpoint", "disk_free_gb": 3.1, "outcome": "No space left on device"},
+      {"context": "governance closeout checkpoint", "disk_free_gb": 3.4, "outcome": "No space left on device at 57% of checkout; volume reached 0 bytes"}
+    ]
+  },
+  "phase_2_governance_reconciliation": {
+    "tracked_python_count": 1102,
+    "expected_python_count": 1102,
+    "inventory_match": true,
+    "i11r2_inventory_pin": 1102,
+    "i11r2_pin_matches_inventory": true,
+    "frozen_governance_constraints": {
+      "i05_scope_audit": "pass",
+      "i09_scope_audit": "pass",
+      "i10_scope_audit": "pass"
+    },
+    "approval_manifest": {
+      "content": {"schema_version": "b5-i09p2a-1", "authority_id": "B5_I09P2A_EMPTY_TRUST_ROOT_V1", "artifacts": {}, "revoked_approval_ids": []},
+      "empty": true
+    },
+    "integration_state": "INTEGRATION_REQUIRED",
+    "unauthorized_production_source_changes": 0,
+    "new_provider_approvals": 0,
+    "trust_promotion": false,
+    "program_gate_movement": false,
+    "focused_governance_tests": {
+      "command": "pytest -p no:cacheprovider -q test_b5_i05_scope_audit.py test_b5_i09_scope_audit.py test_b5_i10_scope_audit.py test_i11r2_binding_audit.py test_i11r2_evidence.py",
+      "result": "75 passed",
+      "duration_seconds": 29.32,
+      "full_canonical_universe_rerun": false
+    }
+  },
+  "phase_3_adjudication": {
+    "historical_producer_passed": false,
+    "environmental_blocker_resolved": false,
+    "existing_regression_evidence_preserved": true,
+    "regression_status": "ANCHORED_COMPLETE / GREEN (unchanged)",
+    "governance_auxiliary_status": "BLOCKED_ENVIRONMENT",
+    "strict_governance_complete_verdict": "NOT ISSUED",
+    "strict_checkpoint_result": "INCOMPLETE — governance auxiliary outstanding",
+    "reason": "The historical producer verification requires a full checkout of the 6,701-file historical snapshot, which needs about 3.5 GB of free disk on this host. Only 3.4 GB was available at the start and the volume reached 0 bytes during checkout, so the digest comparison never ran."
+  },
+  "phase_4_publication": {
+    "additive_only": true,
+    "rewrote_historical_canonical_evidence": false,
+    "ledger_sections_added_or_renumbered": 0,
+    "independent_audit_branches_merged": 0,
+    "production_code_modified": false
+  },
+  "hard_stop": {
+    "production_merge": false,
+    "provider_certification": false,
+    "trust_promotion": false,
+    "custody_authorization": false,
+    "i11_i12_i17_or_bloc6_advancement": false,
+    "self_ratification": false,
+    "closes_independent_r6_security_audit": false
+  },
+  "unresolved_blockers": [
+    "Historical producer verification (I09 H1) cannot run on this host: the snapshot checkout needs ~3.5 GB free and the volume is at ~87 MB.",
+    "The host has 18 pre-existing worktrees averaging ~3.3 GB each; reclaiming space would require deleting worktrees that belong to other checkpoints, which this checkpoint is not authorized to do."
+  ]
+}
