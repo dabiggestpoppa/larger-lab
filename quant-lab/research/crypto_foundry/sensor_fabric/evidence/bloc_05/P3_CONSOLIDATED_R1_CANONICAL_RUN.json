@@ -1,0 +1,279 @@
+{
+  "schema": "P3_CONSOLIDATED_R1_CANONICAL_RUN/v1",
+  "checkpoint": "SENSOR-B5-P3-CONSOLIDATED-R1-CANONICAL-EXECUTION",
+  "role": "Canonical Regression Execution Engineer",
+  "execution_sha": "6de26be9130eb99e0a9b53b340fc5bfaafa4a684",
+  "evidence_branch": "agent/crypto-sensor-fabric-p3-consolidated-r1-canonical",
+  "candidate_branch": "agent/crypto-sensor-fabric-p3-consolidated-r1",
+  "references": {
+    "r6": "9d289500fd7bdd4145d2b9d5e052b93e471cd1f1",
+    "canonical_r3": "3426acfd636e98b6dc5b8d9ad0978f06807d10ea",
+    "production": "f199a7e3f7d92ce555fb436343d24bd42907c3a8"
+  },
+  "phase_0_isolation": {
+    "worktree": ".worktrees/p3-consolidated-r1-canonical",
+    "fresh_worktree_created_at_exact_sha": true,
+    "reused_disqualified_worktree": false,
+    "disqualified_worktree": ".worktrees/p3-consolidated-r1 (contains unexplained untracked collect_digest.py)",
+    "collect_digest_py_executed": false,
+    "collect_digest_py_deleted_or_overwritten": false,
+    "git_clean_run_against_unrelated_files": false,
+    "tree_clean_at_start": true,
+    "tracked_python_files": 1102,
+    "resources_at_start": {
+      "disk_free_gb": 13,
+      "mem_total_kb": 7737884,
+      "mem_free_kb": 791548
+    },
+    "resources_sufficient": true
+  },
+  "phase_1_collection": {
+    "method_a": "committed Canonical R3 runner: collect --workers 4",
+    "method_b": "independent pytest --collect-only parse, no runner code imported",
+    "count": 4733,
+    "digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+    "method_a_count": 4733,
+    "method_a_digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+    "method_b_count": 4733,
+    "method_b_digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+    "methods_agree": true,
+    "duplicates": 0,
+    "malformed": 0,
+    "collection_errors": [],
+    "groups": {
+      "quant-lab\\tests\\crypto_sensor_fabric\\contracts": 68,
+      "quant-lab\\tests\\crypto_sensor_fabric\\normalization": 1300,
+      "quant-lab\\tests\\crypto_sensor_fabric\\normalization\\test_b5_i05_i06_replay_safety": 24,
+      "quant-lab\\tests\\crypto_sensor_fabric\\probes": 159,
+      "quant-lab\\tests\\crypto_sensor_fabric\\providers": 308,
+      "quant-lab\\tests\\crypto_sensor_fabric\\providers\\base": 170,
+      "quant-lab\\tests\\crypto_sensor_fabric\\providers\\deribit": 178,
+      "quant-lab\\tests\\crypto_sensor_fabric\\providers\\gate": 109,
+      "quant-lab\\tests\\crypto_sensor_fabric\\providers\\kraken": 137,
+      "quant-lab\\tests\\crypto_sensor_fabric\\providers\\okx": 142,
+      "quant-lab\\tests\\crypto_sensor_fabric\\registry": 61,
+      "quant-lab\\tests\\crypto_sensor_fabric\\schemas": 48,
+      "quant-lab\\tests\\crypto_sensor_fabric\\storage": 2029
+    },
+    "testpath_roots": [
+      "quant-lab"
+    ],
+    "qcae_tests_contribution": 0,
+    "inherited_from_prior_measurement": false
+  },
+  "phase_2_execution": {
+    "runner": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/canonical_runner.py",
+    "plugin": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/canonical_pytest_plugin.py",
+    "runner_sha256": "46f6f8bf968408a9cffbcf773d6e2f21e1ff548ecde26244786744a96b747a34",
+    "plugin_sha256": "61f7cad56c7b23dad4adfdb89f4e4e97e9bd5fe132b970fc4cda633362dcaade",
+    "command": "canonical_runner.py run --worktree <wt> --workers 2 --run-id canonical-consolidated-r1 --expect-count 4733 --expect-digest 1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+    "worker_count": 2,
+    "partitions": [
+      {
+        "partition_index": 0,
+        "node_count": 2367,
+        "intended_count": 2367,
+        "record_count": 7100,
+        "junit_case_count": 2367,
+        "junit_sha256": "0ba2c9afee1b0ae2039e566692035b437873ab58de8678efbea41723ce1787c7",
+        "timed_out": false,
+        "infrastructure_error": null,
+        "accounting_errors": [],
+        "status": "ok",
+        "file_count": 111,
+        "exit_status": 0,
+        "duration_seconds": 561.5,
+        "session_sentinel_present": true,
+        "artifacts": {
+          "results": {
+            "path": "canonical_runs/canonical-consolidated-r1/results_0.jsonl",
+            "sha256": "840b054a45a8e68975f4758f21a496b8d94efc97c552f8c728ec82930aff234e"
+          },
+          "junit": {
+            "path": "canonical_runs/canonical-consolidated-r1/junit_0.xml",
+            "sha256": "0ba2c9afee1b0ae2039e566692035b437873ab58de8678efbea41723ce1787c7"
+          },
+          "partition": {
+            "path": "canonical_runs/canonical-consolidated-r1/partition_0.json",
+            "sha256": "3cc6e5743a8558e22dffdc50570999e607af97ae8b963a79d7f977fd8ff8d2e8"
+          }
+        }
+      },
+      {
+        "partition_index": 1,
+        "node_count": 2366,
+        "intended_count": 2366,
+        "record_count": 7097,
+        "junit_case_count": 2366,
+        "junit_sha256": "7052e755db98eee248fcec99f3427582c2eb0dd503604f54235bd701ab8b66df",
+        "timed_out": false,
+        "infrastructure_error": null,
+        "accounting_errors": [],
+        "status": "ok",
+        "file_count": 111,
+        "exit_status": 0,
+        "duration_seconds": 791.3,
+        "session_sentinel_present": true,
+        "artifacts": {
+          "results": {
+            "path": "canonical_runs/canonical-consolidated-r1/results_1.jsonl",
+            "sha256": "1ef1abe03807fa6e7bfc584a1abf9bc92b5efa44edd356c7233b166241bfca19"
+          },
+          "junit": {
+            "path": "canonical_runs/canonical-consolidated-r1/junit_1.xml",
+            "sha256": "7052e755db98eee248fcec99f3427582c2eb0dd503604f54235bd701ab8b66df"
+          },
+          "partition": {
+            "path": "canonical_runs/canonical-consolidated-r1/partition_1.json",
+            "sha256": "7b01966a1926e1f999e62353e59f306a769da34324bad371f1b331cb7ded375a"
+          }
+        }
+      }
+    ],
+    "session_sentinels": {
+      "0": {
+        "reports": 7100,
+        "nodes": 2367,
+        "exitstatus": 0
+      },
+      "1": {
+        "reports": 7097,
+        "nodes": 2366,
+        "exitstatus": 0
+      }
+    },
+    "all_partition_exit_statuses_recorded": true,
+    "all_partition_exit_statuses_zero": true,
+    "guarded_snapshot": {
+      "guard_baseline_path": "canonical_runs/canonical-consolidated-r1/guard_baseline.json",
+      "guarded_files": 428
+    },
+    "mutation_detected": null,
+    "restoration_verified": true,
+    "clean_committed_tree_execution": true,
+    "anchor_used": {
+      "expected_count": 4733,
+      "expected_digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+      "source": "independently measured in phase 1 method B"
+    }
+  },
+  "phase_2_aborted_attempt": {
+    "run_id": "canonical-consolidated-r1-attempt1-workers1",
+    "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs/canonical-consolidated-r1-attempt1-workers1",
+    "configuration": "--workers 1: a single 4733-node partition carried by one pytest process",
+    "observed": {
+      "report_records": 4171,
+      "session_sentinel": false,
+      "junit_bytes": 38,
+      "evidence_json_bytes": 0
+    },
+    "failure": "CPython fatal error while formatting an exception; reported object type name OSError; process died mid-stream",
+    "classification": "environment resource limit (MemTotal 7,737,884 kB, MemFree 791,548 kB at start); one process could not carry the entire 4,733-node universe",
+    "counted_as_evidence": false,
+    "tree_side_effects": "none; guard state clean before retry"
+  },
+  "phase_3_independent_reconciliation": {
+    "performed_by": "separate script over results_*.jsonl and junit_*.xml; runner verdict not consulted",
+    "collected": 4733,
+    "executed": 4733,
+    "collected_equals_executed": true,
+    "missing": 0,
+    "extra": 0,
+    "duplicate_execution_nodes": 0,
+    "duplicate_phase_reports": 0,
+    "unknown_phase_reports": 0,
+    "corrupt_records": 0,
+    "unmapped": 0,
+    "total_accounted": 4733,
+    "recomputed": {
+      "passed": 4722,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 11
+    },
+    "collection_digest_recomputed": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+    "execution_digest_recomputed": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+    "digests_equal": true,
+    "anchor_count_match": true,
+    "anchor_digest_match": true,
+    "junit_identity_agreement": true,
+    "junit_case_counts": {
+      "partition_0": 2367,
+      "partition_1": 2366
+    },
+    "guard_rehashed_files": 428,
+    "guard_hash_failures": 0,
+    "tree_clean_outside_evidence_tree": true,
+    "runner_reported": {
+      "disposition": "COMPLETE",
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN",
+      "reasons": []
+    },
+    "independent_assurance": "ANCHORED_COMPLETE",
+    "self_consistent_only": false
+  },
+  "phase_4_governance": {
+    "python_inventory_actual": 1102,
+    "python_inventory_expected": 1102,
+    "inventory_match": true,
+    "i11r2_pin_scanned_files": 1102,
+    "i11r2_mechanical_check": {
+      "command": "pytest test_i11r2_binding_audit.py test_i11r2_evidence.py",
+      "result": "14 passed",
+      "republished": false
+    },
+    "i09_producer_check": {
+      "command": "verify_historical_producer.py --json",
+      "verdict": "FAIL",
+      "resolved_commit": "03522870d40b839a2eac28eff7841bfb161e05f3",
+      "ref_exists": true,
+      "ref_is_immutable_commit": true,
+      "expected_sha256": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4",
+      "failure_cause": "environment: 'No space left on device' while materialising the historical snapshot worktree with 3.1 GB free; the script then could not remove its temp worktree",
+      "classification": "BLOCKED_BY_ENVIRONMENT, not a governance or code regression",
+      "leaked_temp_worktree_removed": true
+    },
+    "frozen_plan_integrity": {
+      "dirty_plan_paths": 0,
+      "intact": true
+    },
+    "approval_manifest": {
+      "path": "quant-lab/config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+      "content": {
+        "schema_version": "b5-i09p2a-1",
+        "authority_id": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+        "artifacts": {},
+        "revoked_approval_ids": []
+      },
+      "empty": true
+    },
+    "integration_state": "INTEGRATION_REQUIRED",
+    "unauthorized_production_source_changes": 0,
+    "src_diff_vs_candidate": 0
+  },
+  "disposition": "CANONICAL_COMPLETE_WITH_ENVIRONMENT_BLOCKED_GOVERNANCE_AUXILIARY",
+  "disposition_detail": {
+    "regression_execution": "CANONICAL_COMPLETE: ANCHORED_COMPLETE, GREEN, independently reconciled",
+    "governance_auxiliary_i09_producer": "BLOCKED by host disk space; not satisfied and not fabricated",
+    "canonical_complete_strict": false,
+    "reason_strict_fails": "Phase 4 I09 producer check could not run to completion because materialising the historical snapshot exhausted the 3.1 GB of free disk."
+  },
+  "hard_stop": {
+    "production_merge": false,
+    "provider_certification": false,
+    "trust_promotion": false,
+    "program_gate_advancement": false,
+    "self_ratification": false,
+    "closes_independent_r6_security_audit": false,
+    "scope": "regression execution qualification only"
+  },
+  "environment": {
+    "python": "3.11.9",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "disk_free_gb_at_start": 13,
+    "disk_free_gb_after_execution": 3.1,
+    "mem_total_kb": 7737884,
+    "mem_free_kb_at_start": 791548
+  }
+}
