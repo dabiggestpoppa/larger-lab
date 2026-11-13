@@ -63,7 +63,7 @@
   "implementation_floor": {
     "mutations": 6,
     "source_mutation_floor": 4,
-    "test_nodes": 41
+    "test_nodes": 46
   },
   "incident_rules": {
     "drill_latency": "legible only when visible_at - detected_at <= limit",
@@ -213,6 +213,12 @@
   "schema": "oce.block_06_i4.contract.v1",
   "stage": "B6-I4",
   "status": "FROZEN",
+  "supplement": {
+    "id": "S1",
+    "nodes": 46,
+    "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_AMENDMENT_001_S1_v1.0.json",
+    "prior_nodes": 41
+  },
   "test_inventory": {
     "modules": [
       "infrastructure/control-plane/tests/test_block_06_i4_contract.py",
@@ -222,7 +228,7 @@
       "infrastructure/control-plane/tests/test_block_06_i4_workflow.py",
       "infrastructure/control-plane/tests/test_block_06_i4_trace.py"
     ],
-    "node_total": 41,
+    "node_total": 46,
     "zero": [
       "failures",
       "errors",
@@ -239,6 +245,7 @@
     "definition_version_bound": true,
     "illegal_transition_refused": true,
     "lease_single_owner": true,
+    "malformed_definition_refused": true,
     "replay_idempotent": true,
     "retry_bounded": true,
     "versioned": true

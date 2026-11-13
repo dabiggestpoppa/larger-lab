@@ -15,7 +15,7 @@
       "infrastructure/control-plane/tests/test_block_06_i4_workflow.py",
       "infrastructure/control-plane/tests/test_block_06_i4_trace.py"
     ],
-    "node_total": 41,
+    "node_total": 46,
     "nodes": [
       "test_block_06_i4_contract.py::test_inventory_equals_collection",
       "test_block_06_i4_contract.py::test_contract_frozen_before_results",
@@ -57,7 +57,12 @@
       "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
       "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
       "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
-      "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused"
+      "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+      "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+      "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+      "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "test_block_06_i4_workflow.py::test_advance_null_version_refused"
     ],
     "zero": [
       "failures",
@@ -394,10 +399,55 @@
       "negative_control": "a secret key nested inside a sequence is dropped",
       "section": "C3.S1",
       "statement": "Secret-key detection recurses through nested sequences"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "failure_class": "F23",
+      "id": "R42",
+      "negative_control": "run document has no definition_id",
+      "section": "C3.S2",
+      "statement": "A run document missing definition_id is refused before replay, lease or transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+      "failure_class": "F23",
+      "id": "R43",
+      "negative_control": "run document has no version",
+      "section": "C3.S2",
+      "statement": "A run document missing version is refused before replay, lease or transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+      "failure_class": "F23",
+      "id": "R46",
+      "negative_control": "run document has neither field",
+      "section": "C3.S2",
+      "statement": "A run document missing both identity fields is refused deterministically"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "failure_class": "F23",
+      "id": "R47",
+      "negative_control": "definition_id is None",
+      "section": "C3.S2",
+      "statement": "A None definition_id is refused and never inferred or defaulted"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_null_version_refused",
+      "failure_class": "F23",
+      "id": "R48",
+      "negative_control": "version is None",
+      "section": "C3.S2",
+      "statement": "A None version is refused and never treated as latest or default"
     }
   ],
-  "requirements_total": 41,
+  "requirements_total": 46,
   "schema": "oce.block_06_i4.registry.v1",
   "stage": "B6-I4",
-  "status": "FROZEN"
+  "status": "FROZEN",
+  "supplement": {
+    "id": "S1",
+    "nodes": 46,
+    "prior_nodes": 41
+  }
 }

@@ -95,6 +95,74 @@ def test_retry_bounded():
     assert exc.value.code == "REFUSED_RETRY_EXCEEDED"
 
 
+def _without(run, *keys):
+    out = dict(run)
+    for key in keys:
+        out.pop(key, None)
+    return out
+
+
+def _refusal(call):
+    with pytest.raises(OperatorRefusal) as exc:
+        call()
+    return exc.value
+
+
+def test_advance_missing_definition_id_refused():
+    doc = workflow()
+    run = _without(running(), "definition_id")
+    first = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    second = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    assert first.code == "REFUSED_INVALID_RECORD"
+    assert (first.code, first.detail) == (second.code, second.detail)
+    assert first.detail == "run.definition_id"
+    assert run["state"] == "new" and run["history"] == [] and run["applied_events"] == []
+
+
+def test_advance_missing_version_refused():
+    doc = workflow()
+    run = _without(running(), "version")
+    first = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    second = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    assert first.code == "REFUSED_INVALID_RECORD"
+    assert (first.code, first.detail) == (second.code, second.detail)
+    assert first.detail == "run.version"
+    assert run["state"] == "new" and run["history"] == []
+
+
+def test_advance_missing_both_refused():
+    doc = workflow()
+    run = _without(running(), "definition_id", "version")
+    first = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    second = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    assert first.code == "REFUSED_INVALID_RECORD"
+    assert first.detail == "run.definition_id"
+    assert (first.code, first.detail) == (second.code, second.detail)
+    assert run["state"] == "new" and run["history"] == []
+
+
+def test_advance_null_definition_id_refused():
+    doc = workflow()
+    run = dict(running(), definition_id=None)
+    first = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    second = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    assert first.code == "REFUSED_INVALID_RECORD"
+    assert first.detail == "run.definition_id=null"
+    assert (first.code, first.detail) == (second.code, second.detail)
+    assert run["state"] == "new" and run["history"] == []
+
+
+def test_advance_null_version_refused():
+    doc = workflow()
+    run = dict(running(), version=None)
+    first = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    second = _refusal(lambda: advance_run(doc, run, "e1", "go", "id:op", 1))
+    assert first.code == "REFUSED_INVALID_RECORD"
+    assert first.detail == "run.version=null"
+    assert (first.code, first.detail) == (second.code, second.detail)
+    assert run["state"] == "new" and run["history"] == []
+
+
 def test_advance_definition_mismatch_refused():
     v1 = define_workflow({**DEFINITION, "version": 1})
     v2 = define_workflow({**DEFINITION, "version": 2})

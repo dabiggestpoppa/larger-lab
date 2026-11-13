@@ -33,10 +33,10 @@ def resolve_symbol(symbol: str):
 def test_inventory_equals_collection():
     registry = load("OCE_BLOCK_06_I4_REQUIREMENT_TEST_REGISTRY_v1.0.json")
     nodes = registry["inventory"]["nodes"]
-    assert len(nodes) == len(set(nodes)) == registry["inventory"]["node_total"] == 41
+    assert len(nodes) == len(set(nodes)) == registry["inventory"]["node_total"] == 46
     assert set(nodes) == defined_nodes()
     assert len(registry["inventory"]["modules"]) == 6
-    assert registry["requirements_total"] == len(registry["requirements"]) == 41
+    assert registry["requirements_total"] == len(registry["requirements"]) == 46
 
 
 def test_contract_frozen_before_results():
@@ -44,7 +44,7 @@ def test_contract_frozen_before_results():
     assert contract["status"] == "FROZEN"
     assert contract["frozen_before_results"] is True
     assert contract["stage"] == "B6-I4"
-    assert contract["implementation_floor"] == {"test_nodes": 41, "source_mutation_floor": 4,
+    assert contract["implementation_floor"] == {"test_nodes": 46, "source_mutation_floor": 4,
                                                 "mutations": 6}
 
 

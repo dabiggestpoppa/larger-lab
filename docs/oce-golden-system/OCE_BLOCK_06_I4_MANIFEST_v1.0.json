@@ -1,6 +1,11 @@
 {
   "artifacts": [
     {
+      "bytes": 5958,
+      "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_AMENDMENT_001_S1_v1.0.json",
+      "sha256": "d2091b097cdfc10d1bf05c55fa8ec632eacec6f9eda9739cfee9bf8f10f7f261"
+    },
+    {
       "bytes": 6584,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_AMENDMENT_001_v1.0.json",
       "sha256": "67817a64de2cc38c848374d7b78ecf6b44572f8ab8fddba865ba48c9f07ec0c0"
@@ -11,14 +16,14 @@
       "sha256": "ab1da2314f4533219bfc6595b945f3ede7b2e126d3db71537f82d2c030366756"
     },
     {
-      "bytes": 3167,
+      "bytes": 3560,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_FAILURE_AND_THREAT_PROOFS_v1.0.json",
-      "sha256": "0e94d9a314beacbf324f9d6a597c6d0d00bd4a3e8fb5d4a13f06460b92ae02d6"
+      "sha256": "10705a0da8228ff26dd8a72e49c89d9d9f59aeacbf55467461928f3f4522b0f0"
     },
     {
-      "bytes": 6621,
+      "bytes": 6822,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_IMPLEMENTATION_CONTRACT_v1.0.json",
-      "sha256": "2137b3fdb21a8e922a77ed7b13a5800e827a0322367b2ece65f676010631d110"
+      "sha256": "1531377b4471fae5b4df7b51d93295af6283eb7532f130cf25100406ecd51281"
     },
     {
       "bytes": 5853,
@@ -31,14 +36,14 @@
       "sha256": "475a0068f80b46511ed311f59b946faea3e071eead8c12d3919b6278957a5c41"
     },
     {
-      "bytes": 16613,
+      "bytes": 18720,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_REQUIREMENT_TEST_REGISTRY_v1.0.json",
-      "sha256": "60e86a1c8fcf2c55ae174c28041ea8191744adc24cab6495ed8189f393502460"
+      "sha256": "ef2698da705df64a804ad1bdafc79c5db8e7f9862deb60590e36e85441921a82"
     },
     {
-      "bytes": 3584,
+      "bytes": 3750,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_SCOPE_DERIVATION_v1.0.json",
-      "sha256": "57ff8a1bd2da165acd00fa06257d85769513c6d30480c49b92a99a07068f8a1a"
+      "sha256": "4867ab5caeaa88026130f671a67e13d75bb80d9d3620d4cd9624f0fb595fbf6f"
     },
     {
       "bytes": 2376,
@@ -54,9 +59,9 @@
       "sha256": "aeb1b383112a0b078d9b97f6b436ea98d29d479b486f7e9f74d9da0b64f975e6"
     },
     {
-      "bytes": 12464,
+      "bytes": 13229,
       "path": "infrastructure/control-plane/scripts/block_06_i4_mutation_battery.py",
-      "sha256": "1c42faa2f3fed852f1a8904b3b2e2dfb844cda3b4dfc674737321d39ed70bf8f"
+      "sha256": "94151eb773712303eb216a1da7a06e5242a8b66d4d36cd0103163d84c1d82c5e"
     },
     {
       "bytes": 5139,
@@ -69,9 +74,9 @@
       "sha256": "e17bc1f1bc8f7f34b3902c0443a73fce0cb56bc4949ed6108a8540ea454ac0f3"
     },
     {
-      "bytes": 13670,
+      "bytes": 14018,
       "path": "infrastructure/control-plane/scripts/block_06_i4_validate.py",
-      "sha256": "f179be43d47f27d3714bacf2a557330043635cae2e0118c39a97a54b6cc68822"
+      "sha256": "d0b2f0dbd5cbf492276c1775ea46f64cbeba1a6e0614584b994d0edd56bbcae4"
     },
     {
       "bytes": 27790,
@@ -114,9 +119,9 @@
       "sha256": "7a4fe618c6fd5f63d70faf969a1243a16a4d31fdb355c4c32bc9d6dd61ef2528"
     },
     {
-      "bytes": 5964,
+      "bytes": 6218,
       "path": "oce/services/workflow.py",
-      "sha256": "cb9842b76988931e659d9b47ce42a68aa2f6f684ad7d9176c249e165d870690f"
+      "sha256": "d60405e5832f1ff6b0e6807aa9ec7f787b6140ab6178a359b5d05f0dd5615cd7"
     },
     {
       "bytes": 798,
@@ -139,7 +144,7 @@
   "stage": "B6-I4",
   "status": "FROZEN",
   "totals": {
-    "artifacts": 9,
+    "artifacts": 10,
     "code": 15
   },
   "verification": {

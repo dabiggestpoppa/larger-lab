@@ -64,7 +64,7 @@ class Checker:
 def check_packet(c: Checker) -> None:
     sys.path.insert(0, str(c.root))
     files = sorted(p.name for p in (c.root / DOCS).glob(f"{PREFIX}*.json"))
-    c.need("packet/count", len(files) == 10, files)
+    c.need("packet/count", len(files) == 11, files)
     for name in files:
         raw = (c.root / DOCS / name).read_bytes()
         c.need(f"packet/canonical/{name}", raw == canonical(json.loads(raw)))
@@ -156,6 +156,12 @@ def check_registration(c: Checker) -> None:
     c.need("registration/amendment", amendment["amendment"] == "001"
            and amendment["prior_inventory"]["test_nodes"] == 34
            and amendment["amended_inventory"]["test_nodes"] == 41)
+    supplement = c.load("AMENDMENT_001_S1_v1.0.json")
+    c.need("registration/supplement", supplement["supplement"] == "S1"
+           and supplement["previous_audited_head"]
+           == "847e24e2e3bb06e7597d3b7d4c65b136de2c91a9"
+           and supplement["prior_inventory"]["test_nodes"] == 41
+           and len(supplement["new_nodes"]) == 5)
     c.need("registration/locks", all(registration["locks"][f"B6-I{i}"] == "LOCKED"
                                      for i in range(5, 10)))
     scope = c.load("SCOPE_DERIVATION_v1.0.json")

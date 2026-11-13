@@ -84,6 +84,11 @@ def acquire_lease(run, owner, now, ttl):
 
 def advance_run(definition, run, event_id, event, actor, now):
     """Advance a run along one legal transition, idempotent on a replayed event id."""
+    for key in ("definition_id", "version"):
+        if key not in run:
+            raise OperatorRefusal("REFUSED_INVALID_RECORD", f"run.{key}")
+        if run[key] is None:
+            raise OperatorRefusal("REFUSED_INVALID_RECORD", f"run.{key}=null")
     if (run["definition_id"] != definition["id"]
             or int(run["version"]) != int(definition["version"])):
         raise OperatorRefusal("REFUSED_WORKFLOW_MISMATCH",

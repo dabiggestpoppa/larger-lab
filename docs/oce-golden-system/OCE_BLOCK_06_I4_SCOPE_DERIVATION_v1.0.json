@@ -60,7 +60,7 @@
     "evaluation_system": "RESERVED_NOT_AUTHORIZED",
     "package_publication": "NOT_AUTHORIZED"
   },
-  "minimum_nodes": 41,
+  "minimum_nodes": 46,
   "mutation_floor": {
     "source": 4,
     "stage": 6
@@ -82,7 +82,8 @@
     "the failure and cost trace reconciles incident, identity, workflow and cost end-to-end",
     "prior stage artifacts remain byte-identical",
     "the trace refuses an identity that is not an authorized owner of the incident",
-    "duplicate incident ids are refused deterministically before projection"
+    "duplicate incident ids are refused deterministically before projection",
+    "a run document missing definition_id or version is refused before any transition"
   ],
   "purpose": "C2 incident and cost plus C3 identity and workflow",
   "requirements": [
@@ -100,6 +101,11 @@
   "stop_conditions": [
     "stop on isolation failure"
   ],
+  "supplement": {
+    "id": "S1",
+    "nodes": 46,
+    "prior_nodes": 41
+  },
   "threats": [
     "T02",
     "T06",

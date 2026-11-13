@@ -48,7 +48,12 @@
         "test_block_06_i4_identity.py::test_duplicate_identity_refused",
         "test_block_06_i4_identity.py::test_resolution_deterministic",
         "test_block_06_i4_workflow.py::test_definition_versioned_and_valid",
-        "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused"
+        "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+        "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+        "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+        "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+        "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+        "test_block_06_i4_workflow.py::test_advance_null_version_refused"
       ],
       "proof_state": "BOUND"
     }
