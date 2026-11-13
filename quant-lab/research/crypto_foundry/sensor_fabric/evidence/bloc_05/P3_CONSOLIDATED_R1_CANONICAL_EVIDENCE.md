@@ -121,6 +121,24 @@ Recomputed outcomes: **passed 4,722 · failed 0 · errored 0 · skipped 11** (su
 
 **Assurance: `ANCHORED_COMPLETE`** — not merely self-consistent. This matches the runner's separately produced verdict (`COMPLETE`, `GREEN`, `reasons: []`), which was withheld from the reconciliation until after recomputation.
 
+### The eleven skipped nodes, by exact ID
+
+Every skip is a platform- or policy-conditional test, not a swallowed failure; each is accounted for in the raw streams with `skipped` outcomes in its recorded phases.
+
+1. `quant-lab/tests/crypto_sensor_fabric/providers/test_network_smoke_live.py::test_live_production_network_smoke`
+2. `quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store.py::TestPermissions::test_final_not_world_writable`
+3. `quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNameMaxProbe::test_posix_probe_failure_fails_closed`
+4. `quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_failed_refresh_rolls_back_previous_snapshot`
+5. `quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_integration_is_explicitly_opt_in`
+6. `quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_restore_symlinked_destination_component_refused`
+7. `quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_verify_symlinked_pack_object_refused`
+8. `quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_concurrent_publication.py::TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed`
+9. `quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_path_canonicalization.py::TestCaseLaw::test_distinct_posix_directories_are_not_merged`
+10. `quant-lab/tests/crypto_sensor_fabric/storage/test_json_catalog.py::TestCorruptionFailClosed::test_unreadable_fragment_fails_closed`
+11. `quant-lab/tests/crypto_sensor_fabric/storage/test_recovery.py::test_symlink_escape_rejected`
+
+All other 4,722 node IDs executed and passed; the full identity list is recoverable from `results_0.jsonl` / `results_1.jsonl` and is bound to the digests above.
+
 ---
 
 ## Phase 4 — Governance
