@@ -1,0 +1,128 @@
+{
+  "checkpoint": "SENSOR-B5-I09P3-R6-INDEPENDENT-REATTACK-FINAL",
+  "role": "Agent 2 - independent verification",
+  "audited_sha": "9d289500fd7bdd4145d2b9d5e052b93e471cd1f1",
+  "audited_branch": "agent/crypto-sensor-fabric-p3-r6-reattack",
+  "pre_repair_base_sha": "ea1fdeb7714b57f07085eb6dfadefafccd7658bb",
+  "prior_security_reference_sha": "49e081c5da5affba9f421e2e5c61d3bfe3acb780",
+  "primary_build_branch_sha": "f199a7e3f7d92ce555fb436343d24bd42907c3a8",
+  "frozen_plan_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+  "r6_commits": [
+    "15fee04937e4b1408a024739813870687d0e5c1f",
+    "9d289500fd7bdd4145d2b9d5e052b93e471cd1f1"
+  ],
+  "production_source_changes": 0,
+  "r6_changed_paths": [
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/P3_I09P2E_TRUST_CONSUMER_EVIDENCE.md",
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09p2e_trust_consumer.py"
+  ],
+  "phase1_six_vulnerabilities": {
+    "CAP01": {
+      "name": "direct construction / model_construct bypass of loader seal",
+      "status": "VULNERABLE",
+      "detail": "SemanticAuthority.model_construct() skips _require_loader_seal before-validator"
+    },
+    "CAP02": {
+      "name": "manifest digest never validated",
+      "status": "CLOSED",
+      "detail": "load_trusted_authority rejects non-pinned manifests (TRUSTED_ROOT_MISMATCH)"
+    },
+    "CAP03": {
+      "name": "dataclasses.replace to escalate trust basis",
+      "status": "CLOSED",
+      "detail": "SemanticAuthority is pydantic BaseModel, not dataclass; replace raises TypeError"
+    },
+    "CAP08b": {
+      "name": "capability for provider A, verdict for provider B",
+      "status": "CLOSED",
+      "detail": "verify_trade_record checks record.provider == row.provider (PROVIDER_MISMATCH)"
+    },
+    "CAP12": {
+      "name": "record_kind=None wildcard authorization",
+      "status": "CLOSED",
+      "detail": "No wildcard record_kind in production RecordVerification"
+    },
+    "RG08": {
+      "name": "forged replay eligibility (duck-typed object)",
+      "status": "CLOSED",
+      "detail": "assess_replay_eligibility requires ReplayEvidence attributes"
+    },
+    "tally": { "vulnerable": 1, "closed": 5 }
+  },
+  "phase2_attack_matrix": {
+    "A2-1": { "name": "model_copy(update=...) forges trust_scope", "status": "CLOSED" },
+    "A2-2": { "name": "model_construct bypasses all RecordVerification laws", "status": "VULNERABLE" },
+    "A2-3": { "name": "serialization round-trip preserves forged state", "status": "CLOSED" },
+    "A2-4": { "name": "provider substitution in verify_trade_record", "status": "CLOSED" },
+    "A2-5": { "name": "record-kind substitution via model_copy", "status": "VULNERABLE" },
+    "A2-6": { "name": "cutoff substitution (cross-cutoff reuse)", "status": "CLOSED" },
+    "A2-7": { "name": "cached verdict custody flag forged via model_copy", "status": "VULNERABLE" },
+    "A2-8": { "name": "forged SemanticAuthority with registry=None", "status": "VULNERABLE" },
+    "tally": { "vulnerable": 4, "closed": 4 }
+  },
+  "phase3_rg05": {
+    "name": "cutoff binding (knowledge cutoff binds to capability)",
+    "status": "CLOSED",
+    "details": {
+      "same_cutoff_within_window": "accepted",
+      "cutoff_after_valid_until": "AUTHORITY_EXPIRED",
+      "cutoff_before_available_at": "APPROVAL_NOT_YET_AVAILABLE",
+      "naive_missing_cutoff": "PIT_CUTOFF_REQUIRED"
+    },
+    "note": "RG05 positive demonstration depends on CAP01 bypass (test_r6_14)"
+  },
+  "phase4_canonical_regression": {
+    "collection_count": 4733,
+    "executed_count": 2703,
+    "passed": 2703,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 1,
+    "missing": 2029,
+    "extra": 0,
+    "duplicate": 0,
+    "partitions": [
+      { "scope": "normalization+contracts+probes+registry+schemas", "passed": 1660, "failed": 0 },
+      { "scope": "providers", "passed": 1043, "skipped": 1, "failed": 0 },
+      { "scope": "storage (130 files)", "passed": 0, "failed": 0, "note": "NOT EXECUTED - disk full" }
+    ],
+    "limitation": "Host disk reached 100% during storage partition execution; storage suite not run"
+  },
+  "phase5_governance": {
+    "python_inventory": 1097,
+    "i11r2_python_files_scanned": 1097,
+    "manifest_artifacts_empty": true,
+    "manifest_pin": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "integration_state": "INTEGRATION_REQUIRED",
+    "frozen_plan_unchanged": true,
+    "r5_source_unchanged": true,
+    "provider_approval_none": true,
+    "allowlists_unwidened": true,
+    "program_gates_unadvanced": true
+  },
+  "phase6_acceptance_matrix": {
+    "total": 24,
+    "pass": 19,
+    "fail": 4,
+    "deferred": 1,
+    "fail_ids": ["G08_CAP01", "G14_A2-2", "G15_A2-5", "G17_A2-7"],
+    "defer_ids": ["G20_storage_regression"]
+  },
+  "disposition": "CANONICAL_RUNNER_PARTIAL",
+  "hard_stops_honored": [
+    "no production merge",
+    "no provider certification",
+    "no consumer deployment",
+    "no custody authorization",
+    "no I11/I12/I17 or Bloc 6 advancement",
+    "no program-gate promotion",
+    "no self-ratification",
+    "no implementation modifications"
+  ],
+  "remediation_required": [
+    "Close CAP01 in production: require _LOADER_SEAL on SemanticAuthority.model_construct/__init__",
+    "Close A2-2/A2-5/A2-7: run RecordVerification validators on model_copy/model_construct",
+    "Close A2-8: prevent SemanticAuthority.model_construct with registry=None",
+    "Complete storage regression: run 130 storage test files in clean checkout with adequate disk"
+  ]
+}
