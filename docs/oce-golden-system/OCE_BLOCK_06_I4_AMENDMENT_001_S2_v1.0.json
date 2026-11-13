@@ -1,0 +1,115 @@
+{
+  "append_only": true,
+  "audit_disposition": "FINAL_PARALLEL_DELTA_AUDIT_REPAIR_REQUIRED_B6_I4",
+  "baseline_head": "4c81913d95691e3e884635a9eee9002679afc9b1",
+  "baseline_tree": "d4c5af08ba569f6de6f146d29c487f4b67c70f00",
+  "blocking_defect": {
+    "classification": "BATTERY_LAW_DEFECT_NOT_PRODUCT_DEFECT",
+    "evidence": [
+      "compile() of the mutated module raises IndentationError",
+      "pytest exits 4 before any test executes",
+      "pytest reports 'found no collectors for ...::<node>'",
+      "the named node is never collected and never executed",
+      "the battery accepted observed_rc != 0 and matched the node name inside the collection error"
+    ],
+    "id": "MUTATION_WITNESS_VACUOUS_M16_M17",
+    "mechanism": "each mutation replaced an `if` statement together with its raise clause by `if False:`, leaving the following statement at equal indentation and making the module syntactically invalid",
+    "mutants": [
+      "M16",
+      "M17"
+    ],
+    "observed_return_code": 4
+  },
+  "cost_usd": 0,
+  "deferred": [
+    {
+      "authority": "cross-stage",
+      "blocking": false,
+      "detail": "B6-I4 class F18 remains unbound; it is not silently accepted as corrected and does not authorize B6-I5.",
+      "id": "F2",
+      "item": "inherited failure/threat mapping convention",
+      "owner": "Book 6 governance-correction stage",
+      "stage": "FUTURE_BOOK_6_GOVERNANCE_CORRECTION"
+    }
+  ],
+  "document_id": "OCE-B6-I4-AMENDMENT-001-S2",
+  "frozen_before_results": true,
+  "locks": {
+    "B6-I5_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "EVIDENCE_SEAL_AUTHORIZED": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "mutation_law": {
+    "admissible_mutant": [
+      "the mutated source must compile successfully before any test run",
+      "the mutated source must collect without import, collection or usage errors",
+      "pytest must return exactly 1",
+      "return codes 2, 3, 4 and 5 are rejected",
+      "the named node must appear in collection evidence",
+      "the named node must appear in executed JUnit evidence",
+      "the named node status must be FAILED, not absent, skipped, error or xfail",
+      "the failure must occur inside the named test, not during collection of it"
+    ],
+    "discrimination": [
+      "a collection or import error is never discrimination",
+      "a usage error is never discrimination",
+      "the phrase 'found no collectors' never satisfies node execution",
+      "matching raw stderr text alone never satisfies node execution",
+      "JUnit evidence is authoritative for node identity and status"
+    ],
+    "prohibited": [
+      "counting observed_rc != 0 as discrimination without node execution evidence",
+      "accepting a node name found only inside a collection error",
+      "weakening any production refusal, node assertion or floor to make a mutant pass"
+    ],
+    "restoration": [
+      "restoration must be byte-exact against the pre-mutation digest",
+      "the pristine named node must pass after restoration",
+      "the complete 46-node pristine suite must pass after restoration",
+      "the worktree must return clean after restoration"
+    ]
+  },
+  "mutation_observations": {
+    "M16": {
+      "intended_weakening": "missing-key governed refusal removed",
+      "node": "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "observed_before_repair": {
+        "compile": "IndentationError",
+        "node_executed": false,
+        "pytest_return_code": 4
+      }
+    },
+    "M17": {
+      "intended_weakening": "None-value governed refusal removed",
+      "node": "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "observed_before_repair": {
+        "compile": "IndentationError",
+        "node_executed": false,
+        "pytest_return_code": 4
+      }
+    }
+  },
+  "parent_amendment": "001",
+  "parent_supplement": "S1",
+  "population": {
+    "mutation_floor": 6,
+    "mutation_floor_kind": "minimum",
+    "mutations_observed": 17,
+    "test_nodes": 46
+  },
+  "product_freeze": {
+    "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+    "base_tree": "5e15ea448b929269193dc904ec0677687df077e4",
+    "head_sha": "1ad1a970206106702b2090c1fb082db08fbfc892",
+    "head_tree": "431bfbe3798eccac67f7291afd421e1d52d34be8",
+    "rule": "the product implementation, the 46 governed nodes, the paired endpoints and the frozen authority remain unchanged by this supplement"
+  },
+  "schema": "oce.block_06_i4.amendment_supplement.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "supplement": "S2"
+}
