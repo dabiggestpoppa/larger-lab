@@ -74,9 +74,9 @@
       "sha256": "6bb4cff9bc820e78cbe6d04e4a609cf7f09b6c24c52b5baaa225c06232a51bbe"
     },
     {
-      "bytes": 7973,
+      "bytes": 8420,
       "path": "infrastructure/control-plane/scripts/block_06_i4_stage_controls.py",
-      "sha256": "e17bc1f1bc8f7f34b3902c0443a73fce0cb56bc4949ed6108a8540ea454ac0f3"
+      "sha256": "e88164122d1b5418e049e49a17b32ba8bc7b573098e997a506021aa0a6959734"
     },
     {
       "bytes": 15074,
