@@ -1,0 +1,236 @@
+{
+  "r6_sha": "9d289500fd7bdd4145d2b9d5e052b93e471cd1f1",
+  "r5_sha": "ea1fdeb7714b57f07085eb6dfadefafccd7658bb",
+  "probe_results": [
+    {
+      "name": "CAP01 forged capability (correct identity)",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "CAP02 replaced basis escalation",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": "is_issued after replace=False"
+    },
+    {
+      "name": "CAP03 incorrect manifest digest",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": "expected manifest 3d707c59fbf1fe96..., got 0*64"
+    },
+    {
+      "name": "CAP08b provider substitution",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": "R6 checks provider binding"
+    },
+    {
+      "name": "CAP12 record kind (forged operator (record_kind=None))",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "CAP12 record kind (synthetic (record_kind=TRADE) for LIQUIDATION record)",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "RG08 forged replay eligibility",
+      "phase": 1,
+      "vulnerable": false,
+      "decision": "REFUSE",
+      "refusal": "REPLAY_BLOCKED",
+      "status": "NOT_POLICY_DERIVED",
+      "detail": "expected REFUSE/REPLAY_BLOCKED/NOT_POLICY_DERIVED"
+    },
+    {
+      "name": "A Validated rederive + matching candidate",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "ACCEPT_FIELD_BINDING",
+      "refusal": null,
+      "status": "SYNTHETIC_TEST_ONLY",
+      "detail": ""
+    },
+    {
+      "name": "B model_construct-forged rederive (candidate=None)",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "ACCEPT_FIELD_BINDING",
+      "refusal": null,
+      "status": "SYNTHETIC_TEST_ONLY",
+      "detail": "candidate=None, rederive returns forged model_construct verdict"
+    },
+    {
+      "name": "C model_copy-forged rederive (candidate=None)",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "REFUSE",
+      "refusal": "FORGED_TRUST_SCOPE",
+      "status": "UNAUTHORIZED",
+      "detail": ""
+    },
+    {
+      "name": "D candidate=None, forged callback object",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "ACCEPT_FIELD_BINDING",
+      "refusal": null,
+      "status": "SYNTHETIC_TEST_ONLY",
+      "detail": ""
+    },
+    {
+      "name": "E cached+derived matching forged objects",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "ACCEPT_FIELD_BINDING",
+      "refusal": null,
+      "status": "SYNTHETIC_TEST_ONLY",
+      "detail": ""
+    },
+    {
+      "name": "F valid-looking but untrusted callback object",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "REFUSE",
+      "refusal": "FORGED_TRUST_SCOPE",
+      "status": "UNAUTHORIZED",
+      "detail": ""
+    },
+    {
+      "name": "G callback raises unexpected exception",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "EXCEPTION",
+      "refusal": "ValueError",
+      "status": "unexpected error in rederive",
+      "detail": "exception propagates out of evaluate()"
+    },
+    {
+      "name": "H different record identity in rederive",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "REFUSE",
+      "refusal": "CACHED_VERDICT_DIVERGENCE",
+      "status": "UNAUTHORIZED",
+      "detail": ""
+    },
+    {
+      "name": "H different knowledge cutoff",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "A Direct _issue() capability in ConsumerPolicy",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": "is_issued=True"
+    },
+    {
+      "name": "B _issue() with wrong manifest_sha256",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "C _issue() with record_kind=None",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "D _issue() with provider=None",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "E replaced capability in ConsumerPolicy",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": "is_issued=False"
+    },
+    {
+      "name": "F Marker-copy + correct knowledge_cutoff in evaluate()",
+      "phase": 3,
+      "vulnerable": true,
+      "decision": "ACCEPT_FIELD_BINDING",
+      "refusal": null,
+      "status": "AUTHORIZED",
+      "detail": "marker copied + all fields correct + knowledge_cutoff passed"
+    },
+    {
+      "name": "G Marker-copy with wrong manifest_sha256",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "H Marker-copy with wrong knowledge_cutoff",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    },
+    {
+      "name": "I Marker-copy with wrong provider",
+      "phase": 3,
+      "vulnerable": false,
+      "decision": "INTEGRATION_REQUIRED",
+      "refusal": null,
+      "status": "INTEGRATION_REQUIRED",
+      "detail": ""
+    }
+  ],
+  "summary": {
+    "closed": 24,
+    "vulnerable": 1,
+    "total": 25
+  }
+}
