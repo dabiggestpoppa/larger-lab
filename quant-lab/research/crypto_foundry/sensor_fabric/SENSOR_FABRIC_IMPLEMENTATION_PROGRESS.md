@@ -9065,3 +9065,19 @@ NONINTERFERENCE: no ingestion application, initializer, custody service, provide
 approval, liquidation transformation, manifest change, I05 replay change, I11/I12/Bloc 6
 advance, or primary-branch write. INTEGRATION_STATE remains INTEGRATION_REQUIRED. No
 self-ratification; independent review required before merge.
+
+## 200 - SENSOR-B5-I09P2E-R1: INDEPENDENT PIT-ENTRY SECURITY AUDIT (AGENT 2)
+
+- Checkpoint ID: `SENSOR-B5-I09P2E-R1` (Agent 2, independent verification). Appendix to section 199; section 199 (Agent 1's P2e record) is not overwritten, renumbered or edited.
+- Audited implementation: `d587e74af1019afef9a87bd9836f5c6431ebad1f` on `agent/crypto-sensor-fabric-pit-parity`, branched from `f199a7e3f7d92ce555fb436343d24bd42907c3a8`. Primary branch `agent/crypto-sensor-fabric-build` remains `f199a7e3...`, unchanged.
+- RED baseline reproduced at `f199a7e3`: 9 failed / 15 passed on the 24-probe PIT entry-parity suite. The mapping-level bypass reproduces: an availability-less approval verified clean at any cutoff; a date-only approval verified clean at same-day intraday cutoffs; a naive cutoff verified clean; and the liquidation entry point inherited the weaker mapping layer.
+- GREEN at `d587e74af`: 24 passed / 0 failed. Every bypass now returns its refusal code (`PIT_AVAILABILITY_MISSING`, `INTRADAY_PIT_AMBIGUOUS`, `EVALUATION_TIME_REQUIRED`), and every law (later day, earlier day, instant boundaries, offset equivalence, DST, revoked/expired, substituted manifest, shipped root admits nothing) still holds.
+- One shared rule: `authority.pit_availability_refusal()` owns PIT availability; `verify_mapping_provenance` calls it after `attests`; `verify_liquidation_admission_provenance` inherits by delegation; the record layer's `_assert_intraday_pit` translates the same refusal. The loader stays date-granular and is explicitly not a PIT decision point (pinned by test_p2e_16).
+- Governance rechecked: Python inventory 1,095 -> 1,096 (one new tracked Python file, mechanical I11R2 republish, single line); I10 allowlist admits the P2e suite by its own named entry; frozen plan `4bb677f9e` untouched; production manifest `artifacts == {}`; no provider approval; `INTEGRATION_STATE` remains `INTEGRATION_REQUIRED`.
+- Goverance dependency gap (deferred, not a bypass): `authority/__init__.py` is in the I09 `sha256_inventory` and changed in P2e, so `evidence/bloc_05/bloc_05_semantic_validation.json` must be regenerated. Independent regeneration changes exactly one inventory-hash line (`6bdc4697...` -> `e27089cd...`). `--check` returns `committed_bytes_mismatch`; `test_sem_a08_semantic_validation_evidence_is_deterministic` fails for that reason alone. Regeneration is legitimate, mechanical and single-line; it is not applied by this audit.
+- Full committed-tree regression: 4,640 collected. Normalization core 1,566 passed / 1 failed (the I09 pin cascade above). Providers 1,043 passed / 1 skipped. Storage (130 memory-intensive DB-backed files) stalls on host memory limits — environment-limited, unrelated to P2e's normalization-layer change, deferred to a clean full-checkout run before merge.
+- Trust-consumer contract: `BLOC_05_I09P2E_TRUST_CONSUMER_CONTRACT.md` is specification only; all eight required elements present; no consuming application built; no custody-source authorization earned.
+- Disposition: `I09P2E_ACCEPTABLE_WITH_DEFERRED_INTEGRATION` — the mapping-level PIT bypass is closed; two deferred integration prerequisites remain (I09 pin-cascade regeneration; full storage regression re-run).
+- Hard stops honored: no production merge, no provider certification, no consumer deployment, no custody authorization, no I11/I12/I17 or Bloc 6 advancement, no program-gate promotion, no self-ratification.
+- Evidence: `evidence/bloc_05/BLOC_05_I09P2ER1_INDEPENDENT_AUDIT.md`; this ledger section 200.
+
