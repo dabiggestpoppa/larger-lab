@@ -1,0 +1,110 @@
+name: I09 historical producer verification
+
+# Narrowly scoped, read-only CI harness for the blocked I09 producer check.
+# It runs the EXISTING verifier unchanged against the pinned historical snapshot.
+# No deployment, no secrets, no provider calls, no canonical-universe rerun.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - agent/crypto-sensor-fabric-p3-i09-ci-verification
+
+permissions:
+  contents: read
+
+concurrency:
+  group: i09-historical-producer-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-historical-producer:
+    name: verify historical producer (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout with full history
+        uses: actions/checkout@v4
+        with:
+          # Full history so the pinned historical commit is present locally.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Record environment and refs
+        run: |
+          set -euo pipefail
+          {
+            echo "workflow_sha=$(git rev-parse HEAD)"
+            echo "runner=$(uname -srm)"
+            echo "python=$(python3 --version 2>&1)"
+            echo "disk_root=$(df -h / | tail -1)"
+            echo "disk_tmp=$(df -h /tmp | tail -1)"
+            echo "historical_commit_available=$(git cat-file -t 03522870d40b839a2eac28eff7841bfb161e05f3 2>/dev/null || echo MISSING)"
+            echo "verifier_sha256=$(sha256sum quant-lab/research/crypto_foundry/sensor_fabric/scripts/verify_historical_producer.py | cut -d' ' -f1)"
+          } | tee environment.txt
+
+      - name: Install minimal runtime dependencies
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet --disable-pip-version-check \
+            "pydantic>=2,<3" "numpy" "pandas" "pyarrow"
+          python3 -c "import pydantic, numpy, pandas; print('deps_ok', pydantic.VERSION)"
+
+      - name: Run the unchanged historical producer verifier
+        env:
+          # The verifier runs the historical producer with cwd=<snapshot>/quant-lab,
+          # so a relative entry resolves to the SNAPSHOT's own package, not this tree.
+          PYTHONPATH: src
+          PYTHONIOENCODING: utf-8
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          set +e
+          python3 quant-lab/research/crypto_foundry/sensor_fabric/scripts/verify_historical_producer.py --json \
+            > producer-verification.json 2> producer-verification.stderr
+          code=$?
+          set -e
+          echo "VERIFIER_EXIT=${code}" | tee verifier-exit.txt
+          echo "----- verifier payload -----"
+          cat producer-verification.json
+          echo "----- verifier stderr (tail) -----"
+          tail -20 producer-verification.stderr || true
+
+      - name: Summarise verdict
+        if: always()
+        run: |
+          set -euo pipefail
+          python3 - <<'PY' | tee verdict-summary.txt
+          import json, pathlib
+          p = pathlib.Path("producer-verification.json")
+          if not p.exists() or not p.read_text().strip():
+              print("verdict=NO_PAYLOAD")
+              raise SystemExit(0)
+          try:
+              d = json.loads(p.read_text())
+          except Exception as exc:
+              print(f"verdict=UNPARSEABLE ({exc})")
+              raise SystemExit(0)
+          for k in ("verdict", "resolved_commit", "source_ref", "producer",
+                    "expected_sha256", "measured_sha256", "bytes_match_pin",
+                    "producer_exit_code", "worktree_created", "worktree_removed",
+                    "blocked_by", "worktree_removal_note"):
+              if k in d:
+                  v = str(d[k])
+                  print(f"{k}={v[:300]}")
+          PY
+          sha256sum producer-verification.json environment.txt verdict-summary.txt | tee artifact-hashes.txt
+
+      - name: Upload verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: i09-historical-producer-verification
+          path: |
+            producer-verification.json
+            producer-verification.stderr
+            environment.txt
+            verifier-exit.txt
+            verdict-summary.txt
+            artifact-hashes.txt
+          if-no-files-found: warn
+          retention-days: 30
