@@ -1,7 +1,18 @@
 {
+  "schema": "sensor-b5-i09p3-r6-boundary-probe/v1",
   "r6_sha": "9d289500fd7bdd4145d2b9d5e052b93e471cd1f1",
   "r5_sha": "ea1fdeb7714b57f07085eb6dfadefafccd7658bb",
-  "probe_results": [
+  "total": 25,
+  "phases": {
+    "1": 7,
+    "2": 9,
+    "3": 9,
+    "4": 0,
+    "5": 0
+  },
+  "vulnerable_count": 2,
+  "exception_count": 1,
+  "results": [
     {
       "name": "CAP01 forged capability (correct identity)",
       "phase": 1,
@@ -126,16 +137,7 @@
       "decision": "EXCEPTION",
       "refusal": "ValueError",
       "status": "unexpected error in rederive",
-      "detail": "exception propagates out of evaluate()"
-    },
-    {
-      "name": "H different record identity in rederive",
-      "phase": 2,
-      "vulnerable": false,
-      "decision": "REFUSE",
-      "refusal": "CACHED_VERDICT_DIVERGENCE",
-      "status": "UNAUTHORIZED",
-      "detail": ""
+      "detail": "rederive raises ValueError, propagates out of evaluate()"
     },
     {
       "name": "H different knowledge cutoff",
@@ -147,12 +149,21 @@
       "detail": ""
     },
     {
+      "name": "H different record identity in rederive",
+      "phase": 2,
+      "vulnerable": false,
+      "decision": "REFUSE",
+      "refusal": "CACHED_VERDICT_DIVERGENCE",
+      "status": "UNAUTHORIZED",
+      "detail": ""
+    },
+    {
       "name": "A Direct _issue() capability in ConsumerPolicy",
       "phase": 3,
-      "vulnerable": false,
-      "decision": "INTEGRATION_REQUIRED",
+      "vulnerable": true,
+      "decision": "ACCEPT_FIELD_BINDING",
       "refusal": null,
-      "status": "INTEGRATION_REQUIRED",
+      "status": "AUTHORIZED",
       "detail": "is_issued=True"
     },
     {
@@ -227,10 +238,5 @@
       "status": "INTEGRATION_REQUIRED",
       "detail": ""
     }
-  ],
-  "summary": {
-    "closed": 24,
-    "vulnerable": 1,
-    "total": 25
-  }
+  ]
 }
