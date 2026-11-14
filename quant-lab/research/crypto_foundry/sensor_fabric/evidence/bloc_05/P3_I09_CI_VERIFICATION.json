@@ -1,0 +1,167 @@
+{
+  "schema": "P3_I09_CI_VERIFICATION/v1",
+  "checkpoint": "SENSOR-B5-I09P3-HISTORICAL-PRODUCER-CI-VERIFICATION",
+  "role": "Independent Governance Verification Engineer",
+  "disposition": "HISTORICAL_PRODUCER_VERIFIED",
+  "reference_lock": {
+    "canonical_candidate": "6de26be9130eb99e0a9b53b340fc5bfaafa4a684",
+    "canonical_evidence": "5c38d0d6396e7cd9b70d5970272475fa975e16e7",
+    "governance_closeout": "d85ba823fdf6d5be9f691289e94c5bc5e6c008cc",
+    "historical_producer": "03522870d40b839a2eac28eff7841bfb161e05f3",
+    "production": "f199a7e3f7d92ce555fb436343d24bd42907c3a8",
+    "verification_branch": "agent/crypto-sensor-fabric-p3-i09-ci-verification"
+  },
+  "phase_0_ci_capability": {
+    "repository_visibility": "PUBLIC",
+    "is_private": false,
+    "default_branch": "main",
+    "actions_permissions": {"enabled": true, "allowed_actions": "all", "sha_pinning_required": false},
+    "default_workflow_permissions": "read",
+    "pre_existing_workflows": 0,
+    "historical_commit_reachable_from_remote_refs": true,
+    "remote_refs_containing_historical_commit": 29,
+    "runner_disk_free_at_job_start": "84G of 145G (43% used)",
+    "runner_os": "Linux 7.0.0-1017-azure x86_64",
+    "runner_python": "3.12.3",
+    "runner_availability_not_assumed": true
+  },
+  "phase_1_isolated_execution": {
+    "environment": "GitHub Actions hosted ubuntu-latest, ephemeral",
+    "host_local_checkout_repeated": false,
+    "worktree": "created by the verifier itself via git worktree add --detach",
+    "permissions": "contents: read (workflow-level)",
+    "secrets_used": 0,
+    "provider_credentials": 0,
+    "network_provider_tests": 0,
+    "deployment_permissions": false,
+    "timeout_minutes": 30,
+    "full_history_checkout": true,
+    "verification_algorithm_substituted": false,
+    "dependencies_installed": ["pydantic>=2,<3", "numpy", "pandas", "pyarrow"],
+    "workflow_file": {
+      "path_when_executed": ".github/workflows/i09-historical-producer-verification.yml",
+      "sha256": "36fee20aa1ecde76e7ac15c0d30db541a83c77be3ad3bba746ed4d5ea5b65656",
+      "archived_at": "evidence/bloc_05/i09_ci_verification/workflow/i09-historical-producer-verification.yml.archived",
+      "still_in_tracked_tree": false,
+      "removal_reason": "the unchanged I10 scope audit admits only its own frozen path allowlist; .github/ is not on it, so the workflow was archived into the evidence tree and removed from the tracked tree after the run, restoring the tree to its base state"
+    },
+    "runs": [
+      {
+        "run_id": 43639204394,
+        "head_sha": "c55bfb3abb492c5958569107afb995f4cf4adb22",
+        "conclusion": "failure",
+        "failure_stage": "actions/checkout post-step `git submodule foreach`",
+        "failure_cause": "fatal: No url found for submodule path 'projects/ai-tools/oransim' in .gitmodules",
+        "class": "workflow harness defect, not a producer verdict",
+        "counted_as_verification": false
+      },
+      {
+        "run_id": 43639340503,
+        "head_sha": "fa8c796b0c991dec8383a8263aaaa35f5c52c59e",
+        "event": "push",
+        "conclusion": "success",
+        "url": "https://github.com/dabiggestpoppa/larger-lab/actions/runs/43639340503",
+        "job": "verify historical producer (read-only)",
+        "job_conclusion": "success",
+        "steps": {
+          "checkout_full_history": "success",
+          "assert_checkout_and_pinned_commit": "success",
+          "record_environment_and_refs": "success",
+          "install_minimal_dependencies": "success",
+          "run_unchanged_verifier": "success",
+          "summarise_verdict": "success",
+          "upload_evidence": "success"
+        },
+        "started_at": "2026-11-14T20:47:21Z",
+        "completed_at": "2026-11-14T20:49:16Z",
+        "counted_as_verification": true
+      }
+    ]
+  },
+  "phase_2_producer_identity_and_digest": {
+    "exact_source_commit": "03522870d40b839a2eac28eff7841bfb161e05f3",
+    "historical_snapshot_identity": "detached worktree of 03522870d, created and removed by the verifier (worktree_created: true, worktree_removed: true)",
+    "producer_entry_point": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i08_units.py",
+    "verifier": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/verify_historical_producer.py",
+    "verifier_sha256_runner": "7b9a08ae51d1b5f556f68b7fb35da1375539109920ff6f0b9d50c3d6f2f9a4cd",
+    "verifier_sha256_local": "7b9a08ae51d1b5f556f68b7fb35da1375539109920ff6f0b9d50c3d6f2f9a4cd",
+    "verifier_unchanged": true,
+    "expected_digest": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4",
+    "measured_digest": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4",
+    "digest_match": true,
+    "bytes_match_pin": true,
+    "producer_exit_code": 0,
+    "producer_reported": {"case_series": "U08-01..U08-20", "rows": 55, "pass": 55, "fail": 0, "artifact_sha256": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4"},
+    "producer_output_equivalence": "the producer's own reported artifact_sha256 equals both the measured file digest and the ratified pin",
+    "verifier_exit_code": 0,
+    "final_verifier_verdict": "PASS",
+    "environmental_errors": [],
+    "scope_note": "the verifier's own distinction field applies: this proves the SEALED I08 artifact against the source snapshot it measured; it is not a statement about the current tree, whose U08-19 refusal remains owned by the pytest scope audits"
+  },
+  "phase_3_evidence_binding": {
+    "workflow_run_id": 43639340503,
+    "workflow_commit_sha": "fa8c796b0c991dec8383a8263aaaa35f5c52c59e",
+    "job_status": "success",
+    "bound_to": {
+      "canonical_candidate": "6de26be9130eb99e0a9b53b340fc5bfaafa4a684",
+      "canonical_evidence": "5c38d0d6396e7cd9b70d5970272475fa975e16e7",
+      "governance_closeout": "d85ba823fdf6d5be9f691289e94c5bc5e6c008cc",
+      "historical_producer": "03522870d40b839a2eac28eff7841bfb161e05f3"
+    },
+    "raw_artifact_dir": "evidence/bloc_05/i09_ci_verification/",
+    "artifact_files_sha256": {
+      "producer-verification.json": "f5d6818c589f5afd24a82eea17ead9764ac39a2bcf7fd6635491a74b12cb1ad0",
+      "environment.txt": "7e5cb41c6a2b2cfbf64d26c12034afc3fb261fa34bbdd7eeae247fb65c397032",
+      "verdict-summary.txt": "625bc72e6c16375eed93a070c1d600c5f1c583acacc8428f67f86129f6b991ad",
+      "verifier-exit.txt": "da5483ed57d1f2f972bca08a8f5fdf56156bab9f5c4c9ef88b0d5f145c1f703b",
+      "artifact-hashes.txt": "42331c916f3dfc5d4cf1ec2efd044af6e3ce66d05b9a43b05310388c21552113",
+      "producer-verification.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "artifact_retention_days": 30,
+    "canonical_universe_rerun": false
+  },
+  "phase_4_governance": {
+    "tracked_python_count": 1102,
+    "expected_python_count": 1102,
+    "inventory_match": true,
+    "i11r2_inventory_pin": 1102,
+    "approval_manifest_empty": true,
+    "integration_state": "INTEGRATION_REQUIRED",
+    "frozen_governance_constraints": "unchanged — 75 focused tests pass on the published branch",
+    "governance_tests": {"result": "75 passed", "duration_seconds": 10.56},
+    "production_source_changes": 0,
+    "authorization_changes": 0,
+    "new_provider_approvals": 0,
+    "trust_promotion": false,
+    "program_gate_movement": false,
+    "first_attempt_scope_violation": {
+      "observed": "with the workflow committed, 2 governance tests failed: unauthorized staged path .github/workflows/i09-historical-producer-verification.yml",
+      "resolution": "workflow archived into the evidence tree and removed from the tracked tree; the tree now differs from the base only inside the admitted evidence prefix",
+      "outcome": "75 passed"
+    }
+  },
+  "phase_5_publication": {
+    "branch": "agent/crypto-sensor-fabric-p3-i09-ci-verification",
+    "base": "d85ba823fdf6d5be9f691289e94c5bc5e6c008cc",
+    "additive_only": true,
+    "historical_evidence_rewritten": false,
+    "ledger_sections_added_or_renumbered": 0,
+    "production_code_modified": false,
+    "workflow_change_reported": "one workflow file added, executed, then archived and removed from the tracked tree"
+  },
+  "adjudication": {
+    "previously_blocked_governance_auxiliary": "RESOLVED",
+    "regression_status_unchanged": "ANCHORED_COMPLETE / GREEN (4,733/4,733, 4,722 passed, 11 skipped, 0 failed, 0 errors)",
+    "strict_checkpoint_now_complete": true,
+    "qualifies": "regression and governance verification only",
+    "closes_independent_r6_security_audit": false
+  },
+  "hard_stop": {
+    "production_merge": false,
+    "provider_certification": false,
+    "trust_promotion": false,
+    "custody_authorization": false,
+    "program_gate_advancement": false,
+    "self_ratification": false
+  }
+}

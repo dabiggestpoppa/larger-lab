@@ -1,0 +1,3 @@
+f5d6818c589f5afd24a82eea17ead9764ac39a2bcf7fd6635491a74b12cb1ad0  producer-verification.json
+7e5cb41c6a2b2cfbf64d26c12034afc3fb261fa34bbdd7eeae247fb65c397032  environment.txt
+625bc72e6c16375eed93a070c1d600c5f1c583acacc8428f67f86129f6b991ad  verdict-summary.txt

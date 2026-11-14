@@ -1,0 +1,21 @@
+{
+  "approach": "external historical-snapshot verification (no sealed code touched)",
+  "artifact": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/bloc_05_unit_validation.json",
+  "bytes_match_pin": true,
+  "distinction": "This proves the SEALED I08 artifact against the source snapshot it measured.  It is not a statement about the current tree: the current-tree U08-19 refusal remains documented and is owned by the pytest scope audits.",
+  "expected_sha256": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4",
+  "harness": "SENSOR-B5-I10E1-H1",
+  "measured_sha256": "260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4",
+  "producer": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i08_units.py",
+  "producer_exit_code": 0,
+  "producer_reported": "{\"artifact_sha256\": \"260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4\", \"case_series\": \"U08-01..U08-20\", \"fail\": 0, \"pass\": 55, \"rows\": 55}",
+  "producer_stdout": "{\"artifact_sha256\": \"260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4\", \"case_series\": \"U08-01..U08-20\", \"fail\": 0, \"pass\": 55, \"rows\": 55}",
+  "ref_exists": true,
+  "ref_is_immutable_commit": true,
+  "resolved_commit": "03522870d40b839a2eac28eff7841bfb161e05f3",
+  "scope": "historical source-snapshot reproduction",
+  "source_ref": "03522870d40b839a2eac28eff7841bfb161e05f3",
+  "verdict": "PASS",
+  "worktree_created": true,
+  "worktree_removed": true
+}

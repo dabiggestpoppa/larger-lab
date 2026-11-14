@@ -1,0 +1,10 @@
+verdict=PASS
+resolved_commit=03522870d40b839a2eac28eff7841bfb161e05f3
+source_ref=03522870d40b839a2eac28eff7841bfb161e05f3
+producer=quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i08_units.py
+expected_sha256=260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4
+measured_sha256=260ec571e1b0c5c4b122e3386c3a751700f182df444b9efc9ae70de64f462cd4
+bytes_match_pin=True
+producer_exit_code=0
+worktree_created=True
+worktree_removed=True
