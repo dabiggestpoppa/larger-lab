@@ -25,10 +25,32 @@ jobs:
     steps:
       - name: Checkout with full history
         uses: actions/checkout@v4
+        # This repository carries a .gitmodules entry (projects/ai-tools/oransim)
+        # with no URL, which makes the action's own `git submodule foreach`
+        # cleanup exit 128 AFTER a successful checkout. The checkout itself is
+        # what matters here; the next step asserts that explicitly.
+        continue-on-error: true
         with:
           # Full history so the pinned historical commit is present locally.
           fetch-depth: 0
+          submodules: false
           persist-credentials: false
+
+      - name: Assert checkout and pinned commit availability
+        run: |
+          set -euo pipefail
+          echo "workflow_sha=$(git rev-parse HEAD)"
+          echo "expected_workflow_sha=${{ github.sha }}"
+          if [ "$(git rev-parse HEAD)" != "${{ github.sha }}" ]; then
+            echo "::error::checkout did not land on the workflow commit"
+            exit 1
+          fi
+          type=$(git cat-file -t 03522870d40b839a2eac28eff7841bfb161e05f3 2>/dev/null || echo MISSING)
+          echo "historical_commit_object=$type"
+          if [ "$type" != "commit" ]; then
+            echo "::error::pinned historical commit is not available on the runner"
+            exit 1
+          fi
 
       - name: Record environment and refs
         run: |
@@ -92,7 +114,7 @@ jobs:
                   v = str(d[k])
                   print(f"{k}={v[:300]}")
           PY
-          sha256sum producer-verification.json environment.txt verdict-summary.txt | tee artifact-hashes.txt
+          sha256sum producer-verification.json environment.txt verdict-summary.txt 2>/dev/null | tee artifact-hashes.txt || true
 
       - name: Upload verification evidence
         if: always()
