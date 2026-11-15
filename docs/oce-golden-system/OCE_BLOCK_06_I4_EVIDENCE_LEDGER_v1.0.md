@@ -202,3 +202,62 @@ No failure mode is deducted twice. No remaining product defect is known; F2/F18 
 ## Holds
 
 `B6-I5`–`B6-I9` LOCKED · `BOOK_6_COMPLETE=false` · `MERGE_AUTHORIZED=false` · `RATIFICATION_AUTHORIZED=false` · evidence ledger sealed, not operator-accepted · cost `$0` · capital authority `none` · repository remains public until the operator is explicitly told **SAFE TO MAKE REPOSITORY PRIVATE**.
+
+## Operator ratification — append-only
+
+The header status line above ("EVIDENCE SEALED — AWAITING OPERATOR RATIFICATION. Not operator-accepted, not merged.") is historical and is preserved unchanged. This section records the later operator decision; it supersedes that pending state for B6-I4 only. Merge remains unauthorized.
+
+| Item | Recorded value |
+|---|---|
+| Operator decision | `OPERATOR_DECISION=RATIFY_B6_I4_EVIDENCE` |
+| Stage | `B6-I4-RATIFICATION` |
+| B6-I4 technical implementation | **ACCEPTED** |
+| B6-I4 evidence package | **ACCEPTED** |
+| B6-I4 ratification | **OPERATOR_RATIFIED — FROZEN** |
+| Merge | **NOT AUTHORIZED** |
+| `B6-I5`–`B6-I9` | LOCKED |
+| `BOOK_6_COMPLETE` | `false` |
+| Cost | `$0` |
+| Capital authority | `none` |
+
+The binding decision record is `OCE_BLOCK_06_I4_OPERATOR_RATIFICATION_v1.0.md`; the ratification commit SHA is recorded in PR #33 and is never predicted here.
+
+### Accepted score
+
+| Dimension | Accepted score |
+|---|---|
+| SPEC | 9.0 |
+| DESIGN | 9.2 |
+| CORRECTNESS | 9.4 |
+| QUALITY | 9.0 |
+| **TOTAL** | **9.15 / 10** (36.6 ÷ 4) |
+
+The DESIGN and CORRECTNESS deductions concern separate dimensions of the same repair episode — process churn versus the original witness defect — and are accepted as a judgment call, not as mathematical certainty. The score is accepted as recorded; it was not re-scored and no failure mode is deducted twice.
+
+### Audit provenance preserved
+
+- Label: **SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT**.
+- Disposition: **FINAL_EVIDENCE_HEAD_AUDIT_ACCEPTED_B6_I4**.
+- Ratification does not claim organizational independence and does not convert the same-host review into an independent one.
+
+### Validator clarification (appended correction)
+
+| Head | Validator |
+|---|---|
+| Accepted technical head `60dbb57c0` | 177/177 |
+| Evidence-seal head `021fc6111` | 181/181 |
+
+The exact reason for the increase of four is: +2 manifest checks for the new ledger entry (`manifest/exists/…` and `manifest/hash/…`), and +2 text-law checks for the new ledger document (`text/no_claim/…` and `text/no_abs_path/…`). The validator source remained byte-identical at `1a7e7166f2dbbe47ce48d603629815ebc4f72bdbf44b174f22d747e2bc9e4978`; no unexplained test or product drift occurred.
+
+The same two text-law checks apply to the ratification document at the ratification head. It adds no manifest row because the manifest generator's artifact glob is JSON-only and this ledger is its single documentation exception; the generator was not changed for ratification.
+
+### PR marker truth (appended correction)
+
+- The terminal `READY_FOR_OPERATOR_REVIEW_B6_I4` marker is unique: it occurs once at the end of the PR body.
+- The literal string occurs twice in the body because unchanged historical prose previously named the prospective marker while describing where the lane would stop.
+- The historical PR body was preserved append-only.
+- This is not a duplicated terminal disposition, and the old prose was not rewritten merely to obtain a literal count of one.
+
+### Holds restated at ratification
+
+`B6-I5`–`B6-I9` remain LOCKED · `BOOK_6_COMPLETE=false` · `MERGE_AUTHORIZED=false` · no B6-I5 work is authorized · cost `$0` · capital authority `none` · repository remains public until the operator is explicitly told **SAFE TO MAKE REPOSITORY PRIVATE**.

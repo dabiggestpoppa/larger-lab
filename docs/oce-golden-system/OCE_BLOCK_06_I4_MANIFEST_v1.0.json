@@ -56,9 +56,9 @@
       "sha256": "98ef941ab91b59489f34ad75aaa4505f3febbb04333878389892c27ec784c517"
     },
     {
-      "bytes": 11078,
+      "bytes": 14442,
       "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_EVIDENCE_LEDGER_v1.0.md",
-      "sha256": "33d3d49a17c519de628da1e14a4334cdb55f2f9d7c7e7792c17a2d5f0d811aea"
+      "sha256": "56166eaa54b1b1a65e7f92e5bc52d64fc8f1a63e1732c41e2577689bb6232be0"
     }
   ],
   "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
