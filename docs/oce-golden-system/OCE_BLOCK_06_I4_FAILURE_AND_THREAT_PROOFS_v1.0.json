@@ -1,0 +1,91 @@
+{
+  "document_id": "OCE-B6-I4-PROOFS-001",
+  "failure_classes": [
+    {
+      "id": "F03",
+      "nodes": [
+        "test_block_06_i4_identity.py::test_revoked_identity_refused",
+        "test_block_06_i4_workflow.py::test_illegal_transition_refused",
+        "test_block_06_i4_workflow.py::test_lease_owner_required",
+        "test_block_06_i4_workflow.py::test_lease_reacquire_after_expiry",
+        "test_block_06_i4_workflow.py::test_cancelled_run_advance_refused",
+        "test_block_06_i4_workflow.py::test_retry_bounded",
+        "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "F11",
+      "nodes": [
+        "test_block_06_i4_incident.py::test_timeline_must_be_monotonic",
+        "test_block_06_i4_cost.py::test_negative_cost_refused",
+        "test_block_06_i4_identity.py::test_raw_secret_refused",
+        "test_block_06_i4_workflow.py::test_replay_preserves_state",
+        "test_block_06_i4_trace.py::test_trace_end_to_end_ok",
+        "test_block_06_i4_trace.py::test_trace_broken_link_refused",
+        "test_block_06_i4_cost.py::test_fractional_cost_refused",
+        "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+        "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+        "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+        "test_block_06_i4_trace.py::test_trace_requires_incident_owner"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "F23",
+      "nodes": [
+        "test_block_06_i4_contract.py::test_inventory_equals_collection",
+        "test_block_06_i4_incident.py::test_incident_view_projects_fields",
+        "test_block_06_i4_incident.py::test_invalid_severity_refused",
+        "test_block_06_i4_incident.py::test_unresolved_risk_requires_containment",
+        "test_block_06_i4_incident.py::test_drill_legibility_latency",
+        "test_block_06_i4_cost.py::test_cost_ledger_separates_estimate_and_actual",
+        "test_block_06_i4_cost.py::test_unknown_category_refused",
+        "test_block_06_i4_cost.py::test_budget_alert_before_excess",
+        "test_block_06_i4_cost.py::test_budget_breach_reported",
+        "test_block_06_i4_cost.py::test_cost_attributed_to_app_and_task",
+        "test_block_06_i4_identity.py::test_identity_registry_canonical",
+        "test_block_06_i4_identity.py::test_duplicate_identity_refused",
+        "test_block_06_i4_identity.py::test_resolution_deterministic",
+        "test_block_06_i4_workflow.py::test_definition_versioned_and_valid",
+        "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+        "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+        "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+        "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+        "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+        "test_block_06_i4_workflow.py::test_advance_null_version_refused"
+      ],
+      "proof_state": "BOUND"
+    }
+  ],
+  "policy": {
+    "fail_closed": true,
+    "no_client_authority": true,
+    "no_inferred_success": true
+  },
+  "schema": "oce.block_06_i4.proofs.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "threats": [
+    {
+      "bound": true,
+      "id": "T02"
+    },
+    {
+      "bound": true,
+      "id": "T06"
+    },
+    {
+      "bound": true,
+      "id": "T10"
+    },
+    {
+      "bound": true,
+      "id": "T13"
+    },
+    {
+      "bound": true,
+      "id": "T19"
+    }
+  ]
+}

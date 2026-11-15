@@ -1,0 +1,29 @@
+{
+  "document_id": "OCE-B6-I4-COMPAT-001",
+  "refusal": {
+    "consumer_evidence": "none",
+    "silent_latest": false,
+    "unknown_refused": true
+  },
+  "rows": [
+    {
+      "state": "OPERATOR_VIEW",
+      "surface": "C2.S4"
+    },
+    {
+      "state": "OPERATOR_LEDGER",
+      "surface": "C2.S5"
+    },
+    {
+      "state": "SERVICE_LOCAL",
+      "surface": "C3.S1"
+    },
+    {
+      "state": "SERVICE_LOCAL",
+      "surface": "C3.S2"
+    }
+  ],
+  "schema": "oce.block_06_i4.compatibility.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN"
+}

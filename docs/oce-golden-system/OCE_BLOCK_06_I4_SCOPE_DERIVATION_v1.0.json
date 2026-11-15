@@ -1,0 +1,116 @@
+{
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "prior_nodes": 34
+  },
+  "api_symbols": [
+    "oce.operator.incident.incident_view",
+    "oce.operator.incident.assess_drill",
+    "oce.operator.cost.cost_ledger",
+    "oce.operator.cost.budget_alerts",
+    "oce.services.identity.identity_registry",
+    "oce.services.identity.resolve_identity",
+    "oce.services.workflow.define_workflow",
+    "oce.services.workflow.start_run",
+    "oce.services.workflow.acquire_lease",
+    "oce.services.workflow.advance_run",
+    "oce.services.workflow.cancel_run",
+    "oce.services.workflow.retry_run",
+    "oce.operator.trace.failure_cost_trace"
+  ],
+  "authority_sources": [
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I4",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6-I4",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S4",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C2.S5",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S1",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S2",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-09",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-10"
+  ],
+  "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+  "base_tree": "5e15ea448b929269193dc904ec0677687df077e4",
+  "capital_authority": "none",
+  "common_regression_floor": 208,
+  "cost_usd": 0,
+  "document_id": "OCE-B6-I4-SCOPE-001",
+  "exit_gate": "failure and cost trace end-to-end",
+  "failure_classes": [
+    "F03",
+    "F11",
+    "F23"
+  ],
+  "implementation_surfaces": [
+    "operator_surface",
+    "services"
+  ],
+  "locks": {
+    "B6-I5": "LOCKED",
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "minimum_nodes": 46,
+  "mutation_floor": {
+    "source": 4,
+    "stage": 6
+  },
+  "non_goals": [
+    "knowledge and artifacts"
+  ],
+  "outputs": [
+    "incident",
+    "cost",
+    "identity",
+    "workflow"
+  ],
+  "provenance_obligations": [
+    "every incident row carries severity, impact, containment, owners, timeline, recovery and unresolved risk",
+    "the cost ledger keeps estimate and actual separate and attributes cost to app and task",
+    "identity resolution is scoped to one application and refuses raw secret material",
+    "workflow leases, retries and cancellations preserve a legal state under replay",
+    "the failure and cost trace reconciles incident, identity, workflow and cost end-to-end",
+    "prior stage artifacts remain byte-identical",
+    "the trace refuses an identity that is not an authorized owner of the incident",
+    "duplicate incident ids are refused deterministically before projection",
+    "a run document missing definition_id or version is refused before any transition"
+  ],
+  "purpose": "C2 incident and cost plus C3 identity and workflow",
+  "requirements": [
+    "B6-P0-SEC-09",
+    "B6-P0-SEC-10"
+  ],
+  "schema": "oce.block_06_i4.scope.v1",
+  "sections": [
+    "C2.S4",
+    "C2.S5",
+    "C3.S1",
+    "C3.S2"
+  ],
+  "stage": "B6-I4",
+  "stop_conditions": [
+    "stop on isolation failure"
+  ],
+  "supplement": {
+    "id": "S1",
+    "nodes": 46,
+    "prior_nodes": 41
+  },
+  "threats": [
+    "T02",
+    "T06",
+    "T10",
+    "T13",
+    "T19"
+  ]
+}

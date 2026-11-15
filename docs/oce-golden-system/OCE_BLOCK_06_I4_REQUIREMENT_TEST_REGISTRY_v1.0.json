@@ -1,0 +1,453 @@
+{
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "prior_nodes": 34
+  },
+  "document_id": "OCE-B6-I4-REGISTRY-001",
+  "inventory": {
+    "collection_equals_execution": true,
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i4_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_incident.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_cost.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_identity.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_workflow.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_trace.py"
+    ],
+    "node_total": 46,
+    "nodes": [
+      "test_block_06_i4_contract.py::test_inventory_equals_collection",
+      "test_block_06_i4_contract.py::test_contract_frozen_before_results",
+      "test_block_06_i4_contract.py::test_scope_binds_construction_sequence",
+      "test_block_06_i4_contract.py::test_locks_and_cost",
+      "test_block_06_i4_contract.py::test_service_symbols_declared",
+      "test_block_06_i4_contract.py::test_no_later_stage_dependency",
+      "test_block_06_i4_incident.py::test_incident_view_projects_fields",
+      "test_block_06_i4_incident.py::test_unknown_subject_refused",
+      "test_block_06_i4_incident.py::test_invalid_severity_refused",
+      "test_block_06_i4_incident.py::test_timeline_must_be_monotonic",
+      "test_block_06_i4_incident.py::test_unresolved_risk_requires_containment",
+      "test_block_06_i4_incident.py::test_drill_legibility_latency",
+      "test_block_06_i4_cost.py::test_cost_ledger_separates_estimate_and_actual",
+      "test_block_06_i4_cost.py::test_unknown_category_refused",
+      "test_block_06_i4_cost.py::test_negative_cost_refused",
+      "test_block_06_i4_cost.py::test_budget_alert_before_excess",
+      "test_block_06_i4_cost.py::test_budget_breach_reported",
+      "test_block_06_i4_cost.py::test_cost_attributed_to_app_and_task",
+      "test_block_06_i4_identity.py::test_identity_registry_canonical",
+      "test_block_06_i4_identity.py::test_raw_secret_refused",
+      "test_block_06_i4_identity.py::test_duplicate_identity_refused",
+      "test_block_06_i4_identity.py::test_cross_app_isolation_refused",
+      "test_block_06_i4_identity.py::test_revoked_identity_refused",
+      "test_block_06_i4_identity.py::test_resolution_deterministic",
+      "test_block_06_i4_workflow.py::test_definition_versioned_and_valid",
+      "test_block_06_i4_workflow.py::test_illegal_transition_refused",
+      "test_block_06_i4_workflow.py::test_lease_owner_required",
+      "test_block_06_i4_workflow.py::test_lease_reacquire_after_expiry",
+      "test_block_06_i4_workflow.py::test_replay_preserves_state",
+      "test_block_06_i4_workflow.py::test_cancelled_run_advance_refused",
+      "test_block_06_i4_workflow.py::test_retry_bounded",
+      "test_block_06_i4_trace.py::test_trace_end_to_end_ok",
+      "test_block_06_i4_trace.py::test_trace_broken_link_refused",
+      "test_block_06_i4_trace.py::test_trace_cross_app_refused",
+      "test_block_06_i4_cost.py::test_fractional_cost_refused",
+      "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+      "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+      "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+      "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
+      "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
+      "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+      "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+      "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+      "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "test_block_06_i4_workflow.py::test_advance_null_version_refused"
+    ],
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  },
+  "requirements": [
+    {
+      "binding_node": "test_block_06_i4_contract.py::test_inventory_equals_collection",
+      "failure_class": "F23",
+      "id": "B6I4-R01",
+      "negative_control": "remove a node from the inventory and the check fails",
+      "section": "C2.S4",
+      "statement": "Declared inventory equals collected and executed nodes"
+    },
+    {
+      "binding_node": "test_block_06_i4_contract.py::test_contract_frozen_before_results",
+      "failure_class": "F23",
+      "id": "B6I4-R02",
+      "negative_control": "a results-first contract fails",
+      "section": "C2.S4",
+      "statement": "Contract is frozen before any result is recorded"
+    },
+    {
+      "binding_node": "test_block_06_i4_contract.py::test_scope_binds_construction_sequence",
+      "failure_class": "F23",
+      "id": "B6I4-R03",
+      "negative_control": "an extra section or purpose fails",
+      "section": "C2.S4",
+      "statement": "Scope binds the construction sequence exactly"
+    },
+    {
+      "binding_node": "test_block_06_i4_contract.py::test_locks_and_cost",
+      "failure_class": "F23",
+      "id": "B6I4-R04",
+      "negative_control": "an unlocked later stage fails",
+      "section": "C2.S4",
+      "statement": "Later stages stay locked and cost is zero"
+    },
+    {
+      "binding_node": "test_block_06_i4_contract.py::test_service_symbols_declared",
+      "failure_class": "F23",
+      "id": "B6I4-R05",
+      "negative_control": "a missing export fails",
+      "section": "C3.S1",
+      "statement": "Service and operator symbols are declared and exported"
+    },
+    {
+      "binding_node": "test_block_06_i4_contract.py::test_no_later_stage_dependency",
+      "failure_class": "T19",
+      "id": "B6I4-R06",
+      "negative_control": "an I5 import fails",
+      "section": "C3.S2",
+      "statement": "No later-stage dependency is imported or referenced"
+    },
+    {
+      "binding_node": "test_block_06_i4_incident.py::test_incident_view_projects_fields",
+      "failure_class": "F23",
+      "id": "B6I4-R07",
+      "negative_control": "a missing field is refused",
+      "section": "C2.S4",
+      "statement": "The incident view projects every governed field"
+    },
+    {
+      "binding_node": "test_block_06_i4_incident.py::test_unknown_subject_refused",
+      "failure_class": "T02",
+      "id": "B6I4-R08",
+      "negative_control": "an empty viewer is refused",
+      "section": "C2.S4",
+      "statement": "An unknown viewer subject is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_incident.py::test_invalid_severity_refused",
+      "failure_class": "F23",
+      "id": "B6I4-R09",
+      "negative_control": "an invented severity is refused",
+      "section": "C2.S4",
+      "statement": "Only the declared severity vocabulary is accepted"
+    },
+    {
+      "binding_node": "test_block_06_i4_incident.py::test_timeline_must_be_monotonic",
+      "failure_class": "F11",
+      "id": "B6I4-R10",
+      "negative_control": "an earlier timestamp follows a later one",
+      "section": "C2.S4",
+      "statement": "A non-monotonic incident timeline is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_incident.py::test_unresolved_risk_requires_containment",
+      "failure_class": "F23",
+      "id": "B6I4-R11",
+      "negative_control": "recovered plus unresolved risk, no containment",
+      "section": "C2.S4",
+      "statement": "A recovered incident with unresolved risk and no containment is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_incident.py::test_drill_legibility_latency",
+      "failure_class": "F23",
+      "id": "B6I4-R12",
+      "negative_control": "latency beyond the limit reports BREACHED",
+      "section": "C2.S4",
+      "statement": "A failure drill is legible within the defined latency"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_cost_ledger_separates_estimate_and_actual",
+      "failure_class": "F23",
+      "id": "B6I4-R13",
+      "negative_control": "estimate folded into actual fails",
+      "section": "C2.S5",
+      "statement": "The ledger keeps estimate and actual strictly separate"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_unknown_category_refused",
+      "failure_class": "F23",
+      "id": "B6I4-R14",
+      "negative_control": "an invented category is refused",
+      "section": "C2.S5",
+      "statement": "An unknown cost category is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_negative_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R15",
+      "negative_control": "a negative estimate is refused",
+      "section": "C2.S5",
+      "statement": "A negative cost or capacity is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_budget_alert_before_excess",
+      "failure_class": "F23",
+      "id": "B6I4-R16",
+      "negative_control": "projected breach with actual below alerts",
+      "section": "C2.S5",
+      "statement": "A projected overrun alerts before actual excess"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_budget_breach_reported",
+      "failure_class": "F23",
+      "id": "B6I4-R17",
+      "negative_control": "actual at ceiling reports BREACHED",
+      "section": "C2.S5",
+      "statement": "An actual overrun is reported as breached"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_cost_attributed_to_app_and_task",
+      "failure_class": "F23",
+      "id": "B6I4-R18",
+      "negative_control": "task attribution missing fails",
+      "section": "C2.S5",
+      "statement": "Cost is attributed to both app and task"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_identity_registry_canonical",
+      "failure_class": "F23",
+      "id": "B6I4-R19",
+      "negative_control": "registry drops app scoping fails",
+      "section": "C3.S1",
+      "statement": "The identity registry is canonical and scoped by app"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_raw_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R20",
+      "negative_control": "a secret key in the credential reference is refused",
+      "section": "C3.S1",
+      "statement": "Raw secret material in metadata is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_duplicate_identity_refused",
+      "failure_class": "F23",
+      "id": "B6I4-R21",
+      "negative_control": "two records share one id",
+      "section": "C3.S1",
+      "statement": "A duplicate identity is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_cross_app_isolation_refused",
+      "failure_class": "T10",
+      "id": "B6I4-R22",
+      "negative_control": "resolve an identity owned by another app",
+      "section": "C3.S1",
+      "statement": "Cross-app identity resolution is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_revoked_identity_refused",
+      "failure_class": "F03",
+      "id": "B6I4-R23",
+      "negative_control": "resolve a revoked credential reference",
+      "section": "C3.S1",
+      "statement": "A revoked identity is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_resolution_deterministic",
+      "failure_class": "F23",
+      "id": "B6I4-R24",
+      "negative_control": "reordered registry changes the digest",
+      "section": "C3.S1",
+      "statement": "Identity resolution is deterministic"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_definition_versioned_and_valid",
+      "failure_class": "F23",
+      "id": "B6I4-R25",
+      "negative_control": "an unknown transition state is refused",
+      "section": "C3.S2",
+      "statement": "A workflow definition is versioned and validated"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_illegal_transition_refused",
+      "failure_class": "F03",
+      "id": "B6I4-R26",
+      "negative_control": "an event with no transition is refused",
+      "section": "C3.S2",
+      "statement": "An illegal transition is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_lease_owner_required",
+      "failure_class": "F03",
+      "id": "B6I4-R27",
+      "negative_control": "a non-owner advances",
+      "section": "C3.S2",
+      "statement": "Advancing without the lease is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_lease_reacquire_after_expiry",
+      "failure_class": "F03",
+      "id": "B6I4-R28",
+      "negative_control": "a second owner during a live lease is refused",
+      "section": "C3.S2",
+      "statement": "A lease can be reacquired only after expiry"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_replay_preserves_state",
+      "failure_class": "F11",
+      "id": "B6I4-R29",
+      "negative_control": "replaying an applied event is idempotent",
+      "section": "C3.S2",
+      "statement": "A replayed event preserves legal state"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_cancelled_run_advance_refused",
+      "failure_class": "F03",
+      "id": "B6I4-R30",
+      "negative_control": "advance after cancel is refused",
+      "section": "C3.S2",
+      "statement": "A cancelled run cannot advance"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_retry_bounded",
+      "failure_class": "F03",
+      "id": "B6I4-R31",
+      "negative_control": "a retry beyond the frozen bound is refused",
+      "section": "C3.S2",
+      "statement": "Retries are bounded"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_end_to_end_ok",
+      "failure_class": "F11",
+      "id": "B6I4-R32",
+      "negative_control": "a missing stage fails",
+      "section": "C2.S4",
+      "statement": "The failure and cost trace reconciles end-to-end"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_broken_link_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R33",
+      "negative_control": "a node points at the wrong parent",
+      "section": "C2.S5",
+      "statement": "A broken trace link is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_cross_app_refused",
+      "failure_class": "T10",
+      "id": "B6I4-R34",
+      "negative_control": "owner identity belongs to another app",
+      "section": "C3.S1",
+      "statement": "A cross-app trace owner is refused"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_requires_incident_owner",
+      "failure_class": "F11",
+      "id": "B6I4-R35",
+      "negative_control": "trace identity ref is not an incident owner",
+      "section": "C2.S4",
+      "statement": "A trace cannot return TRACE_OK unless the identity is an authorized incident owner"
+    },
+    {
+      "binding_node": "test_block_06_i4_trace.py::test_trace_duplicate_incident_refused",
+      "failure_class": "F23",
+      "id": "B6I4-R36",
+      "negative_control": "two accepted incident rows share one id",
+      "section": "C2.S4",
+      "statement": "Duplicate incident ids are refused deterministically before projection"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_definition_mismatch_refused",
+      "failure_class": "F03",
+      "id": "B6I4-R37",
+      "negative_control": "advance a v1 run with a v2 definition",
+      "section": "C3.S2",
+      "statement": "advance_run refuses a definition id or version mismatch before any transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_fractional_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R38",
+      "negative_control": "fractional 0.9 is silently coerced to 0",
+      "section": "C2.S5",
+      "statement": "Fractional cost or capacity values are refused, never coerced to an integer"
+    },
+    {
+      "binding_node": "test_block_06_i4_cost.py::test_non_integer_cost_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R39",
+      "negative_control": "boolean, string, non-finite or null cost is accepted",
+      "section": "C2.S5",
+      "statement": "Non-integer cost and capacity values raise a governed refusal, not a bare error"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_nested_map_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R40",
+      "negative_control": "a secret key nested inside a mapping is dropped",
+      "section": "C3.S1",
+      "statement": "Secret-key detection recurses through nested mappings"
+    },
+    {
+      "binding_node": "test_block_06_i4_identity.py::test_nested_sequence_secret_refused",
+      "failure_class": "F11",
+      "id": "B6I4-R41",
+      "negative_control": "a secret key nested inside a sequence is dropped",
+      "section": "C3.S1",
+      "statement": "Secret-key detection recurses through nested sequences"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_definition_id_refused",
+      "failure_class": "F23",
+      "id": "R42",
+      "negative_control": "run document has no definition_id",
+      "section": "C3.S2",
+      "statement": "A run document missing definition_id is refused before replay, lease or transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_version_refused",
+      "failure_class": "F23",
+      "id": "R43",
+      "negative_control": "run document has no version",
+      "section": "C3.S2",
+      "statement": "A run document missing version is refused before replay, lease or transition"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_missing_both_refused",
+      "failure_class": "F23",
+      "id": "R46",
+      "negative_control": "run document has neither field",
+      "section": "C3.S2",
+      "statement": "A run document missing both identity fields is refused deterministically"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_null_definition_id_refused",
+      "failure_class": "F23",
+      "id": "R47",
+      "negative_control": "definition_id is None",
+      "section": "C3.S2",
+      "statement": "A None definition_id is refused and never inferred or defaulted"
+    },
+    {
+      "binding_node": "test_block_06_i4_workflow.py::test_advance_null_version_refused",
+      "failure_class": "F23",
+      "id": "R48",
+      "negative_control": "version is None",
+      "section": "C3.S2",
+      "statement": "A None version is refused and never treated as latest or default"
+    }
+  ],
+  "requirements_total": 46,
+  "schema": "oce.block_06_i4.registry.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "supplement": {
+    "id": "S1",
+    "nodes": 46,
+    "prior_nodes": 41
+  }
+}
