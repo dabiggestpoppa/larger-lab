@@ -1,0 +1,25 @@
+{
+  "document_id": "OCE-B6-I5-COMPAT-001",
+  "refusal": {
+    "consumer_evidence": "none",
+    "silent_latest": false,
+    "unknown_refused": true
+  },
+  "rows": [
+    {
+      "state": "SERVICE_LOCAL",
+      "surface": "C3.S3"
+    },
+    {
+      "state": "SERVICE_LOCAL",
+      "surface": "C3.S4"
+    },
+    {
+      "state": "SERVICE_LOCAL",
+      "surface": "C3.S5"
+    }
+  ],
+  "schema": "oce.block_06_i5.compatibility.v1",
+  "stage": "B6-I5",
+  "status": "FROZEN"
+}

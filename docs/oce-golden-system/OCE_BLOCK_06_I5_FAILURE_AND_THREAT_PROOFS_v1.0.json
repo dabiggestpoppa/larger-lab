@@ -1,0 +1,106 @@
+{
+  "document_id": "OCE-B6-I5-PROOFS-001",
+  "failure_classes": [
+    {
+      "id": "F03",
+      "nodes": [
+        "test_block_06_i5_knowledge.py::test_scope_isolation_refused",
+        "test_block_06_i5_knowledge.py::test_unpromoted_fact_refused",
+        "test_block_06_i5_artifact.py::test_unauthorized_retrieval_refused",
+        "test_block_06_i5_evaluation.py::test_registered_evaluator_only",
+        "test_block_06_i5_evaluation.py::test_evaluator_change_refused",
+        "test_block_06_i5_evaluation.py::test_gate_requires_independent_decision",
+        "test_block_06_i5_evaluation.py::test_self_approval_refused",
+        "test_block_06_i5_evaluation.py::test_promotion_requires_gate_pass"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "F08",
+      "nodes": [
+        "test_block_06_i5_knowledge.py::test_duplicate_fact_refused",
+        "test_block_06_i5_artifact.py::test_duplicate_artifact_refused"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "F11",
+      "nodes": [
+        "test_block_06_i5_artifact.py::test_registration_immutable",
+        "test_block_06_i5_artifact.py::test_manifest_mismatch_refused",
+        "test_block_06_i5_evaluation.py::test_result_immutable",
+        "test_block_06_i5_provenance.py::test_provenance_chain_end_to_end",
+        "test_block_06_i5_provenance.py::test_broken_chain_refused",
+        "test_block_06_i5_provenance.py::test_artifact_manifest_bound_to_fact",
+        "test_block_06_i5_provenance.py::test_evaluation_bound_to_artifact"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "F12",
+      "nodes": [
+        "test_block_06_i5_artifact.py::test_digest_mismatch_refused",
+        "test_block_06_i5_provenance.py::test_tamper_detected_end_to_end"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "F23",
+      "nodes": [
+        "test_block_06_i5_contract.py::test_inventory_equals_collection",
+        "test_block_06_i5_contract.py::test_contract_frozen_before_results",
+        "test_block_06_i5_contract.py::test_scope_binds_construction_sequence",
+        "test_block_06_i5_contract.py::test_locks_and_cost",
+        "test_block_06_i5_contract.py::test_service_symbols_declared",
+        "test_block_06_i5_knowledge.py::test_knowledge_registry_canonical",
+        "test_block_06_i5_knowledge.py::test_fact_requires_source_digest",
+        "test_block_06_i5_knowledge.py::test_knowledge_separate_from_memory",
+        "test_block_06_i5_knowledge.py::test_retrieval_deterministic",
+        "test_block_06_i5_artifact.py::test_missing_artifact_refused",
+        "test_block_06_i5_artifact.py::test_stale_version_refused",
+        "test_block_06_i5_artifact.py::test_unknown_storage_class_refused",
+        "test_block_06_i5_evaluation.py::test_comparison_version_bound",
+        "test_block_06_i5_provenance.py::test_provenance_missing_refused"
+      ],
+      "proof_state": "BOUND"
+    },
+    {
+      "id": "T19",
+      "nodes": [
+        "test_block_06_i5_contract.py::test_no_later_stage_dependency"
+      ],
+      "proof_state": "BOUND"
+    }
+  ],
+  "policy": {
+    "fail_closed": true,
+    "no_client_authority": true,
+    "no_inferred_success": true
+  },
+  "schema": "oce.block_06_i5.proofs.v1",
+  "stage": "B6-I5",
+  "status": "FROZEN",
+  "tests_present": false,
+  "threats": [
+    {
+      "bound": true,
+      "id": "T05"
+    },
+    {
+      "bound": true,
+      "id": "T06"
+    },
+    {
+      "bound": true,
+      "id": "T07"
+    },
+    {
+      "bound": true,
+      "id": "T08"
+    },
+    {
+      "bound": true,
+      "id": "T19"
+    }
+  ]
+}

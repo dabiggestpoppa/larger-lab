@@ -1,0 +1,243 @@
+{
+  "adjacent_floors": {
+    "b5_i9_nodes": 41,
+    "b6_i0_nodes": 72,
+    "b6_i1_nodes": 42,
+    "b6_i2_nodes": 30,
+    "b6_i3_nodes": 28,
+    "b6_i4_nodes": 46,
+    "common_regression_nodes": 208
+  },
+  "artifact_rules": {
+    "digest_bound": true,
+    "duplicate_refused": true,
+    "immutable_after_registration": true,
+    "manifest_fields": [
+      "artifact_id",
+      "version",
+      "digest",
+      "size",
+      "storage_class",
+      "retention",
+      "scope"
+    ],
+    "retention_classes": [
+      "EPHEMERAL",
+      "STAGE",
+      "RETAINED"
+    ],
+    "retrieval_authorization": "scope membership of the requesting actor",
+    "stale_refused": true,
+    "storage_classes": [
+      "LOCAL",
+      "IMMUTABLE"
+    ]
+  },
+  "base_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+  "base_tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b",
+  "clock": "explicit integer time supplied by the caller; no wall clock read",
+  "compatibility": {
+    "consumer_evidence": "none",
+    "rows": [
+      "C3.S3",
+      "C3.S4",
+      "C3.S5"
+    ],
+    "silent_latest": false,
+    "state": "KNOWLEDGE_ARTIFACT_EVALUATION_ONLY",
+    "unknown_refused": true
+  },
+  "determinism": "canonical JSON with sorted keys and no timestamps, host or random ids",
+  "document_id": "OCE-B6-I5-CONTRACT-001",
+  "evaluation_rules": {
+    "comparison_same_evaluator_version": true,
+    "evaluator_digest_bound": true,
+    "gate_requires_independent_approver": true,
+    "promotion_requires_gate_pass": true,
+    "registered_evaluator_only": true,
+    "result_immutable": true,
+    "self_approval_refused": true
+  },
+  "frozen_before_results": true,
+  "i4_merge_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+  "i4_ratification_sha": "60879f0d0761bc498221b649c43e4ad56226fe5e",
+  "implementation_floor": {
+    "mutations": 3,
+    "source_mutation_floor": 3,
+    "test_nodes": 34
+  },
+  "implementation_state": "NOT_STARTED_P0",
+  "knowledge_rules": {
+    "digest_required": true,
+    "duplicate_refused": true,
+    "promotion_required": true,
+    "retrieval_order": "canonical by fact_id",
+    "scope_dimensions": [
+      "tenant",
+      "project",
+      "scope"
+    ],
+    "separate_from_agent_memory": true,
+    "source_required": true
+  },
+  "locks": {
+    "B6-I6_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "IMPLEMENTATION_AUTHORIZED": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "network": "none",
+  "paired_comparison": {
+    "base_only_expected": 0,
+    "base_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+    "base_tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b",
+    "common_floor": 208,
+    "head_only_expected": 34,
+    "head_sha": null,
+    "head_state": "UNBOUND_PENDING_IMPLEMENTATION",
+    "head_tree": null
+  },
+  "provenance_rules": {
+    "chain": [
+      "fact",
+      "artifact",
+      "evaluation",
+      "decision"
+    ],
+    "digest_links_required": true,
+    "missing_link_refused": true,
+    "substitution_refused": true
+  },
+  "refusals": [
+    {
+      "code": "REFUSED_UNPROMOTED_FACT",
+      "failure_class": "F03",
+      "meaning": "fact is retrievable without an accepted promotion decision"
+    },
+    {
+      "code": "REFUSED_CROSS_SCOPE",
+      "failure_class": "F03",
+      "meaning": "retrieval crosses a tenant, project or scope boundary"
+    },
+    {
+      "code": "REFUSED_DUPLICATE_FACT",
+      "failure_class": "F08",
+      "meaning": "two governed facts claim one fact id"
+    },
+    {
+      "code": "REFUSED_MISSING_SOURCE",
+      "failure_class": "F23",
+      "meaning": "fact carries no source reference or digest"
+    },
+    {
+      "code": "REFUSED_MEMORY_IMPORT",
+      "failure_class": "F23",
+      "meaning": "knowledge service reads or mutates agent memory"
+    },
+    {
+      "code": "REFUSED_DUPLICATE_ARTIFACT",
+      "failure_class": "F08",
+      "meaning": "two artifacts claim one artifact id and version"
+    },
+    {
+      "code": "REFUSED_IMMUTABLE_ARTIFACT",
+      "failure_class": "F11",
+      "meaning": "a registered artifact is re-registered with different bytes"
+    },
+    {
+      "code": "REFUSED_DIGEST_MISMATCH",
+      "failure_class": "F12",
+      "meaning": "served artifact bytes differ from the manifest digest"
+    },
+    {
+      "code": "REFUSED_MANIFEST_MISMATCH",
+      "failure_class": "F11",
+      "meaning": "manifest hash or size row differs from the artifact"
+    },
+    {
+      "code": "REFUSED_MISSING_ARTIFACT",
+      "failure_class": "F23",
+      "meaning": "retrieval names an artifact that was never registered"
+    },
+    {
+      "code": "REFUSED_STALE_VERSION",
+      "failure_class": "F23",
+      "meaning": "retrieval names a version that is not the registered one"
+    },
+    {
+      "code": "REFUSED_UNAUTHORIZED_RETRIEVAL",
+      "failure_class": "F03",
+      "meaning": "actor outside the artifact scope requests retrieval"
+    },
+    {
+      "code": "REFUSED_UNKNOWN_STORAGE_CLASS",
+      "failure_class": "F23",
+      "meaning": "storage or retention class outside the frozen vocabulary"
+    },
+    {
+      "code": "REFUSED_UNREGISTERED_EVALUATOR",
+      "failure_class": "F03",
+      "meaning": "an evaluator not in the registry is executed"
+    },
+    {
+      "code": "REFUSED_EVALUATOR_CHANGED",
+      "failure_class": "F03",
+      "meaning": "evaluator definition digest differs from the registered digest"
+    },
+    {
+      "code": "REFUSED_RESULT_OVERWRITE",
+      "failure_class": "F11",
+      "meaning": "a recorded evaluation result is replaced in place"
+    },
+    {
+      "code": "REFUSED_COMPARISON_VERSION",
+      "failure_class": "F23",
+      "meaning": "comparison mixes results from different evaluator versions"
+    },
+    {
+      "code": "REFUSED_SELF_APPROVAL",
+      "failure_class": "F03",
+      "meaning": "the builder approves its own result"
+    },
+    {
+      "code": "REFUSED_GATE_INCOMPLETE",
+      "failure_class": "F03",
+      "meaning": "promotion is decided without a gate result or independent approver"
+    },
+    {
+      "code": "REFUSED_BROKEN_PROVENANCE",
+      "failure_class": "F11",
+      "meaning": "a provenance link or digest in the chain does not reconcile"
+    },
+    {
+      "code": "REFUSED_TAMPER",
+      "failure_class": "F12",
+      "meaning": "end-to-end tamper or substitution detected in the chain"
+    }
+  ],
+  "schema": "oce.block_06_i5.contract.v1",
+  "stage": "B6-I5",
+  "status": "FROZEN",
+  "test_inventory": {
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i5_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_knowledge.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_artifact.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_evaluation.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_provenance.py"
+    ],
+    "node_total": 34,
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  },
+  "tests_present": false
+}

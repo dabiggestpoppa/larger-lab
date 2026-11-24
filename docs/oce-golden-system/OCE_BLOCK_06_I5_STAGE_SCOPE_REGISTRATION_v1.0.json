@@ -1,0 +1,81 @@
+{
+  "document_id": "OCE-B6-I5-STAGE-SCOPE-REGISTRATION-001",
+  "frozen_before_results": true,
+  "locks": {
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "prior_stages": {
+    "B6-I0": {
+      "base": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+      "head": "c5d7bfcc5ea99837985ba82a3c91fd1e76d85a81"
+    },
+    "B6-I1": {
+      "base": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+      "head": "96e3b81714321f4eea7abcb300ef471e93be0962"
+    },
+    "B6-I2": {
+      "base": "4496d548078660efd7ad4f93e7fff461d34ea538",
+      "head": "9bf76df45dca676ae7cafc4877f117a7dd64c3d2"
+    },
+    "B6-I3": {
+      "base": "018b164f249bbf075334d5d03ad37e80dcbbede0",
+      "head": "eda33f43e6d058891a8009e98e968c9f00252220"
+    },
+    "B6-I4": {
+      "base": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+      "head": "60879f0d0761bc498221b649c43e4ad56226fe5e"
+    }
+  },
+  "refusals": [
+    "stage/identity_missing",
+    "stage/identity_unknown",
+    "stage/identity_spoofed",
+    "stage/identity_tampered",
+    "stage/base_moved",
+    "stage/later_stage_absent",
+    "stage/branch_spoof",
+    "stage/operator_surface_absent"
+  ],
+  "registers": "B6-I5",
+  "schema": "oce.block_06.stage_scope_registration.v1",
+  "stage": "B6-I5",
+  "status": "FROZEN",
+  "this_stage": {
+    "allowed_prefixes": [
+      "oce/services/",
+      "docs/oce-golden-system/OCE_BLOCK_06_I5_",
+      "infrastructure/control-plane/scripts/block_06_i5_",
+      "infrastructure/control-plane/tests/test_block_06_i5_",
+      "infrastructure/control-plane/tests/stage_scope/test_block_06_i5_",
+      "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+      "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i2_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i3_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i4_validate.py",
+      ".github/workflows/block-06-i5-validation.yml",
+      ".github/workflows/block-06-i5-paired-comparison.yml",
+      ".github/workflows/block-06-i4-validation.yml"
+    ],
+    "base": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+    "base_tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b",
+    "contract": "docs/oce-golden-system/OCE_BLOCK_06_I5_IMPLEMENTATION_CONTRACT_v1.0.json",
+    "id": "B6-I5",
+    "production_surfaces": [
+      "oce/services/"
+    ],
+    "scope": "docs/oce-golden-system/OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json",
+    "sections": [
+      "C3.S3",
+      "C3.S4",
+      "C3.S5"
+    ]
+  }
+}
