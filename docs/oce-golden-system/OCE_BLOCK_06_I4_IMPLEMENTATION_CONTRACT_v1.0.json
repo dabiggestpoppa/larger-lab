@@ -1,0 +1,255 @@
+{
+  "adjacent_floors": {
+    "b5_i9_nodes": 41,
+    "b6_i0_nodes": 72,
+    "b6_i1_nodes": 42,
+    "b6_i2_nodes": 30,
+    "b6_i3_nodes": 28,
+    "common_regression_nodes": 208
+  },
+  "amendment": {
+    "id": "001",
+    "nodes": 41,
+    "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_AMENDMENT_001_v1.0.json",
+    "prior_nodes": 34
+  },
+  "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+  "base_tree": "5e15ea448b929269193dc904ec0677687df077e4",
+  "clock": "explicit integer time supplied by the caller; no wall clock read",
+  "compatibility": {
+    "consumer_evidence": "none",
+    "rows": [
+      "C2.S4",
+      "C2.S5",
+      "C3.S1",
+      "C3.S2"
+    ],
+    "silent_latest": false,
+    "state": "INCIDENT_COST_IDENTITY_WORKFLOW_ONLY",
+    "unknown_refused": true
+  },
+  "cost_rules": {
+    "alert": "projected >= ceiling with actual < ceiling reports ALERT; actual >= ceiling reports BREACHED",
+    "attribution": [
+      "app",
+      "task"
+    ],
+    "categories": [
+      "provider",
+      "model",
+      "worker",
+      "storage",
+      "ci"
+    ],
+    "estimate_actual": "separate",
+    "integer_only": true
+  },
+  "determinism": "canonical JSON with sorted keys and no timestamps, host or random ids",
+  "document_id": "OCE-B6-I4-CONTRACT-001",
+  "frozen_before_results": true,
+  "i3_ratification_sha": "eda33f43e6d058891a8009e98e968c9f00252220",
+  "identity_rules": {
+    "app_scoped": true,
+    "duplicate_refused": true,
+    "kinds": [
+      "actor",
+      "service",
+      "app"
+    ],
+    "nested_secret_refused": true,
+    "raw_secret_refused": true,
+    "revoked_refused": true
+  },
+  "implementation_floor": {
+    "mutations": 6,
+    "source_mutation_floor": 4,
+    "test_nodes": 46
+  },
+  "incident_rules": {
+    "drill_latency": "legible only when visible_at - detected_at <= limit",
+    "recovered_unresolved_requires_containment": true,
+    "recoveries": [
+      "ACTIVE",
+      "CONTAINED",
+      "RECOVERED"
+    ],
+    "severities": [
+      "SEV1",
+      "SEV2",
+      "SEV3",
+      "SEV4"
+    ],
+    "timeline": "non-decreasing integer timestamps"
+  },
+  "locks": {
+    "B6-I5_through_I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "network": "none",
+  "paired_comparison": {
+    "base_only_expected": 0,
+    "base_sha": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+    "common_floor": 208,
+    "head_only_expected": 46,
+    "head_sha": "1ad1a970206106702b2090c1fb082db08fbfc892",
+    "head_tree": "431bfbe3798eccac67f7291afd421e1d52d34be8"
+  },
+  "refusals": [
+    {
+      "code": "REFUSED_UNKNOWN_SUBJECT",
+      "failure_class": "T02",
+      "meaning": "viewer subject missing"
+    },
+    {
+      "code": "REFUSED_INVALID_RECORD",
+      "failure_class": "F23",
+      "meaning": "record field missing or malformed"
+    },
+    {
+      "code": "REFUSED_INVALID_SEVERITY",
+      "failure_class": "F23",
+      "meaning": "severity outside the vocabulary"
+    },
+    {
+      "code": "REFUSED_BROKEN_TIMELINE",
+      "failure_class": "F11",
+      "meaning": "timeline not monotonic"
+    },
+    {
+      "code": "REFUSED_UNRESOLVED_RISK",
+      "failure_class": "F23",
+      "meaning": "recovered with unresolved risk and no containment"
+    },
+    {
+      "code": "REFUSED_INVALID_COST",
+      "failure_class": "F11",
+      "meaning": "negative cost or capacity"
+    },
+    {
+      "code": "REFUSED_UNKNOWN_CATEGORY",
+      "failure_class": "F23",
+      "meaning": "cost category outside the vocabulary"
+    },
+    {
+      "code": "REFUSED_RAW_SECRET",
+      "failure_class": "F11",
+      "meaning": "raw secret material in credential metadata"
+    },
+    {
+      "code": "REFUSED_DUPLICATE_IDENTITY",
+      "failure_class": "F23",
+      "meaning": "duplicate identity id"
+    },
+    {
+      "code": "REFUSED_UNKNOWN_IDENTITY",
+      "failure_class": "T02",
+      "meaning": "identity absent from the registry"
+    },
+    {
+      "code": "REFUSED_CROSS_APP",
+      "failure_class": "T10",
+      "meaning": "identity resolved across an application boundary"
+    },
+    {
+      "code": "REFUSED_REVOKED",
+      "failure_class": "F03",
+      "meaning": "revoked credential reference"
+    },
+    {
+      "code": "REFUSED_INVALID_WORKFLOW",
+      "failure_class": "F23",
+      "meaning": "invalid state machine"
+    },
+    {
+      "code": "REFUSED_ILLEGAL_TRANSITION",
+      "failure_class": "F03",
+      "meaning": "transition not defined for the current state"
+    },
+    {
+      "code": "REFUSED_LEASE_HELD",
+      "failure_class": "F03",
+      "meaning": "live lease owned by another actor"
+    },
+    {
+      "code": "REFUSED_LEASE_OWNER",
+      "failure_class": "F03",
+      "meaning": "advance without the lease"
+    },
+    {
+      "code": "REFUSED_CANCELLED",
+      "failure_class": "F03",
+      "meaning": "operation on a cancelled run"
+    },
+    {
+      "code": "REFUSED_RETRY_EXCEEDED",
+      "failure_class": "F03",
+      "meaning": "retry beyond the frozen bound"
+    },
+    {
+      "code": "REFUSED_BROKEN_TRACE",
+      "failure_class": "F11",
+      "meaning": "trace link or digest mismatch"
+    },
+    {
+      "code": "REFUSED_UNOWNED_INCIDENT",
+      "failure_class": "F11",
+      "meaning": "trace identity is not an authorized incident owner"
+    },
+    {
+      "code": "REFUSED_DUPLICATE_INCIDENT",
+      "failure_class": "F23",
+      "meaning": "duplicate incident id"
+    },
+    {
+      "code": "REFUSED_WORKFLOW_MISMATCH",
+      "failure_class": "F03",
+      "meaning": "run definition id or version differs from the supplied definition"
+    }
+  ],
+  "schema": "oce.block_06_i4.contract.v1",
+  "stage": "B6-I4",
+  "status": "FROZEN",
+  "supplement": {
+    "id": "S1",
+    "nodes": 46,
+    "path": "docs/oce-golden-system/OCE_BLOCK_06_I4_AMENDMENT_001_S1_v1.0.json",
+    "prior_nodes": 41
+  },
+  "test_inventory": {
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i4_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_incident.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_cost.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_identity.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_workflow.py",
+      "infrastructure/control-plane/tests/test_block_06_i4_trace.py"
+    ],
+    "node_total": 46,
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  },
+  "trace_rules": {
+    "duplicate_incident_refused": true,
+    "incident_owner_binding": true
+  },
+  "workflow_rules": {
+    "cancel_terminal": true,
+    "definition_version_bound": true,
+    "illegal_transition_refused": true,
+    "lease_single_owner": true,
+    "malformed_definition_refused": true,
+    "replay_idempotent": true,
+    "retry_bounded": true,
+    "versioned": true
+  }
+}
