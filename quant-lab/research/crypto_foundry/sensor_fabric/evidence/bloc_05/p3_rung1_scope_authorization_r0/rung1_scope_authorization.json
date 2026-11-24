@@ -1,0 +1,120 @@
+{
+  "schema": "P3_RUNG1_SCOPE_AUTHORIZATION/v1",
+  "checkpoint": "SENSOR-B5-P3-RUNG1-SCOPE-AUTHORIZATION-R0",
+  "role": "Agent 1 - Production Implementation / Governance Preparation",
+  "disposition": "RUNG1_AWAITING_SCOPE_AUTHORIZATION",
+  "base": {
+    "production_design_r0": "295acb5245ecc47d6f5c0a07f8ff631aa7217c15",
+    "branch": "agent/crypto-sensor-fabric-p3-consumer-rung1-r1",
+    "consolidated_candidate": "6de26be9130eb99e0a9b53b340fc5bfaafa4a684",
+    "canonical_evidence": "5c38d0d6396e7cd9b70d5970272475fa975e16e7",
+    "excluded_workstream_oce_b6_i4": "60879f0d0761bc498221b649c43e4ad56226fe5e"
+  },
+  "phase_0_state": {
+    "rung1_implementation_exists": false,
+    "evidence": "git log --all -- '*normalization/consumer/*' returns 0 commits; no ref contains normalization/consumer/",
+    "baseline_governance": {"suites": 5, "result": "75 passed"},
+    "tracked_python": 1102,
+    "i11r2_pin": 1102,
+    "approach_manifest_empty": true,
+    "integration_state": "INTEGRATION_REQUIRED",
+    "coexisting_workstream": {
+      "branch": "agent/crypto-sensor-fabric-p3-consumer-security-r1",
+      "sha": "16b4a0b2ebbd8f1faaacf39101e17131add521a6",
+      "relation": "direct child of base (merge-base = 295acb52, 1 commit ahead)",
+      "adds": ["quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py"],
+      "lines": 777,
+      "state": "RED / PENDING (imports a consumer package that does not exist)",
+      "merged_here": false
+    }
+  },
+  "blocking_laws": [
+    {
+      "audit": "test_b5_i05_scope_audit.py::test_only_the_authorized_paths_were_added_since_the_i05_base",
+      "mechanism": "allowed_prefixes tuple, path.startswith, asserted over staged + unstaged + untracked",
+      "entries": 18,
+      "rejects": ["src/crypto_sensor_fabric/normalization/consumer/models.py", "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py", "src/crypto_sensor_fabric/normalization/consumer/__init__.py"]
+    },
+    {
+      "audit": "test_b5_i10_scope_audit.py::test_only_the_i10_authorized_prefixes_carry_tracked_changes",
+      "mechanism": "allowed tuple, path.startswith, same three sets",
+      "entries": 25,
+      "rejects": ["src/crypto_sensor_fabric/normalization/consumer/models.py", "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py", "src/crypto_sensor_fabric/normalization/consumer/__init__.py"]
+    },
+    {
+      "audit": "test_i11r2_binding_audit.py:477 and test_b5_i05_scope_audit.py:423",
+      "mechanism": "payload['python_files_scanned'] == tracked python count",
+      "effect": "any new .py breaks the committed 1102 pin until republished"
+    }
+  ],
+  "non_blocking_laws": [
+    {
+      "audit": "test_b5_i09_scope_audit.py::test_sem_a04_sealed_trees_are_untouched_relative_to_the_i09_base",
+      "sealed": ["normalization/identity", "normalization/terms", "normalization/time", "normalization/__init__.py", "normalization/models.py", "normalization/enums.py", "registry", "config/crypto_sensor_fabric"],
+      "reason_not_blocking": "normalization/consumer is outside the sealed list"
+    }
+  ],
+  "requested_authorization": {
+    "decision": "D-1 authorize creation of a production model file",
+    "entries_to_add": [
+      "src/crypto_sensor_fabric/normalization/consumer/models.py",
+      "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py"
+    ],
+    "files_amended": [
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py"
+    ],
+    "mechanical_republish": {"env": "UPDATE_I11R2_EVIDENCE=1", "artifact": "evidence/bloc_04/BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json", "line_changed": "python_files_scanned: 1102 -> 1104"},
+    "granularity": "exact files, not a directory prefix",
+    "not_a_prefix_widening": true,
+    "precedent": ["SENSOR-B5-I09P2A", "SENSOR-B5-I09P2B", "SENSOR-B5-I09P2C", "SENSOR-B5-I09P2D", "SENSOR-B5-I09P2E", "B5-I11E1", "B5-I11R1", "B5-I11F1"]
+  },
+  "decisions_separated": {
+    "D-1_model_file": "REQUESTED",
+    "D-2_verification_logic": "NOT REQUESTED (Rung 2)",
+    "D-3_custody_authority": "NOT REQUESTED (Rung 3)",
+    "D-4_provider_trust": "NOT REQUESTED (governance / custody act)"
+  },
+  "path_matrix": [
+    {"path": "src/crypto_sensor_fabric/normalization/consumer/models.py", "rung": 1, "status": "REQUIRED", "authorization": "exact entry"},
+    {"path": "src/crypto_sensor_fabric/normalization/consumer/__init__.py", "rung": 1, "status": "CONDITIONAL - not requested", "authorization": "exact entry only if import safety fails"},
+    {"path": "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py", "rung": 1, "status": "REQUIRED", "authorization": "exact entry"},
+    {"path": "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py", "rung": 5, "status": "FUTURE - claimed by 16b4a0b2", "authorization": "exact entry at Rung 5"},
+    {"path": "src/crypto_sensor_fabric/normalization/consumer/policy.py", "rung": 2, "status": "FUTURE SCOPE ONLY", "authorization": "own exact entry at Rung 2"},
+    {"path": "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py", "rung": 3, "status": "FUTURE SCOPE ONLY", "authorization": "own exact entry at Rung 3"},
+    {"path": "src/crypto_sensor_fabric/normalization/consumer/rebinding.py", "rung": 4, "status": "OPTIONAL - design keeps rebinding private in policy.py", "authorization": "only if it outlives a private function"}
+  ],
+  "inventory_impact": {
+    "before": 1102,
+    "rung1_without_init": 1104,
+    "rung1_with_init": 1105,
+    "runtime_full_universe_rerun": false,
+    "collection_digest_inherited": false
+  },
+  "rung1_acceptance_targets": {
+    "A1.1": "no verdict/authority/callback field on ConsumerRequest",
+    "A1.2": "ConsumerDecision has exactly three members",
+    "A1.3": "CustodyAuthorityBasis has exactly three members, no SYNTHETIC_TEST_ONLY",
+    "A1.4": "frozen, extra-forbid, naive/bare-date refusal, stable serialisation",
+    "A1.5": "consumer.models does not import sensors/verification.py at runtime"
+  },
+  "not_done": [
+    "no src/ file created",
+    "no test file created",
+    "no audit amended",
+    "no manifest or INTEGRATION_STATE change",
+    "no OCE file or history touched",
+    "no branch merged",
+    "no full-universe regression"
+  ],
+  "hard_stop": {
+    "production_merge": false,
+    "authority_activation": false,
+    "provider_certification": false,
+    "custody_authorization": false,
+    "trust_promotion": false,
+    "gate_advancement": false,
+    "self_ratification": false,
+    "closes_independent_r6_security_audit": false
+  }
+}
