@@ -1,0 +1,171 @@
+"""Detector calibration for the F4/F5 closure probe.  Throwaway copies only.
+
+An unrepaired candidate cannot be mutated to REMOVE a control it does not have,
+so the cycle is run in the other direction and completed in both:
+
+  BASELINE   the published tree as-is            -> the F4/F5 probes must FAIL
+  CAL_A      a copy with whole-selection ordering -> the F4 probes must PASS
+  CAL_B      a copy with the typed detail withheld -> the F5 probes must PASS
+  CAL_AB     both controls                        -> the whole probe must PASS
+
+  M1_CHOSEN_ONLY_CUTOFF   = BASELINE revisited: removing CAL_A's ordering
+                            reproduces f4_05's failure  -> DETECTED
+  M2_RAW_TYPED_DETAIL     = BASELINE revisited: restoring the raw detail
+                            reproduces f5_01's failure  -> DETECTED
+  M3_UNRESOLVED_GUARD     = no such guard exists, proven by AST -> NOT_APPLICABLE
+
+Nothing is written to the audited tree.  The injected text is a calibration
+fixture used only to prove the probe is sensitive to these two controls and
+does not refuse everything; it is not a proposed patch.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+CAND = Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+PROBE = Path(os.environ["AUDIT_PROBE"]).resolve()
+PRIOR = Path(os.environ["AUDIT_PRIOR_FIXTURES"]).resolve()
+SRC = CAND / "src"
+POLICY = Path("crypto_sensor_fabric/normalization/consumer/policy.py")
+
+F4_ANCHOR = "        chosen = selected[record_revision]\n"
+F4_CONTROL = (
+    "        # calibration control: order EVERY selected entry against the cutoff\n"
+    "        for _cal_item in revision.selected:\n"
+    "            if _cal_item.source_revision_id in excluded:\n"
+    "                return (\n"
+    "                    ConsumerRefusalReason.REPLAY_BLOCKED,\n"
+    '                    "calibration control: the selection both selects and "\n'
+    '                    "excludes the same revision",\n'
+    "                )\n"
+    "            try:\n"
+    "                _cal_later = _cal_item.known_from > cutoff\n"
+    "            except Exception:  # noqa: BLE001\n"
+    "                _cal_later = True\n"
+    "            if _cal_later:\n"
+    "                return (\n"
+    "                    ConsumerRefusalReason.PIT_INADMISSIBLE,\n"
+    '                    "the replay selection was computed for a LATER cutoff: "\n'
+    "                    f\"{_cal_item.source_revision_id!r} became known after \"\n"
+    '                    "this request\'s knowledge cutoff",\n'
+    "                )\n"
+)
+
+F5_ANCHOR = 'f"{exc.refusal.value}: {exc.detail}"'
+F5_CONTROL = 'f"{exc.refusal.value}"'
+
+CASES = [
+    {"id": "BASELINE", "f4": False, "f5": False},
+    {"id": "CAL_A_F4_SELECTION_ORDERING", "f4": True, "f5": False},
+    {"id": "CAL_B_F5_TYPED_DETAIL_WITHHELD", "f4": False, "f5": True},
+    {"id": "CAL_AB_BOTH_CONTROLS", "f4": True, "f5": True},
+]
+
+
+def apply_controls(text: str, *, f4: bool, f5: bool) -> tuple[str, list[str]]:
+    notes: list[str] = []
+    if f4:
+        count = text.count(F4_ANCHOR)
+        if count != 1:
+            notes.append(f"F4 anchor matched {count} times, expected 1")
+            return text, notes
+        text = text.replace(F4_ANCHOR, F4_CONTROL + F4_ANCHOR, 1)
+        notes.append("F4 control injected before the chosen-revision ordering")
+    if f5:
+        count = text.count(F5_ANCHOR)
+        if count != 2:
+            notes.append(f"F5 anchor matched {count} times, expected 2")
+            return text, notes
+        text = text.replace(F5_ANCHOR, F5_CONTROL)
+        notes.append("typed refusal detail withheld on both format strings")
+    return text, notes
+
+
+def main() -> int:
+    results: list[dict[str, object]] = []
+    for case in CASES:
+        with tempfile.TemporaryDirectory(prefix="f45cal_") as tmp:
+            root = Path(tmp)
+            target_src = root / "src"
+            shutil.copytree(SRC, target_src)
+            target = target_src / POLICY
+            text = target.read_text(encoding="utf-8")
+            mutated, notes = apply_controls(
+                text, f4=bool(case["f4"]), f5=bool(case["f5"])
+            )
+            if mutated == text and (case["f4"] or case["f5"]):
+                results.append(
+                    {"id": case["id"], "status": "INVALID", "notes": notes}
+                )
+                continue
+            target.write_text(mutated, encoding="utf-8")
+
+            env = dict(os.environ)
+            env["PYTHONPATH"] = str(target_src)
+            env["AUDIT_QUANT_LAB"] = str(CAND)
+            env["AUDIT_PRIOR_FIXTURES"] = str(PRIOR)
+
+            imported = subprocess.run(
+                [
+                    sys.executable,
+                    "-c",
+                    "from crypto_sensor_fabric.normalization.consumer import policy;"
+                    "print(policy.__file__)",
+                ],
+                cwd=str(root),
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            imported_path = (imported.stdout or "").strip()
+            under_copy = imported_path and Path(imported_path).is_relative_to(target_src)
+
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pytest",
+                    str(PROBE),
+                    "-q",
+                    "-p",
+                    "no:cacheprovider",
+                ],
+                cwd=str(root),
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            out = proc.stdout or ""
+            failed = sorted(
+                {
+                    line.split("::")[1].split(" ")[0]
+                    for line in out.splitlines()
+                    if line.startswith("FAILED ")
+                }
+            )
+            summary = [ln for ln in out.splitlines() if " passed" in ln or " failed" in ln]
+            results.append(
+                {
+                    "id": case["id"],
+                    "controls": {k: case[k] for k in ("f4", "f5")},
+                    "injected": notes,
+                    "import_path": imported_path,
+                    "imported_from_copy": bool(under_copy),
+                    "pytest_exit": proc.returncode,
+                    "summary": summary[-1] if summary else "",
+                    "failed": failed,
+                }
+            )
+    print(json.dumps({"calibration": results}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

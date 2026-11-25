@@ -1,0 +1,84 @@
+{
+  "calibration": [
+    {
+      "id": "BASELINE",
+      "controls": {
+        "f4": false,
+        "f5": false
+      },
+      "injected": [],
+      "import_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\f45cal_155olzww\\src\\crypto_sensor_fabric\\normalization\\consumer\\policy.py",
+      "imported_from_copy": true,
+      "pytest_exit": 1,
+      "summary": "9 failed, 23 passed, 12 warnings in 1.59s",
+      "failed": [
+        "test_f4_05_counterexample_future_revision_selected_last",
+        "test_f4_06_future_revision_selected_first",
+        "test_f4_07_duplicate_identifier_hiding_a_future_entry",
+        "test_f4_08_contradictory_duplicate_never_certifies[future_first]",
+        "test_f4_09_selected_and_excluded_contradiction_never_certifies",
+        "test_f4_11_order_alone_may_not_decide_the_outcome",
+        "test_f5_01_typed_refusal_detail_is_withheld",
+        "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+        "test_f5_03_pit_typed_refusal_detail_is_withheld"
+      ]
+    },
+    {
+      "id": "CAL_A_F4_SELECTION_ORDERING",
+      "controls": {
+        "f4": true,
+        "f5": false
+      },
+      "injected": [
+        "F4 control injected before the chosen-revision ordering"
+      ],
+      "import_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\f45cal_ffr8j1hi\\src\\crypto_sensor_fabric\\normalization\\consumer\\policy.py",
+      "imported_from_copy": true,
+      "pytest_exit": 1,
+      "summary": "3 failed, 29 passed, 10 warnings in 1.40s",
+      "failed": [
+        "test_f5_01_typed_refusal_detail_is_withheld",
+        "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+        "test_f5_03_pit_typed_refusal_detail_is_withheld"
+      ]
+    },
+    {
+      "id": "CAL_B_F5_TYPED_DETAIL_WITHHELD",
+      "controls": {
+        "f4": false,
+        "f5": true
+      },
+      "injected": [
+        "typed refusal detail withheld on both format strings"
+      ],
+      "import_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\f45cal_f4ktpgdg\\src\\crypto_sensor_fabric\\normalization\\consumer\\policy.py",
+      "imported_from_copy": true,
+      "pytest_exit": 1,
+      "summary": "6 failed, 26 passed, 11 warnings in 1.60s",
+      "failed": [
+        "test_f4_05_counterexample_future_revision_selected_last",
+        "test_f4_06_future_revision_selected_first",
+        "test_f4_07_duplicate_identifier_hiding_a_future_entry",
+        "test_f4_08_contradictory_duplicate_never_certifies[future_first]",
+        "test_f4_09_selected_and_excluded_contradiction_never_certifies",
+        "test_f4_11_order_alone_may_not_decide_the_outcome"
+      ]
+    },
+    {
+      "id": "CAL_AB_BOTH_CONTROLS",
+      "controls": {
+        "f4": true,
+        "f5": true
+      },
+      "injected": [
+        "F4 control injected before the chosen-revision ordering",
+        "typed refusal detail withheld on both format strings"
+      ],
+      "import_path": "C:\\Users\\wifik\\AppData\\Local\\Temp\\f45cal_diq7iz7d\\src\\crypto_sensor_fabric\\normalization\\consumer\\policy.py",
+      "imported_from_copy": true,
+      "pytest_exit": 0,
+      "summary": "32 passed, 9 warnings in 1.38s",
+      "failed": []
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "candidate": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "probe": "test_f4f5_closure.py",
+  "tally": {
+    "passed": 23,
+    "failed": 9,
+    "errored": 0,
+    "skipped": 0,
+    "total": 32
+  },
+  "failed": [
+    "test_f4_05_counterexample_future_revision_selected_last",
+    "test_f4_06_future_revision_selected_first",
+    "test_f4_07_duplicate_identifier_hiding_a_future_entry",
+    "test_f4_08_contradictory_duplicate_never_certifies[future_first]",
+    "test_f4_09_selected_and_excluded_contradiction_never_certifies",
+    "test_f4_11_order_alone_may_not_decide_the_outcome",
+    "test_f5_01_typed_refusal_detail_is_withheld",
+    "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+    "test_f5_03_pit_typed_refusal_detail_is_withheld"
+  ],
+  "cases": [
+    {
+      "test": "test_f4_00_control_chosen_revision_alone_still_accepts",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.02,
+      "message": null
+    },
+    {
+      "test": "test_f4_01_control_every_selected_revision_known_by_cutoff",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.019,
+      "message": null
+    },
+    {
+      "test": "test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.018,
+      "message": null
+    },
+    {
+      "test": "test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_f4_05_counterexample_future_revision_selected_last",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.017,
+      "message": "Failed: accepted a selection holding a revision that became known after the cutoff: {\"decision\": \"ConsumerDecision.ACCEPT_FIELD_BINDING\", \"trust_scope\": \"ECONOMIC_FIELD_BINDING\", \"verified_field_allowlist\": \"('aggressor_side',)\", \"unverified_dimensions\": \"('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')\", \"pit_status\""
+    },
+    {
+      "test": "test_f4_06_future_revision_selected_first",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.021,
+      "message": "Failed: accepted a selection holding a revision that became known after the cutoff when it is ordered first: {\"decision\": \"ConsumerDecision.ACCEPT_FIELD_BINDING\", \"trust_scope\": \"ECONOMIC_FIELD_BINDING\", \"verified_field_allowlist\": \"('aggressor_side',)\", \"unverified_dimensions\": \"('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_A"
+    },
+    {
+      "test": "test_f4_07_duplicate_identifier_hiding_a_future_entry",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.019,
+      "message": "Failed: a duplicate identifier hid a future entry and the request was accepted: {\"decision\": \"ConsumerDecision.ACCEPT_FIELD_BINDING\", \"trust_scope\": \"ECONOMIC_FIELD_BINDING\", \"verified_field_allowlist\": \"('aggressor_side',)\", \"unverified_dimensions\": \"('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')\", \"pit_status\": \"A"
+    },
+    {
+      "test": "test_f4_08_contradictory_duplicate_never_certifies[future_last]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.01,
+      "message": null
+    },
+    {
+      "test": "test_f4_08_contradictory_duplicate_never_certifies[future_first]",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.02,
+      "message": "Failed: a contradictory duplicate selection (future_first) was accepted: {\"decision\": \"ConsumerDecision.ACCEPT_FIELD_BINDING\", \"trust_scope\": \"ECONOMIC_FIELD_BINDING\", \"verified_field_allowlist\": \"('aggressor_side',)\", \"unverified_dimensions\": \"('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')\", \"pit_status\": \"ADMISSIB"
+    },
+    {
+      "test": "test_f4_09_selected_and_excluded_contradiction_never_certifies",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.02,
+      "message": "Failed: a selection that both selects and excludes the evaluated revision was accepted: {\"decision\": \"ConsumerDecision.ACCEPT_FIELD_BINDING\", \"trust_scope\": \"ECONOMIC_FIELD_BINDING\", \"verified_field_allowlist\": \"('aggressor_side',)\", \"unverified_dimensions\": \"('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')\", \"pit_sta"
+    },
+    {
+      "test": "test_f4_10_malformed_knowledge_instant_on_another_entry",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_f4_11_order_alone_may_not_decide_the_outcome",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.026,
+      "message": "AssertionError: the same selection certifies in one order and refuses in the other; the outcome is decided by tuple order, not by adjudication"
+    },
+    {
+      "test": "test_f4_12_the_temporal_branch_does_execute_for_the_chosen_revision",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.01,
+      "message": null
+    },
+    {
+      "test": "test_f4_13_why_and_when_refusals_stay_distinct",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.012,
+      "message": null
+    },
+    {
+      "test": "test_f5_00_control_typed_refusal_keeps_its_classification",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.01,
+      "message": null
+    },
+    {
+      "test": "test_f5_01_typed_refusal_detail_is_withheld",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.01,
+      "message": "AssertionError: the typed refusal's detail reached refusal_detail: CUSTODY_UNVERIFIED: ZT-PROBE-4b71-NOT-A-CREDENTIAL in typed detail"
+    },
+    {
+      "test": "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.013,
+      "message": "AssertionError: sentinel reached public fields ['refusal_detail']"
+    },
+    {
+      "test": "test_f5_03_pit_typed_refusal_detail_is_withheld",
+      "file": "",
+      "status": "failed",
+      "time_s": 0.008,
+      "message": "AssertionError: {\"decision\": \"ConsumerDecision.REFUSE\", \"trust_scope\": \"ECONOMIC_FIELD_BINDING\", \"verified_field_allowlist\": \"()\", \"unverified_dimensions\": \"()\", \"pit_status\": \"INADMISSIBLE\", \"replay_status\": \"ELIGIBLE\", \"custody_status\": \"UNVERIFIED\", \"custody_source_authorization_status\": \"CustodyAuthorityBasis.UNAUTHORIZED\", \"custody_source_authorized\": \"False\", \"custody_authorization_detail\": "
+    },
+    {
+      "test": "test_f5_04_ordinary_exception_detail_is_withheld",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_f5_05_keyboard_interrupt_propagates",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_f5_06_system_exit_propagates",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_f5_07_the_fixture_is_not_secret_shaped",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_f5_08_the_verification_layer_has_no_pit_member",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_b_00_revision_identity_is_bound",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_b_01_availability_instant_is_bound",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_b_02_evidence_reference_digest_is_bound_at_the_contract",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_b_03_an_unapproved_reference_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.015,
+      "message": null
+    },
+    {
+      "test": "test_b_04_provider_substitution_with_the_same_revision_is_admissible",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.015,
+      "message": null
+    },
+    {
+      "test": "test_b_05_the_schema_cannot_express_full_provenance",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_b_06_the_named_limitation_is_a_constant_not_an_enforcement_branch",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.036,
+      "message": null
+    },
+    {
+      "test": "test_b_07_acceptance_needs_the_composition_control_not_the_empty_manifest",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.01,
+      "message": null
+    }
+  ]
+}

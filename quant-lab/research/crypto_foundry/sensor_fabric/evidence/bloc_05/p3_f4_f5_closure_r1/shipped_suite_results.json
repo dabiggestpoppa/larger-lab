@@ -1,0 +1,1147 @@
+{
+  "candidate": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "files": [
+    "test_b5_p3_consumer_policy.py",
+    "test_b5_p3_consumer_rebinding.py",
+    "test_b5_p3_consumer_security.py",
+    "test_b5_p3_consumer_contracts.py",
+    "test_b5_p3_consumer_custody.py"
+  ],
+  "tally": {
+    "passed": 161,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0,
+    "total": 161
+  },
+  "finding": "the shipped consumer suite is GREEN while every F4 counterexample is accepted and both typed-refusal format strings relay their detail: the producer's detector set is blind to both defects.",
+  "cases": [
+    {
+      "test": "test_a_valid_trade_request_reaches_the_verifier_and_stops_at_authority",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.014,
+      "message": null
+    },
+    {
+      "test": "test_a_valid_liquidation_request_reaches_the_verifier",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.013,
+      "message": null
+    },
+    {
+      "test": "test_the_shipped_manifest_yields_integration_required",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.008,
+      "message": null
+    },
+    {
+      "test": "test_the_accepting_branch_is_reachable_only_through_the_test_double",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_the_production_source_never_authorizes",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.013,
+      "message": null
+    },
+    {
+      "test": "test_field_binding_and_source_authority_stay_separable",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.018,
+      "message": null
+    },
+    {
+      "test": "test_custody_integrity_is_a_prerequisite_of_acceptance",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.012,
+      "message": null
+    },
+    {
+      "test": "test_evaluate_takes_a_request_and_nothing_else",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_the_policy_module_never_names_a_callback_intake",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.013,
+      "message": null
+    },
+    {
+      "test": "test_a_verdict_or_callback_cannot_be_smuggled_through_the_request",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_evaluate_refuses_a_non_request",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_validator_bypass_is_caught_by_revalidation",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_missing_provenance_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_an_unverified_required_field_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_a_verifier_crash_refuses_and_never_accepts",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_a_keyboard_interrupt_is_not_swallowed",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_a_contradictory_verification_refuses_rather_than_accepts",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.014,
+      "message": null
+    },
+    {
+      "test": "test_a_verification_of_another_record_kind_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_a_claimed_manifest_is_compared_not_adopted",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_the_matching_claimed_manifest_changes_nothing",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_the_policy_refuses_a_foreign_root_at_construction",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_manifest_substitution_cannot_produce_a_policy",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_request_without_replay_evidence_is_blocked",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_a_forged_replay_evaluation_cannot_arrive",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_a_missing_cutoff_is_pit_inadmissible",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_a_naive_cutoff_is_refused_by_name",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_diagnostics_are_bounded_and_carry_no_payload",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.01,
+      "message": null
+    },
+    {
+      "test": "test_the_provider_registry_used_by_the_fixtures_is_the_real_one",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_happy_path_rebinds_and_stops_at_authority",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.009,
+      "message": null
+    },
+    {
+      "test": "test_bytes_replaced_after_verification_are_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_bytes_removed_after_verification_are_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_digest_only_custody_is_not_custody",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.005,
+      "message": null
+    },
+    {
+      "test": "test_a_caller_digest_that_does_not_match_the_bytes_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.008,
+      "message": null
+    },
+    {
+      "test": "test_evidence_bound_to_another_artifact_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_each_evidence_reference_is_read_once_by_rebinding",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.013,
+      "message": null
+    },
+    {
+      "test": "test_an_incomplete_interval_blocks_replay",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.004,
+      "message": null
+    },
+    {
+      "test": "test_an_unresolved_identity_blocks_replay",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.004,
+      "message": null
+    },
+    {
+      "test": "test_a_forged_eligibility_below_the_manifest_is_still_checked_first",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.004,
+      "message": null
+    },
+    {
+      "test": "test_a_record_whose_approval_was_not_operative_is_pit_inadmissible",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_pit_inadmissibility_is_not_repaired_by_custody",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_the_accept_row_requires_every_prerequisite",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_the_integration_row_is_not_a_refusal",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_the_unauthorized_row_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.008,
+      "message": null
+    },
+    {
+      "test": "test_a_custody_failure_outranks_a_granted_authority",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.008,
+      "message": null
+    },
+    {
+      "test": "test_a_second_consumption_re_derives_and_re_reads",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.013,
+      "message": null
+    },
+    {
+      "test": "test_h02_eligible_evidence_from_an_unrelated_record_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.008,
+      "message": null
+    },
+    {
+      "test": "test_h02_evidence_selected_at_a_later_cutoff_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_h02_a_revision_excluded_at_the_cutoff_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.004,
+      "message": null
+    },
+    {
+      "test": "test_h02_evidence_not_yet_market_available_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_h02_evidence_contradicting_the_records_availability_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_h02_removing_the_binding_lets_foreign_evidence_through",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_h05_both_reads_are_of_the_same_approved_identity",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_h05_an_omitted_reference_is_not_silently_re_read",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.005,
+      "message": null
+    },
+    {
+      "test": "test_a01_callback_injection_has_no_intake",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_a02_model_construct_verification_cannot_be_an_input",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.017,
+      "message": null
+    },
+    {
+      "test": "test_a16_a_cached_verdict_is_never_reused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.025,
+      "message": null
+    },
+    {
+      "test": "test_a03_a_contradictory_verification_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.021,
+      "message": null
+    },
+    {
+      "test": "test_a10_a_forged_trust_scope_never_accepts",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.012,
+      "message": null
+    },
+    {
+      "test": "test_a11_an_empty_dimension_list_never_reads_as_authentication",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.021,
+      "message": null
+    },
+    {
+      "test": "test_a04_manifest_substitution_is_compared_not_adopted",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.017,
+      "message": null
+    },
+    {
+      "test": "test_a05_a_minted_capability_authorizes_nothing",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.019,
+      "message": null
+    },
+    {
+      "test": "test_a06_a_copied_marker_changes_nothing",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_a07_cross_record_evidence_reuse_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.026,
+      "message": null
+    },
+    {
+      "test": "test_a08_cross_cutoff_authority_cannot_be_reused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_a09_no_synthetic_basis_exists_to_promote",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_a12_a_field_outside_the_allowlist_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.026,
+      "message": null
+    },
+    {
+      "test": "test_a13_evidence_substitution_refuses_for_both_record_kinds",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.05,
+      "message": null
+    },
+    {
+      "test": "test_a14_digest_only_custody_refuses_for_both_record_kinds",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.042,
+      "message": null
+    },
+    {
+      "test": "test_a15_forged_replay_eligibility_blocks",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_a15b_a_blocked_replay_gate_blocks_before_authority",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_a17_pit_inadmissible_authority_refuses_for_both_kinds",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_a18_a_verifier_exception_refuses_and_system_exit_propagates",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_a19_missing_provenance_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_a20_the_empty_manifest_is_the_integration_state",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.012,
+      "message": null
+    },
+    {
+      "test": "test_scope_documentation_names_x01_to_x06",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.014,
+      "message": null
+    },
+    {
+      "test": "test_removing_rebinding_lets_swapped_bytes_through",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.022,
+      "message": null
+    },
+    {
+      "test": "test_removing_the_replay_gate_lets_a_blocked_record_through",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_removing_the_pit_mapping_misreports_a_time_violation",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_removing_the_empty_manifest_mapping_misreports_the_state",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_h01_a_verifier_crash_message_is_never_relayed",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_h01_a_replay_gate_crash_message_is_never_relayed",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_h01_a_custody_crash_message_is_never_relayed",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_h01_keyboard_interrupt_still_propagates",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.007,
+      "message": null
+    },
+    {
+      "test": "test_h03_authority_for_another_identity_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_h03_an_empty_manifest_cannot_be_authorized",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_h03_a_conclusion_naming_an_unapproved_artifact_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.011,
+      "message": null
+    },
+    {
+      "test": "test_h03_a_malformed_derivation_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_h03_a_model_construct_authorization_without_identity_refuses",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_h03_a_raising_source_relays_no_message",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.016,
+      "message": null
+    },
+    {
+      "test": "test_h04_a_model_construct_request_holding_junk_refuses_without_raising",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.01,
+      "message": null
+    },
+    {
+      "test": "test_h04_a_verification_with_unusable_fields_refuses_without_raising",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.008,
+      "message": null
+    },
+    {
+      "test": "test_h04_a_non_request_argument_is_still_a_programmer_error",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_decision_has_exactly_three_members",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_no_bare_accept_or_authorized_decision_exists",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_custody_basis_has_exactly_three_members",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_synthetic_basis_does_not_exist_in_production",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_refusal_vocabulary_covers_the_design_codes",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_trust_scope_constant_matches_the_verifier_scope",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_request_annotations_name_no_authority_verdict_or_callback",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_request_field_names_do_not_read_as_authority",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_request_record_slot_is_exactly_the_two_t1_types",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_request_exposes_no_callable_method_that_derives_a_verdict",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_a_verdict_cannot_be_smuggled_into_a_request",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_non_t1_record_cannot_be_smuggled_into_a_request",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_models_are_frozen",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.002,
+      "message": null
+    },
+    {
+      "test": "test_unknown_fields_are_refused_everywhere",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_naive_cutoff_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_bare_date_cutoff_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_date_only_string_cutoff_is_refused",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_objective_pydantic_would_have_accepted_a_bare_date",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_offset_cutoff_is_normalised_to_utc",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_arbitrary_binary_bytes_round_trip",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.005,
+      "message": null
+    },
+    {
+      "test": "test_canonical_serialisation_is_stable",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_artifact_bytes_are_hidden_from_repr",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_claimed_manifest_bytes_are_hidden_from_repr",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_evidence_references_must_be_canonical_and_unique",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_evidence_reference_digest_must_be_a_sha256_hex_digest",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_required_fields_must_be_unique",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_verdict_laws_hold_on_the_ordinary_path",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_verdict_boolean_and_basis_may_not_disagree",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_verdict_refuses_a_widened_trust_scope",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_verdict_refusal_detail_is_bounded",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_model_construct_bypasses_every_law",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_model_copy_update_bypasses_validation",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.0,
+      "message": null
+    },
+    {
+      "test": "test_the_boundary_is_revalidation_not_immutability",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_importing_the_models_does_not_load_the_verifier",
+      "file": "",
+      "status": "passed",
+      "time_s": 1.252,
+      "message": null
+    },
+    {
+      "test": "test_the_models_module_imports_no_io_hashing_or_clock",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_the_consumer_package_exposes_no_eager_imports",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_shipped_manifest_produces_integration_required_for_every_identity",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_no_input_produces_authorized_even_with_a_complete_fixture_root",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_each_bound_element_fails_closed[overrides0-INTEGRATION_REQUIRED]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_each_bound_element_fails_closed[overrides1-UNAUTHORIZED]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_each_bound_element_fails_closed[overrides2-UNAUTHORIZED]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_each_bound_element_fails_closed[overrides3-UNAUTHORIZED]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_each_bound_element_fails_closed[overrides4-UNAUTHORIZED]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_revoked_approval_is_unauthorized",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_an_approval_not_yet_operative_is_unauthorized",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_authority_does_not_travel_between_roots",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_foreign_manifest_is_unauthorized",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_malformed_reviewed_manifest_is_unauthorized",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_identity_requires_every_element[manifest_sha256]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_identity_requires_every_element[artifact_id]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_identity_requires_every_element[approval_id]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_identity_requires_every_element[registry_digest]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_identity_requires_every_element[provider]",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_wildcard_record_kind_does_not_exist",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_naive_cutoff_cannot_be_bound",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_derivation_rejects_raw_kwargs_and_non_bytes",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_no_capability_object_or_issuance_marker_exists_in_src",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.006,
+      "message": null
+    },
+    {
+      "test": "test_no_public_symbol_in_src_builds_an_authorized_value",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.003,
+      "message": null
+    },
+    {
+      "test": "test_the_source_protocol_is_one_method",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_production_source_refuses_a_foreign_root",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_unresolved_contract_is_named_in_the_derivation",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_manifest_schema_has_no_custody_source_record",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_derivation_invents_no_manifest_token",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_derivation_cannot_be_authorized_while_naming_a_missing_contract",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_a_derivation_cannot_be_authorized_without_naming_its_identity",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_shipped_manifest_is_byte_identical_and_empty",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_derivation_is_deterministic",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    },
+    {
+      "test": "test_the_module_is_pure",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.038,
+      "message": null
+    },
+    {
+      "test": "test_a_verdict_may_not_claim_authorization_under_an_unmet_basis",
+      "file": "",
+      "status": "passed",
+      "time_s": 0.001,
+      "message": null
+    }
+  ]
+}

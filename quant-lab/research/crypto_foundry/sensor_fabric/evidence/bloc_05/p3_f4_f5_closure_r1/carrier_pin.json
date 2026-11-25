@@ -1,0 +1,50 @@
+{
+  "mission": "SENSOR-B5-P3-R6-F4-F5-INDEPENDENT-CLOSURE-R1",
+  "label": "SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT",
+  "candidate_sha": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "candidate_branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+  "candidate_worktree_head": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "audit_predecessor_head": "6a1a7a5d613ceda2f8ea81d4a0e4a9b953e07769",
+  "audit_r1_head_preserved": "6c4874b43",
+  "repair_commit_published": false,
+  "repair_search": {
+    "method": "git ls-remote --heads origin + git log --all -- '*consumer/policy.py'",
+    "result": "no branch, tag or commit beyond 21fd7e473; the newest commit touching consumer/policy.py is d81cceb28 (the R6 repair).  The R7 package at 21fd7e473 is documentation only and records 'no repair'."
+  },
+  "candidate_tree_clean_for_tracked_files": true,
+  "file_sha256": {
+    "src/crypto_sensor_fabric/normalization/consumer/policy.py": "fe3853da5ceec16edd31be7f372ade8ad530d22fe4d963259d0c0a26c6fbe843",
+    "src/crypto_sensor_fabric/normalization/consumer/models.py": "c3cc51b14831bc2a6b2a27e05a44ba70fc4fa328b6888ba6129bb881c733c7da",
+    "src/crypto_sensor_fabric/normalization/time/replay_gate.py": "79aa9bd9a98fc76d4666689f71ea4d47a69d75f3a05036b7ccc278a269a3a936",
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654"
+  },
+  "git_blob_sha1": {
+    "src/crypto_sensor_fabric/normalization/consumer/policy.py": "6034dabb7c79e24cba852269837fffc0539811be",
+    "src/crypto_sensor_fabric/normalization/consumer/models.py": "cb17cb32a439b2278247d74ccb154fd04df90c85",
+    "src/crypto_sensor_fabric/normalization/time/replay_gate.py": "70554db538a0c24cd11bfd208210d3503aeba52c"
+  },
+  "approval_manifest_artifacts": {},
+  "tracked_python_under_quant_lab": 696,
+  "probe_sha256": "827d50a50770cf86f6447215b78db820baa3b14d0e5a7319d0fdf3c53fdfb2f8",
+  "calibration_runner_sha256": "80eb550b17c3d6ccb561a10d17df64b2ee5e937591ff783b6883147bfd717df4",
+  "probe_tally_on_candidate": {
+    "passed": 23,
+    "failed": 9,
+    "errored": 0,
+    "skipped": 0,
+    "total": 32
+  },
+  "shipped_consumer_suite_on_candidate": {
+    "passed": 161,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0,
+    "total": 161
+  },
+  "environment": {
+    "python": "3.11.9",
+    "implementation": "CPython",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "pytest": "pytest 9.0.3"
+  }
+}

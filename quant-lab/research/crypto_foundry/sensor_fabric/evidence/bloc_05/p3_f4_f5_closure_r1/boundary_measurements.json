@@ -1,0 +1,48 @@
+{
+  "candidate": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "question": "is the unsupported complete replay-identity binding explicitly enforced at the consumption boundary?",
+  "answer": "NO -- and the empty manifest is not the reason it is not enforced.",
+  "measurements": [
+    {
+      "axis": "revision identity (record's own source_revision_id)",
+      "status": "BOUND",
+      "evidence": "test_b_00: selection of rev-FOREIGN -> REFUSE REPLAY_BLOCKED"
+    },
+    {
+      "axis": "temporal adjudication (chosen revision vs cutoff)",
+      "status": "BOUND_FOR_THE_CHOSEN_ENTRY_ONLY",
+      "evidence": "test_f4_12 refuses by name; test_f4_05..f4_09 accept other entries"
+    },
+    {
+      "axis": "market-availability instant vs cutoff and vs the record",
+      "status": "BOUND",
+      "evidence": "test_b_01: availability after cutoff -> REFUSE"
+    },
+    {
+      "axis": "evidence-reference digest",
+      "status": "BOUND_AT_THE_CONTRACT",
+      "evidence": "test_b_02 raises on two digests for one reference; test_b_03 refuses an unapproved reference"
+    },
+    {
+      "axis": "provider identity of the replay evidence",
+      "status": "NOT_EXPRESSIBLE_AND_NOT_ENFORCED",
+      "evidence": "test_b_04: another provider's evidence, same revision -> ACCEPT"
+    },
+    {
+      "axis": "record id / record kind / artifact identity of the replay evidence",
+      "status": "NOT_EXPRESSIBLE",
+      "evidence": "test_b_05: none of provider/record_id/record_kind/artifact_id is a ReplayEvidence field"
+    },
+    {
+      "axis": "the named limitation as an executable boundary",
+      "status": "DOCUMENTATION_ONLY",
+      "evidence": "test_b_06: no branch tests UNRESOLVED_REPLAY_BINDING (AST) and rebinding it to () changes no outcome"
+    },
+    {
+      "axis": "authoritative acceptance",
+      "status": "NEEDS_A_TEST_ONLY_COMPOSITION_CONTROL",
+      "evidence": "test_b_07: the shipped manifest plus an authorizing source answers INTEGRATION_REQUIRED; the probe root plus the same source answers ACCEPT.  The empty manifest proves the absence of a custody-authority record, not the enforcement of the replay binding."
+    }
+  ],
+  "disposition": "unchanged from R6.  Intermediate revision binding and temporal adjudication of the chosen entry work; complete replay provenance is neither expressible in the frozen schema nor enforced at the boundary.  No schema was invented here."
+}

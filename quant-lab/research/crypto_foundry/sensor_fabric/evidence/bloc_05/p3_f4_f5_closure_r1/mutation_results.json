@@ -1,0 +1,35 @@
+{
+  "candidate": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "note": "An unrepaired candidate cannot be mutated to REMOVE a control it does not have, so each mutation is measured in both directions: the removal state is the published tree (detector must fail) and the injected state is a throwaway copy (detector must pass).  A mutation counts as DETECTED only when both halves are observed and the mutated module was imported from the copy.",
+  "mutations": [
+    {
+      "id": "M1_CHOSEN_ONLY_CUTOFF",
+      "target": "policy._bind_replay: order the whole selection, not only the chosen entry",
+      "removal_state": "published tree (ordering is chosen-only today)",
+      "detector": "test_f4_05_counterexample_future_revision_selected_last",
+      "detector_fails_on_published_tree": true,
+      "detector_passes_when_control_present": true,
+      "status": "DETECTED"
+    },
+    {
+      "id": "M2_RAW_TYPED_REFUSAL_DETAIL",
+      "target": "policy typed-refusal format strings: withhold exc.detail",
+      "removal_state": "published tree (both format strings relay exc.detail today)",
+      "detector": "test_f5_01_typed_refusal_detail_is_withheld",
+      "detector_fails_on_published_tree": true,
+      "detector_passes_when_control_present": true,
+      "status": "DETECTED"
+    },
+    {
+      "id": "M3_UNRESOLVED_BINDING_GUARD_REMOVAL",
+      "target": "an enforcement guard over UNRESOLVED_REPLAY_BINDING",
+      "status": "NOT_APPLICABLE",
+      "reason": "no such guard exists in the published module.  The constant is referenced by documentation only: no If/Assert tests it (test_b_06, AST), and rebinding the constant to () at runtime changes no outcome (test_b_06).  There is nothing to remove, and removing nothing is not a detection."
+    }
+  ],
+  "tally": {
+    "DETECTED": 2,
+    "NOT_DETECTED": 0,
+    "NOT_APPLICABLE": 1
+  }
+}
