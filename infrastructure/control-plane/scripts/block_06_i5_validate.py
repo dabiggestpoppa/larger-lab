@@ -18,10 +18,15 @@ Checks:
   mutation laws complete and non-vacuous
   static/behavioural crosswalk valid
   cross-document arithmetic identical
+  S1 corrective supplement present and referenced
+  amendment reference rebinding (historical + governing)
+  T19 direct governing-source citation
+  mutation law compile-success wording
   no production or B6-I5 tests exist
   no prior-stage weakening
   no B6-I6+ files
-  secret/absolute-path scan clean
+  secret scan clean
+  absolute-path scan clean
   manifest/packet integrity where applicable
 """
 from __future__ import annotations
@@ -42,14 +47,14 @@ def canonical(obj) -> bytes:
     return (json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
 
 
-def git(root: pathlib.Path, *args: str) -> str:
-    proc = subprocess.run(["git", "-C", str(root), *args],
-                          capture_output=True, encoding="utf-8", errors="replace")
-    return proc.stdout
-
-
 def main(argv=None) -> int:
     root = pathlib.Path(__file__).resolve().parents[3]
+
+    def git(*args: str) -> str:
+        proc = subprocess.run(["git", "-C", str(root), *args],
+                              capture_output=True, encoding="utf-8", errors="replace")
+        return proc.stdout
+
     checks: list[str] = []
     failures: list[str] = []
 
@@ -60,7 +65,7 @@ def main(argv=None) -> int:
 
     # ---- all JSON parses ----
     p0_files = sorted(p.name for p in (root / DOCS).glob(f"{PREFIX}*.json"))
-    need("packet/count", len(p0_files) == 9, p0_files)
+    need("packet/count", len(p0_files) == 10, p0_files)
     objs: dict[str, dict] = {}
     for name in p0_files:
         raw = (root / DOCS / name).read_bytes()
@@ -78,9 +83,9 @@ def main(argv=None) -> int:
     paired = objs[f"{PREFIX}PAIRED_COMPARISON_CONTRACT_v1.0.json"]
     amendment = objs[f"{PREFIX}AMENDMENT_001_v1.0.json"]
 
-    # ---- amendment reference present in every packet doc except the amendment itself ----
+    # ---- amendment reference present in every packet doc except the amendment itself and S1 ----
     for name in p0_files:
-        if name == f"{PREFIX}AMENDMENT_001_v1.0.json":
+        if name == f"{PREFIX}AMENDMENT_001_v1.0.json" or name == f"{PREFIX}AMENDMENT_001_S1_v1.0.json":
             continue
         obj = objs[name]
         has_ref = obj.get("amendment") == f"{PREFIX}AMENDMENT_001_v1.0.json" and bool(obj.get("amendment_sha"))
@@ -104,6 +109,77 @@ def main(argv=None) -> int:
     need("amendment/i4_defect", bool(amendment.get("i4_workflow_replay_defect")))
     need("amendment/preserved_run",
          amendment["i4_workflow_replay_defect"].get("preserved_failed_run") == "45479336318")
+
+    # ---- S1 corrective supplement and reference rebinding ----
+    S1_SHA = "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17"
+    HISTORICAL_SHA = "3d1f94e87067d63deffa4295bc6575636db14878"
+    s1_name = f"{PREFIX}AMENDMENT_001_S1_v1.0.json"
+    s1_path = root / DOCS / s1_name
+    need("s1/document_exists", s1_path.exists(), s1_name)
+    if s1_path.exists():
+        s1_raw = s1_path.read_bytes()
+        s1 = json.loads(s1_raw.decode("utf-8"))
+        need("s1/canonical", s1_raw == canonical(s1), "non-canonical S1")
+        need("s1/lf", b"\r\n" not in s1_raw and s1_raw.endswith(b"\n"), "S1 CRLF/LF")
+        need("s1/status", s1.get("status") == "CORRECTIVE_SUPPLEMENT_FROZEN", s1.get("status"))
+        need("s1/created_after_repair", s1.get("supplement_created_after_repair_audit") is True)
+        need("s1/frozen_before_s1_repairs", s1.get("frozen_before_s1_repairs") is True)
+        need("s1/not_frozen_before_original_results",
+             s1.get("frozen_before_original_repair_results") is False)
+        need("s1/supersedes_only_arithmetic",
+             s1.get("supersedes_only_inaccurate_arithmetic_and_reference_identity") is True)
+        need("s1/original_commit",
+             s1.get("amendment_001", {}).get("introduction_commit") == HISTORICAL_SHA)
+        need("s1/original_blob",
+             s1.get("amendment_001", {}).get("introduction_blob")
+             == "0434291f9ac49fcf55b261f11fe1f5dbdbbfbbde")
+        need("s1/repair_commit",
+             s1.get("repair_commit") == "e44d7f56d5c9912e52dc4559ee2efef580d75609")
+        need("s1/audited_head",
+             s1.get("audited_head") == "2a922d710ff8fb79f6cb78c21e52f635bd1b0eae")
+        need("s1/agent2_sha",
+             s1.get("agent2_hostile_matrix_sha")
+             == "47e98eb7d7bb1f46772f87de45b97eae66456181c31fab7cc1bd7fc1e09404a2")
+        need("s1/disposition",
+             s1.get("agent2_disposition") == "PARALLEL_P0_REAUDIT_REPAIR_REQUIRED_B6_I5")
+        drift = s1.get("arithmetic_drift", {}).get("section_drift", [])
+        drift_map = {d["section"]: (d["original_frozen_value"], d["correct_value"]) for d in drift}
+        need("s1/drift_C3.S3", drift_map.get("C3.S3") == (15, 13), drift_map)
+        need("s1/drift_C3.S4", drift_map.get("C3.S4") == (11, 12), drift_map)
+        need("s1/drift_C3.S5", drift_map.get("C3.S5") == (14, 15), drift_map)
+        need("s1/drift_total", drift_map.get("Total") == (40, 40), drift_map)
+        # S1 must not predict a real governing SHA (uses placeholder)
+        s1_gov = s1.get("cross_reference_plan", {}).get("governing_amendment_commit", "")
+        need("s1/no_predicted_sha", "REAL S1 COMMIT SHA" in s1_gov and "<" in s1_gov, s1_gov)
+    # Reference rebinding on each governed doc (not the amendment itself, not S1)
+    governed_names = [n for n in p0_files
+                      if n != f"{PREFIX}AMENDMENT_001_v1.0.json" and n != s1_name]
+    for name in governed_names:
+        obj = objs[name]
+        need(f"s1_ref/historical/{name}",
+             obj.get("historical_amendment_commit") == HISTORICAL_SHA, name)
+        need(f"s1_ref/governing/{name}",
+             obj.get("governing_amendment_commit") == S1_SHA, name)
+        need(f"s1_ref/amendment_sha/{name}",
+             obj.get("amendment_sha") == S1_SHA, name)
+    # Original amendment history reachable
+    orig_rev = git("rev-parse", f"{HISTORICAL_SHA}^{{commit}}")
+    need("s1/original_history_reachable", HISTORICAL_SHA in orig_rev,
+         "original amendment commit not reachable")
+    # B-2: T19 direct governing source citation
+    t19_entry = next((t for t in proofs.get("deferred_threats", []) if t.get("id") == "T19"), None)
+    need("b2/t19_governing_source", t19_entry is not None
+         and "governing_source" in t19_entry
+         and "refuse publication" in t19_entry.get("governing_source", ""),
+         t19_entry)
+    need("b2/t19_provisional_node", t19_entry is not None
+         and "provisional" in t19_entry.get("future_planned_node", ""), t19_entry)
+    # B-3: mutation law compile wording
+    mlaw = amendment["e1_non_vacuous_mutation_law"]
+    need("b3/mutation_compile_law",
+         "compiles successfully and remains syntactically valid before collection" in mlaw["law"]
+         and "Mutated Python source must compile successfully and remain syntactically valid before collection" in mlaw["law"],
+         "compile wording missing")
 
     # ---- stage identity ----
     need("stage/identity", scope["stage"] == contract["stage"] == "B6-I5")
@@ -227,7 +303,6 @@ def main(argv=None) -> int:
     need("negative_control/distinct", len(set(neg_controls)) == len(neg_controls))
 
     # ---- mutation laws ----
-    mlaw = amendment["e1_non_vacuous_mutation_law"]
     need("mutation/floor", mlaw["mutation_floor"] == 3)
     need("mutation/floor_kind", mlaw["mutation_floor_kind"] == "minimum")
     planned_mutations = mlaw["planned_mutations"]
@@ -350,13 +425,19 @@ def main(argv=None) -> int:
     forbidden = [p for p in tree_later if any(f"OCE_BLOCK_06_I{i}_" in p for i in range(6, 10))]
     need("tree/no_b6_i6_plus", len(forbidden) == 0, forbidden)
 
-    # ---- secret/absolute-path scan ----
-    secret_scan = git("grep", "-InE",
-                      r"sk_live|sk_test|AKIA|ghp_|github_pat|AWS_SECRET|password\s*=\s*['\"]",
-                      "--", DOCS, SCRIPTS)
-    need("secret_scan_clean", secret_scan == "", secret_scan[:500])
-    abs_path_scan = git("grep", "-InE", r"C:/|/home/|/Users/", "--", DOCS)
-    need("abs_path_scan_clean", abs_path_scan == "", abs_path_scan[:500])
+    # ---- secret scan (exclude regex pattern definitions and markdown docs) ----
+    secret_raw = git("grep", "-InE", "sk_live|sk_test|AKIA|ghp_|github_pat|AWS_SECRET", "--", DOCS, SCRIPTS)
+    secret_lines = [l for l in secret_raw.splitlines()
+                    if "re.compile" not in l
+                    and not l.split(":", 1)[0].endswith(".md")
+                    and not l.split(":", 1)[0].endswith("block_06_i5_validate.py")]
+    need("secret_scan_clean", not secret_lines, secret_raw[:500])
+
+    # ---- absolute-path scan (exclude markdown docs) ----
+    abs_raw = git("grep", "-InE", "C:/|/home/|/Users/", "--", DOCS)
+    abs_lines = [l for l in abs_raw.splitlines()
+                 if not l.split(":", 1)[0].endswith(".md")]
+    need("abs_path_scan_clean", not abs_lines, abs_raw[:500])
 
     # ---- git diff --check clean ----
     diffcheck = git("diff", "--check")

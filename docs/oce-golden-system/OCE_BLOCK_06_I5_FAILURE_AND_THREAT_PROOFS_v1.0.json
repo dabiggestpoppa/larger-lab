@@ -1,12 +1,13 @@
 {
   "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
-  "amendment_sha": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
   "deferred_threats": [
     {
       "bound": false,
       "expected_refusal": "refuse publication",
       "future_authorized_stage": "B6-I9",
-      "future_planned_node": "B6-I9 publication-hold gate node",
+      "future_planned_node": "B6-I9 publication-hold gate node (provisional until B6-I9 freezes a concrete node ID)",
+      "governing_source": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T19 (owner=operator, stage=B6-I9, required_refusal=refuse publication)",
       "id": "T19",
       "outside_current_partition": true,
       "owner": "operator",
@@ -87,6 +88,8 @@
       "proof_state": "BOUND"
     }
   ],
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
   "partition_note": "Every current node belongs to exactly one current failure-class partition (F03=8, F08=2, F11=7, F12=3, F23=20; total 40). Deferred T19 is outside the current executable partition. No current threat claims a witness incapable of producing its required refusal.",
   "policy": {
     "fail_closed": true,

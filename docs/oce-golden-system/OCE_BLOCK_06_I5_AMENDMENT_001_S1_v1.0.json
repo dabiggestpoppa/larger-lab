@@ -1,79 +1,52 @@
 {
-  "document_id": "OCE-B6-I5-AMENDMENT-001-S1",
-  "supplement": "S1",
-  "status": "CORRECTIVE_SUPPLEMENT_FROZEN",
-  "stage": "B6-I5",
-  "schema": "oce.block_06_i5.amendment_supplement.v1",
-  "supplement_created_after_repair_audit": true,
-  "frozen_before_s1_repairs": true,
-  "frozen_before_original_repair_results": false,
-  "supersedes_only_inaccurate_arithmetic_and_reference_identity": true,
-  "original_amendment_remains_preserved": true,
-  "no_history_rewrite": true,
-  "no_implementation_authorization": true,
-  "cost_usd": 0,
-  "capital_authority": "none",
   "agent2_disposition": "PARALLEL_P0_REAUDIT_REPAIR_REQUIRED_B6_I5",
-  "agent2_hostile_matrix_sha": "47e98eb7d7bb1f46772f87de45b97eae66456181c31fab7cc1bd7fc1e09404a2",
   "agent2_harness_sha": "aa5828dd45157be13510f7be6b9180c6b06780efb64382794352752d7df9a372",
-  "base": {
-    "sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
-    "tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b"
-  },
-  "original_p0": {
-    "head": "21be8b21a16daa27a0a5114194ac1a6c931224d4",
-    "tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639"
-  },
+  "agent2_hostile_matrix_sha": "47e98eb7d7bb1f46772f87de45b97eae66456181c31fab7cc1bd7fc1e09404a2",
   "amendment_001": {
-    "introduction_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
-    "introduction_blob": "0434291f9ac49fcf55b261f11fe1f5dbdbbfbbde",
-    "status": "FROZEN",
     "frozen_before_results": true,
-    "note": "The original Amendment 001 commit remains preserved in history and is not rewritten."
+    "introduction_blob": "0434291f9ac49fcf55b261f11fe1f5dbdbbfbbde",
+    "introduction_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "note": "The original Amendment 001 commit remains preserved in history and is not rewritten.",
+    "status": "FROZEN"
   },
-  "repair_commit": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
-  "audited_head": "2a922d710ff8fb79f6cb78c21e52f635bd1b0eae",
-  "audited_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
-  "current_head": "0a2313bb39a356badccc17c6ca6dd49f09ab6806",
-  "current_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
   "arithmetic_drift": {
-    "total_was_always_correct": true,
-    "total_original": 40,
-    "total_correct": 40,
     "explanation": "The total of 40 requirements/nodes was always correct and unchanged. The six added node IDs were frozen before repair and unchanged. The three section allocations were predicted incorrectly in the original amendment and were corrected inside repair commit e44d7f56d after repair began. Therefore the original amendment's broad frozen_before_results claim was overbroad for those three section fields. S1 corrects the governance record without pretending the original prediction was accurate. No node, requirement, failure class, mutation plan, product design or workflow result changes because of S1.",
+    "node_distribution_by_module": {
+      "test_block_06_i5_artifact.py": 9,
+      "test_block_06_i5_contract.py": 6,
+      "test_block_06_i5_evaluation.py": 12,
+      "test_block_06_i5_knowledge.py": 7,
+      "test_block_06_i5_provenance.py": 6
+    },
     "section_drift": [
       {
-        "section": "C3.S3",
+        "correct_value": 13,
         "original_frozen_value": 15,
-        "correct_value": 13
+        "section": "C3.S3"
       },
       {
-        "section": "C3.S4",
+        "correct_value": 12,
         "original_frozen_value": 11,
-        "correct_value": 12
+        "section": "C3.S4"
       },
       {
-        "section": "C3.S5",
+        "correct_value": 15,
         "original_frozen_value": 14,
-        "correct_value": 15
+        "section": "C3.S5"
       },
       {
-        "section": "Total",
+        "correct_value": 40,
         "original_frozen_value": 40,
-        "correct_value": 40
+        "section": "Total"
       }
     ],
-    "node_distribution_by_module": {
-      "test_block_06_i5_contract.py": 6,
-      "test_block_06_i5_knowledge.py": 7,
-      "test_block_06_i5_artifact.py": 9,
-      "test_block_06_i5_evaluation.py": 12,
-      "test_block_06_i5_provenance.py": 6
-    }
+    "total_correct": 40,
+    "total_original": 40,
+    "total_was_always_correct": true
   },
+  "audited_head": "2a922d710ff8fb79f6cb78c21e52f635bd1b0eae",
+  "audited_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
   "b2_t19_direct_citation": {
-    "law": "Add the governing-source citation directly to the T19 entry in deferred_threats, not only in the amendment.",
-    "location": "docs/oce-golden-system/OCE_BLOCK_06_I5_FAILURE_AND_THREAT_PROOFS_v1.0.json -> deferred_threats[T19]",
     "fields": [
       "bound: false",
       "owner: operator",
@@ -82,34 +55,40 @@
       "governing_source: OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T19 (owner=operator, stage=B6-I9, required_refusal=refuse publication)",
       "explanation: B6-I5 has no publication surface and cannot honestly produce that refusal",
       "future_planned_node: B6-I9 publication-hold gate node (provisional until B6-I9 freezes a concrete node ID)"
-    ]
+    ],
+    "law": "Add the governing-source citation directly to the T19 entry in deferred_threats, not only in the amendment.",
+    "location": "docs/oce-golden-system/OCE_BLOCK_06_I5_FAILURE_AND_THREAT_PROOFS_v1.0.json -> deferred_threats[T19]"
   },
   "b3_mutation_law_compile_wording": {
     "law": "Make the mutation admissibility law explicitly say: 'Mutated Python source must compile successfully and remain syntactically valid before collection.'",
     "location": "docs/oce-golden-system/OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json -> e1_non_vacuous_mutation_law",
     "note": "Do not weaken any existing collection, execution, rc=1, behavioural-failure, restoration, pristine-suite or clean-tree condition."
   },
+  "base": {
+    "sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+    "tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b"
+  },
+  "capital_authority": "none",
+  "cost_usd": 0,
   "cross_reference_plan": {
+    "governing_amendment_commit": "<REAL S1 COMMIT SHA - to be bound only after S1 exists>",
     "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
     "meaning": "3d1f94e87 is the historical pre-repair amendment commit. S1 is the post-audit corrective governance commit. S1 does not retroactively become pre-result evidence.",
-    "governing_amendment_commit": "<REAL S1 COMMIT SHA - to be bound only after S1 exists>",
     "rule": "After S1 exists, all eight active cross-document references will point to the actual S1 commit as the governing corrective amendment. No predicted commit SHA may be written into S1. The follow-up reference-rebinding commit may use the real S1 SHA only after it exists."
   },
+  "current_head": "0a2313bb39a356badccc17c6ca6dd49f09ab6806",
+  "current_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+  "document_id": "OCE-B6-I5-AMENDMENT-001-S1",
+  "frozen_before_original_repair_results": false,
+  "frozen_before_s1_repairs": true,
+  "no_history_rewrite": true,
+  "no_implementation_authorization": true,
+  "original_amendment_remains_preserved": true,
+  "original_p0": {
+    "head": "21be8b21a16daa27a0a5114194ac1a6c931224d4",
+    "tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639"
+  },
   "preserved_invariants": {
-    "requirements_total": 40,
-    "node_total": 40,
-    "section_distribution": {
-      "C3.S3": 13,
-      "C3.S4": 12,
-      "C3.S5": 15
-    },
-    "module_distribution": {
-      "test_block_06_i5_contract.py": 6,
-      "test_block_06_i5_knowledge.py": 7,
-      "test_block_06_i5_artifact.py": 9,
-      "test_block_06_i5_evaluation.py": 12,
-      "test_block_06_i5_provenance.py": 6
-    },
     "failure_class_partition": {
       "F03": 8,
       "F08": 2,
@@ -117,28 +96,53 @@
       "F12": 3,
       "F23": 20
     },
-    "planned_mutations": ["M01", "M02", "M03"],
-    "mutation_minimum_floor": 3,
-    "mutation_floor_kind": "minimum",
-    "t19_deferral": {
-      "owner": "operator",
-      "future_authorized_stage": "B6-I9",
-      "expected_refusal": "refuse publication"
-    },
-    "r06_binding": "F23",
-    "zero_pass": true,
-    "tests_present": false,
     "implementation_state": "NOT_STARTED_P0",
     "locks": {
-      "IMPLEMENTATION_AUTHORIZED": false,
-      "RATIFICATION_AUTHORIZED": false,
-      "MERGE_AUTHORIZED": false,
-      "BOOK_6_COMPLETE": false,
       "B6-I6": "LOCKED",
       "B6-I7": "LOCKED",
       "B6-I8": "LOCKED",
-      "B6-I9": "LOCKED"
-    }
+      "B6-I9": "LOCKED",
+      "BOOK_6_COMPLETE": false,
+      "IMPLEMENTATION_AUTHORIZED": false,
+      "MERGE_AUTHORIZED": false,
+      "RATIFICATION_AUTHORIZED": false
+    },
+    "module_distribution": {
+      "test_block_06_i5_artifact.py": 9,
+      "test_block_06_i5_contract.py": 6,
+      "test_block_06_i5_evaluation.py": 12,
+      "test_block_06_i5_knowledge.py": 7,
+      "test_block_06_i5_provenance.py": 6
+    },
+    "mutation_floor_kind": "minimum",
+    "mutation_minimum_floor": 3,
+    "node_total": 40,
+    "planned_mutations": [
+      "M01",
+      "M02",
+      "M03"
+    ],
+    "r06_binding": "F23",
+    "requirements_total": 40,
+    "section_distribution": {
+      "C3.S3": 13,
+      "C3.S4": 12,
+      "C3.S5": 15
+    },
+    "t19_deferral": {
+      "expected_refusal": "refuse publication",
+      "future_authorized_stage": "B6-I9",
+      "owner": "operator"
+    },
+    "tests_present": false,
+    "zero_pass": true
   },
-  "reason": "Corrective supplement disclosing that Amendment 001 originally predicted section arithmetic 15/11/14 under frozen_before_results, while the actual repaired design uses 13/12/15. The total 40 was always correct. S1 corrects the governance record truthfully, forward-only, with no history rewrite and no implementation authorization."
+  "reason": "Corrective supplement disclosing that Amendment 001 originally predicted section arithmetic 15/11/14 under frozen_before_results, while the actual repaired design uses 13/12/15. The total 40 was always correct. S1 corrects the governance record truthfully, forward-only, with no history rewrite and no implementation authorization.",
+  "repair_commit": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
+  "schema": "oce.block_06_i5.amendment_supplement.v1",
+  "stage": "B6-I5",
+  "status": "CORRECTIVE_SUPPLEMENT_FROZEN",
+  "supersedes_only_inaccurate_arithmetic_and_reference_identity": true,
+  "supplement": "S1",
+  "supplement_created_after_repair_audit": true
 }

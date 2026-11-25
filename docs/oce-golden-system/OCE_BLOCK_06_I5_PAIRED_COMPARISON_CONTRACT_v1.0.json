@@ -1,6 +1,6 @@
 {
   "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
-  "amendment_sha": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
   "document_id": "OCE-B6-I5-PAIRED-001",
   "endpoints": {
     "base_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
@@ -23,6 +23,8 @@
     "overlapping_sets",
     "cleanup_failure"
   ],
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
   "locks": {
     "B6-I6_through_I9": "LOCKED",
     "MERGE_AUTHORIZED": false,

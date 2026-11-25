@@ -49,7 +49,7 @@
   "cost_usd": 0,
   "document_id": "OCE-B6-I5-AMENDMENT-001",
   "e1_non_vacuous_mutation_law": {
-    "law": "A mutation counts only if: (1) intended target was changed; (2) mutated source remains syntactically valid; (3) named node collects; (4) named node executes; (5) named node fails behaviorally; (6) pytest return code is exactly 1; (7) failure is not import/collection/usage/no-collector failure; (8) the intended node—not an unrelated node—discriminates; (9) restoration is byte-exact; (10) pristine named node passes; (11) pristine complete focused suite passes; (12) tracked tree is clean afterward",
+    "law": "A mutation counts only if: (1) intended target was changed; (2) mutated source compiles successfully and remains syntactically valid before collection; Mutated Python source must compile successfully and remain syntactically valid before collection.; (3) named node collects; (4) named node executes; (5) named node fails behaviorally; (6) pytest return code is exactly 1; (7) failure is not import/collection/usage/no-collector failure; (8) the intended node—not an unrelated node—discriminates; (9) restoration is byte-exact; (10) pristine named node passes; (11) pristine complete focused suite passes; (12) tracked tree is clean afterward",
     "mutation_floor": 3,
     "mutation_floor_kind": "minimum",
     "planned_mutations": [
