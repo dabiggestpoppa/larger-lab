@@ -1,0 +1,394 @@
+"""Independent fixture architecture for the P3 consumer rungs.
+
+MATERIALIZED NAME: ``rung1_fixtures.py``
+
+Why this file exists
+--------------------
+An adversarial probe is only as good as its positive control.  A probe whose
+fixture is invalid for an unrelated reason "passes" by refusing everything, and
+that is indistinguishable from a working defence.  So every fixture here is
+built from the REAL ratified record types and is self-tested in ``__main__``.
+
+Two families are deliberately separated (mission section 6):
+
+* ``STRUCTURAL`` fixtures prove that a value of the right shape can be built at
+  all.  They are the positive controls for construction tests (C01, C02, C16).
+* ``AUTHORIZATION`` fixtures are inputs whose whole purpose is to test a real
+  authorization decision (custody bytes, mutable store, root-loader seam).
+  They are NOT valid evidence of anything: the trusted custody double holds
+  bytes because the verifier hashes them, and the mutable store exists only to
+  rebind after the first read.
+
+Nothing here implements a production policy, invents a provider approval, or
+touches the shipped manifest.  ``RootLoaderSeam`` is a *recording* double: it
+counts every load so a probe can prove a model construction performed no I/O.
+
+Provenance of every constant: derived from the accepted modules
+``normalization/models.py``, ``sensors/trade.py``, ``sensors/liquidation.py``,
+``time/replay_gate.py`` and ``common/methodologies.py`` at the audited commit.
+"""
+
+from __future__ import annotations
+
+import hashlib
+from datetime import UTC, datetime, timedelta, timezone
+from decimal import Decimal
+
+from crypto_sensor_fabric.contracts.enums import AggressorSide, SensorFamily
+from crypto_sensor_fabric.normalization.common.methodologies import (
+    NormalizationMethodologyRegistry,
+)
+from crypto_sensor_fabric.normalization.enums import (
+    AvailabilityBasis,
+    LineageState,
+    NormalizationQualityFlag,
+    NormalizationStatus,
+    QualityDimensionState,
+)
+from crypto_sensor_fabric.normalization.models import (
+    NativeQuantity,
+    ObservationTimeEnvelope,
+    T1LineageRef,
+    T1Quality,
+    T1VersionContext,
+)
+from crypto_sensor_fabric.normalization.sensors.liquidation import (
+    LiquidationAggregationScope,
+    LiquidationPositionSide,
+    T1LiquidationRecord,
+)
+from crypto_sensor_fabric.normalization.sensors.trade import T1TradeRecord
+from crypto_sensor_fabric.normalization.time.replay_gate import ReplayEvidence
+from crypto_sensor_fabric.storage import CoverageState, RevisionState
+
+# ---------------------------------------------------------------------------
+# Fixed, deterministic coordinates.  No wall clock anywhere in this file.
+# ---------------------------------------------------------------------------
+
+#: The one fixed awareness cutoff every probe uses.
+CUTOFF = datetime(2026, 6, 1, 12, 0, tzinfo=UTC)
+#: The SAME INSTANT expressed at a different offset (C09 equivalence family).
+CUTOFF_EQUIVALENT = datetime(2026, 6, 1, 14, 0, tzinfo=timezone(timedelta(hours=2)))
+#: The SAME WALL CLOCK, naive: the C07 attack input.
+CUTOFF_NAIVE = datetime(2026, 6, 1, 12, 0)
+#: A bare date: the C08 attack input (must not be coerced into midnight UTC).
+CUTOFF_BARE_DATE = CUTOFF.date()
+#: A cutoff after every fixture event, so no PIT ordering can refuse it.
+CUTOFF_LATE = datetime(2026, 12, 31, 23, 59, tzinfo=UTC)
+
+EVIDENCE_REF = "ev:p3rung1:side-semantics"
+EVIDENCE_REF_SECOND = "ev:p3rung1:execution-side"
+EVIDENCE_DIGEST = "a" * 64
+EVIDENCE_DIGEST_ALT = "b" * 64
+EVIDENCE_BYTES = b'{"approved":"p3-rung1-fixture-evidence"}'
+EVIDENCE_BYTES_REBOUND = b'{"approved":"p3-rung1-fixture-evidence","mutated":true}'
+ARTIFACT_BYTES = b'{"artifacts":{}}'
+ARTIFACT_ID = "P3-RUNG1-FIXTURE-AUTHORITY"
+MANIFEST_BYTES = b'{"artifacts":{},"schema_version":"fixture"}'
+
+METHOD_ID = "P3_RUNG1_SIDE_V1"
+METHOD_VERSION = "1"
+LIQ_METHOD_ID = "P3_RUNG1_LIQ_V1"
+
+#: Deterministic authority identities (opaque tokens, never resolved here).
+AUTHORITY_IDENTITY = "authority:p3-rung1:fixed:1"
+CUSTODY_SOURCE_IDENTITY = "custody:p3-rung1:independent-store:1"
+ROOT_IDENTITY = "root:p3-rung1:reviewed:1"
+
+
+def digest_of(payload: bytes) -> str:
+    """The same digest rule the verifier uses, so a fixture cannot lie by accident."""
+    return hashlib.sha256(payload).hexdigest()
+
+
+# ---------------------------------------------------------------------------
+# STRUCTURAL family: real T1 records
+# ---------------------------------------------------------------------------
+
+
+def _lineage() -> T1LineageRef:
+    return T1LineageRef(
+        raw_projection_refs=("proj:p3rung1:1",),
+        acquisition_refs=("acq:p3rung1:1",),
+        evidence_blob_hashes=(EVIDENCE_DIGEST,),
+        code_version="p3-rung1-audit",
+        config_version="p3-rung1-cfg",
+    )
+
+
+def _quality() -> T1Quality:
+    """Every dimension VERIFIED, which is what forces a usable availability basis."""
+    return T1Quality(
+        **{
+            name: QualityDimensionState.VERIFIED
+            for name in (
+                "identity_quality",
+                "time_quality",
+                "semantic_quality",
+                "unit_quality",
+                "lineage_quality",
+                "source_integrity_quality",
+                "coverage_quality",
+                "replay_quality",
+            )
+        }
+    )
+
+
+def _versions() -> T1VersionContext:
+    return T1VersionContext(
+        identity_registry_version="identity-registry-v1",
+        contract_terms_version="contract-terms-v1",
+        semantic_registry_version="semantic-registry-v1",
+        methodology_registry_version="methodology-registry-v1",
+        time_semantics_version="time-semantics-v1",
+    )
+
+
+def _base_payload(family: SensorFamily, **overrides: object) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "sensor_family": family,
+        "provider": "BINANCE_USDM",
+        "venue": "BINANCE",
+        "native_instrument": "BTCUSDT",
+        "contract_instance_id": "BINANCE_USDM:BTCUSDT:PERP",
+        "native_event_id": "evt-p3rung1-1",
+        "normalization_generation": "gen-p3rung1-1",
+        "source_revision_id": "rev-p3rung1-1",
+        "source_revision_state": RevisionState.STABLE,
+        "source_coverage_state": CoverageState.COMPLETE_SOURCE_BOUNDARY,
+        "time": ObservationTimeEnvelope(
+            effective_at=CUTOFF,
+            market_available_at=CUTOFF,
+            availability_basis=AvailabilityBasis.REALTIME_PUBLIC_EVENT,
+        ),
+        "native_values": (
+            NativeQuantity(
+                native_field_name="isBuyerMaker",
+                native_value=Decimal("1.5"),
+            ),
+        ),
+        "normalization_status": NormalizationStatus.NORMALIZED,
+        "lineage_state": LineageState.LINEAGE_COMPLETE,
+        "quality_flags": (NormalizationQualityFlag.LINEAGE_COMPLETE,),
+        "lineage": _lineage(),
+        "quality": _quality(),
+        "versions": _versions(),
+    }
+    payload.update(overrides)
+    return payload
+
+
+def valid_trade_record(**overrides: object) -> T1TradeRecord:
+    """Positive control for a T1 trade record (C01)."""
+    payload = _base_payload(
+        SensorFamily.MECHANICAL_TRADE, aggressor_side=AggressorSide.UNKNOWN
+    )
+    payload.update(overrides)
+    return T1TradeRecord.model_validate(payload)
+
+
+def valid_liquidation_record(**overrides: object) -> T1LiquidationRecord:
+    """Positive control for a T1 liquidation record (C02)."""
+    payload = _base_payload(
+        SensorFamily.MECHANICAL_LIQUIDATION,
+        quantity_native=Decimal("2.5"),
+        quantity_native_unit="BTC",
+        aggregation_scope=LiquidationAggregationScope.EVENT_LEVEL,
+        position_side_liquidated=LiquidationPositionSide.UNKNOWN,
+    )
+    payload.update(overrides)
+    return T1LiquidationRecord.model_validate(payload)
+
+
+def valid_replay_evidence(**overrides: object) -> ReplayEvidence:
+    """Real ReplayEvidence, frozen and aware (C01/C16 request component)."""
+    payload: dict[str, object] = {
+        "identity_pit_resolved": True,
+        "timestamp_semantics_verified": True,
+        "source_evidence_refs": ("ev:p3rung1:timestamp-semantics",),
+        "availability_basis": AvailabilityBasis.REALTIME_PUBLIC_EVENT,
+        "availability_confidence": "HIGH",
+        "market_available_at": CUTOFF,
+        "interval_complete": True,
+        "revision": None,
+        "lineage": LineageState.LINEAGE_COMPLETE,
+        "quality_flags": (NormalizationQualityFlag.LINEAGE_COMPLETE,),
+    }
+    payload.update(overrides)
+    return ReplayEvidence.model_validate(payload)
+
+
+def methodology_registry() -> NormalizationMethodologyRegistry:
+    """The existing methodology registry TYPE, populated with fixture rows.
+
+    Reuses the ratified registry rather than inventing a new one, so a Rung 2
+    probe cannot drift from the registry every normalizer already resolves
+    against.
+    """
+    return NormalizationMethodologyRegistry.model_validate(
+        {
+            "schema_version": "p3-rung1-methods-1",
+            "methodologies": [
+                {
+                    "methodology_id": METHOD_ID,
+                    "version": METHOD_VERSION,
+                    "sensor_family": SensorFamily.MECHANICAL_TRADE,
+                    "description": "P3 Rung 1 independent fixture row (trade side).",
+                    "formula_or_algorithm": "identity: native boolean -> canonical side",
+                    "required_inputs": ("native_side_field",),
+                    "output_units": ("ENUM",),
+                    "PIT_requirements": "native field preserved verbatim",
+                    "known_limitations": ("fixture only; not a provider approval",),
+                    "introduced_at": "2026-06-01",
+                },
+                {
+                    "methodology_id": LIQ_METHOD_ID,
+                    "version": METHOD_VERSION,
+                    "sensor_family": SensorFamily.MECHANICAL_LIQUIDATION,
+                    "description": "P3 Rung 1 independent fixture row (liquidation).",
+                    "formula_or_algorithm": "identity: native side -> canonical side",
+                    "required_inputs": ("native_position_side_field",),
+                    "output_units": ("ENUM",),
+                    "PIT_requirements": "native field preserved verbatim",
+                    "known_limitations": ("fixture only; not a provider approval",),
+                    "introduced_at": "2026-06-01",
+                },
+            ],
+        }
+    )
+
+
+# ---------------------------------------------------------------------------
+# AUTHORIZATION family: doubles, never evidence
+# ---------------------------------------------------------------------------
+
+
+class TrustedCustodyDouble:
+    """An independently held BYTE store (the ``TrustedCustodyProvider`` shape).
+
+    It holds bytes because the verifier hashes what it is handed.  A double that
+    returned a digest would let the verifier believe a report about evidence
+    instead of the evidence, which is exactly the P2cR1 F-R1-01 defect.
+    """
+
+    def __init__(self, held: dict[str, bytes] | None = None) -> None:
+        self._held = dict(held or {EVIDENCE_REF: EVIDENCE_BYTES})
+        self.reads: list[str] = []
+
+    def read_evidence(self, reference: str) -> bytes | None:
+        self.reads.append(reference)
+        return self._held.get(reference)
+
+    def rebind(self, reference: str, payload: bytes) -> None:
+        self._held[reference] = payload
+
+
+class MutableEvidenceStore:
+    """A store that changes what it hands over AFTER the first read.
+
+    This is the rebinding attack: a consumer that reads evidence once and then
+    reasons about the earlier bytes is defending nothing.
+    """
+
+    def __init__(self, first: bytes, second: bytes) -> None:
+        self._first = first
+        self._second = second
+        self._reads = 0
+
+    def read_evidence(self, reference: str) -> bytes | None:
+        self._reads += 1
+        if self._reads == 1:
+            return self._first
+        return self._second
+
+    @property
+    def reads(self) -> int:
+        return self._reads
+
+
+class RootLoaderSeam:
+    """The policy-owned root-loader seam, as a RECORDING double.
+
+    Rung 1 must perform no root load at all.  Rungs 2-3 may load the reviewed
+    root exactly through an injected seam like this one, so a probe can count
+    loads and prove that construction alone never touched the root.
+    """
+
+    def __init__(self, payload: bytes = MANIFEST_BYTES) -> None:
+        self._payload = payload
+        self.loads: list[str] = []
+
+    def load(self) -> bytes:
+        self.loads.append(ROOT_IDENTITY)
+        return self._payload
+
+    @property
+    def load_count(self) -> int:
+        return len(self.loads)
+
+
+__all__ = [
+    "ARTIFACT_BYTES",
+    "ARTIFACT_ID",
+    "AUTHORITY_IDENTITY",
+    "CUSTODY_SOURCE_IDENTITY",
+    "CUTOFF",
+    "CUTOFF_BARE_DATE",
+    "CUTOFF_EQUIVALENT",
+    "CUTOFF_LATE",
+    "CUTOFF_NAIVE",
+    "EVIDENCE_BYTES",
+    "EVIDENCE_BYTES_REBOUND",
+    "EVIDENCE_DIGEST",
+    "EVIDENCE_DIGEST_ALT",
+    "EVIDENCE_REF",
+    "EVIDENCE_REF_SECOND",
+    "LIQ_METHOD_ID",
+    "MANIFEST_BYTES",
+    "METHOD_ID",
+    "METHOD_VERSION",
+    "MutableEvidenceStore",
+    "ROOT_IDENTITY",
+    "RootLoaderSeam",
+    "TrustedCustodyDouble",
+    "digest_of",
+    "methodology_registry",
+    "valid_liquidation_record",
+    "valid_replay_evidence",
+    "valid_trade_record",
+]
+
+
+if __name__ == "__main__":  # fixture self-test: every fixture must really build
+    import json
+
+    report: dict[str, object] = {}
+    for name, factory in (
+        ("trade", valid_trade_record),
+        ("liquidation", valid_liquidation_record),
+        ("replay", valid_replay_evidence),
+        ("methodology_registry", methodology_registry),
+    ):
+        try:
+            built = factory()
+        except Exception as exc:  # noqa: BLE001 - a broken fixture must be loud
+            report[name] = {"state": "INVALID", "error": f"{type(exc).__name__}: {exc}"}
+        else:
+            report[name] = {"state": "VALID", "type": type(built).__name__}
+
+    report["custody_double"] = {
+        "state": "VALID",
+        "bytes_held": TrustedCustodyDouble().read_evidence(EVIDENCE_REF) == EVIDENCE_BYTES,
+    }
+    mutable = MutableEvidenceStore(EVIDENCE_BYTES, EVIDENCE_BYTES_REBOUND)
+    report["mutable_store"] = {
+        "state": "VALID",
+        "rebinds": mutable.read_evidence(EVIDENCE_REF) != mutable.read_evidence(EVIDENCE_REF),
+    }
+    seam = RootLoaderSeam()
+    seam.load()
+    report["root_loader_seam"] = {"state": "VALID", "loads_recorded": seam.load_count}
+
+    print(json.dumps(report, indent=2, default=str))
+    exit(0 if all(v.get("state") == "VALID" for v in report.values()) else 1)

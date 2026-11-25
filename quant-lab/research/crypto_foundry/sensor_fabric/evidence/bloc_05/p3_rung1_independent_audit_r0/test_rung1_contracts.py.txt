@@ -1,0 +1,715 @@
+"""Independent adversarial probes C01-C22 for the authorized Rung 1 contracts.
+
+MATERIALIZED NAME: ``test_rung1_contracts.py``
+
+Status on the audited tree: IMPLEMENTATION_PENDING.  ``consumer/models.py`` is
+not published (the Agent 1 branch is still at the D-1 authorization commit), so
+every case below reports NOT_EXECUTED rather than inventing a failure.
+
+Design rules this file holds itself to (the previous suite's conceptual defects
+are corrected here):
+
+1. Every case builds a VALID positive control first and asserts it constructs.
+   A broken fixture fails loudly as a probe defect, never as a security pass.
+2. The attack input actually reaches the entry point the case names.  C05 really
+   submits a callable; C04 really submits a verdict object; C03 really injects
+   unknown authorization keywords.  No case is satisfied by an ordinary request.
+3. An expected validation refusal and an unexpected error are distinguished:
+   only ``ValidationError`` / ``ValueError`` / ``TypeError`` count as a refusal;
+   anything else is reported as an UNEXPECTED ERROR.
+4. Import absence is detected ONCE at module load, and only for the exact
+   unpublished module chain.  A missing internal dependency is re-raised, never
+   masked.
+"""
+
+from __future__ import annotations
+
+import importlib
+import inspect
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+from pydantic import ValidationError
+
+_HERE = Path(__file__).resolve().parent
+if str(_HERE) not in sys.path:
+    sys.path.insert(0, str(_HERE))
+
+import rung1_fixtures as fx  # noqa: E402
+
+_MODULE_NAME = "crypto_sensor_fabric.normalization.consumer.models"
+_CONSUMER_PACKAGE = "crypto_sensor_fabric.normalization.consumer"
+
+
+def _load_contracts():
+    """Detect implementation absence exactly once, without masking anything else."""
+    try:
+        return importlib.import_module(_MODULE_NAME), None
+    except ModuleNotFoundError as exc:
+        missing = exc.name or "<unnamed>"
+        # ONLY the unpublished consumer chain may be absent.  Any other missing
+        # module is a broken internal dependency and must surface at once.
+        if missing not in {_MODULE_NAME, _CONSUMER_PACKAGE}:
+            raise
+        return None, missing
+
+
+MODELS, ABSENT_MODULE = _load_contracts()
+
+requires_implementation = pytest.mark.skipif(
+    MODELS is None,
+    reason=(
+        "NOT_EXECUTED — IMPLEMENTATION_PENDING: "
+        f"{_MODULE_NAME} is not published on this tree "
+        f"(first missing module: {ABSENT_MODULE}); Rung 1 A1.1-A1.5 cannot be "
+        "executed and no result is claimed"
+    ),
+)
+
+
+def _sym(name: str):
+    """A required public symbol.  Absence is an incomplete surface, not a skip."""
+    if MODELS is None:  # pragma: no cover - guarded by requires_implementation
+        pytest.fail("NOT_EXECUTED — IMPLEMENTATION_PENDING: module absent")
+    value = getattr(MODELS, name, None)
+    if value is None:
+        pytest.fail(
+            f"INCOMPLETE SURFACE: {_MODULE_NAME} does not export {name!r}, which "
+            "the authorized Rung 1 contract specifies"
+        )
+    return value
+
+
+def _request(**payload):
+    return _sym("ConsumerRequest")(**payload)
+
+
+def _valid_request_payload(**overrides) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "record": fx.valid_trade_record(),
+        "artifact_bytes": fx.ARTIFACT_BYTES,
+        "required_fields": ("price_canonical",),
+        "evidence_references": ((fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST),),
+        "knowledge_cutoff": fx.CUTOFF,
+        "replay_evidence": fx.valid_replay_evidence(),
+        "claimed_manifest_bytes": fx.MANIFEST_BYTES,
+    }
+    payload.update(overrides)
+    return payload
+
+
+def _accept(build, label: str):
+    """A positive control must genuinely construct."""
+    try:
+        return build()
+    except Exception as exc:  # noqa: BLE001 - deliberate: report, never hide
+        pytest.fail(
+            f"{label}: POSITIVE CONTROL REFUSED — probe/fixture defect, not a "
+            f"security finding: {type(exc).__name__}: {exc}"
+        )
+
+
+def _refuse(build, label: str):
+    """An attack must be refused by validation, and nothing else."""
+    try:
+        build()
+    except (ValidationError, ValueError, TypeError) as exc:
+        return exc
+    except Exception as exc:  # noqa: BLE001 - classify, never swallow
+        pytest.fail(f"{label}: UNEXPECTED ERROR {type(exc).__name__}: {exc}")
+    pytest.fail(f"{label}: attack input was ACCEPTED; no refusal occurred")
+
+
+def _verdict_kwargs(**overrides):
+    payload = {
+        "decision": _sym("ConsumerDecision").ACCEPT_FIELD_BINDING,
+        "pit_status": "PIT_ADMISSIBLE",
+        "replay_status": "REPLAY_ELIGIBLE",
+        "custody_status": "CUSTODY_VERIFIED",
+        "custody_source_authorization_status": _sym("CustodyAuthorityBasis").INTEGRATION_REQUIRED,
+    }
+    payload.update(overrides)
+    return payload
+
+
+# ---------------------------------------------------------------------------
+# C00 -- the import state itself is recorded, and is never a silent skip
+# ---------------------------------------------------------------------------
+
+
+def test_c00_import_state_is_recorded_exactly_once():
+    """Exactly one module-load determination; anything else is a tampering signal."""
+    assert (MODELS is None) is (ABSENT_MODULE is not None)
+    if MODELS is None:
+        assert ABSENT_MODULE in {_MODULE_NAME, _CONSUMER_PACKAGE}
+    else:
+        assert Path(MODELS.__file__).name == "models.py"
+
+
+@requires_implementation
+def test_c00b_module_is_the_authorized_path_not_a_sibling():
+    """The published module must be the authorized exact path."""
+    assert Path(MODELS.__file__).as_posix().endswith(
+        "src/crypto_sensor_fabric/normalization/consumer/models.py"
+    ), Path(MODELS.__file__).as_posix()
+
+
+# ---------------------------------------------------------------------------
+# C01 / C02 -- normal construction with each valid typed record
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c01_consumer_request_accepts_a_typed_trade_record():
+    trade = _accept(fx.valid_trade_record, "C01 fixture")
+    request = _accept(lambda: _request(**_valid_request_payload(record=trade)), "C01 control")
+    assert request.record is trade
+    assert request.artifact_bytes == fx.ARTIFACT_BYTES
+    assert request.knowledge_cutoff == fx.CUTOFF
+
+
+@requires_implementation
+def test_c02_consumer_request_accepts_a_typed_liquidation_record():
+    liquidation = _accept(fx.valid_liquidation_record, "C02 fixture")
+    request = _accept(
+        lambda: _request(**_valid_request_payload(record=liquidation)), "C02 control"
+    )
+    assert request.record is liquidation
+
+
+# ---------------------------------------------------------------------------
+# C03 -- unknown authorization field injection
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c03_unknown_authorization_fields_are_refused():
+    base = _valid_request_payload()
+    _accept(lambda: _request(**base), "C03 control")
+
+    basis = _sym("CustodyAuthorityBasis")
+    injections = {
+        "custody_authority": basis.AUTHORIZED,
+        "authorized": True,
+        "trusted": True,
+        "custody_source_authorization_status": basis.AUTHORIZED,
+        "decision": "ACCEPT_FIELD_BINDING",
+    }
+    for field_name, value in injections.items():
+        _refuse(
+            lambda field_name=field_name, value=value: _request(**{**base, field_name: value}),
+            f"C03 injection {field_name!r}={value!r}",
+        )
+
+
+# ---------------------------------------------------------------------------
+# C04 -- a forged verdict presented as RECORD input
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c04_forged_consumer_verdict_is_refused_as_record_input():
+    verdict = _accept(
+        lambda: _sym("ConsumerVerdict")(**_verdict_kwargs()), "C04 forged verdict fixture"
+    )
+    base = _valid_request_payload()
+
+    # The verdict OBJECT, presented as the record.
+    _refuse(
+        lambda: _request(**{**base, "record": verdict}),
+        "C04 ConsumerVerdict instance as record",
+    )
+    # The verdict as a mapping on the record slot.
+    _refuse(
+        lambda: _request(**{**base, "record": verdict.model_dump(mode="json")}),
+        "C04 verdict mapping as record",
+    )
+    # The verdict smuggled into the replay-evidence slot.
+    _refuse(
+        lambda: _request(**{**base, "replay_evidence": verdict}),
+        "C04 ConsumerVerdict as replay_evidence",
+    )
+
+
+# ---------------------------------------------------------------------------
+# C05 -- callable / rederive injection, across BOTH fixture families
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+@pytest.mark.parametrize(
+    "record_family", ["trade", "liquidation"], ids=["trade", "liquidation"]
+)
+def test_c05_callable_and_rederive_injection_is_refused(record_family):
+    """Same entry point, both record families, real callables submitted."""
+    factory = (
+        fx.valid_trade_record if record_family == "trade" else fx.valid_liquidation_record
+    )
+    record = _accept(factory, f"C05 {record_family} fixture")
+    base = _valid_request_payload(record=record)
+    _accept(lambda: _request(**base), f"C05 {record_family} control")
+
+    def rederive(_record):  # the callback a caller would love to supply
+        return _sym("ConsumerVerdict")(**_verdict_kwargs())
+
+    attacks = {
+        "rederive keyword": lambda: _request(**{**base, "rederive": rederive}),
+        "rederive on record slot": lambda: _request(**{**base, "record": rederive}),
+        "lambda on record slot": lambda: _request(**{**base, "record": lambda: record}),
+        "callable in required_fields": lambda: _request(
+            **{**base, "required_fields": (rederive,)}
+        ),
+        "callable in evidence_references": lambda: _request(
+            **{**base, "evidence_references": ((fx.EVIDENCE_REF, rederive),)}
+        ),
+        "verifier keyword": lambda: _request(
+            **{**base, "verifier": fx.valid_trade_record}
+        ),
+    }
+    for label, build in attacks.items():
+        _refuse(build, f"C05 {record_family} {label}")
+
+
+@requires_implementation
+def test_c05b_no_request_field_annotation_admits_a_callable_or_a_verdict():
+    """Structural A1.1: the field SET cannot reach a callback or a verdict."""
+    forbidden_types = {
+        "ConsumerVerdict",
+        "RecordVerification",
+        "SemanticAuthority",
+        "TrustedAuthorityContext",
+        "CustodyAuthorityCapability",
+        "Callable",
+        "Callable[..., ConsumerVerdict]",
+    }
+    forbidden_names = {"authority", "authorized", "custody_authority", "trusted", "rederive"}
+    request_cls = _sym("ConsumerRequest")
+
+    for name, field in request_cls.model_fields.items():
+        annotation = str(field.annotation)
+        for forbidden in forbidden_types:
+            assert forbidden not in annotation, (
+                f"ConsumerRequest.{name} annotates {forbidden}; a callback can re-enter intake"
+            )
+        assert name not in forbidden_names, f"ConsumerRequest carries forbidden field {name!r}"
+
+
+# ---------------------------------------------------------------------------
+# C06 -- invalid concrete record type
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c06_non_t1_concrete_record_types_are_refused():
+    base = _valid_request_payload()
+    _accept(lambda: _request(**base), "C06 control")
+
+    wrong_types = {
+        "ReplayEvidence": fx.valid_replay_evidence(),
+        "ObservationTimeEnvelope": fx.valid_trade_record().time,
+        "plain dict": {"price_native": "61234.50"},
+        "None": None,
+        "artifact bytes as record": fx.ARTIFACT_BYTES,
+    }
+    for label, value in wrong_types.items():
+        _refuse(
+            lambda value=value: _request(**{**base, "record": value}),
+            f"C06 record={label}",
+        )
+
+
+# ---------------------------------------------------------------------------
+# C07 / C08 -- naive and bare-date cutoffs
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c07_naive_knowledge_cutoff_is_refused():
+    base = _valid_request_payload()
+    _accept(lambda: _request(**{**base, "knowledge_cutoff": fx.CUTOFF}), "C07 aware control")
+    _refuse(
+        lambda: _request(**{**base, "knowledge_cutoff": fx.CUTOFF_NAIVE}),
+        "C07 naive cutoff",
+    )
+
+
+@requires_implementation
+def test_c08_bare_date_cutoff_is_refused():
+    base = _valid_request_payload()
+    _refuse(
+        lambda: _request(**{**base, "knowledge_cutoff": fx.CUTOFF_BARE_DATE}),
+        "C08 bare date cutoff",
+    )
+    # A bare date must not be coerced into midnight UTC by the string path either.
+    _refuse(
+        lambda: _request(**{**base, "knowledge_cutoff": "2026-06-01"}),
+        "C08 ISO date string cutoff",
+    )
+
+
+# ---------------------------------------------------------------------------
+# C09 -- equivalent aware cutoffs across timezone offsets
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c09_equivalent_aware_cutoffs_normalise_to_the_same_instant():
+    assert fx.CUTOFF == fx.CUTOFF_EQUIVALENT  # the fixtures are one instant
+
+    first = _accept(
+        lambda: _request(**{**_valid_request_payload(), "knowledge_cutoff": fx.CUTOFF}),
+        "C09 UTC request",
+    )
+    second = _accept(
+        lambda: _request(
+            **{**_valid_request_payload(), "knowledge_cutoff": fx.CUTOFF_EQUIVALENT}
+        ),
+        "C09 +02:00 request",
+    )
+    assert first.knowledge_cutoff == second.knowledge_cutoff
+    assert first.model_dump()["knowledge_cutoff"] == second.model_dump()["knowledge_cutoff"]
+    assert first.model_dump_json() == second.model_dump_json()
+
+
+# ---------------------------------------------------------------------------
+# C10 -- caller-owned evidence-container mutation after construction
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c10_caller_owned_evidence_container_cannot_mutate_a_built_request():
+    caller_owned = [[fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST]]
+    request = _accept(
+        lambda: _request(**{**_valid_request_payload(), "evidence_references": caller_owned}),
+        "C10 control",
+    )
+    before = request.evidence_references
+
+    caller_owned.append([fx.EVIDENCE_REF_SECOND, fx.EVIDENCE_DIGEST_ALT])
+    caller_owned[0][1] = fx.EVIDENCE_DIGEST_ALT
+
+    assert request.evidence_references == before
+    assert tuple(map(tuple, request.evidence_references)) == (
+        (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST),
+    )
+    with pytest.raises((ValidationError, TypeError, AttributeError)):
+        request.evidence_references = ((fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST_ALT),)
+
+
+# ---------------------------------------------------------------------------
+# C11 / C12 -- duplicate and contradictory evidence references
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c11_duplicate_evidence_references_are_refused():
+    base = _valid_request_payload()
+    _accept(lambda: _request(**base), "C11 control")
+    _refuse(
+        lambda: _request(
+            **{
+                **base,
+                "evidence_references": (
+                    (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST),
+                    (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST),
+                ),
+            }
+        ),
+        "C11 duplicate reference",
+    )
+
+
+@requires_implementation
+def test_c12_contradictory_digests_for_one_reference_are_refused():
+    base = _valid_request_payload()
+    _accept(
+        lambda: _request(
+            **{
+                **base,
+                "evidence_references": (
+                    (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST),
+                    (fx.EVIDENCE_REF_SECOND, fx.EVIDENCE_DIGEST_ALT),
+                ),
+            }
+        ),
+        "C12 distinct references control",
+    )
+    _refuse(
+        lambda: _request(
+            **{
+                **base,
+                "evidence_references": (
+                    (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST),
+                    (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST_ALT),
+                ),
+            }
+        ),
+        "C12 contradictory digests",
+    )
+
+
+# ---------------------------------------------------------------------------
+# C13 / C14 / C15 -- exact enum membership, and the test-only refusal
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c13_consumer_decision_membership_is_exact():
+    decision = _sym("ConsumerDecision")
+    members = {member.name for member in decision}
+    assert members == {"ACCEPT_FIELD_BINDING", "REFUSE", "INTEGRATION_REQUIRED"}, members
+    assert len(list(decision)) == 3
+    for forbidden in ("ACCEPT", "AUTHORIZED", "SYNTHETIC_TEST_ONLY"):
+        assert forbidden not in members, f"ConsumerDecision gained {forbidden}"
+
+
+@requires_implementation
+def test_c14_custody_authority_basis_membership_is_exact():
+    basis = _sym("CustodyAuthorityBasis")
+    members = {member.name for member in basis}
+    assert members == {"AUTHORIZED", "INTEGRATION_REQUIRED", "UNAUTHORIZED"}, members
+    assert len(list(basis)) == 3
+    assert "SYNTHETIC_TEST_ONLY" not in members
+
+
+@requires_implementation
+def test_c15_synthetic_test_only_authority_is_unrepresentable():
+    assert "SYNTHETIC_TEST_ONLY" not in {m.name for m in _sym("CustodyAuthorityBasis")}
+    _refuse(
+        lambda: _sym("ConsumerVerdict")(
+            **_verdict_kwargs(custody_source_authorization_status="SYNTHETIC_TEST_ONLY")
+        ),
+        "C15 SYNTHETIC_TEST_ONLY basis",
+    )
+    _refuse(
+        lambda: _sym("ConsumerVerdict")(**_verdict_kwargs(custody_status="AUTHORIZED")),
+        "C15 custody_status=AUTHORIZED",
+    )
+
+
+# ---------------------------------------------------------------------------
+# C16 -- stable serialization and round-trip
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c16_serialization_is_stable_and_round_trips():
+    request = _accept(lambda: _request(**_valid_request_payload()), "C16 control")
+    assert _request(**request.model_dump()) == request
+    assert request.model_dump_json() == request.model_dump_json()
+    rebuilt = _accept(lambda: _request(**request.model_dump(mode="json")), "C16 wkt rebuild")
+    assert rebuilt == request
+
+
+# ---------------------------------------------------------------------------
+# C17 -- frozen model mutation
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c17_constructed_request_and_verdict_are_immutable():
+    request = _accept(lambda: _request(**_valid_request_payload()), "C17 request control")
+    with pytest.raises((ValidationError, TypeError, AttributeError)):
+        request.record = fx.valid_liquidation_record()
+    with pytest.raises((ValidationError, TypeError, AttributeError)):
+        request.knowledge_cutoff = fx.CUTOFF_LATE
+
+    verdict = _accept(lambda: _sym("ConsumerVerdict")(**_verdict_kwargs()), "C17 verdict control")
+    with pytest.raises((ValidationError, TypeError, AttributeError)):
+        verdict.decision = _sym("ConsumerDecision").REFUSE
+
+
+# ---------------------------------------------------------------------------
+# C18 -- model_copy(update=...) behaviour: measured, then bounded
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c18_model_copy_update_cannot_manufacture_an_authority_field():
+    request = _accept(lambda: _request(**_valid_request_payload()), "C18 control")
+    basis = _sym("CustodyAuthorityBasis")
+
+    copied = request.model_copy(update={"custody_authority": basis.AUTHORIZED})
+    # The FIELD SET is a class fact and cannot be extended by a copy.
+    assert set(type(request).model_fields) == set(type(copied).model_fields)
+    assert "custody_authority" not in type(request).model_fields
+    # And the injected key cannot be serialized back into a request that carries it.
+    assert "custody_authority" not in copied.model_dump()
+    assert "custody_authority" not in json.loads(copied.model_dump_json())
+
+    # Copying a verdict does not create authority where the original had none.
+    verdict = _accept(lambda: _sym("ConsumerVerdict")(**_verdict_kwargs()), "C18 verdict")
+    assert verdict.custody_source_authorized is False
+    copy_verdict = verdict.model_copy(update={"custody_source_authorized": True})
+    assert "custody_authority" not in type(verdict).model_fields
+    assert "custody_authority" not in copy_verdict.model_dump()
+
+
+# ---------------------------------------------------------------------------
+# C19 -- model_construct() behaviour: the bypass is measured, Rung 1 has no consumer
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c19_model_construct_skips_validation_and_rung1_consumes_nothing():
+    request_cls = _sym("ConsumerRequest")
+    unvalidated = request_cls.model_construct(record="not-a-record", artifact_bytes=b"x")
+    assert unvalidated.record == "not-a-record"  # validation was skipped, by design
+
+    # The load-bearing Rung 1 law: there is NO consuming operation that could turn
+    # an unvalidated instance into authority.
+    def _module_level_functions():
+        return {
+            name: member
+            for name, member in inspect.getmembers(MODELS, inspect.isfunction)
+            if getattr(member, "__module__", None) == MODELS.__name__
+            and not name.startswith("_")
+        }
+
+    consumers = {
+        name
+        for name in _module_level_functions()
+        if any(
+            token in name.lower()
+            for token in ("evaluate", "consume", "authorize", "issue", "rederive", "verdict")
+        )
+    }
+    assert consumers == set(), (
+        "Rung 1 must not expose a consuming operation; found " f"{sorted(consumers)}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# C20 -- clean-subprocess import graph
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c20_importing_the_contracts_does_not_pull_in_the_verifier():
+    import crypto_sensor_fabric
+
+    src = str(Path(crypto_sensor_fabric.__file__).resolve().parent.parent)
+    code = (
+        "import json, sys\n"
+        f"import {_MODULE_NAME} as m\n"
+        "print(json.dumps({\n"
+        '  "loaded": sorted(k for k in sys.modules if k.startswith("crypto_sensor_fabric")),\n'
+        '  "file": m.__file__,\n'
+        "}))\n"
+    )
+    env = dict(os.environ)
+    env["PYTHONPATH"] = src
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        env=env,
+        cwd=str(_HERE),
+        check=False,
+    )
+    assert completed.returncode == 0, completed.stderr[-2000:]
+    loaded = set(json.loads(completed.stdout)["loaded"])
+
+    verifier = "crypto_sensor_fabric.normalization.sensors.verification"
+    assert verifier not in loaded, (
+        "A1.5 violated: importing the contracts drags the full-record verifier in"
+    )
+    # Reported, not asserted: the request's replay_evidence field type lives in
+    # `time.replay_gate`, so that module is expected.  `authority` arrives with
+    # the liquidation record module.
+    assert isinstance(loaded, set)
+
+
+# ---------------------------------------------------------------------------
+# C21 -- no hidden I/O and no authority issuance during construction
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c21_construction_performs_no_io_and_issues_no_authority(monkeypatch):
+    import builtins
+    import socket
+
+    events: list[tuple[str, object]] = []
+    real_open = builtins.open
+    real_time = __import__("time").time
+
+    def spy_open(*args, **kwargs):
+        events.append(("open", args[0] if args else None))
+        return real_open(*args, **kwargs)
+
+    def spy_socket(*args, **kwargs):
+        events.append(("socket", args))
+        raise AssertionError("model construction opened a socket")
+
+    monkeypatch.setattr(builtins, "open", spy_open)
+    monkeypatch.setattr(socket, "socket", spy_socket)
+
+    before = real_time()
+    seam = fx.RootLoaderSeam()
+    request = _accept(lambda: _request(**_valid_request_payload()), "C21 control")
+    after = real_time()
+
+    assert [event for event in events if event[0] == "open"] == []
+    assert seam.load_count == 0, "construction loaded a trust root"
+    # No wall-clock read is observable: the fixed cutoff is preserved verbatim.
+    assert request.knowledge_cutoff == fx.CUTOFF
+
+    source = Path(MODELS.__file__).read_text(encoding="utf-8")
+    for forbidden in ("TRUSTED_MANIFEST_SHA256", "from_reviewed_root", "urandom"):
+        assert forbidden not in source, f"contracts reference {forbidden!r}"
+
+    # The authoritative consumer must not be producible by construction: there is
+    # no custody/authority field on a request at all.
+    assert not [
+        name
+        for name in type(request).model_fields
+        if "authorit" in name or name in {"custody_status", "custody_source_authorized"}
+    ]
+
+
+# ---------------------------------------------------------------------------
+# C22 -- forbidden authority types nested inside permitted structures
+# ---------------------------------------------------------------------------
+
+
+@requires_implementation
+def test_c22_authority_values_nested_in_permitted_fields_are_refused():
+    base = _valid_request_payload()
+    _accept(lambda: _request(**base), "C22 control")
+    basis = _sym("CustodyAuthorityBasis")
+
+    attacks = {
+        "3-tuple reference with basis": lambda: _request(
+            **{
+                **base,
+                "evidence_references": (
+                    (fx.EVIDENCE_REF, fx.EVIDENCE_DIGEST, basis.AUTHORIZED),
+                ),
+            }
+        ),
+        "mapping reference carrying authorized": lambda: _request(
+            **{**base, "evidence_references": ({"ref": fx.EVIDENCE_REF, "authorized": True},)}
+        ),
+        "required_fields carrying a basis": lambda: _request(
+            **{**base, "required_fields": (basis.AUTHORIZED,)}
+        ),
+        "required_fields carrying a record": lambda: _request(
+            **{**base, "required_fields": (fx.valid_trade_record(),)}
+        ),
+        "required_fields carrying a verdict": lambda: _request(
+            **{**base, "required_fields": (_sym("ConsumerVerdict")(**_verdict_kwargs()),)}
+        ),
+        "replay_evidence carrying a basis": lambda: _request(
+            **{**base, "replay_evidence": (basis.AUTHORIZED,)}
+        ),
+        "required_fields nested mapping": lambda: _request(
+            **{**base, "required_fields": ({"custody_authority": basis.AUTHORIZED},)}
+        ),
+    }
+    for label, build in attacks.items():
+        _refuse(build, f"C22 {label}")

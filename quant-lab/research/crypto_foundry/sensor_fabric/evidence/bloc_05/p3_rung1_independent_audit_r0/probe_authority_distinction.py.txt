@@ -1,0 +1,96 @@
+"""Section 5 measurement: does a model instance prove provenance?
+
+MATERIALIZED NAME: ``probe_authority_distinction.py``
+
+This is a MEASUREMENT probe, not a pass/fail security test.  It runs against the
+REAL ratified frozen model (``RecordVerification``, ``extra="forbid"``,
+``frozen=True``) precisely so the result is a fact about pydantic and not about
+any Rung 1 code.  ``consumer/models.py`` is not published, so nothing here
+touches Rung 1.
+
+Usage::
+
+    PYTHONPATH=<quant-lab>/src python probe_authority_distinction.py
+
+Exit status is 0 when every measurement ran.  The printed JSON is what the
+audit report cites; it is deliberately not an assertion that the bypass is
+acceptable, only a record of what the data model does.
+"""
+
+from __future__ import annotations
+
+import json
+
+
+def payload(**overrides: object) -> dict[str, object]:
+    base: dict[str, object] = {
+        "record_kind": "T1_TRADE",
+        "artifact_id": "P3-RUNG1-OBS",
+        "approval_id": "P3-RUNG1-OBS-APPROVAL",
+        "registry_digest": "P3-RUNG1-OBS-REGISTRY",
+        "provider": "BINANCE_USDM",
+        "semantic_mapping_approved": False,
+        "record_transformation_verified": False,
+        "custody_verified": False,
+        "pit_admissible": False,
+        "downstream_trusted": False,
+    }
+    base.update(overrides)
+    return base
+
+
+def main() -> dict[str, object]:
+    from crypto_sensor_fabric.normalization.sensors.verification import (
+        RecordVerification,
+    )
+
+    observed: dict[str, object] = {}
+
+    # 1. Validation refuses the forged downstream-trust claim (the real law holds).
+    try:
+        RecordVerification(**payload(downstream_trusted=True, fields_verified=()))
+        observed["validated_forgery"] = "ACCEPTED"
+    except Exception as exc:  # noqa: BLE001 - the refusal class IS the measurement
+        observed["validated_forgery"] = f"REFUSED {type(exc).__name__}"
+
+    # 2. model_construct() bypasses every validator.
+    bypassed = RecordVerification.model_construct(
+        **payload(
+            downstream_trusted=True,
+            custody_source_authorized=True,
+            trust_scope="WHOLE_RECORD",
+            fields_verified=(),
+        )
+    )
+    observed["model_construct"] = {
+        "downstream_trusted": bypassed.downstream_trusted,
+        "custody_source_authorized": bypassed.custody_source_authorized,
+        "trust_scope": bypassed.trust_scope,
+        "validators_ran": False,
+    }
+
+    # 3. model_copy(update=...) rewrites values with no validation.
+    honest = RecordVerification(**payload())
+    copied = honest.model_copy(
+        update={"downstream_trusted": True, "custody_source_authorized": True}
+    )
+    observed["model_copy"] = {
+        "original_downstream_trusted": honest.downstream_trusted,
+        "copied_downstream_trusted": copied.downstream_trusted,
+        "copied_custody_source_authorized": copied.custody_source_authorized,
+        "validation_ran": False,
+    }
+
+    # 4. model_copy(update={unknown_key: ...}) shadows an out-of-schema attribute.
+    shadow = honest.model_copy(update={"custody_authority": "AUTHORIZED"})
+    observed["model_copy_shadow_attribute"] = {
+        "has_attribute": hasattr(shadow, "custody_authority"),
+        "in_model_fields": "custody_authority" in type(honest).model_fields,
+        "survives_model_dump": "custody_authority" in shadow.model_dump(),
+    }
+
+    return observed
+
+
+if __name__ == "__main__":
+    print(json.dumps(main(), indent=2))

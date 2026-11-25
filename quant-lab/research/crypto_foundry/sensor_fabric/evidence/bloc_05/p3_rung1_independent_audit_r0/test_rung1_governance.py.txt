@@ -1,0 +1,494 @@
+"""Independent exact-file governance challenge for the authorized Rung 1 scope.
+
+MATERIALIZED NAME: ``test_rung1_governance.py``
+
+What this file challenges
+-------------------------
+Both frozen scope audits (`test_b5_i05_scope_audit.py`,
+`test_b5_i10_scope_audit.py`) admit a path with
+``path.startswith(tuple_of_entries)``.  Those tuples already contain
+exact-FILE-looking entries, which therefore behave as prefiXES.  Agent 1 has
+been instructed to implement true exact-file authorization instead of adding
+filenames to those tuples.
+
+These probes answer, with executed evidence rather than narrative:
+
+* G1 -- what the two allowlists actually contain today (parsed from source).
+* G2 -- whether an existing exact-file entry already admits a suffix variant.
+* G3 -- whether the naive amendment (appending the authorized string to the
+         ``startswith`` tuple) would admit one.
+* G4 -- the exact-file ORACLE: the required behaviour, as an executable spec.
+* G5 -- Agent 1's actual mechanism, compared with the oracle.  Skipped as
+         NOT_EXECUTED until the amendment lands, then it runs unaided.
+* G6 -- historical authorized paths keep working under the oracle.
+* G7 -- staged, unstaged and untracked admission challenged independently in a
+         disposable git repository.
+
+The oracle deliberately preserves historical DIRECTORY entries (``.../time/``)
+while making file entries exact, because the frozen audits rely on both.
+
+Nothing here writes to the audited tree: every mutation happens inside
+``tmp_path``.
+"""
+
+from __future__ import annotations
+
+import ast
+import subprocess
+from pathlib import Path, PurePosixPath
+
+import pytest
+
+AUDIT_TREE = Path(__file__).resolve()
+_AUDITS = {
+    "I05": ("test_b5_i05_scope_audit.py", "test_only_the_authorized_paths_were_added_since_the_i05_base", "allowed_prefixes"),
+    "I10": ("test_b5_i10_scope_audit.py", "test_only_the_i10_authorized_prefixes_carry_tracked_changes", "allowed"),
+}
+
+CONSUMER_MODEL = "src/crypto_sensor_fabric/normalization/consumer/models.py"
+CONTRACT_TEST = "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py"
+CONSUMER_INIT = "src/crypto_sensor_fabric/normalization/consumer/__init__.py"
+AUTHORIZED = (CONSUMER_MODEL, CONTRACT_TEST)
+
+#: Paths that must NEVER be admitted by a Rung 1 grant.
+REFUSED = (
+    "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+    "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+    "src/crypto_sensor_fabric/normalization/consumer/rebinding.py",
+    CONSUMER_INIT,
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+    CONSUMER_MODEL + "_suffix.py",
+    CONSUMER_MODEL + ".evil.py",
+    CONSUMER_MODEL + "x",
+    CONSUMER_MODEL + "/../policy.py",
+    CONTRACT_TEST + "_extra.py",
+    CONTRACT_TEST + ".bak",
+)
+
+#: Entries that exist in the frozen audits today and must keep working.
+HISTORICAL = (
+    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+    "src/crypto_sensor_fabric/normalization/time/",
+    "src/crypto_sensor_fabric/normalization/sensors/",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/",
+)
+
+
+def _locate_audits() -> Path:
+    """Find the audited ``quant-lab`` tree from the importable package."""
+    import crypto_sensor_fabric
+
+    # .../quant-lab/src/crypto_sensor_fabric/__init__.py -> .../quant-lab
+    quant_lab = Path(crypto_sensor_fabric.__file__).resolve().parents[2]
+    return quant_lab / "tests" / "crypto_sensor_fabric" / "normalization"
+
+
+def _fold(node: ast.AST) -> str:
+    """Evaluate a string expression (constants, implicit/explicit concatenation)."""
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        return _fold(node.left) + _fold(node.right)
+    if isinstance(node, ast.JoinedStr):
+        parts = []
+        for value in node.values:
+            if isinstance(value, ast.Constant):
+                parts.append(str(value.value))
+            elif isinstance(value, ast.FormattedValue) and isinstance(
+                value.value, ast.Constant
+            ):
+                parts.append(str(value.value.value))
+            else:  # pragma: no cover - the audits do not use dynamic f-strings
+                raise AssertionError(f"non-constant f-string member in allowlist: {ast.dump(value)}")
+        return "".join(parts)
+    raise AssertionError(f"unsupported allowlist member expression: {ast.dump(node)}")
+
+
+def _entries(audit_dir: Path, filename: str, func_name: str, var_name: str) -> tuple[str, ...]:
+    """Parse one allowlist tuple out of an audit's source, without importing it."""
+    path = audit_dir / filename
+    assert path.is_file(), f"audit not found: {path}"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == func_name:
+            for statement in ast.walk(node):
+                if isinstance(statement, ast.Assign) and any(
+                    isinstance(target, ast.Name) and target.id == var_name
+                    for target in statement.targets
+                ):
+                    value = statement.value
+                    assert isinstance(value, (ast.Tuple, ast.List)), ast.dump(value)
+                    return tuple(_fold(element) for element in value.elts)
+    raise AssertionError(f"{filename}: no {var_name!r} assignment found in {func_name!r}")
+
+
+def _allowlists() -> dict[str, tuple[str, ...]]:
+    audit_dir = _locate_audits()
+    return {
+        name: _entries(audit_dir, filename, func, var)
+        for name, (filename, func, var) in _AUDITS.items()
+    }
+
+
+def _current_law(path: str, entries: tuple[str, ...]) -> bool:
+    """The frozen admission rule, reproduced exactly."""
+    return path.startswith(tuple(entries))
+
+
+def _entry_kind(entry: str) -> str:
+    """Classify one frozen allowlist entry.
+
+    Measured, not assumed.  The frozen tuples mix THREE kinds of entry, and a
+    naive "if it ends with .py it is exact" rule silently breaks the third:
+
+    * ``dir`` -- ends with ``/`` (``.../normalization/time/``);
+    * ``file`` -- a complete file name with an extension (``..._scope_audit.py``,
+      ``.gitignore``, ``SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md``);
+    * ``legacy_prefix`` -- a bare stem with NO extension
+      (``.../test_b5_i08``, ``.../test_b5_i05_``), which today admits every
+      sibling whose name starts with it.
+    """
+    if entry.endswith("/"):
+        return "dir"
+    return "file" if "." in PurePosixPath(entry).name else "legacy_prefix"
+
+
+def _oracle(path: str, entries: tuple[str, ...]) -> bool:
+    """Required admission rule: exact files are EXACT; directories stay prefixes.
+
+    Legacy filename prefixes keep their historical behaviour, because revoking
+    them would retroactively un-authorize files other checkpoints already
+    shipped.  They are instead counted and watched (see ``test_g6b``): a Rung 1
+    grant must never be expressible as one.
+
+    Any candidate carrying a ``..`` segment is refused outright, so a prefix
+    cannot be used to climb out of an authorized location.
+    """
+    if ".." in PurePosixPath(path).parts:
+        return False
+    for entry in entries:
+        kind = _entry_kind(entry)
+        if kind == "file":
+            if path == entry:
+                return True
+        elif path.startswith(entry):
+            return True
+    return False
+
+
+# ---------------------------------------------------------------------------
+# G1 -- what the frozen audits actually contain
+# ---------------------------------------------------------------------------
+
+
+def test_g1_both_allowlists_parse_and_agree_on_the_amendment_state():
+    lists = _allowlists()
+    assert set(lists) == {"I05", "I10"}
+    for name, entries in lists.items():
+        assert entries, f"{name} allowlist parsed empty"
+        assert len(set(entries)) == len(entries), f"{name} allowlist has duplicates"
+
+    amended = {
+        name: any("normalization/consumer/" in entry for entry in entries)
+        for name, entries in lists.items()
+    }
+    # The two audits must never diverge: half a grant is not a grant.
+    assert amended["I05"] == amended["I10"], f"allowlists disagree on the Rung 1 grant: {amended}"
+
+    # Every entry class is present today; a one-bit "exact or prefix" switch
+    # cannot represent them (see test_g6).
+    kinds = {
+        name: {kind: sum(1 for e in entries if _entry_kind(e) == kind) for kind in ("dir", "file", "legacy_prefix")}
+        for name, entries in lists.items()
+    }
+    for name, counts in kinds.items():
+        assert counts["dir"] and counts["file"], f"{name} lost a structural entry class: {counts}"
+    assert any(counts["legacy_prefix"] for counts in kinds.values()), (
+        f"no legacy filename prefix remains; re-derive the oracle. Observed: {kinds}"
+    )
+
+    # Pre-amendment baseline: no consumer path is admitted by either law.
+    if not amended["I05"]:
+        for path in AUTHORIZED:
+            assert not _current_law(path, lists["I05"])
+            assert not _current_law(path, lists["I10"])
+
+
+# ---------------------------------------------------------------------------
+# G2 -- an existing exact-file entry already behaves as a prefix
+# ---------------------------------------------------------------------------
+
+
+def test_g2_existing_exact_file_entry_does_not_admit_suffix_variants():
+    """RED today: the frozen law admits ``<exact file>_evil.py``."""
+    lists = _allowlists()
+    entry = "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py"
+
+    admitted_by_both = {
+        name: entry in entries for name, entries in lists.items()
+    }
+    assert all(admitted_by_both.values()), (
+        "the disclosed exact-file entry is no longer present; re-derive the probe: "
+        f"{admitted_by_both}"
+    )
+
+    for name, entries in lists.items():
+        variant = entry + "_evil.py"
+        assert not _current_law(variant, entries), (
+            f"{name}: the frozen startswith law ADMITS the suffix variant {variant!r}. "
+            "An exact-file entry is not exact under a prefix test."
+        )
+        assert not _oracle(variant, entries), (
+            f"{name}: the exact-file oracle admitted {variant!r}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# G3 -- the naive amendment is provably insufficient
+# ---------------------------------------------------------------------------
+
+
+def test_g3_naive_startswith_amendment_would_admit_suffix_variants():
+    """RED today: appending the strings to the frozen tuple admits variants.
+
+    This is the precise reason Agent 1 must implement an exact-file mechanism
+    rather than extend the tuple.
+    """
+    lists = _allowlists()
+    for name, entries in lists.items():
+        naive = entries + AUTHORIZED
+        assert _oracle(CONSUMER_MODEL, naive)
+        for variant in (
+            CONSUMER_MODEL + "_suffix.py",
+            CONSUMER_MODEL + ".evil.py",
+            CONSUMER_MODEL + "/../policy.py",
+            CONTRACT_TEST + "_extra.py",
+        ):
+            assert not _current_law(variant, naive), (
+                f"{name}: extending startswith(()) with {CONSUMER_MODEL!r} admits "
+                f"{variant!r}; the grant is not exact"
+            )
+
+
+# ---------------------------------------------------------------------------
+# G4 -- the exact-file oracle is the required behaviour
+# ---------------------------------------------------------------------------
+
+
+def test_g4_exact_file_oracle_admits_exactly_the_two_authorized_paths():
+    lists = _allowlists()
+    entries = lists["I05"] + AUTHORIZED
+
+    for path in AUTHORIZED:
+        assert _oracle(path, entries), f"oracle refused an authorized path: {path}"
+
+    for path in REFUSED:
+        assert not _oracle(path, entries), f"oracle admitted a forbidden path: {path}"
+
+    # Nothing else in the consumer directory is admitted.
+    for sibling in (
+        "src/crypto_sensor_fabric/normalization/consumer/",
+        "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "src/crypto_sensor_fabric/normalization/consumer/models.py/",
+    ):
+        assert not _oracle(sibling, entries), f"oracle admitted {sibling!r}"
+
+
+def test_g4b_oracle_rejects_prefix_escape_and_absolute_paths():
+    entries = (CONSUMER_MODEL, "src/crypto_sensor_fabric/normalization/time/")
+    assert not _oracle(CONSUMER_MODEL + "/../../sensors/trade.py", entries)
+    assert not _oracle("/etc/" + CONSUMER_MODEL, entries)
+    assert not _oracle(CONSUMER_MODEL + "\x00.py", entries)
+
+
+# ---------------------------------------------------------------------------
+# G5 -- Agent 1's real mechanism, compared with the oracle (pending today)
+# ---------------------------------------------------------------------------
+
+
+def _exact_mechanism_present() -> bool:
+    """True once the frozen law stops treating a FILE entry as a prefix."""
+    lists = _allowlists()
+    entries = lists["I05"]
+    return not _current_law(CONSUMER_MODEL + "_suffix.py", entries + AUTHORIZED)
+
+
+@pytest.mark.skipif(
+    not _exact_mechanism_present(),
+    reason=(
+        "NOT_EXECUTED — IMPLEMENTATION_PENDING: the frozen audits still admit with "
+        "startswith(); there is no exact-file mechanism to compare against the oracle"
+    ),
+)
+def test_g5_published_exact_file_mechanism_matches_the_oracle():
+    lists = _allowlists()
+    for name, entries in lists.items():
+        for path in AUTHORIZED:
+            assert _current_law(path, entries), f"{name} refused authorized {path}"
+        for path in REFUSED:
+            assert not _current_law(path, entries), (
+                f"{name} admitted forbidden {path}; the mechanism is not exact"
+            )
+
+
+# ---------------------------------------------------------------------------
+# G6 -- historical authorized paths are preserved
+# ---------------------------------------------------------------------------
+
+
+def test_g6_oracle_preserves_every_historical_authorized_entry():
+    """No historical grant may be revoked by switching to exact-file admission."""
+    lists = _allowlists()
+    for name, entries in lists.items():
+        for entry in entries:
+            kind = _entry_kind(entry)
+            probe = entry + "probe_module.py" if kind in {"dir", "legacy_prefix"} else entry
+            assert _oracle(probe, entries), (
+                f"{name}: the oracle broke historical {kind} entry {entry!r} "
+                f"(probe {probe!r})"
+            )
+
+    # Directory entries stay directory prefixes; complete FILE entries stop being
+    # prefixes.  This is the exact asymmetry Agent 1's mechanism must ship.
+    assert _oracle("src/crypto_sensor_fabric/normalization/time/replay_gate.py", lists["I05"])
+    assert not _oracle(
+        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py_x.py",
+        lists["I05"],
+    )
+
+
+def test_g6b_no_legacy_filename_prefix_can_contain_the_rung1_grant():
+    """A legacy prefix is still a prefix; the grant must not hide inside one."""
+    lists = _allowlists()
+    for name, entries in lists.items():
+        for entry in entries:
+            if _entry_kind(entry) != "legacy_prefix":
+                continue
+            for authorized in AUTHORIZED:
+                assert not authorized.startswith(entry), (
+                    f"{name}: legacy prefix {entry!r} silently admits {authorized!r}"
+                )
+
+
+def test_g6c_a_file_shaped_entry_must_be_shipped_as_an_exact_file_entry():
+    """The Rung 1 grant cannot be a directory entry for ``consumer/``."""
+    directory_grant = "src/crypto_sensor_fabric/normalization/consumer/"
+    # Stated as an explicit decision gate rather than an assumption: a directory
+    # entry WOULD admit every sibling, so the grant must name files.
+    assert _oracle(CONSUMER_MODEL, (directory_grant,)), (
+        "a directory entry no longer admits its members; re-derive this probe"
+    )
+    assert _oracle(
+        "src/crypto_sensor_fabric/normalization/consumer/policy.py", (directory_grant,)
+    ), "a directory entry must admit siblings; if not, the entry model changed"
+
+
+# ---------------------------------------------------------------------------
+# G7 -- staged / unstaged / untracked admitted independently
+# ---------------------------------------------------------------------------
+
+
+def _git(repo: Path, *args: str) -> str:
+    completed = subprocess.run(
+        ["git", *args],
+        cwd=repo,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert completed.returncode == 0, f"git {' '.join(args)} failed: {completed.stderr}"
+    return completed.stdout
+
+
+def test_g7_staged_unstaged_and_untracked_views_are_challenged_separately(tmp_path):
+    repo = tmp_path / "disposable"
+    repo.mkdir()
+    _git(repo, "init", "-q")
+    _git(repo, "config", "user.email", "probe@example.invalid")
+    _git(repo, "config", "user.name", "Probe")
+
+    consumer = repo / "src" / "crypto_sensor_fabric" / "normalization" / "consumer"
+    consumer.mkdir(parents=True)
+    tracked = consumer / "models.py"
+    tracked.write_text("# base\n", encoding="utf-8")
+    _git(repo, "add", "-A")
+    _git(repo, "commit", "-qm", "base")
+
+    # STAGED: a suffix variant of the authorized file.
+    staged_variant = consumer / "models.py_suffix.py"
+    staged_variant.write_text("# staged variant\n", encoding="utf-8")
+    _git(repo, "add", str(staged_variant.relative_to(repo).as_posix()))
+
+    # UNSTAGED: an edit to the authorized file itself.
+    tracked.write_text("# base\n# edited\n", encoding="utf-8")
+
+    # UNTRACKED: a sibling module and a suffix variant of the contract test.
+    (consumer / "policy.py").write_text("# unauthorized sibling\n", encoding="utf-8")
+    tests = repo / "tests" / "crypto_sensor_fabric" / "normalization"
+    tests.mkdir(parents=True)
+    (tests / "test_b5_p3_consumer_contracts.py_extra.py").write_text(
+        "# unauthorized variant\n", encoding="utf-8"
+    )
+
+    staged = [line for line in _git(repo, "diff", "--cached", "--name-only").splitlines() if line]
+    unstaged = [line for line in _git(repo, "diff", "--name-only").splitlines() if line]
+    untracked = [
+        line
+        for line in _git(repo, "ls-files", "--others", "--exclude-standard").splitlines()
+        if line
+    ]
+
+    prefix = "src/crypto_sensor_fabric/normalization/consumer/"
+    assert staged == [prefix + "models.py_suffix.py"], staged
+    assert unstaged == [prefix + "models.py"], unstaged
+    assert sorted(untracked) == [
+        prefix + "policy.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py_extra.py",
+    ], untracked
+
+    lists = _allowlists()
+    note: list[str] = []
+
+    # Each view is admitted by the SAME predicate: there is no per-view protection.
+    for view_name, paths in (
+        ("staged", staged),
+        ("unstaged", unstaged),
+        ("untracked", untracked),
+    ):
+        for path in paths:
+            oracle_admits = _oracle(path, lists["I05"] + AUTHORIZED)
+            current_admits = _current_law(path, lists["I05"] + AUTHORIZED)
+            note.append(
+                f"{view_name}: {path} oracle={oracle_admits} current_law={current_admits}"
+            )
+            # The oracle must refuse every unauthorized path in EVERY view.
+            if path not in AUTHORIZED:
+                assert not oracle_admits, f"oracle admitted {path} in the {view_name} view"
+            else:
+                assert oracle_admits, f"oracle refused an authorized path in the {view_name} view"
+
+    # The unstaged view edits the authorized file itself and must stay admissible.
+    assert _oracle(unstaged[0], lists["I05"] + AUTHORIZED)
+
+    # RED under the frozen law: the untracked and staged variants are admitted.
+    assert not _current_law(staged[0], lists["I05"] + AUTHORIZED), (
+        "the frozen startswith law admits the STAGED suffix variant "
+        f"{staged[0]!r}; staged admission is not exact. Observed: {note}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# G8 -- the sibling security suite stays outside the grant
+# ---------------------------------------------------------------------------
+
+
+def test_g8_the_historical_security_suite_path_remains_unauthorized():
+    """The full A01-A20 suite is Rung 5 specification evidence, not Rung 1 scope."""
+    lists = _allowlists()
+    security = "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py"
+    for name, entries in lists.items():
+        assert not _oracle(security, entries + AUTHORIZED), (
+            f"{name}: the Rung 1 grant admitted the Rung 5 security suite"
+        )
+    # And the Rung 1 contract test is not the security suite under another name.
+    assert CONTRACT_TEST != security

@@ -1,0 +1,200 @@
+{
+  "schema": "BLOC_05_P3_RUNG1_INDEPENDENT_AUDIT_RESULTS_V1",
+  "mission": "SENSOR-B5-P3-RUNG1-INDEPENDENT-CONTRACT-CHALLENGE-R1",
+  "role": "independent_adversarial_verification_engineer",
+  "generated_at_reference_commit": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+  "reference_lock": {
+    "production_design": "295acb5245ecc47d6f5c0a07f8ff631aa7217c15",
+    "authorized_scope_preparation": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+    "prior_security_correction_preserved_not_merged": "6e6ef21929bf621976a2a45d8e6e3b989c63528f",
+    "prior_r6_audit_package": "5be77af4bc88c09a0ac5616951f3d34d68ad1eea",
+    "r6_implementation": "9d289500fd7bdd4145d2b9d5e052b93e471cd1f1",
+    "r5_baseline": "ea1fdeb7714b57f07085eb6dfadefafccd7658bb"
+  },
+  "implementation_state": {
+    "expected_branch": "agent/crypto-sensor-fabric-p3-consumer-rung1-build-r1",
+    "expected_branch_exists": false,
+    "observed_rung1_branch": "agent/crypto-sensor-fabric-p3-consumer-rung1-r1",
+    "observed_rung1_head": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+    "observed_head_equals_authorization_commit": true,
+    "consumer_models_published": false,
+    "a1_authorization_commit_precedes_implementation": "NOT_VERIFIABLE — no implementation commit exists",
+    "audited_tree": "13086755d22a539c6a4dcb20e782bce97fcde82d"
+  },
+  "execution_environment": {
+    "python": "3.11.9",
+    "pydantic": "2.13.4",
+    "pytest": "9.0.3",
+    "platform": "win32",
+    "isolation": "probes materialized in an external temporary directory; audited worktree read-only"
+  },
+  "executed": {
+    "syntax_check": {
+      "command": "python -m py_compile rung1_fixtures.py test_rung1_contracts.py test_rung1_governance.py",
+      "modules": 3,
+      "state": "PASSED",
+      "exit_code": 0
+    },
+    "fixture_self_test": {
+      "command": "python rung1_fixtures.py",
+      "state": "PASSED",
+      "fixtures_valid": 7,
+      "fixtures_total": 7,
+      "details": {
+        "T1TradeRecord": "VALID",
+        "T1LiquidationRecord": "VALID",
+        "ReplayEvidence": "VALID",
+        "NormalizationMethodologyRegistry": "VALID",
+        "TrustedCustodyDouble": "VALID",
+        "MutableEvidenceStore": "VALID",
+        "RootLoaderSeam": "VALID"
+      },
+      "significance": "rules out a probe that refuses everything because its own fixture is invalid"
+    },
+    "governance_challenge": {
+      "file": "test_rung1_governance.py",
+      "collected": 11,
+      "passed": 7,
+      "failed_red": 3,
+      "skipped_pending": 1,
+      "exit_code": 1,
+      "cases": {
+        "test_g1_both_allowlists_parse_and_agree_on_the_amendment_state": {
+          "state": "PASSED",
+          "observation": "I05 and I10 allowlists parse; neither contains a consumer/ entry; all three entry kinds (dir, file, legacy_prefix) are present in both"
+        },
+        "test_g2_existing_exact_file_entry_does_not_admit_suffix_variants": {
+          "state": "FAILED_RED",
+          "finding": "GOVERNANCE_PREFIX_LAW_IS_NOT_EXACT",
+          "smallest_counterexample": "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py_evil.py",
+          "observation": "an existing exact-FILE entry is a startswith prefix, so a tracked .py beside the authorized file is admitted by both audits",
+          "attribution": "frozen audit law at 13086755d, not Agent 1"
+        },
+        "test_g3_naive_startswith_amendment_would_admit_suffix_variants": {
+          "state": "FAILED_RED",
+          "finding": "NAIVE_AMENDMENT_IS_PROVABLY_INSUFFICIENT",
+          "smallest_counterexample": "src/crypto_sensor_fabric/normalization/consumer/models.py_suffix.py",
+          "additional_counterexample": "src/crypto_sensor_fabric/normalization/consumer/models.py/../policy.py",
+          "observation": "appending the authorized strings to the frozen tuple admits suffix variants and a .. climb-out"
+        },
+        "test_g4_exact_file_oracle_admits_exactly_the_two_authorized_paths": {
+          "state": "PASSED",
+          "observation": "oracle admits the two authorized paths and refuses all 11 forbidden paths"
+        },
+        "test_g4b_oracle_rejects_prefix_escape_and_absolute_paths": {
+          "state": "PASSED"
+        },
+        "test_g5_published_exact_file_mechanism_matches_the_oracle": {
+          "state": "NOT_EXECUTED_IMPLEMENTATION_PENDING",
+          "skip_reason": "the frozen audits still admit with startswith(); no exact-file mechanism to compare",
+          "activation": "automatic — the probe is keyed on audit behaviour, not on a manual flag"
+        },
+        "test_g6_oracle_preserves_every_historical_authorized_entry": {
+          "state": "PASSED",
+          "observation": "every one of the 18 I05 and 25 I10 entries stays admitted under the oracle, including legacy filename prefixes"
+        },
+        "test_g6b_no_legacy_filename_prefix_can_contain_the_rung1_grant": {
+          "state": "PASSED"
+        },
+        "test_g6c_a_file_shaped_entry_must_be_shipped_as_an_exact_file_entry": {
+          "state": "PASSED",
+          "observation": "a consumer/ directory grant would admit every sibling, so the grant must name files"
+        },
+        "test_g7_staged_unstaged_and_untracked_views_are_challenged_separately": {
+          "state": "FAILED_RED",
+          "finding": "STAGED_ADMISSION_IS_NOT_EXACT",
+          "smallest_counterexample": "src/crypto_sensor_fabric/normalization/consumer/models.py_suffix.py (staged)",
+          "observation": "in a disposable git repository all three views are admitted by the same predicate; the staged suffix variant is admitted while the oracle refuses it",
+          "view_evidence": [
+            "staged: consumer/models.py_suffix.py  oracle=False current_law=True",
+            "unstaged: consumer/models.py  oracle=True current_law=True",
+            "untracked: consumer/policy.py  oracle=False current_law=False",
+            "untracked: tests/.../test_b5_p3_consumer_contracts.py_extra.py  oracle=False current_law=True"
+          ]
+        },
+        "test_g8_the_historical_security_suite_path_remains_unauthorized": {
+          "state": "PASSED"
+        }
+      }
+    },
+    "contract_challenge": {
+      "file": "test_rung1_contracts.py",
+      "collected": 26,
+      "passed": 1,
+      "failed": 0,
+      "skipped_pending": 25,
+      "executed_case": {
+        "test_c00_import_state_is_recorded_exactly_once": {
+          "state": "PASSED",
+          "observation": "one module-load determination; missing module is crypto_sensor_fabric.normalization.consumer; no internal dependency masked"
+        }
+      }
+    },
+    "authority_distinction": {
+      "file": "probe_authority_distinction.py",
+      "state": "EXECUTED",
+      "vehicle": "real RecordVerification (frozen=True, extra=forbid)",
+      "measurements": {
+        "validated_forgery": "REFUSED ValidationError",
+        "model_construct_bypass": true,
+        "model_copy_value_rewrite_without_validation": true,
+        "model_copy_shadow_attribute": {
+          "has_attribute": true,
+          "in_model_fields": false,
+          "survives_model_dump": false
+        }
+      },
+      "classification": "DATA_MODEL_BOUNDARY_OBSERVATION",
+      "not_classified_as": "PRODUCTION_AUTHORIZATION_COMPROMISE",
+      "reason": "Rung 1 exposes no consuming operation; an instance is not a decision; the existing production path re-derives authority from pinned bytes"
+    }
+  },
+  "pending_implementation": {
+    "state": "NOT_EXECUTED_IMPLEMENTATION_PENDING",
+    "cases": [
+      "C00b module_is_the_authorized_path_not_a_sibling",
+      "C01 consumer_request_accepts_a_typed_trade_record",
+      "C02 consumer_request_accepts_a_typed_liquidation_record",
+      "C03 unknown_authorization_fields_are_refused",
+      "C04 forged_consumer_verdict_is_refused_as_record_input",
+      "C05 callable_and_rederive_injection_is_refused[trade]",
+      "C05 callable_and_rederive_injection_is_refused[liquidation]",
+      "C05b no_request_field_annotation_admits_a_callable_or_a_verdict",
+      "C06 non_t1_concrete_record_types_are_refused",
+      "C07 naive_knowledge_cutoff_is_refused",
+      "C08 bare_date_cutoff_is_refused",
+      "C09 equivalent_aware_cutoffs_normalise_to_the_same_instant",
+      "C10 caller_owned_evidence_container_cannot_mutate_a_built_request",
+      "C11 duplicate_evidence_references_are_refused",
+      "C12 contradictory_digests_for_one_reference_are_refused",
+      "C13 consumer_decision_membership_is_exact",
+      "C14 custody_authority_basis_membership_is_exact",
+      "C15 synthetic_test_only_authority_is_unrepresentable",
+      "C16 serialization_is_stable_and_round_trips",
+      "C17 constructed_request_and_verdict_are_immutable",
+      "C18 model_copy_update_cannot_manufacture_an_authority_field",
+      "C19 model_construct_skips_validation_and_rung1_consumes_nothing",
+      "C20 importing_the_contracts_does_not_pull_in_the_verifier",
+      "C21 construction_performs_no_io_and_issues_no_authority",
+      "C22 authority_values_nested_in_permitted_fields_are_refused",
+      "G05 published_exact_file_mechanism_matches_the_oracle"
+    ],
+    "not_manufactured_as_failures": true
+  },
+  "corrected_prior_defects": [
+    "A01-style ordinary-request substitution: C03/C05 submit the real attack input, and every case asserts its positive control first",
+    "single-request A3.1: C05 is parametrized over both record families",
+    "flattened identity fields: fixtures build real typed T1 records validated by the ratified models",
+    "omitted trusted dependencies: fixtures supply a real NormalizationMethodologyRegistry, custody bytes and a counted root-loader seam",
+    "broad ImportError masking: only ModuleNotFoundError naming the unpublished consumer chain is handled, once, at module load"
+  ],
+  "claims_not_made": [
+    "no independent acceptance of Rung 1",
+    "no executed A1.1-A1.5 result",
+    "no production authorization compromise",
+    "no canonical admission of the full security suite",
+    "no provider approval or custody authorization",
+    "no program-gate advancement"
+  ],
+  "disposition": "RUNG1_INDEPENDENT_PROBES_READY"
+}
