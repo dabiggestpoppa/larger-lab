@@ -171,10 +171,22 @@ def test_terms_time_identity_packages_are_untouched_by_i08() -> None:
     # DISCLOSED SENSOR-B5-I09P2A: the trusted authority loader package joins the
     # disclosed delta.  identity/, terms/, time/ and the top-level modules stay
     # refused by name.
+    # DISCLOSED SENSOR-B5-P3-MASTER-BUILD-R1 (operator directive
+    # SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-BUILD-R1,
+    # AUTHORIZE_P3_RUNGS_1_THROUGH_5_BOUNDED): the bounded production consumer
+    # package joins the disclosed delta.  This is an amendment to a live
+    # scope-admission rule, not to the seal it was written under: every path this
+    # assertion admitted before is still admitted, and identity/, terms/, time/
+    # and the top-level modules are still refused by name.  The package's exact
+    # file set is constrained elsewhere (I05/I10 ``P3_MASTER_EXACT_PATHS``), so
+    # this test does not become a directory-wide permission slip.
     for line in changed_paths:
-        assert "/common/" in line or "/sensors/" in line or "/authority/" in line, (
-            f"non-common/non-sensors/non-authority source change: {line}"
-        )
+        assert (
+            "/common/" in line
+            or "/sensors/" in line
+            or "/authority/" in line
+            or "/consumer/" in line
+        ), f"non-common/non-sensors/non-authority/non-consumer source change: {line}"
 
 
 def test_no_network_or_provider_import() -> None:
