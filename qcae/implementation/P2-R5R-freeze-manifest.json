@@ -19,8 +19,9 @@
     "qcae_only": "git diff 8212b59d..FINAL_HEAD shows qcae/ and nothing else",
     "history_claim": "semantic QCAE reconciliation, NOT identical Git history"
   },
-  "head_commit": "edfb6d91c8289a6816e1c4ecc1f3518c3ed33133 (R2-FREEZE; evidence + manifest only, no production code change after the tested commit)",
-  "tested_commit": "edfb6d91c8289a6816e1c4ecc1f3518c3ed33133",
+  "head_commit": "P2-R5R-R2 — Final Custody Seal (tested_commit and evidence_commit tracked separately; no production code change during E1)",
+  "tested_commit": "5bf2e9c7ab08c2542c6da7c6862ba3eebdb36ca4",
+  "evidence_commit": "01bb45cef8e43596116758a057b812a4c8620298",
   "active_amendments": ["A-001 v1.0"],
   "phase_commits": {
     "p2_r5r_r1_r0_qcae_tree_seed": ["82772000b"],
@@ -119,6 +120,7 @@
       "p3_r4_regression": {"passed": 238, "exit_code": 0},
       "crash_after_lease": {"passed": 1, "exit_code": 0},
       "topology": {"passed": 78, "exit_code": 0},
+      "r2_custody_seal": {"passed": 6, "exit_code": 0},
       "full_qcae": {"passed": 1459, "failed": 0, "exit_code": 0}
     }
   },
@@ -145,7 +147,7 @@
     "full_qcae_suite_green": true,
     "review_branch_remote_verified": true,
     "verified_ref": "agent/qcae-p2-r5r-final",
-    "verified_tested_commit": "edfb6d91c8289a6816e1c4ecc1f3518c3ed33133",
+    "verified_tested_commit": "5bf2e9c7ab08c2542c6da7c6862ba3eebdb36ca4",
     "blockers": []
   },
   "blockers": [],
