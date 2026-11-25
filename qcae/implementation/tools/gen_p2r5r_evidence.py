@@ -33,6 +33,7 @@ BLOCKS = [
         "test_crash_after_lease_resume_does_not_repeat_committed",
     ]),
     ("topology", ["qcae/tests/unit/test_p0_topology.py"]),
+    ("r2_custody_seal", ["qcae/tests/unit/test_p2r5r_r2_custody_seal.py"]),
     ("full_qcae", ["qcae/tests"]),
 ]
 
