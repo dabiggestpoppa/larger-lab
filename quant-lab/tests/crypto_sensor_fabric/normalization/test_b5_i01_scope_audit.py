@@ -86,7 +86,23 @@ def test_only_authorized_subpackages_exist() -> None:
     # subpackage (not a ``common/`` module) because digest verification and a
     # read-only clock-free validity check would violate the ratified I08 purity
     # law inside ``common/``.  Membership grows by exactly one named package.
-    allowed = {"identity", "terms", "time", "common", "sensors", "authority"}
+    # DISCLOSED SENSOR-B5-P3-MASTER-BUILD-R1 (operator directive
+    # SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-BUILD-R1,
+    # AUTHORIZE_P3_RUNGS_1_THROUGH_5_BOUNDED): the production trust consumer is
+    # a subpackage, not a ``common/`` module, because it is allowed to import
+    # ``sensors/verification.py`` while ``common/`` is sworn to purity -- the
+    # same reasoning that put the authority loader in its own package at
+    # SENSOR-B5-I09P2A.  Membership grows by exactly one NAMED package, so the
+    # set stays enumerated and a second new subpackage is still refused.
+    allowed = {
+        "identity",
+        "terms",
+        "time",
+        "common",
+        "sensors",
+        "authority",
+        "consumer",
+    }
     present = {
         entry.name
         for entry in PACKAGE.iterdir()

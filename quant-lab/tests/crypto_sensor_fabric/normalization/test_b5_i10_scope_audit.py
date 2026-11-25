@@ -22,6 +22,8 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
+
 _HERE = Path(__file__).resolve().parent
 _QUANT_LAB = _HERE.parents[2]
 _REPO_ROOT = _QUANT_LAB.parent
@@ -384,71 +386,118 @@ def test_fixtures_are_deterministic_on_disk() -> None:
 # ---------------------------------------------------------------------------
 
 
+ALLOWED_PREFIXES = (
+    "src/crypto_sensor_fabric/normalization/sensors/",
+    # DISCLOSED SENSOR-B5-I09P2A: the loader module, the empty approval
+    # manifest and the authority suite are this checkpoint's named surfaces.
+    "src/crypto_sensor_fabric/normalization/authority/",
+    "config/crypto_sensor_fabric/provider_semantics/",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_",
+    # DISCLOSED SENSOR-B5-I09P2b: the trusted-root/provenance security
+    # suite is a distinct checkpoint file under the authority prefix
+    # family, admitted by its own named entry.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2b_",
+    # DISCLOSED SENSOR-B5-I09P2c: the full-record verification, custody and
+    # intraday-PIT security suite is a distinct checkpoint file under the
+    # authority prefix family, admitted by its own named entry.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2c_",
+    # DISCLOSED SENSOR-B5-I09P2d: the custody-authority, scoped-verdict and
+    # PIT-fail-closure security suite is a distinct checkpoint file under
+    # the same authority prefix family, admitted by its own named entry.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2d_",
+    # DISCLOSED SENSOR-B5-I09P2e: the PIT entry-parity probe suite is a
+    # distinct checkpoint file under the same authority prefix family, so it
+    # is admitted by its own named entry rather than by widening a prefix.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09p2e_",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
+    # DISCLOSED B5-I11R1 (independent audit): the audit suite is a
+    # distinct checkpoint file under the I11 prefix family, so it is
+    # admitted by its own named entry rather than by widening the
+    # I11E1 prefix.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i11r1_",
+    # DISCLOSED B5-I11F1 (semantic-admission repair): the security suite is
+    # a distinct checkpoint file under the I11 prefix family, so it is
+    # admitted by its own named entry rather than by widening an I11 prefix.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i11f1_",
+    "tests/crypto_sensor_fabric/fixtures/i10/",
+    "tests/crypto_sensor_fabric/fixtures/i11/",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+    # DISCLOSED SENSOR-B5-I09P2A: SEM-32 measures the Bloc 1 registry
+    # surface by changed path rather than by total emptiness, because the
+    # trust root adds one config file.  Named individually, not by prefix.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py",
+    # the I06 replay-safety suite re-pins its disclosed src prefix and its
+    # inventory-carrying artifact pin for this checkpoint (section 9.5 A17)
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/",
+    "research/crypto_foundry/sensor_fabric/scripts/",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_04/"
+    "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json",
+    "research/crypto_foundry/sensor_fabric/"
+    + "SENSOR_FABRIC_"
+    + "IMPLEMENTATION_PROGRESS.md",
+    # annotations/ignore files are custody plumbing, not content
+    ".gitignore",
+    ".gitattributes",
+)
+
+
+#: DISCLOSED SENSOR-B5-P3-MASTER-BUILD-R1 (operator directive
+#: SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-BUILD-R1,
+#: AUTHORIZE_P3_RUNGS_1_THROUGH_5_BOUNDED): the bounded production consumer,
+#: admitted by EXACT FILE.  A ``consumer/`` prefix would authorize any module
+#: dropped into the package under this grant -- including a later rung's module
+#: -- so the grant is a set, not a prefix, and every historical prefix and named
+#: exception above stays exactly as it was.
+P3_MASTER_EXACT_PATHS = frozenset(
+    {
+        "src/crypto_sensor_fabric/normalization/consumer/__init__.py",
+        "src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+        # A scope audit must be able to name its own amendment, or it can never
+        # be amended at all.  Named individually for that reason only.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py",
+    }
+)
+
+#: Historical admission samples: paths the pre-existing prefixes already admit.
+#: The counterexample audit proves the amendment did not narrow them.
+HISTORICAL_ADMISSION_SAMPLES = (
+    "src/crypto_sensor_fabric/normalization/sensors/trade.py",
+    "src/crypto_sensor_fabric/normalization/authority/__init__.py",
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i10_trade_semantics.py",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/README.md",
+)
+
+
+def _authorized(path: str) -> bool:
+    """The admission predicate: historical prefixes, or an exact P3 file.
+
+    The disjunction is the whole point.  ``path in P3_MASTER_EXACT_PATHS`` is an
+    equality test, so ``consumer/models.py.backup`` and ``consumer/rebinding.py``
+    are refused even though they live in the authorized directory.
+    """
+    return path.startswith(ALLOWED_PREFIXES) or path in P3_MASTER_EXACT_PATHS
+
+
+
 def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
     """Directive section 14's authorized file list, as a tracked-path audit.
 
     The disclosed custody amendments of I10D1 section 9.5 are admitted through
     their own named entries; every other path is refused.
     """
-    allowed = (
-        "src/crypto_sensor_fabric/normalization/sensors/",
-        # DISCLOSED SENSOR-B5-I09P2A: the loader module, the empty approval
-        # manifest and the authority suite are this checkpoint's named surfaces.
-        "src/crypto_sensor_fabric/normalization/authority/",
-        "config/crypto_sensor_fabric/provider_semantics/",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_",
-        # DISCLOSED SENSOR-B5-I09P2b: the trusted-root/provenance security
-        # suite is a distinct checkpoint file under the authority prefix
-        # family, admitted by its own named entry.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2b_",
-        # DISCLOSED SENSOR-B5-I09P2c: the full-record verification, custody and
-        # intraday-PIT security suite is a distinct checkpoint file under the
-        # authority prefix family, admitted by its own named entry.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2c_",
-        # DISCLOSED SENSOR-B5-I09P2d: the custody-authority, scoped-verdict and
-        # PIT-fail-closure security suite is a distinct checkpoint file under
-        # the same authority prefix family, admitted by its own named entry.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2d_",
-        # DISCLOSED SENSOR-B5-I09P2e: the PIT entry-parity probe suite is a
-        # distinct checkpoint file under the same authority prefix family, so it
-        # is admitted by its own named entry rather than by widening a prefix.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09p2e_",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i10_",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i11_",
-        # DISCLOSED B5-I11R1 (independent audit): the audit suite is a
-        # distinct checkpoint file under the I11 prefix family, so it is
-        # admitted by its own named entry rather than by widening the
-        # I11E1 prefix.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i11r1_",
-        # DISCLOSED B5-I11F1 (semantic-admission repair): the security suite is
-        # a distinct checkpoint file under the I11 prefix family, so it is
-        # admitted by its own named entry rather than by widening an I11 prefix.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i11f1_",
-        "tests/crypto_sensor_fabric/fixtures/i10/",
-        "tests/crypto_sensor_fabric/fixtures/i11/",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
-        # DISCLOSED SENSOR-B5-I09P2A: SEM-32 measures the Bloc 1 registry
-        # surface by changed path rather than by total emptiness, because the
-        # trust root adds one config file.  Named individually, not by prefix.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py",
-        # the I06 replay-safety suite re-pins its disclosed src prefix and its
-        # inventory-carrying artifact pin for this checkpoint (section 9.5 A17)
-        "tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/",
-        "research/crypto_foundry/sensor_fabric/scripts/",
-        "research/crypto_foundry/sensor_fabric/evidence/bloc_05/",
-        "research/crypto_foundry/sensor_fabric/evidence/bloc_04/"
-        "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json",
-        "research/crypto_foundry/sensor_fabric/"
-        + "SENSOR_FABRIC_"
-        + "IMPLEMENTATION_PROGRESS.md",
-        # annotations/ignore files are custody plumbing, not content
-        ".gitignore",
-        ".gitattributes",
-    )
-
     def _quant_lab_paths(*args: str) -> list[str]:
         return [
             line.removeprefix("quant-lab/")
@@ -465,7 +514,7 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
 
     # STAGED is what a commit would ship, so every staged path must be authorized.
     for path in _paths("diff", "--cached", "--name-only", I10_BASE_HEAD, "--"):
-        assert path.startswith(allowed), f"unauthorized staged path: {path}"
+        assert _authorized(path), f"unauthorized staged path: {path}"
 
     # UNSTAGED may carry the documented Bloc 04 evidence side effects the
     # whole-package suite leaves behind.  Those are restored to their committed
@@ -473,9 +522,77 @@ def test_only_the_i10_authorized_prefixes_carry_tracked_changes() -> None:
     # SIDE_EFFECT_PREFIX precedent the I05 audit already records for this tree.
     side_effects = "research/crypto_foundry/sensor_fabric/evidence/bloc_04/"
     for path in _paths("diff", "--name-only", "--"):
-        assert path.startswith(allowed) or path.startswith(side_effects), (
+        assert _authorized(path) or path.startswith(side_effects), (
             f"unauthorized worktree change: {path}"
         )
 
     for path in _quant_lab_paths("ls-files", "--others", "--exclude-standard"):
-        assert path.startswith(allowed), path
+        assert _authorized(path), path
+
+# ---------------------------------------------------------------------------
+# A4 -- the exact-file predicate, as executed counterexamples
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "path, admitted",
+    [
+        # admitted: the exact authorized surface, one entry at a time
+        ("src/crypto_sensor_fabric/normalization/consumer/__init__.py", True),
+        ("src/crypto_sensor_fabric/normalization/consumer/models.py", True),
+        ("src/crypto_sensor_fabric/normalization/consumer/policy.py", True),
+        ("src/crypto_sensor_fabric/normalization/consumer/custody_authority.py", True),
+        (
+            "tests/crypto_sensor_fabric/normalization/"
+            "test_b5_p3_consumer_contracts.py",
+            True,
+        ),
+        ("tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py", True),
+        (
+            "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py",
+            True,
+        ),
+        (
+            "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+            True,
+        ),
+        (
+            "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+            True,
+        ),
+        # refused: a suffix is not the file
+        ("src/crypto_sensor_fabric/normalization/consumer/models.py.backup", False),
+        ("src/crypto_sensor_fabric/normalization/consumer/models.py.orig", False),
+        # refused: a module this grant did not name
+        ("src/crypto_sensor_fabric/normalization/consumer/unapproved.py", False),
+        ("src/crypto_sensor_fabric/normalization/consumer/schemas.py", False),
+        # refused: rebinding stays private inside policy.py, so a module for it
+        # is not authorized even though the design once contemplated one
+        ("src/crypto_sensor_fabric/normalization/consumer/rebinding.py", False),
+        # refused: a consumer subdirectory is not the package's flat surface
+        ("src/crypto_sensor_fabric/normalization/consumer/internal/helpers.py", False),
+        # refused: an unapproved P3 test filename
+        ("tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_e2e.py", False),
+        ("tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer.py", False),
+        # refused: unrelated normalization modules and unrelated project files
+        ("src/crypto_sensor_fabric/normalization/writer.py", False),
+        ("src/crypto_sensor_fabric/normalization/consumer.py", False),
+        ("quant-lab/README.md", False),
+        ("AGENTS.md", False),
+    ],
+)
+def test_p3_master_admission_is_exact_file_only(path: str, admitted: bool) -> None:
+    assert _authorized(path) is admitted, (path, admitted)
+
+
+@pytest.mark.parametrize("path", HISTORICAL_ADMISSION_SAMPLES)
+def test_historical_admission_is_unchanged_by_the_p3_amendment(path: str) -> None:
+    """The amendment adds a disjunct; it must not have removed one."""
+    assert _authorized(path) is True, path
+
+
+def test_the_p3_grant_names_no_directory_prefix() -> None:
+    """A prefix in the grant would be a prefix, whatever the comment says."""
+    for path in P3_MASTER_EXACT_PATHS:
+        assert not path.endswith("/"), path
+        assert "*" not in path, path

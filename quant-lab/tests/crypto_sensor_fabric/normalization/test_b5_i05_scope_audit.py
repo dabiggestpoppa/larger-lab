@@ -295,6 +295,85 @@ def _repo_git(*args: str) -> str:
     return result.stdout
 
 
+ALLOWED_PREFIXES = (
+    "src/crypto_sensor_fabric/normalization/time/",
+    "src/crypto_sensor_fabric/normalization/common/",
+    # DISCLOSED SENSOR-B5-I09P2A: the authorized authority loader package
+    # plus its single trust-root manifest directory (one empty-artifact
+    # manifest; no provider approval artifact is shipped).
+    "src/crypto_sensor_fabric/normalization/authority/",
+    "config/crypto_sensor_fabric/provider_semantics/",
+    "src/crypto_sensor_fabric/normalization/sensors/",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i08",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i09",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i10",
+    # DISCLOSED B5-I11 (SENSOR-B5-I11E1 directive sections 07-09): the I11E1
+    # pass adds the liquidation suite and its scope audit on the same
+    # precedent by which this list grew test_b5_i08/test_b5_i09/test_b5_i10.
+    # The ``sensors/`` prefix above already covers liquidation.py.
+    "tests/crypto_sensor_fabric/normalization/test_b5_i11",
+    "tests/crypto_sensor_fabric/fixtures/i11/",
+    "tests/crypto_sensor_fabric/fixtures/i10/",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+    "config/crypto_sensor_fabric/provider_time_semantics.yaml",
+    "config/crypto_sensor_fabric/revision_policies.yaml",
+    "research/crypto_foundry/sensor_fabric/scripts/",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/",
+    "research/crypto_foundry/sensor_fabric/SENSOR_FABRIC_"
+    "IMPLEMENTATION_PROGRESS.md",
+)
+
+def _authorized(path: str) -> bool:
+    return path.startswith(ALLOWED_PREFIXES) or path in P3_MASTER_EXACT_PATHS
+
+
+#: DISCLOSED SENSOR-B5-P3-MASTER-BUILD-R1 (operator directive
+#: SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-BUILD-R1,
+#: AUTHORIZE_P3_RUNGS_1_THROUGH_5_BOUNDED): the bounded production consumer,
+#: admitted by EXACT FILE.  A ``consumer/`` prefix would authorize any module
+#: dropped into the package under this grant -- including a later rung's module
+#: -- so the grant is a set, not a prefix, and every historical prefix and named
+#: exception above stays exactly as it was.
+P3_MASTER_EXACT_PATHS = frozenset(
+    {
+        "src/crypto_sensor_fabric/normalization/consumer/__init__.py",
+        "src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+        # A scope audit must be able to name its own amendment, or it can never
+        # be amended at all.  Named individually for that reason only.
+        "tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py",
+    }
+)
+
+#: Historical admission samples: paths the pre-existing prefixes already admit.
+#: The counterexample audit proves the amendment did not narrow them.
+HISTORICAL_ADMISSION_SAMPLES = (
+    "src/crypto_sensor_fabric/normalization/sensors/trade.py",
+    "src/crypto_sensor_fabric/normalization/authority/__init__.py",
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i10_trade_semantics.py",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/README.md",
+)
+
+
+def _authorized(path: str) -> bool:
+    """The admission predicate: historical prefixes, or an exact P3 file.
+
+    The disjunction is the whole point.  ``path in P3_MASTER_EXACT_PATHS`` is an
+    equality test, so ``consumer/models.py.backup`` and ``consumer/rebinding.py``
+    are refused even though they live in the authorized directory.
+    """
+    return path.startswith(ALLOWED_PREFIXES) or path in P3_MASTER_EXACT_PATHS
+
+
+
 def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
     """Protected-file diff audit: every path this checkpoint touches is I05-legal.
 
@@ -328,37 +407,6 @@ def test_only_the_authorized_paths_were_added_since_the_i05_base() -> None:
       never reach the index.
     * UNTRACKED must already be an I05-authorized path.
     """
-    allowed_prefixes = (
-        "src/crypto_sensor_fabric/normalization/time/",
-        "src/crypto_sensor_fabric/normalization/common/",
-        # DISCLOSED SENSOR-B5-I09P2A: the authorized authority loader package
-        # plus its single trust-root manifest directory (one empty-artifact
-        # manifest; no provider approval artifact is shipped).
-        "src/crypto_sensor_fabric/normalization/authority/",
-        "config/crypto_sensor_fabric/provider_semantics/",
-        "src/crypto_sensor_fabric/normalization/sensors/",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i05_",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i08",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i09",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i10",
-        # DISCLOSED B5-I11 (SENSOR-B5-I11E1 directive sections 07-09): the I11E1
-        # pass adds the liquidation suite and its scope audit on the same
-        # precedent by which this list grew test_b5_i08/test_b5_i09/test_b5_i10.
-        # The ``sensors/`` prefix above already covers liquidation.py.
-        "tests/crypto_sensor_fabric/normalization/test_b5_i11",
-        "tests/crypto_sensor_fabric/fixtures/i11/",
-        "tests/crypto_sensor_fabric/fixtures/i10/",
-        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
-        "config/crypto_sensor_fabric/provider_time_semantics.yaml",
-        "config/crypto_sensor_fabric/revision_policies.yaml",
-        "research/crypto_foundry/sensor_fabric/scripts/",
-        "research/crypto_foundry/sensor_fabric/evidence/bloc_05/",
-        "research/crypto_foundry/sensor_fabric/SENSOR_FABRIC_"
-        "IMPLEMENTATION_PROGRESS.md",
-    )
-
-    def _authorized(path: str) -> bool:
-        return path.startswith(allowed_prefixes)
 
     staged = _quant_lab_paths("diff", "--cached", "--name-only", I05_BASE_HEAD)
     unstaged = _quant_lab_paths("diff", "--name-only")
@@ -421,3 +469,84 @@ def test_the_governance_audit_republish_is_mechanical_only() -> None:
         line for line in _repo_git("ls-files", "*.py").splitlines() if line.strip()
     ]
     assert payload["python_files_scanned"] == len(tracked_python)
+
+# ---------------------------------------------------------------------------
+# A4 -- the exact-file predicate, as executed counterexamples
+# ---------------------------------------------------------------------------
+
+
+#: I05's own grant is wider than I10's (it owns ``time/``, ``common/`` and the
+#: whole ``test_b5_i05_`` family), so the samples that prove its historical
+#: admission is unchanged are its own.
+I05_ADDITIONAL_HISTORICAL_SAMPLES = (
+    "src/crypto_sensor_fabric/normalization/time/models.py",
+    "src/crypto_sensor_fabric/normalization/time/replay_gate.py",
+    "src/crypto_sensor_fabric/normalization/common/units.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i05_time_models.py",
+)
+
+
+@pytest.mark.parametrize(
+    "path, admitted",
+    [
+        # admitted: the exact authorized surface, one entry at a time
+        ("src/crypto_sensor_fabric/normalization/consumer/__init__.py", True),
+        ("src/crypto_sensor_fabric/normalization/consumer/models.py", True),
+        ("src/crypto_sensor_fabric/normalization/consumer/policy.py", True),
+        ("src/crypto_sensor_fabric/normalization/consumer/custody_authority.py", True),
+        (
+            "tests/crypto_sensor_fabric/normalization/"
+            "test_b5_p3_consumer_contracts.py",
+            True,
+        ),
+        ("tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py", True),
+        (
+            "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py",
+            True,
+        ),
+        (
+            "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+            True,
+        ),
+        (
+            "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+            True,
+        ),
+        # refused: a suffix is not the file
+        ("src/crypto_sensor_fabric/normalization/consumer/models.py.backup", False),
+        ("src/crypto_sensor_fabric/normalization/consumer/models.py.orig", False),
+        # refused: a module this grant did not name
+        ("src/crypto_sensor_fabric/normalization/consumer/unapproved.py", False),
+        ("src/crypto_sensor_fabric/normalization/consumer/schemas.py", False),
+        # refused: rebinding stays private inside policy.py, so a module for it
+        # is not authorized even though the design once contemplated one
+        ("src/crypto_sensor_fabric/normalization/consumer/rebinding.py", False),
+        # refused: a consumer subdirectory is not the package's flat surface
+        ("src/crypto_sensor_fabric/normalization/consumer/internal/helpers.py", False),
+        # refused: an unapproved P3 test filename
+        ("tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_e2e.py", False),
+        ("tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer.py", False),
+        # refused: unrelated normalization modules and unrelated project files
+        ("src/crypto_sensor_fabric/normalization/writer.py", False),
+        ("src/crypto_sensor_fabric/normalization/consumer.py", False),
+        ("quant-lab/README.md", False),
+        ("AGENTS.md", False),
+    ],
+)
+def test_p3_master_admission_is_exact_file_only(path: str, admitted: bool) -> None:
+    assert _authorized(path) is admitted, (path, admitted)
+
+
+@pytest.mark.parametrize(
+    "path", HISTORICAL_ADMISSION_SAMPLES + I05_ADDITIONAL_HISTORICAL_SAMPLES
+)
+def test_historical_admission_is_unchanged_by_the_p3_amendment(path: str) -> None:
+    """The amendment adds a disjunct; it must not have removed one."""
+    assert _authorized(path) is True, path
+
+
+def test_the_p3_grant_names_no_directory_prefix() -> None:
+    """A prefix in the grant would be a prefix, whatever the comment says."""
+    for path in P3_MASTER_EXACT_PATHS:
+        assert not path.endswith("/"), path
+        assert "*" not in path, path
