@@ -1,0 +1,149 @@
+{
+  "record_id": "P3_RUNG6_FINAL_R1",
+  "mission": "SENSOR-B5-P3-R6-FINAL-VERIFICATION-R1",
+  "directive": "AUTHORIZE_R6_BOUNDED_VERIFICATION_AND_REPAIR",
+  "branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+  "starting_sha": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+  "verified_candidate_sha": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+  "repair_commits": [
+    {
+      "sha": "d81cceb28aa79870f6702bed053bfb6d8d80f2c1",
+      "subject": "B5-P3-R6: enforce a total fail-closed boundary and rebind replay evidence",
+      "covers": ["H01", "H02", "H03", "H04", "H05", "G17"]
+    },
+    {
+      "sha": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+      "subject": "B5-P3-R6: keep the leak sentinel out of credential shape",
+      "covers": ["H01-fixture"]
+    }
+  ],
+  "disposition": "P3_RUNG6_CANONICAL_GREEN_AWAITING_OPERATOR_ACCEPTANCE",
+  "collection": {
+    "nodes": 4952,
+    "digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+    "digest_equal_at_starting_sha_and_candidate": true,
+    "groups": 13,
+    "partition_plan_workers4": [1238, 1238, 1238, 1238],
+    "tracked_python_files": 1111,
+    "tracked_python_src": 157,
+    "tracked_python_tests": 249
+  },
+  "execution": {
+    "disposition": "COMPLETE",
+    "assurance": "ANCHORED_COMPLETE",
+    "test_outcome": "GREEN",
+    "workers": 1,
+    "partition_timeout_seconds": 5400,
+    "counts": {"passed": 4941, "failed": 0, "errored": 0, "skipped": 11},
+    "missing_nodes": 0,
+    "extra_nodes": 0,
+    "duplicate_executions": 0,
+    "exit_code": 0,
+    "junit": {"tests": 4952, "failures": 0, "errors": 0, "skipped": 11, "time_seconds": 1494.799},
+    "verify": {
+      "command": "canonical_runner.py verify evidence.json --expect-count 4952 --expect-digest f2fc...d1931 --require-anchor",
+      "exit_code": 0,
+      "external_anchor_count": 4952,
+      "external_anchor_digest_checked": true,
+      "recomputed_counts_match_recorded": true
+    },
+    "restoration": {"attempted": true, "verified": true, "paths": 11, "failed": 0},
+    "tree_after": {"clean_after": true, "dirty_paths": 0, "untracked_added": 0},
+    "bundle": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs/p3-r6-final",
+    "artifacts": {
+      "collection.json": "259df401afaf00a120545fda813a7acfd1dbf611bb81801d0533b986b35b5b86",
+      "evidence.json": "e919d886dfaeb1b0c1efb3da8122c0a613694e79e7c6908d5e471a45ea678c1f",
+      "guard_baseline.json": "66cb79f145dad8bca7a4259c5e3ba8c4fda769e8472030524f6553cccb831d3a",
+      "junit_0.xml": "1936e6e7d9c3714329647f9ca0695511b1fca8ce97087e045757d3d568bc5a96",
+      "partition_0.json": "6b8dc3e3fd4640725bcae94c50d6a142defce8243594d735efd7ed505d34625b",
+      "results_0.jsonl": "6e055b916edb97f4655e0d3b9f662a076e1671a4539d5adb8b9b699006a36023"
+    },
+    "environment": {
+      "python": "3.11.9",
+      "pytest": "pytest 9.0.3",
+      "platform": "Windows-10-10.0.26200-SP0",
+      "cpu_count": 8,
+      "thread_caps": {"OPENBLAS_NUM_THREADS": "1", "OMP_NUM_THREADS": "1", "MKL_NUM_THREADS": "1"}
+    }
+  },
+  "skips": [
+    {"node": "providers/test_network_smoke_live::test_live_production_network_smoke", "reason": "SENSOR_NETWORK_SMOKE not set; live network smoke disabled"},
+    {"node": "storage/test_blob_store.TestPermissions::test_final_not_world_writable", "reason": "POSIX mode bits do not apply on Windows"},
+    {"node": "storage/test_blob_store_namespace.TestNameMaxProbe::test_posix_probe_failure_fails_closed", "reason": "platform has no os.pathconf"},
+    {"node": "storage/test_i11_postgres_metadata::test_real_postgres_integration_is_explicitly_opt_in", "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"},
+    {"node": "storage/test_i11_postgres_metadata::test_real_postgres_failed_refresh_rolls_back_previous_snapshot", "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"},
+    {"node": "storage/test_i13_export_restore.TestSecurityAndResources::test_restore_symlinked_destination_component_refused", "reason": "symlink privilege unavailable"},
+    {"node": "storage/test_i13_export_restore.TestSecurityAndResources::test_verify_symlinked_pack_object_refused", "reason": "symlink privilege unavailable"},
+    {"node": "storage/test_i15r2_concurrent_publication.TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed", "reason": "Windows cannot create symlinks without privilege (1314)"},
+    {"node": "storage/test_i15r2_path_canonicalization.TestCaseLaw::test_distinct_posix_directories_are_not_merged", "reason": "Windows filesystem is case-insensitive here"},
+    {"node": "storage/test_json_catalog.TestCorruptionFailClosed::test_unreadable_fragment_fails_closed", "reason": "POSIX permission semantics"},
+    {"node": "storage/test_recovery::test_symlink_escape_rejected", "reason": "POSIX symlink semantics required"}
+  ],
+  "infra_attempts": [
+    {"run_id": "p3-r6-attempt1-workers4", "workers": 4, "disposition": "INCOMPLETE_INFRA", "missing_nodes": 1586, "failed": 42, "errored": 2, "cause": "parallel interference: OpenBLAS thread exhaustion and shared temp staging; all failing suites green serially"},
+    {"run_id": "p3-r6-attempt2-workers1-timeout900", "workers": 1, "disposition": "INCOMPLETE_INFRA", "missing_nodes": 1107, "failed": 4, "cause": "partition timeout at 900s; four real failures were the credential-shaped leak sentinel in this mission's own fixture, fixed in 868dd3fc9"}
+  ],
+  "h_dispositions": {
+    "H01": "CLOSED - unexpected exceptions contribute only their class; KeyboardInterrupt/SystemExit preserved; repo secret scan green",
+    "H02": "REPAIRED - record/provider/kind/cutoff binding with typed mapping; provider+kind+artifact axes named UNRESOLVED_REPLAY_BINDING (REPLAY_EVIDENCE_RECORD_BINDING_V1) and disclosed",
+    "H03": "CLOSED - identity_sha256 required for AUTHORIZED and artifact must be approved by the pinned manifest; empty-manifest composition refused",
+    "H04": "CLOSED - evaluate is a thin guard over _evaluate; only programmer errors raise",
+    "H05": "CLOSED - two-read evidence custody; mismatch is a typed refusal",
+    "H06": "CONFIRMED PROSPECTIVE - I08 amendment is +15/-3, adds /consumer/ to one live predicate, seals nothing historical"
+  },
+  "governance": {
+    "G16": "prospective amendment, disclosed, exact-path constrained by P3_MASTER_EXACT_PATHS",
+    "G17": "pre-existing red: I06 audit and producer allowlists never admitted consumer/ and pins were stale; fixed by disclosed prospective amendment plus mechanical republication",
+    "republished_artifacts": {
+      "bloc_05_time_validation.json": "5f308aa689c26cd574169a1cc0b24b4da4663493f3026af0a5fb8181767b2237",
+      "bloc_05_semantic_validation.json": "9347afccb7ef3d8272e80e9a945eaf6c6787fedde04d99b708798f1e5253bb70",
+      "bloc_05_replay_safety_validation.json": "7c1fbd24a86f5654e81bdcdfb5bd1924bf85268c9fc8454771c64718cadba3ac",
+      "BLOC_05_I06_SCOPE_AUDIT.json": "8f076bd5450bf2427ce12628daae0f5945e55220c2c471f5c1e0f4ac4bcab1cc"
+    },
+    "producers": {
+      "I05": "86 rows / 86 pass",
+      "I06": "14/14 rows + 8/8 scope rows, exit 0, idempotent across two runs",
+      "I09": "35 pass / 0 fail, --check exit 0",
+      "I11R2": "binding audit green"
+    },
+    "focused_suites": {
+      "consumer_contracts": 36,
+      "consumer_policy": 28,
+      "consumer_custody": 33,
+      "consumer_rebinding": 25,
+      "consumer_security": 39,
+      "consumer_total": 161,
+      "governance_set_collected": 415,
+      "i15_hardening": 17,
+      "normalization_tree_plus_i11r2": 1543
+    }
+  },
+  "invariants": {
+    "approval_manifest_artifacts": {},
+    "approval_manifest_revoked": [],
+    "approval_manifest_authority": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+    "approval_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "integration_state": "INTEGRATION_REQUIRED",
+    "custody_source_authority": "OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1 unresolved and not implemented",
+    "production_merge": false,
+    "provider_approval": false,
+    "trust_promotion": false,
+    "gate_or_bloc6_advance": false,
+    "independent_agent2_reconciliation": "not received"
+  },
+  "limitations": [
+    "green result is serial (workers=1); 4-worker execution did not complete",
+    "11 platform/opt-in skips unexecuted on this host",
+    "real PostgreSQL and live network smoke not exercised",
+    "replay provider/kind/artifact axes bound only by name, contract unimplemented",
+    "operator custody-source authority still unresolved",
+    "no independent Agent 2 reconciliation received"
+  ],
+  "rung7_recommendation": [
+    "define REPLAY_EVIDENCE_RECORD_BINDING_V1 and bind provider/kind/artifact identity",
+    "prove parallel safety or record serial as the canonical configuration",
+    "run the POSIX surface once on Linux",
+    "exercise opt-in integrations as a separate assurance class",
+    "keep provider approval, custody authority and trust promotion as operator actions"
+  ]
+}
