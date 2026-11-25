@@ -1050,10 +1050,28 @@ language is preserved as history and is not deleted.
   changed during E1.
 * P3 development: authorized to resume after this integration checkpoint.
 
+## Current operational status (this session — agent/qcae-p3-t02-github-discovery)
+
+This entry states the current status; the historical `P2-R5R = OPEN` declaration
+above is preserved as evidence and is not deleted or restated as current.
+
+| Concern | Status | Evidence |
+| --- | --- | --- |
+| P2 | FROZEN / ACCEPTED | `P2-R5R-R2-E1` accepted; tested `5bf2e9c7a`, evidence `01bb45cef`, freeze `7df9d183e`, integrated at canonical `34148131e` (remote-verified) |
+| P3 | ACTIVE | P3-R4 preserved (238 regression tests green); no P3 production code changed during E1 |
+| P3-R4 | PRESERVED | `p3_r4_regression` block green; discovery contract layer intact |
+| P3-T02 | OPEN | GitHub discovery build — this session, branch `agent/qcae-p3-t02-github-discovery` |
+
 ## Blockers
 
-P2 FINAL FREEZE held for R1; P3 not authorized.
+None open. P2 = FROZEN / ACCEPTED; P3 = ACTIVE; P3-T02 = OPEN.
+P3 is deliberately not frozen in this session, and canonical is not advanced
+without operator review.
 
 ## Next Action
 
-P0 — FROZEN v0.1 + A-001 RECONCILED. Awaiting operator authorization for **P1 — Evidence + Registry Spine** (canon 18.1 Phase 1: artifact hashing/store, structured persistence, provenance relationships, Capability Receipts, negative knowledge, repositories/unit-of-work, migrations, backup/restore; plus A-001 §13 P1 obligation: cross-registry provenance without collapsing knowledge/capability ownership). Book IV Block 9 chapters + A-001 to be read before P1 starts.
+P3-T02 GitHub discovery build (transport + adapter + policy-gated egress +
+adversarial qualification) on `agent/qcae-p3-t02-github-discovery`.
+STOP after P3-T02: do not freeze P3, do not advance canonical, do not begin
+P4. Research Mesh delegation seam, planner, discovery worker, IT/T01
+integration and P3-FREEZE belong to the next gated tranches (P3-T03+).
