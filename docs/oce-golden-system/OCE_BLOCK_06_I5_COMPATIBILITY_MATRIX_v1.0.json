@@ -4,6 +4,18 @@
   "document_id": "OCE-B6-I5-COMPAT-001",
   "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
   "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "compatibility claims",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
   "refusal": {
     "consumer_evidence": "none",
     "silent_latest": false,

@@ -3,6 +3,33 @@
   "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
   "document_id": "OCE-B6-I5-STAGE-SCOPE-REGISTRATION-001",
   "frozen_before_results": true,
+  "frozen_before_results_field_scope": {
+    "flag_applies_to": [
+      "total requirements = 40",
+      "six new node IDs",
+      "three mutation IDs M01-M03"
+    ],
+    "flag_does_not_apply_to": [
+      "C3.S3 / C3.S4 / C3.S5 section allocation"
+    ],
+    "mutation_ids_predeclared": true,
+    "node_ids_predeclared": true,
+    "note": "frozen_before_results is true only at field level: the total (40), the six new node IDs and the three mutation IDs were predeclared. The section allocation was predicted as 15/11/14 in historical amendment commit 3d1f94e87 and corrected to 13/12/15 inside repair commit e44d7f56d after repair had started. This document must not be read as evidence that the current split was the original prediction.",
+    "section_distribution_corrected_in_commit": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
+    "section_distribution_correction_timing": "AFTER_REPAIR_STARTED",
+    "section_distribution_current_values": {
+      "C3.S3": 13,
+      "C3.S4": 12,
+      "C3.S5": 15
+    },
+    "section_distribution_predeclared": false,
+    "section_distribution_predicted_values": {
+      "C3.S3": 15,
+      "C3.S4": 11,
+      "C3.S5": 14
+    },
+    "total_requirements_predeclared": true
+  },
   "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
   "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
   "locks": {
@@ -14,6 +41,18 @@
     "RATIFICATION_AUTHORIZED": false,
     "capital_authority": "none",
     "cost_usd": 0
+  },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "T19 deferral record; pre-result flag chronology",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
   },
   "prior_stages": {
     "B6-I0": {
@@ -63,13 +102,25 @@
   "stage": "B6-I5",
   "status": "FROZEN",
   "t19_deferral": {
+    "bound": false,
+    "current_publication_witness": null,
     "expected_refusal": "refuse publication",
-    "future_authorized_stage": "B6-I9",
-    "future_planned_node": "B6-I9 publication-hold gate node",
+    "future_planned_node": "publication-hold gate node (provisional and unassigned; no stage has frozen a concrete node ID)",
+    "future_verification_authority": "PROPOSED_PENDING_OPERATOR_DECISION",
+    "future_verification_decision_required": "Operator must assign or confirm the stage that will witness T19 'refuse publication' and freeze a concrete node ID there. No governing document assigns this verification to B6-I9; B6-I9 is only the platform-gate stage in the construction sequence, so this destination remains a proposal and is not authorized.",
+    "governing_source": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19] (owner=operator, stage=B6-I2, required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED)",
     "id": "T19",
+    "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+    "no_current_publication_witness": true,
     "outside_current_partition": true,
     "owner": "operator",
-    "reason": "Publication refusal is enforced by the B6-I9 platform gate under the explicit operator publication hold; B6-I5 has no packaging, publication, or cloud capability"
+    "proof_state": "DEFERRED",
+    "proposed_future_verification_stage": "B6-I9",
+    "reason": "Publication refusal belongs to the release boundary. OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19]: owner=operator, stage=B6-I2 (source stage), required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED. The registry row records only the source stage B6-I2 (owner operator, required_refusal 'refuse publication', mitigation_state PLANNED_NOT_IMPLEMENTED); it names no later verification stage. B6-I5's surface is services only, with no packaging, publication or cloud capability, so no B6-I5 node can produce a refuse-publication observable.",
+    "source_document": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json",
+    "source_row": "threats[T19]",
+    "source_stage": "B6-I2",
+    "source_stage_field": "stage"
   },
   "this_stage": {
     "allowed_prefixes": [

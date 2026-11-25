@@ -39,6 +39,18 @@
     "head_only_expected": 40,
     "head_only_files": "infrastructure/control-plane/tests/test_block_06_i5_*.py"
   },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "paired comparison claims",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
   "schema": "oce.block_06_i5.paired_contract.v1",
   "setup": {
     "clean_isolated_clones": true,

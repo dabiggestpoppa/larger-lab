@@ -20,17 +20,22 @@ Checks:
   cross-document arithmetic identical
   S1 corrective supplement present and referenced
   amendment reference rebinding (historical + governing)
+  post-audit correction record present and bound to Git identities
+  T19 source stage equals the actual P0 registry row; future destination unassigned
   T19 direct governing-source citation
+  pre-result flags qualified at field level against the historical commit
   mutation law compile-success wording
   no production or B6-I5 tests exist
   no prior-stage weakening
   no B6-I6+ files
-  secret scan clean
-  absolute-path scan clean
+  redundant command exits are hard failures, never empty results
+  secret scan clean (value-shaped rules, no file/type/line suppression)
+  absolute-path scan clean (governed Block 06 documents, Markdown included)
   manifest/packet integrity where applicable
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import pathlib
 import re
@@ -42,6 +47,44 @@ PREFIX = "OCE_BLOCK_06_I5_"
 SCRIPTS = "infrastructure/control-plane/scripts"
 TESTS = "infrastructure/control-plane/tests"
 
+BASE_SHA = "a4c4f10acac56ce53e1efd29c726039c86930b10"
+AMENDMENT_NAME = f"{PREFIX}AMENDMENT_001_v1.0.json"
+S1_NAME = f"{PREFIX}AMENDMENT_001_S1_v1.0.json"
+CORRECTION_NAME = f"{PREFIX}POST_AUDIT_CORRECTION_001_v1.0.json"
+
+# Identities are re-derived with git below; these constants only name the values the
+# documents claim, so a drift between claim and Git fails the check instead of passing.
+REPAIR_SHA = "e44d7f56d5c9912e52dc4559ee2efef580d75609"
+REPAIR_TREE = "3677da614fa58ecdda21a9d8fad26151b828bcbb"
+S1_AUDITED_HEAD = "2a922d710ff8fb79f6cb78c21e52f635bd1b0eae"
+S1_AUDITED_TREE = "8b20b2d334307d59fb913c90ed4dd114255eee01"
+S1_BIND_HEAD = "0a2313bb39a356badccc17c6ca6dd49f09ab6806"
+S1_BIND_TREE = "ad0d5801c23a5753889b652000b6d34b1ecbe4c7"
+S1_RECORDED_TREE = "5eb228fcf859fc7224ee82b64d4bffc21d95e639"
+S1_BLOB_INTRO = "3b61cfa03ef34ad3d32fb1fcce83ff21d475f711"
+S1_BLOB_CURRENT = "b655a0e956aa1242ea41758c0d8973dcd1825997"
+
+PREDICTED_SECTIONS = {"C3.S3": 15, "C3.S4": 11, "C3.S5": 14}
+CORRECTED_SECTIONS = {"C3.S3": 13, "C3.S4": 12, "C3.S5": 15}
+
+# Governed documents of this stage. Markdown is covered; the scope is defined by
+# governance (Block 06 documents this stage may speak for), not by file type.
+GOVERNED_PATH_PREFIX = "docs/oce-golden-system/OCE_BLOCK_06_"
+ABS_PATH_RE = r"C:/|/home/|/Users/"
+
+# Value-shaped credential rules. Each rule requires a credential-shaped value, so the
+# rule text itself never matches and no file, file type or matched line is suppressed.
+SECRET_RULES = (
+    ("stripe_live_key", r"sk_live_[A-Za-z0-9]{16,}"),
+    ("stripe_test_key", r"sk_test_[A-Za-z0-9]{16,}"),
+    ("aws_access_key_id", r"AKIA[0-9A-Z]{16}"),
+    ("github_pat_classic", r"gh[pousr]_[A-Za-z0-9]{36,}"),
+    ("github_pat_fine_grained", r"github_pat_[A-Za-z0-9_]{22,}"),
+    ("aws_secret_access_key", r"AWS_SECRET[A-Z_]*[[:space:]]*[:=][[:space:]]*[\"'][A-Za-z0-9/+=]{40}[\"']"),
+    ("password_assignment",
+     r"([Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]|[Pp][Aa][Ss][Ss][Ww][Dd])[[:space:]]*[:=][[:space:]]*[\"'][^\"']{8,}[\"']"),
+)
+
 
 def canonical(obj) -> bytes:
     return (json.dumps(obj, sort_keys=True, indent=2, ensure_ascii=False) + "\n").encode("utf-8")
@@ -50,10 +93,17 @@ def canonical(obj) -> bytes:
 def main(argv=None) -> int:
     root = pathlib.Path(__file__).resolve().parents[3]
 
-    def git(*args: str) -> str:
+    def git_run(*args: str):
         proc = subprocess.run(["git", "-C", str(root), *args],
                               capture_output=True, encoding="utf-8", errors="replace")
-        return proc.stdout
+        return proc.returncode, proc.stdout, proc.stderr
+
+    def git_bytes(*args: str):
+        proc = subprocess.run(["git", "-C", str(root), *args], capture_output=True)
+        return proc.returncode, proc.stdout, proc.stderr
+
+    def git(*args: str) -> str:
+        return git_run(*args)[1]
 
     checks: list[str] = []
     failures: list[str] = []
@@ -63,9 +113,39 @@ def main(argv=None) -> int:
         if not ok:
             failures.append(f"{name}: {detail}")
 
+    def git_ok(name: str, *args: str) -> str:
+        """Run git and require exit status 0.
+
+        A nonzero exit is a FAIL, never a successful empty result: the returned
+        stdout of a failed command is empty, so callers cannot mistake it for data.
+        """
+        rc, out, err = git_run(*args)
+        need(f"git/{name}", rc == 0, f"rc={rc} stderr={err.strip()[:200]}")
+        return out if rc == 0 else ""
+
+    def git_grep(name: str, pattern: str, *paths: str) -> list[str]:
+        """git grep with POSIX status semantics: 0 = hits, 1 = clean, >=2 = error."""
+        rc, out, err = git_run("grep", "-InE", "-e", pattern, "--", *paths)
+        need(f"git/{name}", rc in (0, 1), f"rc={rc} stderr={err.strip()[:200]}")
+        return out.splitlines() if rc == 0 else []
+
+    def tree_of(sha: str):
+        rc, out, _ = git_run("rev-parse", f"{sha}^{{tree}}")
+        return out.strip() if rc == 0 and out.strip() else None
+
+    def bind_tree(name: str, entry: dict) -> None:
+        """Require that a recorded commit exists and its tree equals the recorded tree."""
+        sha = entry.get("sha") or ""
+        claimed = entry.get("tree")
+        rc, out, _ = git_run("rev-parse", "--verify", f"{sha}^{{commit}}")
+        need(f"bind/{name}/commit", rc == 0 and out.strip() != "", f"sha={sha} rc={rc}")
+        actual = tree_of(sha) if rc == 0 else None
+        need(f"bind/{name}/tree", actual is not None and actual == claimed,
+             f"claimed={claimed} actual={actual}")
+
     # ---- all JSON parses ----
     p0_files = sorted(p.name for p in (root / DOCS).glob(f"{PREFIX}*.json"))
-    need("packet/count", len(p0_files) == 10, p0_files)
+    need("packet/count", len(p0_files) == 11, p0_files)
     objs: dict[str, dict] = {}
     for name in p0_files:
         raw = (root / DOCS / name).read_bytes()
@@ -151,6 +231,9 @@ def main(argv=None) -> int:
         # S1 must not predict a real governing SHA (uses placeholder)
         s1_gov = s1.get("cross_reference_plan", {}).get("governing_amendment_commit", "")
         need("s1/no_predicted_sha", "REAL S1 COMMIT SHA" in s1_gov and "<" in s1_gov, s1_gov)
+        s1_doc = s1
+    else:  # pragma: no cover - the existence check already failed
+        s1_doc = {}
     # Reference rebinding on each governed doc (not the amendment itself, not S1)
     governed_names = [n for n in p0_files
                       if n != f"{PREFIX}AMENDMENT_001_v1.0.json" and n != s1_name]
@@ -166,20 +249,209 @@ def main(argv=None) -> int:
     orig_rev = git("rev-parse", f"{HISTORICAL_SHA}^{{commit}}")
     need("s1/original_history_reachable", HISTORICAL_SHA in orig_rev,
          "original amendment commit not reachable")
-    # B-2: T19 direct governing source citation
+    # B-2: T19 direct governing source citation, checked against the actual registry row
+    p0_registry_name = "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json"
+    p0_registry_raw = git_ok("show/p0_registry", "show", f"HEAD:{DOCS}/{p0_registry_name}")
+    p0_row = None
+    if p0_registry_raw:
+        try:
+            p0_row = next((t for t in json.loads(p0_registry_raw).get("threats", [])
+                           if t.get("id") == "T19"), None)
+        except (ValueError, AttributeError):
+            p0_row = None
+    need("source/t19_registry_row", p0_row is not None, p0_registry_name)
+    if p0_row is not None:
+        need("source/t19_stage", p0_row.get("stage") == "B6-I2", p0_row.get("stage"))
+        need("source/t19_owner", p0_row.get("owner") == "operator", p0_row.get("owner"))
+        need("source/t19_refusal",
+             p0_row.get("required_refusal") == "refuse publication", p0_row.get("required_refusal"))
+        need("source/t19_mitigation_state",
+             p0_row.get("mitigation_state") == "PLANNED_NOT_IMPLEMENTED",
+             p0_row.get("mitigation_state"))
+
     t19_entry = next((t for t in proofs.get("deferred_threats", []) if t.get("id") == "T19"), None)
     need("b2/t19_governing_source", t19_entry is not None
-         and "governing_source" in t19_entry
          and "refuse publication" in t19_entry.get("governing_source", ""),
-         t19_entry)
+         (t19_entry or {}).get("governing_source"))
+    need("b2/t19_source_stage_matches_registry",
+         t19_entry is not None and p0_row is not None
+         and t19_entry.get("source_stage") == p0_row.get("stage") == "B6-I2",
+         (t19_entry or {}).get("source_stage"))
+    need("b2/t19_governing_source_stage_text",
+         t19_entry is not None
+         and "stage=B6-I2" in t19_entry.get("governing_source", "")
+         and "stage=B6-I9" not in t19_entry.get("governing_source", ""),
+         (t19_entry or {}).get("governing_source"))
     need("b2/t19_provisional_node", t19_entry is not None
          and "provisional" in t19_entry.get("future_planned_node", ""), t19_entry)
+    need("b2/t19_future_unassigned",
+         t19_entry is not None
+         and t19_entry.get("future_verification_authority") == "PROPOSED_PENDING_OPERATOR_DECISION"
+         and "future_authorized_stage" not in t19_entry
+         and t19_entry.get("no_current_publication_witness") is True
+         and t19_entry.get("current_publication_witness") is None
+         and bool(t19_entry.get("future_verification_decision_required")))
+    need("b2/t19_no_publication_node",
+         not any("publication" in str(n).lower() for n in registry["inventory"]["nodes"]))
     # B-3: mutation law compile wording
     mlaw = amendment["e1_non_vacuous_mutation_law"]
     need("b3/mutation_compile_law",
          "compiles successfully and remains syntactically valid before collection" in mlaw["law"]
          and "Mutated Python source must compile successfully and remain syntactically valid before collection" in mlaw["law"],
          "compile wording missing")
+
+    # ---- post-audit correction record: identities re-derived from Git ----
+    corr = objs[CORRECTION_NAME]
+    need("correction/status", corr.get("status") == "POST_AUDIT_CORRECTION_FROZEN", corr.get("status"))
+    need("correction/post_audit",
+         corr.get("post_audit") is True and corr.get("created_after_audit") is True
+         and corr.get("created_after_audit_of_head") == "2fe7de77406af354d2edd07903ba2041c8f2204c",
+         corr.get("created_after_audit_of_head"))
+    need("correction/no_self_binding",
+         corr.get("identities", {}).get("correction_commit", {}).get("sha") is None
+         and corr["identities"]["correction_commit"].get("self_binding_claimed") is False)
+    for key, entry in sorted(corr.get("identities", {}).items()):
+        if key == "correction_commit" or not isinstance(entry, dict):
+            continue
+        bind_tree(f"correction/{key}", entry)
+    need("correction/s1_audited_tree",
+         corr["identities"]["s1_audited_head"]["tree"] == S1_AUDITED_TREE
+         and tree_of(S1_AUDITED_HEAD) == S1_AUDITED_TREE
+         and corr["identities"]["s1_audited_head"]["s1_recorded_tree"] == S1_RECORDED_TREE
+         and corr["identities"]["s1_audited_head"]["s1_recorded_tree_matches_git"] is False)
+    need("correction/s1_binding_tree",
+         corr["identities"]["s1_binding_head"]["tree"] == S1_BIND_TREE
+         and tree_of(S1_BIND_HEAD) == S1_BIND_TREE
+         and corr["identities"]["s1_binding_head"]["s1_recorded_tree"] == S1_RECORDED_TREE)
+    need("correction/repair_tree",
+         tree_of(REPAIR_SHA) == REPAIR_TREE
+         and corr["identities"]["repair_commit"]["tree"] == REPAIR_TREE)
+    # S1 must not have been edited or reformatted again by this correction
+    need("correction/s1_untouched",
+         corr["s1_blob_observation"]["s1_edited_again_in_this_correction"] is False
+         and s1_doc.get("audited_tree") == S1_RECORDED_TREE
+         and s1_doc.get("current_tree") == S1_RECORDED_TREE)
+    need("correction/s1_tree_fields_declared_superseded",
+         set(corr["s1_tree_binding_correction"]["s1_superseded_fields"])
+         >= {"audited_tree", "current_tree"}
+         and corr["s1_tree_binding_correction"]["s1_edited_again"] is False)
+
+    # ---- both observed S1 blobs: byte vs semantic equality, from Git objects ----
+    blob = corr["s1_blob_observation"]
+    intro_ref = git_ok("rev-parse/s1_intro_blob", "rev-parse",
+                       f"{blob['introduction_commit']}:{blob['path']}").strip()
+    need("correction/s1_blob/introduction_matches_git",
+         intro_ref == blob["introduction_blob"] == S1_BLOB_INTRO, intro_ref)
+    head_ref = git_ok("rev-parse/s1_head_blob", "rev-parse", f"HEAD:{blob['path']}").strip()
+    need("correction/s1_blob/current_matches_git",
+         head_ref == blob["current_blob"] == S1_BLOB_CURRENT, head_ref)
+    rc_intro, bytes_intro, err_intro = git_bytes("cat-file", "blob", S1_BLOB_INTRO)
+    rc_head, bytes_head, err_head = git_bytes("cat-file", "blob", S1_BLOB_CURRENT)
+    need("correction/s1_blob/readable", rc_intro == 0 and rc_head == 0,
+         f"rc={rc_intro}/{rc_head} {err_intro[:80]!r} {err_head[:80]!r}")
+    need("correction/s1_blob/byte_difference",
+         blob["byte_equal"] is False
+         and bytes_intro != bytes_head
+         and len(bytes_intro) == blob["introduction_size_bytes"]
+         and len(bytes_head) == blob["current_size_bytes"],
+         (len(bytes_intro), len(bytes_head)))
+    need("correction/s1_blob/hashes",
+         hashlib.sha256(bytes_intro).hexdigest() == blob["introduction_sha256"]
+         and hashlib.sha256(bytes_head).hexdigest() == blob["current_sha256"])
+    need("correction/s1_blob/semantic_equality_claim",
+         blob["semantic_equal"] is True
+         and json.loads(bytes_intro.decode("utf-8")) == json.loads(bytes_head.decode("utf-8")))
+    need("correction/s1_blob/byte_identity_retracted",
+         blob["byte_identity_claim_retracted"] is True
+         and bool(blob.get("retracted_claim")) and bool(blob.get("retraction_reason")))
+
+    # ---- T19 correction agrees with the registry row and across active documents ----
+    t19_corr = corr["t19_correction"]
+    need("correction/t19/source_stage",
+         t19_corr["source_stage"] == "B6-I2"
+         and p0_row is not None and t19_corr["source_stage"] == p0_row["stage"])
+    need("correction/t19/owner_refusal",
+         t19_corr["owner"] == "operator" and t19_corr["required_refusal"] == "refuse publication")
+    need("correction/t19/no_current_witness",
+         t19_corr["current_i5_publication_witness"] is None
+         and t19_corr["no_current_i5_publication_witness"] is True)
+    need("correction/t19/future_unassigned",
+         t19_corr["future_verification"]["destination_authority"]
+         == "PROPOSED_PENDING_OPERATOR_DECISION"
+         and t19_corr["future_verification"]["authorized"] is False
+         and t19_corr["future_verification"]["operator_decision_required"] is True
+         and bool(t19_corr["future_verification"]["decision_required"]))
+    need("correction/t19/corrected_claim",
+         t19_corr["corrected_claim"]["correct_value"].startswith("stage=B6-I2"))
+    need("correction/t19/proofs_agree",
+         t19_entry is not None and t19_entry.get("source_stage") == "B6-I2"
+         and t19_entry.get("future_verification_authority") == "PROPOSED_PENDING_OPERATOR_DECISION")
+    need("correction/t19/scope_agree",
+         bool(scope.get("deferred_threats"))
+         and scope["deferred_threats"][0].get("source_stage") == "B6-I2")
+    need("correction/t19/registration_agree",
+         registration["t19_deferral"].get("source_stage") == "B6-I2"
+         and registration["t19_deferral"].get("future_verification_authority")
+         == "PROPOSED_PENDING_OPERATOR_DECISION")
+    need("correction/t19/amendment_agree",
+         amendment["b1_t19_repair"]["t19"].get("source_stage") == "B6-I2")
+    need("correction/t19/no_authorized_stage_claim",
+         all("future_authorized_stage" not in json.dumps(doc)
+             for doc in (proofs, scope, registration, amendment)))
+
+    # ---- pre-result flags qualified at field level, from the historical commit ----
+    hist_raw = git_ok("show/historical_amendment", "show",
+                      f"{HISTORICAL_SHA}:{DOCS}/{AMENDMENT_NAME}")
+    hist = None
+    if hist_raw:
+        try:
+            hist = json.loads(hist_raw)
+        except ValueError:
+            hist = None
+    need("pre_result/historical_amendment_readable", hist is not None)
+    if hist is not None:
+        need("pre_result/historical_prediction",
+             hist["planned_arithmetic"]["per_section"] == PREDICTED_SECTIONS,
+             hist["planned_arithmetic"]["per_section"])
+        need("pre_result/historical_frozen_claim", hist.get("frozen_before_results") is True)
+        need("pre_result/historical_total", hist["planned_arithmetic"]["requirements_total"] == 40)
+        need("pre_result/six_node_ids_predeclared",
+             len(hist["new_node_ids_before_results"]) == 6
+             and hist["new_node_ids_before_results"] == amendment["new_node_ids_before_results"],
+             hist["new_node_ids_before_results"])
+        need("pre_result/mutation_ids_predeclared",
+             set(hist["new_mutation_ids_before_results"]) == {"M01", "M02", "M03"})
+    arith = amendment["planned_arithmetic"]
+    need("pre_result/corrected_later",
+         arith["per_section"] == CORRECTED_SECTIONS
+         and arith.get("per_section_original_prediction") == PREDICTED_SECTIONS
+         and arith.get("per_section_was_predeclared") is False
+         and arith.get("per_section_corrected_in_commit") == REPAIR_SHA)
+    for doc_name in (f"{PREFIX}IMPLEMENTATION_CONTRACT_v1.0.json",
+                     f"{PREFIX}STAGE_SCOPE_REGISTRATION_v1.0.json",
+                     AMENDMENT_NAME):
+        fscope = objs[doc_name].get("frozen_before_results_field_scope", {})
+        need(f"pre_result/field_scope/{doc_name}",
+             objs[doc_name].get("frozen_before_results") is True
+             and fscope.get("section_distribution_predeclared") is False
+             and fscope.get("section_distribution_predicted_values") == PREDICTED_SECTIONS
+             and fscope.get("section_distribution_current_values") == CORRECTED_SECTIONS
+             and fscope.get("section_distribution_corrected_in_commit") == REPAIR_SHA
+             and fscope.get("total_requirements_predeclared") is True
+             and fscope.get("node_ids_predeclared") is True)
+    need("pre_result/record_agrees",
+         corr["pre_result_flag_correction"]["predicted_section_values"] == PREDICTED_SECTIONS
+         and corr["pre_result_flag_correction"]["corrected_section_values"] == CORRECTED_SECTIONS
+         and corr["pre_result_flag_correction"]["total_40_predeclared"] is True
+         and corr["pre_result_flag_correction"]["six_node_ids_predeclared"] is True)
+    need("pre_result/repair_commit_binds", tree_of(REPAIR_SHA) == REPAIR_TREE, tree_of(REPAIR_SHA))
+
+    # ---- post-audit supersession pointer on every active packet document ----
+    for name in p0_files:
+        if name in (S1_NAME, CORRECTION_NAME):
+            continue
+        need(f"supersession/{name}",
+             objs[name].get("post_audit_correction", {}).get("document") == CORRECTION_NAME)
 
     # ---- stage identity ----
     need("stage/identity", scope["stage"] == contract["stage"] == "B6-I5")
@@ -282,13 +554,21 @@ def main(argv=None) -> int:
     t19_entry = next((t for t in t19_list if t["id"] == "T19"), None)
     need("t19/deferred", t19_entry is not None)
     if t19_entry:
-        need("t19/owner", t19_entry["owner"] == "operator")
-        need("t19/future_stage", t19_entry["future_authorized_stage"] == "B6-I9")
-        need("t19/expected_refusal", t19_entry["expected_refusal"] == "refuse publication")
+        need("t19/owner", t19_entry.get("owner") == "operator")
+        need("t19/expected_refusal",
+             t19_entry.get("expected_refusal") == "refuse publication")
+        need("t19/source_stage",
+             t19_entry.get("source_stage") == "B6-I2"
+             and (p0_row is None or t19_entry["source_stage"] == p0_row.get("stage")))
+        need("t19/future_stage_proposed_not_authorized",
+             t19_entry.get("future_verification_authority")
+             == "PROPOSED_PENDING_OPERATOR_DECISION"
+             and "future_authorized_stage" not in t19_entry)
         need("t19/outside_partition", t19_entry.get("outside_current_partition") is True)
         need("t19/proof_state", t19_entry.get("proof_state") == "DEFERRED")
         need("t19/future_planned_node",
-             "B6-I9 publication-hold gate node" in t19_entry.get("future_planned_node", ""))
+             "unassigned" in t19_entry.get("future_planned_node", "")
+             and "provisional" in t19_entry.get("future_planned_node", ""))
     bound_threat_ids = [t["id"] for t in proofs.get("threats", []) if t.get("bound") is True]
     need("t19/not_bound", "T19" not in bound_threat_ids, bound_threat_ids)
     t19_nodes = [n for row in fc if row["id"] == "T19" for n in row["nodes"]]
@@ -409,11 +689,12 @@ def main(argv=None) -> int:
     test_files = sorted(p.name for p in (root / TESTS).glob("test_block_06_i5_*.py"))
     need("no_b6_i5_tests", len(test_files) == 0, test_files)
     oce_dir = root / "oce"
-    i5_refs = git("grep", "-InE", "block_06_i5|B6-I5", "--", str(oce_dir))
-    need("no_b6_i5_production_refs", i5_refs == "", i5_refs[:500])
+    i5_refs = git_grep("production_refs", "block_06_i5|B6-I5", str(oce_dir))
+    need("no_b6_i5_production_refs", not i5_refs, i5_refs[:3])
 
-    # ---- no prior-stage weakening ----
-    changed = git("diff", "--name-only", "a4c4f10acac56ce53e1efd29c726039c86930b10..HEAD").splitlines()
+    # ---- no prior-stage weakening (a failed diff is a FAIL, not an empty result) ----
+    changed = git_ok("diff_names", "diff", "--name-only", f"{BASE_SHA}..HEAD").splitlines()
+    need("changed/list_readable", bool(changed), "git diff --name-only returned nothing")
     prior_changed = [p for p in changed if re.search(r"OCE_BLOCK_06_I[0-3]_", p)]
     need("no_prior_stage_change", len(prior_changed) == 0, prior_changed)
 
@@ -421,36 +702,53 @@ def main(argv=None) -> int:
     LATER_RE = r"OCE_BLOCK_06_I[6-9]_"
     later_files = [p for p in changed if re.search(LATER_RE, p)]
     need("no_b6_i6_plus_files", len(later_files) == 0, later_files)
-    tree_later = git("ls-tree", "-r", "--name-only", "HEAD").splitlines()
+    tree_later = git_ok("ls_tree", "ls-tree", "-r", "--name-only", "HEAD").splitlines()
     forbidden = [p for p in tree_later if any(f"OCE_BLOCK_06_I{i}_" in p for i in range(6, 10))]
     need("tree/no_b6_i6_plus", len(forbidden) == 0, forbidden)
 
-    # ---- secret scan (exclude regex pattern definitions and markdown docs) ----
-    secret_raw = git("grep", "-InE", "sk_live|sk_test|AKIA|ghp_|github_pat|AWS_SECRET", "--", DOCS, SCRIPTS)
-    secret_lines = [l for l in secret_raw.splitlines()
-                    if "re.compile" not in l
-                    and not l.split(":", 1)[0].endswith(".md")
-                    and not l.split(":", 1)[0].endswith("block_06_i5_validate.py")]
-    need("secret_scan_clean", not secret_lines, secret_raw[:500])
+    # ---- secret scan: every path, Markdown and this validator included ----
+    # Rules are credential-shaped, so the rule text cannot match itself and nothing is
+    # suppressed. Only path, line and rule name are reported; matched values never are.
+    secret_hits: list[str] = []
+    for rule_name, rule_re in SECRET_RULES:
+        for hit in git_grep(f"secret_rule/{rule_name}", rule_re, DOCS, SCRIPTS):
+            parts = hit.split(":", 2)
+            if len(parts) >= 2:
+                secret_hits.append(f"{parts[0]}:{parts[1]} rule={rule_name}")
+    need("secret_scan_clean", not secret_hits, secret_hits[:10])
 
-    # ---- absolute-path scan (exclude markdown docs) ----
-    abs_raw = git("grep", "-InE", "C:/|/home/|/Users/", "--", DOCS)
-    abs_lines = [l for l in abs_raw.splitlines()
-                 if not l.split(":", 1)[0].endswith(".md")]
-    need("abs_path_scan_clean", not abs_lines, abs_raw[:500])
+    # ---- absolute-path scan over governed Block 06 documents, Markdown included ----
+    abs_hits = git_grep("abs_path", ABS_PATH_RE, DOCS)
+    governed_hits, outside_scope = [], []
+    for hit in abs_hits:
+        parts = hit.split(":", 2)
+        if len(parts) < 2:
+            continue
+        path, lineno = parts[0], parts[1]
+        entry = f"{path}:{lineno}"
+        if path.startswith(GOVERNED_PATH_PREFIX) or path in changed:
+            governed_hits.append(entry)
+        else:
+            outside_scope.append(entry)
+    need("abs_path_scan_clean", not governed_hits, governed_hits[:10])
+    need("abs_path_scan/prior_book_out_of_scope", all(
+        not p.startswith(GOVERNED_PATH_PREFIX) for p in outside_scope), outside_scope[:5])
 
     # ---- git diff --check clean ----
-    diffcheck = git("diff", "--check")
+    dc_rc, diffcheck, dc_err = git_run("diff", "--check")
+    need("git/diff_check_readable", dc_rc == 0, f"rc={dc_rc} {(diffcheck or dc_err).strip()[:200]}")
     need("git_diff_check_clean", diffcheck == "", diffcheck[:500])
 
     # ---- tracked tree clean after commit ----
-    status = git("status", "--porcelain", "--untracked-files=all").strip()
+    status_rc, status_out, status_err = git_run("status", "--porcelain", "--untracked-files=all")
+    status = status_out.strip()
+    need("git/status_readable", status_rc == 0, f"rc={status_rc} {status_err.strip()[:200]}")
     need("tracked_tree_clean", status == "", status[:500])
 
     # ---- local == remote ----
-    local = git("rev-parse", "HEAD").strip()
-    remote = git("rev-parse", "origin/oce-book-6-i5").strip()
-    need("local_equals_remote", local == remote, (local, remote))
+    local = git_ok("rev_parse/head", "rev-parse", "HEAD").strip()
+    remote = git_ok("rev_parse/remote", "rev-parse", "origin/oce-book-6-i5").strip()
+    need("local_equals_remote", local != "" and local == remote, (local, remote))
 
     status_str = "PASS" if not failures else "FAIL"
     doc = {"status": status_str, "stage": "B6-I5", "checks": len(checks),

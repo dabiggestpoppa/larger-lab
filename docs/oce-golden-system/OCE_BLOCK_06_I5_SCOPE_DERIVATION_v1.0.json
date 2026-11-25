@@ -58,12 +58,25 @@
   "cost_usd": 0,
   "deferred_threats": [
     {
+      "bound": false,
+      "current_publication_witness": null,
       "expected_refusal": "refuse publication",
-      "future_authorized_stage": "B6-I9",
-      "future_planned_node": "B6-I9 publication-hold gate node",
+      "future_planned_node": "publication-hold gate node (provisional and unassigned; no stage has frozen a concrete node ID)",
+      "future_verification_authority": "PROPOSED_PENDING_OPERATOR_DECISION",
+      "future_verification_decision_required": "Operator must assign or confirm the stage that will witness T19 'refuse publication' and freeze a concrete node ID there. No governing document assigns this verification to B6-I9; B6-I9 is only the platform-gate stage in the construction sequence, so this destination remains a proposal and is not authorized.",
+      "governing_source": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19] (owner=operator, stage=B6-I2, required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED)",
       "id": "T19",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "no_current_publication_witness": true,
+      "outside_current_partition": true,
       "owner": "operator",
-      "reason": "Publication refusal is enforced by the B6-I9 platform gate under the explicit operator publication hold; B6-I5 has no packaging, publication, or cloud capability"
+      "proof_state": "DEFERRED",
+      "proposed_future_verification_stage": "B6-I9",
+      "reason": "Publication refusal belongs to the release boundary. OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19]: owner=operator, stage=B6-I2 (source stage), required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED. The registry row records only the source stage B6-I2 (owner operator, required_refusal 'refuse publication', mitigation_state PLANNED_NOT_IMPLEMENTED); it names no later verification stage. B6-I5's surface is services only, with no packaging, publication or cloud capability, so no B6-I5 node can produce a refuse-publication observable.",
+      "source_document": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json",
+      "source_row": "threats[T19]",
+      "source_stage": "B6-I2",
+      "source_stage_field": "stage"
     }
   ],
   "deferred_work": [
@@ -74,7 +87,7 @@
     "post-Book-6 evaluation system: RESERVED_NOT_AUTHORIZED",
     "packaging or publication of any artifact: NOT_AUTHORIZED",
     "cloud hosting or provider coupling: NOT_AUTHORIZED",
-    "T19 publication refusal deferred to operator/B6-I9 platform gate (amendment 001)"
+    "T19 publication refusal deferred to operator; proposed verification destination B6-I9 is PROPOSED_PENDING_OPERATOR_DECISION and not authorized (post-audit correction 001)"
   ],
   "depends_on": [
     "B6-I4"
@@ -146,6 +159,18 @@
     "evaluation"
   ],
   "p0_documentation_only": true,
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "deferred T19 threat entry and deferred-work note",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
   "provenance_obligations": [
     "every governed fact carries a source reference and a digest before it is retrievable",
     "knowledge stays separate from agent memory and shares no mutable store with it",

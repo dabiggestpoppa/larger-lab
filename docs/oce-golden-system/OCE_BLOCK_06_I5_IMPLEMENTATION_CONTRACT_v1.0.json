@@ -61,6 +61,33 @@
     "self_approval_refused": true
   },
   "frozen_before_results": true,
+  "frozen_before_results_field_scope": {
+    "flag_applies_to": [
+      "total requirements = 40",
+      "six new node IDs",
+      "three mutation IDs M01-M03"
+    ],
+    "flag_does_not_apply_to": [
+      "C3.S3 / C3.S4 / C3.S5 section allocation"
+    ],
+    "mutation_ids_predeclared": true,
+    "node_ids_predeclared": true,
+    "note": "frozen_before_results is true only at field level: the total (40), the six new node IDs and the three mutation IDs were predeclared. The section allocation was predicted as 15/11/14 in historical amendment commit 3d1f94e87 and corrected to 13/12/15 inside repair commit e44d7f56d after repair had started. This document must not be read as evidence that the current split was the original prediction.",
+    "section_distribution_corrected_in_commit": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
+    "section_distribution_correction_timing": "AFTER_REPAIR_STARTED",
+    "section_distribution_current_values": {
+      "C3.S3": 13,
+      "C3.S4": 12,
+      "C3.S5": 15
+    },
+    "section_distribution_predeclared": false,
+    "section_distribution_predicted_values": {
+      "C3.S3": 15,
+      "C3.S4": 11,
+      "C3.S5": 14
+    },
+    "total_requirements_predeclared": true
+  },
   "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
   "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
   "i4_merge_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
@@ -105,6 +132,18 @@
     "head_sha": null,
     "head_state": "UNBOUND_PENDING_IMPLEMENTATION",
     "head_tree": null
+  },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "pre-result flag chronology",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
   },
   "provenance_rules": {
     "chain": [

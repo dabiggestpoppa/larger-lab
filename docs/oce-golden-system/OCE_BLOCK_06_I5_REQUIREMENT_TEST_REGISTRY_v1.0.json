@@ -63,6 +63,18 @@
       "xfail"
     ]
   },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "requirement inventory and section assignment",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
   "requirements": [
     {
       "binding_node": "test_block_06_i5_contract.py::test_inventory_equals_collection",
