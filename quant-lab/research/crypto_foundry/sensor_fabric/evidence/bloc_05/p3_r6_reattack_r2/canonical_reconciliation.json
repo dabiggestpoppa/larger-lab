@@ -1,0 +1,310 @@
+{
+  "final": {
+    "bundle": "p3-r6-final",
+    "files": {
+      "collection.json": {
+        "sha256": "259df401afaf00a120545fda813a7acfd1dbf611bb81801d0533b986b35b5b86",
+        "bytes": 699183
+      },
+      "evidence.json": {
+        "sha256": "e919d886dfaeb1b0c1efb3da8122c0a613694e79e7c6908d5e471a45ea678c1f",
+        "bytes": 2947694
+      },
+      "guard_baseline.json": {
+        "sha256": "66cb79f145dad8bca7a4259c5e3ba8c4fda769e8472030524f6553cccb831d3a",
+        "bytes": 81445
+      },
+      "junit_0.xml": {
+        "sha256": "1936e6e7d9c3714329647f9ca0695511b1fca8ce97087e045757d3d568bc5a96",
+        "bytes": 857400
+      },
+      "partition_0.json": {
+        "sha256": "6b8dc3e3fd4640725bcae94c50d6a142defce8243594d735efd7ed505d34625b",
+        "bytes": 716215
+      },
+      "results_0.jsonl": {
+        "sha256": "6e055b916edb97f4655e0d3b9f662a076e1671a4539d5adb8b9b699006a36023",
+        "bytes": 3097215
+      }
+    },
+    "recorded_commit": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "recorded_commit_ok": true,
+    "workers": 1,
+    "collection": {
+      "count": 4952,
+      "unique": 4952,
+      "digest_recorded": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+      "digest_recomputed": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+      "digest_ok": true,
+      "duplicates": 0,
+      "malformed": 0,
+      "errors": 0,
+      "exit_code": 0
+    },
+    "partition": {
+      "index": 0,
+      "intended": 4952,
+      "set_equals_collection": true,
+      "files": 227
+    },
+    "execution": {
+      "unique_nodes": 4952,
+      "node_set_equals_collection": true,
+      "counts_recorded": {
+        "passed": 4941,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "counts_recomputed": {
+        "passed": 4941,
+        "skipped": 11
+      },
+      "duplicate_executions": 0,
+      "unimplemented_partitions": [],
+      "null_node_rows": 1
+    },
+    "junit": {
+      "tests": 4952,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 11,
+      "skipped_detail": [
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.providers.test_network_smoke_live::test_live_production_network_smoke",
+          "reason": "SENSOR_NETWORK_SMOKE not set; live network smoke disabled"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store.TestPermissions::test_final_not_world_writable",
+          "reason": "POSIX mode bits do not apply on Windows"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store_namespace.TestNameMaxProbe::test_posix_probe_failure_fails_closed",
+          "reason": "platform has no os.pathconf"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata::test_real_postgres_integration_is_explicitly_opt_in",
+          "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata::test_real_postgres_failed_refresh_rolls_back_previous_snapshot",
+          "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources::test_restore_symlinked_destination_component_refused",
+          "reason": "symlink privilege unavailable on this platform"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources::test_verify_symlinked_pack_object_refused",
+          "reason": "symlink privilege unavailable on this platform"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_concurrent_publication.TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed",
+          "reason": "Windows cannot create symlinks without privilege (1314)"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_path_canonicalization.TestCaseLaw::test_distinct_posix_directories_are_not_merged",
+          "reason": "Windows filesystem is case-insensitive here"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_json_catalog.TestCorruptionFailClosed::test_unreadable_fragment_fails_closed",
+          "reason": "POSIX permission semantics"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_recovery::test_symlink_escape_rejected",
+          "reason": "POSIX symlink semantics required"
+        }
+      ]
+    },
+    "verdict": {
+      "disposition": "COMPLETE",
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN",
+      "reasons": [],
+      "missing_nodes": [],
+      "missing_count": 0,
+      "extra_nodes": [],
+      "extra_count": 0,
+      "counts": {
+        "passed": 4941,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "reconciliation": {
+        "recomputed_counts": {
+          "passed": 4941,
+          "failed": 0,
+          "errored": 0,
+          "skipped": 11
+        },
+        "recorded_anchor_checked": true,
+        "anchored": true
+      }
+    },
+    "verdict_ok": true,
+    "universe_anchor": {
+      "count": 4952,
+      "digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931"
+    },
+    "restoration": true,
+    "tree_clean_after": true,
+    "interrupted": false
+  },
+  "cross": {
+    "run": {
+      "exit_code": 0,
+      "result": {
+        "disposition": "COMPLETE",
+        "assurance": "ANCHORED_COMPLETE",
+        "test_outcome": "GREEN",
+        "reasons": [],
+        "missing_nodes": [],
+        "missing_count": 0,
+        "extra_nodes": [],
+        "extra_count": 0,
+        "counts": {
+          "passed": 4941,
+          "failed": 0,
+          "errored": 0,
+          "skipped": 11
+        },
+        "reconciliation": {
+          "recomputed_counts": {
+            "passed": 4941,
+            "failed": 0,
+            "errored": 0,
+            "skipped": 11
+          },
+          "external_anchor_count": 4952,
+          "external_anchor_digest_checked": true,
+          "recorded_anchor_checked": true,
+          "external_anchor_checked": true,
+          "anchored": true
+        }
+      }
+    },
+    "attempt1": {
+      "bundle": "p3-r6-attempt1-workers4",
+      "commit": "d81cceb28aa79870f6702bed053bfb6d8d80f2c1",
+      "workers": 4,
+      "counts": {
+        "passed": 3313,
+        "failed": 42,
+        "errored": 2,
+        "skipped": 9
+      },
+      "disposition": "INCOMPLETE_INFRA",
+      "assurance": "NOT_COMPLETE",
+      "reasons": [
+        "accounting_failed: partition 1 reports 1 stream accounting error(s), e.g. stream_sentinel_missing: the result stream was never closed by a session, so it may be truncated",
+        "accounting_failed: partition 1 result stream has no session sentinel and may be truncated",
+        "accounting_failed: partition 2 reports 4 stream accounting error(s), e.g. quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestRestart::test_full_chain_survives_restart: missing_call_phase",
+        "accounting_failed: partition 2 kept 2665 report(s) of 2866 written",
+        "infrastructure_failures: [(1, 'no result stream produced by the plugin')]",
+        "missing_nodes: 1586"
+      ],
+      "failed_nodes": [
+        "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py::test_regeneration_is_byte_identical_and_exits_zero",
+        "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py::test_unit_validation_evidence_is_deterministic",
+        "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09p2d_custody_scope_pit.py::test_sec_d06_a_mutated_blob_is_refused",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestConcurrency::test_concurrent_identical_writers_one_final",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestCrossFilesystem::test_same_device_default_probe_accepted",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestLongComponent::test_ordinary_key_components_accepted",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_ordinary_reuse_performs_final_parent_fsync",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_publish_race_loser_proves_parent_fsync_before_success",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_retry_after_crash_E_idempotent_identity",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_retry_after_crash_E_proves_parent_fsync_before_success",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNamespaceDurabilityOrder::test_existing_namespace_no_dir_creation",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNamespaceDurabilityOrder::test_second_blob_same_fanout_no_creation",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestDeterministicStoredBytes::test_encode_twice_same_stored_bytes[ZSTD]",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestH1H2Separation::test_h1_invariant_across_encodings[ZSTD]",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_bounded_reads_only",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_large_streamed_fixture_bounded",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_nonseekable_source",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_small_chunk_size_works",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_streams_not_closed",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestValidation::test_decode_rejects_corrupt_zstd_frame",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestZstdEncoding::test_decoded_length_matches_source",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestZstdEncoding::test_h1_is_source_hash_not_stored_hash",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestZstdEncoding::test_roundtrip_exact",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestZstdEncoding::test_stored_bytes_compressed",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_duckdb_rebuild.py::test_10k_manifest_scan_is_usable",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_failed_acquisition_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_hidden_source_blob_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_missing_artifact_but_lineage_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_missing_physical_source_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_multi_source_real_chain",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_single_source_real_chain",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_wrong_acquisition_blob_pair_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_wrong_partition_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_end_to_end_projection.py::TestEndToEnd::test_wrong_provider_rejected",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i05r1_adversarial.py::TestCorruptionRestartMatrix::test_corrupt_physical_projection_fails_closed",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i05r4_evidence.py::TestI05R4Evidence::test_evidence_immutability_matrix_matches_committed",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i08r1_evidence.py::test_evidence_directory_untouched_after_run",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i08r1_evidence.py::test_generated_matches_committed[build_i08r1_streaming_quarantine_matrix-BLOC_04_I08R1_STREAMING_QUARANTINE_MATRIX.json]",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15ErrorLeakage::test_secret_never_in_exception_or_durable_metadata",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15RepoSecretScan::test_repository_secret_scan",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15RuntimeSecretSentinel::test_secret_context_refused_and_never_durable",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15SecretScannerSelfProof::test_self_exclusion_and_realistic_detection"
+      ]
+    },
+    "attempt2": {
+      "bundle": "p3-r6-attempt2-workers1-timeout900",
+      "commit": "d81cceb28aa79870f6702bed053bfb6d8d80f2c1",
+      "workers": 1,
+      "counts": {
+        "passed": 3833,
+        "failed": 4,
+        "errored": 1,
+        "skipped": 7
+      },
+      "disposition": "INCOMPLETE_INFRA",
+      "assurance": "NOT_COMPLETE",
+      "reasons": [
+        "accounting_failed: partition 0 reports 2 stream accounting error(s), e.g. quant-lab/tests/crypto_sensor_fabric/storage/test_i15_manifest_scan_scale.py::TestManifestScanScale::test_scan_scale_10k_real_manifest_rows: missi",
+        "accounting_failed: partition 0 result stream has no session sentinel and may be truncated",
+        "partition_timeout: [0]",
+        "infrastructure_failures: [(0, 'partition exceeded 900s')]",
+        "missing_nodes: 1107"
+      ],
+      "failed_nodes": [
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15ErrorLeakage::test_secret_never_in_exception_or_durable_metadata",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15RepoSecretScan::test_repository_secret_scan",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15RuntimeSecretSentinel::test_secret_context_refused_and_never_durable",
+        "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15SecretScannerSelfProof::test_self_exclusion_and_realistic_detection"
+      ]
+    },
+    "attempt1_final_status": {
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py::test_regeneration_is_byte_identical_and_exits_zero": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py::test_unit_validation_evidence_is_deterministic": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09p2d_custody_scope_pit.py::test_sec_d06_a_mutated_blob_is_refused": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestConcurrency::test_concurrent_identical_writers_one_final": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestCrossFilesystem::test_same_device_default_probe_accepted": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestLongComponent::test_ordinary_key_components_accepted": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_ordinary_reuse_performs_final_parent_fsync": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_publish_race_loser_proves_parent_fsync_before_success": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_retry_after_crash_E_idempotent_identity": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_adversarial.py::TestReuseDurability::test_retry_after_crash_E_proves_parent_fsync_before_success": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNamespaceDurabilityOrder::test_existing_namespace_no_dir_creation": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNamespaceDurabilityOrder::test_second_blob_same_fanout_no_creation": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestDeterministicStoredBytes::test_encode_twice_same_stored_bytes[ZSTD]": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestH1H2Separation::test_h1_invariant_across_encodings[ZSTD]": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_bounded_reads_only": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_large_streamed_fixture_bounded": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_nonseekable_source": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_small_chunk_size_works": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestStreamingContract::test_streams_not_closed": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_compression.py::TestValidation::test_decode_rejects_corrupt_zstd_frame": "passed"
+    },
+    "attempt1_all_pass_in_final": true,
+    "attempt2_final_status": {
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15ErrorLeakage::test_secret_never_in_exception_or_durable_metadata": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15RepoSecretScan::test_repository_secret_scan": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15RuntimeSecretSentinel::test_secret_context_refused_and_never_durable": "passed",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_i15_hardening.py::TestI15SecretScannerSelfProof::test_self_exclusion_and_realistic_detection": "passed"
+    },
+    "attempt2_all_pass_in_final": true
+  },
+  "doc_commit": "eb3644f03528744c85811b3ff1d80789fe69fc54"
+}

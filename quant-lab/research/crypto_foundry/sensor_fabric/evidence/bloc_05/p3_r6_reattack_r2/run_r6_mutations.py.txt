@@ -1,0 +1,172 @@
+"""Bounded mutation controls against 868dd3fc9.  Disposable copies only.
+
+Each mutation removes or weakens ONE repaired control in a throwaway copy of
+``quant-lab/src`` and runs the auditor's reattack module against it.  A mutation
+is DETECTED when the specific probe fails, SURVIVED when it still passes, and
+INVALID when the pattern did not apply exactly once (so nothing was measured).
+
+Nothing is written to the audited tree.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+CAND = Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+PROBE = Path(os.environ["AUDIT_PROBE"]).resolve()
+PRIOR = Path(os.environ["AUDIT_PRIOR_FIXTURES"]).resolve()
+SRC = CAND / "src"
+POLICY = Path("crypto_sensor_fabric/normalization/consumer/policy.py")
+
+MUTATIONS = [
+    {
+        "id": "M1_REVISION_BINDING",
+        "file": POLICY,
+        "old": (
+            '        if record_revision not in selected:\n'
+            '            return (\n'
+            '                ConsumerRefusalReason.REPLAY_BLOCKED,\n'
+            '                f"the replay evidence selects {sorted(selected)} but the "\n'
+            '                f"evaluated record is revision {record_revision!r}; evidence "\n'
+            '                "about another observation certifies nothing here",\n'
+            '            )\n'
+        ),
+        "new": "        pass\n",
+        "detector": "f1_01",
+        "expected": "DETECTED",
+    },
+    {
+        "id": "M2_CUTOFF_KEY_ERROR",
+        "file": POLICY,
+        "old": "            if chosen.known_from > cutoff:",
+        "new": "            if False:  # mutation: cutoff binding removed",
+        "detector": "f1_03",
+        "expected": "DETECTED",
+    },
+    {
+        "id": "M3_AVAILABILITY_CUTOFF",
+        "file": POLICY,
+        "old": "            if available is not None and available > cutoff:",
+        "new": "            if False:  # mutation: availability-vs-cutoff removed",
+        "detector": "f1_02",
+        "expected": "SURVIVED",
+    },
+    {
+        "id": "M4_RAW_EXCEPTION_TEXT",
+        "file": POLICY,
+        "old": (
+            "    return _bounded(\n"
+            '        f"an unexpected {type(exc).__name__} was raised; the message is withheld "\n'
+            '        "because it is untrusted text that may carry credentials, artifacts or "\n'
+            '        "evidence"\n'
+            "    )\n"
+        ),
+        "new": "    return _bounded(str(exc))\n",
+        "detector": "f2_01",
+        "expected": "DETECTED",
+    },
+    {
+        "id": "M5_EMPTY_MANIFEST_GUARD",
+        "file": POLICY,
+        "old": "            if identity.artifact_id not in self._approved_artifact_ids:",
+        "new": "            if False:  # mutation: empty-manifest guard removed",
+        "detector": "h03_01",
+        "expected": "DETECTED",
+    },
+    {
+        "id": "M6_TOTAL_FAIL_CLOSED_HANDLER",
+        "file": POLICY,
+        "old": "        except Exception as exc:  # noqa: BLE001 - fail closed on everything else",
+        "new": "        except ZeroDivisionError as exc:  # mutation: boundary narrowed",
+        "detector": "f3_01",
+        "expected": "DETECTED",
+    },
+    {
+        "id": "M7_REPLAY_GATE_BLOCK",
+        "file": POLICY,
+        "old": '        blocked = evaluation.eligibility.value != "ELIGIBLE"',
+        "new": "        blocked = False  # mutation: gate result ignored",
+        "detector": "f1_10",
+        "expected": "DETECTED",
+    },
+    {
+        "id": "M8_EVIDENCE_DIGEST",
+        "file": POLICY,
+        "old": "            if observed != item.approved_digest:",
+        "new": "            if False:  # mutation: caller-claim digest ignored",
+        "detector": "h05_01",
+        "expected": "DETECTED",
+    },
+]
+
+
+def main() -> int:
+    results: list[dict[str, object]] = []
+    for mutation in MUTATIONS:
+        with tempfile.TemporaryDirectory(prefix="r6mut_") as tmp:
+            root = Path(tmp)
+            target_src = root / "src"
+            shutil.copytree(SRC, target_src)
+            target = root / "src" / mutation["file"]
+            text = target.read_text(encoding="utf-8")
+            old = str(mutation["old"])
+            count = text.count(old)
+            if count != 1:
+                results.append(
+                    {
+                        "id": mutation["id"],
+                        "status": "INVALID",
+                        "detail": f"pattern matched {count} times, expected 1",
+                    }
+                )
+                continue
+            target.write_text(text.replace(old, str(mutation["new"])), encoding="utf-8")
+            env = dict(os.environ)
+            env["PYTHONPATH"] = str(target_src)
+            env["AUDIT_QUANT_LAB"] = str(CAND)
+            env["AUDIT_PRIOR_FIXTURES"] = str(PRIOR)
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pytest",
+                    str(PROBE),
+                    "-q",
+                    "-p",
+                    "no:cacheprovider",
+                    "-k",
+                    str(mutation["detector"]),
+                ],
+                cwd=str(root),
+                env=env,
+                capture_output=True,
+                text=True,
+            )
+            status = "DETECTED" if proc.returncode != 0 else "SURVIVED"
+            tail = (proc.stdout or "").strip().splitlines()[-1:] or [""]
+            results.append(
+                {
+                    "id": mutation["id"],
+                    "status": status,
+                    "expected": mutation["expected"],
+                    "detector": mutation["detector"],
+                    "pytest_exit": proc.returncode,
+                    "summary": tail[0][:160],
+                }
+            )
+    tally = {
+        s: sum(1 for r in results if r["status"] == s)
+        for s in ("DETECTED", "SURVIVED", "INVALID")
+    }
+    print(json.dumps({"mutations": results, "tally": tally}, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

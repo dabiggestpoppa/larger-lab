@@ -1,0 +1,134 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT",
+  "mission": "SENSOR-B5-P3-R6-FINAL-REATTACK-R2",
+  "candidate_sha": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+  "ladder": {
+    "r5": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+    "hardening": "d81cceb28aa79870f6702bed053bfb6d8d80f2c1",
+    "candidate": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "docs": "eb3644f03528744c85811b3ff1d80789fe69fc54",
+    "docs_commit_touches_only": "evidence/bloc_05/p3_rung6_final_r1/ (7 files)"
+  },
+  "previous_audit_head": "6c4874b4399883128d4061c607c9ea4da237d6c3",
+  "disposition": "P3_FINAL_REPAIR_REQUIRED",
+  "executed": {
+    "probe_cases": 33,
+    "probe_passed": 31,
+    "probe_failed": 2,
+    "mutations": 8,
+    "mutations_detected": 6,
+    "mutations_survived": 2,
+    "mutations_invalid": 0,
+    "canonical_collection_records": 4952,
+    "canonical_verified": true
+  },
+  "f1_replay_binding": {
+    "foreign_revision": "REPAIRED — REFUSE/REPLAY_BLOCKED",
+    "future_availability": "REPAIRED — REFUSE/PIT_INADMISSIBLE",
+    "chosen_revision_after_cutoff": "REPAIRED — REFUSE/PIT_INADMISSIBLE",
+    "missing_revision_identity": "REPAIRED — REFUSE",
+    "multiple_selected_one_after_cutoff": "OPEN — ACCEPT (F4)",
+    "malformed_temporal": "REPAIRED — REFUSE",
+    "provider_axis": "UNBOUND — documented only, ACCEPT observed",
+    "record_kind_artifact_axes": "NOT EXPRESSIBLE in frozen schema"
+  },
+  "findings": [
+    {
+      "id": "F4",
+      "severity": "MEDIUM-LOW",
+      "status": "OPEN",
+      "control": "_bind_replay orders only selected[record_revision].known_from",
+      "attack": "selection = [rev-audit(2026-05-31), rev-LATER(2026-09-01)] at cutoff 2026-06-01",
+      "observed": "ACCEPT_FIELD_BINDING, replay_status=ELIGIBLE, pit_status=ADMISSIBLE",
+      "repair": "order every selected[*].known_from against the cutoff, reusing the existing refusal"
+    },
+    {
+      "id": "F5",
+      "severity": "LOW",
+      "status": "OPEN",
+      "control": "_withheld covers unexpected exceptions only",
+      "attack": "typed RecordVerificationError(CUSTODY_UNVERIFIED, detail with sentinel)",
+      "observed": "refusal_detail = 'CUSTODY_UNVERIFIED: ZT-PROBE-4b71-NOT-A-CREDENTIAL …'",
+      "repair": "bound the typed branch to the refusal token or scrub detail at construction"
+    }
+  ],
+  "repaired_and_verified": {
+    "F1_revision": true,
+    "F1_availability": true,
+    "F1_chosen_cutoff": true,
+    "F2_unexpected_exception_withholding": true,
+    "F3_total_fail_closed": true
+  },
+  "h03": {
+    "positive_control_accept": true,
+    "empty_manifest_plus_authorizing_source": "INTEGRATION_REQUIRED, no AUTHORIZED text",
+    "forged_model_construct_derivation": "REFUSE",
+    "cross_identity": "REFUSE",
+    "raising_source": "REFUSE, message withheld",
+    "shipped_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "shipped_artifacts": {}
+  },
+  "h05": {
+    "caller_reference_reads": 2,
+    "other_approved_reference_reads": 1,
+    "flipped_bytes": "REFUSE / EVIDENCE_BYTES_MISMATCH",
+    "foreign_reference": "read then REFUSE",
+    "omitted_references": "whole approved set still read",
+    "contradictory_references": "refused at the contract",
+    "transactional_guarantees_claimed": false
+  },
+  "mutations": [
+    {"id": "M1_REVISION_BINDING", "status": "DETECTED"},
+    {"id": "M2_CUTOFF_KEY_ERROR", "status": "DETECTED"},
+    {"id": "M3_AVAILABILITY_CUTOFF", "status": "DETECTED"},
+    {"id": "M4_RAW_EXCEPTION_TEXT", "status": "DETECTED"},
+    {"id": "M5_EMPTY_MANIFEST_GUARD", "status": "SURVIVED", "redundant_control": "verifier refuses NO_APPROVAL before the guard"},
+    {"id": "M6_TOTAL_FAIL_CLOSED_HANDLER", "status": "DETECTED"},
+    {"id": "M7_REPLAY_GATE_BLOCK", "status": "DETECTED"},
+    {"id": "M8_EVIDENCE_DIGEST", "status": "SURVIVED", "redundant_control": "rebinding refuses EVIDENCE_BYTES_MISMATCH"}
+  ],
+  "governance_g17": {
+    "pins_checked": 45,
+    "pins_verified": 45,
+    "pins_mismatched": 0,
+    "manifest_unchanged_since_r5": true,
+    "consumer_models_unchanged": true,
+    "replay_gate_unchanged": true,
+    "tracked_python_at_candidate": 1111,
+    "scope_audit_additions": "one exact path each in I05 and I10",
+    "hand_written_evidence_rewritten": false,
+    "g15_g16_findings_still_valid": true
+  },
+  "canonical": {
+    "bundle": "evidence/bloc_05/canonical_runs/p3-r6-final",
+    "recorded_commit": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "node_count": 4952,
+    "unique_nodes": 4952,
+    "digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+    "digest_recomputed": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+    "partition_set_equals_collection": true,
+    "result_nodes_equal_collection": true,
+    "counts": {"passed": 4941, "failed": 0, "errored": 0, "skipped": 11},
+    "junit": {"tests": 4952, "failures": 0, "errors": 0, "skipped": 11},
+    "skip_reasons_all_explained": true,
+    "verifier_require_anchor_exit": 0,
+    "assurance": "ANCHORED_COMPLETE",
+    "test_outcome": "GREEN",
+    "restoration_verified": true,
+    "tree_clean_after": true,
+    "attempts": {
+      "p3-r6-attempt1-workers4": {"failed": 42, "disposition": "INCOMPLETE_INFRA", "all_failed_nodes_pass_in_final": true},
+      "p3-r6-attempt2-workers1-timeout900": {"failed": 4, "disposition": "INCOMPLETE_INFRA", "all_failed_nodes_pass_in_final": true}
+    }
+  },
+  "hard_stops_observed": [
+    "no production source modification",
+    "no merge",
+    "no provider approval",
+    "no replay or custody authority schema invention",
+    "no manifest activation",
+    "no trust promotion",
+    "no program-gate advancement",
+    "no self-ratification"
+  ]
+}

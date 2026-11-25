@@ -1,0 +1,604 @@
+"""SENSOR-B5-P3-R6-FINAL-REATTACK-R2 -- targeted repair reattack at 868dd3fc9.
+
+SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT.
+
+Fixtures are the auditor's own R1 harness (the accepted-path manifest, records
+and custody doubles), loaded from the previous evidence package; only the
+assertions are new.  That keeps the accept path independently reachable instead
+of borrowing the producer's test fixtures.
+
+Run:  AUDIT_QUANT_LAB=<quant-lab> PYTHONPATH=<quant-lab>/src pytest t.py -q
+"""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import pathlib
+import sys
+
+import pytest
+
+HERE = pathlib.Path(__file__).resolve()
+QUANT_LAB = pathlib.Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+PRIOR = pathlib.Path(
+    os.environ.get(
+        "AUDIT_PRIOR_FIXTURES",
+        str(
+            QUANT_LAB
+            / "research/crypto_foundry/sensor_fabric/evidence/bloc_05"
+            / "p3_consolidated_independent_audit_r1"
+            / "test_second_agent_p01_p06.py.txt"
+        ),
+    )
+)
+
+_loader = importlib.machinery.SourceFileLoader("r5_audit_fixtures", str(PRIOR))
+_spec = importlib.util.spec_from_loader("r5_audit_fixtures", _loader)
+R5 = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
+sys.modules["r5_audit_fixtures"] = R5
+_loader.exec_module(R5)  # type: ignore[union-attr]
+
+from crypto_sensor_fabric.normalization.consumer import policy as policy_module  # noqa: E402
+from crypto_sensor_fabric.normalization.consumer.custody_authority import (  # noqa: E402
+    CustodyAuthorityBasis,
+    CustodyAuthorityDerivation,
+    custody_authority_identity_digest,
+)
+from crypto_sensor_fabric.normalization.consumer.models import (  # noqa: E402
+    ConsumerDecision,
+    ConsumerRefusalReason,
+    ConsumerRequest,
+)
+from crypto_sensor_fabric.normalization.sensors import verification as verification_module  # noqa: E402
+from crypto_sensor_fabric.normalization.sensors.verification import (  # noqa: E402
+    RecordVerificationError,
+    RecordVerificationRefusal,
+)
+from crypto_sensor_fabric.normalization.time.enums import RevisionMode, RevisionStatus  # noqa: E402
+from crypto_sensor_fabric.normalization.time.replay_gate import ReplayEvidence  # noqa: E402
+from crypto_sensor_fabric.normalization.time.revision_policy import (  # noqa: E402
+    RevisionRecord,
+    RevisionSelection,
+)
+
+CUTOFF = R5.CUTOFF
+EARLY = R5.EARLY
+SENTINEL = "ZT-PROBE-4b71-NOT-A-CREDENTIAL"
+REFUSE = ConsumerDecision.REFUSE
+ACCEPT = ConsumerDecision.ACCEPT_FIELD_BINDING
+REV = "rev-audit"
+
+
+# ---------------------------------------------------------------------------
+# local helpers
+# ---------------------------------------------------------------------------
+
+
+def _rev(
+    revision_id: str = REV,
+    known_from: object = EARLY,
+    generation: int = 1,
+) -> RevisionRecord:
+    return RevisionRecord(
+        source_revision_id=revision_id,
+        normalization_generation=generation,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from=known_from,
+        known_to=None,
+    )
+
+
+def _selection(
+    *revs: RevisionRecord, excluded: tuple[RevisionRecord, ...] = ()
+) -> RevisionSelection:
+    return RevisionSelection(
+        mode=RevisionMode.AS_KNOWN_THEN,
+        selected=tuple(revs) if revs else (_rev(),),
+        excluded=excluded,
+        pit_safe=True,
+        pit_uncertain=False,
+    )
+
+
+class _Custody:
+    def __init__(self, payloads: object = None, exc: BaseException | None = None) -> None:
+        self._payloads = R5.DOC if payloads is None else payloads
+        self._exc = exc
+        self.reads: list[str] = []
+
+    def read_evidence(self, reference: str) -> object:
+        self.reads.append(reference)
+        if self._exc is not None:
+            raise self._exc
+        return self._payloads
+
+
+class _AuthSource:
+    """A custody source that WOULD authorize when the root approves artifacts."""
+
+    def __init__(self, echos: BaseException | None = None) -> None:
+        self._echos = echos
+        self.seen: list[object] = []
+
+    def authorize(self, identity: object) -> CustodyAuthorityDerivation:
+        if self._echos is not None:
+            raise self._echos
+        self.seen.append(identity)
+        return CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED,
+            detail="probe authority",
+            identity_sha256=custody_authority_identity_digest(identity),
+        )
+
+
+class _ForgedSource:
+    def __init__(self, basis: CustodyAuthorityBasis, digest: str | None) -> None:
+        self._basis = basis
+        self._digest = digest
+
+    def authorize(self, identity: object) -> CustodyAuthorityDerivation:
+        return CustodyAuthorityDerivation.model_construct(
+            basis=self._basis, detail="forged", identity_sha256=self._digest
+        )
+
+
+class _WrongIdentity:
+    def authorize(self, identity: object) -> CustodyAuthorityDerivation:
+        return CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED,
+            detail="another identity",
+            identity_sha256="0" * 64,
+        )
+
+
+def _text(verdict: object) -> str:
+    return R5.verdict_text(verdict)
+
+
+def _no_sentinel(verdict: object) -> None:
+    assert SENTINEL not in _text(verdict), _text(verdict)
+
+
+def _policy(manifest: bytes | None = None, **kwargs: object):
+    return R5.policy(R5.wire_manifest() if manifest is None else manifest, **kwargs)
+
+
+# ===========================================================================
+# F1 -- replay evidence binding
+# ===========================================================================
+
+
+def test_r2_f1_00_control_matching_evidence_reaches_accept(monkeypatch):
+    """Positive control: the repaired binding must not refuse a correct row."""
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.replay_status == "ELIGIBLE", _text(verdict)
+    assert verdict.decision is ACCEPT, _text(verdict)
+
+
+def test_r2_f1_01_foreign_revision_is_refused(monkeypatch):
+    """The R1 counterexample, revision half: rev-audit record, foreign row."""
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(revision=_selection(_rev("rev-FOREIGN")))
+    verdict = _policy().evaluate(R5.request(record, replay_evidence=evidence))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED, _text(verdict)
+    assert verdict.replay_status == "NOT_BOUND", _text(verdict)
+
+
+def test_r2_f1_02_future_availability_is_refused(monkeypatch):
+    """The R1 counterexample, cutoff half: availability after the cutoff."""
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(market_available_at=R5.datetime(2026, 7, 1, tzinfo=R5.UTC))
+    verdict = _policy().evaluate(R5.request(record, replay_evidence=evidence))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason in {
+        ConsumerRefusalReason.PIT_INADMISSIBLE,
+        ConsumerRefusalReason.REPLAY_BLOCKED,
+    }, _text(verdict)
+
+
+def test_r2_f1_03_revision_known_after_cutoff_is_refused(monkeypatch):
+    """Cutoff binding isolated from availability: known_from is after the cutoff."""
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(
+        revision=_selection(_rev(REV, known_from=R5.datetime(2026, 8, 1, tzinfo=R5.UTC)))
+    )
+    verdict = _policy().evaluate(R5.request(record, replay_evidence=evidence))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE, _text(verdict)
+
+
+def test_r2_f1_04_missing_revision_selection_is_refused(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    hollow = ReplayEvidence.model_construct(
+        **{**R5.replay().model_dump(), "revision": None}
+    )
+    verdict = _policy().evaluate(R5.request(record, replay_evidence=hollow))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason in {
+        ConsumerRefusalReason.REPLAY_BLOCKED,
+        ConsumerRefusalReason.VERIFICATION_FAILED,
+    }, _text(verdict)
+
+
+def test_r2_f1_05_extra_selected_revision_after_cutoff_is_bound(monkeypatch):
+    """F4: a selection computed after the cutoff may not certify this consumption.
+
+    The record's own revision is early and admissible; a SECOND selected revision
+    became known after the cutoff, so the selection was computed for a later
+    replay.  ``_bind_replay`` orders only the chosen revision against the cutoff,
+    so this request reaches ACCEPT.  Fails until every selected revision is
+    ordered.
+    """
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(
+        revision=_selection(
+            _rev(REV), _rev("rev-LATER", known_from=R5.datetime(2026, 9, 1, tzinfo=R5.UTC))
+        )
+    )
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(record, replay_evidence=evidence)
+    )
+    assert verdict.decision is REFUSE, (
+        "accepted a selection holding a revision known after the cutoff: " + _text(verdict)
+    )
+
+
+def test_r2_f1_06_malformed_temporal_evidence_never_accepts(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    broken = RevisionRecord.model_construct(
+        source_revision_id=REV,
+        normalization_generation=1,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from="not-an-instant",
+        known_to=None,
+    )
+    selection = RevisionSelection.model_construct(
+        mode=RevisionMode.AS_KNOWN_THEN,
+        selected=(broken,),
+        excluded=(),
+        pit_safe=True,
+        pit_uncertain=False,
+    )
+    evidence = ReplayEvidence.model_construct(
+        **{**R5.replay().model_dump(), "revision": selection}
+    )
+    verdict = _policy().evaluate(R5.request(record, replay_evidence=evidence))
+    assert verdict.decision is REFUSE, _text(verdict)
+
+
+def test_r2_f1_07_same_revision_across_providers_is_unbound(monkeypatch):
+    """The residual axis, measured: the frozen schema cannot name a provider.
+
+    Evidence that would belong to another provider but carries the same
+    revision id is admissible.  Recorded as an observed limitation, not a control.
+    """
+    record = R5.trade_record(monkeypatch)
+    assert "provider" not in ReplayEvidence.model_fields
+    assert not hasattr(R5.replay(), "provider")
+    evidence = R5.replay(source_evidence_refs=("ANOTHER_PROVIDER_TIMESTAMP_DOC",))
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(record, replay_evidence=evidence)
+    )
+    assert verdict.decision is ACCEPT, _text(verdict)
+
+
+def test_r2_f1_08_record_kind_and_artifact_axes_are_not_expressible():
+    fields = set(ReplayEvidence.model_fields)
+    for axis in ("record_id", "record_kind", "artifact_id", "provider"):
+        assert axis not in fields, f"schema unexpectedly carries {axis}"
+
+
+def test_r2_f1_09_unresolved_axes_are_documentation_not_a_branch():
+    source = (
+        QUANT_LAB / "src/crypto_sensor_fabric/normalization/consumer/policy.py"
+    ).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    uses: list[int] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name) and node.id == "UNRESOLVED_REPLAY_BINDING":
+            uses.append(node.lineno)
+        if isinstance(node, ast.Attribute) and node.attr == "UNRESOLVED_REPLAY_BINDING":
+            uses.append(node.lineno)
+    assert uses, "the named limitation disappeared from the module"
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.If, ast.IfExp, ast.Assert)):
+            names = {
+                child.id
+                for child in ast.walk(node)
+                if isinstance(child, ast.Name)
+            }
+            assert "UNRESOLVED_REPLAY_BINDING" not in names, (
+                f"line {node.lineno}: the named limitation became an enforcement "
+                "branch without a schema change"
+            )
+
+
+# ===========================================================================
+# F2 -- diagnostic confidentiality
+# ===========================================================================
+
+
+def test_r2_f2_01_ordinary_verifier_exception_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RuntimeError(SENTINEL)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy().evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFIER_CRASH, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_r2_f2_02_typed_verifier_refusal_detail_is_withheld(monkeypatch):
+    """F5: a TYPED refusal's ``detail`` is relayed verbatim into the verdict.
+
+    ``_withheld`` protects the unexpected-exception path; the typed branch does
+    ``f"{exc.refusal.value}: {exc.detail}"`` and the detail is whatever the
+    verifying layer formatted.  Fails until that branch stops carrying payload.
+    """
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RecordVerificationError(
+            RecordVerificationRefusal.CUSTODY_UNVERIFIED,
+            f"{SENTINEL} in typed detail",
+        )
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_r2_f2_03_replay_gate_exception_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RuntimeError(SENTINEL)
+
+    monkeypatch.setattr(policy_module, "assess_replay_eligibility", boom)
+    verdict = _policy().evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_r2_f2_04_custody_read_exception_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    custody = _Custody(exc=RuntimeError(SENTINEL))
+    verdict = _policy(custody=custody).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert custody.reads, "custody was never read; the probe measured nothing"
+    _no_sentinel(verdict)
+
+
+def test_r2_f2_05_authority_derivation_exception_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_AuthSource(RuntimeError(SENTINEL))).evaluate(
+        R5.request(record)
+    )
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_r2_f2_06_loader_failure_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise KeyError(SENTINEL)
+
+    monkeypatch.setattr(policy_module, "load_trusted_authority", boom)
+    verdict = _policy().evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_r2_f2_07_base_exceptions_still_propagate(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def interrupt(*args: object, **kwargs: object) -> object:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", interrupt)
+    with pytest.raises(KeyboardInterrupt):
+        _policy().evaluate(R5.request(record))
+
+    def exit_now(*args: object, **kwargs: object) -> object:
+        raise SystemExit(3)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", exit_now)
+    with pytest.raises(SystemExit):
+        _policy().evaluate(R5.request(record))
+
+
+# ===========================================================================
+# F3 -- total fail-closed boundary
+# ===========================================================================
+
+
+def test_r2_f3_01_loader_keyerror_during_rebinding_refuses(monkeypatch):
+    """The exact R1 F3 attack, reexecuted: a refusal, not an escaped KeyError."""
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise KeyError(SENTINEL)
+
+    monkeypatch.setattr(policy_module, "load_trusted_authority", boom)
+    verdict = _policy().evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED
+
+
+def test_r2_f3_02_model_construct_request_holding_junk_refuses(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    request = ConsumerRequest.model_construct(
+        record="not-a-record",
+        artifact_bytes=b"bytes",
+        evidence_references=(),
+        knowledge_cutoff=CUTOFF,
+        replay_evidence=None,
+        claimed_manifest_bytes=None,
+    )
+    verdict = _policy().evaluate(request)
+    assert verdict.decision is REFUSE, _text(verdict)
+
+
+def test_r2_f3_03_serialization_failure_refuses(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    class _Unserializable(ConsumerRequest):
+        def model_dump(self, *args: object, **kwargs: object) -> object:
+            raise RuntimeError(SENTINEL)
+
+    request = _Unserializable(**R5.request(record).model_dump())
+    verdict = _policy().evaluate(request)
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_r2_f3_04_non_request_argument_is_still_a_programmer_error(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    with pytest.raises(TypeError):
+        _policy().evaluate(record)
+
+
+# ===========================================================================
+# H03 -- authority seam
+# ===========================================================================
+
+
+def test_r2_h03_00_control_a_test_root_can_authorize(monkeypatch):
+    """Positive control: the seam does authorize when the root approves."""
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is ACCEPT, _text(verdict)
+
+
+def test_r2_h03_01_empty_manifest_cannot_authorize_custody(monkeypatch):
+    shipped = R5.PRODUCTION_MANIFEST.read_bytes()
+    assert (
+        hashlib.sha256(shipped).hexdigest()
+        == policy_module._authority_pkg.TRUSTED_MANIFEST_SHA256
+    )
+    record = R5.trade_record(monkeypatch)
+    # ``trade_record`` pins the probe root; restore the shipped pin so the
+    # production policy can be constructed at all.
+    monkeypatch.setattr(
+        policy_module._authority_pkg,
+        "TRUSTED_MANIFEST_SHA256",
+        hashlib.sha256(shipped).hexdigest(),
+    )
+    source = _AuthSource()
+    verdict = R5.policy(shipped, source=source).evaluate(R5.request(record))
+    assert verdict.decision is ConsumerDecision.INTEGRATION_REQUIRED, _text(verdict)
+    assert "AUTHORIZED" not in _text(verdict), _text(verdict)
+
+
+def test_r2_f1_10_blocked_gate_evidence_refuses(monkeypatch):
+    """The gate itself, not only the binding: incomplete interval must block."""
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(interval_complete=False)
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(record, replay_evidence=evidence)
+    )
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED, _text(verdict)
+
+
+def test_r2_h03_02_malformed_derivation_refuses(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(
+        source=_ForgedSource(CustodyAuthorityBasis.AUTHORIZED, None)
+    ).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+
+
+def test_r2_h03_03_cross_identity_authority_refuses(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_WrongIdentity()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+
+
+def test_r2_h03_04_raising_source_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_AuthSource(ValueError(SENTINEL))).evaluate(
+        R5.request(record)
+    )
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+# ===========================================================================
+# H05 -- evidence consistency, measured
+# ===========================================================================
+
+
+def test_r2_h05_01_changed_bytes_between_reads_refuse(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    custody = R5.FlipCustody(later=b"tampered bytes")
+    verdict = _policy(custody=custody).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert len(custody.reads) >= 2, custody.reads
+
+
+def test_r2_h05_02_foreign_reference_refuses(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    custody = R5.Custody()
+    verdict = _policy(custody=custody).evaluate(
+        R5.request(record, evidence_references=(R5.ref("FOREIGN_REF_AUDIT"),))
+    )
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert custody.reads, "a foreign reference was never read"
+
+
+def test_r2_h05_03_omitted_references_still_read_the_approved_set(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    custody = R5.Custody()
+    verdict = _policy(custody=custody, source=_AuthSource()).evaluate(
+        R5.request(record, evidence_references=())
+    )
+    assert verdict.decision is ACCEPT, _text(verdict)
+    assert set(custody.reads) == {R5.REF, R5.REF2}, custody.reads
+
+
+def test_r2_h05_04_contradictory_references_are_refused_at_the_contract(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    with pytest.raises(Exception):
+        R5.request(
+            record,
+            evidence_references=(R5.ref(), R5.ref(R5.REF, "2" * 64)),
+        )
+
+
+def test_r2_h05_05_each_approved_reference_is_read_twice(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    custody = R5.Custody()
+    verdict = _policy(custody=custody, source=_AuthSource()).evaluate(
+        R5.request(record)
+    )
+    assert verdict.decision is ACCEPT, _text(verdict)
+    assert set(custody.reads) == {R5.REF, R5.REF2}, custody.reads
+    # measured: the verifier reads the approved set once; rebinding re-reads the
+    # caller's own reference.  REF=2, REF2=1.
+    assert custody.reads.count(R5.REF) == 2, custody.reads
+    assert custody.reads.count(R5.REF2) == 1, custody.reads
+
+
+def test_r2_h03_05_the_shipped_manifest_carries_no_authority_record():
+    """Measure the invariant: the reviewed root approves nothing and names no
+    operator custody-source authority, so no source can be derived from it."""
+    payload = json.loads(R5.PRODUCTION_MANIFEST.read_text(encoding="utf-8"))
+    assert payload.get("artifacts") == {}, payload.get("artifacts")
+    blob = json.dumps(payload).lower()
+    assert "custody_source_authority" not in blob
+    assert "operator_custody" not in blob

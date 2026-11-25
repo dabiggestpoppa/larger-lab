@@ -1,0 +1,47 @@
+{
+  "changed": {
+    "BLOC_05_I06_SCOPE_AUDIT.json": {
+      "present": true,
+      "generator": null,
+      "pins_checked": 0,
+      "pins_ok": 0,
+      "pins_bad": 0
+    },
+    "bloc_05_replay_safety_validation.json": {
+      "present": true,
+      "generator": "live run 2026-10-11: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i06_replay_safety.py (from quant-lab; acceptance policy under test = accepted I05 time package imported read-only + deterministic synthetic fixtures)",
+      "pins_checked": 12,
+      "pins_ok": 12,
+      "pins_bad": 0
+    },
+    "bloc_05_semantic_validation.json": {
+      "present": true,
+      "generator": "PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i09_semantics.py",
+      "pins_checked": 13,
+      "pins_ok": 13,
+      "pins_bad": 0
+    },
+    "bloc_05_time_validation.json": {
+      "present": true,
+      "generator": "live run 2026-10-10: PYTHONIOENCODING=utf-8 python research/crypto_foundry/sensor_fabric/scripts/b5_i05_time.py (from quant-lab; time surface under test = src/crypto_sensor_fabric/normalization/time/ + config/crypto_sensor_fabric/{provider_time_semantics,revision_policies}.yaml)",
+      "pins_checked": 20,
+      "pins_ok": 20,
+      "pins_bad": 0
+    }
+  },
+  "inventory": {
+    "tracked_python_at_candidate": 1111,
+    "hits": []
+  },
+  "frozen": {
+    "manifest_unchanged_since_base": true,
+    "manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "consumer_models_unchanged": true,
+    "replay_gate_unchanged": true
+  },
+  "pins": {
+    "checked": 45,
+    "verified": 45,
+    "mismatches": []
+  }
+}

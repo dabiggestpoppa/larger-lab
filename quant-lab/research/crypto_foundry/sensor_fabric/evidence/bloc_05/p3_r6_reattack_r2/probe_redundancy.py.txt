@@ -1,0 +1,101 @@
+"""Show WHICH control still refuses when the surviving mutation is applied.
+
+A surviving mutation is not a vulnerability when an independent control forbids
+the same outcome.  This prints the refusing mechanism's own text, so the
+redundancy is demonstrated rather than asserted.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import sys
+import tempfile
+from pathlib import Path
+
+CAND = Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+PROBE = Path(os.environ["AUDIT_RUN_PROBE"]).resolve()
+POLICY = Path("crypto_sensor_fabric/normalization/consumer/policy.py")
+
+
+def load(tmp_src: Path):
+    os.environ["PYTHONPATH"] = str(tmp_src)
+    for name in list(sys.modules):
+        if name.startswith("crypto_sensor_fabric"):
+            del sys.modules[name]
+    sys.path.insert(0, str(tmp_src))
+    import importlib.util
+
+    spec = importlib.util.spec_from_file_location("r6_probe", str(PROBE))
+    module = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
+    spec.loader.exec_module(module)  # type: ignore[union-attr]
+    return module
+
+
+def run(mutation_old: str, mutation_new: str, case: str) -> dict:
+    import hashlib
+
+    with tempfile.TemporaryDirectory(prefix="r6red_") as tmp:
+        root = Path(tmp)
+        target_src = root / "src"
+        shutil.copytree(CAND / "src", target_src)
+        target = target_src / POLICY
+        text = target.read_text(encoding="utf-8")
+        assert text.count(mutation_old) == 1
+        target.write_text(text.replace(mutation_old, mutation_new), encoding="utf-8")
+        probe = load(target_src)
+        R5 = probe.R5
+
+        class MP:
+            def setattr(self, obj, name, value):
+                setattr(obj, name, value)
+
+        mp = MP()
+        record = R5.trade_record(mp)
+        if case == "empty-manifest":
+            shipped = R5.PRODUCTION_MANIFEST.read_bytes()
+            setattr(
+                probe.policy_module._authority_pkg,
+                "TRUSTED_MANIFEST_SHA256",
+                hashlib.sha256(shipped).hexdigest(),
+            )
+            verdict = R5.policy(shipped, source=probe._AuthSource()).evaluate(
+                R5.request(record)
+            )
+        else:
+            custody = R5.FlipCustody(later=b"tampered bytes")
+            verdict = R5.policy(
+                R5.wire_manifest(), custody=custody, source=probe._AuthSource()
+            ).evaluate(R5.request(record))
+        return {
+            "case": case,
+            "decision": str(verdict.decision),
+            "refusal_reason": str(verdict.refusal_reason),
+            "custody_status": str(verdict.custody_status),
+            "detail": str(verdict.refusal_detail or verdict.custody_authorization_detail)[
+                :400
+            ],
+            "reads": getattr(locals().get("custody", None), "reads", None),
+        }
+
+
+def main() -> int:
+    out = {
+        "M5_without_empty_manifest_guard": run(
+            "            if identity.artifact_id not in self._approved_artifact_ids:",
+            "            if False:  # mutation: empty-manifest guard removed",
+            "empty-manifest",
+        ),
+        "M8_without_caller_digest_check": run(
+            "            if observed != item.approved_digest:",
+            "            if False:  # mutation: caller-claim digest ignored",
+            "flip-custody",
+        ),
+    }
+    print(json.dumps(out, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,215 @@
+"""Independent reconciliation of the R6 canonical bundles.  Read-only.
+
+Recomputes the collection digest from the node ids, compares the collection,
+partition, result stream and JUnit universes, extracts every skip reason, checks
+the recorded commit, and runs the hardened verifier with ``--require-anchor``.
+Nothing in the bundles is written, moved or regenerated.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+from collections import Counter, defaultdict
+from pathlib import Path
+
+CAND = Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+RUNS = Path(os.environ["AUDIT_CANONICAL_RUNS"]).resolve()
+CANDIDATE_SHA = "868dd3fc91b5a38d02742bd3705da0c1d78b66c3"
+DOC_SHA = "eb3644f03528744c85811b3ff1d80789fe69fc54"
+
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def digest_nodes(nodes: list[str]) -> str:
+    return hashlib.sha256("\n".join(sorted(nodes)).encode()).hexdigest()
+
+
+def final_outcomes(results_path: Path) -> tuple[dict[str, str], list[dict]]:
+    outcomes: dict[str, str] = {}
+    odd: list[dict] = []
+    with results_path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            row = json.loads(line)
+            node = row.get("nodeid")
+            if node is None:
+                odd.append(row)
+                continue
+            phase = row.get("when")
+            outcome = str(row.get("outcome"))
+            if phase == "call":
+                outcomes[node] = outcome
+            elif node not in outcomes and phase in {"setup", "teardown"} and outcome != "passed":
+                # a setup-phase skip has no call phase; it is still this node's result
+                outcomes[node] = outcome
+    return outcomes, odd
+
+
+def reconcile_final(bundle: Path) -> dict:
+    collection = json.loads((bundle / "collection.json").read_text(encoding="utf-8"))
+    evidence = json.loads((bundle / "evidence.json").read_text(encoding="utf-8"))
+    partition = json.loads((bundle / "partition_0.json").read_text(encoding="utf-8"))
+    nodes = list(collection["nodes"])
+    outcomes, odd = final_outcomes(bundle / "results_0.jsonl")
+    junit = ET.parse(bundle / "junit_0.xml").getroot()
+    suite = junit if junit.tag.endswith("testsuite") else junit.find("testsuite")
+    skipped = []
+    for case in junit.iter("testcase"):
+        marker = case.find("skipped")
+        if marker is not None:
+            skipped.append(
+                {
+                    "node": (case.get("classname", "") + "::" + case.get("name", "")),
+                    "reason": (marker.get("message") or "")[:200],
+                }
+            )
+    counts = Counter(outcomes.values())
+    return {
+        "bundle": bundle.name,
+        "files": {
+            path.name: {"sha256": sha256(path), "bytes": path.stat().st_size}
+            for path in sorted(bundle.iterdir())
+            if path.is_file()
+        },
+        "recorded_commit": evidence["ownership"].get("commit"),
+        "recorded_commit_ok": evidence["ownership"].get("commit") == CANDIDATE_SHA,
+        "workers": evidence["limits"].get("workers"),
+        "collection": {
+            "count": collection["count"],
+            "unique": len(set(nodes)),
+            "digest_recorded": collection["digest"],
+            "digest_recomputed": digest_nodes(nodes),
+            "digest_ok": digest_nodes(nodes) == collection["digest"],
+            "duplicates": len(collection["duplicates"]),
+            "malformed": collection["malformed_count"],
+            "errors": len(collection["collection_errors"]),
+            "exit_code": collection["exit_code"],
+        },
+        "partition": {
+            "index": partition["index"],
+            "intended": partition["intended_count"],
+            "set_equals_collection": set(partition["intended_nodes"]) == set(nodes),
+            "files": len(partition["files"]),
+        },
+        "execution": {
+            "unique_nodes": evidence["execution"]["unique_count"],
+            "node_set_equals_collection": set(outcomes) == set(nodes),
+            "counts_recorded": evidence["execution"]["counts"],
+            "counts_recomputed": dict(counts),
+            "duplicate_executions": len(evidence["execution"]["duplicate_executions"]),
+            "unimplemented_partitions": evidence["execution"]["unimplemented_partitions"],
+            "null_node_rows": len(odd),
+        },
+        "junit": {
+            "tests": int(suite.get("tests", 0)),
+            "failures": int(suite.get("failures", 0)),
+            "errors": int(suite.get("errors", 0)),
+            "skipped": int(suite.get("skipped", 0)),
+            "skipped_detail": skipped,
+        },
+        "verdict": evidence["verdict"],
+        "verdict_ok": (
+            evidence["verdict"].get("assurance") == "ANCHORED_COMPLETE"
+            and evidence["verdict"].get("test_outcome") == "GREEN"
+            and evidence["verdict"].get("missing_count") == 0
+            and evidence["verdict"].get("extra_count") == 0
+        ),
+        "universe_anchor": evidence["universe_anchor"],
+        "restoration": evidence["restoration"].get("verified"),
+        "tree_clean_after": evidence["tree"].get("clean_after"),
+        "interrupted": evidence["interrupted"],
+    }
+
+
+def verify_with_runner(bundle: Path) -> dict:
+    runner = (
+        CAND
+        / "research/crypto_foundry/sensor_fabric/scripts/canonical_runner.py"
+    )
+    evidence = bundle / "evidence.json"
+    payload = json.loads(evidence.read_text(encoding="utf-8"))
+    anchor = payload["universe_anchor"]
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(CAND / "src")
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(runner),
+            "verify",
+            str(evidence),
+            "--require-anchor",
+            "--expect-count",
+            str(anchor["count"]),
+            "--expect-digest",
+            anchor["digest"],
+        ],
+        cwd=str(CAND),
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    try:
+        start = proc.stdout.index("{")
+        parsed = json.loads(proc.stdout[start:])
+    except Exception:
+        parsed = {"raw_tail": (proc.stdout or proc.stderr or "")[-600:]}
+    return {"exit_code": proc.returncode, "result": parsed}
+
+
+def attempt(bundle: Path) -> dict:
+    evidence = json.loads((bundle / "evidence.json").read_text(encoding="utf-8"))
+    failed: set[str] = set()
+    for stream in sorted(bundle.glob("results_*.jsonl")):
+        outcomes, _ = final_outcomes(stream)
+        failed.update(node for node, outcome in outcomes.items() if outcome in {"failed", "error"})
+    return {
+        "bundle": bundle.name,
+        "commit": evidence["ownership"].get("commit"),
+        "workers": evidence["limits"].get("workers"),
+        "counts": evidence["execution"]["counts"],
+        "disposition": evidence["verdict"].get("disposition"),
+        "assurance": evidence["verdict"].get("assurance"),
+        "reasons": [
+            str(reason)[:220] for reason in evidence["verdict"].get("reasons", [])[:6]
+        ],
+        "failed_nodes": sorted(failed),
+    }
+
+
+def main() -> int:
+    final = reconcile_final(RUNS / "p3-r6-final")
+    cross = {
+        "run": verify_with_runner(RUNS / "p3-r6-final"),
+        "attempt1": attempt(RUNS / "p3-r6-attempt1-workers4"),
+        "attempt2": attempt(RUNS / "p3-r6-attempt2-workers1-timeout900"),
+    }
+    # Do the failure nodes of the abandoned attempts pass in the final run?
+    green, _ = final_outcomes(RUNS / "p3-r6-final" / "results_0.jsonl")
+    for key in ("attempt1", "attempt2"):
+        nodes = cross[key]["failed_nodes"]
+        cross[key + "_final_status"] = {
+            node: green.get(node, "ABSENT_FROM_FINAL") for node in nodes[:20]
+        }
+        cross[key + "_all_pass_in_final"] = all(
+            green.get(node) == "passed" for node in nodes
+        )
+    output = {"final": final, "cross": cross, "doc_commit": DOC_SHA}
+    print(json.dumps(output, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

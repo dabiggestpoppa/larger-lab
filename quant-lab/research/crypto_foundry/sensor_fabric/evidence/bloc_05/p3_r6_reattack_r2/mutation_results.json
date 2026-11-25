@@ -1,0 +1,73 @@
+{
+  "mutations": [
+    {
+      "id": "M1_REVISION_BINDING",
+      "status": "DETECTED",
+      "expected": "DETECTED",
+      "detector": "f1_01",
+      "pytest_exit": 1,
+      "summary": "1 failed, 32 deselected, 1 warning in 1.06s"
+    },
+    {
+      "id": "M2_CUTOFF_KEY_ERROR",
+      "status": "DETECTED",
+      "expected": "DETECTED",
+      "detector": "f1_03",
+      "pytest_exit": 1,
+      "summary": "1 failed, 32 deselected, 1 warning in 1.04s"
+    },
+    {
+      "id": "M3_AVAILABILITY_CUTOFF",
+      "status": "DETECTED",
+      "expected": "SURVIVED",
+      "detector": "f1_02",
+      "pytest_exit": 1,
+      "summary": "1 failed, 32 deselected, 1 warning in 1.03s"
+    },
+    {
+      "id": "M4_RAW_EXCEPTION_TEXT",
+      "status": "DETECTED",
+      "expected": "DETECTED",
+      "detector": "f2_01",
+      "pytest_exit": 1,
+      "summary": "1 failed, 32 deselected, 2 warnings in 1.04s"
+    },
+    {
+      "id": "M5_EMPTY_MANIFEST_GUARD",
+      "status": "SURVIVED",
+      "expected": "DETECTED",
+      "detector": "h03_01",
+      "pytest_exit": 0,
+      "summary": "1 passed, 32 deselected, 1 warning in 0.91s"
+    },
+    {
+      "id": "M6_TOTAL_FAIL_CLOSED_HANDLER",
+      "status": "DETECTED",
+      "expected": "DETECTED",
+      "detector": "f3_01",
+      "pytest_exit": 1,
+      "summary": "1 failed, 32 deselected in 1.07s"
+    },
+    {
+      "id": "M7_REPLAY_GATE_BLOCK",
+      "status": "DETECTED",
+      "expected": "DETECTED",
+      "detector": "f1_10",
+      "pytest_exit": 1,
+      "summary": "1 failed, 32 deselected, 1 warning in 1.05s"
+    },
+    {
+      "id": "M8_EVIDENCE_DIGEST",
+      "status": "SURVIVED",
+      "expected": "DETECTED",
+      "detector": "h05_01",
+      "pytest_exit": 0,
+      "summary": "1 passed, 32 deselected in 0.90s"
+    }
+  ],
+  "tally": {
+    "DETECTED": 6,
+    "SURVIVED": 2,
+    "INVALID": 0
+  }
+}

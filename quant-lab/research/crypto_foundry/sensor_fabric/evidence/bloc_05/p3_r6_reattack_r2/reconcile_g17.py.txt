@@ -1,0 +1,166 @@
+"""G17 governance reconciliation at 868dd3fc9.  Read-only, via git objects.
+
+Verifies every (path, sha256) pin carried by the republished generated artifacts
+against the bytes actually committed at the candidate, checks the I11R2-style
+inventory against the tracked Python universe, and confirms the shipped manifest
+and the frozen schemas did not move.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+from pathlib import Path
+
+REPO = Path(os.environ["AUDIT_REPO"]).resolve()
+SHA = "868dd3fc91b5a38d02742bd3705da0c1d78b66c3"
+BASE = "5ee268b1d"
+EVID = Path("quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05")
+CHANGED = [
+    EVID / "BLOC_05_I06_SCOPE_AUDIT.json",
+    EVID / "bloc_05_replay_safety_validation.json",
+    EVID / "bloc_05_semantic_validation.json",
+    EVID / "bloc_05_time_validation.json",
+]
+HEX64 = re.compile(r"^[0-9a-f]{64}$")
+
+
+def git(*args: str) -> bytes:
+    proc = subprocess.run(
+        ["git", "-C", str(REPO), *args], capture_output=True, check=False
+    )
+    if proc.returncode != 0:
+        return b""
+    return proc.stdout
+
+
+def blob(path: str) -> bytes:
+    # git speaks POSIX paths; a Windows Path would render with backslashes
+    rel = Path(path).as_posix()
+    return git("show", f"{SHA}:{rel}")
+
+
+def walk(node: object):
+    if isinstance(node, dict):
+        yield node
+        for value in node.values():
+            yield from walk(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from walk(value)
+
+
+def pin_rows(payload: object) -> list[tuple[str, str]]:
+    """Pins are stored as {repo-relative path: sha256} mappings."""
+    rows: list[tuple[str, str]] = []
+    for item in walk(payload):
+        for key, value in item.items():
+            if (
+                isinstance(key, str)
+                and isinstance(value, str)
+                and "/" in key
+                and HEX64.match(value)
+            ):
+                rows.append((key, value))
+    return rows
+
+
+def main() -> int:
+    import hashlib
+
+    report: dict[str, object] = {"changed": {}, "inventory": {}, "frozen": {}}
+    total = verified = 0
+    mismatches: list[dict[str, str]] = []
+    for path in CHANGED:
+        raw = blob(str(path))
+        if not raw:
+            report["changed"][path.name] = {"present": False}  # type: ignore[index]
+            continue
+        payload = json.loads(raw)
+        rows = pin_rows(payload)
+        local_ok = local_bad = 0
+        for row_path, digest in rows:
+            body = blob(row_path)
+            if not body:
+                body = blob("quant-lab/" + row_path)
+            total += 1
+            if not body:
+                if len(mismatches) < 8:
+                    mismatches.append({"file": path.name, "path": row_path, "why": "absent"})
+                continue
+            actual = hashlib.sha256(body).hexdigest()
+            if actual == digest:
+                verified += 1
+                local_ok += 1
+            else:
+                local_bad += 1
+                if len(mismatches) < 8:
+                    mismatches.append({"file": path.name, "path": row_path})
+        report["changed"][path.name] = {  # type: ignore[index]
+            "present": True,
+            "generator": payload.get("generator") if isinstance(payload, dict) else None,
+            "pins_checked": local_ok + local_bad,
+            "pins_ok": local_ok,
+            "pins_bad": local_bad,
+        }
+
+    # inventory: any long list of tracked .py paths inside the evidence tree
+    tracked = [
+        line
+        for line in git("ls-tree", "-r", "--name-only", SHA).decode().splitlines()
+        if line.endswith(".py")
+    ]
+    inventory_hits: list[dict[str, object]] = []
+    for path in git("ls-tree", "-r", "--name-only", SHA, str(EVID)).decode().splitlines():
+        if not path.endswith(".json"):
+            continue
+        raw = blob(path)
+        try:
+            payload = json.loads(raw)
+        except Exception:
+            continue
+        for item in walk(payload):
+            for value in item.values():
+                if (
+                    isinstance(value, list)
+                    and len(value) > 500
+                    and all(isinstance(v, str) and v.endswith(".py") for v in value[:5])
+                ):
+                    inventory_hits.append(
+                        {
+                            "artifact": path,
+                            "listed": len(value),
+                            "matches_tracked_set": set(value) == set(tracked),
+                            "matches_tracked_count": len(value) == len(tracked),
+                        }
+                    )
+    report["inventory"] = {
+        "tracked_python_at_candidate": len(tracked),
+        "hits": inventory_hits[:5],
+    }
+
+    # frozen surfaces
+    manifest = "quant-lab/config/crypto_sensor_fabric/provider_semantics/approval_manifest.json"
+    report["frozen"] = {
+        "manifest_unchanged_since_base": git("diff", "--name-only", BASE, SHA, "--", manifest) == b"",
+        "manifest_sha256": hashlib.sha256(blob(manifest)).hexdigest(),
+        "consumer_models_unchanged": git(
+            "diff", "--name-only", BASE, SHA, "--",
+            "quant-lab/src/crypto_sensor_fabric/normalization/consumer/models.py",
+        )
+        == b"",
+        "replay_gate_unchanged": git(
+            "diff", "--name-only", BASE, SHA, "--",
+            "quant-lab/src/crypto_sensor_fabric/normalization/time/replay_gate.py",
+        )
+        == b"",
+    }
+    report["pins"] = {"checked": total, "verified": verified, "mismatches": mismatches}
+    print(json.dumps(report, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
