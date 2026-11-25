@@ -458,7 +458,9 @@ class TestProviderStatusMatrix:
         )
         outcome = adapter.search(query())
         assert outcome.status is AdapterStatus.RATE_LIMITED
-        assert outcome.retry_after_seconds == 1700000000
+        # C06: retry_after_seconds is a duration, never the raw X-RateLimit-Reset epoch.
+        assert outcome.retry_after_seconds is not None
+        assert outcome.retry_after_seconds != 1700000000
 
     def test_incomplete_pagination_partial_with_note(self) -> None:
         transport = FakeGitHubTransport()

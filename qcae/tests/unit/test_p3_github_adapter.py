@@ -388,8 +388,8 @@ class TestEgressGates:
             authority=FakeAuthorityProvider(),
             baseline=partially_satisfied(),
         )
-        adapter.search(query())
-        # One repository page plus one code-search page (tier ceiling allows code search).
+        adapter.search(query(max_tier=CostTier.TIER_3_SOURCE_TREE))
+        # One repository page plus one code-search page (effective tier permits code search).
         assert self._transport_calls(adapter) == 2
         assert len(transport.repository_calls) == 1
         assert transport.repository_calls[0][0] == CONCRETE_QUERY
@@ -454,11 +454,11 @@ class TestProviderStatuses:
             authority=FakeAuthorityProvider(),
             baseline=partially_satisfied(),
         )
-        outcome = adapter.search(query())
+        outcome = adapter.search(query(max_tier=CostTier.TIER_3_SOURCE_TREE))
         assert outcome.status is AdapterStatus.OK
         assert len(outcome.leads) == 2
         assert outcome.results_inspected == 2
-        # One repository page plus one code-search page (tier ceiling allows code search).
+        # One repository page plus one code-search page (effective tier permits code search).
         assert outcome.pages_inspected == 2
         assert len(transport.repository_calls) == 1
         assert outcome.exhaustive is True
@@ -471,10 +471,10 @@ class TestProviderStatuses:
             authority=FakeAuthorityProvider(),
             baseline=partially_satisfied(),
         )
-        outcome = adapter.search(query())
+        outcome = adapter.search(query(max_tier=CostTier.TIER_3_SOURCE_TREE))
         assert outcome.status is AdapterStatus.NO_RESULTS
         assert outcome.leads == ()
-        # One repository page plus one code-search page (tier ceiling allows code search).
+        # One repository page plus one code-search page (effective tier permits code search).
         assert outcome.pages_inspected == 2
 
     def test_401_is_auth_failure(self) -> None:
@@ -516,7 +516,9 @@ class TestProviderStatuses:
         )
         outcome = adapter.search(query())
         assert outcome.status is AdapterStatus.RATE_LIMITED
-        assert outcome.retry_after_seconds == 1700000000
+        # C06: retry_after_seconds is a duration, never the raw X-RateLimit-Reset epoch.
+        assert outcome.retry_after_seconds is not None
+        assert outcome.retry_after_seconds != 1700000000
 
     def test_500_is_provider_failure(self) -> None:
         transport = FakeGitHubTransport()
@@ -579,7 +581,7 @@ class TestProviderStatuses:
 
     def test_pagination_tracks_pages_inspected(self) -> None:
         transport = FakeGitHubTransport()
-        # Page 1 has items, page 2 is empty -> two pages inspected.
+        # Page 1 has all results (total_count == 1) -> one page inspected.
         transport._responses[("repository", CONCRETE_QUERY, 1)] = GitHubResponse(
             status_code=200, headers={}, body={"items": [self._item()], "total_count": 1}
         )
@@ -592,7 +594,7 @@ class TestProviderStatuses:
             baseline=partially_satisfied(),
         )
         outcome = adapter.search(query())
-        assert outcome.pages_inspected == 2
+        assert outcome.pages_inspected == 1
         assert outcome.results_inspected == 1
 
 

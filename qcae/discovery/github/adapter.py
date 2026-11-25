@@ -14,24 +14,35 @@ C02 egress authority — before any transport call the adapter confirms:
 1. the internal baseline is established;
 2. assert_external_execution_authorized (the baseline forecloses external search
    for fully satisfied / internally covered atoms);
-3. the query belongs to the current DiscoveryPlan (identity, family, source
-   class, scope);
-4. the source class and search scope are authorized by an enabled allocation;
-5. an explicit may_discover allow decision is obtained through the
-   AuthorityProvider boundary (GRANT required; DENY / REQUEST_MORE_EVIDENCE /
-   missing provider -> zero transport calls);
-6. remaining per-query and whole-run budgets are checked;
-7. only then is the injected transport called.
+3. baseline contract/version match the plan; the queried atom belongs to both
+   the plan scope and the baseline's external_target_atoms;
+4. the query belongs to the current DiscoveryPlan (identity, family, source
+   class, scope) and its family is served by a hypothesis covering that atom;
+5. the source class and search scope are authorized by an enabled allocation;
+6. an explicit may_discover allow decision is obtained through the
+   AuthorityProvider boundary, with the decision bound to the exact request
+   (request_ref, action, structural validity; DENY / REQUEST_MORE_EVIDENCE /
+   missing provider / provider exception -> zero transport calls);
+7. remaining per-query and whole-run budgets are checked;
+8. only then is the injected transport called.
 
-The standalone may_discover allowance is therefore not treated as permission for
-arbitrary GitHub network access: it is one gated step among several, and every
-gate is fail-closed.
+C02 audit (frozen authority model): the standalone LocalAuthorityProvider /
+LocalPolicyEngine matches policy rules on action / principal / resource /
+classification only. The PolicyRequest scope and budget_ref fields are carried
+but never rule-matched, so a broad internal MAY_DISCOVER ALLOW for a contract
+cannot distinguish internal discovery from external GitHub egress, nor bind the
+intended provider/resource, query/atom scope, or cost envelope. The adapter
+therefore records provider/query/atom/tier context in the AuthorityRequest for
+auditability but does NOT pretend the authority layer enforces egress scope.
+Expressing that safely requires a frozen-model amendment (rule matching on
+scope and/or budget_ref, or a dedicated egress action) and is reported as a
+blocker rather than worked around with a permissive default.
 
 C03 provider outcome truth — typed statuses are implemented faithfully:
 
 * NOT_CONFIGURED: provider/authority not wired, or egress not authorized.
-* AUTH_FAILURE: provider 401/403.
-* RATE_LIMITED: provider throttling (429 / headers) or budget exhaustion.
+* AUTH_FAILURE: provider 401, or 403 access denial without rate-limit evidence.
+* RATE_LIMITED: provider throttling (429, or 403 with X-RateLimit-Remaining: 0).
 * PROVIDER_FAILURE: provider error or malformed payload.
 * UNSUPPORTED_QUERY: query not expressible within this plan/contract.
 * NO_RESULTS: a completed search returned no matches.
@@ -54,11 +65,14 @@ qualification is deferred.
 Exact query identity and lineage are preserved via DiscoveryQuery.lineage_for;
 provider identity and revision metadata, pagination cursor and pages inspected,
 result limit and cost-tier ceiling, rate-limit / partial-search standing, and
-raw source evidence are all carried on the AdapterOutcome.
+raw source evidence are all carried on the AdapterOutcome. Raw SHA-based
+artifact refs are classified as non-durable response fingerprints, not
+retrievable evidence artifacts.
 """
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from hashlib import sha256
 from typing import Optional, Tuple
 
@@ -276,32 +290,124 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
                 + " in this plan",
             )
 
+        # C03: plan/baseline identity binding before any authority decision.
+        # baseline.contract_id/version must match the plan.
+        if self._baseline.contract_id != plan.contract_id:
+            return self.not_configured(
+                query,
+                "baseline contract " + self._baseline.contract_id
+                + " does not match plan contract " + plan.contract_id
+                + "; zero transport calls",
+            )
+        if self._baseline.contract_version != plan.contract_version:
+            return self.not_configured(
+                query,
+                "baseline contract version "
+                + str(self._baseline.contract_version)
+                + " does not match plan version "
+                + str(plan.contract_version)
+                + "; zero transport calls",
+            )
+        # The queried atom must be an authorized external target of the baseline.
+        if query.atom_id not in self._baseline.external_target_atoms:
+            return self.not_configured(
+                query,
+                "atom " + query.atom_id
+                + " is not in the baseline's external_target_atoms; zero transport calls",
+            )
+        # The query's family must be served by a hypothesis that covers this atom.
+        family_record = next(
+            (f for f in plan.query_families if f.family_id == query.family_id),
+            None,
+        )
+        hypothesis_covers_atom = False
+        if family_record is not None:
+            hypothesis_covers_atom = any(
+                query.atom_id in h.atom_ids
+                for h in plan.search_hypotheses
+                if h.hypothesis_id in family_record.hypothesis_ids
+            )
+        if not hypothesis_covers_atom:
+            return self.unsupported(
+                query,
+                "no search hypothesis in family "
+                + query.family_id
+                + " covers atom "
+                + query.atom_id
+                + "; zero transport calls",
+            )
+
         # C02 gate 5: explicit allow decision through the governance boundary.
         if self._authority_provider is None:
             return self.not_configured(
                 query,
                 "no governance authority provider wired; may_discover cannot be decided",
             )
-        decision = self._authority_provider.decide(
-            AuthorityRequest(
-                request_id="auth-" + query.query_id,
-                action=PolicyAction.MAY_DISCOVER,
-                subject_id=plan.contract_id,
-                justification=(
-                    "GitHub discovery for query "
-                    + query.query_id
-                    + " on behalf of plan "
-                    + plan.discovery_plan_id
-                ),
-                requested_by="qcae-github-discovery-adapter",
-                context={
-                    "scope": "github-external-search",
-                    "budget_ref": plan.discovery_plan_id,
-                    "classification": "INTERNAL",
-                    "risk_class": "low",
-                },
-            )
+        # C01: construct and validate the exact AuthorityRequest.
+        request = AuthorityRequest(
+            request_id="auth-" + query.query_id,
+            action=PolicyAction.MAY_DISCOVER,
+            subject_id=plan.contract_id,
+            justification=(
+                "GitHub discovery for query "
+                + query.query_id
+                + " on behalf of plan "
+                + plan.discovery_plan_id
+            ),
+            requested_by="qcae-github-discovery-adapter",
+            context={
+                "scope": "github-external-search",
+                "budget_ref": plan.discovery_plan_id,
+                "classification": "INTERNAL",
+                "risk_class": "low",
+                # C02: record the exact external egress intent for auditability.
+                # The frozen policy engine does not match on scope/budget_ref;
+                # these fields are recorded, not enforced, at this boundary.
+                "provider": "github",
+                "query_id": query.query_id,
+                "atom_id": query.atom_id,
+                "family_id": query.family_id,
+                "cost_tier_ceiling": plan.cost_tier_ceiling.value,
+            },
         )
+        request.validate()
+        # C01: obtain the decision, fail closed on any exception.
+        try:
+            decision = self._authority_provider.decide(request)
+        except Exception as exc:  # fail closed: provider unreachable -> no egress
+            return self.not_configured(
+                query,
+                "authority provider raised while deciding may_discover: "
+                + type(exc).__name__
+                + "; zero transport calls",
+            )
+        # C01: validate the decision's structural validity.
+        try:
+            decision.validate()
+        except QcaeValidationError:
+            return self.not_configured(
+                query,
+                "authority decision failed structural validation; zero transport calls",
+            )
+        # C01: require request_ref to equal the issued request ID.
+        if decision.request_ref != request.request_id:
+            return self.not_configured(
+                query,
+                "authority decision request_ref "
+                + decision.request_ref
+                + " does not match issued request "
+                + request.request_id
+                + "; zero transport calls",
+            )
+        # C01: require the action to equal MAY_DISCOVER.
+        if decision.action is not PolicyAction.MAY_DISCOVER:
+            return self.not_configured(
+                query,
+                "authority decision action "
+                + decision.action.value
+                + " is not MAY_DISCOVER; zero transport calls",
+            )
+        # C01: require a genuine GRANT.
         if decision.outcome is not AuthorityOutcome.GRANT:
             return self.not_configured(
                 query,
@@ -327,24 +433,34 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
 
         # All gates passed — execute the search.
         self._queries_executed += 1
-        return self._run_search(query, allocation, budget, remaining_results)
+        return self._run_search(query, plan, allocation, budget, remaining_results)
 
     # -- search execution -------------------------------------------------
 
     def _run_search(
         self,
         query: DiscoveryQuery,
+        plan,
         allocation,
         budget,
         remaining_results: int,
     ) -> AdapterOutcome:
         """Perform the bounded repository/code search once egress is authorized."""
+        # C06: refuse invalid pagination cursors instead of silently restarting
+        # at page 1.
+        start_page = self._parse_cursor(query.cursor)
+        if start_page is None:
+            return self.unsupported(
+                query,
+                "invalid pagination cursor " + repr(query.cursor)
+                + "; zero transport calls",
+            )
+
         max_results = min(query.max_results, remaining_results)
         if self._max_results_cap is not None:
             max_results = min(max_results, self._max_results_cap)
 
         per_page = min(max_results, 10)
-        start_page = int(query.cursor) if query.cursor and query.cursor.isdigit() else 1
 
         leads: list = []
         pages_inspected = 0
@@ -352,16 +468,24 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
         raw_refs: list = []
         provider_revision = ""
 
-        status = AdapterStatus.OK
         completeness_note_parts: list = []
 
-        # Repository search (metadata snippets — TIER_1 surface).
+        # C04: effective cost-tier ceiling — the most restrictive of query,
+        # plan, and allocation. Repository search is TIER_1 and always allowed;
+        # code search is TIER_2+ and gated on the effective ceiling.
+        effective_tier = min(
+            query.max_tier,
+            plan.cost_tier_ceiling,
+            allocation.max_tier,
+        )
+
+        # Repository search (TIER_1 metadata surface — always allowed).
         (
-            status,
-            pages_inspected,
-            results_inspected,
-            raw_refs,
-            note,
+            repo_status,
+            repo_pages,
+            repo_results,
+            repo_refs,
+            repo_note,
             repo_retry_after,
         ) = self._search_pages(
             kind="repository",
@@ -371,14 +495,35 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
             max_results=max_results,
             items=leads,
         )
-        if note:
-            completeness_note_parts.append(note)
+        pages_inspected += repo_pages
+        results_inspected += repo_results
+        raw_refs.extend(repo_refs)
+        if repo_note:
+            completeness_note_parts.append("repository: " + repo_note)
+        repo_surface_complete = repo_status == AdapterStatus.OK
 
-        # Code search (deeper source surface) only when the tier ceiling allows.
+        # C05 rule 2: a repository surface failure is terminal — no secondary
+        # code-search request after a terminal provider/authority failure.
+        if repo_status in FAILURE_STATUSES:
+            self._results_inspected += results_inspected
+            return self._failure_outcome(
+                query,
+                repo_status,
+                pages_inspected,
+                results_inspected,
+                raw_refs,
+                repo_note or "repository surface failed",
+                repo_retry_after,
+            )
+
+        # Code search (deeper source surface) only when the effective tier
+        # ceiling permits TIER_2+ work.
+        code_status = AdapterStatus.OK
         code_note = ""
         code_retry_after: Optional[int] = None
+        code_surface_complete = True
         if (
-            allocation.max_tier >= CostTier.TIER_2_DOCS_PACKAGE_METADATA
+            effective_tier >= CostTier.TIER_2_DOCS_PACKAGE_METADATA
             and results_inspected < max_results
         ):
             (
@@ -400,21 +545,32 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
             results_inspected += code_results
             raw_refs.extend(code_refs)
             if code_note:
-                completeness_note_parts.append(code_note)
-            # Code search is additive; if either surface was partial, overall is partial.
-            if code_status == AdapterStatus.PARTIAL_RESULTS:
-                status = AdapterStatus.PARTIAL_RESULTS
+                completeness_note_parts.append("code: " + code_note)
+            code_surface_complete = code_status == AdapterStatus.OK
 
         self._results_inspected += results_inspected
 
-        # A failed search emits no leads, even if an earlier page succeeded.
-        if status in FAILURE_STATUSES:
-            leads = []
+        # C05: explicit two-surface outcome aggregation.
+        status = self._aggregate_surface_status(repo_status, code_status)
 
-        # Build leads (collected into ``leads`` by the surface searches).
-        lead_tuple: Tuple[CandidateLead, ...] = tuple(
-            self._normalize_item(item, query, kind) for item, kind in leads
-        )
+        # Build leads with per-surface completeness (C07): a lead from a
+        # partial surface cannot be recorded as exhaustive evidence. Items
+        # without a usable repository identity are skipped (no github:unknown
+        # fabrication) rather than emitted.
+        normalized: list = []
+        for item, kind in leads:
+            lead = self._normalize_item(
+                item,
+                query,
+                kind,
+                completeness=SearchCompleteness.COMPLETE
+                if (kind == "repository" and repo_surface_complete)
+                or (kind == "code" and code_surface_complete)
+                else SearchCompleteness.PARTIAL,
+            )
+            if lead is not None:
+                normalized.append(lead)
+        lead_tuple: Tuple[CandidateLead, ...] = tuple(normalized)
 
         completeness_note = "; ".join(part for part in completeness_note_parts if part)
         if status == AdapterStatus.OK and not lead_tuple:
@@ -444,6 +600,89 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
         )
         outcome.validate()
         return outcome
+
+    @staticmethod
+    def _parse_cursor(cursor: str) -> Optional[int]:
+        """Parse a pagination cursor; return None for invalid cursors (C06)."""
+        if not cursor:
+            return 1
+        if not cursor.isdigit():
+            return None
+        value = int(cursor)
+        return value if value >= 1 else None
+
+    @staticmethod
+    def _aggregate_surface_status(
+        repo_status: AdapterStatus,
+        code_status: AdapterStatus,
+    ) -> AdapterStatus:
+        """C05: explicit two-surface outcome aggregation.
+
+        1. Repository failure is terminal (no secondary continuation).
+        2. Code failure after repo success -> PARTIAL_RESULTS (never exhaustive OK).
+        3. Either surface partial -> PARTIAL_RESULTS.
+        4. Both OK -> OK.
+        """
+        if repo_status in FAILURE_STATUSES:
+            return repo_status
+        if code_status in FAILURE_STATUSES:
+            return AdapterStatus.PARTIAL_RESULTS
+        if repo_status == AdapterStatus.PARTIAL_RESULTS or code_status == AdapterStatus.PARTIAL_RESULTS:
+            return AdapterStatus.PARTIAL_RESULTS
+        return AdapterStatus.OK
+
+    def _failure_outcome(
+        self,
+        query: DiscoveryQuery,
+        status: AdapterStatus,
+        pages_inspected: int,
+        results_inspected: int,
+        raw_refs: list,
+        message: str,
+        retry_after: Optional[int],
+    ) -> AdapterOutcome:
+        """Build a typed failure outcome with zero leads (C05 rule 1)."""
+        outcome = AdapterOutcome(
+            adapter_id=self.adapter_id,
+            source_class=self.source_class,
+            query_id=query.query_id,
+            status=status,
+            retrieved_at=self._clock(),
+            leads=(),
+            pages_inspected=pages_inspected,
+            results_inspected=results_inspected,
+            duplicate_count=0,
+            novelty_count=0,
+            raw_artifact_refs=tuple(raw_refs),
+            completeness_note=message,
+            provider_revision="",
+            message=message,
+            retry_after_seconds=retry_after,
+        )
+        outcome.validate()
+        return outcome
+
+    def _retry_after_seconds(self, response: GitHubResponse) -> Optional[int]:
+        """C06: compute retry_after as a duration (seconds) from X-RateLimit-Reset.
+
+        X-RateLimit-Reset is a UTC epoch timestamp; retry_after_seconds is a
+        duration. Never copy the epoch directly into retry_after_seconds.
+        Uses the injected clock for determinism; returns None when the reset
+        timestamp is unavailable or unparseable.
+        """
+        reset = self._transport.rate_limit_reset(response)
+        if reset is None:
+            return None
+        try:
+            now_str = self._clock()
+            now_dt = datetime.strptime(now_str, "%Y-%m-%dT%H:%M:%SZ").replace(
+                tzinfo=timezone.utc
+            )
+            now_epoch = int(now_dt.timestamp())
+            duration = reset - now_epoch
+            return max(duration, 0)
+        except (ValueError, TypeError, OSError):
+            return None
 
     def _search_pages(
         self,
@@ -491,17 +730,41 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
             pages_inspected += 1
             raw_refs.append(_sha_of_body(response.body))
 
-            if response.status_code == 401 or response.status_code == 403:
+            # C06: distinguish AUTH_FAILURE (access denial) from RATE_LIMITED
+            # (exhausted provider allowance). 401 is always AUTH_FAILURE. 403 is
+            # RATE_LIMITED only when X-RateLimit-Remaining signals exhaustion;
+            # otherwise it is AUTH_FAILURE. 429 is always RATE_LIMITED.
+            remaining = self._transport.rate_limit_remaining(response)
+            if response.status_code == 401:
                 return (
                     AdapterStatus.AUTH_FAILURE,
                     pages_inspected,
                     0,
                     raw_refs,
-                    "provider returned HTTP " + str(response.status_code) + " (authentication failure)",
-                    retry_after,
+                    "provider returned HTTP 401 (authentication failure)",
+                    None,
+                )
+            if response.status_code == 403:
+                if remaining is not None and remaining <= 0:
+                    retry_after = self._retry_after_seconds(response)
+                    return (
+                        AdapterStatus.RATE_LIMITED,
+                        pages_inspected,
+                        results_inspected,
+                        raw_refs,
+                        "provider rate-limit exhausted (HTTP 403, X-RateLimit-Remaining: 0)",
+                        retry_after,
+                    )
+                return (
+                    AdapterStatus.AUTH_FAILURE,
+                    pages_inspected,
+                    0,
+                    raw_refs,
+                    "provider returned HTTP 403 (access denial)",
+                    None,
                 )
             if response.status_code == 429:
-                retry_after = self._transport.rate_limit_reset(response)
+                retry_after = self._retry_after_seconds(response)
                 return (
                     AdapterStatus.RATE_LIMITED,
                     pages_inspected,
@@ -517,7 +780,7 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
                     results_inspected,
                     raw_refs,
                     "provider returned HTTP " + str(response.status_code),
-                    retry_after,
+                    None,
                 )
 
             body = response.body
@@ -531,9 +794,38 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
                     retry_after,
                 )
 
+            # C06: required response structure — items must exist and be a list.
+            # A 200 with missing/malformed required fields is not a completed
+            # empty search.
+            if "items" not in body or not isinstance(body.get("items"), list):
+                return (
+                    AdapterStatus.PROVIDER_FAILURE,
+                    pages_inspected,
+                    results_inspected,
+                    raw_refs,
+                    "provider returned a 200 response missing the required 'items' list",
+                    retry_after,
+                )
+
             total_count = _total_count_from(body)
             incomplete = _incomplete_from(body)
             page_items = _items_from(body)
+
+            # C06: consume X-RateLimit-Remaining — if the provider signals
+            # exhaustion after a successful page, report partial (results from
+            # this page are valid, but no more calls should be issued).
+            remaining = self._transport.rate_limit_remaining(response)
+            if remaining is not None and remaining <= 0:
+                note = "provider rate-limit remaining exhausted after this page"
+                retry_after = self._retry_after_seconds(response)
+                return (
+                    AdapterStatus.PARTIAL_RESULTS,
+                    pages_inspected,
+                    results_inspected,
+                    raw_refs,
+                    note,
+                    retry_after,
+                )
 
             for item in page_items:
                 if results_inspected >= max_results:
@@ -602,6 +894,7 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
         item: dict,
         query: DiscoveryQuery,
         kind: str,
+        completeness: SearchCompleteness = SearchCompleteness.COMPLETE,
     ) -> CandidateLead:
         """Normalize one raw provider item into a CandidateLead (C04 firewall).
 
@@ -609,6 +902,10 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
         signals only; they are never interpreted as capability evidence. The
         retrieved revision is explicitly missing because GitHub search returns
         mutable repository metadata, never an immutable commit SHA.
+
+        Completeness reflects whether the surface search that yielded this
+        lead was exhaustive (C07): a lead from a partial surface is PARTIAL,
+        never COMPLETE.
         """
         if item.get("full_name"):
             full_name = str(item["full_name"])
@@ -617,13 +914,21 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
             repository = item
         else:
             repository = item.get("repository") or {}
-            full_name = str(
+            repo_full_name = (
                 repository.get("full_name")
                 or item.get("repository_full_name")
-                or "unknown"
+                or ""
             )
-            owner_repo = full_name
-            html_url = repository.get("html_url") or "https://github.com/" + full_name
+            # C07: never fabricate github:unknown when repository identity is missing.
+            if not repo_full_name:
+                html_url = item.get("html_url") or ""
+                owner_repo = html_url.replace("https://github.com/", "").rstrip("/") if html_url else ""
+                if not owner_repo:
+                    # No usable identity — skip this item rather than fabricating.
+                    return None  # type: ignore[return-value]
+            else:
+                owner_repo = repo_full_name
+                html_url = repository.get("html_url") or "https://github.com/" + repo_full_name
 
         source_locator = "github:" + owner_repo
 
@@ -639,6 +944,15 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
             if isinstance(value, str) and value.strip():
                 activity_signals[key] = value
         activity_signals["source_url"] = html_url
+        # C07: code-search provenance retains file/path identity without
+        # pretending a blob SHA is a repository commit anchor.
+        if kind == "code":
+            path = item.get("path")
+            if isinstance(path, str) and path.strip():
+                activity_signals["path"] = path
+            blob_sha = item.get("sha")
+            if isinstance(blob_sha, str) and blob_sha.strip():
+                activity_signals["blob_sha"] = blob_sha
 
         license_claim = ""
         license_block = item.get("license")
@@ -670,10 +984,12 @@ class GitHubDiscoveryAdapter(DiscoverySourceAdapter):
             novelty_family="",
             prior_evaluation_id="",
             raw_source_artifact_ref=_sha_of_body(item),
-            completeness=SearchCompleteness.COMPLETE,
+            completeness=completeness,
             notes=(
                 "discovered via GitHub " + kind + " search for " + repr(query.concrete_query) + "; "
                 "retrieved revision is a mutable repository reference, not an "
-                "immutable commit anchor (deeper intelligence deferred)"
+                "immutable commit anchor (deeper intelligence deferred); "
+                "raw_source_artifact_ref is a non-durable response fingerprint, "
+                "not a retrievable evidence artifact"
             ),
         )
