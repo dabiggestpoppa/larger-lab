@@ -114,7 +114,19 @@ _INTEGRATION_ABSENT_REFUSALS = frozenset(
     {
         RecordVerificationRefusal.NO_APPROVAL,
         RecordVerificationRefusal.ARTIFACT_NOT_APPROVED,
+    }
+)
+
+#: Refusals that mean "this record cannot be placed in time at this cutoff".
+#: They are violations of an approval that *exists*, so they are PIT
+#: inadmissibility, never "integration absent": an approval that was not yet
+#: operative at the cutoff is a time violation, not a missing integration.
+_PIT_REFUSALS = frozenset(
+    {
         RecordVerificationRefusal.APPROVAL_NOT_YET_AVAILABLE,
+        RecordVerificationRefusal.INTRADAY_PIT_AMBIGUOUS,
+        RecordVerificationRefusal.PIT_CUTOFF_REQUIRED,
+        RecordVerificationRefusal.PIT_AVAILABILITY_MISSING,
     }
 )
 
@@ -274,6 +286,12 @@ class TrustConsumerPolicy:
                 )
             derived.assert_trustworthy()
         except RecordVerificationError as exc:
+            if exc.refusal in _PIT_REFUSALS:
+                return self._refuse(
+                    ConsumerRefusalReason.PIT_INADMISSIBLE,
+                    f"{exc.refusal.value}: {exc.detail}",
+                    replay_status=replay.status,
+                )
             if exc.refusal in _INTEGRATION_ABSENT_REFUSALS:
                 return self._integration_required(
                     f"no integration to evaluate: {exc.refusal.value}",
@@ -713,7 +731,9 @@ class TrustConsumerPolicy:
             detail = derivation.detail
             if derivation.unresolved_contract:
                 token = derivation.unresolved_contract.split(" ", 1)[0].rstrip(":")
-                detail = f"{detail} (unmet: {token})"
+                # The token goes FIRST so a bounded field can never truncate the
+                # one part an operator has to act on.
+                detail = f"unmet {token}: {detail}"
             return self._integration_required(
                 detail,
                 derived=derived,
