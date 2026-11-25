@@ -2,9 +2,11 @@
   "agent2_disposition": "PARALLEL_P0_AUDIT_REPAIR_REQUIRED_B6_I5",
   "agent2_hostile_matrix_sha": "47e98eb7d7bb1f46772f87de45b97eae66456181c31fab7cc1bd7fc1e09404a2",
   "amendment": "001",
+  "audited_head": "21be8b21a16daa27a0a5114194ac1a6c931224d4",
   "audited_p0_base": "a4c4f10acac56ce53e1efd29c726039c86930b10",
   "audited_p0_head": "21be8b21a16daa27a0a5114194ac1a6c931224d4",
   "audited_p0_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+  "audited_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
   "authority": {
     "base_reality": "origin/main a4c4f10acac56ce53e1efd29c726039c86930b10; PR #33 merged 2026-11-24T19:41:56Z; parents f0bd9bdd3 + 60879f0d0; tree b66fa4e3",
     "carrier": "branch oce-book-6-i5 at 21be8b21a, parent exact main, no force, local == origin/oce-book-6-i5",
@@ -164,6 +166,7 @@
       "statement": "Substitution of an artifact with unchanged name but different bytes is refused"
     }
   },
+  "frozen_before_repair_results": true,
   "frozen_before_results": true,
   "i4_workflow_replay_defect": {
     "defect": "block-06-i4-validation.yml stage-scope resolver resolves origin/main (the moving successor) instead of replaying the pinned frozen I4 identity, raising stage/base_moved on any later PR",
