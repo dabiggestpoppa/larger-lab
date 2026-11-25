@@ -35,9 +35,32 @@ program-gate assertions.
 | G12 | Program-gate matrix stays `NOT_YET_EARNED` | I01/I09/I10/I11 audits | 1. unaffected | no gate language is introduced in `src/` |
 | G13 | Monitor: no invented `bloc_05_*.json` artifacts | I10/I11 audits | 1. unaffected | evidence is additive Markdown + one non-`bloc_05_` JSON |
 | G14 | Canonical collection count/digest | runner evidence | **4. re-measured** (Rung 6 owns the canonical run) | the historical 4,733 anchor is not inherited |
+| G15 | I09 SEM artifact `sha256_inventory` (13 pinned source digests) | `bloc_05_semantic_validation.json` + `b5_i09_semantics.py` + `test_b5_i09_scope_audit.py::test_sem_a08` | **2. mechanically republished** | the pin covers `test_b5_i01_scope_audit.py` and `test_b5_i05_scope_audit.py`, which G1/G4 amend |
 
 Nothing in class 5 (material conflict). Nothing required by the grant touches a sealed
 historical artifact.
+
+### G15 was found by execution, not by reading — recorded rather than hidden
+
+The first audit run after the amendments failed `SEM-A08` with
+`committed_bytes_mismatch`: the I09 semantic artifact pins the SHA-256 of thirteen
+files, two of which are the scope audits this grant amends. The producer is
+deterministic and re-checkable, so the repair is the mechanical one the artifact's own
+extension note prescribes ("a later checkpoint extending it must pin these rows by
+SHA-256"): re-run the tracked producer, which changes **exactly two digest rows** and
+nothing else, and re-verify with `--check`.
+
+```
+-WRITE: python research/.../scripts/b5_i09_semantics.py        exit 0
+-CHECK: python research/.../scripts/b5_i09_semantics.py --check exit 0
+-diff:  2 changed lines, both `sha256_inventory` rows for the two amended audits
+```
+
+This is a republish of a *generated measurement*, not a rewrite of a historical plan:
+the file's rows, its `artifact_sha256` and its provenance are recomputed from the
+tracked producer, and the amended inputs are the ones this directive authorizes. It is
+listed here as a mechanism Phase A should have found by reading, which is the honest
+account of how it was found.
 
 ## 2. The three amendments, exactly
 
