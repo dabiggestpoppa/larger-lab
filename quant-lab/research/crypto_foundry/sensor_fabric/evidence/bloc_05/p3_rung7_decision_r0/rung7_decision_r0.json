@@ -1,0 +1,131 @@
+{
+  "record_id": "P3_RUNG7_DECISION_R0",
+  "mission": "SENSOR-B5-P3-R7-ACCEPTANCE-PREPARATION-R0",
+  "role": "Lead Implementation Engineer and Evidence Custodian",
+  "disposition": "RUNG7_DECISION_PACKAGE_READY_AWAITING_INDEPENDENT_ACCEPTANCE",
+  "freeze": {
+    "branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+    "canonical_candidate": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "evidence_publication": "eb3644f03528744c85811b3ff1d80789fe69fc54",
+    "head": "eb3644f03528744c85811b3ff1d80789fe69fc54",
+    "remote_head": "eb3644f03528744c85811b3ff1d80789fe69fc54",
+    "local_equals_remote": true,
+    "ahead": 0,
+    "behind": 0,
+    "full_regression_run_in_this_mission": false,
+    "candidate_changed_in_this_mission": false
+  },
+  "candidate_to_publication_delta": {
+    "from": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "to": "eb3644f03528744c85811b3ff1d80789fe69fc54",
+    "files": 7,
+    "insertions": 637,
+    "deletions": 0,
+    "all_files_under": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r1/",
+    "production_source_changed": false,
+    "test_source_changed": false,
+    "manifest_changed": false,
+    "integration_state_changed": false
+  },
+  "canonical_execution": {
+    "candidate": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "disposition": "COMPLETE",
+    "assurance": "ANCHORED_COMPLETE",
+    "test_outcome": "GREEN",
+    "anchor_nodes": 4952,
+    "anchor_digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+    "passed": 4941,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 11,
+    "missing": 0,
+    "extra": 0,
+    "duplicates": 0,
+    "workers": 1,
+    "partition_timeout_seconds": 5400,
+    "junit_time_seconds": 1494.799,
+    "verify_exit_code": 0,
+    "restoration_verified": true,
+    "tree_clean_after": true
+  },
+  "artifacts": {
+    "committed_to_git": false,
+    "in_place_root": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs",
+    "handoff_root": "C:/Users/wifik/Desktop/larger-lab/.p3-r6-evidence/rung7-handoff",
+    "handoff_files": ["ARTIFACTS.sha256", "artifact_inventory.json", "VERIFY_OUTPUT.json", "run-final.out", "run-final.err"],
+    "bundles": {
+      "p3-r6-final": {"status": "SUCCESSFUL", "files": 6, "bytes": 8399152},
+      "p3-r6-attempt2-workers1-timeout900": {"status": "FAILED_ATTEMPT", "files": 5, "bytes": 6382628},
+      "p3-r6-attempt1-workers4": {"status": "FAILED_ATTEMPT", "files": 13, "bytes": 6455663}
+    },
+    "total_artifacts": 24,
+    "successful_bundle_sha256": {
+      "collection.json": "259df401afaf00a120545fda813a7acfd1dbf611bb81801d0533b986b35b5b86",
+      "evidence.json": "e919d886dfaeb1b0c1efb3da8122c0a613694e79e7c6908d5e471a45ea678c1f",
+      "guard_baseline.json": "66cb79f145dad8bca7a4259c5e3ba8c4fda769e8472030524f6553cccb831d3a",
+      "junit_0.xml": "1936e6e7d9c3714329647f9ca0695511b1fca8ce97087e045757d3d568bc5a96",
+      "partition_0.json": "6b8dc3e3fd4640725bcae94c50d6a142defce8243594d735efd7ed505d34625b",
+      "results_0.jsonl": "6e055b916edb97f4655e0d3b9f662a076e1671a4539d5adb8b9b699006a36023"
+    }
+  },
+  "decisions": {
+    "D1_accept_bounded_fail_closed_implementation": {"taken": false, "status": "prepared, awaiting independent acceptance"},
+    "D2_authorize_production_integration_or_merge": {"taken": false, "status": "not requested"},
+    "D3_activate_provider_and_custody_source_authority": {"taken": false, "status": "not authorized"}
+  },
+  "capabilities": [
+    "closed decision vocabulary ACCEPT_FIELD_BINDING / REFUSE / INTEGRATION_REQUIRED",
+    "closed refusal vocabulary of 14 named codes",
+    "field-scope acceptance only for allowlisted economic fields with bound evidence",
+    "PIT law: offset-aware cutoffs, no bare dates, selection excludes no later-known revision",
+    "replay binding on revision identity, cutoff and declared availability",
+    "two-read evidence custody with digest binding",
+    "custody authority derived from pinned root; AUTHORIZED requires identity digest and manifest approval",
+    "total fail-closed boundary with payload withheld and interrupt/system-exit propagation"
+  ],
+  "unsupported": [
+    "no provider approval or manifest entry (artifacts = {})",
+    "no custody-source authorization record",
+    "replay evidence cannot be bound on provider, record kind or artifact identity",
+    "no production integration; INTEGRATION_STATE = INTEGRATION_REQUIRED",
+    "no cached-verdict divergence path (reserved, unreachable code)",
+    "no wildcard record kind; SUPPORTED_RECORD_KINDS = (TRADE, LIQUIDATION)"
+  ],
+  "environmental_limitations": [
+    "green canonical result is serial (workers=1); 4-worker execution did not complete on this host",
+    "11 skips are POSIX-only or opt-in (symlinks, mode bits, case sensitivity, os.pathconf, PostgreSQL DSN, live network smoke)",
+    "host Windows 10 26200, CPython 3.11.9, pytest 9.0.3, 8 CPUs",
+    "canonical bundles are local artifacts, not committed"
+  ],
+  "remaining_contracts": {
+    "REPLAY_EVIDENCE_RECORD_BINDING_V1": {
+      "implemented": false,
+      "bound_today": ["record source_revision_id present in selection", "no selected revision known after cutoff", "availability instant not after cutoff and agrees with record"],
+      "missing_identity_dimensions": ["record_id", "provider", "record_kind", "artifact_id", "artifact_evidence_digest"],
+      "affected_interfaces": ["ConsumerRequest.replay_evidence", "TrustConsumerPolicy._bind_replay", "I05 replay gate result", "I06 audit admitted field set"]
+    },
+    "OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1": {
+      "implemented": false,
+      "bound_today": ["CustodyAuthorityIdentity: manifest_sha256, artifact_id, approval_id, registry_digest, record_kind, provider, knowledge_cutoff", "AUTHORIZED requires identity_sha256 and manifest approval membership"],
+      "missing_identity_dimensions": ["source_id", "store", "operating_entity", "authorized_record_kinds", "authorized_providers", "validity_window", "manifest_root_binding"],
+      "affected_interfaces": ["custody_authority.derive_custody_authority", "CustodySourceAuthoritySource", "ManifestCustodyAuthority", "CustodyAuthorityDerivation", "refusal code UNAUTHORIZED_CUSTODY_SOURCE"]
+    }
+  },
+  "independent_acceptance": {
+    "agent2_reconciliation_received": false,
+    "confirmed_defects_received": 0,
+    "repairs_made": 0
+  },
+  "invariants": {
+    "approval_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "approval_manifest_artifacts": {},
+    "integration_state": "INTEGRATION_REQUIRED",
+    "production_merge": false,
+    "provider_approval": false,
+    "custody_source_activation": false,
+    "manifest_modification": false,
+    "trust_promotion": false,
+    "gate_or_bloc6_advance": false,
+    "self_ratification": false
+  }
+}
