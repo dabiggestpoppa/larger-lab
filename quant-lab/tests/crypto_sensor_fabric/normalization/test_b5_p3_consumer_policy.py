@@ -45,6 +45,7 @@ from crypto_sensor_fabric.normalization.consumer.custody_authority import (
     CustodyAuthorityIdentity,
     ManifestCustodyAuthority,
     UNRESOLVED_AUTHORITY_CONTRACT,
+    custody_authority_identity_digest,
 )
 from crypto_sensor_fabric.normalization.consumer.models import (
     ConsumerDecision,
@@ -52,6 +53,7 @@ from crypto_sensor_fabric.normalization.consumer.models import (
     ConsumerRequest,
     ConsumerVerdict,
 )
+from crypto_sensor_fabric.normalization.consumer import policy as policy_module
 from crypto_sensor_fabric.normalization.consumer.policy import TrustConsumerPolicy
 from crypto_sensor_fabric.normalization.sensors.liquidation import (
     LiquidationAggregationScope,
@@ -417,7 +419,17 @@ class _FixedAuthoritySource:
 
     def authorize(self, identity: CustodyAuthorityIdentity) -> CustodyAuthorityDerivation:
         self.seen.append(identity)
-        return CustodyAuthorityDerivation(basis=self._basis, detail=self._detail)
+        # H03: even a TEST DOUBLE must name the identity it authorizes.  The law
+        # is on the derivation, not on the source, so the double cannot skip it.
+        return CustodyAuthorityDerivation(
+            basis=self._basis,
+            detail=self._detail,
+            identity_sha256=(
+                custody_authority_identity_digest(identity)
+                if self._basis is CustodyAuthorityBasis.AUTHORIZED
+                else None
+            ),
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -635,7 +647,7 @@ def test_a_verifier_crash_refuses_and_never_accepts(monkeypatch: pytest.MonkeyPa
         raise RuntimeError("boom: internal detail that must not be echoed verbatim")
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _explode
+        policy_module, "verify_trade_record", _explode
     )
     record = _trade_record(monkeypatch)
     verdict = _policy().evaluate(_request(record))
@@ -649,7 +661,7 @@ def test_a_keyboard_interrupt_is_not_swallowed(monkeypatch: pytest.MonkeyPatch) 
         raise KeyboardInterrupt
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _interrupt
+        policy_module, "verify_trade_record", _interrupt
     )
     record = _trade_record(monkeypatch)
     with pytest.raises(KeyboardInterrupt):
@@ -669,7 +681,7 @@ def test_a_contradictory_verification_refuses_rather_than_accepts(
 
     record = _trade_record(monkeypatch)
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _forged
+        policy_module, "verify_trade_record", _forged
     )
     verdict = _policy(
         authority_source=_FixedAuthoritySource(CustodyAuthorityBasis.AUTHORIZED)
@@ -691,7 +703,7 @@ def test_a_verification_of_another_record_kind_refuses(
 
     record = _trade_record(monkeypatch)
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _wrong_kind
+        policy_module, "verify_trade_record", _wrong_kind
     )
     verdict = _policy().evaluate(_request(record))
     assert verdict.decision is ConsumerDecision.REFUSE
@@ -824,7 +836,7 @@ def test_diagnostics_are_bounded_and_carry_no_payload(
         raise RuntimeError("x" * 5000 + " TAIL-MARKER-PAST-THE-BOUND")
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _noisy
+        policy_module, "verify_trade_record", _noisy
     )
     record = _trade_record(monkeypatch)
     verdict = _policy().evaluate(_request(record))

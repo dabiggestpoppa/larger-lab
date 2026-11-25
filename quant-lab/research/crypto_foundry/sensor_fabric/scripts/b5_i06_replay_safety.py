@@ -1073,6 +1073,55 @@ CURRENT_DISCLOSED_SHA256.update(P2A_DISCLOSED_SHA256)
 CURRENT_DISCLOSED_EVIDENCE_SHA256.update(P2A_DISCLOSED_EVIDENCE_SHA256)
 CURRENT_DISCLOSED_SHA256.update(P2B_DISCLOSED_SHA256)
 
+# ---------------------------------------------------------------------------
+# DISCLOSED SENSOR-B5-P3-MASTER-BUILD-R1 (operator directive
+# SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-BUILD-R1,
+# AUTHORIZE_P3_RUNGS_1_THROUGH_5_BOUNDED; re-measured under
+# SENSOR-B5-P3-R6-FINAL-VERIFICATION-R1)
+# ---------------------------------------------------------------------------
+#
+# The bounded production consumer is a NEW package under
+# ``normalization/consumer/``, admitted by EXACT FILE for the same reason the
+# sibling audits admit it that way: a ``consumer/`` prefix would authorize any
+# module dropped into that directory under this grant.  Admitting it changes
+# the bytes of the two audits that name it, which re-enters the I05 producer's
+# SHA-256 inventory and therefore regenerates ``bloc_05_time_validation.json``.
+# Those files and that artifact are pinned below; every predecessor pin above
+# is preserved unmodified, and this merge is last so P3 is operative per path.
+# No row is weakened: every path outside the disclosed delta keeps its absolute
+# measurement.
+P3_DISCLOSED_SRC_EXACT_PATHS = frozenset(
+    {
+        "quant-lab/src/crypto_sensor_fabric/normalization/consumer/__init__.py",
+        "quant-lab/src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "quant-lab/src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "quant-lab/src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+    }
+)
+
+P3_DISCLOSED_SHA256 = {
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": (
+        "37b20d7147dbc1c887ee47fb7dda55b9da9195f55c0b8c41d4515d898896fea7"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
+        "2cb91e5a926e94472b992eaeadf1359cfc2bf4846604b98137a1add2f280ba64"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": (
+        "53ff349423c5b2ff1e3203f3eb50d24dafa6aa87ac61e772a963b3752c104f47"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py": (
+        "bdcd4490fdcc2e8221b582517a3171ff0d979883f7961a31fb6c7d4a30f13284"
+    ),
+}
+
+P3_DISCLOSED_EVIDENCE_SHA256 = {
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
+    "bloc_05_time_validation.json": ("5f308aa689c26cd574169a1cc0b24b4da4663493f3026af0a5fb8181767b2237"),
+}
+
+CURRENT_DISCLOSED_SHA256.update(P3_DISCLOSED_SHA256)
+CURRENT_DISCLOSED_EVIDENCE_SHA256.update(P3_DISCLOSED_EVIDENCE_SHA256)
+
 #: The exact test paths row ``no_i05_test_diff_vs_base`` has always measured.
 I06_SEALED_TEST_PATHS = (
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
@@ -1128,10 +1177,11 @@ def _sha256_path(relpath: str) -> str:
 
 
 def _src_delta_is_disclosed() -> bool:
-    """Only the operator-authorized ``common/`` tree may appear under src."""
+    """Only the operator-authorized trees and exact P3 files may appear."""
     paths = _changed_paths("quant-lab/src") + _status_paths("quant-lab/src")
     return all(
         any(path.startswith(prefix) for prefix in DISCLOSED_SRC_PREFIXES)
+        or path in P3_DISCLOSED_SRC_EXACT_PATHS
         for path in paths
     )
 
@@ -1214,8 +1264,10 @@ def build_scope_payload() -> dict:
             ),
             "detail": (
                 "git status + git diff 32a897436 -- quant-lab/src name only "
-                "normalization/common/ paths (bloc_05/03 s21 required I08+I09 "
-                "surface); every other production path is byte-identical to base"
+                "normalization/common/, sensors/ and authority/ paths "
+                "(bloc_05/03 s21 required surface) plus the four exact "
+                "normalization/consumer/ files the P3 master directive admits "
+                "by name; every other production path is byte-identical to base"
             ),
             "pass": _src_delta_is_disclosed(),
         },

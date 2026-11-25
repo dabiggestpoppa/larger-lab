@@ -40,6 +40,7 @@ arrive as DATA.
 
 from __future__ import annotations
 
+import hashlib
 from datetime import date, datetime
 from typing import Protocol, runtime_checkable
 
@@ -62,6 +63,7 @@ __all__ = [
     "ManifestCustodyAuthority",
     "SUPPORTED_RECORD_KINDS",
     "UNRESOLVED_AUTHORITY_CONTRACT",
+    "custody_authority_identity_digest",
     "derive_custody_authority",
 ]
 
@@ -116,16 +118,35 @@ class CustodyAuthorityIdentity(NormalizationModelBase):
 
 
 class CustodyAuthorityDerivation(NormalizationModelBase):
-    """The derived basis, the bounded reason, and the contract still missing."""
+    """The derived basis, the bounded reason, and the contract still missing.
+
+    ``identity_sha256`` is H03's binding: an ``AUTHORIZED`` basis must NAME the
+    identity it was derived for
+    (:func:`custody_authority_identity_digest`), and the policy refuses a basis
+    whose digest is not the identity it just built.  Without it an authorization
+    is a wildcard -- valid for whatever record the source happened to be asked
+    about first, which is exactly the reuse axis CAP08b/CAP12/A07/A08 closed on
+    every other element of the identity.
+
+    The other two bases may leave it unset: a refusal is evidence about the
+    identity it declined, not a grant that could be replayed.
+    """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     basis: CustodyAuthorityBasis
     detail: str = Field(max_length=_DETAIL_MAX)
     unresolved_contract: str | None = Field(default=None, max_length=_DETAIL_MAX)
+    identity_sha256: str | None = Field(default=None, max_length=64)
 
     @model_validator(mode="after")
     def _basis_laws(self) -> CustodyAuthorityDerivation:
+        if self.basis is CustodyAuthorityBasis.AUTHORIZED and not self.identity_sha256:
+            raise ValueError(
+                "an AUTHORIZED derivation must name the identity digest it was "
+                "derived for; an authorization that names no identity is a "
+                "wildcard and cannot be told apart from a forged one"
+            )
         if self.basis is CustodyAuthorityBasis.AUTHORIZED and self.unresolved_contract:
             raise ValueError(
                 "an AUTHORIZED derivation that names a missing contract is "
@@ -157,6 +178,17 @@ class CustodySourceAuthoritySource(Protocol):
 
     def authorize(self, identity: CustodyAuthorityIdentity) -> CustodyAuthorityDerivation:
         ...
+
+
+def custody_authority_identity_digest(identity: CustodyAuthorityIdentity) -> str:
+    """Canonical digest of the complete identity an authorization covers.
+
+    Deterministic and dependency-free: the same identity always yields the same
+    digest, and the policy compares it with the basis it was handed.  It is a
+    BINDING, not a secret -- a caller can compute it, and that is the point: it
+    names what an answer is about, so an answer about something else is visible.
+    """
+    return hashlib.sha256(identity.model_dump_json().encode("utf-8")).hexdigest()
 
 
 def _result(

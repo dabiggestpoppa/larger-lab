@@ -353,6 +353,11 @@ P3_MASTER_EXACT_PATHS = frozenset(
         # authority/ under an I08-era base diff, so admitting consumer/ requires
         # one disclosed word in that file.  Named exactly, for the same reason.
         "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+        # SENSOR-B5-P3-R6-G17: the I06 replay-safety audit carries the same kind
+        # of sealed src-delta allowlist, so it must name the consumer package
+        # once.  Named exactly; its own pins are re-measured in that file.
+        "tests/crypto_sensor_fabric/normalization/"
+        "test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py",
     }
 )
 

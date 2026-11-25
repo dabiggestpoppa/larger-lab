@@ -433,7 +433,18 @@ def test_a_derivation_cannot_be_authorized_while_naming_a_missing_contract() -> 
             basis=CustodyAuthorityBasis.AUTHORIZED,
             detail="looks fine",
             unresolved_contract=UNRESOLVED_AUTHORITY_CONTRACT,
+            identity_sha256="0" * 64,
         )
+
+
+def test_a_derivation_cannot_be_authorized_without_naming_its_identity() -> None:
+    """H03: an authorization that names no identity is a wildcard."""
+    with pytest.raises(Exception):
+        CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED, detail="looks fine"
+        )
+    # ...and a digest that is not this identity's is refused by the policy.'
+
 
 
 def test_the_shipped_manifest_is_byte_identical_and_empty() -> None:

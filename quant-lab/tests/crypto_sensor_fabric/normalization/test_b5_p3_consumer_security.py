@@ -49,6 +49,7 @@ from crypto_sensor_fabric.normalization.consumer.custody_authority import (
     CustodyAuthorityDerivation,
     CustodyAuthorityIdentity,
     ManifestCustodyAuthority,
+    custody_authority_identity_digest,
 )
 from crypto_sensor_fabric.normalization.consumer.models import (
     ConsumerDecision,
@@ -58,6 +59,7 @@ from crypto_sensor_fabric.normalization.consumer.models import (
     ConsumerVerdict,
     CustodyAuthorityBasis as VerdictBasis,
 )
+from crypto_sensor_fabric.normalization.consumer import policy as policy_module
 from crypto_sensor_fabric.normalization.consumer.policy import TrustConsumerPolicy
 from crypto_sensor_fabric.normalization.enums import (
     AvailabilityBasis,
@@ -408,7 +410,15 @@ class _Source:
 
     def authorize(self, identity: CustodyAuthorityIdentity) -> CustodyAuthorityDerivation:
         self.seen.append(identity)
-        return CustodyAuthorityDerivation(basis=self._basis, detail="fixture basis")
+        return CustodyAuthorityDerivation(
+            basis=self._basis,
+            detail="fixture basis",
+            identity_sha256=(
+                custody_authority_identity_digest(identity)
+                if self._basis is CustodyAuthorityBasis.AUTHORIZED
+                else None
+            ),
+        )
 
 
 def _policy(
@@ -535,7 +545,7 @@ def test_a03_a_contradictory_verification_refuses(
     assert control.decision is ConsumerDecision.INTEGRATION_REQUIRED
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _poisoned
+        policy_module, "verify_trade_record", _poisoned
     )
     verdict = _policy(
         manifest, source=_Source(CustodyAuthorityBasis.AUTHORIZED)
@@ -554,7 +564,7 @@ def test_a10_a_forged_trust_scope_never_accepts(monkeypatch: pytest.MonkeyPatch)
     record = _trade_record(monkeypatch)
     manifest = _manifest()
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _widened
+        policy_module, "verify_trade_record", _widened
     )
     verdict = _policy(
         manifest, source=_Source(CustodyAuthorityBasis.AUTHORIZED)
@@ -597,7 +607,7 @@ def test_a11_an_empty_dimension_list_never_reads_as_authentication(
     assert control.decision is ConsumerDecision.INTEGRATION_REQUIRED
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _empty
+        policy_module, "verify_trade_record", _empty
     )
     verdict = _policy(
         manifest, source=_Source(CustodyAuthorityBasis.AUTHORIZED)
@@ -630,8 +640,18 @@ def test_a04_manifest_substitution_is_compared_not_adopted(
 def test_a05_a_minted_capability_authorizes_nothing(monkeypatch: pytest.MonkeyPatch) -> None:
     record = _trade_record(monkeypatch)
     manifest = _manifest()
-    # "mint" the most permissive derivation the type allows
-    minted = CustodyAuthorityDerivation(basis=CustodyAuthorityBasis.AUTHORIZED, detail="minted")
+    # H03: "minting" the most permissive derivation the type allows is itself
+    # impossible without naming an identity -- a wildcard grant cannot be
+    # constructed at all, so there is nothing to mint.
+    with pytest.raises(Exception):
+        CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED, detail="minted"
+        )
+    minted = CustodyAuthorityDerivation(
+        basis=CustodyAuthorityBasis.AUTHORIZED,
+        detail="minted",
+        identity_sha256="0" * 64,
+    )
     assert minted.basis is CustodyAuthorityBasis.AUTHORIZED
 
     # there is no field on the request into which it can be placed
@@ -869,7 +889,7 @@ def test_a18_a_verifier_exception_refuses_and_system_exit_propagates(
         raise ValueError("interpreter detail")
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _explode
+        policy_module, "verify_trade_record", _explode
     )
     refused = _policy(manifest, source=_Source(CustodyAuthorityBasis.AUTHORIZED)).evaluate(
         _request(record)
@@ -882,7 +902,7 @@ def test_a18_a_verifier_exception_refuses_and_system_exit_propagates(
         raise SystemExit(3)
 
     monkeypatch.setattr(
-        "crypto_sensor_fabric.normalization.consumer.policy.verify_trade_record", _exit
+        policy_module, "verify_trade_record", _exit
     )
     with pytest.raises(SystemExit):
         _policy(manifest).evaluate(_request(record))
@@ -1002,13 +1022,21 @@ class TestMutationControls:
     ) -> None:
         from crypto_sensor_fabric.normalization.consumer import policy as policy_module
 
+        # A PIT violation only the VERIFIER can see: the approval becomes
+        # operative after this cutoff, while the replay evidence is known and
+        # market-available inside it.  H02's binding therefore passes, and the
+        # verifier's refusal is the one the PIT mapping classifies.
         record = _trade_record(monkeypatch)
-        manifest = _manifest()
-        guarded = _policy(manifest).evaluate(_request(record, knowledge_cutoff=EARLY))
+        late = _manifest(available_at="2026-06-02")
+        monkeypatch.setattr(
+            authority_module, "TRUSTED_MANIFEST_SHA256", hashlib.sha256(late).hexdigest()
+        )
+        guarded = _policy(late).evaluate(_request(record))
         assert guarded.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE
+        assert guarded.replay_status == "ELIGIBLE"
 
         monkeypatch.setattr(policy_module, "_PIT_REFUSALS", frozenset())
-        mutated = _policy(manifest).evaluate(_request(record, knowledge_cutoff=EARLY))
+        mutated = _policy(late).evaluate(_request(record))
         assert mutated.refusal_reason is not ConsumerRefusalReason.PIT_INADMISSIBLE
         # the answer is still not acceptance -- the mapping classifies, it does
         # not gate -- which is exactly why it is a mutation of REPORTING, not of
@@ -1037,3 +1065,285 @@ class TestMutationControls:
         mutated = _policy(shipped).evaluate(_request(record))
         assert mutated.decision is ConsumerDecision.REFUSE  # forbidden classification
         assert mutated.decision is not ConsumerDecision.INTEGRATION_REQUIRED
+
+
+# ---------------------------------------------------------------------------
+# H01-H04 -- final hardening (SENSOR-B5-P3-R6-FINAL-VERIFICATION-R1)
+# ---------------------------------------------------------------------------
+
+#: A string no public verdict may ever contain.  Its shape is the one that
+#: actually leaks in production: a credential inside a driver's message.
+_SECRET = "AKIA-P3-SENTINEL-CREDENTIAL-DO-NOT-RELAY-9f4c"
+
+
+def _public_text(verdict: Any) -> str:
+    """Everything a verdict exposes, as one string."""
+    return repr(verdict.model_dump())
+
+
+def test_h01_a_verifier_crash_message_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A 200-character bound limits the leak; it does not prevent it."""
+    record = _trade_record(monkeypatch)
+
+    def _explode(*args: Any, **kwargs: Any) -> None:
+        raise RuntimeError(f"connect failed: postgres://root:{_SECRET}@db/sensor")
+
+    monkeypatch.setattr(
+        policy_module, "verify_trade_record",
+        _explode,
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFIER_CRASH
+    assert _SECRET not in _public_text(verdict)
+    assert "RuntimeError" in (verdict.refusal_detail or "")  # the class IS disclosed
+    assert len(verdict.refusal_detail or "") <= 400
+
+
+def test_h01_a_replay_gate_crash_message_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+
+    def _explode(*args: Any, **kwargs: Any) -> None:
+        raise RuntimeError(f"gate exploded while reading token {_SECRET}")
+
+    monkeypatch.setattr(
+        policy_module, "assess_replay_eligibility",
+        _explode,
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert _SECRET not in _public_text(verdict)
+
+
+def test_h01_a_custody_crash_message_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+
+    class _LeakyCustody:
+        def read_evidence(self, reference: str) -> bytes | None:
+            raise OSError(f"cannot open /srv/{_SECRET}/evidence.bin")
+
+    verdict = _policy(_manifest(), custody=_LeakyCustody()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.decision is not ConsumerDecision.ACCEPT_FIELD_BINDING
+    assert _SECRET not in _public_text(verdict)
+
+
+def test_h01_keyboard_interrupt_still_propagates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The withheld-message rule must not start swallowing process signals."""
+    record = _trade_record(monkeypatch)
+
+    def _interrupt(*args: Any, **kwargs: Any) -> None:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(
+        policy_module, "verify_trade_record",
+        _interrupt,
+    )
+    with pytest.raises(KeyboardInterrupt):
+        _policy(_manifest()).evaluate(_request(record))
+
+
+class _WildcardSource:
+    """A wiring double that authorizes whatever identity it is handed."""
+
+    def __init__(self) -> None:
+        self.seen: list[CustodyAuthorityIdentity] = []
+
+    def authorize(self, identity: CustodyAuthorityIdentity) -> CustodyAuthorityDerivation:
+        self.seen.append(identity)
+        return CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED,
+            detail="wildcard grant",
+            identity_sha256=custody_authority_identity_digest(identity),
+        )
+
+
+class _WrongIdentitySource:
+    """Authorizes a *different* identity than the one it was asked about."""
+
+    def __init__(self, cutoff: datetime) -> None:
+        self._cutoff = cutoff
+
+    def authorize(self, identity: CustodyAuthorityIdentity) -> CustodyAuthorityDerivation:
+        other = identity.model_copy(update={"knowledge_cutoff": self._cutoff})
+        return CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED,
+            detail="authorized for another cutoff",
+            identity_sha256=custody_authority_identity_digest(other),
+        )
+
+
+def test_h03_authority_for_another_identity_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+    source = _WrongIdentitySource(datetime(2027, 1, 1, tzinfo=UTC))
+    verdict = _policy(_manifest(), source=source).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.UNAUTHORIZED_CUSTODY_SOURCE
+    assert verdict.custody_source_authorized is False
+
+
+def test_h03_an_empty_manifest_cannot_be_authorized(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """No empty-manifest request becomes authorized, even with a grant wired in."""
+    shipped = PRODUCTION_MANIFEST.read_bytes()
+    record = _trade_record(monkeypatch)
+    monkeypatch.setattr(
+        authority_module, "TRUSTED_MANIFEST_SHA256", hashlib.sha256(shipped).hexdigest()
+    )
+    source = _WildcardSource()
+    policy = TrustConsumerPolicy(
+        manifest_bytes=shipped,
+        methodology_registry=_methodologies(),
+        custody=HeldCustody(),
+        authority_source=source,
+    )
+    verdict = policy.evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.INTEGRATION_REQUIRED
+    assert verdict.decision is not ConsumerDecision.ACCEPT_FIELD_BINDING
+    assert verdict.custody_source_authorized is False
+    assert source.seen == []  # the seam is never even consulted
+
+
+def test_h03_a_conclusion_naming_an_unapproved_artifact_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The empty-manifest guard itself, reached through the conclusion path."""
+    from crypto_sensor_fabric.normalization.consumer import policy as policy_module
+
+    record = _trade_record(monkeypatch)
+    source = _WildcardSource()
+    policy = _policy(_manifest(), source=source)
+    derived = policy._derive(record, ARTIFACT, CUTOFF)  # noqa: SLF001
+    forged = derived.model_copy(update={"artifact_id": "NOT-AN-APPROVED-ARTIFACT"})
+    verdict = policy._conclude(  # noqa: SLF001
+        request=_request(record),
+        derived=forged,
+        cutoff=CUTOFF,
+        replay=policy_module._ReplayAdjudication(
+            status="ELIGIBLE", blocked=False, detail=""
+        ),
+        pit_status="ADMISSIBLE",
+        custody_status="VERIFIED",
+    )
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.UNAUTHORIZED_CUSTODY_SOURCE
+    assert "no empty-manifest request may become authorized" in (
+        verdict.refusal_detail or ""
+    )
+
+
+def test_h03_a_malformed_derivation_refuses(monkeypatch: pytest.MonkeyPatch) -> None:
+    record = _trade_record(monkeypatch)
+
+    class _Malformed:
+        def authorize(self, identity: CustodyAuthorityIdentity) -> Any:
+            return {"basis": "AUTHORIZED"}
+
+    verdict = _policy(_manifest(), source=_Malformed()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFIER_CRASH
+
+
+def test_h03_a_model_construct_authorization_without_identity_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+
+    class _Unbound:
+        def authorize(self, identity: CustodyAuthorityIdentity) -> Any:
+            # model_construct skips the law that requires an identity digest
+            return CustodyAuthorityDerivation.model_construct(
+                basis=CustodyAuthorityBasis.AUTHORIZED,
+                detail="unbound",
+                unresolved_contract=None,
+            )
+
+    verdict = _policy(_manifest(), source=_Unbound()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.UNAUTHORIZED_CUSTODY_SOURCE
+
+
+def test_h03_a_raising_source_relays_no_message(monkeypatch: pytest.MonkeyPatch) -> None:
+    record = _trade_record(monkeypatch)
+
+    class _Raising:
+        def authorize(self, identity: CustodyAuthorityIdentity) -> Any:
+            raise RuntimeError(f"vault token {_SECRET} rejected")
+
+    verdict = _policy(_manifest(), source=_Raising()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFIER_CRASH
+    assert _SECRET not in _public_text(verdict)
+
+
+def test_h04_a_model_construct_request_holding_junk_refuses_without_raising(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _trade_record(monkeypatch)  # pins the fixture root
+    manifest = _manifest()
+    for junk in (object(), "not-a-record", 42, None, 3.5):
+        forced = ConsumerRequest.model_construct(
+            record=junk,
+            artifact_bytes=ARTIFACT,
+            required_fields=(),
+            evidence_references=(),
+            knowledge_cutoff=CUTOFF,
+            replay_evidence=_replay_evidence(),
+            claimed_manifest_bytes=None,
+        )
+        verdict = _policy(manifest).evaluate(forced)
+        assert verdict.decision is ConsumerDecision.REFUSE, junk
+        assert verdict.decision is not ConsumerDecision.ACCEPT_FIELD_BINDING
+
+
+def test_h04_a_verification_with_unusable_fields_refuses_without_raising(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Inspection reads a verification; a forged one must not raise from it."""
+    record = _trade_record(monkeypatch)
+    junk = RecordVerification.model_construct(
+        record_kind="TRADE",
+        artifact_id=ARTIFACT_ID,
+        approval_id="APPROVAL-FORGED",
+        registry_digest=ARTIFACT_SHA,
+        provider="BINANCE_USDM",
+        semantic_mapping_approved=True,
+        record_transformation_verified=True,
+        custody_verified=True,
+        source_lineage_verified=True,
+        pit_admissible=True,
+        downstream_trusted=True,
+        trust_scope="ECONOMIC_FIELD_BINDING",
+        unverified_dimensions=("SOURCE_LINEAGE",),
+        custody_source_authorized=True,
+        fields_verified=([], ["aggressor_side"]),
+    )
+    monkeypatch.setattr(
+        policy_module, "verify_trade_record",
+        lambda *args, **kwargs: junk,
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.decision is not ConsumerDecision.ACCEPT_FIELD_BINDING
+
+
+def test_h04_a_non_request_argument_is_still_a_programmer_error() -> None:
+    policy = TrustConsumerPolicy(
+        manifest_bytes=PRODUCTION_MANIFEST.read_bytes(),
+        methodology_registry=_methodologies(),
+        custody=HeldCustody(),
+    )
+    with pytest.raises(TypeError):
+        policy.evaluate({"record": "nope"})  # type: ignore[arg-type]

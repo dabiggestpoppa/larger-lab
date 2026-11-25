@@ -36,6 +36,7 @@ from crypto_sensor_fabric.normalization.consumer.custody_authority import (
     CustodyAuthorityBasis,
     CustodyAuthorityDerivation,
     CustodyAuthorityIdentity,
+    custody_authority_identity_digest,
 )
 from crypto_sensor_fabric.normalization.consumer.models import (
     ConsumerDecision,
@@ -290,7 +291,15 @@ class _RecordingSource:
 
     def authorize(self, identity: CustodyAuthorityIdentity) -> CustodyAuthorityDerivation:
         self.seen.append(identity)
-        return CustodyAuthorityDerivation(basis=self._basis, detail="fixture basis")
+        return CustodyAuthorityDerivation(
+            basis=self._basis,
+            detail="fixture basis",
+            identity_sha256=(
+                custody_authority_identity_digest(identity)
+                if self._basis is CustodyAuthorityBasis.AUTHORIZED
+                else None
+            ),
+        )
 
 
 def _policy(manifest: bytes, *, custody: Any = None, source: Any = None) -> TrustConsumerPolicy:
@@ -554,3 +563,187 @@ def test_a_second_consumption_re_derives_and_re_reads(
     assert third.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED
     assert third.custody_status == "UNVERIFIED"
     assert "CUSTODY_UNVERIFIED" in (third.refusal_detail or "")
+
+
+# ---------------------------------------------------------------------------
+# H02 -- replay evidence must belong to THIS consumption
+# ---------------------------------------------------------------------------
+
+
+def _selection(
+    revision_id: str,
+    *,
+    known_from: datetime | None = None,
+    exclude: bool = False,
+) -> RevisionSelection:
+    item = RevisionRecord(
+        source_revision_id=revision_id,
+        normalization_generation=1,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from=known_from or datetime(2026, 5, 31, 23, 59, tzinfo=UTC),
+        known_to=None,
+    )
+    return RevisionSelection(
+        mode=RevisionMode.AS_KNOWN_THEN,
+        selected=() if exclude else (item,),
+        excluded=(item,) if exclude else (),
+        pit_safe=True,
+        pit_uncertain=exclude,
+    )
+
+
+def test_h02_eligible_evidence_from_an_unrelated_record_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The I05 gate answers \"is this eligible\"; it cannot answer \"whose\"."""
+    record = _trade_record(monkeypatch)
+    control = _policy(_manifest()).evaluate(_request(record))
+    assert control.decision is ConsumerDecision.INTEGRATION_REQUIRED  # row is fine
+
+    foreign = _replay_evidence(revision=_selection("rev-of-another-record"))
+    verdict = _policy(_manifest()).evaluate(
+        _request(record, replay_evidence=foreign)
+    )
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert verdict.replay_status == "NOT_BOUND"
+    assert "rev-of-another-record" in (verdict.refusal_detail or "")
+    assert verdict.decision is not ConsumerDecision.ACCEPT_FIELD_BINDING
+
+
+def test_h02_evidence_selected_at_a_later_cutoff_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+    later = _replay_evidence(
+        revision=_selection("rev-p3-4", known_from=datetime(2026, 7, 1, tzinfo=UTC))
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=later))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE
+
+
+def test_h02_a_revision_excluded_at_the_cutoff_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An eligible-looking selection that WITHHELD this record's own revision.
+
+    ``pit_uncertain`` is False and another revision is selected, so the I05 gate
+    answers ELIGIBLE: eligibility alone cannot see that the row under evaluation
+    is the one that was excluded.
+    """
+    record = _trade_record(monkeypatch)
+    mine = RevisionRecord(
+        source_revision_id="rev-p3-4",
+        normalization_generation=1,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from=datetime(2026, 5, 31, 23, 59, tzinfo=UTC),
+        known_to=None,
+    )
+    other = RevisionRecord(
+        source_revision_id="rev-p3-4-corrected",
+        normalization_generation=2,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.PROVIDER_CORRECTED,
+        known_from=datetime(2026, 5, 31, 23, 59, tzinfo=UTC),
+        known_to=None,
+    )
+    withheld = _replay_evidence(
+        revision=RevisionSelection(
+            mode=RevisionMode.AS_KNOWN_THEN,
+            selected=(other,),
+            excluded=(mine,),
+            pit_safe=True,
+            pit_uncertain=False,
+        )
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=withheld))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE
+    assert "excludes revision" in (verdict.refusal_detail or "")
+
+
+def test_h02_evidence_not_yet_market_available_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+    unborn = _replay_evidence(market_available_at=datetime(2026, 7, 1, tzinfo=UTC))
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=unborn))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE
+
+
+def test_h02_evidence_contradicting_the_records_availability_is_refused(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The record declares one instant; the evidence claims another."""
+    record = _trade_record(monkeypatch)
+    declared = record.time.model_copy(
+        update={
+            "market_available_at": datetime(2026, 5, 30, 0, 0, tzinfo=UTC),
+            "availability_basis": AvailabilityBasis.PUBLIC_INTERVAL_CLOSE,
+        }
+    )
+    altered = record.model_copy(update={"time": declared})
+    verdict = _policy(_manifest()).evaluate(_request(altered))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert "market-availability" in (verdict.refusal_detail or "")
+
+
+def test_h02_removing_the_binding_lets_foreign_evidence_through(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Mutation control: the binding is what refuses the foreign row."""
+    record = _trade_record(monkeypatch)
+    manifest = _manifest()
+    foreign = _replay_evidence(revision=_selection("rev-of-another-record"))
+
+    guarded = _policy(
+        manifest, source=_RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
+    ).evaluate(_request(record, replay_evidence=foreign))
+    assert guarded.decision is ConsumerDecision.REFUSE
+
+    monkeypatch.setattr(TrustConsumerPolicy, "_bind_replay", lambda self, *args: None)
+    mutated = _policy(
+        manifest, source=_RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
+    ).evaluate(_request(record, replay_evidence=foreign))
+    assert mutated.decision is ConsumerDecision.ACCEPT_FIELD_BINDING  # forbidden
+
+
+# ---------------------------------------------------------------------------
+# H05 -- one evidence snapshot, two measured reads
+# ---------------------------------------------------------------------------
+
+
+def test_h05_both_reads_are_of_the_same_approved_identity(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+    custody = HeldCustody()
+    source = _RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
+    verdict = _policy(_manifest(), custody=custody, source=source).evaluate(
+        _request(record)
+    )
+    assert verdict.decision is ConsumerDecision.ACCEPT_FIELD_BINDING
+    assert custody.reads == [REF, REF]  # derivation, then the consumption re-read
+    assert source.seen[-1].artifact_id == ARTIFACT_ID
+    assert verdict.custody_status == "VERIFIED"
+
+
+def test_h05_an_omitted_reference_is_not_silently_re_read(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """No claim, no second read -- measured rather than assumed."""
+    record = _trade_record(monkeypatch)
+    custody = HeldCustody()
+    verdict = _policy(_manifest(), custody=custody).evaluate(
+        _request(record, evidence_references=())
+    )
+    assert verdict.decision is ConsumerDecision.INTEGRATION_REQUIRED
+    # Measured, not assumed: one read, because the caller made no second claim.
+    # The window between the verifier's read and consumption is therefore
+    # unobserved -- there is nothing to compare against (A4.5's honest limit).
+    assert custody.reads == [REF]

@@ -4,7 +4,7 @@
   "rows": [
     {
       "clause": "I06E1 s12 (forbidden: editing sealed I01-I05 production) + DISCLOSED B5-I08 extension (operator-authorized)",
-      "detail": "git status + git diff 32a897436 -- quant-lab/src name only normalization/common/ paths (bloc_05/03 s21 required I08+I09 surface); every other production path is byte-identical to base",
+      "detail": "git status + git diff 32a897436 -- quant-lab/src name only normalization/common/, sensors/ and authority/ paths (bloc_05/03 s21 required surface) plus the four exact normalization/consumer/ files the P3 master directive admits by name; every other production path is byte-identical to base",
       "pass": true,
       "row_id": "no_production_source_diff_vs_base"
     },
