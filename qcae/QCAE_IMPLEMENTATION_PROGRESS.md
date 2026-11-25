@@ -1027,6 +1027,29 @@ REQUIRE_APPROVAL fails closed with nothing recorded; unconstrained still
 records). Evidence generator extended with `schema_r1` / `constraint_r1`
 blocks; per-block counts observed, no hardcoded booleans.
 
+### P2-R5R-R2-E1 — Operator acceptance record (appended)
+
+P2-R5R-R2-E1 accepted by operator review. This record supersedes the
+`P2-R5R = OPEN` declaration above for the R2 custody seal; the OPEN
+language is preserved as history and is not deleted.
+
+* P2-R5R-R2-E1: ACCEPTED
+* Tested commit: `5bf2e9c7a` (clean generator HEAD used for pytest)
+* Evidence commit: `01bb45cef` (evidence-only commit archiving results)
+* Freeze commit: `7df9d183e` (final manifest seal on canonical
+  `qcae-capability-acquisition-engine`, remote-verified)
+* All 15 evidence blocks green (observed counts/exit codes, not hardcoded):
+  operator_loop 5, grant_journey 2, process_crash 7, schema_r5r 19,
+  binding_r5r 26, boundary_r5r 8, backup_r5r 6, typed_r5r 10,
+  schema_r1 11, constraint_r1 2, p3_r4_regression 238,
+  crash_after_lease 1, topology 78, r2_custody_seal 6, full_qcae 1459.
+* P2 predecessor repair: CLOSED — Finding A zero-mutation refusal ordering
+  in `open_metadata_db`; Finding B durable atomic legacy reconciliation
+  provenance via `schema_migration_ledger`.
+* P3-R4: PRESERVED — 238 regression tests green; no P3 capability code
+  changed during E1.
+* P3 development: authorized to resume after this integration checkpoint.
+
 ## Blockers
 
 P2 FINAL FREEZE held for R1; P3 not authorized.
