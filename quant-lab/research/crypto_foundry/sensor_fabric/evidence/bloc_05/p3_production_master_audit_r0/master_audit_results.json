@@ -1,0 +1,214 @@
+{
+  "mission": "SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-AUDIT-R1",
+  "role": "second_agent_adversarial_verification_engineer",
+  "independence_label": "SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT",
+  "authorization": "AUTHORIZE_P3_RUNGS_1_THROUGH_5_BOUNDED",
+  "disposition": "P3_CONSUMER_IMPLEMENTATION_ABSENT",
+  "audit_carrier_branch": "agent/crypto-sensor-fabric-p3-production-master-audit-r1",
+  "carrier_base": "34c4d97b7df1ec50d6aefdcc0b46125debbfe929",
+  "carrier_ancestry_verified": "13086755d22a539c6a4dcb20e782bce97fcde82d is an ancestor; 6e6ef21929bf621976a2a45d8e6e3b989c63528f is NOT an ancestor",
+  "reference_lock": {
+    "production_design": "295acb5245ecc47d6f5c0a07f8ff631aa7217c15",
+    "rung1_authorization_prep": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+    "rung1_attempt_head": "ea17eb5ae3df9319745c66780e85e0a9f1aa9b98",
+    "historical_security_spec_not_inherited": "6e6ef21929bf621976a2a45d8e6e3b989c63528f",
+    "r6_boundary_audit": "5be77af4bc88c09a0ac5616951f3d34d68ad1eea",
+    "agent1_implementation_branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+    "agent1_implementation_branch_exists": false,
+    "audited_governance_pin": "13086755d22a539c6a4dcb20e782bce97fcde82d"
+  },
+  "implementation_absence": {
+    "verdict": "NOT_RETRIEVABLE",
+    "measured_this_session": true,
+    "checks": [
+      {"path": "local branches", "command": "git branch -a", "result": "absent"},
+      {"path": "remote heads", "command": "git ls-remote --heads origin", "result": "absent"},
+      {"path": "force refetch", "command": "git fetch --all --prune", "result": "no change"},
+      {"path": "agent1 worktree consumer dir", "command": "find . -type d -name consumer", "result": "0 directories"},
+      {"path": "agent1 worktree uncommitted", "command": "git status --porcelain", "result": "clean"},
+      {"path": "dangling commits", "command": "git fsck --lost-found", "result": "3 commits, 0 consumer paths, all unrelated CI probes"},
+      {"path": "stashes", "command": "git stash list", "result": "10 stashes, none on a P3 consumer branch"},
+      {"path": "full history any ref", "command": "git log --all -- '*consumer/models.py'", "result": "0 commits"},
+      {"path": "recorded blob f7f2ab98", "command": "git cat-file -t", "result": "could not get object info"},
+      {"path": "recorded blob 837a7943", "command": "git cat-file -t", "result": "could not get object info"}
+    ],
+    "only_published_head": {
+      "sha": "ea17eb5ae3df9319745c66780e85e0a9f1aa9b98",
+      "tracked_python_files": 1102,
+      "consumer_paths": 0,
+      "content": "6 evidence documents, no source"
+    }
+  },
+  "governance_audit": {
+    "probe": "test_master_governance_challenge.py.txt",
+    "executed": true,
+    "cases_total": 26,
+    "passed": 21,
+    "failed": 5,
+    "skipped": 0,
+    "errors": 0,
+    "findings": [
+      {
+        "case": "M1",
+        "kind": "PRE_AMENDMENT",
+        "requirement": "consumer directory prospectively authorized",
+        "measured": "I01 admits {authority, common, identity, sensors, terms, time}; 'consumer' absent",
+        "severity": "BLOCKING",
+        "required_repair": "add one subpackage name to I01 membership set"
+      },
+      {
+        "case": "M4",
+        "kind": "PRE_AMENDMENT",
+        "requirement": "I05 path admission covers the Rung 1 source file",
+        "measured": "18 entries, none covers src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "severity": "BLOCKING",
+        "required_repair": "add two exact file paths to I05"
+      },
+      {
+        "case": "M5",
+        "kind": "PRE_AMENDMENT",
+        "requirement": "I10 path admission covers the Rung 1 source file",
+        "measured": "26 entries, none covers src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "severity": "BLOCKING",
+        "required_repair": "add two exact file paths to I10"
+      },
+      {
+        "case": "M6-i05",
+        "kind": "LAW_DEFECT",
+        "requirement": "new file authorization is exact, not prefix-based",
+        "measured": "4 of 4 exact-file entries admit a suffix variant",
+        "counterexample": {
+          "entry": "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+          "admitted": "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py_evil.py"
+        },
+        "severity": "BLOCKING",
+        "required_repair": "exact-match clause for file-kind entries; do NOT widen the prefix tuple"
+      },
+      {
+        "case": "M6-i10",
+        "kind": "LAW_DEFECT",
+        "requirement": "new file authorization is exact, not prefix-based",
+        "measured": "9 of 9 exact-file entries admit a suffix variant",
+        "counterexample": {
+          "entry": "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+          "admitted": "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py_evil.py"
+        },
+        "severity": "BLOCKING",
+        "required_repair": "same clause across I10's three custody loops"
+      }
+    ],
+    "properties_satisfied": {
+      "consumer_directory_authorized": false,
+      "historical_allowed_directories_unchanged": true,
+      "new_file_authorization_exact": false,
+      "filename_suffix_variants_refuse": false,
+      "unauthorized_sibling_files_refuse": true,
+      "historical_permitted_paths_remain_permitted": true,
+      "tri_state_views_consistent": true,
+      "frozen_historical_artifacts_unchanged": true,
+      "no_approval_manifest_or_integration_state_change": true
+    },
+    "supporting_cases": {
+      "M2_historical_i01_subpackages_intact": "PASS",
+      "M3_i01_membership_exact_positive_control": "PASS",
+      "M5b_inventory_reconciliation": "PASS",
+      "M7_required_oracle_refuses_suffix_variants": "PASS",
+      "M8_authorized_paths_admitted_under_required_oracle": "PASS",
+      "M9_eleven_forbidden_paths_refused": "PASS",
+      "M10_no_legacy_prefix_silently_revoked": "PASS",
+      "M11_tri_state_disposable_repository": "PASS",
+      "M12_frozen_artifacts_7_of_7": "PASS",
+      "M13_manifest_grants_zero_provider_authorization": "PASS",
+      "M14_no_manifest_or_integration_state_drift": "PASS",
+      "M15_i09_sealed_surface_measured_excludes_consumer": "PASS",
+      "M16_i11r2_inventory_binding_measured": "PASS",
+      "M17_rung1_grant_verdict_recorded": "PASS"
+    },
+    "i09_sealed_trees": {
+      "blocks_consumer": false,
+      "reason": "sealed list names 8 surfaces; consumer/ is not among them; exclusion pinned by M15 so silence is not read as approval"
+    },
+    "i11r2_inventory_binding": {
+      "mechanism": "python_files_scanned == len(_scanned_paths())",
+      "effect": "any new tracked .py moves the pin; I05 republish case sanctions the update only for authorized additions"
+    }
+  },
+  "inventory_reconciliation": {
+    "i05_allowed_prefixes": {"total": 18, "dir": 9, "file": 4, "legacy_prefix": 5},
+    "i10_allowed": {"total": 26, "dir": 8, "file": 9, "legacy_prefix": 9},
+    "d1_packet_claimed_i10": 25,
+    "measured_i10": 26,
+    "packet_off_by": 1,
+    "note": "the grant's shape is unaffected; the packet count must not be quoted as authoritative",
+    "exact_file_entries": {
+      "i05": [
+        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+        "config/crypto_sensor_fabric/provider_time_semantics.yaml",
+        "config/crypto_sensor_fabric/revision_policies.yaml",
+        "research/crypto_foundry/sensor_fabric/SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md"
+      ],
+      "i10": [
+        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py",
+        "research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json",
+        "research/crypto_foundry/sensor_fabric/SENSOR_FABRIC_IMPLEMENTATION_PROGRESS.md",
+        ".gitignore",
+        ".gitattributes"
+      ]
+    }
+  },
+  "approval_manifest_measurement": {
+    "path": "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+    "authority_id": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+    "schema_version": "b5-i09p2a-1",
+    "approved_artifacts": 0,
+    "revoked_approval_ids": [],
+    "sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "verdict": "shipped manifest produces zero real provider authorization — correct Rung 3 baseline"
+  },
+  "rung_matrix": {
+    "rung_1": {"subject": "typed data contracts C00-C22", "audited_sha": null, "executed": 0, "not_executed": 26, "disposition": "DEPENDENCY_PENDING"},
+    "rung_2": {"subject": "verification ownership policy", "audited_sha": null, "executed": 0, "not_executed": "all", "disposition": "DEPENDENCY_PENDING"},
+    "rung_3": {"subject": "custody authority derivation", "audited_sha": null, "executed": 0, "not_executed": "all", "disposition": "DEPENDENCY_PENDING"},
+    "rung_4": {"subject": "temporal and evidence integrity", "audited_sha": null, "executed": 0, "not_executed": "all", "disposition": "DEPENDENCY_PENDING"},
+    "rung_5": {"subject": "A01-A20 adversarial matrix", "audited_sha": null, "executed": 0, "not_executed": "20 + mutation controls", "disposition": "DEPENDENCY_PENDING"}
+  },
+  "required_accounting": {
+    "attacks_executed": 0,
+    "attacks_closed": 0,
+    "attacks_vulnerable": 0,
+    "unexpected_errors": 0,
+    "dependency_pending_cases": "all Rung 1-5 adversarial cases",
+    "threat_class_c_observations": 0,
+    "mutations_executed": 0,
+    "mutations_detected": 0,
+    "mutations_surviving": 0,
+    "governance_cases_executed": 26,
+    "governance_cases_passed": 21,
+    "governance_cases_failed": 5
+  },
+  "hard_stops_respected": {
+    "production_implementation": false,
+    "unilateral_governance_amendment": false,
+    "modification_of_agent1_branch": false,
+    "production_merge": false,
+    "provider_approval": false,
+    "actual_custody_authorization": false,
+    "manifest_activation": false,
+    "trust_promotion": false,
+    "program_gate_advancement": false,
+    "i11_i12_i17_or_bloc6_advancement": false,
+    "capital_authority": false,
+    "self_ratification": false,
+    "tracked_python_files_added": 0
+  },
+  "re_entry": {
+    "trigger": "Agent 1 publishes I01 subpackage grant + I05 and I10 exact-file grants with an exact-match clause, plus the implementation commit on agent/crypto-sensor-fabric-p3-production-master-r1",
+    "command": "see README section 4; no probe edit required",
+    "expected_after_correct_amendment": "M1, M4, M5 clear; M6 remains red unless the exact-match clause was added",
+    "false_pass_guard": "M6 green with a widened tuple is a false pass; M7 is its positive control and M9 the sibling-refusal check"
+  }
+}

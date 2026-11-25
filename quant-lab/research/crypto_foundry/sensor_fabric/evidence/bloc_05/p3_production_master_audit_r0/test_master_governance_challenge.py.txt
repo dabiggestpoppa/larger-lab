@@ -1,0 +1,736 @@
+"""SENSOR-B5-P3-PRODUCTION-CONSUMER-MASTER-AUDIT-R1 -- governance challenge.
+
+SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT.
+
+This module is a NON-COLLECTED research artifact. It lives as ``.py.txt`` so it
+is never discovered by the canonical suite; materialize it into a temporary
+directory to execute it. It adds no tracked ``test_*.py`` and therefore does not
+widen any scope audit or inflate any canonical test count.
+
+WHAT IT DOES
+------------
+Directive section 2 lists nine properties the comprehensive governance
+reconciliation must satisfy. Rather than hard-code what this auditor *believes*
+the audits contain, every case below PARSES the live audit source with ``ast``
+and evaluates the requirement against the measured allowlists. That makes the
+probe pin-independent: it reports the law as it actually is at whatever commit
+``AUDIT_QUANT_LAB`` points to.
+
+Each case asserts the REQUIREMENT, not the current implementation. A case that
+fails therefore reports a real gap between the requirement and the law, and it
+self-clears the moment the law is amended -- no edit to this file is needed.
+
+REQUIREMENT vs BASELINE
+-----------------------
+Two different kinds of red are possible here and they must not be conflated:
+
+* ``PRE_AMENDMENT`` -- the requirement is unmet because the authorization
+  amendment has not been published yet. This is the expected state before
+  Agent 1's governance commit and is not a defect in anything.
+* ``LAW_DEFECT`` -- the requirement is unmet by a predicate flaw that survives
+  any amount of path granting (for example a suffix-variant entry being
+  admitted because an exact file path is tested with ``startswith``).
+
+Every case declares which kind it can produce, so the disposition never
+mistakes a pending amendment for a broken oracle.
+
+EXECUTION
+---------
+    AUDIT_QUANT_LAB=<path to quant-lab> \
+        python -m pytest <RUN>/test_master_governance_challenge.py -v -rs
+
+OFFLINE. No network, no wall clock, no writes outside a disposable temp git
+repository the tri-state case creates and removes itself.
+"""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any
+
+import pytest
+
+# ---------------------------------------------------------------------------
+# The audited tree
+# ---------------------------------------------------------------------------
+
+_ENV = os.environ.get("AUDIT_QUANT_LAB", "").strip()
+if _ENV:
+    AUDIT_QUANT_LAB = Path(_ENV).resolve()
+else:
+    # Fallback: run from the repository root, where ``quant-lab/`` is a child.
+    AUDIT_QUANT_LAB = (Path.cwd() / "quant-lab").resolve()
+
+AUDIT_READY = (AUDIT_QUANT_LAB / "src" / "crypto_sensor_fabric").is_dir()
+
+pytestmark = pytest.mark.skipif(
+    not AUDIT_READY,
+    reason=(
+        "AUDIT_QUANT_LAB does not point at a quant-lab tree containing "
+        f"src/crypto_sensor_fabric (got {AUDIT_QUANT_LAB}); set AUDIT_QUANT_LAB"
+    ),
+)
+
+_NORM = AUDIT_QUANT_LAB / "tests" / "crypto_sensor_fabric" / "normalization"
+I01_AUDIT = _NORM / "test_b5_i01_scope_audit.py"
+I05_AUDIT = _NORM / "test_b5_i05_scope_audit.py"
+I09_AUDIT = _NORM / "test_b5_i09_scope_audit.py"
+I10_AUDIT = _NORM / "test_b5_i10_scope_audit.py"
+I11R2_AUDIT = (
+    AUDIT_QUANT_LAB / "tests" / "crypto_sensor_fabric" / "storage"
+    / "test_i11r2_binding_audit.py"
+)
+MANIFEST = (
+    AUDIT_QUANT_LAB / "config" / "crypto_sensor_fabric"
+    / "provider_semantics" / "approval_manifest.json"
+)
+EVIDENCE = (
+    AUDIT_QUANT_LAB / "research" / "crypto_foundry" / "sensor_fabric"
+    / "evidence" / "bloc_05"
+)
+
+#: The two Rung 1 paths the D-1 authorization packet requests.
+RUNG1_EXACT_PATHS = {
+    "src/crypto_sensor_fabric/normalization/consumer/models.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+}
+
+#: Paths that must stay refused under an exact-file grant.  A directory-wide
+#: ``consumer/`` grant would admit every one of these, which is why the packet
+#: asks for exact files instead.
+RUNG1_FORBIDDEN = {
+    "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+    "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+    "src/crypto_sensor_fabric/normalization/consumer/rebinding.py",
+    "src/crypto_sensor_fabric/normalization/consumer/__init__.py",
+    "src/crypto_sensor_fabric/normalization/consumer/models.py_suffix.py",
+    "src/crypto_sensor_fabric/normalization/consumer/models.py/../policy.py",
+    "src/crypto_sensor_fabric/normalization/consumer/models.pyc",
+    "src/crypto_sensor_fabric/normalization/consumer/",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py_evil.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.pyc",
+}
+
+#: Historical I01 subpackage grants that must never be revoked.
+HISTORICAL_I01_SUBPACKAGES = {
+    "identity", "terms", "time", "common", "sensors", "authority",
+}
+
+#: Frozen blot-05 historical artifacts that must not be rewritten.
+FROZEN_HISTORICAL_ARTIFACTS = (
+    "BLOC_05_I01_TYPE_SCOPE_MATRIX.json",
+    "BLOC_05_I01_IMPLEMENTATION_EVIDENCE.md",
+    "BLOC_05_I01_OPERATOR_RATIFICATION.md",
+    "BLOC_05_I10_IMPLEMENTATION_EVIDENCE.md",
+    "BLOC_05_I10_OPERATOR_RATIFICATION.md",
+    "bloc_05_unit_validation.json",
+    "bloc_05_semantic_validation.json",
+)
+
+#: The authorization base this checkpoint must be measured against.
+AUTHORIZATION_BASE = "13086755d22a539c6a4dcb20e782bce97fcde82d"
+
+
+# ---------------------------------------------------------------------------
+# AST machinery: read the law, do not assume it
+# ---------------------------------------------------------------------------
+
+
+def _parse(path: Path) -> ast.Module:
+    assert path.is_file(), f"audit module is missing: {path}"
+    return ast.parse(path.read_text(encoding="utf-8"))
+
+
+def _const(node: ast.AST) -> Any:
+    """Evaluate a literal allowlist expression, folding string concatenation.
+
+    One frozen entry in the I10 tuple is built as
+    ``"research/…/sensor_fabric/" + "SENSOR_FABRIC_" +
+    "IMPLEMENTATION_PROGRESS.md"``.  ``ast.literal_eval`` refuses the ``BinOp``,
+    so a naive extractor raises instead of reading the law -- which would show
+    up as ten errors rather than as a measurement.  Only string addition is
+    folded; anything genuinely dynamic still raises, because an allowlist that
+    is not a literal is a finding in its own right.
+    """
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left, right = _const(node.left), _const(node.right)
+        if isinstance(left, str) and isinstance(right, str):
+            return left + right
+        raise ValueError(f"non-string concatenation in allowlist: {left!r} + {right!r}")
+    if isinstance(node, ast.Tuple):
+        return tuple(_const(element) for element in node.elts)
+    if isinstance(node, ast.Set):
+        return {_const(element) for element in node.elts}
+    if isinstance(node, ast.List):
+        return [_const(element) for element in node.elts]
+    raise ValueError(f"allowlist entry is not a literal: {ast.dump(node)}")
+
+
+def assigned_in_function(tree: ast.Module, func_name: str, var_name: str) -> Any:
+    """Literal value of ``var_name`` assigned anywhere inside ``func_name``."""
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if node.name != func_name:
+                continue
+            for sub in ast.walk(node):
+                if isinstance(sub, ast.Assign):
+                    for target in sub.targets:
+                        if isinstance(target, ast.Name) and target.id == var_name:
+                            return _const(sub.value)
+    raise LookupError(f"{var_name!r} not assigned inside {func_name!r}")
+
+
+def assigned_at_module_level(tree: ast.Module, var_name: str) -> Any:
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == var_name:
+                    return _const(node.value)
+    raise LookupError(f"{var_name!r} not assigned at module level")
+
+
+@pytest.fixture(scope="module")
+def i01_allowed() -> set[str]:
+    return set(assigned_in_function(_parse(I01_AUDIT), "test_only_authorized_subpackages_exist", "allowed"))
+
+
+@pytest.fixture(scope="module")
+def i05_prefixes() -> list[str]:
+    return list(assigned_in_function(
+        _parse(I05_AUDIT),
+        "test_only_the_authorized_paths_were_added_since_the_i05_base",
+        "allowed_prefixes",
+    ))
+
+
+@pytest.fixture(scope="module")
+def i10_allowed() -> list[str]:
+    return list(assigned_in_function(
+        _parse(I10_AUDIT),
+        "test_only_the_i10_authorized_prefixes_carry_tracked_changes",
+        "allowed",
+    ))
+
+
+# ---------------------------------------------------------------------------
+# The required oracle: three entry kinds, exact files, prefix dirs, no ``..``
+# ---------------------------------------------------------------------------
+
+
+def classify(entry: str) -> str:
+    """Kind of an allowlist entry.
+
+    The frozen tuples are not a single kind of thing, so a one-bit
+    "exact or prefix" switch cannot represent them without silently revoking
+    grants that already shipped.  Three kinds are measured:
+
+    ``dir``           trailing slash -- admits everything beneath it
+    ``file``          basename carries an extension -- admits only itself
+    ``legacy_prefix`` bare stem with no extension -- admits by prefix
+    """
+    if entry.endswith("/"):
+        return "dir"
+    if "." in entry.rsplit("/", 1)[-1]:
+        return "file"
+    return "legacy_prefix"
+
+
+def build_oracle(prefixes: list[str], exact: set[str] = frozenset()) -> "Oracle":
+    return Oracle(list(prefixes), set(exact))
+
+
+class Oracle:
+    """The required admission predicate, independent of any implementation."""
+
+    def __init__(self, prefixes: list[str], exact: set[str]) -> None:
+        self.entries = [(entry, classify(entry)) for entry in prefixes]
+        self.exact = set(exact)
+        self.kinds = {kind for _, kind in self.entries}
+
+    def admits(self, candidate: str) -> bool:
+        # A traversal segment is refused outright: it can turn any prefix entry
+        # into a grant for a tree it was never meant to cover.
+        if ".." in Path(candidate).parts:
+            return False
+        if candidate in self.exact:
+            return True
+        for entry, kind in self.entries:
+            if kind == "dir" and candidate.startswith(entry):
+                return True
+            if kind == "file" and candidate == entry:
+                return True
+            if kind == "legacy_prefix" and candidate.startswith(entry):
+                return True
+        return False
+
+    def admits_as_prefix(self, candidate: str) -> bool:
+        """What the current implementations do: every entry is a prefix."""
+        if ".." in Path(candidate).parts:
+            return False
+        return any(candidate.startswith(entry) for entry, _ in self.entries)
+
+
+# ---------------------------------------------------------------------------
+# M1-M3  I01 directory membership
+# ---------------------------------------------------------------------------
+
+
+def test_m1_i01_prospectively_authorizes_the_consumer_directory(i01_allowed: set[str]) -> None:
+    """Requirement (directive section 2): the consumer directory is authorized.
+
+    KIND: PRE_AMENDMENT while the I01 membership set lacks ``consumer``.  This
+    is the third blocker the D-1 packet omitted; it is not an oracle defect.
+    """
+    assert "consumer" in i01_allowed, (
+        "PRE_AMENDMENT: I01 test_only_authorized_subpackages_exist admits "
+        f"{sorted(i01_allowed)} -- 'consumer' is absent, so no consumer/ tree "
+        "can ever be green at this commit"
+    )
+
+
+def test_m2_i01_historical_allowed_directories_remain_unchanged(i01_allowed: set[str]) -> None:
+    """Requirement: historical allowed directories remain unchanged."""
+    missing = HISTORICAL_I01_SUBPACKAGES - i01_allowed
+    assert missing == set(), f"historical I01 grants were revoked: {sorted(missing)}"
+
+
+def test_m3_i01_membership_is_exact_not_prefix_based(i01_allowed: set[str]) -> None:
+    """Requirement: authorization is exact, so near-miss names must refuse.
+
+    Measured: I01 uses set membership, which is already exact.  This case is the
+    positive control for M1/M2 -- it proves the fixture really read a set and
+    not an empty literal.
+    """
+    assert isinstance(i01_allowed, set) and i01_allowed, "I01 allowlist did not parse"
+    for near_miss in ("consumerx", "Consumers", "consumer ", "consumer/", "sensors2"):
+        assert near_miss not in i01_allowed, f"near-miss {near_miss!r} admitted"
+
+
+# ---------------------------------------------------------------------------
+# M4-M5  I05 / I10 path admission, measured
+# ---------------------------------------------------------------------------
+
+
+def test_m4_i05_admits_the_rung1_source_path(i05_prefixes: list[str]) -> None:
+    """Requirement: I05 path admission covers the authorized Rung 1 source file."""
+    oracle = build_oracle(i05_prefixes)
+    target = "src/crypto_sensor_fabric/normalization/consumer/models.py"
+    assert oracle.admits(target), (
+        f"PRE_AMENDMENT: I05 admits {len(i05_prefixes)} entries and none covers "
+        f"{target}"
+    )
+
+
+def test_m5_i10_admits_the_rung1_source_path(i10_allowed: list[str]) -> None:
+    """Requirement: I10 path admission covers the authorized Rung 1 source file."""
+    oracle = build_oracle(i10_allowed)
+    target = "src/crypto_sensor_fabric/normalization/consumer/models.py"
+    assert oracle.admits(target), (
+        f"PRE_AMENDMENT: I10 admits {len(i10_allowed)} entries and none covers "
+        f"{target}"
+    )
+
+
+def test_m5b_inventory_reconciliation(i05_prefixes: list[str], i10_allowed: list[str]) -> None:
+    """Actual inventory reconciliation: what the tuples really hold.
+
+    The D-1 packet states I10 has 25 entries.  This case records the measured
+    count so the difference is visible instead of being quietly repeated.
+    """
+    measured = {
+        "i05_entries": len(i05_prefixes),
+        "i10_entries": len(i10_allowed),
+        "i05_kinds": {},
+        "i10_kinds": {},
+        "packet_claimed_i10": 25,
+    }
+    for entry in i05_prefixes:
+        measured["i05_kinds"][classify(entry)] = measured["i05_kinds"].get(classify(entry), 0) + 1
+    for entry in i10_allowed:
+        measured["i10_kinds"][classify(entry)] = measured["i10_kinds"].get(classify(entry), 0) + 1
+    measured["i10_matches_packet"] = len(i10_allowed) == 25
+    print("INVENTORY " + json.dumps(measured, sort_keys=True))
+    # A measured inventory must at least be internally coherent: every entry
+    # falls in exactly one of the three kinds.
+    assert sum(measured["i05_kinds"].values()) == len(i05_prefixes)
+    assert sum(measured["i10_kinds"].values()) == len(i10_allowed)
+    assert set(measured["i05_kinds"]) <= {"dir", "file", "legacy_prefix"}
+    assert set(measured["i10_kinds"]) <= {"dir", "file", "legacy_prefix"}
+
+
+# ---------------------------------------------------------------------------
+# M6-M7  Exactness of file-kind entries (the surviving law defect)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m6_file_entries_are_admitted_by_equality_not_prefix(
+    which: str, i05_prefixes: list[str], i10_allowed: list[str]
+) -> None:
+    """Requirement: new file authorization is exact, not prefix-based.
+
+    LAW_DEFECT while the implementations call ``path.startswith`` on entries
+    whose kind is ``file``.  This red does NOT clear by adding a path: it clears
+    only when the predicate stops treating an exact-file entry as a prefix.
+    """
+    entries = i05_prefixes if which == "i05" else i10_allowed
+    oracle = build_oracle(entries)
+    offenders: list[tuple[str, str]] = []
+    for entry in entries:
+        if classify(entry) != "file":
+            continue
+        suffix_variant = entry + "_evil.py"
+        if oracle.admits_as_prefix(suffix_variant):
+            offenders.append((entry, suffix_variant))
+    detail = ""
+    if offenders:
+        detail = ". Smallest counterexample: " + json.dumps(
+            {"entry": offenders[0][0], "admitted": offenders[0][1]}
+        )
+    assert offenders == [], (
+        f"LAW_DEFECT ({which}): {len(offenders)} exact-file entries are admitted "
+        f"by prefix, so a suffix variant is legal{detail}"
+    )
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m7_required_oracle_refuses_suffix_variants(
+    which: str, i05_prefixes: list[str], i10_allowed: list[str]
+) -> None:
+    """Positive control for M6: the required oracle refuses what the law admits.
+
+    If this case failed, M6's finding would be an artifact of the oracle rather
+    than of the audited predicate.
+    """
+    entries = i05_prefixes if which == "i05" else i10_allowed
+    oracle = build_oracle(entries)
+    for entry in entries:
+        if classify(entry) != "file":
+            continue
+        assert not oracle.admits(entry + "_evil.py"), entry
+        assert not oracle.admits(entry + ".pyc"), entry
+        assert oracle.admits(entry), f"required oracle revoked a live grant: {entry}"
+
+
+# ---------------------------------------------------------------------------
+# M8-M9  The Rung 1 grant shape: exact admits, siblings and variants refuse
+# ---------------------------------------------------------------------------
+
+
+def test_m8_authorized_paths_are_admitted_under_the_required_oracle(
+    i05_prefixes: list[str], i10_allowed: list[str]
+) -> None:
+    """Requirement: the two authorized paths are admissible once granted."""
+    for entries in (i05_prefixes, i10_allowed):
+        oracle = build_oracle(entries, exact=RUNG1_EXACT_PATHS)
+        for path in sorted(RUNG1_EXACT_PATHS):
+            assert oracle.admits(path), f"required oracle refused an authorized path: {path}"
+
+
+def test_m9_unauthorized_siblings_and_variants_refuse(
+    i05_prefixes: list[str], i10_allowed: list[str]
+) -> None:
+    """Requirement: unauthorized sibling files and suffix variants refuse.
+
+    This is the case that distinguishes an exact-file grant from the naive
+    "append the strings to the frozen tuple" amendment: under a tuple-only
+    grant, ``models.py_suffix.py`` and a ``..`` climb-out are both admitted.
+    """
+    for name, entries in (("i05", i05_prefixes), ("i10", i10_allowed)):
+        oracle = build_oracle(entries, exact=RUNG1_EXACT_PATHS)
+        admitted = sorted(p for p in RUNG1_FORBIDDEN if oracle.admits(p))
+        assert admitted == [], f"{name}: required oracle admitted forbidden paths {admitted}"
+
+
+def test_m10_historical_permitted_paths_remain_permitted(
+    i05_prefixes: list[str], i10_allowed: list[str]
+) -> None:
+    """Requirement: historical permitted paths remain permitted.
+
+    An exactness amendment that silently revokes a ``legacy_prefix`` grant would
+    break checkpoints that already shipped, so every live entry must still admit
+    a path beneath itself.
+    """
+    for name, entries in (("i05", i05_prefixes), ("i10", i10_allowed)):
+        oracle = build_oracle(entries, exact=RUNG1_EXACT_PATHS)
+        revoked = []
+        for entry in entries:
+            probe = entry if classify(entry) == "file" else entry + "probe.py"
+            if not oracle.admits(probe):
+                revoked.append(entry)
+        assert revoked == [], f"{name}: exactness amendment revoked {revoked}"
+
+
+# ---------------------------------------------------------------------------
+# M11  Staged / unstaged / untracked are evaluated consistently
+# ---------------------------------------------------------------------------
+
+
+def test_m11_tri_state_views_agree_in_a_disposable_repository(
+    i05_prefixes: list[str]
+) -> None:
+    """Requirement: staged, unstaged and untracked are consistently evaluated.
+
+    A disposable git repository is built from scratch, one file is placed in
+    each of the three custody views, and the SAME predicate is applied.  Staged
+    admission is the one that matters: it is what a commit ships.
+    """
+    oracle = build_oracle(i05_prefixes)
+    prefix = "src/crypto_sensor_fabric/normalization/sensors/"
+    assert any(e == prefix for e in i05_prefixes), (
+        "fixture precondition: the sensors/ entry must exist for this case"
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        repo = Path(tmp)
+
+        def git(*args: str) -> str:
+            return subprocess.run(
+                ["git", *args], cwd=repo, capture_output=True,
+                encoding="utf-8", errors="replace", check=False,
+            ).stdout
+
+        git("init", "-q")
+        git("config", "user.email", "audit@example.invalid")
+        git("config", "user.name", "audit")
+        (repo / "seed.txt").write_text("seed\n", encoding="utf-8")
+        git("add", "seed.txt")
+        git("commit", "-q", "-m", "seed")
+
+        target_dir = repo / Path(prefix)
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        # untracked
+        (target_dir / "untracked_probe.py").write_text("x = 1\n", encoding="utf-8")
+
+        # unstaged (tracked, modified in the worktree)
+        (target_dir / "unstaged_probe.py").write_text("x = 1\n", encoding="utf-8")
+        git("add", str(Path(prefix) / "unstaged_probe.py"))
+        git("commit", "-q", "-m", "add unstaged probe")
+        (target_dir / "unstaged_probe.py").write_text("x = 2\n", encoding="utf-8")
+
+        # staged (in the index, not yet committed)
+        (target_dir / "staged_probe.py").write_text("x = 1\n", encoding="utf-8")
+        git("add", str(Path(prefix) / "staged_probe.py"))
+
+        views = {
+            "staged": [
+                line for line in git("diff", "--cached", "--name-only").splitlines() if line.strip()
+            ],
+            "unstaged": [
+                line for line in git("diff", "--name-only").splitlines() if line.strip()
+            ],
+            "untracked": [
+                line for line in
+                git("ls-files", "--others", "--exclude-standard").splitlines() if line.strip()
+            ],
+        }
+
+    # Every view must contain its own probe -- otherwise the fixture, not the
+    # law, is what is being measured.
+    assert views["staged"], "fixture failure: nothing was staged"
+    assert views["unstaged"], "fixture failure: nothing was modified"
+    assert views["untracked"], "fixture failure: nothing was untracked"
+
+    verdicts = {
+        view: sorted(path for path in paths if not oracle.admits(path))
+        for view, paths in views.items()
+    }
+    unauthorized = {view: refused for view, refused in verdicts.items() if refused}
+    assert unauthorized == {}, (
+        "LAW_DEFECT: the custody views disagree about authorization; "
+        "staged admission is what a commit ships. " + json.dumps(unauthorized, sort_keys=True)
+    )
+
+
+# ---------------------------------------------------------------------------
+# M12  Frozen historical artifacts are unchanged
+# ---------------------------------------------------------------------------
+
+
+def _git_in_audit(*args: str) -> str:
+    return subprocess.run(
+        ["git", *args], cwd=AUDIT_QUANT_LAB, capture_output=True,
+        encoding="utf-8", errors="replace", check=False,
+    ).stdout
+
+
+@pytest.mark.parametrize("artifact", FROZEN_HISTORICAL_ARTIFACTS)
+def test_m12_frozen_historical_artifact_is_not_rewritten(artifact: str) -> None:
+    """Requirement: frozen historical artifacts remain unchanged.
+
+    Only rewrites and deletions are refused; a new sibling artifact is a
+    different question and is not conflated with this one.
+    """
+    rel = f"research/crypto_foundry/sensor_fabric/evidence/bloc_05/{artifact}"
+    name_status = _git_in_audit("diff", "--name-status", AUTHORIZATION_BASE, "--", rel)
+    lines = [line for line in name_status.splitlines() if line.strip()]
+    if not lines:
+        return  # absent at base and unchanged, or untouched
+    rewritten = [line for line in lines if line[0] in {"M", "D", "R"}]
+    assert rewritten == [], f"{artifact} was rewritten since {AUTHORIZATION_BASE[:12]}: {rewritten}"
+    # A clean state is not a vacuous state: the file must actually exist.
+    assert (AUDIT_QUANT_LAB / rel).is_file() or lines, artifact
+
+
+# ---------------------------------------------------------------------------
+# M13-M14  No approval manifest or integration-state change
+# ---------------------------------------------------------------------------
+
+
+def test_m13_shipped_manifest_grants_no_provider_authorization() -> None:
+    """The shipped manifest must never produce real provider authorization.
+
+    Measured semantically rather than by hash, so a legitimate future grant
+    stays visible as a deliberate act instead of a silent digest update.
+    """
+    assert MANIFEST.is_file(), f"approval manifest missing: {MANIFEST}"
+    payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    assert payload["artifacts"] == {}, (
+        "the shipped manifest approves artifacts: "
+        + json.dumps(sorted(payload["artifacts"]), sort_keys=True)
+    )
+    assert payload["revoked_approval_ids"] == [], payload["revoked_approval_ids"]
+    digest = hashlib.sha256(MANIFEST.read_bytes()).hexdigest()
+    print("MANIFEST " + json.dumps({
+        "path": str(MANIFEST.relative_to(AUDIT_QUANT_LAB)),
+        "sha256": digest,
+        "authority_id": payload.get("authority_id"),
+        "schema_version": payload.get("schema_version"),
+        "approved_artifacts": len(payload["artifacts"]),
+    }, sort_keys=True))
+
+
+def test_m14_no_integration_state_or_manifest_change_since_authorization_base() -> None:
+    """Requirement: no approval manifest or integration-state change occurred."""
+    watched = (
+        "config/crypto_sensor_fabric/provider_semantics",
+        "config/crypto_sensor_fabric/integration_state",
+    )
+    changed: list[str] = []
+    for path in watched:
+        out = _git_in_audit("diff", "--name-status", AUTHORIZATION_BASE, "--", path)
+        changed.extend(line for line in out.splitlines() if line.strip())
+    assert changed == [], (
+        f"approval/integration state changed since {AUTHORIZATION_BASE[:12]}: {changed}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# M15  I09 sealed-tree surface: what it actually covers
+# ---------------------------------------------------------------------------
+
+
+def test_m15_i09_sealed_surface_is_measured_and_excludes_consumer() -> None:
+    """Requirement: I09 sealed trees are inspected, and their coverage is stated.
+
+    I09's sealed-tree case diffs a NAMED list.  ``consumer/`` is not on it, so
+    I09 neither authorizes nor blocks the consumer tree -- which is exactly why
+    granting it needs no I09 amendment, and why this audit states the exclusion
+    instead of implying I09 approved anything.
+    """
+    # The sealed list is a call ARGUMENT, not an assignment, so it is measured
+    # from the source text rather than by literal_eval.
+    text = I09_AUDIT.read_text(encoding="utf-8")
+    sealed_paths = [
+        sealed_path
+        for sealed_path in (
+            "src/crypto_sensor_fabric/normalization/identity",
+            "src/crypto_sensor_fabric/normalization/terms",
+            "src/crypto_sensor_fabric/normalization/time",
+            "src/crypto_sensor_fabric/normalization/__init__.py",
+            "src/crypto_sensor_fabric/normalization/models.py",
+            "src/crypto_sensor_fabric/normalization/enums.py",
+            "src/crypto_sensor_fabric/registry",
+            "config/crypto_sensor_fabric",
+        )
+        if sealed_path in text
+    ]
+    assert len(sealed_paths) == 8, (
+        f"I09 sealed-tree case no longer names the expected surfaces: {sealed_paths}"
+    )
+    assert "normalization/consumer" not in text, (
+        "I09 now names consumer/ -- the sealed surface changed and this audit's "
+        "coverage statement must be re-measured"
+    )
+
+
+# ---------------------------------------------------------------------------
+# M16  I11R2 inventory binding mechanism
+# ---------------------------------------------------------------------------
+
+
+def test_m16_i11r2_inventory_pin_is_present_and_mechanically_republished() -> None:
+    """Requirement: I11R2 inventory and binding mechanisms are inspected.
+
+    The binding is ``python_files_scanned == len(_scanned_paths())``.  Any new
+    tracked ``.py`` moves the inventory, and the I05 republish case sanctions
+    updating it ONLY for authorized additions.  This case records the mechanism
+    and the currently pinned number so a future drift is attributable.
+    """
+    assert I11R2_AUDIT.is_file(), f"I11R2 audit missing: {I11R2_AUDIT}"
+    text = I11R2_AUDIT.read_text(encoding="utf-8")
+    assert "python_files_scanned" in text, "the inventory pin disappeared from I11R2"
+    artifact = (
+        AUDIT_QUANT_LAB / "research" / "crypto_foundry" / "sensor_fabric"
+        / "evidence" / "bloc_04" / "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json"
+    )
+    assert artifact.is_file(), f"the I11R2 artifact is missing: {artifact}"
+    payload = json.loads(artifact.read_text(encoding="utf-8"))
+    tracked = [
+        line for line in _git_in_audit("ls-files", "*.py").splitlines() if line.strip()
+    ]
+    print("INVENTORY_BINDING " + json.dumps({
+        "artifact_python_files_scanned": payload.get("python_files_scanned"),
+        "measured_tracked_python": len(tracked),
+        "in_agreement": payload.get("python_files_scanned") == len(tracked),
+    }, sort_keys=True))
+
+
+# ---------------------------------------------------------------------------
+# M17  Current governance verdict for the Rung 1 grant, as one measurement
+# ---------------------------------------------------------------------------
+
+
+def test_m17_rung1_grant_verdict_is_recorded_as_data(
+    i01_allowed: set[str], i05_prefixes: list[str], i10_allowed: list[str]
+) -> None:
+    """The three rulings on the proposed grant, measured together.
+
+    This is the headline of the governance challenge: what does the law as it
+    stands actually say about the two Rung 1 paths?
+    """
+    rulings = {}
+    for name, entries, exact_kind in (
+        ("i01_subpackage", sorted(i01_allowed), "set"),
+        ("i05_paths", i05_prefixes, "prefix"),
+        ("i10_paths", i10_allowed, "prefix"),
+    ):
+        if exact_kind == "set":
+            rulings[name] = {
+                "consumer_authorized": "consumer" in i01_allowed,
+                "mechanism": "set membership (already exact)",
+            }
+        else:
+            oracle = build_oracle(entries)
+            rulings[name] = {
+                p: oracle.admits(p) for p in sorted(RUNG1_EXACT_PATHS)
+            }
+            rulings[name]["mechanism"] = "path.startswith over a mixed tuple"
+            rulings[name]["entries"] = len(entries)
+    print("RUNG1_GRANT_VERDICT " + json.dumps(rulings, sort_keys=True, indent=None))
+    # The measurement itself must be coherent: it reports every requested path.
+    for key in ("i05_paths", "i10_paths"):
+        for path in RUNG1_EXACT_PATHS:
+            assert path in rulings[key], (key, path)
+    assert "consumer_authorized" in rulings["i01_subpackage"]

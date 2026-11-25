@@ -1,0 +1,210 @@
+"""SENSOR-B5-P3-R6 -- bounded SOURCE mutations against load-bearing controls.
+
+SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT.
+
+NON-COLLECTED research artifact.  Materialize as ``run_source_mutations.py``:
+
+    python run_source_mutations.py \
+        --quant-lab <path>/quant-lab \
+        --probe <RUN>/test_second_agent_p01_p06.py \
+        --out <RUN>/mutation_results.json
+
+WHAT IT DOES, AND WHAT IT REFUSES TO COUNT
+------------------------------------------
+Each mutation is applied to a DISPOSABLE COPY of ``src/`` (never the audited
+tree), then the named probe is run against the mutated package.  A mutation is
+DETECTED only when the intended probe fails on the intended test.  A syntax
+error, a collection error or a fixture error is INVALID and is not counted.  A
+mutation that leaves the probe green is SURVIVED -- that is a finding about the
+control (it is not load-bearing for that input), never a pass.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
+
+POLICY = "crypto_sensor_fabric/normalization/consumer/policy.py"
+AUTHORITY = "crypto_sensor_fabric/normalization/consumer/custody_authority.py"
+
+
+@dataclass(frozen=True)
+class Mutation:
+    name: str
+    file: str
+    edits: tuple[tuple[str, str], ...]
+    selector: str
+    expected_failure: str
+    comment: str
+
+
+MUTATIONS: tuple[Mutation, ...] = (
+    Mutation(
+        name="M1_evidence_rebinding",
+        file=POLICY,
+        edits=(
+            ("            if observed != item.approved_digest:", "            if False:"),
+            ("            if observed != expected:", "            if False:"),
+        ),
+        selector="p05d",
+        expected_failure="test_p05d_bytes_that_change_between_reads_refuse",
+        comment="remove BOTH digest comparisons from the post-verification re-read",
+    ),
+    Mutation(
+        name="M2_replay_adjudication",
+        file=POLICY,
+        edits=(('        blocked = evaluation.eligibility.value != "ELIGIBLE"',
+                "        blocked = False"),),
+        selector="p02a",
+        expected_failure="test_p02a_control_replay_evidence_adjudication_is_policy_owned",
+        comment="make the replay gate advisory instead of blocking",
+    ),
+    Mutation(
+        name="M3_manifest_identity",
+        file=POLICY,
+        edits=((
+            "        digest = manifest_digest(manifest_bytes)\n"
+            "        pin = _authority_pkg.TRUSTED_MANIFEST_SHA256\n"
+            "        if digest != pin:",
+            "        digest = manifest_digest(manifest_bytes)\n"
+            "        pin = _authority_pkg.TRUSTED_MANIFEST_SHA256\n"
+            "        if False:",
+        ),),
+        selector="p03b",
+        expected_failure="test_p03b_a_foreign_manifest_cannot_build_an_authority_source",
+        comment="let the policy be constructed over a caller-supplied root",
+    ),
+    Mutation(
+        name="M4_required_field_inspection",
+        file=POLICY,
+        edits=(("            if name not in verified:", "            if False:"),),
+        selector="a12",
+        expected_failure="test_a12_a_field_outside_the_allowlist_refuses",
+        comment="ignore required_fields (the only field-scope grant)",
+    ),
+    Mutation(
+        name="M5_consumer_custody_prerequisite",
+        file=POLICY,
+        edits=(("        if not derived.custody_verified:", "        if False:"),),
+        selector="a14",
+        expected_failure="test_a14_digest_only_custody_refuses",
+        comment="remove the consumer's own custody prerequisite in _inspect",
+    ),
+    Mutation(
+        name="M6_authority_identity_binding",
+        file=AUTHORITY,
+        edits=(("    if artifact.approval_id != identity.approval_id:", "    if False:"),),
+        selector="p03c",
+        expected_failure="test_p03c_the_derivation_binds_every_identity_element",
+        comment="stop binding the approval id in the authority derivation",
+    ),
+    Mutation(
+        name="M7_empty_manifest_guard",
+        file=AUTHORITY,
+        edits=(("    if not manifest.artifacts:", "    if False:"),),
+        selector="p03a",
+        expected_failure="test_p03a_the_empty_manifest_invariant_holds_for_every_identity",
+        comment="remove the empty-manifest early return",
+    ),
+)
+
+
+def apply_mutations(source_src: Path, destination: Path, mutation: Mutation) -> None:
+    shutil.copytree(source_src, destination)
+    path = destination / mutation.file
+    text = path.read_text(encoding="utf-8")
+    for old, new in mutation.edits:
+        count = text.count(old)
+        if count != 1:
+            raise SystemExit(
+                f"{mutation.name}: anchor appears {count} times (expected 1) in "
+                f"{mutation.file}; the source moved, so the mutation is not applied"
+            )
+        text = text.replace(old, new)
+    path.write_text(text, encoding="utf-8")
+
+
+def run_probe(quant_lab: Path, probe: Path, selector: str, python_path: Path) -> dict:
+    env = {
+        **os.environ,
+        "AUDIT_QUANT_LAB": str(quant_lab),
+        "PYTHONPATH": str(python_path),
+        "PYTHONIOENCODING": "utf-8",
+    }
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", str(probe), "-q", "-p", "no:cacheprovider",
+         "-k", selector, "--tb=no"],
+        capture_output=True, encoding="utf-8", errors="replace", check=False, env=env,
+    )
+    lines = [line for line in result.stdout.splitlines() if line.strip()]
+    return {
+        "exit": result.returncode,
+        "summary": lines[-1] if lines else "",
+        "failing": [line for line in lines if line.startswith(("FAILED", "ERROR"))][:4],
+        "stderr_tail": result.stderr.strip().splitlines()[-4:] if result.stderr.strip() else [],
+    }
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--quant-lab", required=True)
+    parser.add_argument("--probe", required=True)
+    parser.add_argument("--out", required=True)
+    args = parser.parse_args()
+    quant_lab = Path(args.quant_lab).resolve()
+    probe = Path(args.probe).resolve()
+    source_src = quant_lab / "src"
+    control_selector = " or ".join(sorted({m.selector for m in MUTATIONS}))
+    rows: list[dict] = []
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        control = run_probe(quant_lab, probe, control_selector, source_src)
+        rows.append({"mutation": "CONTROL_pristine", "disposition": "control", **control})
+        if control["exit"] != 0:
+            Path(args.out).write_text(json.dumps(rows, indent=2), encoding="utf-8")
+            print(json.dumps({"fatal": "control is not green", "control": control}, indent=2))
+            return 2
+
+        for index, mutation in enumerate(MUTATIONS):
+            target = root / f"mut_{index}"
+            try:
+                apply_mutations(source_src, target, mutation)
+            except SystemExit as exc:
+                rows.append({"mutation": mutation.name, "disposition": "INVALID",
+                             "reason": str(exc)})
+                continue
+            observation = run_probe(quant_lab, probe, mutation.selector, target)
+            invalid = observation["exit"] == 4 or "error" in observation["summary"].lower()
+            if invalid:
+                disposition = "INVALID"
+            elif observation["exit"] == 0:
+                disposition = "SURVIVED"
+            elif any(mutation.expected_failure in line for line in observation["failing"]):
+                disposition = "DETECTED"
+            else:
+                disposition = "DETECTED_OTHER"
+            rows.append({
+                "mutation": mutation.name,
+                "target": mutation.file,
+                "comment": mutation.comment,
+                "selector": mutation.selector,
+                "expected_failure": mutation.expected_failure,
+                "disposition": disposition,
+                **observation,
+            })
+
+    Path(args.out).write_text(json.dumps(rows, indent=2), encoding="utf-8")
+    print(json.dumps(rows, indent=2))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

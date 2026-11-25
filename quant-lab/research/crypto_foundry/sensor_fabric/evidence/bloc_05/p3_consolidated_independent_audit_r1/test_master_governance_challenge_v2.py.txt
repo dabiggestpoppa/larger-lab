@@ -1,0 +1,858 @@
+"""SENSOR-B5-P3-R6-INDEPENDENT-ACCEPTANCE-R1 -- governance reattack, v2.
+
+SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT.
+
+NON-COLLECTED research artifact: it lives as ``.py.txt`` so the canonical suite
+never discovers it.  Materialize it into a temporary directory to execute it.
+
+WHY A v2
+--------
+The R0 probe (``p3_production_master_audit_r0``) parsed the I05 allowlist as a
+function-local ``allowed_prefixes`` and reconstructed an oracle from it.  At R5
+the law moved the tuple to module scope (``ALLOWED_PREFIXES``) and added a second
+mechanism (``P3_MASTER_EXACT_PATHS``, admitted by equality).  Twelve R0 cases
+therefore ERRORED on a stale assumption rather than measuring anything.  v2 does
+not repair the oracle by guessing: it **imports the shipped audit module in a
+subprocess and calls its own ``_authorized``**, so the predicate measured is the
+one that actually runs.  Structure is never substituted for behaviour.
+
+WHAT IS MEASURED
+----------------
+1.  The exact admitted path set: base predicate (R0) vs live predicate (R5),
+    over every path that either could touch.  The delta must be exactly the
+    disclosed grant, with zero revocations.
+2.  New exact-file authority: for each disclosed path, a suffix variant must be
+    refused (the defect R0 reported is closed for the new grant).
+3.  Preserved historical prefix weakness: file-kind entries that predate the
+    grant are still admitted by ``startswith``.  The count must not GROW.
+4.  Evidence integrity: frozen artifacts, the generated SEM inventory, the I11R2
+    count progression (1102 -> 1111), the I09 sealed surface, the I08 amendment.
+5.  Provenance: AUTH -> R1 -> ... -> R5, and every src/tests path each commit
+    touches is authorized by the live predicate.
+
+EXECUTION
+---------
+    AUDIT_QUANT_LAB=<path to quant-lab> \
+        python -m pytest <RUN>/test_master_governance_challenge_v2.py -v -rs
+
+OFFLINE.  One disposable git repository, created and removed by the case that
+needs it.  No writes to the audited tree.
+"""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+from typing import Any, Iterable, Sequence
+
+import pytest
+
+_ENV = os.environ.get("AUDIT_QUANT_LAB", "").strip()
+AUDIT_QUANT_LAB = (
+    Path(_ENV).resolve() if _ENV else (Path.cwd() / "quant-lab").resolve()
+)
+AUDIT_READY = (AUDIT_QUANT_LAB / "src" / "crypto_sensor_fabric").is_dir()
+pytestmark = pytest.mark.skipif(
+    not AUDIT_READY,
+    reason=f"AUDIT_QUANT_LAB is not a quant-lab tree: {AUDIT_QUANT_LAB}",
+)
+
+_NORM = AUDIT_QUANT_LAB / "tests" / "crypto_sensor_fabric" / "normalization"
+I01_AUDIT = _NORM / "test_b5_i01_scope_audit.py"
+I05_AUDIT = _NORM / "test_b5_i05_scope_audit.py"
+I08_AUDIT = _NORM / "test_b5_i08_scope_audit.py"
+I09_AUDIT = _NORM / "test_b5_i09_scope_audit.py"
+I10_AUDIT = _NORM / "test_b5_i10_scope_audit.py"
+I11R2_AUDIT = (
+    AUDIT_QUANT_LAB / "tests" / "crypto_sensor_fabric" / "storage"
+    / "test_i11r2_binding_audit.py"
+)
+MANIFEST = (
+    AUDIT_QUANT_LAB / "config" / "crypto_sensor_fabric"
+    / "provider_semantics" / "approval_manifest.json"
+)
+EVIDENCE = (
+    AUDIT_QUANT_LAB / "research" / "crypto_foundry" / "sensor_fabric"
+    / "evidence" / "bloc_05"
+)
+I11R2_ARTIFACT = (
+    AUDIT_QUANT_LAB / "research" / "crypto_foundry" / "sensor_fabric"
+    / "evidence" / "bloc_04" / "BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json"
+)
+SEM_INVENTORY = EVIDENCE / "bloc_05_semantic_validation.json"
+
+#: The commit the P3 grant is measured against (the authorization packet).
+AUTHORIZATION_BASE = "13086755d22a539c6a4dcb20e782bce97fcde82d"
+#: The published implementation lineage, in order.
+LINEAGE = (
+    ("AUTH", "f4972cba898d6e202a32ba2566bb30fce4566ab2"),
+    ("R1", "198e2aaab4721e087a430e7c781a58bfa0edc482"),
+    ("R2", "7cb7763b9d8a1d8a1f492c879ca4e421c32c1743"),
+    ("R3", "7155cbf60f12fd1b9c2ad48188baa532089933bd"),
+    ("R4", "6af9200faf0e06e1f42f331e05efc1dcba508fba"),
+    ("R5", "5ee268b1d872fe4040d2d1505d012f344e7b5d54"),
+)
+
+#: The eleven paths the AUTH commit discloses (four sources, seven tests).
+DISCLOSED_EXACT_PATHS = frozenset(
+    {
+        "src/crypto_sensor_fabric/normalization/consumer/__init__.py",
+        "src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+    }
+)
+
+#: Paths that must stay refused even though they live in the granted directory.
+MUST_REFUSE = (
+    "src/crypto_sensor_fabric/normalization/consumer/rebinding.py",
+    "src/crypto_sensor_fabric/normalization/consumer/rebinding_v2.py",
+    "src/crypto_sensor_fabric/normalization/consumer/models.py_suffix.py",
+    "src/crypto_sensor_fabric/normalization/consumer/models.pyc",
+    "src/crypto_sensor_fabric/normalization/consumer/models.py/../policy.py",
+    "src/crypto_sensor_fabric/normalization/consumer/",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py_evil.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_trust.py",
+)
+
+#: Historical admission samples: prefix grants that must not be revoked.
+HISTORICAL_SAMPLES = (
+    "src/crypto_sensor_fabric/normalization/sensors/trade.py",
+    "src/crypto_sensor_fabric/normalization/authority/__init__.py",
+    "src/crypto_sensor_fabric/normalization/time/replay_gate.py",
+    "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i10_trade_semantics.py",
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/README.md",
+)
+
+#: Frozen bloc-05 artifacts.  The generated ones are named separately because a
+#: generated inventory's lawful maintenance IS republication -- provided the
+#: republished rows still verify against the bytes they pin.
+FROZEN_ARTIFACTS = (
+    "BLOC_05_I01_TYPE_SCOPE_MATRIX.json",
+    "BLOC_05_I01_IMPLEMENTATION_EVIDENCE.md",
+    "BLOC_05_I01_OPERATOR_RATIFICATION.md",
+    "BLOC_05_I10_IMPLEMENTATION_EVIDENCE.md",
+    "BLOC_05_I10_OPERATOR_RATIFICATION.md",
+    "bloc_05_unit_validation.json",
+    "bloc_05_semantic_validation.json",
+)
+GENERATED_ARTIFACTS = frozenset({"bloc_05_semantic_validation.json"})
+
+
+# ---------------------------------------------------------------------------
+# Git + AST
+# ---------------------------------------------------------------------------
+
+
+def _git(*args: str) -> str:
+    return subprocess.run(
+        ["git", "-C", str(AUDIT_QUANT_LAB), *args],
+        capture_output=True, encoding="utf-8", errors="replace", check=False,
+    ).stdout
+
+
+def _parse_source(text: str) -> ast.Module:
+    return ast.parse(text)
+
+
+def _module_value(tree: ast.Module, name: str) -> Any:
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == name:
+                    return _literal(node.value)
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            if node.target.id == name and node.value is not None:
+                return _literal(node.value)
+    raise LookupError(f"{name!r} is not assigned at module level")
+
+
+def _literal(node: ast.AST) -> Any:
+    """Evaluate a literal allowlist, folding string concatenation only.
+
+    The shipped grants are written as ``frozenset({...})`` and as bare tuples,
+    so the container constructor is folded rather than treated as dynamic.
+    """
+    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+        if node.func.id in {"frozenset", "set", "tuple", "list"} and len(node.args) == 1:
+            value = _literal(node.args[0])
+            if node.func.id == "frozenset":
+                return frozenset(value)
+            if node.func.id == "set":
+                return set(value)
+            if node.func.id == "tuple":
+                return tuple(value)
+            return list(value)
+    if isinstance(node, ast.Constant):
+        return node.value
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        left, right = _literal(node.left), _literal(node.right)
+        if isinstance(left, str) and isinstance(right, str):
+            return left + right
+        raise ValueError(f"non-string concatenation: {left!r} + {right!r}")
+    if isinstance(node, (ast.Tuple, ast.List, ast.Set)):
+        values = [_literal(element) for element in node.elts]
+        if isinstance(node, ast.Tuple):
+            return tuple(values)
+        if isinstance(node, ast.Set):
+            return set(values)
+        return values
+    raise ValueError(f"allowlist entry is not a literal: {ast.dump(node)}")
+
+
+def _legacy_prefixes(audit_path: Path) -> tuple[str, ...]:
+    return tuple(_module_value(_parse_source(audit_path.read_text(encoding="utf-8")), "ALLOWED_PREFIXES"))
+
+
+def _exact_paths(audit_path: Path) -> frozenset[str]:
+    tree = _parse_source(audit_path.read_text(encoding="utf-8"))
+    try:
+        return frozenset(_module_value(tree, "P3_MASTER_EXACT_PATHS"))
+    except LookupError:
+        return frozenset()
+
+
+_PYTHON_PATH = os.pathsep.join([str(AUDIT_QUANT_LAB / "src"), str(_NORM)])
+
+
+def live_admits(audit_module: str, candidates: Sequence[str]) -> dict[str, bool]:
+    """Call the SHIPPED predicate.  Behaviour, not a reconstruction of it.
+
+    The audit module is imported in a clean subprocess and its own
+    ``_authorized`` is applied to every candidate.  If the predicate is renamed
+    or removed this raises rather than silently falling back to an oracle.
+    """
+    code = (
+        "import json, sys\n"
+        f"import {audit_module} as law\n"
+        "candidates = json.load(sys.stdin)\n"
+        "print(json.dumps({c: bool(law._authorized(c)) for c in candidates}))\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        input=json.dumps(list(candidates)),
+        cwd=str(AUDIT_QUANT_LAB),
+        capture_output=True, encoding="utf-8", errors="replace", check=False,
+        env={**os.environ, "PYTHONPATH": _PYTHON_PATH},
+    )
+    assert result.returncode == 0, (
+        f"the shipped predicate could not be imported from {audit_module}: "
+        f"{result.stderr[-1500:]}"
+    )
+    return json.loads(result.stdout.strip().splitlines()[-1])
+
+
+def _legacy_prefixes_from_text(text: str) -> tuple[str, ...]:
+    """Read the pre-amendment tuple from a historical source text.
+
+    Three shapes exist across the history: module-level ``ALLOWED_PREFIXES``
+    (I05 and I10 today), a function-local ``allowed_prefixes`` (I05 at the
+    authorization base) and a function-local ``allowed`` (I10 at the base).
+    Guessing one of them turned a measurement into a LookupError, which is why
+    all three are tried by name.
+    """
+    tree = _parse_source(text)
+    for name in ("ALLOWED_PREFIXES", "allowed_prefixes", "allowed"):
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    if isinstance(target, ast.Name) and target.id == name:
+                        return tuple(_literal(node.value))
+    raise LookupError("no allowlist assignment found in the historical source")
+
+
+def classify(entry: str) -> str:
+    if entry.endswith("/"):
+        return "dir"
+    if "." in entry.rsplit("/", 1)[-1]:
+        return "file"
+    return "legacy_prefix"
+
+
+# ---------------------------------------------------------------------------
+# M1-M3  I01 subpackage membership
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture(scope="module")
+def i01_allowed() -> set[str]:
+    tree = _parse_source(I01_AUDIT.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == "test_only_authorized_subpackages_exist":
+            for sub in ast.walk(node):
+                if isinstance(sub, ast.Assign):
+                    for target in sub.targets:
+                        if isinstance(target, ast.Name) and target.id == "allowed":
+                            return set(_literal(sub.value))
+    raise LookupError("I01 no longer assigns `allowed` in its membership case")
+
+
+def test_m1_i01_prospectively_authorizes_the_consumer_subpackage(i01_allowed: set[str]) -> None:
+    """Requirement: the consumer subpackage is a NAMED member of I01."""
+    assert "consumer" in i01_allowed, (
+        f"PRE_AMENDMENT: I01 admits {sorted(i01_allowed)}; 'consumer' is absent"
+    )
+
+
+def test_m2_i01_historical_membership_is_not_revoked(i01_allowed: set[str]) -> None:
+    """Requirement: no historical subpackage lost its grant."""
+    historical = {"identity", "terms", "time", "common", "sensors", "authority"}
+    assert historical - i01_allowed == set(), sorted(historical - i01_allowed)
+
+
+def test_m3_i01_membership_is_exact_not_prefix_based(i01_allowed: set[str]) -> None:
+    """Positive control for M1/M2: the parsed value is a real, exact set."""
+    assert isinstance(i01_allowed, set) and i01_allowed
+    for near_miss in ("consumerx", "Consumers", "consumer ", "consumer/", "sensors2"):
+        assert near_miss not in i01_allowed, near_miss
+
+
+# ---------------------------------------------------------------------------
+# M4-M5  The new exact grant is exact under the SHIPPED predicate
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m4_new_exact_paths_are_admitted_and_variants_refuse(which: str) -> None:
+    """Requirement: every disclosed path admits, and no variant of it does."""
+    audit = I05_AUDIT if which == "i05" else I10_AUDIT
+    module = f"test_b5_{which}_scope_audit"
+    exact = _exact_paths(audit)
+    assert exact == DISCLOSED_EXACT_PATHS, (
+        f"{which}: the exact-file grant is not the disclosed set; "
+        f"added={sorted(exact - DISCLOSED_EXACT_PATHS)} "
+        f"missing={sorted(DISCLOSED_EXACT_PATHS - exact)}"
+    )
+    prefixes = _legacy_prefixes(audit)
+    # A path that already sits inside a historical prefix is admitted by that
+    # prefix, not by the exact grant, so its variant is expected to pass.  Those
+    # paths are measured separately instead of being quietly excused.
+    legacy_covered = sorted(p for p in exact if p.startswith(tuple(prefixes)))
+    exact_only = sorted(exact - set(legacy_covered))
+    candidates = sorted(exact) + [entry + "_evil.py" for entry in exact_only] + [
+        entry + "_evil.py" for entry in legacy_covered
+    ]
+    verdicts = live_admits(module, candidates)
+    refused_variants = [c for c in candidates if c.endswith("_evil.py") and verdicts[c]]
+    leaked = [v for v in refused_variants if v not in {
+        entry + "_evil.py" for entry in legacy_covered
+    }]
+    print(f"P3_GRANT {which} " + json.dumps({
+        "exact_only": len(exact_only), "legacy_covered": legacy_covered,
+        "legacy_covered_variants_admitted": len(refused_variants),
+    }, sort_keys=True))
+    assert leaked == [], (
+        f"{which}: the NEW exact grant still admits a suffix variant: {leaked[:3]}"
+    )
+    assert legacy_covered == [
+        p for p in exact if p.endswith(("test_b5_i08_scope_audit.py", "test_b5_i10_scope_audit.py"))
+    ], legacy_covered
+    not_admitted = [p for p in exact if not verdicts[p]]
+    assert not_admitted == [], f"{which}: granted paths are not admitted: {not_admitted}"
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m5_exact_admitted_path_set_delta_is_the_grant(which: str) -> None:
+    """Requirement: the grant is the delta, and nothing was revoked.
+
+    Measures base predicate vs live predicate over every tracked Python path,
+    every disclosed path, every refused variant and the historical samples.
+    """
+    audit = I05_AUDIT if which == "i05" else I10_AUDIT
+    module = f"test_b5_{which}_scope_audit"
+    prefixes = _legacy_prefixes(audit)
+    universe = sorted(
+        {p for p in _git("ls-tree", "-r", "--name-only", "HEAD").splitlines() if p}
+        | {p.removeprefix("quant-lab/") for p in
+           _git("ls-tree", "-r", "--name-only", AUTHORIZATION_BASE).splitlines() if p}
+        | set(DISCLOSED_EXACT_PATHS)
+        | set(MUST_REFUSE)
+        | set(HISTORICAL_SAMPLES)
+    )
+    verdicts = live_admits(module, universe)
+    base_prefixes = _legacy_prefixes_from_text(
+        _git("show", f"{AUTHORIZATION_BASE}:quant-lab/tests/crypto_sensor_fabric/"
+                     "normalization/test_b5_i05_scope_audit.py")
+    )
+    # The base predicate is measured on the I05 tuple only where it applies; for
+    # I10 the base tuple is read from I10's own base source.
+    if which == "i10":
+        base_prefixes = _legacy_prefixes_from_text(
+            _git("show", f"{AUTHORIZATION_BASE}:quant-lab/tests/crypto_sensor_fabric/"
+                         "normalization/test_b5_i10_scope_audit.py")
+        )
+
+    def base(path: str) -> bool:
+        if ".." in Path(path).parts:
+            return False
+        return path.startswith(base_prefixes)
+
+    added = sorted(p for p in universe if verdicts[p] and not base(p))
+    removed = sorted(p for p in universe if base(p) and not verdicts[p])
+    print(f"PATH_SET_DELTA {which} " + json.dumps({
+        "prefix_entries": len(prefixes), "exact_entries": len(_exact_paths(audit)),
+        "added": added, "removed": removed, "universe": len(universe),
+    }, sort_keys=True))
+    assert removed == [], f"{which}: the amendment REVOKED live admission: {removed[:5]}"
+    assert set(added) <= DISCLOSED_EXACT_PATHS, (
+        f"{which}: the amendment admitted paths beyond the disclosed grant: "
+        f"{sorted(set(added) - DISCLOSED_EXACT_PATHS)[:5]}"
+    )
+    assert added, f"{which}: the grant admitted nothing -- the measurement is vacuous"
+
+
+# ---------------------------------------------------------------------------
+# M6-M7  Preserved historical prefix weakness: measured, and must not grow
+# ---------------------------------------------------------------------------
+
+
+def _prefix_admitted_file_entries(prefixes: Iterable[str]) -> list[str]:
+    return sorted(e for e in prefixes if classify(e) == "file")
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m6_historical_prefix_weakness_did_not_grow(which: str) -> None:
+    """Requirement: the pre-existing law defect keeps its exact blast radius.
+
+    Every file-kind entry that predates the grant is still tested with
+    ``startswith``, so ``<entry>_evil.py`` is admitted.  That weakness is
+    preserved by operator directive; what must NOT happen is a NEW entry joining
+    it.  The count is compared with the base commit's own tuple.
+    """
+    audit = I05_AUDIT if which == "i05" else I10_AUDIT
+    module = f"test_b5_{which}_scope_audit"
+    live_prefixes = _legacy_prefixes(audit)
+    base_prefixes = _legacy_prefixes_from_text(
+        _git("show", f"{AUTHORIZATION_BASE}:quant-lab/tests/crypto_sensor_fabric/"
+                     f"normalization/test_b5_{which}_scope_audit.py")
+    )
+    live_files = _prefix_admitted_file_entries(live_prefixes)
+    base_files = _prefix_admitted_file_entries(base_prefixes)
+    variants = [e + "_evil.py" for e in live_files]
+    verdicts = live_admits(module, variants) if variants else {}
+    offenders = [v for v in variants if verdicts.get(v)]
+    print(f"HISTORICAL_PREFIX_WEAKNESS {which} " + json.dumps({
+        "live_file_entries": len(live_files), "base_file_entries": len(base_files),
+        "prefix_admitted_variants": len(offenders),
+        "new_file_entries": sorted(set(live_files) - set(base_files)),
+    }, sort_keys=True))
+    assert set(live_files) == set(base_files), (
+        f"{which}: the grant added prefix-tested file entries "
+        f"{sorted(set(live_files) - set(base_files))}"
+    )
+    assert len(offenders) == len(live_files), (
+        f"{which}: the historical weakness is not what was measured: "
+        f"{len(offenders)}/{len(live_files)} variants admitted"
+    )
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m7_required_oracle_refuses_what_the_law_admits(which: str) -> None:
+    """Positive control for M6: equality-oracle refuses every variant."""
+    audit = I05_AUDIT if which == "i05" else I10_AUDIT
+    prefixes = _legacy_prefixes(audit)
+    exact = _exact_paths(audit)
+    for entry in prefixes:
+        if classify(entry) != "file" or entry in exact:
+            continue
+        suffix = entry + "_evil.py"
+        assert suffix.startswith(entry) and suffix not in exact, suffix
+
+
+# ---------------------------------------------------------------------------
+# M8-M9  Unauthorized siblings, traversal and historical admission
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m8_unauthorized_siblings_variants_and_traversal_refuse(which: str) -> None:
+    """Requirement: a grant for files is not a grant for the directory."""
+    module = f"test_b5_{which}_scope_audit"
+    verdicts = live_admits(module, MUST_REFUSE)
+    admitted = sorted(p for p in MUST_REFUSE if verdicts[p])
+    assert admitted == [], f"{which}: unauthorized paths admitted: {admitted}"
+
+
+@pytest.mark.parametrize("which", ["i05", "i10"])
+def test_m9_historical_admission_samples_are_not_revoked(which: str) -> None:
+    """Requirement: no path the BASE predicate admitted is refused now.
+
+    The sample set is not universal: I10 never covered ``time/``.  The expected
+    set is therefore derived from the base predicate itself, not from a list
+    this auditor believes should be admitted.
+    """
+    module = f"test_b5_{which}_scope_audit"
+    base_prefixes = _legacy_prefixes_from_text(
+        _git("show", f"{AUTHORIZATION_BASE}:quant-lab/tests/crypto_sensor_fabric/"
+                     f"normalization/test_b5_{which}_scope_audit.py")
+    )
+    expected = [p for p in HISTORICAL_SAMPLES if p.startswith(base_prefixes)]
+    assert expected, f"{which}: fixture failure -- the base admitted none of the samples"
+    verdicts = live_admits(module, expected)
+    refused = sorted(p for p in expected if not verdicts[p])
+    assert refused == [], f"{which}: live grants were revoked: {refused}"
+
+
+# ---------------------------------------------------------------------------
+# M10  Tri-state custody views agree, under the shipped predicate
+# ---------------------------------------------------------------------------
+
+
+def test_m10_tri_state_views_agree_under_the_shipped_predicate() -> None:
+    """Requirement: staged, unstaged and untracked are judged identically."""
+    prefix = "src/crypto_sensor_fabric/normalization/consumer/"
+    with tempfile.TemporaryDirectory() as tmp:
+        repo = Path(tmp)
+
+        def git(*args: str) -> str:
+            return subprocess.run(
+                ["git", *args], cwd=repo, capture_output=True,
+                encoding="utf-8", errors="replace", check=False,
+            ).stdout
+
+        git("init", "-q")
+        git("config", "user.email", "audit@example.invalid")
+        git("config", "user.name", "audit")
+        (repo / "seed.txt").write_text("seed\n", encoding="utf-8")
+        git("add", "seed.txt")
+        git("commit", "-q", "-m", "seed")
+        target = repo / Path(prefix)
+        target.mkdir(parents=True, exist_ok=True)
+
+        (target / "untracked_probe.py").write_text("x = 1\n", encoding="utf-8")
+        (target / "unstaged_probe.py").write_text("x = 1\n", encoding="utf-8")
+        git("add", str(Path(prefix) / "unstaged_probe.py"))
+        git("commit", "-q", "-m", "track")
+        (target / "unstaged_probe.py").write_text("x = 2\n", encoding="utf-8")
+        (target / "staged_probe.py").write_text("x = 1\n", encoding="utf-8")
+        git("add", str(Path(prefix) / "staged_probe.py"))
+        # A sibling that must be refused in every view.
+        (target / "not_granted.py").write_text("x = 1\n", encoding="utf-8")
+        git("add", str(Path(prefix) / "not_granted.py"))
+
+        views = {
+            "staged": [l for l in git("diff", "--cached", "--name-only").splitlines() if l.strip()],
+            "unstaged": [l for l in git("diff", "--name-only").splitlines() if l.strip()],
+            "untracked": [l for l in git("ls-files", "--others",
+                                         "--exclude-standard").splitlines() if l.strip()],
+        }
+    assert all(views.values()), f"fixture failure: {views}"
+    universe = sorted({p for paths in views.values() for p in paths})
+    first = {p: live_admits("test_b5_i05_scope_audit", [p])[p] for p in universe}
+    # every view must reach the SAME ruling for the same path
+    disagreement = {
+        p: verdict for p, verdict in first.items()
+        if live_admits("test_b5_i05_scope_audit", [p])[p] != verdict
+    }
+    assert disagreement == {}, disagreement
+    refused_everywhere = sorted(p for p, v in first.items() if not v)
+    admitted = sorted(p for p, v in first.items() if v)
+    assert "src/crypto_sensor_fabric/normalization/consumer/not_granted.py" in refused_everywhere
+    assert "src/crypto_sensor_fabric/normalization/consumer/staged_probe.py" in refused_everywhere
+    print("TRI_STATE " + json.dumps({"admitted": admitted, "refused": refused_everywhere}))
+
+
+# ---------------------------------------------------------------------------
+# M11-M12  Evidence integrity and the SEM republication (G15)
+# ---------------------------------------------------------------------------
+
+
+def test_m11_non_generated_frozen_artifacts_are_unmodified() -> None:
+    """Requirement: hand-written historical evidence is not rewritten."""
+    modified: list[str] = []
+    for artifact in FROZEN_ARTIFACTS:
+        # git runs from quant-lab, so the pathspec is quant-lab-relative.  A
+        # "quant-lab/"-prefixed pathspec matches nothing and silently reports
+        # "unchanged" for every artifact -- a vacuous green.
+        rel = f"research/crypto_foundry/sensor_fabric/evidence/bloc_05/{artifact}"
+        status = _git("diff", "--name-status", AUTHORIZATION_BASE, "--", rel)
+        if any(line.strip() for line in status.splitlines()):
+            modified.append(artifact)
+    offending = sorted(set(modified) - GENERATED_ARTIFACTS)
+    print("FROZEN_MODIFIED " + json.dumps({"modified": modified}))
+    assert "bloc_05_semantic_validation.json" in modified, (
+        "positive control failed: the generated inventory is known to have been "
+        "republished, so 'unchanged' means the pathspec measured nothing"
+    )
+    assert offending == [], f"hand-written evidence was rewritten: {offending}"
+
+
+def test_m12_generated_inventory_republication_is_truthful() -> None:
+    """Requirement: a republished generator output still verifies its rows."""
+    payload = json.loads(SEM_INVENTORY.read_text(encoding="utf-8"))
+    assert payload.get("generator"), "the SEM artifact no longer declares a generator"
+    inventory: dict[str, str] = payload["sha256_inventory"]
+    stale, missing = [], []
+    for rel, digest in inventory.items():
+        path = AUDIT_QUANT_LAB / rel
+        if not path.is_file():
+            missing.append(rel)
+            continue
+        if hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+            stale.append(rel)
+    base_payload = json.loads(
+        _git("show", f"{AUTHORIZATION_BASE}:quant-lab/research/crypto_foundry/"
+                     "sensor_fabric/evidence/bloc_05/bloc_05_semantic_validation.json")
+    )
+    base_inventory = base_payload["sha256_inventory"]
+    moved = sorted(
+        rel for rel in inventory
+        if base_inventory.get(rel) != inventory[rel]
+    )
+    added_rows = sorted(set(inventory) - set(base_inventory))
+    print("SEM_REPUBLICATION " + json.dumps({
+        "rows": len(inventory), "moved": moved, "added_rows": added_rows,
+        "stale": stale, "missing": missing,
+    }, sort_keys=True))
+    assert missing == [] and stale == [], {"stale": stale, "missing": missing}
+    assert moved == [
+        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+    ], f"undisclosed rows moved: {moved}"
+
+
+# ---------------------------------------------------------------------------
+# M13-M14  Manifest and integration state
+# ---------------------------------------------------------------------------
+
+
+def test_m13_shipped_manifest_still_grants_nothing() -> None:
+    payload = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    digest = hashlib.sha256(MANIFEST.read_bytes()).hexdigest()
+    print("MANIFEST " + json.dumps({
+        "sha256": digest, "authority_id": payload.get("authority_id"),
+        "schema_version": payload.get("schema_version"),
+        "approved_artifacts": len(payload.get("artifacts", {})),
+    }, sort_keys=True))
+    assert payload.get("artifacts") == {}, sorted(payload.get("artifacts", {}))
+    assert payload.get("revoked_approval_ids") == []
+
+
+def test_m14_integration_state_is_unchanged_since_authorization_base() -> None:
+    watched = (
+        "config/crypto_sensor_fabric/provider_semantics",
+        "config/crypto_sensor_fabric/integration_state",
+    )
+    changed: list[str] = []
+    for path in watched:
+        changed.extend(
+            line for line in _git("diff", "--name-status", AUTHORIZATION_BASE, "--", path).splitlines()
+            if line.strip()
+        )
+    # positive control: the same mechanism must SEE a known-changed tree
+    probe_diff = _git(
+        "diff", "--name-status", AUTHORIZATION_BASE, "--",
+        "src/crypto_sensor_fabric/normalization/consumer",
+    )
+    assert any(line.strip() for line in probe_diff.splitlines()), (
+        "positive control failed: the diff mechanism reports nothing for a tree "
+        "that certainly changed, so an empty result here proves nothing"
+    )
+    assert changed == [], changed
+
+
+# ---------------------------------------------------------------------------
+# M15-M16  I09 sealed surface and the I11R2 inventory progression
+# ---------------------------------------------------------------------------
+
+
+def test_m15_i09_sealed_surface_is_measured_and_excludes_consumer() -> None:
+    text = I09_AUDIT.read_text(encoding="utf-8")
+    surfaces = (
+        "src/crypto_sensor_fabric/normalization/identity",
+        "src/crypto_sensor_fabric/normalization/terms",
+        "src/crypto_sensor_fabric/normalization/time",
+        "src/crypto_sensor_fabric/normalization/__init__.py",
+        "src/crypto_sensor_fabric/normalization/models.py",
+        "src/crypto_sensor_fabric/normalization/enums.py",
+        "src/crypto_sensor_fabric/registry",
+        "config/crypto_sensor_fabric",
+    )
+    present = [s for s in surfaces if s in text]
+    assert len(present) == 8, present
+    assert "normalization/consumer" not in text, (
+        "I09 now names consumer/: the sealed-surface statement must be re-measured"
+    )
+
+
+def test_m16_i11r2_progression_is_1111_and_equals_the_measured_count() -> None:
+    """Requirement: 1102 -> 1111 is +9 authorized files, not a lost count."""
+    payload = json.loads(I11R2_ARTIFACT.read_text(encoding="utf-8"))
+    # The I11R2 audit runs `git ls-files '*.py'` from the REPOSITORY ROOT.  From
+    # quant-lab it would count only this subtree (696), which is exactly the
+    # measurement error the artifact's own history records.
+    repo_root = AUDIT_QUANT_LAB.parent
+    tracked = [
+        l for l in subprocess.run(
+            ["git", "-C", str(repo_root), "ls-files", "*.py"],
+            capture_output=True, encoding="utf-8", errors="replace", check=False,
+        ).stdout.splitlines() if l.strip()
+    ]
+    base_tracked = [
+        l for l in subprocess.run(
+            ["git", "-C", str(repo_root), "ls-tree", "-r", "--name-only", AUTHORIZATION_BASE],
+            capture_output=True, encoding="utf-8", errors="replace", check=False,
+        ).stdout.splitlines() if l.endswith(".py")
+    ]
+    added = sorted(
+        p.removeprefix("quant-lab/") for p in set(tracked) - set(base_tracked)
+    )
+    expected_added = sorted(
+        p for p in DISCLOSED_EXACT_PATHS if p.endswith(".py")
+        and not p.startswith("tests/crypto_sensor_fabric/normalization/test_b5_i10")
+        and not p.startswith("tests/crypto_sensor_fabric/normalization/test_b5_i08")
+    )
+    print("I11R2 " + json.dumps({
+        "artifact": payload.get("python_files_scanned"),
+        "measured": len(tracked), "base": len(base_tracked),
+        "added_count": len(added), "added": added,
+    }, sort_keys=True))
+    assert payload["python_files_scanned"] == len(tracked), (
+        payload["python_files_scanned"], len(tracked)
+    )
+    assert len(tracked) == len(base_tracked) + 9, (len(base_tracked), len(tracked))
+    assert added == expected_added, {"added": added, "expected": expected_added}
+    assert payload.get("unexpected_hits") == {}, payload.get("unexpected_hits")
+
+
+# ---------------------------------------------------------------------------
+# M17-M18  G16: the I08 sealed-tree amendment
+# ---------------------------------------------------------------------------
+
+
+def test_m17_i08_amendment_is_additive_and_pathspec_scoped() -> None:
+    text = I08_AUDIT.read_text(encoding="utf-8")
+    # the diff this law evaluates is confined to the normalization package
+    assert 'I08_BASE_HEAD' in text
+    assert '"--", "src/crypto_sensor_fabric/normalization"' in text or (
+        '"--",\n        "src/crypto_sensor_fabric/normalization"' in text
+    ), "the I08 diff pathspec moved; the amendment's scope must be re-measured"
+    # the historical branches are still present, and exactly one was added
+    for branch in ('"/common/"', '"/sensors/"', '"/authority/"'):
+        assert branch in text, branch
+    assert '"/consumer/"' in text
+    added = text.count('"/consumer/"')
+    assert added == 1, f"the consumer branch appears {added} times"
+
+
+#: The I08/I09 evidence producers spawn a numpy/OpenBLAS process.  On a loaded
+#: host that allocator aborts ("Memory allocation still failed after 10 retries")
+#: and the audit fails for a reason that has nothing to do with the law it
+#: measures.  That is classified ENVIRONMENT and recorded, never counted as a
+#: product pass or a product failure.
+_ENVIRONMENT_ABORT = "OpenBLAS error"
+
+
+def _audit_run(paths: Sequence[Path]) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, "-m", "pytest", *[str(p) for p in paths],
+         "-q", "-p", "no:cacheprovider"],
+        cwd=str(AUDIT_QUANT_LAB), capture_output=True, encoding="utf-8",
+        errors="replace", check=False,
+        env={**os.environ, "PYTHONPATH": str(AUDIT_QUANT_LAB / "src")},
+    )
+
+
+def test_m18_i08_law_executes_green_at_this_commit() -> None:
+    """Behavioural: the amended seal accepts the tree it is asked about."""
+    result = _audit_run([I08_AUDIT])
+    combined = (result.stdout or "") + (result.stderr or "")
+    if _ENVIRONMENT_ABORT in combined:
+        pytest.skip("ENVIRONMENT: the evidence producer's BLAS allocator aborted")
+    tail = result.stdout.strip().splitlines()[-1] if result.stdout.strip() else ""
+    assert result.returncode == 0, f"I08 refused the R5 tree: {tail}\n{result.stderr[-1200:]}"
+
+
+# ---------------------------------------------------------------------------
+# M19  No phantom grants, no ungranted consumer file
+# ---------------------------------------------------------------------------
+
+
+def test_m19_granted_paths_exist_and_no_extra_consumer_file_does() -> None:
+    tracked = {
+        p.removeprefix("quant-lab/")
+        for p in _git("ls-tree", "-r", "--name-only", "HEAD").splitlines() if p
+    }
+    phantom = sorted(DISCLOSED_EXACT_PATHS - tracked)
+    assert phantom == [], f"granted paths that do not exist: {phantom}"
+    consumer_src = sorted(
+        p for p in tracked
+        if "/normalization/consumer/" in p and p.endswith(".py")
+    )
+    assert consumer_src == sorted(
+        p for p in DISCLOSED_EXACT_PATHS if "/normalization/consumer/" in p
+    ), consumer_src
+    consumer_tests = sorted(
+        p for p in tracked
+        if "/normalization/test_b5_p3_consumer_" in p
+    )
+    assert len(consumer_tests) == 5, consumer_tests
+
+
+# ---------------------------------------------------------------------------
+# M20  The amended governance audits execute, not just parse
+# ---------------------------------------------------------------------------
+
+
+def test_m20_amended_governance_audits_execute_green() -> None:
+    audits = [I01_AUDIT, I05_AUDIT, I08_AUDIT, I09_AUDIT, I10_AUDIT, I11R2_AUDIT]
+    result = _audit_run(audits)
+    combined = (result.stdout or "") + (result.stderr or "")
+    tail = result.stdout.strip().splitlines()[-1] if result.stdout.strip() else ""
+    print("GOVERNANCE_EXECUTION " + json.dumps({
+        "exit": result.returncode, "tail": tail,
+        "environment_abort": _ENVIRONMENT_ABORT in combined,
+    }))
+    if _ENVIRONMENT_ABORT in combined:
+        pytest.skip("ENVIRONMENT: the evidence producer's BLAS allocator aborted")
+    assert result.returncode == 0, f"{tail}\n{result.stderr[-1200:]}"
+
+
+# ---------------------------------------------------------------------------
+# M21  Provenance: the published lineage, and what each commit touched
+# ---------------------------------------------------------------------------
+
+
+def test_m21_lineage_is_present_ancestral_and_scope_clean() -> None:
+    shas = [sha for _, sha in LINEAGE]
+    for sha in shas:
+        assert subprocess.run(
+            ["git", "-C", str(AUDIT_QUANT_LAB), "cat-file", "-e", f"{sha}^{{commit}}"],
+            capture_output=True, check=False,
+        ).returncode == 0, f"commit is not present locally: {sha}"
+    for earlier, later in zip(shas, shas[1:]):
+        ancestor = subprocess.run(
+            ["git", "-C", str(AUDIT_QUANT_LAB), "merge-base", "--is-ancestor", earlier, later],
+            capture_output=True, check=False,
+        )
+        assert ancestor.returncode == 0, f"{earlier[:9]} is not an ancestor of {later[:9]}"
+    head = _git("rev-parse", "HEAD").strip()
+    assert head == LINEAGE[-1][1], f"audited tree is not R5: {head}"
+
+    i05 = _legacy_prefixes(I05_AUDIT)
+    per_rung: dict[str, list[str]] = {}
+    for (name, sha), (_, previous) in zip(LINEAGE[1:], LINEAGE):
+        changed = [
+            l.removeprefix("quant-lab/")
+            for l in _git("diff", "--name-only", previous, sha).splitlines() if l.strip()
+        ]
+        per_rung[name] = changed
+        code_paths = [p for p in changed if p.startswith(("src/", "tests/"))]
+        unauthorized = [p for p in code_paths if not (p.startswith(i05) or p in DISCLOSED_EXACT_PATHS)]
+        assert unauthorized == [], f"{name} touched unauthorized code paths: {unauthorized}"
+    print("LINEAGE " + json.dumps(per_rung, sort_keys=True))

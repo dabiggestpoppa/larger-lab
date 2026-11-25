@@ -1,0 +1,179 @@
+{
+  "mission": "SENSOR-B5-P3-R6-INDEPENDENT-ACCEPTANCE-R1",
+  "label": "SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT",
+  "audited_candidate_sha": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+  "audit_carrier": "agent/crypto-sensor-fabric-p3-production-master-audit-r1",
+  "supersedes": "p3_production_master_audit_r0 (disposition P3_CONSUMER_IMPLEMENTATION_ABSENT, head 18857504a)",
+  "verified_lineage": {
+    "AUTH": "f4972cba898d6e202a32ba2566bb30fce4566ab2",
+    "R1": "198e2aaab4721e087a430e7c781a58bfa0edc482",
+    "R2": "7cb7763b9d8a1d8a1f492c879ca4e421c32c1743",
+    "R3": "7155cbf60f12fd1b9c2ad48188baa532089933bd",
+    "R4": "6af9200faf0e06e1f42f331e05efc1dcba508fba",
+    "R5": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+    "ancestral_chain_verified": true,
+    "authorization_base": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+    "implementation_branch_on_origin_at_R5": true
+  },
+  "execution_summary": {
+    "governance_challenge_v2": {"cases": 27, "passed": 27, "failed": 0, "errors": 0, "skipped": 0},
+    "priority_probes_P01_P06": {"cases": 24, "passed": 21, "failed": 3},
+    "acceptance_matrix_A01_A20": {"cases": 20, "passed": 20, "failed": 0},
+    "independent_probe_total": {"cases": 52, "passed": 49, "failed": 3},
+    "agent1_consumer_suite_reproduced": {"command": "pytest tests/.../test_b5_p3_consumer_{contracts,policy,custody,rebinding,security}.py", "result": "139 passed", "exit": 0},
+    "amended_governance_audits_reproduced": {"command": "pytest test_b5_i01/i05/i08/i09/i10_scope_audit.py test_i11r2_binding_audit.py", "result": "180 passed", "exit": 0}
+  },
+  "threat_classes": {
+    "A_hostile_data_and_caller": "attacked; all 52 probes are of this class unless labelled COMPOSITION",
+    "B_forged_trust_artifacts": "attacked; no capability object exists to forge",
+    "C_code_with_equivalent_privileges": "explicitly out of scope, per threat model X01-X06 and the directive"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "probe": "P02",
+      "title": "Replay evidence is not bound to the record, provider or knowledge cutoff under evaluation",
+      "severity": "MEDIUM",
+      "status": "OPEN",
+      "audited_sha": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+      "minimal_counterexample": {
+        "record_source_revision_id": "rev-OWN",
+        "replay_evidence_source_revision_id": "rev-FOREIGN",
+        "replay_evidence_market_available_at": "2027-01-01T00:00:00+00:00",
+        "knowledge_cutoff": "2026-06-01T12:00:00+00:00",
+        "observed": "replay_status=ELIGIBLE; with a non-empty reviewed root decision=ACCEPT_FIELD_BINDING"
+      },
+      "positive_control": "matching evidence -> replay_status=ELIGIBLE; interval_incomplete=False -> REFUSE/REPLAY_BLOCKED",
+      "expected": "replay admissibility is a claim about THIS record at THIS cutoff; foreign or post-cutoff evidence must be refused",
+      "cause": "_adjudicate_replay(request.replay_evidence) receives only the evidence. ReplayEvidence (I05 TimeEvidenceBase) carries no record id, provider or cutoff, and assess_replay_eligibility(evidence) takes no cutoff, so the policy owns adjudication but not evidence provenance.",
+      "downstream_controls": ["ConsumerVerdict.replay_status", "ACCEPT_FIELD_BINDING once an operator supplies a non-empty manifest", "A15 (forged evaluation) does not cover it"],
+      "production_reachability": "the false replay_status claim is visible today; acceptance is unreachable only because the shipped root approves no artifact",
+      "required_repair": "bound the evidence in the policy from existing fields: require every revision.selected[*].source_revision_id == request.record.source_revision_id and market_available_at <= knowledge_cutoff, else REFUSE/REPLAY_BLOCKED. No I05 amendment is required for this bounded repair; an I05-wide binding is the alternative if the operator prefers it."
+    },
+    {
+      "id": "F2",
+      "probe": "P01",
+      "title": "The verifier-crash verdict relays a trusted dependency's exception message verbatim",
+      "severity": "LOW",
+      "status": "OPEN",
+      "audited_sha": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+      "minimal_counterexample": {
+        "attack": "custody provider raises RuntimeError('SECOND-AGENT-SENTINEL-7f3c1a-DO-NOT-ECHO')",
+        "observed": "refusal_detail == 'RuntimeError: SECOND-AGENT-SENTINEL-7f3c1a-DO-NOT-ECHO' (200-char bound)"
+      },
+      "positive_control": "a custody failure on the post-verification re-read is reported with a fixed message and leaks nothing",
+      "expected": "module docstring claims no detail carries payload; the crash path carries whatever the dependency said",
+      "cause": "the generic handler in evaluate() builds its detail from type(exc).__name__ and str(exc)",
+      "downstream_controls": ["log/monitoring surfaces that persist ConsumerVerdict", "the bounded-diagnostic claim"],
+      "production_reachability": "requires a wired trusted dependency to raise; not caller-selectable. No artifact or evidence bytes are echoed (verified).",
+      "required_repair": "relay only the exception class, as the authority handler already does, or hash/redact the message."
+    },
+    {
+      "id": "F3",
+      "probe": "P04",
+      "title": "An unexpected failure in the evidence-rebinding loader escapes evaluate()",
+      "severity": "LOW",
+      "status": "OPEN",
+      "audited_sha": "5ee268b1d872fe4040d2d1505d012f344e7b5d54",
+      "minimal_counterexample": {"attack": "load_trusted_authority raises KeyError in _rebind", "observed": "KeyError escapes TrustConsumerPolicy.evaluate; no verdict is returned"},
+      "positive_control": "all nine request-level bypasses in the P04a matrix returned a verdict (0 unexpected exceptions)",
+      "expected": "every stage outside the verifier handler should still produce a fail-closed verdict",
+      "cause": "_rebind catches only RecordVerificationError and SemanticAuthorityRefusal",
+      "downstream_controls": ["fail-closed completeness", "operator-visible refusal accounting"],
+      "production_reachability": "COMPOSITION (X02/X03): the loader is trusted code; no hostile request was found that reaches it with an unexpected exception type",
+      "required_repair": "wrap the rebinding stage in the same bounded exception handler as _derive, mapping to VERIFIER_CRASH and letting BaseException propagate."
+    }
+  ],
+  "observations": [
+    {"id": "N1", "title": "The consumer's own custody prerequisite is redundant, not load-bearing", "evidence": "mutation M5 removed it; a14 still refuses because verify_trade_record raises CUSTODY_UNVERIFIED first", "classification": "defence in depth"},
+    {"id": "N2", "title": "The policy's own manifest-digest check is redundant at construction", "evidence": "mutation M3 removed it; p03b still raises because ManifestCustodyAuthority refuses foreign bytes", "classification": "defence in depth"},
+    {"id": "N3", "title": "The empty-manifest guard is reporting-only", "evidence": "mutation M7 removed it; the derivation still returns INTEGRATION_REQUIRED via the artifact-absent branch. The real protection is that the manifest schema cannot express a custody-source authority record.", "classification": "measured"},
+    {"id": "N4", "title": "Latent NameError in Agent 1's A20 failure message", "evidence": "test_a20 uses build.__name__ where build is undefined; the assertion passes today so the message is never evaluated", "classification": "test-quality, not a security defect"},
+    {"id": "N5", "title": "Two granted audit paths remain inside historical prefixes", "evidence": "test_b5_i08_scope_audit.py and test_b5_i10_scope_audit.py are exact members but also match the pre-existing test_b5_i08 / test_b5_i10 prefixes, so their suffix variants stay prefix-admitted", "classification": "pre-existing LAW_DEFECT, blast radius unchanged (i05 4/4, i10 9/9)"},
+    {"id": "N6", "title": "I08's /consumer/ clause is substring-based but pathspec-confined", "evidence": "the diff it evaluates is limited to src/crypto_sensor_fabric/normalization, and /common/, /sensors/, /authority/ all survive", "classification": "confined widening"}
+  ],
+  "governance_reconciliation": {
+    "exact_admitted_path_set": {
+      "i05": {"prefix_entries": 18, "exact_entries": 11, "added_vs_base": 9, "removed_vs_base": 0},
+      "i10": {"prefix_entries": 26, "exact_entries": 11, "added_vs_base": 9, "removed_vs_base": 0},
+      "added_paths": [
+        "src/crypto_sensor_fabric/normalization/consumer/__init__.py",
+        "src/crypto_sensor_fabric/normalization/consumer/custody_authority.py",
+        "src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py"
+      ],
+      "universe_measured": 5808
+    },
+    "new_exact_file_behaviour": {"exact_only_paths": 9, "suffix_variants_refused": "9/9", "legacy_covered_paths": 2, "legacy_covered_variants_still_admitted": 2},
+    "historical_prefix_weakness": {"i05_file_entries": 4, "i05_variants_admitted": 4, "i10_file_entries": 9, "i10_variants_admitted": 9, "new_file_entries": 0},
+    "G15_semantic_evidence_republication": {"artifact": "bloc_05_semantic_validation.json", "generated": true, "rows": 13, "rows_truthful": 13, "rows_moved_since_base": ["test_b5_i01_scope_audit.py", "test_b5_i05_scope_audit.py", "test_b5_i08_scope_audit.py"], "disclosed_in_commit_message": true, "hand_written_evidence_rewritten": []},
+    "G16_i08_sealed_tree_amendment": {"added_clause": "/consumer/", "additive": true, "pathspec": "src/crypto_sensor_fabric/normalization", "sealed_surfaces_named": 8, "consumer_named_by_I09": false},
+    "I11R2_inventory_progression": {"at_base": 1102, "at_R5": 1111, "delta": 9, "artifact_equals_measured_repo_root_count": true, "added_python_files": 9},
+    "prior_26_case_reconciliation": {
+      "resolved_by_amendment": ["M1 (I01 consumer membership)", "M4 (I05 admits the granted paths)", "M5 (I10 admits the granted paths)", "M6-new (suffix variants of the 9 new exact paths)"],
+      "reclassified": ["M12 -> the generated inventory was republished (disclosed and truthful); hand-written evidence untouched", "M17 -> superseded by the path-set delta measurement"],
+      "preserved_by_operator_directive": ["M6-historical (prefix-admitted file entries, 4/4 i05 and 9/9 i10, unchanged)", "M6-legacy-covered (the two granted audit paths remain inside historical prefixes)"],
+      "unchanged_green": ["M2", "M3", "M7", "M8", "M9", "M10", "M11", "M13", "M14", "M15", "M16"],
+      "probe_errors_fixed": "12 R0 cases errored on a stale assumption (function-local allowed_prefixes). v2 imports the shipped _authorized in a subprocess instead of reconstructing it; 0 errors remain."
+    }
+  },
+  "rung_matrix": {
+    "R1": {"rung": "contracts", "verdict": "ACCEPTED", "evidence": "A01/A02/A03/A05/A06/A11 execute; no callback, verdict or capability field is representable"},
+    "R2": {"rung": "policy-owned derivation", "verdict": "ACCEPTED WITH FINDING F1", "evidence": "scope laundering, empty dimensions, record kind and field allowlist all refuse; replay provenance is unbound"},
+    "R3": {"rung": "custody authority derivation", "verdict": "ACCEPTED", "evidence": "empty-manifest invariant 2/2; four identity axes refuse (M6 detected); foreign roots refuse at construction"},
+    "R4": {"rung": "PIT and evidence rebinding", "verdict": "ACCEPTED", "evidence": "two reads per approved reference; omitted references still read the whole approved set; flipped bytes refuse (M1 detected)"},
+    "R5": {"rung": "suite and evidence", "verdict": "ACCEPTED WITH FINDINGS F2/F3", "evidence": "139 tests reproduced independently; findings are in the diagnostic and stage-exception surfaces"}
+  },
+  "acceptance_matrix": {
+    "A01": "PASS no callback intake", "A02": "PASS forged verification unrepresentable",
+    "A03": "PASS contradictory verification refuses", "A04": "PASS manifest compared not adopted",
+    "A05": "PASS minted basis unplaceable", "A06": "PASS copied marker inert",
+    "A07": "PASS cross-record evidence refuses", "A08": "PASS cross-cutoff authority refuses",
+    "A09": "PASS no synthetic basis in src", "A10": "PASS forged trust scope refuses",
+    "A11": "PASS empty dimensions refuse", "A12": "PASS field allowlist is the grant",
+    "A13": "PASS substituted evidence bytes refuse", "A14": "PASS digest-only custody refuses",
+    "A15": "PASS forged replay evaluation refuses (see F1 for foreign-but-valid evidence)",
+    "A16": "PASS no cached verdict reuse", "A17": "PASS PIT refuses before authority",
+    "A18": "PASS crash refuses, interrupt propagates", "A19": "PASS missing provenance refuses",
+    "A20": "PASS empty manifest is the integration state for both record kinds"
+  },
+  "mutation_accounting": {
+    "executed": 7, "detected": 4, "survived": 3, "invalid": 0, "mutated_source_committed": false,
+    "detected": ["M1_evidence_rebinding", "M2_replay_adjudication", "M4_required_field_inspection", "M6_authority_identity_binding"],
+    "survived": [
+      {"mutation": "M3_manifest_identity", "reason": "ManifestCustodyAuthority refuses the foreign root independently (N2)"},
+      {"mutation": "M5_consumer_custody_prerequisite", "reason": "the verifier raises CUSTODY_UNVERIFIED before inspection (N1)"},
+      {"mutation": "M7_empty_manifest_guard", "reason": "the artifact-absent branch returns INTEGRATION_REQUIRED; the guard is reporting-only (N3)"}
+    ]
+  },
+  "rung6_canonical_reconciliation": {
+    "status": "PENDING",
+    "reason": "no canonical R6 collection evidence is published: origin carries only the design, master-audit-r1 and master-r1 branches",
+    "required_inputs": ["candidate SHA", "collection digest", "partition membership", "executed nodes", "raw output", "JUnit totals", "artifact hashes", "exit codes", "evidence restoration", "missing/duplicate nodes", "skip dispositions"],
+    "note": "implementation acceptance and canonical acceptance are reported separately; this package cannot accept a collection it has not seen"
+  },
+  "environment_limitations": [
+    "The I08/I09 evidence producers spawn a numpy/OpenBLAS process that aborted with 'Memory allocation still failed after 10 retries' on this host during compound runs. Two governance cases (m18/m20) are environment-sensitive; the direct six-audit run passed 180/180 and the clean governance run passed 27/27 before the host became unstable.",
+    "The full canonical ~5,000-node collection was not run by this auditor (Agent 1 owns it).",
+    "The accept path requires a wiring-double root (X01/X03) because the shipped manifest approves nothing; findings that need it are labelled COMPOSITION."
+  ],
+  "hard_stop_attestation": {
+    "production_implementation_changes": false,
+    "unilateral_governance_amendment": false,
+    "provider_approval_created": false,
+    "custody_source_activated": false,
+    "manifest_modified": false,
+    "production_merge": false,
+    "trust_promotion": false,
+    "self_ratification": false,
+    "program_gate_advanced": false,
+    "capital_authority_claimed": false
+  },
+  "disposition": "P3_FINAL_REPAIR_REQUIRED",
+  "disposition_basis": "F1 (MEDIUM) makes the verdict claim replay admissibility it did not establish and would grant acceptance on foreign evidence as soon as an operator supplies a non-empty root. F2/F3 are bounded hardening items. Rungs 1-5 are otherwise accepted, with canonical acceptance pending."
+}
