@@ -91,7 +91,12 @@
         },
         "test_g6_oracle_preserves_every_historical_authorized_entry": {
           "state": "PASSED",
-          "observation": "every one of the 18 I05 and 25 I10 entries stays admitted under the oracle, including legacy filename prefixes"
+          "observation": "every one of the 18 I05 and 26 I10 entries stays admitted under the oracle, including legacy filename prefixes",
+          "entry_kinds": {
+            "I05": {"dir": 9, "file": 4, "legacy_prefix": 5, "total": 18},
+            "I10": {"dir": 8, "file": 9, "legacy_prefix": 9, "total": 26}
+          },
+          "count_discrepancy": "the D-1 authorization packet states 25 I10 entries; the tuple parses to 26; the grant's shape is unaffected but the packet's count is off by one"
         },
         "test_g6b_no_legacy_filename_prefix_can_contain_the_rung1_grant": {
           "state": "PASSED"

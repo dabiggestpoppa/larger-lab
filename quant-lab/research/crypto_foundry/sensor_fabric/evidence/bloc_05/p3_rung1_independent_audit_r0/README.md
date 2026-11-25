@@ -115,11 +115,17 @@ replace with true exact-file authorization. Each has a minimal counterexample.
 The frozen allowlists do not contain one kind of entry. They contain **three**,
 and no one-bit "exact or prefix" switch can represent them:
 
-| Kind | Example | Count today |
-|---|---|---|
-| `dir` (trailing `/`) | `src/crypto_sensor_fabric/normalization/time/` | present in both |
-| `file` (has an extension) | `tests/…/test_b5_i01_scope_audit.py`, `.gitignore` | present in both |
-| `legacy_prefix` (bare stem, no extension) | `tests/…/test_b5_i08`, `tests/…/test_b5_i05_` | present in both |
+| Kind | Example | I05 | I10 |
+|---|---|---|---|
+| `dir` (trailing `/`) | `src/crypto_sensor_fabric/normalization/time/` | 9 | 8 |
+| `file` (has an extension) | `tests/…/test_b5_i01_scope_audit.py`, `.gitignore` | 4 | 9 |
+| `legacy_prefix` (bare stem, no extension) | `tests/…/test_b5_i08`, `tests/…/test_b5_i05_` | 5 | 9 |
+| **total entries** | | **18** | **26** |
+
+**Count discrepancy, recorded rather than smoothed:** the D-1 authorization
+packet (`01_AUTHORIZATION_MATRIX.md`) states 25 I10 entries; the tuple parses to
+**26**. The grant's shape is unaffected, but the pre-existing packet's count is
+off by one and should not be quoted as authoritative.
 
 A mechanism that treats every non-`/` entry as exact silently **revokes**
 `legacy_prefix` grants that later checkpoints already shipped (G6 proves the
