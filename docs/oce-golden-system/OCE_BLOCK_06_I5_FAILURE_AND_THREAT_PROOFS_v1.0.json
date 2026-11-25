@@ -1,4 +1,19 @@
 {
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "deferred_threats": [
+    {
+      "bound": false,
+      "expected_refusal": "refuse publication",
+      "future_authorized_stage": "B6-I9",
+      "future_planned_node": "B6-I9 publication-hold gate node",
+      "id": "T19",
+      "outside_current_partition": true,
+      "owner": "operator",
+      "proof_state": "DEFERRED",
+      "reason": "Publication refusal is enforced by the B6-I9 platform gate under the explicit operator publication hold; B6-I5 has no packaging, publication, or cloud capability. No current B6-I5 node claims publication enforcement, and T19's prior witness node test_no_later_stage_dependency cannot produce a refuse-publication observable."
+    }
+  ],
   "document_id": "OCE-B6-I5-PROOFS-001",
   "failure_classes": [
     {
@@ -40,6 +55,7 @@
       "id": "F12",
       "nodes": [
         "test_block_06_i5_artifact.py::test_digest_mismatch_refused",
+        "test_block_06_i5_artifact.py::test_substitution_unchanged_name_refused",
         "test_block_06_i5_provenance.py::test_tamper_detected_end_to_end"
       ],
       "proof_state": "BOUND"
@@ -52,6 +68,7 @@
         "test_block_06_i5_contract.py::test_scope_binds_construction_sequence",
         "test_block_06_i5_contract.py::test_locks_and_cost",
         "test_block_06_i5_contract.py::test_service_symbols_declared",
+        "test_block_06_i5_contract.py::test_no_later_stage_dependency",
         "test_block_06_i5_knowledge.py::test_knowledge_registry_canonical",
         "test_block_06_i5_knowledge.py::test_fact_requires_source_digest",
         "test_block_06_i5_knowledge.py::test_knowledge_separate_from_memory",
@@ -60,18 +77,17 @@
         "test_block_06_i5_artifact.py::test_stale_version_refused",
         "test_block_06_i5_artifact.py::test_unknown_storage_class_refused",
         "test_block_06_i5_evaluation.py::test_comparison_version_bound",
+        "test_block_06_i5_evaluation.py::test_refusal_never_pass",
+        "test_block_06_i5_evaluation.py::test_score_field_prohibited",
+        "test_block_06_i5_evaluation.py::test_weight_field_prohibited",
+        "test_block_06_i5_evaluation.py::test_threshold_field_prohibited",
+        "test_block_06_i5_evaluation.py::test_ranking_field_prohibited",
         "test_block_06_i5_provenance.py::test_provenance_missing_refused"
-      ],
-      "proof_state": "BOUND"
-    },
-    {
-      "id": "T19",
-      "nodes": [
-        "test_block_06_i5_contract.py::test_no_later_stage_dependency"
       ],
       "proof_state": "BOUND"
     }
   ],
+  "partition_note": "Every current node belongs to exactly one current failure-class partition (F03=8, F08=2, F11=7, F12=3, F23=20; total 40). Deferred T19 is outside the current executable partition. No current threat claims a witness incapable of producing its required refusal.",
   "policy": {
     "fail_closed": true,
     "no_client_authority": true,
@@ -97,10 +113,6 @@
     {
       "bound": true,
       "id": "T08"
-    },
-    {
-      "bound": true,
-      "id": "T19"
     }
   ]
 }

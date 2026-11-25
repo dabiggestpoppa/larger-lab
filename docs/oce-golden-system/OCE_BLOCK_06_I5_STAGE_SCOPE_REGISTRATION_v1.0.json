@@ -1,4 +1,6 @@
 {
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "3d1f94e87067d63deffa4295bc6575636db14878",
   "document_id": "OCE-B6-I5-STAGE-SCOPE-REGISTRATION-001",
   "frozen_before_results": true,
   "locks": {
@@ -33,6 +35,17 @@
       "head": "60879f0d0761bc498221b649c43e4ad56226fe5e"
     }
   },
+  "r06_rebinding": {
+    "authority": "direct: OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json allowed_production_surfaces oce/services/ and implementation_surfaces services; inherited: OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I5 non_goal adapter layer and deferred platform gate B6-I9",
+    "binding_node": "test_block_06_i5_contract.py::test_no_later_stage_dependency",
+    "failure_class": "F23",
+    "id": "B6I5-R06",
+    "negative_control": "an I6 import or reference is accepted by the boundary check",
+    "previous_failure_class": "T19",
+    "remains_in_inventory": true,
+    "section": "C3.S5",
+    "statement": "No later-stage dependency is imported or referenced; the B6-I5 construction boundary admits only oce/services and its own documented C3.S3/C3.S4/C3.S5 surfaces"
+  },
   "refusals": [
     "stage/identity_missing",
     "stage/identity_unknown",
@@ -47,6 +60,15 @@
   "schema": "oce.block_06.stage_scope_registration.v1",
   "stage": "B6-I5",
   "status": "FROZEN",
+  "t19_deferral": {
+    "expected_refusal": "refuse publication",
+    "future_authorized_stage": "B6-I9",
+    "future_planned_node": "B6-I9 publication-hold gate node",
+    "id": "T19",
+    "outside_current_partition": true,
+    "owner": "operator",
+    "reason": "Publication refusal is enforced by the B6-I9 platform gate under the explicit operator publication hold; B6-I5 has no packaging, publication, or cloud capability"
+  },
   "this_stage": {
     "allowed_prefixes": [
       "oce/services/",

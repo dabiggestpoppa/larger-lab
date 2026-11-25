@@ -6,6 +6,8 @@
     "infrastructure/control-plane/tests/test_block_06_i5_*.py",
     "infrastructure/control-plane/tests/stage_scope/test_block_06_i5_*.py"
   ],
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "3d1f94e87067d63deffa4295bc6575636db14878",
   "api_symbols": [
     "oce.services.knowledge.knowledge_store",
     "oce.services.knowledge.retrieve_facts",
@@ -54,6 +56,16 @@
     "prior stage artifacts, symbols and tests remain byte-identical"
   ],
   "cost_usd": 0,
+  "deferred_threats": [
+    {
+      "expected_refusal": "refuse publication",
+      "future_authorized_stage": "B6-I9",
+      "future_planned_node": "B6-I9 publication-hold gate node",
+      "id": "T19",
+      "owner": "operator",
+      "reason": "Publication refusal is enforced by the B6-I9 platform gate under the explicit operator publication hold; B6-I5 has no packaging, publication, or cloud capability"
+    }
+  ],
   "deferred_work": [
     "C4 adapter contract, translation, isolation and certification (B6-I6)",
     "C5 second application and reuse measurement (B6-I7)",
@@ -61,7 +73,8 @@
     "platform gate and downstream dependency contract (B6-I9)",
     "post-Book-6 evaluation system: RESERVED_NOT_AUTHORIZED",
     "packaging or publication of any artifact: NOT_AUTHORIZED",
-    "cloud hosting or provider coupling: NOT_AUTHORIZED"
+    "cloud hosting or provider coupling: NOT_AUTHORIZED",
+    "T19 publication refusal deferred to operator/B6-I9 platform gate (amendment 001)"
   ],
   "depends_on": [
     "B6-I4"
@@ -110,7 +123,7 @@
     "evaluation_system": "RESERVED_NOT_AUTHORIZED",
     "package_publication": "NOT_AUTHORIZED"
   },
-  "minimum_nodes": 34,
+  "minimum_nodes": 40,
   "mutation_floor": {
     "source": 3,
     "stage": 3
@@ -171,7 +184,6 @@
     "T05",
     "T06",
     "T07",
-    "T08",
-    "T19"
+    "T08"
   ]
 }

@@ -1,4 +1,6 @@
 {
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "3d1f94e87067d63deffa4295bc6575636db14878",
   "document_id": "OCE-B6-I5-PAIRED-001",
   "endpoints": {
     "base_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
@@ -32,7 +34,7 @@
     "base_only_expected": 0,
     "common_files": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
     "common_floor": 208,
-    "head_only_expected": 34,
+    "head_only_expected": 40,
     "head_only_files": "infrastructure/control-plane/tests/test_block_06_i5_*.py"
   },
   "schema": "oce.block_06_i5.paired_contract.v1",
