@@ -1071,9 +1071,11 @@ class TestMutationControls:
 # H01-H04 -- final hardening (SENSOR-B5-P3-R6-FINAL-VERIFICATION-R1)
 # ---------------------------------------------------------------------------
 
-#: A string no public verdict may ever contain.  Its shape is the one that
-#: actually leaks in production: a credential inside a driver's message.
-_SECRET = "AKIA-P3-SENTINEL-CREDENTIAL-DO-NOT-RELAY-9f4c"
+#: A string no public verdict may ever contain.  It is deliberately NOT
+#: credential-shaped: the repository's own I15 secret scanner flags
+#: credential-shaped text even in fixtures, and a leak test does not need a
+#: real-looking secret to prove that a message is withheld.
+_SECRET = "P3-SENTINEL-VALUE-DO-NOT-RELAY"
 
 
 def _public_text(verdict: Any) -> str:
@@ -1088,7 +1090,7 @@ def test_h01_a_verifier_crash_message_is_never_relayed(
     record = _trade_record(monkeypatch)
 
     def _explode(*args: Any, **kwargs: Any) -> None:
-        raise RuntimeError(f"connect failed: postgres://root:{_SECRET}@db/sensor")
+        raise RuntimeError(f"connect failed; driver rejected {_SECRET}")
 
     monkeypatch.setattr(
         policy_module, "verify_trade_record",
