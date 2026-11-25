@@ -1,0 +1,148 @@
+{
+  "checkpoint": "SENSOR-B5-P3-PRODUCTION-CONSUMER-RUNG1-BUILD-R1",
+  "operator_directive": "AUTHORIZE_D1_ONLY",
+  "base_sha": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+  "production_design_r0": "295acb5245ecc47d6f5c0a07f8ff631aa7217c15",
+  "consolidated_candidate": "6de26be9130eb99e0a9b53b340fc5bfaafa4a684",
+  "historical_producer_verification": "b76ba80683b12072c22ab0b379a2204a99dc64b1",
+  "independent_security_spec": "6e6ef21929bf621976a2a45d8e6e3b989c63528f",
+  "branch": "agent/crypto-sensor-fabric-p3-consumer-rung1-build-r1",
+  "commits": {
+    "a1": "the commit that introduces this packet directory (branch head at publication)",
+    "a2": null,
+    "a2_status": "NOT_CREATED_BLOCKED"
+  },
+  "disposition": "RUNG1_BLOCKED_ON_SCOPE_AUTHORIZATION_I01",
+  "authorized_by_d1": {
+    "files": [
+      "quant-lab/src/crypto_sensor_fabric/normalization/consumer/models.py",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py"
+    ],
+    "amendment_scope": [
+      "test_b5_i05_scope_audit.py",
+      "test_b5_i10_scope_audit.py"
+    ],
+    "mechanical_republish": "I11R2 python_files_scanned 1102 -> 1104"
+  },
+  "not_authorized_and_not_created": [
+    "consumer/policy.py",
+    "consumer/custody_authority.py",
+    "consumer/rebinding.py",
+    "consumer/__init__.py",
+    "test_b5_p3_consumer_security.py",
+    "any provider approval or manifest modification"
+  ],
+  "blocker": {
+    "audit": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+    "test": "test_only_authorized_subpackages_exist",
+    "assertion": "assert present <= allowed, f\"unauthorized subpackages: {sorted(present - allowed)}\"",
+    "measured_message": "unauthorized subpackages: ['consumer']",
+    "allowed_subpackages": ["identity", "terms", "time", "common", "sensors", "authority"],
+    "detail": "present is built from directory entries, so an implicit namespace directory counts; omitting __init__.py avoids an inventory unit but not this refusal",
+    "why_unamendable_this_checkpoint": "I01 is not in the granted amendment set, and widening a frozen historical exception is forbidden by directive section 2"
+  },
+  "audit_matrix_with_files_present": {
+    "b5_i01_scope_audit": "1 failed, 46 passed (unauthorized subpackages: ['consumer'])",
+    "b5_i05_scope_audit": "failed on unauthorized untracked paths",
+    "b5_i09_scope_audit": "9 passed (consumer/ is outside every sealed tree)",
+    "b5_i10_scope_audit": "1 failed, 21 passed (unauthorized untracked path)",
+    "i11r2_binding_audit_and_evidence": "14 passed (counts tracked Python only; passes while untracked)"
+  },
+  "implementation_record": {
+    "status": "VERIFIED_THEN_WITHDRAWN",
+    "files": [
+      {
+        "path": "quant-lab/src/crypto_sensor_fabric/normalization/consumer/models.py",
+        "blob_sha1": "f7f2ab98f0e6f3b275dd7beb3020e3e3b6df9c1f",
+        "lines": 350
+      },
+      {
+        "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+        "blob_sha1": "837a7943d1b2e8f3cf93a2927d2f1ce44f6f0659",
+        "lines": 714
+      }
+    ],
+    "init_py_required": false,
+    "export_surface": [
+      "ConsumerDecision",
+      "ConsumerEvidenceReference",
+      "ConsumerRefusalReason",
+      "ConsumerRequest",
+      "ConsumerVerdict",
+      "CustodyAuthorityBasis",
+      "TRUST_SCOPE_ECONOMIC_FIELD_BINDING"
+    ],
+    "decisions": {
+      "consumer_decision": ["ACCEPT_FIELD_BINDING", "REFUSE", "INTEGRATION_REQUIRED"],
+      "custody_authority_basis": ["AUTHORIZED", "INTEGRATION_REQUIRED", "UNAUTHORIZED"],
+      "synthetic_test_only": "absent",
+      "refusal_reasons": 12,
+      "frozen": "set locally; NormalizationModelBase is not frozen",
+      "trust_scope": "Literal[ECONOMIC_FIELD_BINDING]",
+      "binary_serialization": "ser_json_bytes=base64, val_json_bytes=base64"
+    },
+    "contract_tests": {
+      "collected": 32,
+      "result": "32 passed in 4.66s",
+      "a1_1": "PASS",
+      "a1_2": "PASS",
+      "a1_3": "PASS",
+      "a1_4": "PASS",
+      "a1_5": "PASS"
+    },
+    "measured_pydantic": {
+      "version": "2.13.4",
+      "python": "3.11",
+      "bare_date_for_datetime": "accepted and coerced to midnight; refused explicitly by the module",
+      "naive_datetime": "accepted by type; refused by coerce_utc",
+      "model_construct": "bypasses all validation",
+      "model_copy_update": "bypasses validation"
+    },
+    "import_graph": {
+      "sensors_verification_loaded": false,
+      "normalization_authority_loaded": true,
+      "reading": "transitive from the authorized T1 payload (sensors/trade.py imports MappingProvenance); authority module body is constants only, no I/O"
+    }
+  },
+  "collection": {
+    "with_implementation": {
+      "count": 4765,
+      "digest": "5239abe5c029cf27ac262e9fd5157bf4f1698f437fbe87f1833634d6e575bc1d"
+    },
+    "published_branch": {
+      "count": 4733,
+      "digest": "1036049742127c8f9919ae2d831627381318b15d83358ab6b45920c88a52e837",
+      "equals_canonical_anchor": true
+    },
+    "full_universe_executed": false
+  },
+  "published_tree_verification": {
+    "tracked_python": 1102,
+    "governance_suites": "122 passed (I01, I05, I09, I10, I11R2 binding, I11R2 evidence)",
+    "worktree_clean": true,
+    "approval_manifest": "empty, byte-identical to base",
+    "integration_state": "INTEGRATION_REQUIRED, unchanged"
+  },
+  "next_authorization_required": {
+    "i01": "one named subpackage entry \"consumer\" in test_only_authorized_subpackages_exist",
+    "i05": "exact-file predicate rung1_exact_paths admitting the two D-1 paths",
+    "i10": "same exact-file predicate",
+    "i11r2": "mechanical republish python_files_scanned 1102 -> 1104",
+    "explicitly_still_not_granted": [
+      "Rung 2 verification logic",
+      "custody authority",
+      "rebinding",
+      "provider trust",
+      "sibling security suite"
+    ]
+  },
+  "hard_stop_respected": {
+    "rung2_implemented": false,
+    "custody_authorization": false,
+    "provider_certification": false,
+    "trust_promotion": false,
+    "production_merge": false,
+    "gate_advancement": false,
+    "self_ratification": false
+  }
+}
