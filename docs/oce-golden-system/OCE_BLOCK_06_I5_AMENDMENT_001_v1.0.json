@@ -1,0 +1,239 @@
+{
+  "document_id": "OCE-B6-I5-AMENDMENT-001",
+  "amendment": "001",
+  "status": "FROZEN",
+  "stage": "B6-I5",
+  "schema": "oce.block_06_i5.amendment.v1",
+  "frozen_before_results": true,
+  "cost_usd": 0,
+  "capital_authority": "none",
+  "implementation_authorized": false,
+  "ratification_authorized": false,
+  "merge_authorized": false,
+  "audited_p0_head": "21be8b21a16daa27a0a5114194ac1a6c931224d4",
+  "audited_p0_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+  "audited_p0_base": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+  "agent2_hostile_matrix_sha": "47e98eb7d7bb1f46772f87de45b97eae66456181c31fab7cc1bd7fc1e09404a2",
+  "agent2_disposition": "PARALLEL_P0_AUDIT_REPAIR_REQUIRED_B6_I5",
+  "authority": {
+    "base_reality": "origin/main a4c4f10acac56ce53e1efd29c726039c86930b10; PR #33 merged 2026-11-24T19:41:56Z; parents f0bd9bdd3 + 60879f0d0; tree b66fa4e3",
+    "carrier": "branch oce-book-6-i5 at 21be8b21a, parent exact main, no force, local == origin/oce-book-6-i5",
+    "packet": "eight P0 documents under docs/oce-golden-system/OCE_BLOCK_06_I5_*, 116/116 local packet checks pass",
+    "construction_sequence": "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I5 (kind implementation, surfaces services, sections C3.S3/C3.S4/C3.S5, mutation_floor 3)",
+    "failure_threat_registry": "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json (T19 owner operator, required_refusal refuse publication, stage B6-I9)",
+    "scope_derivation": "docs/oce-golden-system/OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json (allowed_production_surfaces oce/services/, failure classes F03/F08/F11/F12/F23, threats T05/T06/T07/T08/T19)",
+    "implementation_contract": "docs/oce-golden-system/OCE_BLOCK_06_I5_IMPLEMENTATION_CONTRACT_v1.0.json (implementation_floor mutations 3 / source_mutation_floor 3 / test_nodes 34, refusals F03/F08/F11/F12/F23)",
+    "service_surface": "docs/oce-golden-system/OCE_BLOCK_06_I5_SERVICE_SURFACE_CONTRACT_v1.0.json (section bindings C3.S3/C3.S4/C3.S5/provenance, no operator surface in this stage)"
+  },
+  "blocking": ["B-1"],
+  "weaknesses": ["E-1", "E-2", "E-3", "E-4"],
+  "i4_workflow_replay_defect": {
+    "defect": "block-06-i4-validation.yml stage-scope resolver resolves origin/main (the moving successor) instead of replaying the pinned frozen I4 identity, raising stage/base_moved on any later PR",
+    "precedent": "I3->I4 replay pattern in block-06-i3-validation.yml (git fetch + checkout --detach pinned head, update-ref origin/base to pinned base)",
+    "repair": "CI-selection repair only: pin frozen I4 base f0bd9bdd3 and head 60879f0d0, execute I4 validation against its own audited tree, verify base and head bindings, do not weaken or remove any I4 assertion, do not edit I4 product or tests, do not change I4 evidence numbers",
+    "preserved_failed_run": "45479336318"
+  },
+  "b1_t19_repair": {
+    "defect": "T19 remains bound: true but its witness node test_block_06_i5_contract.py::test_no_later_stage_dependency cannot demonstrate refuse publication; publication is not a B6-I5 capability",
+    "t19": {
+      "id": "T19",
+      "owner": "operator",
+      "future_authorized_stage": "B6-I9",
+      "reason": "Publication refusal is enforced by the B6-I9 platform gate under the explicit operator publication hold (OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T19 owner=operator, stage=B6-I9, required_refusal=refuse publication); B6-I5's surface is services only (scope derivation allowed_production_surfaces oce/services/) with no packaging, publication, or cloud capability",
+      "expected_refusal": "refuse publication",
+      "future_planned_node": "B6-I9 publication-hold gate node (planned at B6-I9, not in the B6-I5 executable inventory)",
+      "deferral_stage": "B6-I9",
+      "outside_current_partition": true
+    },
+    "r06_replacement_binding": {
+      "id": "B6I5-R06",
+      "binding_node": "test_block_06_i5_contract.py::test_no_later_stage_dependency",
+      "failure_class": "F23",
+      "authority": "direct: OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json allowed_production_surfaces oce/services/ and implementation_surfaces services; inherited: OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I5 non_goal adapter layer and deferred platform gate B6-I9",
+      "section": "C3.S5",
+      "statement": "No later-stage dependency is imported or referenced; the B6-I5 construction boundary admits only oce/services and its own documented C3.S3/C3.S4/C3.S5 surfaces",
+      "negative_control": "an I6 import or reference is accepted by the boundary check",
+      "previous_failure_class": "T19 (not a failure class; threat, not executable)",
+      "remains_in_inventory": true
+    }
+  },
+  "e1_non_vacuous_mutation_law": {
+    "law": "A mutation counts only if: (1) intended target was changed; (2) mutated source remains syntactically valid; (3) named node collects; (4) named node executes; (5) named node fails behaviorally; (6) pytest return code is exactly 1; (7) failure is not import/collection/usage/no-collector failure; (8) the intended node—not an unrelated node—discriminates; (9) restoration is byte-exact; (10) pristine named node passes; (11) pristine complete focused suite passes; (12) tracked tree is clean afterward",
+    "mutation_floor": 3,
+    "mutation_floor_kind": "minimum",
+    "planned_mutations": [
+      {
+        "id": "M01",
+        "target": "knowledge source/digest rule",
+        "intended_weakening": "fact accepted without source reference or digest",
+        "discriminator_node": "test_block_06_i5_knowledge.py::test_fact_requires_source_digest",
+        "failure_class": "F23"
+      },
+      {
+        "id": "M02",
+        "target": "artifact digest/stale rule",
+        "intended_weakening": "served bytes differ from manifest digest or stale version served",
+        "discriminator_node": "test_block_06_i5_artifact.py::test_digest_mismatch_refused",
+        "failure_class": "F12"
+      },
+      {
+        "id": "M03",
+        "target": "promotion gate / self-approval rule",
+        "intended_weakening": "builder self-approval or promotion without gate pass",
+        "discriminator_node": "test_block_06_i5_evaluation.py::test_self_approval_refused",
+        "failure_class": "F03"
+      }
+    ],
+    "prohibited": [
+      "counting observed_rc != 0 as discrimination without node execution evidence",
+      "accepting a node name found only inside a collection error",
+      "a collection or import error is never discrimination",
+      "a usage error is never discrimination",
+      "the phrase 'found no collectors' never satisfies node execution",
+      "matching raw stderr text alone never satisfies node execution",
+      "weakening any production refusal, node assertion or floor to make a mutant pass"
+    ],
+    "restoration": [
+      "restoration must be byte-exact against the pre-mutation digest",
+      "the pristine named node must pass after restoration",
+      "the pristine complete focused suite must pass after restoration",
+      "the worktree must return clean after restoration"
+    ]
+  },
+  "e2_refusal_never_pass": {
+    "new_requirement": {
+      "id": "B6I5-R35",
+      "binding_node": "test_block_06_i5_evaluation.py::test_refusal_never_pass",
+      "failure_class": "F23",
+      "section": "C3.S5",
+      "statement": "An evaluator refusal cannot be normalized to PASS; missing evidence cannot become PASS; a failed or refused gate cannot be normalized to success; promotion cannot proceed on refusal",
+      "negative_control": "a refused gate is normalized to PASS and promotion proceeds",
+      "mutation_witness": "M03",
+      "authority": "OCE_BLOCK_06_I5_IMPLEMENTATION_CONTRACT_v1.0.json evaluation_rules (promotion_requires_gate_pass, self_approval_refused, gate_requires_independent_approver) and refusals REFUSED_GATE_INCOMPLETE / REFUSED_SELF_APPROVAL"
+    }
+  },
+  "e3_reserved_evaluation_fields": {
+    "prohibition": "Unauthorized score, weight, threshold, or ranking fields belong to the reserved post-Book-6 evaluation system; adding any such field during B6-I5 must fail closed",
+    "authority": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json B6-P0-EVAL-01/EVAL-02/EVAL-03 (evaluation_boundary, F23, POST_BOOK_6, deferred owner operator)",
+    "new_requirements": [
+      {
+        "id": "B6I5-R36",
+        "binding_node": "test_block_06_i5_evaluation.py::test_score_field_prohibited",
+        "failure_class": "F23",
+        "section": "C3.S5",
+        "statement": "A score field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns scoring",
+        "negative_control": "a score field is accepted in an evaluation artifact or result",
+        "field": "score"
+      },
+      {
+        "id": "B6I5-R37",
+        "binding_node": "test_block_06_i5_evaluation.py::test_weight_field_prohibited",
+        "failure_class": "F23",
+        "section": "C3.S5",
+        "statement": "A weight field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns weighting",
+        "negative_control": "a weight field is accepted in an evaluation artifact or result",
+        "field": "weight"
+      },
+      {
+        "id": "B6I5-R38",
+        "binding_node": "test_block_06_i5_evaluation.py::test_threshold_field_prohibited",
+        "failure_class": "F23",
+        "section": "C3.S5",
+        "statement": "A threshold field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns thresholds",
+        "negative_control": "a threshold field is accepted in an evaluation artifact or result",
+        "field": "threshold"
+      },
+      {
+        "id": "B6I5-R39",
+        "binding_node": "test_block_06_i5_evaluation.py::test_ranking_field_prohibited",
+        "failure_class": "F23",
+        "section": "C3.S5",
+        "statement": "A ranking field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns ranking",
+        "negative_control": "a ranking field is accepted in an evaluation artifact or result",
+        "field": "ranking"
+      }
+    ]
+  },
+  "e4_manifest_separability": {
+    "law": "Manifest integrity is split into independently-refusable laws: (1) hash-only mismatch refuses; (2) size-only mismatch refuses; (3) substitution with unchanged name refuses where applicable. Each law has a distinct hostile input and a distinct named node.",
+    "authority": "OCE_BLOCK_06_I5_IMPLEMENTATION_CONTRACT_v1.0.json artifact_rules (digest_bound, duplicate_refused, immutable_after_registration, stale_refused) and refusals REFUSED_DIGEST_MISMATCH (F12) / REFUSED_MANIFEST_MISMATCH (F11) / REFUSED_TAMPER (F12)",
+    "crosswalk": {
+      "static_preserved": "R16 (test_digest_mismatch_refused, F12) remains the static hash/digest proof; R17 (test_manifest_mismatch_refused, F11) remains the static manifest proof",
+      "behavioural_supplements": "R40 (test_substitution_unchanged_name_refused, F12) supplements with a distinct substitution hostile input",
+      "hash_only_law": "R16 reframed: digest field altered, size byte-identical → refuse",
+      "size_only_law": "R17 reframed: size field altered, digest byte-identical → refuse",
+      "substitution_law": "R40: same artifact_id/name, different bytes → refuse",
+      "no_silent_replace": "R16 and R17 are retained and reframed, not removed; behavioural tests supplement, never replace, the static binding"
+    },
+    "new_requirement": {
+      "id": "B6I5-R40",
+      "binding_node": "test_block_06_i5_artifact.py::test_substitution_unchanged_name_refused",
+      "failure_class": "F12",
+      "section": "C3.S4",
+      "statement": "Substitution of an artifact with unchanged name but different bytes is refused",
+      "negative_control": "a different artifact served under a registered name is accepted",
+      "hostile_input": "same artifact_id and version, different content bytes"
+    }
+  },
+  "planned_arithmetic": {
+    "requirements_total": 40,
+    "node_total": 40,
+    "previous_requirements_total": 34,
+    "previous_node_total": 34,
+    "per_section": {
+      "C3.S3": 15,
+      "C3.S4": 11,
+      "C3.S5": 14
+    },
+    "per_module": {
+      "test_block_06_i5_contract.py": 6,
+      "test_block_06_i5_knowledge.py": 7,
+      "test_block_06_i5_artifact.py": 9,
+      "test_block_06_i5_evaluation.py": 12,
+      "test_block_06_i5_provenance.py": 6
+    },
+    "current_failure_class_partition": {
+      "F03": 8,
+      "F08": 2,
+      "F11": 7,
+      "F12": 3,
+      "F23": 20
+    },
+    "deferred_threat_count": 1,
+    "deferred_threat": "T19",
+    "negative_control_count": 40,
+    "planned_mutation_count": 3,
+    "planned_mutation_ids": ["M01", "M02", "M03"],
+    "paired_head_only_expected": 40,
+    "minimum_node_floor": 40,
+    "mutation_minimum_floor": 3,
+    "tests_present": false
+  },
+  "new_node_ids_before_results": [
+    "test_block_06_i5_evaluation.py::test_refusal_never_pass",
+    "test_block_06_i5_evaluation.py::test_score_field_prohibited",
+    "test_block_06_i5_evaluation.py::test_weight_field_prohibited",
+    "test_block_06_i5_evaluation.py::test_threshold_field_prohibited",
+    "test_block_06_i5_evaluation.py::test_ranking_field_prohibited",
+    "test_block_06_i5_artifact.py::test_substitution_unchanged_name_refused"
+  ],
+  "new_mutation_ids_before_results": ["M01", "M02", "M03"],
+  "locks": {
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "IMPLEMENTATION_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "MERGE_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "no_implementation_authorization": true,
+  "b6_i6_through_i9_locked": true,
+  "reason": "SECOND-AGENT PARALLEL P0 AUDIT — repair before implementation. T19 deferred to operator/B6-I9 publication hold; R06 rebound to F23; E-1 non-vacuous mutation law; E-2 refusal-not-pass proof; E-3 reserved evaluation fields; E-4 manifest separability with static/behavioural crosswalk; I4 workflow replay defect documented. Forward-only commits; no amend or force-push."
+}
