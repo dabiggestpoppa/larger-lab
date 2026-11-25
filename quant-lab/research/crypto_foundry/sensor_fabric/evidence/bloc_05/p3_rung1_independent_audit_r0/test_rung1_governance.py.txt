@@ -482,6 +482,64 @@ def test_g7_staged_unstaged_and_untracked_views_are_challenged_separately(tmp_pa
 # ---------------------------------------------------------------------------
 
 
+def _i01_allowed_subpackages() -> set[str]:
+    """The I01 subpackage set, parsed from source."""
+    path = _locate_audits() / "test_b5_i01_scope_audit.py"
+    assert path.is_file(), f"I01 audit not found: {path}"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name == "test_only_authorized_subpackages_exist":
+            for statement in ast.walk(node):
+                if (
+                    isinstance(statement, ast.Assign)
+                    and any(
+                        isinstance(target, ast.Name) and target.id == "allowed"
+                        for target in statement.targets
+                    )
+                    and isinstance(statement.value, ast.Set)
+                ):
+                    return {_fold(element) for element in statement.value.elts}
+    raise AssertionError("I01: no `allowed` subpackage set found")
+
+
+def test_g9_i01_is_a_third_blocker_the_authorization_packet_omitted():
+    """The D-1 packet named I05/I10; I01 also refuses the ``consumer`` subpackage.
+
+    I01 tests subpackage membership with a SET, which is already exact.  The grant
+    therefore needs a third, differently-shaped amendment, and a packet that named
+    only two files could never have produced a green tree.  This is the reason the
+    implementation was withdrawn rather than committed.
+    """
+    allowed = _i01_allowed_subpackages()
+    assert allowed == {
+        "identity",
+        "terms",
+        "time",
+        "common",
+        "sensors",
+        "authority",
+    }, f"I01 subpackage set drifted; re-derive the blocker inventory: {sorted(allowed)}"
+
+    # The blocker, stated exactly: the directory a Rung 1 model file lives in is
+    # itself an unauthorized subpackage under I01.
+    assert "consumer" not in allowed, (
+        "I01 now admits `consumer`; the third blocker has been amended and this "
+        "probe must be re-derived rather than kept"
+    )
+
+    # I01 is exact already: membership is set equality, so a sibling, a plural or a
+    # dotted variant cannot be climbed into.  None of them is present today.
+    for candidate in ("consumer", "consumer_extra", "consumers", "consumer.policy"):
+        assert candidate not in allowed, (
+            f"I01 admits {candidate!r}; set membership is not the exact rule assumed"
+        )
+    # And the exactness is structural: a prefix law WOULD admit the sibling, which is
+    # why the grant cannot be expressed as a prefix of a subpackage name.
+    assert "consumer_extra".startswith("consumer"), (
+        "the sibling no longer shares the prefix; the exactness argument must be re-derived"
+    )
+
+
 def test_g8_the_historical_security_suite_path_remains_unauthorized():
     """The full A01-A20 suite is Rung 5 specification evidence, not Rung 1 scope."""
     lists = _allowlists()

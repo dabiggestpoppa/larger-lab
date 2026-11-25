@@ -13,13 +13,18 @@
   },
   "implementation_state": {
     "expected_branch": "agent/crypto-sensor-fabric-p3-consumer-rung1-build-r1",
-    "expected_branch_exists": false,
-    "observed_rung1_branch": "agent/crypto-sensor-fabric-p3-consumer-rung1-r1",
-    "observed_rung1_head": "13086755d22a539c6a4dcb20e782bce97fcde82d",
-    "observed_head_equals_authorization_commit": true,
+    "expected_branch_exists": true,
+    "published_commit": "ea17eb5ae3df9319745c66780e85e0a9f1aa9b98",
+    "published_to_origin": true,
+    "published_during_this_mission": true,
+    "implementation_content_published": false,
+    "implementation_status": "IMPLEMENTED_THEN_WITHDRAWN_BY_AGENT1",
+    "a1_authorization_commit_precedes_implementation": "YES — 13086755d is an ancestor of ea17eb5ae",
+    "files_in_published_commit": 6,
+    "source_files_in_published_commit": 0,
     "consumer_models_published": false,
-    "a1_authorization_commit_precedes_implementation": "NOT_VERIFIABLE — no implementation commit exists",
-    "audited_tree": "13086755d22a539c6a4dcb20e782bce97fcde82d"
+    "audited_tree": "13086755d22a539c6a4dcb20e782bce97fcde82d",
+    "source_identical_to_published_commit": true
   },
   "execution_environment": {
     "python": "3.11.9",
@@ -53,8 +58,8 @@
     },
     "governance_challenge": {
       "file": "test_rung1_governance.py",
-      "collected": 11,
-      "passed": 7,
+      "collected": 12,
+      "passed": 8,
       "failed_red": 3,
       "skipped_pending": 1,
       "exit_code": 1,
@@ -119,6 +124,13 @@
         },
         "test_g8_the_historical_security_suite_path_remains_unauthorized": {
           "state": "PASSED"
+        },
+        "test_g9_i01_is_a_third_blocker_the_authorization_packet_omitted": {
+          "state": "PASSED",
+          "finding": "THIRD_GOVERNANCE_BLOCKER_OMITTED_FROM_D1",
+          "observation": "I01 test_only_authorized_subpackages_exist admits only {identity, terms, time, common, sensors, authority}; the consumer subpackage is absent, so a grant naming only the two files could never produce a green tree",
+          "mechanism": "set membership — already exact, unlike the I05/I10 prefix tuples",
+          "required_amendment_shape": {"I01": "one subpackage name", "I05": "two exact file paths", "I10": "two exact file paths"}
         }
       }
     },
@@ -153,6 +165,28 @@
       "not_classified_as": "PRODUCTION_AUTHORIZATION_COMPROMISE",
       "reason": "Rung 1 exposes no consuming operation; an instance is not a decision; the existing production path re-derives authority from pinned bytes"
     }
+  },
+  "agent1_publication_verified_independently": {
+    "commit": "ea17eb5ae3df9319745c66780e85e0a9f1aa9b98",
+    "commit_subject": "B5-P3-R1-AUTH: disclose exact-file D1 authorization",
+    "verified_claims": {
+      "tracked_python_returns_to_1102": "CONFIRMED via git ls-tree -r ea17eb5ae | grep -c '.py$' = 1102",
+      "consumer_directory_removed": "CONFIRMED — 0 paths match normalization/consumer/",
+      "i01_refuses_the_subpackage": "CONFIRMED — consumer absent from the I01 allowed set",
+      "a1_precedes_implementation": "CONFIRMED — ancestry test passes",
+      "i05_and_i10_remain_green": "CONFIRMED on this tree — 52 passed with the audit package present"
+    },
+    "unverified_claims": {
+      "32_contract_tests_passed": "NOT REPRODUCIBLE — content unavailable",
+      "collection_4765_nodes_digest": "NOT REPRODUCIBLE — content unavailable",
+      "recorded_blob_hashes": [
+        "f7f2ab98f0e6f3b275dd7beb3020e3e3b6df9c1f (models.py)",
+        "837a7943d1b2e8f3cf93a2927d2f1ce44f6f0659 (contract test)"
+      ],
+      "blob_retrievability": "BOTH ABSENT from this repository (git cat-file: could not get object info); no dangling commit among 20 inspected contains a normalization/consumer/ path; the branch reflog shows only 'branch: Created from HEAD' then the documentation commit",
+      "consequence": "the implementation exists as prose and hashes only, so its results cannot be independently reproduced and are recorded as Agent 1's claim, not as established fact"
+    },
+    "corroboration": "the prepared exact-file amendment published at ea17eb5ae is the same mechanism this audit's oracle specifies (a second exact-match clause, not a widened prefix tuple), and its counterexample table matches the executed G2/G3/G7 findings"
   },
   "pending_implementation": {
     "state": "NOT_EXECUTED_IMPLEMENTATION_PENDING",
