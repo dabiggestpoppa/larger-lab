@@ -44,6 +44,7 @@ from crypto_sensor_fabric.normalization.consumer.models import (
     ConsumerRefusalReason,
     ConsumerRequest,
 )
+from crypto_sensor_fabric.normalization.consumer import policy as policy_module
 from crypto_sensor_fabric.normalization.consumer.policy import TrustConsumerPolicy
 from crypto_sensor_fabric.normalization.enums import (
     AvailabilityBasis,
@@ -491,8 +492,27 @@ def test_pit_inadmissibility_is_not_repaired_by_custody(
 
 
 def test_the_accept_row_requires_every_prerequisite(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The accepting row, reachable only once the record binding is minted.
+
+    Every claim the frozen schema carries is satisfied below (custody, PIT,
+    replay, an authorization bound to this identity), and the row still
+    terminates in ``INTEGRATION_REQUIRED`` naming
+    ``REPLAY_EVIDENCE_RECORD_BINDING_V1``.  The guard is then flipped to the
+    state a minted contract would create, which is the only route to the
+    accepting row -- so the row needs the FOURTH claim as well.
+    """
     record = _trade_record(monkeypatch)
     manifest = _manifest()
+    held = _policy(
+        manifest, source=_RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
+    ).evaluate(_request(record))
+    assert held.decision is ConsumerDecision.INTEGRATION_REQUIRED
+    assert held.custody_status == "VERIFIED"  # the other claims DID hold
+    assert policy_module.REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT in (
+        held.custody_authorization_detail or ""
+    )
+
+    monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED", True)
     verdict = _policy(
         manifest, source=_RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
     ).evaluate(_request(record))
@@ -707,10 +727,257 @@ def test_h02_removing_the_binding_lets_foreign_evidence_through(
     assert guarded.decision is ConsumerDecision.REFUSE
 
     monkeypatch.setattr(TrustConsumerPolicy, "_bind_replay", lambda self, *args: None)
+    monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED", True)
     mutated = _policy(
         manifest, source=_RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
     ).evaluate(_request(record, replay_evidence=foreign))
     assert mutated.decision is ConsumerDecision.ACCEPT_FIELD_BINDING  # forbidden
+
+
+# ---------------------------------------------------------------------------
+# F4 -- the cutoff law orders EVERY selected revision
+# (SENSOR-B5-P3-R6-F4-F5-CLOSURE-R1; Agent 2 counterexample F4)
+# ---------------------------------------------------------------------------
+
+#: One selected revision, with an explicit knowledge instant.
+def _revision(
+    revision_id: str, *, known_from: datetime | None = None, generation: int = 1
+) -> RevisionRecord:
+    return RevisionRecord(
+        source_revision_id=revision_id,
+        normalization_generation=generation,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from=known_from or datetime(2026, 5, 31, 23, 59, tzinfo=UTC),
+        known_to=None,
+    )
+
+
+def _selection_of(
+    *items: RevisionRecord, excluded: tuple[RevisionRecord, ...] = ()
+) -> RevisionSelection:
+    return RevisionSelection(
+        mode=RevisionMode.AS_KNOWN_THEN,
+        selected=tuple(items),
+        excluded=excluded,
+        pit_safe=True,
+        pit_uncertain=False,
+    )
+
+
+def test_f4_a_second_selected_revision_known_after_the_cutoff_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Agent 2's F4 counterexample, exactly: chosen revision early, another late.
+
+    ``_bind_replay`` ordered only ``selected[record_revision]`` against the
+    cutoff, so this selection -- computed for a 2026-09 replay -- certified a
+    2026-06 consumption and reached ``ACCEPT_FIELD_BINDING``.
+    """
+    record = _trade_record(monkeypatch)
+    evidence = _replay_evidence(
+        revision=_selection_of(
+            _revision("rev-p3-4"),
+            _revision("rev-LATER", known_from=datetime(2026, 9, 1, tzinfo=UTC)),
+        )
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=evidence))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE
+    assert verdict.replay_status == "NOT_BOUND"
+    assert "rev-LATER" in (verdict.refusal_detail or "")
+
+
+def test_f4_a_valid_multi_revision_selection_still_passes(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Positive control: closing F4 must not become a blanket refusal.
+
+    Three selected revisions, every one known by the cutoff -- including one
+    known EXACTLY at it, which the existing temporal law admits.
+    """
+    record = _trade_record(monkeypatch)
+    evidence = _replay_evidence(
+        revision=_selection_of(
+            _revision("rev-p3-4"),
+            _revision("rev-audit-2", known_from=datetime(2026, 5, 1, tzinfo=UTC)),
+            _revision("rev-audit-3", known_from=CUTOFF),
+        )
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=evidence))
+    assert verdict.decision is not ConsumerDecision.REFUSE, verdict.refusal_detail
+    assert verdict.replay_status == "ELIGIBLE"
+    assert verdict.decision is ConsumerDecision.INTEGRATION_REQUIRED
+
+
+def test_f4_equivalent_offsets_behave_identically(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The same instant in another offset is the same instant, and one second
+    later is later -- the sweep compares instants, not wall-clock text."""
+    from datetime import timedelta, timezone
+
+    record = _trade_record(monkeypatch)
+    plus_nine = timezone(timedelta(hours=9))
+    minus_five = timezone(timedelta(hours=-5))
+
+    same = _replay_evidence(
+        revision=_selection_of(
+            _revision("rev-p3-4"),
+            _revision("rev-audit-2", known_from=datetime(2026, 6, 1, 21, 0, tzinfo=plus_nine)),
+        )
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=same))
+    assert verdict.decision is not ConsumerDecision.REFUSE, verdict.refusal_detail
+
+    later = _replay_evidence(
+        revision=_selection_of(
+            _revision("rev-p3-4"),
+            _revision("rev-audit-2", known_from=datetime(2026, 6, 1, 7, 0, 1, tzinfo=minus_five)),
+        )
+    )
+    late_verdict = _policy(_manifest()).evaluate(
+        _request(record, replay_evidence=later)
+    )
+    assert late_verdict.decision is ConsumerDecision.REFUSE
+    assert late_verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE
+
+
+def test_f4_a_duplicate_selected_identity_cannot_hide_a_late_entry(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The id-keyed view would keep the LAST entry; the sequence is authoritative.
+
+    Ordering here is (late, early) for the same id, so a dict built over the
+    entries kept the early one and the late entry was never read.
+    """
+    record = _trade_record(monkeypatch)
+    evidence = _replay_evidence(
+        revision=_selection_of(
+            _revision("rev-p3-4", known_from=datetime(2026, 9, 1, tzinfo=UTC)),
+            _revision("rev-p3-4"),
+        )
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=evidence))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert "more than once" in (verdict.refusal_detail or "")
+
+
+def test_f4_a_selected_entry_cannot_also_be_excluded(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """selected ∪ excluded is empty; a self-contradicting selection proves nothing."""
+    record = _trade_record(monkeypatch)
+    mine = _revision("rev-p3-4")
+    evidence = _replay_evidence(
+        revision=_selection_of(mine, excluded=(_revision("rev-p3-4"),))
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=evidence))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert "BOTH selected and excluded" in (verdict.refusal_detail or "")
+
+
+def test_f4_entry_order_cannot_change_the_decision(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+    early = _revision("rev-audit-2", known_from=datetime(2026, 5, 1, tzinfo=UTC))
+    late = _revision("rev-LATER", known_from=datetime(2026, 9, 1, tzinfo=UTC))
+    chosen = _revision("rev-p3-4")
+
+    outcomes = []
+    for items in ((chosen, early, late), (late, chosen, early), (early, late, chosen)):
+        verdict = _policy(_manifest()).evaluate(
+            _request(record, replay_evidence=_replay_evidence(revision=_selection_of(*items)))
+        )
+        outcomes.append(
+            (verdict.decision, verdict.refusal_reason, verdict.replay_status)
+        )
+    assert len(set(outcomes)) == 1, outcomes
+    assert outcomes[0][0] is ConsumerDecision.REFUSE
+    assert outcomes[0][1] is ConsumerRefusalReason.PIT_INADMISSIBLE
+
+
+def test_f4_a_malformed_non_chosen_selected_instant_refuses(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A malformed entry that is not the chosen one is still evidence to order.
+
+    Driven at the seam: the request revalidation normally refuses such a
+    selection first, and this proves the binding itself does not treat an
+    unorderable entry as if it were absent.
+    """
+    record = _trade_record(monkeypatch)
+    broken = RevisionRecord.model_construct(
+        source_revision_id="rev-broken",
+        normalization_generation=1,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from="not-an-instant",
+        known_to=None,
+    )
+    evidence = _replay_evidence(
+        revision=_selection_of(_revision("rev-p3-4"), broken)
+    )
+    refusal = _policy(_manifest())._bind_replay(  # noqa: SLF001
+        evidence, record, CUTOFF
+    )
+    assert refusal is not None
+    reason, detail = refusal
+    assert reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert "not a timestamp" in detail
+
+
+def test_f4_an_excluded_future_revision_needs_no_cutoff_instant(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Exclusion evidence is retained BECAUSE it was not knowable here.
+
+    Ordering the excluded half against the cutoff would delete the evidence of
+    the exclusion, which is the opposite of the requirement.
+    """
+    record = _trade_record(monkeypatch)
+    evidence = _replay_evidence(
+        revision=_selection_of(
+            _revision("rev-p3-4"),
+            excluded=(
+                _revision("rev-FUTURE", known_from=datetime(2026, 12, 1, tzinfo=UTC)),
+            ),
+        )
+    )
+    verdict = _policy(_manifest()).evaluate(_request(record, replay_evidence=evidence))
+    assert verdict.decision is not ConsumerDecision.REFUSE, verdict.refusal_detail
+    assert verdict.replay_status == "ELIGIBLE"
+
+
+def test_f1_the_unresolved_binding_guard_is_executable_and_off(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """F1 residual: four distinct claims, and the fourth is not establishable."""
+    assert policy_module.REPLAY_RECORD_BINDING_ESTABLISHED is False
+    assert len(policy_module.REPLAY_BINDING_CLAIMS) == 4
+    assert set(policy_module.REPLAY_BINDING_CLAIMS) == {
+        "TEMPORAL_ELIGIBILITY",
+        "REVISION_IDENTITY_COMPATIBILITY",
+        "RECORD_PROVIDER_ARTIFACT_BINDING",
+        "AUTHORITY_TO_CONSUME",
+    }
+
+    record = _trade_record(monkeypatch)
+    source = _RecordingSource(CustodyAuthorityBasis.AUTHORIZED)
+    held = _policy(_manifest(), source=source).evaluate(_request(record))
+    assert held.decision is ConsumerDecision.INTEGRATION_REQUIRED
+    detail = held.custody_authorization_detail or ""
+    assert policy_module.REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT in detail
+    assert "met:" in detail  # the claims that DID hold are named, not collapsed
+
+    # M-BIND: flipping the guard alone makes the unsupported acceptance
+    # reachable again, which is what makes it a guard rather than prose.
+    monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED", True)
+    unsupported = _policy(_manifest(), source=source).evaluate(_request(record))
+    assert unsupported.decision is ConsumerDecision.ACCEPT_FIELD_BINDING
 
 
 # ---------------------------------------------------------------------------
@@ -727,7 +994,9 @@ def test_h05_both_reads_are_of_the_same_approved_identity(
     verdict = _policy(_manifest(), custody=custody, source=source).evaluate(
         _request(record)
     )
-    assert verdict.decision is ConsumerDecision.ACCEPT_FIELD_BINDING
+    # The terminal outcome is the record-binding gate (F1 residual); the two
+    # measured reads and the identity the source saw are independent of it.
+    assert verdict.decision is ConsumerDecision.INTEGRATION_REQUIRED
     assert custody.reads == [REF, REF]  # derivation, then the consumption re-read
     assert source.seen[-1].artifact_id == ARTIFACT_ID
     assert verdict.custody_status == "VERIFIED"

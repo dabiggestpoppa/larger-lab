@@ -52,9 +52,13 @@ leaks, not whether any does: an ``OSError``, a ``RuntimeError`` from a custody
 adapter or a serializer error can carry a credential, a local path, artifact
 bytes or an evidence digest, and a verdict travels to whoever consumes the
 record.  So an unexpected exception contributes its class and nothing else.
-Typed refusals keep their authored detail, because that string is produced by
-this repository's own verifier from codes and field names -- never from a
-foreign exception object.  ``KeyboardInterrupt`` and ``SystemExit`` propagate.
+F5 (final hardening): a TYPED refusal contributes its refusal TOKEN from the
+approved vocabulary and a fixed diagnostic, and never its authored ``detail``.
+An authored sentence is still free text assembled at the failing layer, and one
+path -- ``str(exc)`` of a typed refusal, whose message is
+``"<CODE>: <detail>"`` -- would have relayed the payload even where the detail
+was never formatted here.  ``KeyboardInterrupt`` and ``SystemExit`` propagate,
+and no exception text is written to a log as a substitute.
 
 H02 (final hardening).  Running the I05 gate over structurally valid evidence
 does not establish that the evidence describes THIS record.  ``ReplayEvidence``
@@ -66,6 +70,27 @@ record's declared one -- and refuses when they disagree.  The axes the schema
 cannot express are named in :data:`UNRESOLVED_REPLAY_BINDING` rather than
 invented, on the same precedent as
 ``OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1``.
+
+F4 (final hardening).  The cutoff law orders EVERY selected revision, not only
+the record's own.  A selection assembled at a later replay can agree with this
+record's revision and still contain another revision that did not exist at this
+cutoff: agreement about ``WHICH`` revisions was never an answer about ``WHEN``.
+The sweep runs over the ORIGINAL selected sequence, before any id-keyed mapping,
+so a duplicate identity cannot hide a late entry behind an early one; the
+excluded half is deliberately NOT ordered against the cutoff, because an
+excluded revision is retained precisely as evidence that it was not known here.
+
+F1 residual (unresolved record binding).  Temporal eligibility, revision
+identity compatibility, complete record/provider/artifact evidence binding and
+authority to consume are FOUR claims, and the frozen I05 ``ReplayEvidence``
+schema can carry only the first two plus the record's own revision identity.  So
+complete binding is not establishable here at all, and it is executable rather
+than documentary: :data:`REPLAY_RECORD_BINDING_ESTABLISHED` is ``False``, and a
+evaluation that satisfies every other claim terminates in
+``INTEGRATION_REQUIRED`` naming ``REPLAY_EVIDENCE_RECORD_BINDING_V1`` instead of
+an acceptance that would imply a binding the schema cannot support.  Minting the
+contract is an operator decision; flipping this guard without implementing it
+is a mutation the suite detects.
 
 H04 (final hardening).  The boundary is TOTAL.  ``evaluate`` is a thin guard
 around ``_evaluate``; anything data-shaped that escapes the named handling --
@@ -90,6 +115,7 @@ import crypto_sensor_fabric.normalization.authority as _authority_pkg
 from pydantic import ValidationError
 
 from ..authority import (
+    AuthorityRefusal,
     SemanticAuthorityRefusal,
     evidence_digest,
     load_trusted_authority,
@@ -145,6 +171,17 @@ _INTEGRATION_ABSENT_REFUSALS = frozenset(
     }
 )
 
+#: Every refusal code this repository owns.  F5: a verdict may carry a member of
+#: this vocabulary, and nothing else that looks like a code.
+_APPROVED_REFUSAL_TOKENS = frozenset(
+    [item.value for item in RecordVerificationRefusal]
+    + [item.value for item in AuthorityRefusal]
+)
+
+#: What a verdict says when the failing layer named no approved code at all.
+#: Fixed text: a fallback that echoed the payload would be the leak itself.
+_UNSPECIFIED_REFUSAL = "UNSPECIFIED_REFUSAL"
+
 #: Refusals that mean "this record cannot be placed in time at this cutoff".
 #: They are violations of an approval that *exists*, so they are PIT
 #: inadmissibility, never "integration absent": an approval that was not yet
@@ -181,6 +218,31 @@ UNRESOLVED_REPLAY_BINDING = (
     "are bound here; the remaining axes are not invented."
 )
 
+#: The contract that would carry the missing axes.  Named, never minted here.
+REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT = "REPLAY_EVIDENCE_RECORD_BINDING_V1"
+
+#: F1 residual: is complete record-level replay binding established?
+#:
+#: ``False`` is the measured state: the frozen I05 schema carries no record id,
+#: provider, record kind or artifact identity, so the policy can establish
+#: temporal eligibility and revision identity compatibility and nothing more.
+#: This is an executable guard rather than a docstring -- while it is ``False``
+#: no evaluation reaches :attr:`ConsumerDecision.ACCEPT_FIELD_BINDING`, however
+#: well every other claim holds.  An operator mission that mints
+#: :data:`REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT` flips it by implementing the
+#: binding; flipping it alone is a mutation the security suite detects.
+REPLAY_RECORD_BINDING_ESTABLISHED: bool = False
+
+#: The four independent claims an authoritative consumption needs.  Kept as a
+#: tuple so a test can assert the guard names each one and refuses to collapse
+#: them into one badge.
+REPLAY_BINDING_CLAIMS = (
+    "TEMPORAL_ELIGIBILITY",
+    "REVISION_IDENTITY_COMPATIBILITY",
+    "RECORD_PROVIDER_ARTIFACT_BINDING",
+    "AUTHORITY_TO_CONSUME",
+)
+
 
 def _bounded(text: object, limit: int = _DETAIL_MAX) -> str:
     """One line, hard length bound.  Never a traceback, and never a raise."""
@@ -206,6 +268,27 @@ def _withheld(exc: BaseException) -> str:
         "because it is untrusted text that may carry credentials, artifacts or "
         "evidence"
     )
+
+
+def _approved_refusal(value: object) -> str | None:
+    """Reduce a refusal to an APPROVED token, or ``None`` (F5).
+
+    A typed refusal's ``detail`` is authored free text assembled at the failing
+    layer, so it may not travel into a verdict; the CODE may, because the code
+    is the closed vocabulary this repository defines.  An object that claims to
+    be a refusal without naming a member of that vocabulary gets ``None`` -- the
+    caller then reports :data:`_UNSPECIFIED_REFUSAL`, never the claimed text.
+    """
+    if isinstance(value, (RecordVerificationRefusal, AuthorityRefusal)):
+        return value.value
+    if isinstance(value, str) and value in _APPROVED_REFUSAL_TOKENS:
+        return value
+    return None
+
+
+def _refusal_token(value: object) -> str:
+    """``_approved_refusal`` or the fixed fallback; never interpolated text."""
+    return _approved_refusal(value) or _UNSPECIFIED_REFUSAL
 
 
 def _identifiers(derived: object, name: str) -> tuple[str, ...]:
@@ -420,36 +503,50 @@ class TrustConsumerPolicy:
                 )
             derived.assert_trustworthy()
         except RecordVerificationError as exc:
-            if exc.refusal in _PIT_REFUSALS:
+            # F5: the CODE travels, the authored ``detail`` does not.  The
+            # classification still reads the mutable refusal SETS, so the
+            # reporting mutations that empty them keep their meaning.
+            code = getattr(exc, "refusal", None)
+            try:
+                pit = code in _PIT_REFUSALS
+                absent = code in _INTEGRATION_ABSENT_REFUSALS
+            except TypeError:  # an unhashable claimed code is not a code
+                pit = absent = False
+            token = _refusal_token(code)
+            if pit:
                 return self._refuse(
                     ConsumerRefusalReason.PIT_INADMISSIBLE,
-                    f"{exc.refusal.value}: {exc.detail}",
+                    f"{token}: the approval or its evidence was not admissible at "
+                    "this request's knowledge cutoff",
                     replay_status=replay.status,
                 )
-            if exc.refusal in _INTEGRATION_ABSENT_REFUSALS:
+            if absent:
                 return self._integration_required(
-                    f"no integration to evaluate: {exc.refusal.value}",
+                    f"no integration to evaluate: {token}",
                     replay_status=replay.status,
                     pit_status="INADMISSIBLE",
                     custody_status="NOT_PROVIDED",
                 )
             return self._refuse(
                 ConsumerRefusalReason.VERIFICATION_FAILED,
-                f"{exc.refusal.value}: {exc.detail}",
+                f"{token}: record verification did not establish economic field "
+                "binding for this record",
                 replay_status=replay.status,
             )
         except SemanticAuthorityRefusal as exc:
-            refusal = str(getattr(exc, "refusal", exc))
-            if refusal in {item.value for item in _INTEGRATION_ABSENT_REFUSALS}:
+            # F5: ``str(exc)`` is "<CODE>: <detail>", so it is never used here.
+            token = _refusal_token(getattr(exc, "refusal", None))
+            if token in {item.value for item in _INTEGRATION_ABSENT_REFUSALS}:
                 return self._integration_required(
-                    f"no integration to evaluate: {refusal}",
+                    f"no integration to evaluate: {token}",
                     replay_status=replay.status,
                     pit_status="INADMISSIBLE",
                     custody_status="NOT_PROVIDED",
                 )
             return self._refuse(
                 ConsumerRefusalReason.VERIFICATION_FAILED,
-                f"{refusal}: {getattr(exc, 'detail', '')}",
+                f"{token}: the semantic authority did not establish an approval "
+                "for this record; its authored detail is not relayed",
                 replay_status=replay.status,
             )
         except Exception as exc:  # noqa: BLE001 - fail closed, class only
@@ -487,9 +584,17 @@ class TrustConsumerPolicy:
             )
         try:
             evaluation = assess_replay_eligibility(evidence)  # type: ignore[arg-type]
-        except UnassessableReplayEvidence as exc:
+        except UnassessableReplayEvidence:
+            # F5: the gate's message is assembled from evidence values, so it is
+            # exception text like any other and does not become verdict text.
             return _ReplayAdjudication(
-                status="UNASSESSABLE", blocked=True, detail=_bounded(exc)
+                status="UNASSESSABLE",
+                blocked=True,
+                detail=(
+                    "the replay gate could not express this evidence in its frozen "
+                    "eligibility vocabulary; its message is withheld because it is "
+                    "assembled from the evidence it read"
+                ),
             )
         except Exception as exc:  # noqa: BLE001 - a broken gate blocks, never opens
             return _ReplayAdjudication(
@@ -521,8 +626,11 @@ class TrustConsumerPolicy:
            a selection that EXCLUDES it is a row that was not known at the
            cutoff, and a selection that does not mention it at all describes a
            different observation;
-        2. no selected revision may have become known after the cutoff -- that
-           is a selection computed for a later replay;
+        2. EVERY selected revision must have become known by the cutoff -- not
+           only the record's own.  A selection assembled at a later replay can
+           agree with this record's revision and still contain another revision
+           that did not exist here, so the cutoff law is ordered over the whole
+           selected sequence (F4);
         3. the evidence's market-availability instant may not be after the
            cutoff, and must agree with the record's own declared one when the
            record declares it (an availability instant that contradicts the
@@ -546,14 +654,62 @@ class TrustConsumerPolicy:
                 "ties it to this record; cutoff compatibility is unproven",
             )
         try:
-            selected = {item.source_revision_id: item for item in revision.selected}
-            excluded = {item.source_revision_id: item for item in revision.excluded}
+            selected_items = tuple(revision.selected)
+            excluded_items = tuple(revision.excluded)
         except Exception:  # noqa: BLE001 - a malformed selection is not evidence
             return (
                 ConsumerRefusalReason.REPLAY_BLOCKED,
                 "the replay evidence carries a revision selection that cannot be "
                 "read; malformed evidence certifies nothing",
             )
+
+        # F4: the ORIGINAL selected sequence is validated before any id-keyed
+        # mapping.  A dict built from the entries keeps the LAST one for an id,
+        # so an early admissible entry could stand in front of a late entry for
+        # the same revision and the late entry would never be read.
+        selected_ids: list[str] = []
+        selected_instants: list[object] = []
+        for item in selected_items:
+            identity = getattr(item, "source_revision_id", None)
+            if not isinstance(identity, str) or not identity.strip():
+                return (
+                    ConsumerRefusalReason.REPLAY_BLOCKED,
+                    "a selected revision declares no source revision identity; a "
+                    "selection whose entries cannot be named certifies nothing",
+                )
+            selected_ids.append(identity)
+            selected_instants.append(getattr(item, "known_from", None))
+        excluded_ids: list[str] = []
+        for item in excluded_items:
+            identity = getattr(item, "source_revision_id", None)
+            if not isinstance(identity, str) or not identity.strip():
+                return (
+                    ConsumerRefusalReason.REPLAY_BLOCKED,
+                    "an excluded revision declares no source revision identity; a "
+                    "selection whose entries cannot be named certifies nothing",
+                )
+            excluded_ids.append(identity)
+
+        repeated = sorted(
+            {identity for identity in selected_ids if selected_ids.count(identity) > 1}
+        )
+        if repeated:
+            return (
+                ConsumerRefusalReason.REPLAY_BLOCKED,
+                f"the replay selection names revision(s) {repeated} more than "
+                "once; two entries for one revision are a contradiction, and a "
+                "contradictory selection certifies nothing",
+            )
+        both = sorted(set(selected_ids) & set(excluded_ids))
+        if both:
+            return (
+                ConsumerRefusalReason.REPLAY_BLOCKED,
+                f"revision(s) {both} are BOTH selected and excluded; a selection "
+                "that contradicts itself cannot manufacture admissibility",
+            )
+
+        selected = frozenset(selected_ids)
+        excluded = frozenset(excluded_ids)
 
         record_revision = getattr(record, "source_revision_id", None)
         if not isinstance(record_revision, str) or not record_revision.strip():
@@ -563,7 +719,7 @@ class TrustConsumerPolicy:
                 "cannot be bound to it",
             )
 
-        if record_revision in excluded and record_revision not in selected:
+        if record_revision in excluded:
             return (
                 ConsumerRefusalReason.PIT_INADMISSIBLE,
                 f"the replay evidence excludes revision {record_revision!r}; a "
@@ -578,20 +734,42 @@ class TrustConsumerPolicy:
                 "about another observation certifies nothing here",
             )
 
-        chosen = selected[record_revision]
-        try:
-            if chosen.known_from > cutoff:
+        # F4: the cutoff law orders EVERY selected revision, read from the
+        # original sequence so the answer cannot depend on entry order.  The
+        # excluded half is deliberately not ordered: an excluded revision is
+        # retained BECAUSE it was not known here, and requiring its instant to be
+        # inside the window would delete the evidence of its exclusion.
+        future: list[str] = []
+        for identity, known_from in zip(selected_ids, selected_instants):
+            if not isinstance(known_from, datetime):
                 return (
-                    ConsumerRefusalReason.PIT_INADMISSIBLE,
-                    "the replay selection was computed for a LATER cutoff: the "
-                    f"selected revision {record_revision!r} became known after "
-                    "this request's knowledge cutoff",
+                    ConsumerRefusalReason.REPLAY_BLOCKED,
+                    "a selected revision's knowledge instant is not a timestamp; "
+                    "the selection cannot be placed in time and certifies nothing",
                 )
-        except Exception:  # noqa: BLE001 - a non-instant known_from is malformed
+            try:
+                placeable = (
+                    known_from.tzinfo is not None
+                    and known_from.utcoffset() is not None
+                )
+            except Exception:  # noqa: BLE001 - a hostile tzinfo is malformed
+                placeable = False
+            if not placeable:
+                return (
+                    ConsumerRefusalReason.REPLAY_BLOCKED,
+                    "a selected revision's knowledge instant is naive, so it "
+                    "occupies no position on a timeline; ordering it against the "
+                    "cutoff would fabricate a PIT answer",
+                )
+            if known_from > cutoff:
+                future.append(identity)
+        if future:
             return (
-                ConsumerRefusalReason.REPLAY_BLOCKED,
-                "the replay selection's knowledge window cannot be ordered "
-                "against this cutoff; malformed evidence certifies nothing",
+                ConsumerRefusalReason.PIT_INADMISSIBLE,
+                "the replay selection was computed for a LATER cutoff: selected "
+                f"revision(s) {sorted(set(future))} became known after this "
+                "request's knowledge cutoff, so the selection does not describe "
+                "what was known here",
             )
 
         available = getattr(evidence, "market_available_at", None)
@@ -857,11 +1035,11 @@ class TrustConsumerPolicy:
                 evaluation_at=cutoff,
             )
         except (RecordVerificationError, SemanticAuthorityRefusal) as exc:
-            refusal = getattr(exc, "refusal", None)
+            # F5: the approved token or the exception CLASS -- never the detail.
             return (
                 ConsumerRefusalReason.VERIFICATION_FAILED,
-                f"the approved evidence set could not be re-derived: "
-                f"{getattr(refusal, 'value', refusal) or type(exc).__name__}",
+                "the approved evidence set could not be re-derived: "
+                f"{_approved_refusal(getattr(exc, 'refusal', None)) or type(exc).__name__}",
             )
 
         approved = dict(authority.evidence_blobs)
@@ -1028,6 +1206,29 @@ class TrustConsumerPolicy:
                 pit_status=pit_status,
                 custody_status=custody_status,
             )
+
+        # F1 residual.  Every claim the frozen schema CAN carry now holds:
+        # temporal eligibility, revision identity compatibility, and an
+        # AUTHORIZED custody basis bound to this exact identity.  The fourth
+        # claim -- complete record / provider / artifact evidence binding -- is
+        # not expressible in ``ReplayEvidence`` at all, and an
+        # ``ACCEPT_FIELD_BINDING`` would read as though it had been established.
+        # So the terminal outcome names the unmet contract instead.  Removing
+        # this guard is mutation M-BIND: the suite then reports the acceptance
+        # that the frozen schema cannot support.
+        if not REPLAY_RECORD_BINDING_ESTABLISHED:
+            return self._integration_required(
+                f"unmet {REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT}: the frozen "
+                "replay schema carries no record id, provider, record kind or "
+                "artifact identity, so complete evidence binding for this record "
+                "cannot be established; met: temporal eligibility, revision "
+                "identity compatibility, authority to consume",
+                derived=derived,
+                replay_status=replay.status,
+                pit_status=pit_status,
+                custody_status=custody_status,
+            )
+
         return ConsumerVerdict(
             decision=ConsumerDecision.ACCEPT_FIELD_BINDING,
             verified_field_allowlist=derived.fields_verified,

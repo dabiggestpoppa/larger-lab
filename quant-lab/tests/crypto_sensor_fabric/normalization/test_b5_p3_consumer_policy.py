@@ -491,18 +491,35 @@ def test_the_shipped_manifest_yields_integration_required(monkeypatch: pytest.Mo
         assert verdict.custody_source_authorized is False
 
 
-def test_the_accepting_branch_is_reachable_only_through_the_test_double(
+def test_the_accepting_branch_requires_the_record_binding_contract(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """A wiring double can accept; the shipped source cannot (see next test)."""
+    """A wiring double satisfies authority; the record binding is still missing.
+
+    F1 residual: the fourth claim (complete record / provider / artifact
+    evidence binding) is not expressible in the frozen I05 ``ReplayEvidence``
+    schema, so a fully satisfied evaluation terminates in
+    ``INTEGRATION_REQUIRED`` naming ``REPLAY_EVIDENCE_RECORD_BINDING_V1`` -- not
+    in an acceptance.  Flipping the executable guard is the state a MINTED
+    contract would create, and it is the only way to reach the accepting branch:
+    that is what proves the branch itself was not deleted by the guard.
+    """
     record = _trade_record(monkeypatch)
     source = _FixedAuthoritySource(CustodyAuthorityBasis.AUTHORIZED)
+    held = _policy(authority_source=source).evaluate(_request(record))
+    assert held.decision is ConsumerDecision.INTEGRATION_REQUIRED
+    assert policy_module.REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT in (
+        held.custody_authorization_detail or ""
+    )
+    assert held.custody_source_authorized is False
+    assert source.seen and source.seen[0].record_kind == "TRADE"
+
+    monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED", True)
     verdict = _policy(authority_source=source).evaluate(_request(record))
     assert verdict.decision is ConsumerDecision.ACCEPT_FIELD_BINDING
     assert verdict.custody_source_authorized is True
     assert verdict.custody_source_authorization_status is CustodyAuthorityBasis.AUTHORIZED
     assert verdict.unverified_dimensions  # an acceptance still enumerates its gaps
-    assert source.seen and source.seen[0].record_kind == "TRADE"
 
 
 def test_the_production_source_never_authorizes(monkeypatch: pytest.MonkeyPatch) -> None:

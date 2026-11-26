@@ -40,7 +40,11 @@ import pytest
 
 import crypto_sensor_fabric.normalization.authority as authority_module
 from crypto_sensor_fabric.contracts.enums import AggressorSide
-from crypto_sensor_fabric.normalization.authority import load_trusted_authority
+from crypto_sensor_fabric.normalization.authority import (
+    AuthorityRefusal,
+    SemanticAuthorityRefusal,
+    load_trusted_authority,
+)
 from crypto_sensor_fabric.normalization.common.methodologies import (
     NormalizationMethodologyRegistry,
 )
@@ -79,10 +83,15 @@ from crypto_sensor_fabric.normalization.sensors.trade import (
 )
 from crypto_sensor_fabric.normalization.sensors.verification import (
     RecordVerification,
+    RecordVerificationError,
+    RecordVerificationRefusal,
     verify_trade_record,
 )
 from crypto_sensor_fabric.normalization.time.enums import RevisionMode, RevisionStatus
-from crypto_sensor_fabric.normalization.time.replay_gate import ReplayEvidence
+from crypto_sensor_fabric.normalization.time.replay_gate import (
+    ReplayEvidence,
+    UnassessableReplayEvidence,
+)
 from crypto_sensor_fabric.normalization.time.revision_policy import (
     RevisionRecord,
     RevisionSelection,
@@ -494,7 +503,11 @@ def test_a02_model_construct_verification_cannot_be_an_input(
     control = _policy(manifest, source=_Source(CustodyAuthorityBasis.AUTHORIZED)).evaluate(
         _request(record)
     )
-    assert control.decision is ConsumerDecision.ACCEPT_FIELD_BINDING  # the real path works
+    # the real path works: it reaches the record-binding gate, not a refusal
+    assert control.decision is ConsumerDecision.INTEGRATION_REQUIRED
+    assert policy_module.REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT in (
+        control.custody_authorization_detail or ""
+    )
 
     with pytest.raises(Exception):
         _request(record, candidate=forged)
@@ -715,7 +728,9 @@ def test_a08_cross_cutoff_authority_cannot_be_reused(
     policy = _policy(manifest, source=source)
 
     verdict = policy.evaluate(_request(record))
-    assert verdict.decision is ConsumerDecision.ACCEPT_FIELD_BINDING
+    # Every claim the frozen schema carries holds; the terminal outcome is the
+    # record-binding gate, which the schema cannot satisfy (F1 residual).
+    assert verdict.decision is ConsumerDecision.INTEGRATION_REQUIRED
     # the identity the source saw is bound to THIS request's cutoff
     assert source.seen[-1].knowledge_cutoff == CUTOFF
 
@@ -824,7 +839,7 @@ def test_a15_forged_replay_eligibility_blocks(monkeypatch: pytest.MonkeyPatch) -
     control = _policy(manifest, source=_Source(CustodyAuthorityBasis.AUTHORIZED)).evaluate(
         _request(record)
     )
-    assert control.decision is ConsumerDecision.ACCEPT_FIELD_BINDING
+    assert control.decision is ConsumerDecision.INTEGRATION_REQUIRED
     assert control.replay_status == "ELIGIBLE"
 
     forced = ConsumerRequest.model_construct(
@@ -983,6 +998,7 @@ class TestMutationControls:
         monkeypatch.setattr(
             TrustConsumerPolicy, "_rebind", lambda self, *args: None
         )
+        monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED", True)
         mutated = _policy(
             manifest,
             custody=FlipCustody(DOC_BYTES, TAMPERED_BYTES),
@@ -1012,6 +1028,7 @@ class TestMutationControls:
                 status="ELIGIBLE", blocked=False, detail=""
             ),
         )
+        monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED", True)
         mutated = _policy(manifest, source=source).evaluate(
             _request(record, replay_evidence=blocked)
         )
@@ -1151,6 +1168,151 @@ def test_h01_keyboard_interrupt_still_propagates(
         _interrupt,
     )
     with pytest.raises(KeyboardInterrupt):
+        _policy(_manifest()).evaluate(_request(record))
+
+
+# ---------------------------------------------------------------------------
+# F5 -- typed-refusal confidentiality (SENSOR-B5-P3-R6-F4-F5-CLOSURE-R1)
+# ---------------------------------------------------------------------------
+
+def test_f5_a_typed_verifier_detail_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """F5: the typed branch formatted ``"<CODE>: <detail>"`` into the verdict.
+
+    ``_withheld`` guards only the unexpected-exception path, and this branch
+    fires in NORMAL operation -- every typed refusal the verifier raises -- so
+    it was the likelier leak of the two.
+    """
+    record = _trade_record(monkeypatch)
+
+    def _refuse(*args: Any, **kwargs: Any) -> None:
+        raise RecordVerificationError(
+            RecordVerificationRefusal.CUSTODY_UNVERIFIED,
+            f"adapter echoed {_SECRET} while hashing",
+        )
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", _refuse)
+    verdict = _policy(
+        _manifest(), source=_Source(CustodyAuthorityBasis.AUTHORIZED)
+    ).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED
+    assert _SECRET not in _public_text(verdict)
+    # the CODE is the approved vocabulary and does travel; the payload does not
+    assert "CUSTODY_UNVERIFIED" in (verdict.refusal_detail or "")
+
+
+def test_f5_no_typed_refusal_code_can_carry_its_detail(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Every member of the vocabulary, not only the two named in the report."""
+    record = _trade_record(monkeypatch)
+    for code in RecordVerificationRefusal:
+        def _refuse(*args: Any, _code: Any = code, **kwargs: Any) -> None:
+            raise RecordVerificationError(
+                _code, f"payload {_SECRET} attached to {_code.value}"
+            )
+
+        monkeypatch.setattr(policy_module, "verify_trade_record", _refuse)
+        verdict = _policy(
+            _manifest(), source=_Source(CustodyAuthorityBasis.AUTHORIZED)
+        ).evaluate(_request(record))
+        assert _SECRET not in _public_text(verdict), code.value
+        assert code.value in (
+            (verdict.refusal_detail or "")
+            + (verdict.custody_authorization_detail or "")
+        ), code.value
+
+
+def test_f5_a_semantic_authority_detail_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """``str(exc)`` of a typed refusal is ``"<CODE>: <detail>"`` -- never used."""
+    record = _trade_record(monkeypatch)
+
+    def _refuse(*args: Any, **kwargs: Any) -> None:
+        raise SemanticAuthorityRefusal(
+            AuthorityRefusal.MALFORMED_MANIFEST, f"manifest /srv/{_SECRET} truncated"
+        )
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", _refuse)
+    verdict = _policy(
+        _manifest(), source=_Source(CustodyAuthorityBasis.AUTHORIZED)
+    ).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert _SECRET not in _public_text(verdict)
+    assert "MALFORMED_MANIFEST" in (verdict.refusal_detail or "")
+
+
+def test_f5_a_formatted_exception_string_is_not_used_as_a_code(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A refusal object that names no approved code contributes no text at all."""
+    record = _trade_record(monkeypatch)
+
+    def _refuse(*args: Any, **kwargs: Any) -> None:
+        exc = SemanticAuthorityRefusal(AuthorityRefusal.NO_APPROVAL, "placeholder")
+        exc.refusal = f"{_SECRET}"  # a payload wearing the code's clothes
+        raise exc
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", _refuse)
+    verdict = _policy(_manifest()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert _SECRET not in _public_text(verdict)
+    assert policy_module._UNSPECIFIED_REFUSAL in (verdict.refusal_detail or "")
+
+
+def test_f5_a_loader_detail_during_rebinding_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+
+    def _refuse(*args: Any, **kwargs: Any) -> None:
+        raise RecordVerificationError(
+            RecordVerificationRefusal.DIGEST_MISMATCH,
+            f"approval digest {_SECRET} does not match",
+        )
+
+    monkeypatch.setattr(policy_module, "load_trusted_authority", _refuse)
+    verdict = _policy(
+        _manifest(), source=_Source(CustodyAuthorityBasis.AUTHORIZED)
+    ).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED
+    assert _SECRET not in _public_text(verdict)
+    assert "DIGEST_MISMATCH" in (verdict.refusal_detail or "")
+
+
+def test_f5_an_unassessable_replay_message_is_never_relayed(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The gate's own typed refusal is exception text like any other."""
+    record = _trade_record(monkeypatch)
+
+    def _explode(*args: Any, **kwargs: Any) -> None:
+        raise UnassessableReplayEvidence(
+            f"quality flag {_SECRET} has no member in the frozen vocabulary"
+        )
+
+    monkeypatch.setattr(policy_module, "assess_replay_eligibility", _explode)
+    verdict = _policy(_manifest()).evaluate(_request(record))
+    assert verdict.decision is ConsumerDecision.REFUSE
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED
+    assert verdict.replay_status == "UNASSESSABLE"
+    assert _SECRET not in _public_text(verdict)
+
+
+def test_f5_system_exit_still_propagates_from_the_typed_path(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    record = _trade_record(monkeypatch)
+
+    def _exit(*args: Any, **kwargs: Any) -> None:
+        raise SystemExit(3)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", _exit)
+    with pytest.raises(SystemExit):
         _policy(_manifest()).evaluate(_request(record))
 
 
