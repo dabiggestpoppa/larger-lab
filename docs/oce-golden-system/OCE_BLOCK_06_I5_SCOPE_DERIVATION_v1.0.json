@@ -1,0 +1,216 @@
+{
+  "allowed_production_surfaces": [
+    "oce/services/"
+  ],
+  "allowed_test_surfaces": [
+    "infrastructure/control-plane/tests/test_block_06_i5_*.py",
+    "infrastructure/control-plane/tests/stage_scope/test_block_06_i5_*.py"
+  ],
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "api_symbols": [
+    "oce.services.knowledge.knowledge_store",
+    "oce.services.knowledge.retrieve_facts",
+    "oce.services.artifact.register_artifact",
+    "oce.services.artifact.artifact_manifest",
+    "oce.services.artifact.retrieve_artifact",
+    "oce.services.evaluation.register_evaluator",
+    "oce.services.evaluation.run_evaluation",
+    "oce.services.evaluation.compare_results",
+    "oce.services.evaluation.promotion_decision",
+    "oce.services.provenance.provenance_chain"
+  ],
+  "authority_sources": [
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I5",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_PLAN_v1.0.md#1",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_CONSTRUCTION_PLAN_v1.0.md#3",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#7",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S3",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S4",
+    "docs/oce-golden-system/OCE_BLOCK_06_REUSABLE_PLATFORM_SURFACES_PLAN_v1.0.md#B6.C3.S5",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-13",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-14",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_REQUIREMENT_TEST_REGISTRY_v1.0.json#B6-P0-SEC-15",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#F03",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#F08",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#F11",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#F12",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#F23",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T05",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T06",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T07",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T08",
+    "docs/oce-golden-system/OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#T19",
+    "docs/oce-golden-system/OCE_BLOCK_06_I4_SCOPE_DERIVATION_v1.0.json",
+    "docs/oce-golden-system/OCE_BLOCK_06_I4_IMPLEMENTATION_CONTRACT_v1.0.json",
+    "docs/oce-golden-system/OCE_BLOCK_06_I4_OPERATOR_RATIFICATION_v1.0.md"
+  ],
+  "base_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+  "base_tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b",
+  "capital_authority": "none",
+  "common_regression_floor": 208,
+  "compatibility_requirements": [
+    "rows C3.S3, C3.S4 and C3.S5 are SERVICE_LOCAL until a consumer exists",
+    "no silent latest: an unknown knowledge, artifact or evaluator version is refused",
+    "consumer evidence is none at this stage and no compatibility claim is made",
+    "prior stage artifacts, symbols and tests remain byte-identical"
+  ],
+  "cost_usd": 0,
+  "deferred_threats": [
+    {
+      "bound": false,
+      "current_publication_witness": null,
+      "expected_refusal": "refuse publication",
+      "future_planned_node": "publication-hold gate node (provisional and unassigned; no stage has frozen a concrete node ID)",
+      "future_verification_authority": "PROPOSED_PENDING_OPERATOR_DECISION",
+      "future_verification_decision_required": "Operator must assign or confirm the stage that will witness T19 'refuse publication' and freeze a concrete node ID there. No governing document assigns this verification to B6-I9; B6-I9 is only the platform-gate stage in the construction sequence, so this destination remains a proposal and is not authorized.",
+      "governing_source": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19] (owner=operator, stage=B6-I2, required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED)",
+      "id": "T19",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "no_current_publication_witness": true,
+      "outside_current_partition": true,
+      "owner": "operator",
+      "proof_state": "DEFERRED",
+      "proposed_future_verification_stage": "B6-I9",
+      "reason": "Publication refusal belongs to the release boundary. OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19]: owner=operator, stage=B6-I2 (source stage), required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED. The registry row records only the source stage B6-I2 (owner operator, required_refusal 'refuse publication', mitigation_state PLANNED_NOT_IMPLEMENTED); it names no later verification stage. B6-I5's surface is services only, with no packaging, publication or cloud capability, so no B6-I5 node can produce a refuse-publication observable.",
+      "source_document": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json",
+      "source_row": "threats[T19]",
+      "source_stage": "B6-I2",
+      "source_stage_field": "stage"
+    }
+  ],
+  "deferred_work": [
+    "C4 adapter contract, translation, isolation and certification (B6-I6)",
+    "C5 second application and reuse measurement (B6-I7)",
+    "independent API, security, compatibility and recovery audit (B6-I8)",
+    "platform gate and downstream dependency contract (B6-I9)",
+    "post-Book-6 evaluation system: RESERVED_NOT_AUTHORIZED",
+    "packaging or publication of any artifact: NOT_AUTHORIZED",
+    "cloud hosting or provider coupling: NOT_AUTHORIZED",
+    "T19 publication refusal deferred to operator; proposed verification destination B6-I9 is PROPOSED_PENDING_OPERATOR_DECISION and not authorized (post-audit correction 001)"
+  ],
+  "depends_on": [
+    "B6-I4"
+  ],
+  "document_id": "OCE-B6-I5-SCOPE-001",
+  "evidence_artifact": "provenance and tamper evidence",
+  "evidence_requirements": [
+    "contract, scope and registry are committed and frozen before any result is recorded",
+    "every requirement is bound to a named executed node, never to a badge or a narrative",
+    "the mutation battery runs at or above the floor of 3 and restores pristine bytes",
+    "the provenance chain reconciles end-to-end from fact to artifact to evaluation to decision",
+    "tamper, substitution and stale-version refusals are recorded with their digests",
+    "independence evidence shows the builder cannot alter, execute or approve its own result",
+    "the exact base/head paired comparison runs against the B6-I4 merge with common floor 208",
+    "validator output, node totals and cleanup proof report zero failures, errors and skips",
+    "evidence JSON is deterministic and carries hashes, sizes and commit identity, never a wall clock"
+  ],
+  "exit_gate": "provenance, tamper and independent gate pass",
+  "failure_classes": [
+    "F03",
+    "F08",
+    "F11",
+    "F12",
+    "F23"
+  ],
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "i4_merge_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+  "i4_ratification_head": "60879f0d0761bc498221b649c43e4ad56226fe5e",
+  "implementation_surfaces": [
+    "services"
+  ],
+  "inputs": [
+    "B6-I4"
+  ],
+  "locks": {
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "G16": "OPEN",
+    "G16_OWNER": "B5I8-DF05",
+    "IMPLEMENTATION_AUTHORIZED": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "evaluation_system": "RESERVED_NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "minimum_nodes": 40,
+  "mutation_floor": {
+    "source": 3,
+    "stage": 3
+  },
+  "non_goals": [
+    "adapter layer",
+    "C4 translation and certification",
+    "second application",
+    "audit of I1-I7",
+    "platform gate",
+    "post-Book-6 evaluation system",
+    "package publication",
+    "cloud hosting"
+  ],
+  "outputs": [
+    "knowledge",
+    "artifact",
+    "evaluation"
+  ],
+  "p0_documentation_only": true,
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "deferred T19 threat entry and deferred-work note",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
+  "provenance_obligations": [
+    "every governed fact carries a source reference and a digest before it is retrievable",
+    "knowledge stays separate from agent memory and shares no mutable store with it",
+    "retrieval is scoped to one tenant, project and scope and refuses any wider read",
+    "an artifact is registered once with an immutable digest and size and is never overwritten",
+    "a served artifact must equal its manifest digest; a different artifact for a name is refused",
+    "a result recorded by the evaluation service cannot be replaced, only superseded by a new run id",
+    "the evaluator definition is digest-bound so a builder cannot silently change it",
+    "a promotion decision requires a gate result and an approver that is not the builder",
+    "the provenance chain reconciles fact, artifact, evaluation and decision end-to-end",
+    "prior stage artifacts remain byte-identical"
+  ],
+  "purpose": "C3 knowledge, artifact and evaluation services",
+  "requirements": [
+    "B6-P0-SEC-13",
+    "B6-P0-SEC-14",
+    "B6-P0-SEC-15"
+  ],
+  "schema": "oce.block_06_i5.scope.v1",
+  "sections": [
+    "C3.S3",
+    "C3.S4",
+    "C3.S5"
+  ],
+  "stage": "B6-I5",
+  "stage_kind": "implementation",
+  "stop_conditions": [
+    "stop if builder can alter evaluator"
+  ],
+  "surface_preflight": {
+    "later_stage_branches_on_origin": [],
+    "later_stage_paths_on_base": 0,
+    "local_unpublished_probe_disclosed": true,
+    "reserved_filenames_on_base": [],
+    "reserved_node_prefixes_on_base": []
+  },
+  "threats": [
+    "T05",
+    "T06",
+    "T07",
+    "T08"
+  ]
+}

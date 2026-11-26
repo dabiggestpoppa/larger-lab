@@ -1,0 +1,196 @@
+{
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "document_id": "OCE-B6-I5-SURFACE-001",
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "service surface claims",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
+  "prohibitions": [
+    "no client supplied authority",
+    "no raw secret stored in services",
+    "no wall clock read",
+    "no random ids or random sampling",
+    "no later stage import",
+    "no cloud or network access",
+    "no operator surface in this stage",
+    "no agent memory read or write"
+  ],
+  "schema": "oce.block_06_i5.service_surface.v1",
+  "section_bindings": {
+    "C3.S3": "oce.services.knowledge.knowledge_store + retrieve_facts",
+    "C3.S4": "oce.services.artifact.register_artifact + artifact_manifest + retrieve_artifact",
+    "C3.S5": "oce.services.evaluation.register_evaluator + run_evaluation + compare_results + promotion_decision",
+    "provenance": "oce.services.provenance.provenance_chain"
+  },
+  "stage": "B6-I5",
+  "status": "FROZEN",
+  "symbols": [
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_duplicate_fact_missing_source_unknown_scope",
+      "exported": true,
+      "section": "C3.S3",
+      "symbol": "oce.services.knowledge.knowledge_store",
+      "typed_inputs": [
+        "facts",
+        "scope"
+      ],
+      "typed_outputs": [
+        "knowledge_registry"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unpromoted_cross_scope_stale_version",
+      "exported": true,
+      "section": "C3.S3",
+      "symbol": "oce.services.knowledge.retrieve_facts",
+      "typed_inputs": [
+        "registry",
+        "query",
+        "scope",
+        "requester"
+      ],
+      "typed_outputs": [
+        "fact_set"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_duplicate_artifact_missing_digest_unknown_storage_class",
+      "exported": true,
+      "section": "C3.S4",
+      "symbol": "oce.services.artifact.register_artifact",
+      "typed_inputs": [
+        "artifact",
+        "manifest_row"
+      ],
+      "typed_outputs": [
+        "artifact_record"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_manifest_mismatch_missing_artifact",
+      "exported": true,
+      "section": "C3.S4",
+      "symbol": "oce.services.artifact.artifact_manifest",
+      "typed_inputs": [
+        "records"
+      ],
+      "typed_outputs": [
+        "artifact_manifest"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unauthorized_retrieval_digest_mismatch_missing_artifact_stale_version",
+      "exported": true,
+      "section": "C3.S4",
+      "symbol": "oce.services.artifact.retrieve_artifact",
+      "typed_inputs": [
+        "manifest",
+        "artifact_id",
+        "version",
+        "requester"
+      ],
+      "typed_outputs": [
+        "artifact_bytes_ref"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_duplicate_evaluator_missing_definition_digest",
+      "exported": true,
+      "section": "C3.S5",
+      "symbol": "oce.services.evaluation.register_evaluator",
+      "typed_inputs": [
+        "evaluator"
+      ],
+      "typed_outputs": [
+        "evaluator_registry"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_unregistered_evaluator_evaluator_changed_result_overwrite",
+      "exported": true,
+      "section": "C3.S5",
+      "symbol": "oce.services.evaluation.run_evaluation",
+      "typed_inputs": [
+        "registry",
+        "evaluator_id",
+        "evaluator_digest",
+        "subject",
+        "run_id"
+      ],
+      "typed_outputs": [
+        "evaluation_result"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_comparison_version",
+      "exported": true,
+      "section": "C3.S5",
+      "symbol": "oce.services.evaluation.compare_results",
+      "typed_inputs": [
+        "results",
+        "evaluator_id"
+      ],
+      "typed_outputs": [
+        "comparison"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_self_approval_gate_incomplete_unregistered_evaluator",
+      "exported": true,
+      "section": "C3.S5",
+      "symbol": "oce.services.evaluation.promotion_decision",
+      "typed_inputs": [
+        "comparison",
+        "gate",
+        "approver",
+        "builder"
+      ],
+      "typed_outputs": [
+        "promotion_decision"
+      ]
+    },
+    {
+      "classification": "public_experimental",
+      "error_behavior": "refuse_broken_provenance_tamper_cross_scope",
+      "exported": true,
+      "section": "C3.S3",
+      "symbol": "oce.services.provenance.provenance_chain",
+      "typed_inputs": [
+        "facts",
+        "manifest",
+        "results",
+        "decisions",
+        "root"
+      ],
+      "typed_outputs": [
+        "provenance_chain"
+      ]
+    }
+  ],
+  "view_invariants": {
+    "canonical_digest_present": true,
+    "chain_ordered": true,
+    "fact_rows_sorted": "fact_id",
+    "manifest_rows_sorted": "artifact_id then version"
+  }
+}

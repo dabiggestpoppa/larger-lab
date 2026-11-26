@@ -1,0 +1,156 @@
+{
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "document_id": "OCE-B6-I5-STAGE-SCOPE-REGISTRATION-001",
+  "frozen_before_results": true,
+  "frozen_before_results_field_scope": {
+    "flag_applies_to": [
+      "total requirements = 40",
+      "six new node IDs",
+      "three mutation IDs M01-M03"
+    ],
+    "flag_does_not_apply_to": [
+      "C3.S3 / C3.S4 / C3.S5 section allocation"
+    ],
+    "mutation_ids_predeclared": true,
+    "node_ids_predeclared": true,
+    "note": "frozen_before_results is true only at field level: the total (40), the six new node IDs and the three mutation IDs were predeclared. The section allocation was predicted as 15/11/14 in historical amendment commit 3d1f94e87 and corrected to 13/12/15 inside repair commit e44d7f56d after repair had started. This document must not be read as evidence that the current split was the original prediction.",
+    "section_distribution_corrected_in_commit": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
+    "section_distribution_correction_timing": "AFTER_REPAIR_STARTED",
+    "section_distribution_current_values": {
+      "C3.S3": 13,
+      "C3.S4": 12,
+      "C3.S5": 15
+    },
+    "section_distribution_predeclared": false,
+    "section_distribution_predicted_values": {
+      "C3.S3": 15,
+      "C3.S4": 11,
+      "C3.S5": 14
+    },
+    "total_requirements_predeclared": true
+  },
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "locks": {
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "T19 deferral record; pre-result flag chronology",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
+  "prior_stages": {
+    "B6-I0": {
+      "base": "5e76dc12207bf1674ff7ccd94aed0f36b12dd3e6",
+      "head": "c5d7bfcc5ea99837985ba82a3c91fd1e76d85a81"
+    },
+    "B6-I1": {
+      "base": "6783bf7638f5ecd4e42ec2eb8141d1aa57dfaa3e",
+      "head": "96e3b81714321f4eea7abcb300ef471e93be0962"
+    },
+    "B6-I2": {
+      "base": "4496d548078660efd7ad4f93e7fff461d34ea538",
+      "head": "9bf76df45dca676ae7cafc4877f117a7dd64c3d2"
+    },
+    "B6-I3": {
+      "base": "018b164f249bbf075334d5d03ad37e80dcbbede0",
+      "head": "eda33f43e6d058891a8009e98e968c9f00252220"
+    },
+    "B6-I4": {
+      "base": "f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14",
+      "head": "60879f0d0761bc498221b649c43e4ad56226fe5e"
+    }
+  },
+  "r06_rebinding": {
+    "authority": "direct: OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json allowed_production_surfaces oce/services/ and implementation_surfaces services; inherited: OCE_BLOCK_06_P0_CONSTRUCTION_SEQUENCE_v1.0.json#B6-I5 non_goal adapter layer and deferred platform gate B6-I9",
+    "binding_node": "test_block_06_i5_contract.py::test_no_later_stage_dependency",
+    "failure_class": "F23",
+    "id": "B6I5-R06",
+    "negative_control": "an I6 import or reference is accepted by the boundary check",
+    "previous_failure_class": "T19",
+    "remains_in_inventory": true,
+    "section": "C3.S5",
+    "statement": "No later-stage dependency is imported or referenced; the B6-I5 construction boundary admits only oce/services and its own documented C3.S3/C3.S4/C3.S5 surfaces"
+  },
+  "refusals": [
+    "stage/identity_missing",
+    "stage/identity_unknown",
+    "stage/identity_spoofed",
+    "stage/identity_tampered",
+    "stage/base_moved",
+    "stage/later_stage_absent",
+    "stage/branch_spoof",
+    "stage/operator_surface_absent"
+  ],
+  "registers": "B6-I5",
+  "schema": "oce.block_06.stage_scope_registration.v1",
+  "stage": "B6-I5",
+  "status": "FROZEN",
+  "t19_deferral": {
+    "bound": false,
+    "current_publication_witness": null,
+    "expected_refusal": "refuse publication",
+    "future_planned_node": "publication-hold gate node (provisional and unassigned; no stage has frozen a concrete node ID)",
+    "future_verification_authority": "PROPOSED_PENDING_OPERATOR_DECISION",
+    "future_verification_decision_required": "Operator must assign or confirm the stage that will witness T19 'refuse publication' and freeze a concrete node ID there. No governing document assigns this verification to B6-I9; B6-I9 is only the platform-gate stage in the construction sequence, so this destination remains a proposal and is not authorized.",
+    "governing_source": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19] (owner=operator, stage=B6-I2, required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED)",
+    "id": "T19",
+    "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+    "no_current_publication_witness": true,
+    "outside_current_partition": true,
+    "owner": "operator",
+    "proof_state": "DEFERRED",
+    "proposed_future_verification_stage": "B6-I9",
+    "reason": "Publication refusal belongs to the release boundary. OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json#threats[T19]: owner=operator, stage=B6-I2 (source stage), required_refusal=refuse publication, mitigation_state=PLANNED_NOT_IMPLEMENTED. The registry row records only the source stage B6-I2 (owner operator, required_refusal 'refuse publication', mitigation_state PLANNED_NOT_IMPLEMENTED); it names no later verification stage. B6-I5's surface is services only, with no packaging, publication or cloud capability, so no B6-I5 node can produce a refuse-publication observable.",
+    "source_document": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json",
+    "source_row": "threats[T19]",
+    "source_stage": "B6-I2",
+    "source_stage_field": "stage"
+  },
+  "this_stage": {
+    "allowed_prefixes": [
+      "oce/services/",
+      "docs/oce-golden-system/OCE_BLOCK_06_I5_",
+      "infrastructure/control-plane/scripts/block_06_i5_",
+      "infrastructure/control-plane/tests/test_block_06_i5_",
+      "infrastructure/control-plane/tests/stage_scope/test_block_06_i5_",
+      "infrastructure/control-plane/scripts/block_06_stage_scope.py",
+      "infrastructure/control-plane/scripts/block_06_i0_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i1_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i2_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i3_validate.py",
+      "infrastructure/control-plane/scripts/block_06_i4_validate.py",
+      ".github/workflows/block-06-i5-validation.yml",
+      ".github/workflows/block-06-i5-paired-comparison.yml",
+      ".github/workflows/block-06-i4-validation.yml"
+    ],
+    "base": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+    "base_tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b",
+    "contract": "docs/oce-golden-system/OCE_BLOCK_06_I5_IMPLEMENTATION_CONTRACT_v1.0.json",
+    "id": "B6-I5",
+    "production_surfaces": [
+      "oce/services/"
+    ],
+    "scope": "docs/oce-golden-system/OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json",
+    "sections": [
+      "C3.S3",
+      "C3.S4",
+      "C3.S5"
+    ]
+  }
+}

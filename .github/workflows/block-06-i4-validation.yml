@@ -21,6 +21,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Replay the frozen B6-I4 head
+        run: |
+          git fetch --no-tags --quiet origin             60879f0d0761bc498221b649c43e4ad56226fe5e             f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14 || true
+          git checkout --quiet --detach 60879f0d0761bc498221b649c43e4ad56226fe5e
+          git update-ref refs/remotes/origin/main f0bd9bdd3f776b33d3b70b5b441966e2c80e1f14
+          echo "replaying $(git rev-parse HEAD) over base $(git rev-parse origin/main)"
+
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
         with:

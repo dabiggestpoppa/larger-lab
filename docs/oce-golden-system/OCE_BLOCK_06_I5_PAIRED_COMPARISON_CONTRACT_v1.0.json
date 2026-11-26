@@ -1,0 +1,63 @@
+{
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "document_id": "OCE-B6-I5-PAIRED-001",
+  "endpoints": {
+    "base_sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+    "base_tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b",
+    "head_sha": null,
+    "head_state": "UNBOUND_PENDING_IMPLEMENTATION",
+    "head_tree": null
+  },
+  "fail_closed_on": [
+    "contract_not_frozen",
+    "endpoint_identity_mismatch",
+    "zero_common_nodes",
+    "common_below_floor",
+    "base_only_nodes",
+    "common_regression",
+    "new_skip_on_common_node",
+    "head_only_count_mismatch",
+    "head_only_not_green",
+    "duplicate_node_ids",
+    "overlapping_sets",
+    "cleanup_failure"
+  ],
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "locks": {
+    "B6-I6_through_I9": "LOCKED",
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "capital_authority": "none",
+    "cost_usd": 0
+  },
+  "population": {
+    "base_only_expected": 0,
+    "common_files": "infrastructure/control-plane/tests/test_b5_i[2-9]*.py",
+    "common_floor": 208,
+    "head_only_expected": 40,
+    "head_only_files": "infrastructure/control-plane/tests/test_block_06_i5_*.py"
+  },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "paired comparison claims",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
+  "schema": "oce.block_06_i5.paired_contract.v1",
+  "setup": {
+    "clean_isolated_clones": true,
+    "identical_setup_both_endpoints": true,
+    "install": "pip install --require-hashes --only-binary ':all:' -r infrastructure/control-plane/requirements-ci.lock.txt",
+    "python_version": "3.12"
+  },
+  "stage": "B6-I5",
+  "status": "FROZEN"
+}

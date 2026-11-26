@@ -1,0 +1,242 @@
+{
+  "active_reader_pointer": {
+    "applies_to_packet": [
+      "OCE_BLOCK_06_I5_IMPLEMENTATION_CONTRACT_v1.0.json",
+      "OCE_BLOCK_06_I5_SCOPE_DERIVATION_v1.0.json",
+      "OCE_BLOCK_06_I5_REQUIREMENT_TEST_REGISTRY_v1.0.json",
+      "OCE_BLOCK_06_I5_FAILURE_AND_THREAT_PROOFS_v1.0.json",
+      "OCE_BLOCK_06_I5_STAGE_SCOPE_REGISTRATION_v1.0.json",
+      "OCE_BLOCK_06_I5_SERVICE_SURFACE_CONTRACT_v1.0.json",
+      "OCE_BLOCK_06_I5_COMPATIBILITY_MATRIX_v1.0.json",
+      "OCE_BLOCK_06_I5_PAIRED_COMPARISON_CONTRACT_v1.0.json",
+      "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json"
+    ],
+    "read_this_first": true,
+    "s1_is_historical": true,
+    "supersedes_documents_for_the_listed_fields": [
+      "OCE_BLOCK_06_I5_AMENDMENT_001_S1_v1.0.json",
+      "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json"
+    ]
+  },
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "base": {
+    "sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+    "tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b"
+  },
+  "capital_authority": "none",
+  "correction_stage": "B6-I5-P0-TARGETED-CORRECTION",
+  "cost_usd": 0,
+  "created_after_audit": true,
+  "created_after_audit_of_head": "2fe7de77406af354d2edd07903ba2041c8f2204c",
+  "document_id": "OCE-B6-I5-POST-AUDIT-CORRECTION-001",
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "identities": {
+    "base": {
+      "sha": "a4c4f10acac56ce53e1efd29c726039c86930b10",
+      "tree": "b66fa4e3068565bc8d52ac5e0b7db71aee5b762b"
+    },
+    "correction_commit": {
+      "note": "A commit cannot bind its own SHA inside its own tree. The correction commit identity is reported forward-only on PR #34 and is derivable with git log from the pre-correction head.",
+      "self_binding_claimed": false,
+      "sha": null
+    },
+    "historical_amendment_commit": {
+      "sha": "3d1f94e87067d63deffa4295bc6575636db14878",
+      "tree": "f6edf757c65c47bb26dab305ee737828f21369eb"
+    },
+    "pre_audit_p0_head": {
+      "sha": "21be8b21a16daa27a0a5114194ac1a6c931224d4",
+      "tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639"
+    },
+    "pre_correction_head": {
+      "sha": "2fe7de77406af354d2edd07903ba2041c8f2204c",
+      "tree": "17e83c18c4c66bb9b933df6693b3b66196976b03"
+    },
+    "repair_commit": {
+      "sha": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
+      "tree": "3677da614fa58ecdda21a9d8fad26151b828bcbb"
+    },
+    "s1_audited_head": {
+      "correct_tree_bound_here": true,
+      "s1_recorded_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+      "s1_recorded_tree_matches_git": false,
+      "sha": "2a922d710ff8fb79f6cb78c21e52f635bd1b0eae",
+      "tree": "8b20b2d334307d59fb913c90ed4dd114255eee01"
+    },
+    "s1_binding_head": {
+      "correct_tree_bound_here": true,
+      "s1_recorded_tree": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+      "s1_recorded_tree_matches_git": false,
+      "sha": "0a2313bb39a356badccc17c6ca6dd49f09ab6806",
+      "tree": "ad0d5801c23a5753889b652000b6d34b1ecbe4c7"
+    },
+    "s1_commit": {
+      "sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+      "tree": "ce264caf253b7a9f8d98fd0d2617f80aacce8a6f"
+    }
+  },
+  "identity_source": "Every commit, tree and blob identity below was derived with git in this repository, not from a prior report.",
+  "locks": {
+    "B6-I6": "LOCKED",
+    "B6-I7": "LOCKED",
+    "B6-I8": "LOCKED",
+    "B6-I9": "LOCKED",
+    "BOOK_6_COMPLETE": false,
+    "IMPLEMENTATION_AUTHORIZED": false,
+    "MERGE_AUTHORIZED": false,
+    "RATIFICATION_AUTHORIZED": false,
+    "cloud_hosting": "NOT_AUTHORIZED",
+    "package_publication": "NOT_AUTHORIZED"
+  },
+  "no_history_rewrite": true,
+  "no_implementation": true,
+  "no_merge": true,
+  "no_ratification": true,
+  "post_audit": true,
+  "pre_result_flag_correction": {
+    "active_document_rule": "An active document read on its own must not present the corrected 13/12/15 split as the original prediction. Every document carrying frozen_before_results states the field-level scope, and Amendment 001 keeps the predicted values under planned_arithmetic.",
+    "corrected_in_commit": "e44d7f56d5c9912e52dc4559ee2efef580d75609",
+    "corrected_section_values": {
+      "C3.S3": 13,
+      "C3.S4": 12,
+      "C3.S5": 15
+    },
+    "correction_timing": "AFTER_REPAIR_STARTED",
+    "field_level_flags": {
+      "frozen_before_results_valid_for_node_ids": true,
+      "frozen_before_results_valid_for_section_distribution": false,
+      "frozen_before_results_valid_for_total": true
+    },
+    "historical_claim": "frozen_before_results: true accompanied a predicted section allocation of 15/11/14",
+    "historical_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "predicted_section_values": {
+      "C3.S3": 15,
+      "C3.S4": 11,
+      "C3.S5": 14
+    },
+    "six_node_ids_predeclared": true,
+    "three_mutation_ids_predeclared": true,
+    "total_40_predeclared": true
+  },
+  "preserved_invariants": {
+    "failure_class_partition": {
+      "F03": 8,
+      "F08": 2,
+      "F11": 7,
+      "F12": 3,
+      "F23": 20
+    },
+    "i4_replay_unchanged": true,
+    "module_distribution": {
+      "test_block_06_i5_artifact.py": 9,
+      "test_block_06_i5_contract.py": 6,
+      "test_block_06_i5_evaluation.py": 12,
+      "test_block_06_i5_knowledge.py": 7,
+      "test_block_06_i5_provenance.py": 6
+    },
+    "mutation_floor_kind": "minimum",
+    "mutation_minimum_floor": 3,
+    "node_ids_unchanged": true,
+    "node_total": 40,
+    "planned_mutations": [
+      "M01",
+      "M02",
+      "M03"
+    ],
+    "r06_binding": "F23",
+    "requirements_total": 40,
+    "tests_present": false,
+    "zero_pass": true
+  },
+  "purpose": "Single explicitly post-audit correction record for the B6-I5 P0 packet. It retracts the S1 byte-identity claim, records both observed S1 blobs, binds the two trees S1 mis-recorded, corrects T19 against its actual registry row, and qualifies the pre-result flags at field level.",
+  "s1_blob_observation": {
+    "byte_equal": false,
+    "byte_identity_claim_retracted": true,
+    "current_blob": "b655a0e956aa1242ea41758c0d8973dcd1825997",
+    "current_commit": "2fe7de77406af354d2edd07903ba2041c8f2204c",
+    "current_sha256": "d542f87c7624914bbc2b8678ee6839af4bc0b69b5d12a3d515085e7d3718e95a",
+    "current_size_bytes": 6685,
+    "difference": "R4 (2fe7de774) rewrote the S1 bytes into canonical key order. Parsed JSON values are identical; the byte sequences and blob IDs are not.",
+    "introduction_blob": "3b61cfa03ef34ad3d32fb1fcce83ff21d475f711",
+    "introduction_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+    "introduction_sha256": "0832cf9e11005da07b80fba982a39652a18dac4f0ab7a159a277a33476c22e41",
+    "introduction_size_bytes": 6661,
+    "path": "docs/oce-golden-system/OCE_BLOCK_06_I5_AMENDMENT_001_S1_v1.0.json",
+    "retracted_claim": "S1 is byte-identical after its own commit (PR #34 section 20 and validator evidence list)",
+    "retraction_reason": "The claim is false at byte level: blob 3b61cfa0 (6661 bytes) at bec496dfa became blob b655a0e9 (6685 bytes) at 2fe7de774. The historical byte change did happen and is not denied. Only semantic equality holds.",
+    "s1_edited_again_in_this_correction": false,
+    "semantic_equal": true
+  },
+  "s1_tree_binding_correction": {
+    "law": "S1 recorded the pre-audit P0 tree for two different heads; this record binds the actual trees.",
+    "s1_audited_tree_actual": "8b20b2d334307d59fb913c90ed4dd114255eee01",
+    "s1_audited_tree_declared": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+    "s1_current_tree_actual": "ad0d5801c23a5753889b652000b6d34b1ecbe4c7",
+    "s1_current_tree_declared": "5eb228fcf859fc7224ee82b64d4bffc21d95e639",
+    "s1_edited_again": false,
+    "s1_superseded_fields": [
+      "audited_tree",
+      "current_tree",
+      "b2_t19_direct_citation.fields"
+    ]
+  },
+  "schema": "oce.block_06_i5.post_audit_correction.v1",
+  "stage": "B6-I5",
+  "status": "POST_AUDIT_CORRECTION_FROZEN",
+  "supersessions": {
+    "does_not_supersede": [
+      "S1 arithmetic drift disclosure (15/11/14 -> 13/12/15, total 40)",
+      "S1 existence, timing and no-predicted-SHA rules",
+      "Amendment 001 history or commits",
+      "any requirement, node, failure class, mutation plan or product decision"
+    ],
+    "s1_historical_record": "S1 stays at its committed bytes and commits; this record adds, it does not rewrite.",
+    "supersedes_only": [
+      "the S1 byte-identity claim",
+      "S1 audited_tree and current_tree bindings",
+      "S1 b2_t19_direct_citation field enumeration (stage=B6-I9)",
+      "T19 governing_source stage citation and future_authorized_stage",
+      "field-level reading of frozen_before_results in Amendment 001, contract and registration"
+    ]
+  },
+  "t19_correction": {
+    "corrected_claim": {
+      "correct_value": "stage=B6-I2 (source stage)",
+      "field": "deferred_threats[T19].governing_source",
+      "recorded_value": "stage=B6-I9"
+    },
+    "current_i5_publication_witness": null,
+    "future_verification": {
+      "authority_basis": "No governing document assigns T19 'refuse publication' verification to B6-I9. The registry row records only the source stage B6-I2 with a PLANNED_NOT_IMPLEMENTED mitigation, and its planned_proof names no later stage. B6-I9 appears only as the platform-gate stage of the construction sequence.",
+      "authorized": false,
+      "decision_required": "Operator must assign or confirm the stage that witnesses T19 'refuse publication' and freeze a concrete node ID in that stage; until then no witness may be claimed.",
+      "destination_authority": "PROPOSED_PENDING_OPERATOR_DECISION",
+      "destination_stage": "B6-I9",
+      "operator_decision_required": true,
+      "planned_node_state": "UNRESOLVED_PENDING_OPERATOR_DECISION"
+    },
+    "no_current_i5_publication_witness": true,
+    "owner": "operator",
+    "preserved": {
+      "current_partition_total": 40,
+      "r06_binding_node": "test_block_06_i5_contract.py::test_no_later_stage_dependency",
+      "r06_binding_to_f23": true,
+      "t19_outside_current_partition": true
+    },
+    "registry_document": "OCE_BLOCK_06_P0_FAILURE_AND_THREAT_REGISTRY_v1.0.json",
+    "registry_row": "threats[T19]",
+    "registry_values_observed": {
+      "asset": "release",
+      "mitigation_state": "PLANNED_NOT_IMPLEMENTED",
+      "owner": "operator",
+      "required_refusal": "refuse publication",
+      "stage": "B6-I2",
+      "trust_boundary": "release boundary"
+    },
+    "required_refusal": "refuse publication",
+    "source_stage": "B6-I2"
+  },
+  "version": "1.0"
+}

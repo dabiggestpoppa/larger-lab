@@ -1,0 +1,406 @@
+{
+  "amendment": "OCE_BLOCK_06_I5_AMENDMENT_001_v1.0.json",
+  "amendment_sha": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "document_id": "OCE-B6-I5-REGISTRY-001",
+  "governing_amendment_commit": "bec496dfa60be3f61eced6f25d9fbf8ca19f5e17",
+  "historical_amendment_commit": "3d1f94e87067d63deffa4295bc6575636db14878",
+  "inventory": {
+    "collection_equals_execution": true,
+    "modules": [
+      "infrastructure/control-plane/tests/test_block_06_i5_contract.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_knowledge.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_artifact.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_evaluation.py",
+      "infrastructure/control-plane/tests/test_block_06_i5_provenance.py"
+    ],
+    "node_total": 40,
+    "nodes": [
+      "test_block_06_i5_contract.py::test_inventory_equals_collection",
+      "test_block_06_i5_contract.py::test_contract_frozen_before_results",
+      "test_block_06_i5_contract.py::test_scope_binds_construction_sequence",
+      "test_block_06_i5_contract.py::test_locks_and_cost",
+      "test_block_06_i5_contract.py::test_service_symbols_declared",
+      "test_block_06_i5_contract.py::test_no_later_stage_dependency",
+      "test_block_06_i5_knowledge.py::test_knowledge_registry_canonical",
+      "test_block_06_i5_knowledge.py::test_fact_requires_source_digest",
+      "test_block_06_i5_knowledge.py::test_duplicate_fact_refused",
+      "test_block_06_i5_knowledge.py::test_scope_isolation_refused",
+      "test_block_06_i5_knowledge.py::test_unpromoted_fact_refused",
+      "test_block_06_i5_knowledge.py::test_knowledge_separate_from_memory",
+      "test_block_06_i5_knowledge.py::test_retrieval_deterministic",
+      "test_block_06_i5_artifact.py::test_registration_immutable",
+      "test_block_06_i5_artifact.py::test_duplicate_artifact_refused",
+      "test_block_06_i5_artifact.py::test_digest_mismatch_refused",
+      "test_block_06_i5_artifact.py::test_manifest_mismatch_refused",
+      "test_block_06_i5_artifact.py::test_missing_artifact_refused",
+      "test_block_06_i5_artifact.py::test_stale_version_refused",
+      "test_block_06_i5_artifact.py::test_unauthorized_retrieval_refused",
+      "test_block_06_i5_artifact.py::test_unknown_storage_class_refused",
+      "test_block_06_i5_artifact.py::test_substitution_unchanged_name_refused",
+      "test_block_06_i5_evaluation.py::test_registered_evaluator_only",
+      "test_block_06_i5_evaluation.py::test_evaluator_change_refused",
+      "test_block_06_i5_evaluation.py::test_result_immutable",
+      "test_block_06_i5_evaluation.py::test_comparison_version_bound",
+      "test_block_06_i5_evaluation.py::test_gate_requires_independent_decision",
+      "test_block_06_i5_evaluation.py::test_self_approval_refused",
+      "test_block_06_i5_evaluation.py::test_promotion_requires_gate_pass",
+      "test_block_06_i5_evaluation.py::test_refusal_never_pass",
+      "test_block_06_i5_evaluation.py::test_score_field_prohibited",
+      "test_block_06_i5_evaluation.py::test_weight_field_prohibited",
+      "test_block_06_i5_evaluation.py::test_threshold_field_prohibited",
+      "test_block_06_i5_evaluation.py::test_ranking_field_prohibited",
+      "test_block_06_i5_provenance.py::test_provenance_chain_end_to_end",
+      "test_block_06_i5_provenance.py::test_broken_chain_refused",
+      "test_block_06_i5_provenance.py::test_provenance_missing_refused",
+      "test_block_06_i5_provenance.py::test_tamper_detected_end_to_end",
+      "test_block_06_i5_provenance.py::test_artifact_manifest_bound_to_fact",
+      "test_block_06_i5_provenance.py::test_evaluation_bound_to_artifact"
+    ],
+    "zero": [
+      "failures",
+      "errors",
+      "skipped",
+      "xfail"
+    ]
+  },
+  "post_audit_correction": {
+    "document": "OCE_BLOCK_06_I5_POST_AUDIT_CORRECTION_001_v1.0.json",
+    "historical_commit_preserved": "3d1f94e87067d63deffa4295bc6575636db14878",
+    "history_rewritten": false,
+    "read_before_relying_on": [
+      "retracted S1 byte-identity claim (S1 bytes changed in R4; values unchanged)",
+      "T19 source stage B6-I2 and unassigned future verification destination",
+      "pre-result section arithmetic: 15/11/14 predicted, 13/12/15 corrected later"
+    ],
+    "scope": "requirement inventory and section assignment",
+    "status": "POST_AUDIT_CORRECTION_FROZEN"
+  },
+  "requirements": [
+    {
+      "binding_node": "test_block_06_i5_contract.py::test_inventory_equals_collection",
+      "failure_class": "F23",
+      "id": "B6I5-R01",
+      "negative_control": "remove a node from the inventory and the check fails",
+      "section": "C3.S3",
+      "statement": "Declared inventory equals collected and executed nodes"
+    },
+    {
+      "binding_node": "test_block_06_i5_contract.py::test_contract_frozen_before_results",
+      "failure_class": "F23",
+      "id": "B6I5-R02",
+      "negative_control": "a results-first contract fails",
+      "section": "C3.S3",
+      "statement": "Contract, scope and registry are frozen before any result is recorded"
+    },
+    {
+      "binding_node": "test_block_06_i5_contract.py::test_scope_binds_construction_sequence",
+      "failure_class": "F23",
+      "id": "B6I5-R03",
+      "negative_control": "an extra section or purpose fails",
+      "section": "C3.S3",
+      "statement": "Scope binds the B6-I5 construction sequence rows exactly"
+    },
+    {
+      "binding_node": "test_block_06_i5_contract.py::test_locks_and_cost",
+      "failure_class": "F23",
+      "id": "B6I5-R04",
+      "negative_control": "an unlocked later stage fails",
+      "section": "C3.S3",
+      "statement": "B6-I6 through I9 stay locked and recurring cost stays zero"
+    },
+    {
+      "binding_node": "test_block_06_i5_contract.py::test_service_symbols_declared",
+      "failure_class": "F23",
+      "id": "B6I5-R05",
+      "negative_control": "a missing export fails",
+      "section": "C3.S4",
+      "statement": "Every declared knowledge, artifact, evaluation and provenance symbol is exported"
+    },
+    {
+      "binding_node": "test_block_06_i5_contract.py::test_no_later_stage_dependency",
+      "failure_class": "F23",
+      "id": "B6I5-R06",
+      "negative_control": "an I6 import or reference is accepted by the boundary check",
+      "section": "C3.S5",
+      "statement": "No later-stage dependency is imported or referenced; the B6-I5 construction boundary admits only oce/services and its own documented C3.S3/C3.S4/C3.S5 surfaces"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_knowledge_registry_canonical",
+      "failure_class": "F23",
+      "id": "B6I5-R07",
+      "negative_control": "the registry drops tenant, project or scope",
+      "section": "C3.S3",
+      "statement": "The knowledge registry is canonical and scoped by tenant, project and scope"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_fact_requires_source_digest",
+      "failure_class": "F23",
+      "id": "B6I5-R08",
+      "negative_control": "a fact without a source or digest is accepted",
+      "section": "C3.S3",
+      "statement": "A governed fact without a source reference and digest is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_duplicate_fact_refused",
+      "failure_class": "F08",
+      "id": "B6I5-R09",
+      "negative_control": "two facts share one fact id",
+      "section": "C3.S3",
+      "statement": "A duplicate fact id is refused deterministically"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_scope_isolation_refused",
+      "failure_class": "F03",
+      "id": "B6I5-R10",
+      "negative_control": "a retrieval crosses a project boundary",
+      "section": "C3.S3",
+      "statement": "Cross-tenant, cross-project and out-of-scope retrieval is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_unpromoted_fact_refused",
+      "failure_class": "F03",
+      "id": "B6I5-R11",
+      "negative_control": "an unpromoted fact is returned",
+      "section": "C3.S3",
+      "statement": "A fact is retrievable only after an accepted promotion decision"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_knowledge_separate_from_memory",
+      "failure_class": "F23",
+      "id": "B6I5-R12",
+      "negative_control": "the knowledge service writes to agent memory",
+      "section": "C3.S3",
+      "statement": "Knowledge storage stays separate from agent memory and shares no mutable store"
+    },
+    {
+      "binding_node": "test_block_06_i5_knowledge.py::test_retrieval_deterministic",
+      "failure_class": "F23",
+      "id": "B6I5-R13",
+      "negative_control": "reordered input changes the digest",
+      "section": "C3.S3",
+      "statement": "Fact retrieval order and digest are deterministic"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_registration_immutable",
+      "failure_class": "F11",
+      "id": "B6I5-R14",
+      "negative_control": "a registered artifact is re-registered with new bytes",
+      "section": "C3.S4",
+      "statement": "An artifact is immutable after registration"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_duplicate_artifact_refused",
+      "failure_class": "F08",
+      "id": "B6I5-R15",
+      "negative_control": "two artifacts claim one id and version",
+      "section": "C3.S4",
+      "statement": "A duplicate artifact id and version is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_digest_mismatch_refused",
+      "failure_class": "F12",
+      "id": "B6I5-R16",
+      "negative_control": "different bytes are served for a registered digest",
+      "section": "C3.S4",
+      "statement": "A served artifact whose digest differs from the manifest (hash-only mismatch, size identical) is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_manifest_mismatch_refused",
+      "failure_class": "F11",
+      "id": "B6I5-R17",
+      "negative_control": "a manifest hash or size row is edited",
+      "section": "C3.S4",
+      "statement": "A manifest whose size row differs from the artifact (size-only mismatch, digest identical) is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_missing_artifact_refused",
+      "failure_class": "F23",
+      "id": "B6I5-R18",
+      "negative_control": "retrieval names an unregistered artifact",
+      "section": "C3.S4",
+      "statement": "Retrieval of a never-registered artifact is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_stale_version_refused",
+      "failure_class": "F23",
+      "id": "B6I5-R19",
+      "negative_control": "a superseded version is returned as current",
+      "section": "C3.S4",
+      "statement": "A stale or unknown artifact version is refused rather than served as latest"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_unauthorized_retrieval_refused",
+      "failure_class": "F03",
+      "id": "B6I5-R20",
+      "negative_control": "an actor outside the scope retrieves",
+      "section": "C3.S4",
+      "statement": "Retrieval without scope authorization is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_unknown_storage_class_refused",
+      "failure_class": "F23",
+      "id": "B6I5-R21",
+      "negative_control": "an invented storage or retention class is accepted",
+      "section": "C3.S4",
+      "statement": "Only the frozen storage and retention classes are accepted"
+    },
+    {
+      "binding_node": "test_block_06_i5_artifact.py::test_substitution_unchanged_name_refused",
+      "failure_class": "F12",
+      "id": "B6I5-R40",
+      "negative_control": "a different artifact served under a registered name is accepted",
+      "section": "C3.S4",
+      "statement": "Substitution of an artifact with unchanged name but different bytes is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_registered_evaluator_only",
+      "failure_class": "F03",
+      "id": "B6I5-R22",
+      "negative_control": "an unregistered evaluator runs",
+      "section": "C3.S5",
+      "statement": "Only a registered evaluator may be executed"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_evaluator_change_refused",
+      "failure_class": "F03",
+      "id": "B6I5-R23",
+      "negative_control": "the builder swaps the evaluator definition",
+      "section": "C3.S5",
+      "statement": "A builder cannot silently change the evaluator; a differing digest is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_result_immutable",
+      "failure_class": "F11",
+      "id": "B6I5-R24",
+      "negative_control": "a recorded result is overwritten in place",
+      "section": "C3.S5",
+      "statement": "A recorded evaluation result cannot be replaced in place"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_comparison_version_bound",
+      "failure_class": "F23",
+      "id": "B6I5-R25",
+      "negative_control": "results from two evaluator versions are compared",
+      "section": "C3.S5",
+      "statement": "A comparison refuses results from different evaluator versions"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_gate_requires_independent_decision",
+      "failure_class": "F03",
+      "id": "B6I5-R26",
+      "negative_control": "the gate decision is authored by the builder",
+      "section": "C3.S5",
+      "statement": "A gate decision requires an approver independent of the builder"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_self_approval_refused",
+      "failure_class": "F03",
+      "id": "B6I5-R27",
+      "negative_control": "approver equals builder",
+      "section": "C3.S5",
+      "statement": "Self-approval is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_promotion_requires_gate_pass",
+      "failure_class": "F03",
+      "id": "B6I5-R28",
+      "negative_control": "promotion with a failed or absent gate",
+      "section": "C3.S5",
+      "statement": "Promotion requires a passing gate result and an independent approver"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_refusal_never_pass",
+      "failure_class": "F23",
+      "id": "B6I5-R35",
+      "mutation_witness": "M03",
+      "negative_control": "a refused gate is normalized to PASS and promotion proceeds",
+      "section": "C3.S5",
+      "statement": "An evaluator refusal cannot be normalized to PASS; missing evidence cannot become PASS; a failed or refused gate cannot be normalized to success; promotion cannot proceed on refusal"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_score_field_prohibited",
+      "failure_class": "F23",
+      "id": "B6I5-R36",
+      "negative_control": "a score field is accepted in an evaluation artifact or result",
+      "section": "C3.S5",
+      "statement": "A score field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns scoring"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_weight_field_prohibited",
+      "failure_class": "F23",
+      "id": "B6I5-R37",
+      "negative_control": "a weight field is accepted in an evaluation artifact or result",
+      "section": "C3.S5",
+      "statement": "A weight field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns weighting"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_threshold_field_prohibited",
+      "failure_class": "F23",
+      "id": "B6I5-R38",
+      "negative_control": "a threshold field is accepted in an evaluation artifact or result",
+      "section": "C3.S5",
+      "statement": "A threshold field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns thresholds"
+    },
+    {
+      "binding_node": "test_block_06_i5_evaluation.py::test_ranking_field_prohibited",
+      "failure_class": "F23",
+      "id": "B6I5-R39",
+      "negative_control": "a ranking field is accepted in an evaluation artifact or result",
+      "section": "C3.S5",
+      "statement": "A ranking field is prohibited in B6-I5; the reserved post-Book-6 evaluation system owns ranking"
+    },
+    {
+      "binding_node": "test_block_06_i5_provenance.py::test_provenance_chain_end_to_end",
+      "failure_class": "F11",
+      "id": "B6I5-R29",
+      "negative_control": "a missing chain stage fails",
+      "section": "C3.S3",
+      "statement": "The provenance chain reconciles fact, artifact, evaluation and decision end-to-end"
+    },
+    {
+      "binding_node": "test_block_06_i5_provenance.py::test_broken_chain_refused",
+      "failure_class": "F11",
+      "id": "B6I5-R30",
+      "negative_control": "a link points at the wrong parent digest",
+      "section": "C3.S4",
+      "statement": "A broken provenance link or digest is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_provenance.py::test_provenance_missing_refused",
+      "failure_class": "F23",
+      "id": "B6I5-R31",
+      "negative_control": "a decision with no provenance row",
+      "section": "C3.S5",
+      "statement": "A decision without a provenance record is refused"
+    },
+    {
+      "binding_node": "test_block_06_i5_provenance.py::test_tamper_detected_end_to_end",
+      "failure_class": "F12",
+      "id": "B6I5-R32",
+      "negative_control": "an artifact is substituted inside the chain",
+      "section": "C3.S4",
+      "statement": "Tamper and substitution anywhere in the chain are detected"
+    },
+    {
+      "binding_node": "test_block_06_i5_provenance.py::test_artifact_manifest_bound_to_fact",
+      "failure_class": "F11",
+      "id": "B6I5-R33",
+      "negative_control": "an artifact row cites a fact digest that does not exist",
+      "section": "C3.S3",
+      "statement": "Every artifact row is bound to the fact digest that justified it"
+    },
+    {
+      "binding_node": "test_block_06_i5_provenance.py::test_evaluation_bound_to_artifact",
+      "failure_class": "F11",
+      "id": "B6I5-R34",
+      "negative_control": "a result cites an unregistered artifact digest",
+      "section": "C3.S5",
+      "statement": "Every evaluation result is bound to a registered artifact digest"
+    }
+  ],
+  "requirements_total": 40,
+  "schema": "oce.block_06_i5.registry.v1",
+  "stage": "B6-I5",
+  "status": "FROZEN",
+  "tests_present": false
+}
