@@ -1,0 +1,28 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "status": "PREDECESSOR EVIDENCE \u2014 carried forward, not re-executed",
+  "package": "bloc_05/p3_f4_f5_closure_r1",
+  "audit_head": "d6b3f9f83a0cf5bb92f8e37b72e044beeaed6740",
+  "candidate": "21fd7e473a534c38b237729f9474c46bb94267ee",
+  "probe_file_sha256": "827d50a50770cf86f6447215b78db820baa3b14d0e5a7319d0fdf3c53fdfb2f8",
+  "results_file_sha256": "8c3301e09d27a3b5820a84874f953449152990979cf164df30032af6f38a07b2",
+  "tally": {
+    "passed": 23,
+    "failed": 9,
+    "errored": 0,
+    "skipped": 0,
+    "total": 32
+  },
+  "failed": [
+    "test_f4_05_counterexample_future_revision_selected_last",
+    "test_f4_06_future_revision_selected_first",
+    "test_f4_07_duplicate_identifier_hiding_a_future_entry",
+    "test_f4_08_contradictory_duplicate_never_certifies[future_first]",
+    "test_f4_09_selected_and_excluded_contradiction_never_certifies",
+    "test_f4_11_order_alone_may_not_decide_the_outcome",
+    "test_f5_01_typed_refusal_detail_is_withheld",
+    "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+    "test_f5_03_pit_typed_refusal_detail_is_withheld"
+  ],
+  "note": "Executed by this auditor at the pre-repair pin. It is the counterexample-of-record: without it a pass at the later SHA could not be attributed to the repair."
+}

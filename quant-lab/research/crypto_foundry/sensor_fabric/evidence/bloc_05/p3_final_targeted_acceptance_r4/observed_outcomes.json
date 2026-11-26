@@ -1,0 +1,283 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+  "note": "production_default leaves REPLAY_RECORD_BINDING_ESTABLISHED False; test_only_override flips it, which is NOT production authority",
+  "rows": [
+    {
+      "scenario": "F4 control: single early revision",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "pit_status": "ADMISSIBLE",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      },
+      "test_only_override": {
+        "decision": "ACCEPT_FIELD_BINDING",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "detail": "probe authority"
+      }
+    },
+    {
+      "scenario": "F4 control: multi-revision, all known by cutoff",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "pit_status": "ADMISSIBLE",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      },
+      "test_only_override": {
+        "decision": "ACCEPT_FIELD_BINDING",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "detail": "probe authority"
+      }
+    },
+    {
+      "scenario": "F4 control: knowledge equal to the cutoff",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "pit_status": "ADMISSIBLE",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      },
+      "test_only_override": {
+        "decision": "ACCEPT_FIELD_BINDING",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "detail": "probe authority"
+      }
+    },
+    {
+      "scenario": "F4 control: equivalent timezone offset",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "pit_status": "ADMISSIBLE",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      },
+      "test_only_override": {
+        "decision": "ACCEPT_FIELD_BINDING",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "detail": "probe authority"
+      }
+    },
+    {
+      "scenario": "F4 control: correctly excluded future revision",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "pit_status": "ADMISSIBLE",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      },
+      "test_only_override": {
+        "decision": "ACCEPT_FIELD_BINDING",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "detail": "probe authority"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: future revision selected last",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "PIT_INADMISSIBLE",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the replay selection was computed for a LATER cutoff: selected revision(s) ['rev-LATER'] became known after this request's knowledge cutoff, so the selection does not describe what was known here"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "PIT_INADMISSIBLE",
+        "replay_status": "NOT_BOUND",
+        "detail": "the replay selection was computed for a LATER cutoff: selected revision(s) ['rev-LATER'] became known after this request's knowledge cutoff, so the selection does not describe what was known here"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: future revision selected first",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "PIT_INADMISSIBLE",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the replay selection was computed for a LATER cutoff: selected revision(s) ['rev-LATER'] became known after this request's knowledge cutoff, so the selection does not describe what was known here"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "PIT_INADMISSIBLE",
+        "replay_status": "NOT_BOUND",
+        "detail": "the replay selection was computed for a LATER cutoff: selected revision(s) ['rev-LATER'] became known after this request's knowledge cutoff, so the selection does not describe what was known here"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: duplicate id hides a future entry",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the replay selection names revision(s) ['rev-audit'] more than once; two entries for one revision are a contradiction, and a contradictory selection certifies nothing"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "detail": "the replay selection names revision(s) ['rev-audit'] more than once; two entries for one revision are a contradiction, and a contradictory selection certifies nothing"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: duplicate id, future last",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the replay selection names revision(s) ['rev-audit'] more than once; two entries for one revision are a contradiction, and a contradictory selection certifies nothing"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "detail": "the replay selection names revision(s) ['rev-audit'] more than once; two entries for one revision are a contradiction, and a contradictory selection certifies nothing"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: selected and excluded",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "revision(s) ['rev-audit'] are BOTH selected and excluded; a selection that contradicts itself cannot manufacture admissibility"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "detail": "revision(s) ['rev-audit'] are BOTH selected and excluded; a selection that contradicts itself cannot manufacture admissibility"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: malformed knowledge instant on another entry",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "VERIFICATION_FAILED",
+        "replay_status": "NOT_RESOLVED",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the request does not satisfy its own schema (1 violation(s)); a validator bypass is not a request"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "VERIFICATION_FAILED",
+        "replay_status": "NOT_RESOLVED",
+        "detail": "the request does not satisfy its own schema (1 violation(s)); a validator bypass is not a request"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: chosen revision itself is future",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "PIT_INADMISSIBLE",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the replay selection was computed for a LATER cutoff: selected revision(s) ['rev-audit'] became known after this request's knowledge cutoff, so the selection does not describe what was known here"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "PIT_INADMISSIBLE",
+        "replay_status": "NOT_BOUND",
+        "detail": "the replay selection was computed for a LATER cutoff: selected revision(s) ['rev-audit'] became known after this request's knowledge cutoff, so the selection does not describe what was known here"
+      }
+    },
+    {
+      "scenario": "F4 counterexample: selection names another row",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "pit_status": "INADMISSIBLE",
+        "names_binding_contract": false,
+        "detail": "the replay evidence selects ['rev-OTHER'] but the evaluated record is revision 'rev-audit'; evidence about another observation certifies nothing here"
+      },
+      "test_only_override": {
+        "decision": "REFUSE",
+        "refusal_reason": "REPLAY_BLOCKED",
+        "replay_status": "NOT_BOUND",
+        "detail": "the replay evidence selects ['rev-OTHER'] but the evaluated record is revision 'rev-audit'; evidence about another observation certifies nothing here"
+      }
+    },
+    {
+      "scenario": "Guard: provider evidence substitution",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "custody_status": "VERIFIED",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      }
+    },
+    {
+      "scenario": "Guard: provider evidence substitution, labelled override",
+      "production_default": {
+        "decision": "ACCEPT_FIELD_BINDING",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "custody_status": "VERIFIED",
+        "names_binding_contract": false,
+        "detail": "probe authority"
+      }
+    },
+    {
+      "scenario": "Guard: record-kind substitution (liquidation against trade evidence)",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "custody_status": "VERIFIED",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      }
+    },
+    {
+      "scenario": "Guard: artifact substitution",
+      "production_default": {
+        "decision": "REFUSE",
+        "refusal_reason": "VERIFICATION_FAILED",
+        "replay_status": "ELIGIBLE",
+        "custody_status": "UNVERIFIED",
+        "names_binding_contract": false,
+        "detail": "DIGEST_MISMATCH: record verification did not establish economic field binding for this record"
+      }
+    },
+    {
+      "scenario": "Guard: nonempty test manifest, fully satisfied composition",
+      "production_default": {
+        "decision": "INTEGRATION_REQUIRED",
+        "refusal_reason": null,
+        "replay_status": "ELIGIBLE",
+        "custody_status": "VERIFIED",
+        "names_binding_contract": true,
+        "detail": "unmet REPLAY_EVIDENCE_RECORD_BINDING_V1: the frozen replay schema carries no record id, provider, record kind or artifact identity, so complete evidence binding for this record cannot be established; "
+      }
+    }
+  ]
+}

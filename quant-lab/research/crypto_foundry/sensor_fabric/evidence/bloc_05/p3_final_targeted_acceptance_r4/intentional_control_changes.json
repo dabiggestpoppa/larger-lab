@@ -1,0 +1,34 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "why_this_file_exists": "\u00a71 changes the expected terminal outcome of a fully satisfied evaluation. Eight cases from the 32-case baseline therefore invert or move; each is listed with its old and new anchor so no change is silent and none is counted as a repair.",
+  "cases": [
+    {
+      "case": "f4_00 / f4_01 / f4_02 / f4_03 / f4_04",
+      "baseline_anchor": "decision is ACCEPT_FIELD_BINDING",
+      "repaired_anchor": "decision is INTEGRATION_REQUIRED, replay_status == 'ELIGIBLE', detail names REPLAY_EVIDENCE_RECORD_BINDING_V1, no temporal refusal detail; ACCEPT is then reached under the labelled test-only binding override",
+      "classification": "INTENTIONAL_OPERATOR_RECONCILED_CHANGE",
+      "not_a_regression_because": "the temporal control ADMITTED the selection and recorded it as ELIGIBLE; only the new record-binding guard refuses"
+    },
+    {
+      "case": "f4_07 duplicate identifier hiding a future entry",
+      "baseline_anchor": "refusal PIT_INADMISSIBLE 'LATER cutoff'",
+      "repaired_anchor": "refusal REPLAY_BLOCKED 'names revision(s) [...] more than once'",
+      "classification": "STRONGER_CONTROL",
+      "not_a_regression_because": "the repair refuses a contradictory duplicate before ordering it; the selection can no longer reach the ordering stage at all, which strictly dominates the temporal refusal"
+    },
+    {
+      "case": "b_04 provider substitution",
+      "baseline_anchor": "decision is ACCEPT (the residual-axis finding)",
+      "repaired_anchor": "decision is INTEGRATION_REQUIRED, names the contract",
+      "classification": "FINDING_CLOSED_BY_THE_NEW_GUARD",
+      "not_a_regression_because": "the historical finding was that acceptance did not depend on provenance; the guard now makes that unobservable as an acceptance, which is the requested behaviour"
+    },
+    {
+      "case": "b_06 the named limitation is a constant, not a branch",
+      "baseline_anchor": "UNRESOLVED_REPLAY_BINDING is documentary only",
+      "repaired_anchor": "the DOCUMENTATION constant is still not a branch (the AST assertion is retained as b_10), but the ENFORCED control is now REPLAY_RECORD_BINDING_ESTABLISHED, and flipping it changes the outcome",
+      "classification": "FINDING_RESOLVED_BY_A_SEPARATE_EXECUTABLE_GUARD",
+      "not_a_regression_because": "the original finding stands against the string constant; crediting the repair required measuring the new boolean, not retiring the old observation"
+    }
+  ]
+}

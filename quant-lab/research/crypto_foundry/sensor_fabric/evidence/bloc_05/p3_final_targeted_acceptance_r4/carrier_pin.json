@@ -1,0 +1,86 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "mission": "SENSOR-B5-P3-R6-FINAL-INDEPENDENT-CLOSEOUT-R3",
+  "candidate": {
+    "sha": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "tree": "e7f058bb2e315365b19c3933c16745c895e7bb5b",
+    "branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+    "subject": "B5-P3-R6: close selected-revision cutoff and typed-refusal leakage",
+    "committer_date": "2026-11-25T19:14:04-05:00",
+    "parents": [
+      "21fd7e473a534c38b237729f9474c46bb94267ee"
+    ],
+    "additive_parent_state": {
+      "previous_audit_head": "d6b3f9f83a0cf5bb92f8e37b72e044beeaed6740",
+      "previous_audit_branch": "agent/crypto-sensor-fabric-p3-production-master-audit-r3",
+      "pre_repair_pin": "21fd7e473a534c38b237729f9474c46bb94267ee",
+      "commits_pre_repair_to_repair": "1",
+      "files_changed_by_repair": [
+        "quant-lab/src/crypto_sensor_fabric/normalization/consumer/policy.py",
+        "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+        "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+        "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py"
+      ]
+    }
+  },
+  "artifacts": {
+    "consumer_policy_sha256": "cc5d1bb9dc6cd8c901106153cfb81aa638a60bceb3527758b7bf340445f4e24a",
+    "consumer_policy_sha256_at_pre_repair_pin": "ee1b07ee22899f0b050b275e6cdbedd15c21296370791f0f4f7760c3e1c62102",
+    "consumer_models_sha256": "c3cc51b14831bc2a6b2a27e05a44ba70fc4fa328b6888ba6129bb881c733c7da",
+    "consumer_models_changed_by_repair": false,
+    "time_replay_gate_sha256": "79aa9bd9a98fc76d4666689f71ea4d47a69d75f3a05036b7ccc278a269a3a936",
+    "approval_manifest_path": "C:\\Users\\wifik\\Desktop\\larger-lab\\.worktrees\\p3-consumer-rung1\\quant-lab\\config\\crypto_sensor_fabric\\provider_semantics\\approval_manifest.json",
+    "approval_manifest_artifacts": {},
+    "approval_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654"
+  },
+  "workspace": {
+    "tracked_tree_byte_clean": false,
+    "untracked_paths": [
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs/p3-r6-attempt1-workers4/",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs/p3-r6-attempt2-workers1-timeout900/",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs/p3-r6-final-r3/",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/canonical_runs/p3-r6-final/"
+    ],
+    "dirty_tracked_paths": [
+      {
+        "path": "uant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+        "category": "OTHER",
+        "content_unchanged_eol_only": true
+      },
+      {
+        "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+        "category": "RESEARCH_EVIDENCE",
+        "content_unchanged_eol_only": true
+      },
+      {
+        "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+        "category": "RESEARCH_EVIDENCE",
+        "content_unchanged_eol_only": true
+      },
+      {
+        "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+        "category": "RESEARCH_EVIDENCE",
+        "content_unchanged_eol_only": true
+      },
+      {
+        "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+        "category": "RESEARCH_EVIDENCE",
+        "content_unchanged_eol_only": true
+      },
+      {
+        "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+        "category": "RESEARCH_EVIDENCE",
+        "content_unchanged_eol_only": true
+      },
+      {
+        "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+        "category": "RESEARCH_EVIDENCE",
+        "content_unchanged_eol_only": true
+      }
+    ],
+    "dirty_production_or_canonical_test_paths": [],
+    "untested_change_check": "\u00a77 requires the evidence publication to contain no untested production or canonical-test changes. No path under quant-lab/src or quant-lab/tests is dirty. The seven dirty paths are BLOC_04 research evidence JSONs listed in the canonical runner's own restoration set, and each is EOL-only: `git diff --ignore-cr-at-eol --numstat` reports zero hunks for every one of them, so their JSON content is unchanged.",
+    "tracked_python_under_quant_lab": 5813,
+    "python": "python 3.11.9 (C:\\Users\\wifik\\AppData\\Local\\Programs\\Python\\Python311\\python.exe)"
+  }
+}

@@ -1,0 +1,262 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+  "probe": "test_f4f5_closure_r4.py",
+  "probe_file_sha256": "86ca15770c89b2eb368bf0ff99b57d487fcf1f8ddf52c6af90a6085f288ae706",
+  "junit_file_sha256": "6293fd03bb6a92c1a9617370e981cc360ff952b48aa176cb6facc5fd1f8c7b6a",
+  "tally": {
+    "passed": 41,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0,
+    "total": 41
+  },
+  "cases": [
+    {
+      "test": "test_f4_00_control_chosen_revision_alone_still_accepts",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_01_control_every_selected_revision_known_by_cutoff",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_05_counterexample_future_revision_selected_last",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_06_future_revision_selected_first",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_07_duplicate_identifier_hiding_a_future_entry",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_08_contradictory_duplicate_never_certifies[future_last]",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_08_contradictory_duplicate_never_certifies[future_first]",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_09_selected_and_excluded_contradiction_never_certifies",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_10_malformed_knowledge_instant_on_another_entry",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_11_order_alone_may_not_decide_the_outcome",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_12_the_temporal_branch_does_execute_for_the_chosen_revision",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_13_why_and_when_refusals_stay_distinct",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f4_14_reordering_a_valid_selection_cannot_manufacture_admissibility",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_00_control_typed_refusal_keeps_its_classification",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_01_typed_refusal_detail_is_withheld",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_03_pit_typed_refusal_detail_is_withheld",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_04_ordinary_exception_detail_is_withheld",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_05_keyboard_interrupt_propagates",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_06_system_exit_propagates",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_07_the_fixture_is_not_secret_shaped",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_08_the_verification_layer_has_no_pit_member",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_09_semantic_authority_detail_is_withheld_and_classification_kept",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_10_semantic_authority_violation_stays_a_refusal",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_11_an_unapproved_claimed_code_falls_back_to_a_fixed_token",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_f5_12_the_rederivation_branch_relays_a_token_not_a_detail",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_00_revision_identity_is_bound",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_01_availability_instant_is_bound",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_02_evidence_reference_digest_is_bound_at_the_contract",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_03_an_unapproved_reference_is_refused",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_04_provider_substitution_cannot_produce_authoritative_acceptance",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_05_record_kind_substitution_cannot_produce_authoritative_acceptance",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_06_artifact_substitution_cannot_produce_authoritative_acceptance",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_08_the_shipped_empty_manifest_remains_non_authorizing",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_09_the_schema_cannot_express_full_provenance",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    },
+    {
+      "test": "test_zz_the_imported_policy_module_is_the_expected_tree",
+      "classname": "test_f4f5_closure_r4",
+      "status": "passed",
+      "message": null
+    }
+  ]
+}

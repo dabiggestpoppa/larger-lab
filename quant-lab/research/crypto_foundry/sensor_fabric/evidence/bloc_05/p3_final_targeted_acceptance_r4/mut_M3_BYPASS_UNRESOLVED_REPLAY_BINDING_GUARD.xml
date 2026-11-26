@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="41" time="1.947" timestamp="2026-11-26T07:15:38.106915-05:00" hostname="blrrr"><testcase classname="test_f4f5_closure_r4" name="test_f4_00_control_chosen_revision_alone_still_accepts" time="0.034"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F9576D03D0&gt;
+
+    def test_f4_00_control_chosen_revision_alone_still_accepts(monkeypatch):
+        """Positive control: the accept path stays reachable through this harness."""
+        verdict = _evaluate(monkeypatch, _selection(_rev()))
+&gt;       _assert_intermediate_temporal_pass(verdict)
+
+test_f4f5_closure_r4.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+verdict = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+
+    def _assert_intermediate_temporal_pass(verdict: object) -&gt; None:
+        """The temporal control ADMITTED this selection; the guard is what refused.
+    
+        This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+        it is also what a broken harness produces -- so the assertion additionally
+        requires the replay stage to report ELIGIBLE and requires the terminal detail
+        to name the unmet binding contract rather than any temporal rule.
+        """
+        text = _text(verdict)
+&gt;       assert verdict.decision is INTEGRATION, text
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:228: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_f4_01_control_every_selected_revision_known_by_cutoff" time="0.018"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F9576E00D0&gt;
+
+    def test_f4_01_control_every_selected_revision_known_by_cutoff(monkeypatch):
+        selection = _selection(
+            _rev(), _rev("rev-EARLY-2", datetime(2026, 1, 5, tzinfo=UTC))
+        )
+&gt;       _assert_intermediate_temporal_pass(_evaluate(monkeypatch, selection))
+
+test_f4f5_closure_r4.py:289: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+verdict = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+
+    def _assert_intermediate_temporal_pass(verdict: object) -&gt; None:
+        """The temporal control ADMITTED this selection; the guard is what refused.
+    
+        This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+        it is also what a broken harness produces -- so the assertion additionally
+        requires the replay stage to report ELIGIBLE and requires the terminal detail
+        to name the unmet binding contract rather than any temporal rule.
+        """
+        text = _text(verdict)
+&gt;       assert verdict.decision is INTEGRATION, text
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:228: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible" time="0.018"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F957866B90&gt;
+
+    def test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible(monkeypatch):
+        """The boundary is inclusive: known AT the cutoff was knowable at it."""
+&gt;       _assert_intermediate_temporal_pass(
+            _evaluate(monkeypatch, _selection(_rev(REV, CUTOFF)))
+        )
+
+test_f4f5_closure_r4.py:297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+verdict = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+
+    def _assert_intermediate_temporal_pass(verdict: object) -&gt; None:
+        """The temporal control ADMITTED this selection; the guard is what refused.
+    
+        This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+        it is also what a broken harness produces -- so the assertion additionally
+        requires the replay stage to report ELIGIBLE and requires the terminal detail
+        to name the unmet binding contract rather than any temporal rule.
+        """
+        text = _text(verdict)
+&gt;       assert verdict.decision is INTEGRATION, text
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:228: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant" time="0.017"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F9576C58D0&gt;
+
+    def test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant(monkeypatch):
+        offset = CUTOFF.astimezone(timezone(timedelta(hours=2)))
+        assert offset == CUTOFF and offset.utcoffset() != CUTOFF.utcoffset()
+&gt;       _assert_intermediate_temporal_pass(
+            _evaluate(monkeypatch, _selection(_rev(REV, offset)))
+        )
+
+test_f4f5_closure_r4.py:308: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+verdict = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+
+    def _assert_intermediate_temporal_pass(verdict: object) -&gt; None:
+        """The temporal control ADMITTED this selection; the guard is what refused.
+    
+        This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+        it is also what a broken harness produces -- so the assertion additionally
+        requires the replay stage to report ELIGIBLE and requires the terminal detail
+        to name the unmet binding contract rather than any temporal rule.
+        """
+        text = _text(verdict)
+&gt;       assert verdict.decision is INTEGRATION, text
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:228: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse" time="0.017"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F957881290&gt;
+
+    def test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse(
+        monkeypatch,
+    ):
+        """A withheld revision is analysis context; it must not force a refusal."""
+        selection = _selection(_rev(), excluded=(_rev("rev-WITHHELD", FUTURE),))
+&gt;       _assert_intermediate_temporal_pass(_evaluate(monkeypatch, selection))
+
+test_f4f5_closure_r4.py:321: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+verdict = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+
+    def _assert_intermediate_temporal_pass(verdict: object) -&gt; None:
+        """The temporal control ADMITTED this selection; the guard is what refused.
+    
+        This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+        it is also what a broken harness produces -- so the assertion additionally
+        requires the replay stage to report ELIGIBLE and requires the terminal detail
+        to name the unmet binding contract rather than any temporal rule.
+        """
+        text = _text(verdict)
+&gt;       assert verdict.decision is INTEGRATION, text
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:228: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_f4_05_counterexample_future_revision_selected_last" time="0.013" /><testcase classname="test_f4f5_closure_r4" name="test_f4_06_future_revision_selected_first" time="0.012" /><testcase classname="test_f4f5_closure_r4" name="test_f4_07_duplicate_identifier_hiding_a_future_entry" time="0.013" /><testcase classname="test_f4f5_closure_r4" name="test_f4_08_contradictory_duplicate_never_certifies[future_last]" time="0.013" /><testcase classname="test_f4f5_closure_r4" name="test_f4_08_contradictory_duplicate_never_certifies[future_first]" time="0.013" /><testcase classname="test_f4f5_closure_r4" name="test_f4_09_selected_and_excluded_contradiction_never_certifies" time="0.013" /><testcase classname="test_f4f5_closure_r4" name="test_f4_10_malformed_knowledge_instant_on_another_entry" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f4_11_order_alone_may_not_decide_the_outcome" time="0.013" /><testcase classname="test_f4f5_closure_r4" name="test_f4_12_the_temporal_branch_does_execute_for_the_chosen_revision" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f4_13_why_and_when_refusals_stay_distinct" time="0.008" /><testcase classname="test_f4f5_closure_r4" name="test_f4_14_reordering_a_valid_selection_cannot_manufacture_admissibility" time="0.035"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F95755F550&gt;
+
+    def test_f4_14_reordering_a_valid_selection_cannot_manufacture_admissibility(
+        monkeypatch,
+    ):
+        """§2: order is not an input to the answer, in either direction."""
+        early = _rev("rev-EARLY-2", datetime(2026, 1, 5, tzinfo=UTC))
+        forward = _evaluate(monkeypatch, _selection(_rev(), early))
+        reverse = _evaluate(monkeypatch, _selection(early, _rev()))
+&gt;       _assert_intermediate_temporal_pass(forward)
+
+test_f4f5_closure_r4.py:433: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+verdict = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+
+    def _assert_intermediate_temporal_pass(verdict: object) -&gt; None:
+        """The temporal control ADMITTED this selection; the guard is what refused.
+    
+        This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+        it is also what a broken harness produces -- so the assertion additionally
+        requires the replay stage to report ELIGIBLE and requires the terminal detail
+        to name the unmet binding contract rather than any temporal rule.
+        """
+        text = _text(verdict)
+&gt;       assert verdict.decision is INTEGRATION, text
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:228: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_f5_00_control_typed_refusal_keeps_its_classification" time="0.009" /><testcase classname="test_f4f5_closure_r4" name="test_f5_01_typed_refusal_detail_is_withheld" time="0.008" /><testcase classname="test_f4f5_closure_r4" name="test_f5_02_typed_sentinel_is_absent_from_every_public_field" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_03_pit_typed_refusal_detail_is_withheld" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_04_ordinary_exception_detail_is_withheld" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_05_keyboard_interrupt_propagates" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_06_system_exit_propagates" time="0.008" /><testcase classname="test_f4f5_closure_r4" name="test_f5_07_the_fixture_is_not_secret_shaped" time="0.001" /><testcase classname="test_f4f5_closure_r4" name="test_f5_08_the_verification_layer_has_no_pit_member" time="0.001" /><testcase classname="test_f4f5_closure_r4" name="test_f5_09_semantic_authority_detail_is_withheld_and_classification_kept" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_10_semantic_authority_violation_stays_a_refusal" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_11_an_unapproved_claimed_code_falls_back_to_a_fixed_token" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_f5_12_the_rederivation_branch_relays_a_token_not_a_detail" time="0.012" /><testcase classname="test_f4f5_closure_r4" name="test_b_00_revision_identity_is_bound" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_b_01_availability_instant_is_bound" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_b_02_evidence_reference_digest_is_bound_at_the_contract" time="0.006" /><testcase classname="test_f4f5_closure_r4" name="test_b_03_an_unapproved_reference_is_refused" time="0.017" /><testcase classname="test_f4f5_closure_r4" name="test_b_04_provider_substitution_cannot_produce_authoritative_acceptance" time="0.019"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is not &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F9576C7E10&gt;
+
+    def test_b_04_provider_substitution_cannot_produce_authoritative_acceptance(
+        monkeypatch,
+    ):
+        """§4: substituting the provider evidence axis cannot authorize.
+    
+        Historically this measured that acceptance did NOT depend on provenance --
+        that was the finding.  Under the repair the same substitution still cannot
+        reach an authoritative acceptance; what changed is only that the terminal
+        outcome now names the unmet binding contract instead of accepting.
+        """
+        record = R5.trade_record(monkeypatch)
+        evidence = R5.replay(source_evidence_refs=("ANOTHER_PROVIDER_TIMESTAMP_DOC",))
+        verdict = _policy(source=_AuthSource()).evaluate(
+            R5.request(record, replay_evidence=evidence)
+        )
+&gt;       assert verdict.decision is not ACCEPT, _text(verdict)
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is not &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:707: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_b_05_record_kind_substitution_cannot_produce_authoritative_acceptance" time="0.024"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('position_side_liquidated', 'execution_side')&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('position_side_liquidated', 'execution_side'), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is not &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F957578FD0&gt;
+
+    def test_b_05_record_kind_substitution_cannot_produce_authoritative_acceptance(
+        monkeypatch,
+    ):
+        """§4: a different record kind against the same evidence cannot authorize."""
+        trade = R5.trade_record(monkeypatch)
+        liquidation = R5.liq_record(monkeypatch)
+        assert type(trade) is not type(liquidation)
+        verdict = _policy(source=_AuthSource()).evaluate(
+            R5.request(liquidation, replay_evidence=R5.replay())
+        )
+&gt;       assert verdict.decision is not ACCEPT, _text(verdict)
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('position_side_liquidated', 'execution_side')", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('position_side_liquidated', 'execution_side'), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is not &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:722: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_b_06_artifact_substitution_cannot_produce_authoritative_acceptance" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard" time="0.017"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F957875E50&gt;
+
+    def test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard(monkeypatch):
+        """§4: every other claim satisfied, and the answer still is not acceptance.
+    
+        This is the wired composition -- a fixture manifest that DOES approve the
+        artifact, an authorizing source, admissible evidence.  The only thing left
+        is the record-binding guard, and it must hold.
+        """
+        record = R5.trade_record(monkeypatch)
+        verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+&gt;       assert verdict.decision is INTEGRATION, _text(verdict)
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:745: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_b_08_the_shipped_empty_manifest_remains_non_authorizing" time="0.007" /><testcase classname="test_f4f5_closure_r4" name="test_b_09_the_schema_cannot_express_full_provenance" time="0.001" /><testcase classname="test_f4f5_closure_r4" name="test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not" time="0.042"><failure message="AssertionError: {&quot;decision&quot;: &quot;ConsumerDecision.ACCEPT_FIELD_BINDING&quot;, &quot;trust_scope&quot;: &quot;ECONOMIC_FIELD_BINDING&quot;, &quot;verified_field_allowlist&quot;: &quot;('aggressor_side',)&quot;, &quot;unverified_dimensions&quot;: &quot;('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')&quot;, &quot;pit_status&quot;: &quot;ADMISSIBLE&quot;, &quot;replay_status&quot;: &quot;ELIGIBLE&quot;, &quot;custody_status&quot;: &quot;VERIFIED&quot;, &quot;custody_source_authorization_status&quot;: &quot;CustodyAuthorityBasis.AUTHORIZED&quot;, &quot;custody_source_authorized&quot;: &quot;True&quot;, &quot;custody_authorization_detail&quot;: &quot;probe authority&quot;, &quot;refusal_reason&quot;: null, &quot;refusal_detail&quot;: null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)&#10;assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;&#10; +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001F957862550&gt;
+
+    def test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not(
+        monkeypatch,
+    ):
+        """Operation, not documentation.
+    
+        The historical finding stands for ``UNRESOLVED_REPLAY_BINDING``: it is a
+        string and no branch reads it.  The ENFORCED control is the new boolean, and
+        it must be demonstrably executable -- flipping it must change the outcome.
+        """
+        source = (
+            QUANT_LAB / "src/crypto_sensor_fabric/normalization/consumer/policy.py"
+        ).read_text(encoding="utf-8")
+        tree = ast.parse(source)
+    
+        documented = [
+            node.lineno
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Name) and node.id == "UNRESOLVED_REPLAY_BINDING"
+        ]
+        assert documented, "the named limitation disappeared from the module"
+        for node in ast.walk(tree):
+            if isinstance(node, ast.If):
+                names = {
+                    child.id
+                    for child in ast.walk(node.test)
+                    if isinstance(child, ast.Name)
+                }
+                assert "UNRESOLVED_REPLAY_BINDING" not in names, (
+                    f"line {node.lineno}: the documentation constant became a branch"
+                )
+    
+        enforced = [
+            node.lineno
+            for node in ast.walk(tree)
+            if isinstance(node, ast.If)
+            and any(
+                isinstance(child, ast.Name) and child.id == BINDING_GUARD
+                for child in ast.walk(node.test)
+            )
+        ]
+        assert enforced, "the executable binding guard is not read by any branch"
+        assert getattr(policy_module, BINDING_GUARD) is False, (
+            "production must ship the guard off; a flipped default would be an "
+            "acceptance the schema cannot support"
+        )
+        assert getattr(policy_module, "REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT") == (
+            BINDING_CONTRACT
+        )
+    
+        record = R5.trade_record(monkeypatch)
+        before = _policy(source=_AuthSource()).evaluate(R5.request(record))
+        monkeypatch.setattr(policy_module, BINDING_GUARD, True)
+        after = _policy(source=_AuthSource()).evaluate(R5.request(record))
+&gt;       assert before.decision is INTEGRATION, _text(before)
+E       AssertionError: {"decision": "ConsumerDecision.ACCEPT_FIELD_BINDING", "trust_scope": "ECONOMIC_FIELD_BINDING", "verified_field_allowlist": "('aggressor_side',)", "unverified_dimensions": "('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY')", "pit_status": "ADMISSIBLE", "replay_status": "ELIGIBLE", "custody_status": "VERIFIED", "custody_source_authorization_status": "CustodyAuthorityBasis.AUTHORIZED", "custody_source_authorized": "True", "custody_authorization_detail": "probe authority", "refusal_reason": null, "refusal_detail": null}ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_BINDING', verified_field_allowlist=('aggressor_side',), unverified_dimensions=('SOURCE_LINEAGE', 'VENUE_IDENTITY', 'INSTRUMENT_IDENTITY', 'SOURCE_REVISION', 'ACQUISITION_LINEAGE', 'CUSTODY_SOURCE_AUTHORITY'), pit_status='ADMISSIBLE', replay_status='ELIGIBLE', custody_status='VERIFIED', custody_source_authorization_status=&lt;CustodyAuthorityBasis.AUTHORIZED: 'AUTHORIZED'&gt;, custody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None)
+E       assert &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; is &lt;ConsumerDecision.INTEGRATION_REQUIRED: 'INTEGRATION_REQUIRED'&gt;
+E        +  where &lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt; = ConsumerVerdict(decision=&lt;ConsumerDecision.ACCEPT_FIELD_BINDING: 'ACCEPT_FIELD_BINDING'&gt;, trust_scope='ECONOMIC_FIELD_...stody_source_authorized=True, custody_authorization_detail='probe authority', refusal_reason=None, refusal_detail=None).decision
+
+test_f4f5_closure_r4.py:824: AssertionError</failure></testcase><testcase classname="test_f4f5_closure_r4" name="test_zz_the_imported_policy_module_is_the_expected_tree" time="0.001" /></testsuite></testsuites>

@@ -1,0 +1,255 @@
+"""SENSOR-B5-P3-R6-FINAL-INDEPENDENT-CLOSEOUT-R3 -- mutation runner (R4).
+
+SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT.
+
+Each mutation is applied to a DISPOSABLE COPY of the repaired package, and the
+probe is run with PYTHONPATH pointing at that copy.  Three things are required
+before a mutation may be called DETECTED:
+
+1. the copy's provenance case passes (the mutated module was actually imported);
+2. at least one INTENDED behavioural detector fails;
+3. no collection error, i.e. the failure is an assertion about behaviour and not
+   a syntax error, a missing import or an unrelated fixture problem.
+
+A control run of the unmutated copy comes first, so a red result cannot be
+attributed to the copying mechanism.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import pathlib
+import shutil
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+
+HERE = pathlib.Path(__file__).resolve().parent
+QUANT_LAB = pathlib.Path(
+    os.environ.get("AUDIT_QUANT_LAB", "")
+).resolve()
+PROBE = HERE / "test_f4f5_closure_r4.py"
+PRIOR = pathlib.Path(os.environ["AUDIT_PRIOR_FIXTURES"]).resolve()
+MUTROOT = HERE / "mut"
+POLICY_REL = pathlib.Path(
+    "crypto_sensor_fabric/normalization/consumer/policy.py"
+)
+PROVENANCE = "test_zz_the_imported_policy_module_is_the_expected_tree"
+
+MUTATIONS: dict[str, dict[str, object]] = {
+    "M1_CHOSEN_ONLY_CUTOFF": {
+        "description": (
+            "Restore the R6 defect: order only the record's own selected revision "
+            "against the cutoff instead of the whole selected sequence."
+        ),
+        "replacements": [
+            (
+                "        future: list[str] = []\n"
+                "        for identity, known_from in zip(selected_ids, selected_instants):\n",
+                "        future: list[str] = []\n"
+                "        for identity, known_from in [\n"
+                "            (i, k)\n"
+                "            for i, k in zip(selected_ids, selected_instants)\n"
+                "            if i == record_revision\n"
+                "        ]:\n",
+            )
+        ],
+        "expected": {
+            "test_f4_05_counterexample_future_revision_selected_last",
+            "test_f4_06_future_revision_selected_first",
+        },
+    },
+    "M2_RAW_TYPED_REFUSAL_DETAIL": {
+        "description": (
+            "Restore the F5 defect: format the authored typed-refusal detail into "
+            "the public verdict on both typed branches."
+        ),
+        "replacements": [
+            (
+                'f"{token}: the approval or its evidence was not admissible at "',
+                'f"{token}: {exc.detail}: was not admissible at "',
+            ),
+            (
+                'f"{token}: record verification did not establish economic field "',
+                'f"{token}: {exc.detail}: did not establish economic field "',
+            ),
+        ],
+        "expected": {
+            "test_f5_01_typed_refusal_detail_is_withheld",
+            "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+            "test_f5_03_pit_typed_refusal_detail_is_withheld",
+        },
+    },
+    "M3_BYPASS_UNRESOLVED_REPLAY_BINDING_GUARD": {
+        "description": (
+            "Remove the executable unresolved replay-binding guard, so a fully "
+            "satisfied evaluation returns an authoritative acceptance the frozen "
+            "schema cannot support."
+        ),
+        "replacements": [
+            (
+                "        if not REPLAY_RECORD_BINDING_ESTABLISHED:\n",
+                "        if False:  # M3 mutation: guard bypassed\n",
+            )
+        ],
+        "expected": {
+            "test_f4_00_control_chosen_revision_alone_still_accepts",
+            "test_f4_01_control_every_selected_revision_known_by_cutoff",
+            "test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible",
+            "test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant",
+            "test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse",
+            "test_b_04_provider_substitution_cannot_produce_authoritative_acceptance",
+            "test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard",
+            "test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not",
+        },
+    },
+}
+
+
+def _env(src_root: pathlib.Path) -> dict[str, str]:
+    env = dict(os.environ)
+    env["AUDIT_QUANT_LAB"] = str(QUANT_LAB)
+    env["AUDIT_PRIOR_FIXTURES"] = str(PRIOR)
+    env["AUDIT_EXPECT_SRC_ROOT"] = str(src_root)
+    env["PYTHONPATH"] = str(src_root)
+    env["PYTHONIOENCODING"] = "utf-8"
+    return env
+
+
+def _run(src_root: pathlib.Path, junit: pathlib.Path) -> dict[str, object]:
+    if junit.exists():
+        junit.unlink()
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            str(PROBE),
+            "-q",
+            "--junitxml",
+            str(junit),
+            "-p",
+            "no:cacheprovider",
+        ],
+        cwd=str(HERE),
+        env=_env(src_root),
+        capture_output=True,
+        text=True,
+    )
+    tail = (completed.stdout or "").strip().splitlines()[-1:] or [""]
+    result: dict[str, object] = {
+        "exit_code": completed.returncode,
+        "summary": tail[0],
+        "failed": [],
+        "errored": [],
+        "passed": 0,
+        "collected": 0,
+    }
+    if not junit.exists():
+        result["collection_error"] = (completed.stderr or completed.stdout or "")[-2000:]
+        return result
+    root = ET.parse(junit).getroot()
+    for case in root.iter("testcase"):
+        result["collected"] += 1  # type: ignore[operator]
+        name = case.get("name", "")
+        outcome = None
+        for child in case:
+            if child.tag in ("failure", "error", "skipped"):
+                outcome = child.tag
+                if child.tag == "failure":
+                    result["failed"].append(name)  # type: ignore[union-attr]
+                elif child.tag == "error":
+                    result["errored"].append(name)  # type: ignore[union-attr]
+                break
+        if outcome is None:
+            result["passed"] += 1  # type: ignore[operator]
+    return result
+
+
+def main() -> int:
+    MUTROOT.mkdir(exist_ok=True)
+    package = QUANT_LAB / "src" / "crypto_sensor_fabric"
+    record: dict[str, object] = {
+        "label": "SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT",
+        "method": (
+            "each mutation is applied to a disposable copy of the repaired "
+            "package; PYTHONPATH points at the copy and the provenance case "
+            "asserts the imported policy.py came from it"
+        ),
+        "package_source": str(package),
+        "control": None,
+        "mutations": {},
+    }
+
+    # --- control: the uncompacted copy must be green ------------------------
+    control_root = MUTROOT / "_control"
+    if control_root.exists():
+        shutil.rmtree(control_root)
+    control_root.mkdir(parents=True)
+    shutil.copytree(package, control_root / "crypto_sensor_fabric")
+    control = _run(control_root, HERE / "mut_control.xml")
+    record["control"] = {"name": "CAL_COPY_BASELINE_UNMUTATED", "result": control}
+    print("CONTROL", control["summary"], flush=True)
+    control_ok = (
+        control["exit_code"] == 0
+        and not control["failed"]
+        and not control["errored"]
+        and control["passed"] == control["collected"]
+        and control["collected"] >= 41
+    )
+
+    for name, spec in MUTATIONS.items():
+        target = MUTROOT / name
+        if target.exists():
+            shutil.rmtree(target)
+        target.mkdir(parents=True)
+        shutil.copytree(package, target / "crypto_sensor_fabric")
+        policy = target / POLICY_REL
+        text = policy.read_text(encoding="utf-8")
+        applied = []
+        for old, new in spec["replacements"]:  # type: ignore[union-attr]
+            count = text.count(old)
+            if count != 1:
+                raise SystemExit(f"{name}: anchor occurs {count} times, expected 1")
+            text = text.replace(old, new)
+            applied.append(old.strip().splitlines()[0][:90])
+        policy.write_text(text, encoding="utf-8")
+        result = _run(target, HERE / f"mut_{name}.xml")
+        expected = set(spec["expected"])  # type: ignore[arg-type]
+        failed = set(result["failed"])  # type: ignore[call-overload]
+        provenance_ok = PROVENANCE not in failed and PROVENANCE not in set(
+            result["errored"]  # type: ignore[call-overload]
+        )
+        intended = sorted(expected & failed)
+        status = (
+            "DETECTED"
+            if control_ok
+            and provenance_ok
+            and not result["errored"]
+            and "collection_error" not in result
+            and intended
+            else "NOT_DETECTED"
+        )
+        record["mutations"][name] = {
+            "description": spec["description"],
+            "applied_anchor": applied,
+            "result": result,
+            "expected_detectors": sorted(expected),
+            "intended_detectors_that_failed": intended,
+            "additional_failures": sorted(failed - expected),
+            "provenance_ok": provenance_ok,
+            "control_ok": control_ok,
+            "status": status,
+        }
+        print(name, status, result["summary"], flush=True)
+
+    (HERE / "mutation_results_r4.json").write_text(
+        json.dumps(record, indent=2) + "\n", encoding="utf-8"
+    )
+    print("wrote mutation_results_r4.json")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

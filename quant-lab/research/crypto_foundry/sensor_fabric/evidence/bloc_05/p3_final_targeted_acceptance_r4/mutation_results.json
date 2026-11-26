@@ -1,0 +1,132 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "method": "each mutation is applied to a disposable copy of the repaired package; PYTHONPATH points at the copy and the provenance case asserts the imported policy.py came from it",
+  "package_source": "C:\\Users\\wifik\\Desktop\\larger-lab\\.worktrees\\p3-consumer-rung1\\quant-lab\\src\\crypto_sensor_fabric",
+  "control": {
+    "name": "CAL_COPY_BASELINE_UNMUTATED",
+    "result": {
+      "exit_code": 0,
+      "summary": "41 passed, 40 warnings in 1.95s",
+      "failed": [],
+      "errored": [],
+      "passed": 41,
+      "collected": 41
+    }
+  },
+  "mutations": {
+    "M1_CHOSEN_ONLY_CUTOFF": {
+      "description": "Restore the R6 defect: order only the record's own selected revision against the cutoff instead of the whole selected sequence.",
+      "applied_anchor": [
+        "future: list[str] = []"
+      ],
+      "result": {
+        "exit_code": 1,
+        "summary": "2 failed, 39 passed, 38 warnings in 2.24s",
+        "failed": [
+          "test_f4_05_counterexample_future_revision_selected_last",
+          "test_f4_06_future_revision_selected_first"
+        ],
+        "errored": [],
+        "passed": 39,
+        "collected": 41
+      },
+      "expected_detectors": [
+        "test_f4_05_counterexample_future_revision_selected_last",
+        "test_f4_06_future_revision_selected_first"
+      ],
+      "intended_detectors_that_failed": [
+        "test_f4_05_counterexample_future_revision_selected_last",
+        "test_f4_06_future_revision_selected_first"
+      ],
+      "additional_failures": [],
+      "provenance_ok": true,
+      "control_ok": true,
+      "status": "DETECTED"
+    },
+    "M2_RAW_TYPED_REFUSAL_DETAIL": {
+      "description": "Restore the F5 defect: format the authored typed-refusal detail into the public verdict on both typed branches.",
+      "applied_anchor": [
+        "f\"{token}: the approval or its evidence was not admissible at \"",
+        "f\"{token}: record verification did not establish economic field \""
+      ],
+      "result": {
+        "exit_code": 1,
+        "summary": "3 failed, 38 passed, 42 warnings in 3.17s",
+        "failed": [
+          "test_f5_01_typed_refusal_detail_is_withheld",
+          "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+          "test_f5_03_pit_typed_refusal_detail_is_withheld"
+        ],
+        "errored": [],
+        "passed": 38,
+        "collected": 41
+      },
+      "expected_detectors": [
+        "test_f5_01_typed_refusal_detail_is_withheld",
+        "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+        "test_f5_03_pit_typed_refusal_detail_is_withheld"
+      ],
+      "intended_detectors_that_failed": [
+        "test_f5_01_typed_refusal_detail_is_withheld",
+        "test_f5_02_typed_sentinel_is_absent_from_every_public_field",
+        "test_f5_03_pit_typed_refusal_detail_is_withheld"
+      ],
+      "additional_failures": [],
+      "provenance_ok": true,
+      "control_ok": true,
+      "status": "DETECTED"
+    },
+    "M3_BYPASS_UNRESOLVED_REPLAY_BINDING_GUARD": {
+      "description": "Remove the executable unresolved replay-binding guard, so a fully satisfied evaluation returns an authoritative acceptance the frozen schema cannot support.",
+      "applied_anchor": [
+        "if not REPLAY_RECORD_BINDING_ESTABLISHED:"
+      ],
+      "result": {
+        "exit_code": 1,
+        "summary": "10 failed, 31 passed, 36 warnings in 1.97s",
+        "failed": [
+          "test_f4_00_control_chosen_revision_alone_still_accepts",
+          "test_f4_01_control_every_selected_revision_known_by_cutoff",
+          "test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible",
+          "test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant",
+          "test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse",
+          "test_f4_14_reordering_a_valid_selection_cannot_manufacture_admissibility",
+          "test_b_04_provider_substitution_cannot_produce_authoritative_acceptance",
+          "test_b_05_record_kind_substitution_cannot_produce_authoritative_acceptance",
+          "test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard",
+          "test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not"
+        ],
+        "errored": [],
+        "passed": 31,
+        "collected": 41
+      },
+      "expected_detectors": [
+        "test_b_04_provider_substitution_cannot_produce_authoritative_acceptance",
+        "test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard",
+        "test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not",
+        "test_f4_00_control_chosen_revision_alone_still_accepts",
+        "test_f4_01_control_every_selected_revision_known_by_cutoff",
+        "test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible",
+        "test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant",
+        "test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse"
+      ],
+      "intended_detectors_that_failed": [
+        "test_b_04_provider_substitution_cannot_produce_authoritative_acceptance",
+        "test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard",
+        "test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not",
+        "test_f4_00_control_chosen_revision_alone_still_accepts",
+        "test_f4_01_control_every_selected_revision_known_by_cutoff",
+        "test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible",
+        "test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant",
+        "test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse"
+      ],
+      "additional_failures": [
+        "test_b_05_record_kind_substitution_cannot_produce_authoritative_acceptance",
+        "test_f4_14_reordering_a_valid_selection_cannot_manufacture_admissibility"
+      ],
+      "provenance_ok": true,
+      "control_ok": true,
+      "status": "DETECTED"
+    }
+  }
+}

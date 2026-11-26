@@ -1,0 +1,219 @@
+"""Observed-outcome table for the R4 matrix.
+
+SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT.
+
+The matrix asserts; this table MEASURES.  Each row is one composition evaluated
+twice: once with the production default and once with the labelled test-only
+binding override.  Nothing here is inferred from a test name.
+"""
+
+from __future__ import annotations
+
+import importlib.util
+import json
+import os
+import pathlib
+import sys
+
+import pytest
+
+HERE = pathlib.Path(__file__).resolve().parent
+_spec = importlib.util.spec_from_file_location(
+    "probe_r4", HERE / "test_f4f5_closure_r4.py"
+)
+probe = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
+sys.modules["probe_r4"] = probe
+_spec.loader.exec_module(probe)  # type: ignore[union-attr]
+
+R5 = probe.R5
+FUTURE = probe.FUTURE
+dt = probe.datetime
+TZ = probe.timezone
+td = probe.timedelta
+CUTOFF = probe.CUTOFF
+UTC = probe.UTC
+EARLY = probe.EARLY
+REV = probe.REV
+_rev = probe._rev
+_broken = probe._broken
+_selection = probe._selection
+_AuthSource = probe._AuthSource
+
+
+def row(label: str, selection=None, **kwargs) -> dict:
+    mp = pytest.MonkeyPatch()
+    out: dict[str, object] = {"scenario": label}
+    try:
+        v = probe._evaluate(mp, selection if selection is not None else _selection(_rev()), **kwargs)
+        out["production_default"] = {
+            "decision": v.decision.value,
+            "refusal_reason": None if v.refusal_reason is None else v.refusal_reason.value,
+            "replay_status": v.replay_status,
+            "pit_status": v.pit_status,
+            "names_binding_contract": probe.BINDING_CONTRACT in probe._text(v),
+            "detail": (v.refusal_detail or v.custody_authorization_detail or "")[:200],
+        }
+    except AssertionError as exc:
+        out["production_default"] = {"assertion_refused": str(exc)[:200]}
+    mp.undo()
+
+    mp = pytest.MonkeyPatch()
+    try:
+        v = probe._evaluate_with_override(
+            mp, selection if selection is not None else _selection(_rev()), **kwargs
+        )
+        out["test_only_override"] = {
+            "decision": v.decision.value,
+            "refusal_reason": None if v.refusal_reason is None else v.refusal_reason.value,
+            "replay_status": v.replay_status,
+            "detail": (v.refusal_detail or v.custody_authorization_detail or "")[:200],
+        }
+    except AssertionError as exc:
+        out["test_only_override"] = {"assertion_refused": str(exc)[:200]}
+    mp.undo()
+    return out
+
+
+def main() -> int:
+    rows = [
+        row("F4 control: single early revision", _selection(_rev())),
+        row(
+            "F4 control: multi-revision, all known by cutoff",
+            _selection(_rev(), _rev("rev-EARLY-2", dt(2026, 1, 5, tzinfo=UTC))),
+        ),
+        row("F4 control: knowledge equal to the cutoff", _selection(_rev(REV, CUTOFF))),
+        row(
+            "F4 control: equivalent timezone offset",
+            _selection(
+                _rev(REV, CUTOFF.astimezone(TZ(td(hours=2))))
+            ),
+        ),
+        row(
+            "F4 control: correctly excluded future revision",
+            _selection(_rev(), excluded=(_rev("rev-WITHHELD", FUTURE),)),
+        ),
+        row(
+            "F4 counterexample: future revision selected last",
+            _selection(_rev(), _rev("rev-LATER", FUTURE)),
+        ),
+        row(
+            "F4 counterexample: future revision selected first",
+            _selection(_rev("rev-LATER", FUTURE), _rev()),
+        ),
+        row(
+            "F4 counterexample: duplicate id hides a future entry",
+            _selection(_rev(REV, FUTURE), _rev(REV, EARLY)),
+        ),
+        row(
+            "F4 counterexample: duplicate id, future last",
+            _selection(_rev(REV, EARLY), _rev(REV, FUTURE)),
+        ),
+        row(
+            "F4 counterexample: selected and excluded",
+            _selection(_rev(), excluded=(_rev(REV, FUTURE),)),
+        ),
+        row(
+            "F4 counterexample: malformed knowledge instant on another entry",
+            _selection(_rev(), _broken()),
+        ),
+        row("F4 counterexample: chosen revision itself is future", _selection(_rev(REV, FUTURE))),
+        row("F4 counterexample: selection names another row", _selection(_rev("rev-OTHER"))),
+    ]
+
+    def guard_row(
+        scenario: str,
+        build_request,
+        build_record=None,
+        with_override: bool = False,
+    ) -> dict:
+        """Pin the manifest BEFORE constructing the policy (A04 needs the pin)."""
+        mp = pytest.MonkeyPatch()
+        build_record = build_record or R5.trade_record
+        record = build_record(mp)
+        policy = probe._policy(source=_AuthSource())
+        if with_override:
+            mp.setattr(probe.policy_module, probe.BINDING_GUARD, True)
+        verdict = policy.evaluate(build_request(record))
+        mp.undo()
+        return {"scenario": scenario, "production_default": _verdict(verdict)}
+
+    rows.append(
+        guard_row(
+            "Guard: provider evidence substitution",
+            lambda record: R5.request(
+                record,
+                replay_evidence=R5.replay(
+                    source_evidence_refs=("ANOTHER_PROVIDER_TIMESTAMP_DOC",)
+                ),
+            ),
+        )
+    )
+    rows.append(
+        guard_row(
+            "Guard: provider evidence substitution, labelled override",
+            lambda record: R5.request(
+                record,
+                replay_evidence=R5.replay(
+                    source_evidence_refs=("ANOTHER_PROVIDER_TIMESTAMP_DOC",)
+                ),
+            ),
+            with_override=True,
+        )
+    )
+    rows.append(
+        guard_row(
+            "Guard: record-kind substitution (liquidation against trade evidence)",
+            lambda record: R5.request(record, replay_evidence=R5.replay()),
+            build_record=R5.liq_record,
+        )
+    )
+    rows.append(
+        guard_row(
+            "Guard: artifact substitution",
+            lambda record: R5.request(
+                record, artifact_bytes=b"not-the-approved-artifact"
+            ),
+        )
+    )
+    rows.append(
+        guard_row(
+            "Guard: nonempty test manifest, fully satisfied composition",
+            lambda record: R5.request(record),
+        )
+    )
+
+    payload = {
+        "label": "SECOND-AGENT TECHNICAL AUDIT — NOT ORGANIZATIONALLY INDEPENDENT",
+        "candidate": os.environ.get("AUDIT_CANDIDATE_SHA", ""),
+        "note": (
+            "production_default leaves REPLAY_RECORD_BINDING_ESTABLISHED False; "
+            "test_only_override flips it, which is NOT production authority"
+        ),
+        "rows": rows,
+    }
+    (HERE / "observed_outcomes_r4.json").write_text(
+        json.dumps(payload, indent=2) + "\n", encoding="utf-8"
+    )
+    for row_ in rows:
+        pd_ = row_.get("production_default", {})
+        ov = row_.get("test_only_override", {})
+        print(
+            f"{row_['scenario'][:58]:58} default={pd_.get('decision', pd_.get('assertion_refused','')[:24])!s:22}"
+            f" reason={pd_.get('refusal_reason')!s:22} override={ov.get('decision','-')}"
+        )
+    return 0
+
+
+def _verdict(v) -> dict:
+    return {
+        "decision": v.decision.value,
+        "refusal_reason": None if v.refusal_reason is None else v.refusal_reason.value,
+        "replay_status": v.replay_status,
+        "custody_status": v.custody_status,
+        "names_binding_contract": probe.BINDING_CONTRACT in probe._text(v),
+        "detail": (v.refusal_detail or v.custody_authorization_detail or "")[:200],
+    }
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

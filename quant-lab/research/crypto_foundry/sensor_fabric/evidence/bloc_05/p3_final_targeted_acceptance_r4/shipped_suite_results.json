@@ -1,0 +1,21 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+  "files": [
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_contracts.py",
+    "tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_custody.py"
+  ],
+  "junit_file_sha256": "91c0ffd35e7ca57f902af8dd9f3a9074094d73cce75dcd6ea8b7f4741fb32c39",
+  "tally": {
+    "passed": 177,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 0,
+    "total": 177
+  },
+  "pre_repair_reference_total": 161,
+  "blindness_statement": "The shipped suite is green here, which is exactly why the independently-built probe -- not the producer's suite -- carries the verdict. It went from 161 to 177 cases because the repair adds 16 tracked regressions of its own."
+}

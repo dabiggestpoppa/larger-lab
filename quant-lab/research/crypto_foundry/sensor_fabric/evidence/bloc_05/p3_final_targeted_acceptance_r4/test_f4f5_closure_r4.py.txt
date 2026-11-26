@@ -1,0 +1,855 @@
+"""SENSOR-B5-P3-R6-FINAL-INDEPENDENT-CLOSEOUT-R3 -- additive targeted reattack.
+
+SECOND-AGENT TECHNICAL AUDIT -- NOT ORGANIZATIONALLY INDEPENDENT.
+
+This file is the R4 successor of ``test_f4f5_closure.py`` (audit-r3).  The 32
+cases of that file are preserved in substance; what changes is the ANCHOR of the
+positive controls, because the repair made the terminal outcome of a fully
+satisfied evaluation deliberately non-accepting.
+
+TWO CONFIGURATIONS, NEVER CONFLATED
+-----------------------------------
+PRODUCTION DEFAULT
+    ``REPLAY_RECORD_BINDING_ESTABLISHED`` is ``False`` in the module, so a fully
+    satisfied evaluation terminates in ``INTEGRATION_REQUIRED`` naming
+    ``REPLAY_EVIDENCE_RECORD_BINDING_V1``.  A positive control here therefore
+    asserts the INTERMEDIATE control passed -- ``replay_status == "ELIGIBLE"``
+    and no temporal refusal detail -- and that the terminal guard is the ONLY
+    thing standing between it and acceptance.
+
+LABELLED TEST-ONLY OVERRIDE
+    ``monkeypatch.setattr(policy_module, "REPLAY_RECORD_BINDING_ESTABLISHED",
+    True)``.  This exercises the downstream ACCEPTING MACHINERY and is not
+    production authority -- the binding it implies does not exist, and the
+    schema still cannot carry it.  It is used for exactly two purposes: to show
+    the accept path is still reachable through these fixtures (so a green run
+    cannot be produced by refusing everything), and to show the override cannot
+    manufacture temporal or diagnostic admissibility it should not have.
+
+Fixtures are still the auditor's own R1 harness, loaded from the previous
+evidence package; no producer fixture is borrowed.
+
+Run:
+  AUDIT_QUANT_LAB=<quant-lab> PYTHONPATH=<quant-lab>/src pytest t.py -q
+"""
+
+from __future__ import annotations
+
+import ast
+import hashlib
+import importlib.machinery
+import importlib.util
+import json
+import os
+import pathlib
+import re
+import sys
+from datetime import timedelta, timezone
+
+import pytest
+
+HERE = pathlib.Path(__file__).resolve()
+QUANT_LAB = pathlib.Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+PRIOR = pathlib.Path(
+    os.environ.get(
+        "AUDIT_PRIOR_FIXTURES",
+        str(
+            QUANT_LAB
+            / "research/crypto_foundry/sensor_fabric/evidence/bloc_05"
+            / "p3_consolidated_independent_audit_r1"
+            / "test_second_agent_p01_p06.py.txt"
+        ),
+    )
+)
+
+_loader = importlib.machinery.SourceFileLoader("r5_audit_fixtures", str(PRIOR))
+_spec = importlib.util.spec_from_loader("r5_audit_fixtures", _loader)
+R5 = importlib.util.module_from_spec(_spec)  # type: ignore[arg-type]
+sys.modules["r5_audit_fixtures"] = R5
+_loader.exec_module(R5)  # type: ignore[union-attr]
+
+from crypto_sensor_fabric.normalization.authority import AuthorityRefusal  # noqa: E402
+from crypto_sensor_fabric.normalization.authority import (  # noqa: E402
+    SemanticAuthorityRefusal,
+)
+from crypto_sensor_fabric.normalization.consumer import policy as policy_module  # noqa: E402
+from crypto_sensor_fabric.normalization.consumer.custody_authority import (  # noqa: E402
+    CustodyAuthorityBasis,
+    CustodyAuthorityDerivation,
+    custody_authority_identity_digest,
+)
+from crypto_sensor_fabric.normalization.consumer.models import (  # noqa: E402
+    ConsumerDecision,
+    ConsumerRefusalReason,
+)
+from crypto_sensor_fabric.normalization.sensors.verification import (  # noqa: E402
+    RecordVerificationError,
+    RecordVerificationRefusal,
+)
+from crypto_sensor_fabric.normalization.time.enums import RevisionMode, RevisionStatus  # noqa: E402
+from crypto_sensor_fabric.normalization.time.revision_policy import (  # noqa: E402
+    RevisionRecord,
+    RevisionSelection,
+)
+
+CUTOFF = R5.CUTOFF
+EARLY = R5.EARLY
+UTC = R5.UTC
+datetime = R5.datetime
+SENTINEL = "ZT-PROBE-4b71-NOT-A-CREDENTIAL"
+REFUSE = ConsumerDecision.REFUSE
+ACCEPT = ConsumerDecision.ACCEPT_FIELD_BINDING
+INTEGRATION = ConsumerDecision.INTEGRATION_REQUIRED
+REV = "rev-audit"
+FUTURE = datetime(2026, 9, 1, tzinfo=UTC)
+
+BINDING_GUARD = "REPLAY_RECORD_BINDING_ESTABLISHED"
+BINDING_CONTRACT = "REPLAY_EVIDENCE_RECORD_BINDING_V1"
+
+
+# ---------------------------------------------------------------------------
+# local helpers
+# ---------------------------------------------------------------------------
+
+
+def _rev(revision_id: str = REV, known_from: object = EARLY) -> RevisionRecord:
+    return RevisionRecord(
+        source_revision_id=revision_id,
+        normalization_generation=1,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from=known_from,
+        known_to=None,
+    )
+
+
+def _broken(revision_id: str = "rev-BROKEN") -> RevisionRecord:
+    """A revision whose knowledge instant is not an instant (hostile data)."""
+    return RevisionRecord.model_construct(
+        source_revision_id=revision_id,
+        normalization_generation=1,
+        supersedes_t1_record_id=None,
+        revision_status=RevisionStatus.ORIGINAL,
+        known_from="not-an-instant",
+        known_to=None,
+    )
+
+
+def _selection(
+    *revs: RevisionRecord, excluded: tuple[RevisionRecord, ...] = ()
+) -> RevisionSelection:
+    return RevisionSelection(
+        mode=RevisionMode.AS_KNOWN_THEN,
+        selected=tuple(revs) if revs else (_rev(),),
+        excluded=excluded,
+        pit_safe=True,
+        pit_uncertain=False,
+    )
+
+
+class _Custody:
+    def __init__(self, payloads: object = None) -> None:
+        self._payloads = R5.DOC if payloads is None else payloads
+        self.reads: list[str] = []
+
+    def read_evidence(self, reference: str) -> object:
+        self.reads.append(reference)
+        return self._payloads
+
+
+class _AuthSource:
+    """The test-only composition control: a source that WOULD authorize."""
+
+    def __init__(self, echos: BaseException | None = None) -> None:
+        self._echos = echos
+        self.seen: list[object] = []
+
+    def authorize(self, identity: object) -> CustodyAuthorityDerivation:
+        if self._echos is not None:
+            raise self._echos
+        self.seen.append(identity)
+        return CustodyAuthorityDerivation(
+            basis=CustodyAuthorityBasis.AUTHORIZED,
+            detail="probe authority",
+            identity_sha256=custody_authority_identity_digest(identity),
+        )
+
+
+def _text(verdict: object) -> str:
+    return R5.verdict_text(verdict)
+
+
+def _no_sentinel(verdict: object) -> None:
+    assert SENTINEL not in _text(verdict), _text(verdict)
+
+
+def _policy(manifest: bytes | None = None, **kwargs: object):
+    return R5.policy(R5.wire_manifest() if manifest is None else manifest, **kwargs)
+
+
+def _evidence(selection: RevisionSelection):
+    return R5.replay(revision=selection)
+
+
+def _evaluate(monkeypatch, selection: RevisionSelection, **kwargs: object):
+    """PRODUCTION DEFAULT: the module guard is untouched."""
+    assert getattr(policy_module, BINDING_GUARD) is False, (
+        "the production default must leave the binding guard off; this probe "
+        "measures the production default and a flipped guard would invalidate it"
+    )
+    record = R5.trade_record(monkeypatch)
+    evidence = _evidence(selection)
+    kwargs.setdefault("source", _AuthSource())
+    return _policy(**kwargs).evaluate(
+        R5.request(record, replay_evidence=evidence, knowledge_cutoff=CUTOFF)
+    )
+
+
+def _evaluate_with_override(monkeypatch, selection: RevisionSelection, **kwargs: object):
+    """LABELLED TEST-ONLY OVERRIDE -- exercises the accepting machinery only."""
+    monkeypatch.setattr(policy_module, BINDING_GUARD, True)
+    record = R5.trade_record(monkeypatch)
+    evidence = _evidence(selection)
+    kwargs.setdefault("source", _AuthSource())
+    return _policy(**kwargs).evaluate(
+        R5.request(record, replay_evidence=evidence, knowledge_cutoff=CUTOFF)
+    )
+
+
+def _assert_intermediate_temporal_pass(verdict: object) -> None:
+    """The temporal control ADMITTED this selection; the guard is what refused.
+
+    This is the §1 anchor.  ``INTEGRATION_REQUIRED`` alone would be ambiguous --
+    it is also what a broken harness produces -- so the assertion additionally
+    requires the replay stage to report ELIGIBLE and requires the terminal detail
+    to name the unmet binding contract rather than any temporal rule.
+    """
+    text = _text(verdict)
+    assert verdict.decision is INTEGRATION, text
+    assert verdict.replay_status == "ELIGIBLE", text
+    detail = verdict.refusal_detail or ""
+    assert BINDING_CONTRACT in text, text
+    assert "LATER cutoff" not in detail, text
+    assert verdict.refusal_reason is None, text
+
+
+def _assert_test_only_override_reaches_acceptance(verdict: object) -> None:
+    text = _text(verdict)
+    assert verdict.decision is ACCEPT, (
+        "the accepting machinery is unreachable through the labelled test-only "
+        "override, so a refusals-only matrix cannot be distinguished from a "
+        "broken harness: " + text
+    )
+    assert verdict.replay_status == "ELIGIBLE", text
+
+
+def _refused_temporally(verdict: object) -> None:
+    """A refusal that must be the temporal control, not a downstream stage."""
+    text = _text(verdict)
+    assert verdict.decision is REFUSE, text
+    assert verdict.decision is not INTEGRATION, text
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE, text
+    assert verdict.replay_status == "NOT_BOUND", text
+    assert "LATER cutoff" in (verdict.refusal_detail or ""), text
+
+
+def _refused_as_contradiction(verdict: object) -> None:
+    """A duplicate or self-contradictory selection refuses as a CONTRADICTION.
+
+    §2 requires that a duplicate identifier cannot conceal future information.
+    The repair refuses the selection before ordering it, which is the stronger
+    answer; what matters for attribution is that the refusal is the rebinding
+    stage's own (REPLAY_BLOCKED) and not the terminal integration guard nor a
+    verification-schema accident.
+    """
+    text = _text(verdict)
+    assert verdict.decision is REFUSE, text
+    assert verdict.decision is not INTEGRATION, text
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED, text
+
+
+# ===========================================================================
+# F4 -- temporal binding of the WHOLE selection
+# ===========================================================================
+
+
+def test_f4_00_control_chosen_revision_alone_still_accepts(monkeypatch):
+    """Positive control: the accept path stays reachable through this harness."""
+    verdict = _evaluate(monkeypatch, _selection(_rev()))
+    _assert_intermediate_temporal_pass(verdict)
+    _assert_test_only_override_reaches_acceptance(
+        _evaluate_with_override(monkeypatch, _selection(_rev()))
+    )
+
+
+def test_f4_01_control_every_selected_revision_known_by_cutoff(monkeypatch):
+    selection = _selection(
+        _rev(), _rev("rev-EARLY-2", datetime(2026, 1, 5, tzinfo=UTC))
+    )
+    _assert_intermediate_temporal_pass(_evaluate(monkeypatch, selection))
+    _assert_test_only_override_reaches_acceptance(
+        _evaluate_with_override(monkeypatch, selection)
+    )
+
+
+def test_f4_02_control_knowledge_equal_to_the_cutoff_is_admissible(monkeypatch):
+    """The boundary is inclusive: known AT the cutoff was knowable at it."""
+    _assert_intermediate_temporal_pass(
+        _evaluate(monkeypatch, _selection(_rev(REV, CUTOFF)))
+    )
+    _assert_test_only_override_reaches_acceptance(
+        _evaluate_with_override(monkeypatch, _selection(_rev(REV, CUTOFF)))
+    )
+
+
+def test_f4_03_control_equivalent_timezone_offsets_are_the_same_instant(monkeypatch):
+    offset = CUTOFF.astimezone(timezone(timedelta(hours=2)))
+    assert offset == CUTOFF and offset.utcoffset() != CUTOFF.utcoffset()
+    _assert_intermediate_temporal_pass(
+        _evaluate(monkeypatch, _selection(_rev(REV, offset)))
+    )
+    _assert_test_only_override_reaches_acceptance(
+        _evaluate_with_override(monkeypatch, _selection(_rev(REV, offset)))
+    )
+
+
+def test_f4_04_control_a_correctly_excluded_future_revision_does_not_refuse(
+    monkeypatch,
+):
+    """A withheld revision is analysis context; it must not force a refusal."""
+    selection = _selection(_rev(), excluded=(_rev("rev-WITHHELD", FUTURE),))
+    _assert_intermediate_temporal_pass(_evaluate(monkeypatch, selection))
+    _assert_test_only_override_reaches_acceptance(
+        _evaluate_with_override(monkeypatch, selection)
+    )
+
+
+def test_f4_05_counterexample_future_revision_selected_last(monkeypatch):
+    """F4, the exact R6 counterexample: the record's own revision is early."""
+    selection = _selection(_rev(), _rev("rev-LATER", FUTURE))
+    _refused_temporally(_evaluate(monkeypatch, selection))
+    # The override must not reach across a temporal refusal.
+    _refused_temporally(_evaluate_with_override(monkeypatch, selection))
+
+
+def test_f4_06_future_revision_selected_first(monkeypatch):
+    selection = _selection(_rev("rev-LATER", FUTURE), _rev())
+    _refused_temporally(_evaluate(monkeypatch, selection))
+    _refused_temporally(_evaluate_with_override(monkeypatch, selection))
+
+
+def test_f4_07_duplicate_identifier_hiding_a_future_entry(monkeypatch):
+    """Same id twice: the future entry is masked by the later early entry."""
+    selection = _selection(_rev(REV, FUTURE), _rev(REV, EARLY))
+    verdict = _evaluate(monkeypatch, selection)
+    _refused_as_contradiction(verdict)
+    assert "more than once" in (verdict.refusal_detail or ""), _text(verdict)
+    _refused_as_contradiction(_evaluate_with_override(monkeypatch, selection))
+
+
+@pytest.mark.parametrize(
+    "order",
+    ["future_last", "future_first"],
+    ids=["future_last", "future_first"],
+)
+def test_f4_08_contradictory_duplicate_never_certifies(monkeypatch, order):
+    """Two knowledge instants for one id: no ordering of them may certify."""
+    pair = (
+        (_rev(REV, EARLY), _rev(REV, FUTURE))
+        if order == "future_last"
+        else (_rev(REV, FUTURE), _rev(REV, EARLY))
+    )
+    selection = _selection(*pair)
+    _refused_as_contradiction(_evaluate(monkeypatch, selection))
+    _refused_as_contradiction(_evaluate_with_override(monkeypatch, selection))
+
+
+def test_f4_09_selected_and_excluded_contradiction_never_certifies(monkeypatch):
+    """A revision named as both selected and excluded is not evidence."""
+    selection = _selection(_rev(), excluded=(_rev(REV, FUTURE),))
+    verdict = _evaluate(monkeypatch, selection)
+    _refused_as_contradiction(verdict)
+    assert "BOTH selected and excluded" in (verdict.refusal_detail or ""), _text(verdict)
+    _refused_as_contradiction(_evaluate_with_override(monkeypatch, selection))
+
+
+def test_f4_10_malformed_knowledge_instant_on_another_entry(monkeypatch):
+    """Either the temporal control refuses it, or the boundary guard does.
+
+    The important part is which path ran: a schema-guard refusal is NOT credit
+    for the temporal control, and the assertion says so.
+    """
+    verdict = _evaluate(monkeypatch, _selection(_rev(), _broken()))
+    detail = verdict.refusal_detail or ""
+    assert verdict.decision is REFUSE, _text(verdict)
+    if verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE:
+        assert "LATER cutoff" in detail, _text(verdict)
+    elif verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED:
+        assert "not a timestamp" in detail, _text(verdict)
+    else:
+        assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED, _text(
+            verdict
+        )
+        assert "does not satisfy its own schema" in detail, _text(verdict)
+
+
+def test_f4_11_order_alone_may_not_decide_the_outcome(monkeypatch):
+    """The crisp statement of F4: identical content, two orders, one answer."""
+    forward = _evaluate(monkeypatch, _selection(_rev(REV, EARLY), _rev(REV, FUTURE)))
+    reverse = _evaluate(monkeypatch, _selection(_rev(REV, FUTURE), _rev(REV, EARLY)))
+    assert forward.decision is reverse.decision, (
+        "the same selection certifies in one order and refuses in the other; the "
+        "outcome is decided by tuple order, not by adjudication\n"
+        f"  early-then-future -> {forward.decision.value}\n"
+        f"  future-then-early -> {reverse.decision.value}"
+    )
+    _refused_as_contradiction(forward)
+    _refused_as_contradiction(reverse)
+    assert forward.refusal_reason is reverse.refusal_reason
+
+
+def test_f4_12_the_temporal_branch_does_execute_for_the_chosen_revision(monkeypatch):
+    """Execution-path proof, so no refusal below is credited to a guess."""
+    verdict = _evaluate(monkeypatch, _selection(_rev(REV, FUTURE)))
+    _refused_temporally(verdict)
+    assert "became known after" in (verdict.refusal_detail or "")
+
+
+def test_f4_13_why_and_when_refusals_stay_distinct(monkeypatch):
+    """A wrong-row refusal is REPLAY_BLOCKED; it is not the temporal law."""
+    verdict = _evaluate(monkeypatch, _selection(_rev("rev-OTHER")))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED, _text(verdict)
+    assert verdict.decision is not INTEGRATION
+
+
+def test_f4_14_reordering_a_valid_selection_cannot_manufacture_admissibility(
+    monkeypatch,
+):
+    """§2: order is not an input to the answer, in either direction."""
+    early = _rev("rev-EARLY-2", datetime(2026, 1, 5, tzinfo=UTC))
+    forward = _evaluate(monkeypatch, _selection(_rev(), early))
+    reverse = _evaluate(monkeypatch, _selection(early, _rev()))
+    _assert_intermediate_temporal_pass(forward)
+    _assert_intermediate_temporal_pass(reverse)
+    assert forward.decision is reverse.decision
+    assert forward.replay_status == reverse.replay_status
+
+
+# ===========================================================================
+# F5 -- typed-refusal diagnostics
+# ===========================================================================
+
+
+def test_f5_00_control_typed_refusal_keeps_its_classification(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RecordVerificationError(
+            RecordVerificationRefusal.CUSTODY_UNVERIFIED, "probe detail"
+        )
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED, _text(
+        verdict
+    )
+    assert "CUSTODY_UNVERIFIED" in (verdict.refusal_detail or ""), _text(verdict)
+
+
+def test_f5_01_typed_refusal_detail_is_withheld(monkeypatch):
+    """F5, the exact sentinel attack: the typed branch relays ``exc.detail``."""
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RecordVerificationError(
+            RecordVerificationRefusal.CUSTODY_UNVERIFIED,
+            f"{SENTINEL} in typed detail",
+        )
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_f5_02_typed_sentinel_is_absent_from_every_public_field(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RecordVerificationError(
+            RecordVerificationRefusal.CUSTODY_UNVERIFIED,
+            f"{SENTINEL} in typed detail",
+        )
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    leaked = {
+        name: str(getattr(verdict, name))
+        for name in verdict.model_fields
+        if SENTINEL in str(getattr(verdict, name))
+    }
+    assert not leaked, f"sentinel reached public fields {sorted(leaked)}"
+    assert SENTINEL not in verdict.model_dump_json(), "sentinel reached model_dump_json"
+    assert SENTINEL not in repr(verdict), "sentinel reached repr"
+
+
+def test_f5_03_pit_typed_refusal_detail_is_withheld(monkeypatch):
+    """The PIT branch is a separate format string; it is attacked separately."""
+    record = R5.trade_record(monkeypatch)
+    member = sorted(policy_module._PIT_REFUSALS, key=lambda item: item.value)[0]
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RecordVerificationError(member, SENTINEL)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.PIT_INADMISSIBLE, _text(verdict)
+    assert member.value in (verdict.refusal_detail or ""), _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_f5_04_ordinary_exception_detail_is_withheld(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise RuntimeError(SENTINEL)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFIER_CRASH, _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_f5_05_keyboard_interrupt_propagates(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def interrupt(*args: object, **kwargs: object) -> object:
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", interrupt)
+    with pytest.raises(KeyboardInterrupt):
+        _policy(source=_AuthSource()).evaluate(R5.request(record))
+
+
+def test_f5_06_system_exit_propagates(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+
+    def exit_now(*args: object, **kwargs: object) -> object:
+        raise SystemExit(3)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", exit_now)
+    with pytest.raises(SystemExit):
+        _policy(source=_AuthSource()).evaluate(R5.request(record))
+
+
+def test_f5_07_the_fixture_is_not_secret_shaped():
+    """A probe must not depend on a credential-shaped string to be meaningful."""
+    assert re.fullmatch(r"ZT-PROBE-[0-9a-f]{4}-NOT-A-CREDENTIAL", SENTINEL)
+    assert not re.search(r"(?i)(key|token|secret|passw|bearer|sk-)", SENTINEL)
+
+
+def test_f5_08_the_verification_layer_has_no_pit_member():
+    """Measured: the consumer's PIT classification is its own; the raised
+    vocabulary cannot name PIT_INADMISSIBLE, so the branch is the consumer's."""
+    assert not hasattr(RecordVerificationRefusal, "PIT_INADMISSIBLE")
+    assert ConsumerRefusalReason.PIT_INADMISSIBLE.value == "PIT_INADMISSIBLE"
+
+
+def _unapproved_refusal() -> SemanticAuthorityRefusal:
+    """A SemanticAuthorityRefusal whose code is NOT in the approved vocabulary.
+
+    Built without running ``__init__`` because that constructor formats
+    ``refusal.value``; the point here is a refusal-shaped object whose ``value``
+    is arbitrary text.  If the policy echoed it, the leak would be the payload.
+    """
+
+    class _NotApproved:
+        value = SENTINEL
+
+    exc = SemanticAuthorityRefusal.__new__(SemanticAuthorityRefusal)
+    exc.refusal = _NotApproved()  # type: ignore[assignment]
+    exc.detail = SENTINEL
+    ValueError.__init__(exc, SENTINEL)
+    return exc
+
+
+def test_f5_09_semantic_authority_detail_is_withheld_and_classification_kept(
+    monkeypatch,
+):
+    """The third channel: ``str(exc)`` of a typed semantic refusal.
+
+    This is the VERIFICATION-stage branch; ``str(exc)`` is "<CODE>: <detail>",
+    which is why the old code could not withhold the detail by not formatting it.
+    """
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise SemanticAuthorityRefusal(AuthorityRefusal.NO_APPROVAL, SENTINEL)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is INTEGRATION, _text(verdict)
+    assert "NO_APPROVAL" in _text(verdict), _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_f5_10_semantic_authority_violation_stays_a_refusal(monkeypatch):
+    """A broken rule is not 'integration absent'; classification is preserved."""
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise SemanticAuthorityRefusal(AuthorityRefusal.DIGEST_MISMATCH, SENTINEL)
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED, _text(
+        verdict
+    )
+    assert "DIGEST_MISMATCH" in (verdict.refusal_detail or ""), _text(verdict)
+    _no_sentinel(verdict)
+
+
+def test_f5_11_an_unapproved_claimed_code_falls_back_to_a_fixed_token(monkeypatch):
+    """A refusal-shaped object without an approved code cannot name itself."""
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise _unapproved_refusal()
+
+    monkeypatch.setattr(policy_module, "verify_trade_record", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert policy_module._UNSPECIFIED_REFUSAL in (verdict.refusal_detail or ""), _text(
+        verdict
+    )
+    _no_sentinel(verdict)
+
+
+def test_f5_12_the_rederivation_branch_relays_a_token_not_a_detail(monkeypatch):
+    """A fourth channel, found while targeting the third: the approved-evidence
+    re-derivation wraps its own authority load and reported ``<CODE>`` there.
+    It must still withhold the detail."""
+    record = R5.trade_record(monkeypatch)
+
+    def boom(*args: object, **kwargs: object) -> object:
+        raise SemanticAuthorityRefusal(AuthorityRefusal.DIGEST_MISMATCH, SENTINEL)
+
+    monkeypatch.setattr(policy_module, "load_trusted_authority", boom)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.VERIFICATION_FAILED, _text(
+        verdict
+    )
+    assert "DIGEST_MISMATCH" in (verdict.refusal_detail or ""), _text(verdict)
+    _no_sentinel(verdict)
+
+
+# ===========================================================================
+# The executable replay-binding guard -- what is bound, and what is not
+# ===========================================================================
+
+
+def test_b_00_revision_identity_is_bound(monkeypatch):
+    verdict = _evaluate(monkeypatch, _selection(_rev("rev-FOREIGN")))
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason is ConsumerRefusalReason.REPLAY_BLOCKED, _text(verdict)
+
+
+def test_b_01_availability_instant_is_bound(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(market_available_at=datetime(2026, 7, 1, tzinfo=UTC))
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(record, replay_evidence=evidence)
+    )
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert verdict.refusal_reason in {
+        ConsumerRefusalReason.PIT_INADMISSIBLE,
+        ConsumerRefusalReason.REPLAY_BLOCKED,
+    }, _text(verdict)
+
+
+def test_b_02_evidence_reference_digest_is_bound_at_the_contract(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    with pytest.raises(Exception):
+        R5.request(record, evidence_references=(R5.ref(), R5.ref(R5.REF, "2" * 64)))
+
+
+def test_b_03_an_unapproved_reference_is_refused(monkeypatch):
+    record = R5.trade_record(monkeypatch)
+    custody = _Custody()
+    verdict = _policy(custody=custody).evaluate(
+        R5.request(record, evidence_references=(R5.ref("FOREIGN_REF_AUDIT"),))
+    )
+    assert verdict.decision is REFUSE, _text(verdict)
+    assert custody.reads, "the reference was never read; nothing was measured"
+
+
+def test_b_04_provider_substitution_cannot_produce_authoritative_acceptance(
+    monkeypatch,
+):
+    """§4: substituting the provider evidence axis cannot authorize.
+
+    Historically this measured that acceptance did NOT depend on provenance --
+    that was the finding.  Under the repair the same substitution still cannot
+    reach an authoritative acceptance; what changed is only that the terminal
+    outcome now names the unmet binding contract instead of accepting.
+    """
+    record = R5.trade_record(monkeypatch)
+    evidence = R5.replay(source_evidence_refs=("ANOTHER_PROVIDER_TIMESTAMP_DOC",))
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(record, replay_evidence=evidence)
+    )
+    assert verdict.decision is not ACCEPT, _text(verdict)
+    assert verdict.decision is INTEGRATION, _text(verdict)
+    assert BINDING_CONTRACT in _text(verdict), _text(verdict)
+
+
+def test_b_05_record_kind_substitution_cannot_produce_authoritative_acceptance(
+    monkeypatch,
+):
+    """§4: a different record kind against the same evidence cannot authorize."""
+    trade = R5.trade_record(monkeypatch)
+    liquidation = R5.liq_record(monkeypatch)
+    assert type(trade) is not type(liquidation)
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(liquidation, replay_evidence=R5.replay())
+    )
+    assert verdict.decision is not ACCEPT, _text(verdict)
+
+
+def test_b_06_artifact_substitution_cannot_produce_authoritative_acceptance(
+    monkeypatch,
+):
+    """§4: bytes that are not the approved artifact cannot authorize."""
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_AuthSource()).evaluate(
+        R5.request(record, artifact_bytes=b"not-the-approved-artifact")
+    )
+    assert verdict.decision is not ACCEPT, _text(verdict)
+
+
+def test_b_07_a_nonempty_test_manifest_cannot_bypass_the_guard(monkeypatch):
+    """§4: every other claim satisfied, and the answer still is not acceptance.
+
+    This is the wired composition -- a fixture manifest that DOES approve the
+    artifact, an authorizing source, admissible evidence.  The only thing left
+    is the record-binding guard, and it must hold.
+    """
+    record = R5.trade_record(monkeypatch)
+    verdict = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is INTEGRATION, _text(verdict)
+    assert BINDING_CONTRACT in _text(verdict), _text(verdict)
+    assert verdict.custody_status == "VERIFIED", _text(verdict)
+
+
+def test_b_08_the_shipped_empty_manifest_remains_non_authorizing(monkeypatch):
+    """§4: the production root cannot accept, with or without the composition."""
+    record = R5.trade_record(monkeypatch)
+    shipped = R5.PRODUCTION_MANIFEST.read_bytes()
+    payload = json.loads(shipped.decode("utf-8"))
+    assert payload.get("artifacts") == {}
+    monkeypatch.setattr(
+        policy_module._authority_pkg,
+        "TRUSTED_MANIFEST_SHA256",
+        hashlib.sha256(shipped).hexdigest(),
+    )
+    verdict = R5.policy(shipped, source=_AuthSource()).evaluate(R5.request(record))
+    assert verdict.decision is INTEGRATION, _text(verdict)
+
+
+def test_b_09_the_schema_cannot_express_full_provenance():
+    fields = set(R5.replay().model_fields)
+    for axis in ("provider", "record_id", "record_kind", "artifact_id"):
+        assert axis not in fields, f"ReplayEvidence unexpectedly carries {axis!r}"
+
+
+def test_b_10_the_binding_guard_is_executable_and_the_old_constant_is_not(
+    monkeypatch,
+):
+    """Operation, not documentation.
+
+    The historical finding stands for ``UNRESOLVED_REPLAY_BINDING``: it is a
+    string and no branch reads it.  The ENFORCED control is the new boolean, and
+    it must be demonstrably executable -- flipping it must change the outcome.
+    """
+    source = (
+        QUANT_LAB / "src/crypto_sensor_fabric/normalization/consumer/policy.py"
+    ).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    documented = [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Name) and node.id == "UNRESOLVED_REPLAY_BINDING"
+    ]
+    assert documented, "the named limitation disappeared from the module"
+    for node in ast.walk(tree):
+        if isinstance(node, ast.If):
+            names = {
+                child.id
+                for child in ast.walk(node.test)
+                if isinstance(child, ast.Name)
+            }
+            assert "UNRESOLVED_REPLAY_BINDING" not in names, (
+                f"line {node.lineno}: the documentation constant became a branch"
+            )
+
+    enforced = [
+        node.lineno
+        for node in ast.walk(tree)
+        if isinstance(node, ast.If)
+        and any(
+            isinstance(child, ast.Name) and child.id == BINDING_GUARD
+            for child in ast.walk(node.test)
+        )
+    ]
+    assert enforced, "the executable binding guard is not read by any branch"
+    assert getattr(policy_module, BINDING_GUARD) is False, (
+        "production must ship the guard off; a flipped default would be an "
+        "acceptance the schema cannot support"
+    )
+    assert getattr(policy_module, "REPLAY_EVIDENCE_RECORD_BINDING_CONTRACT") == (
+        BINDING_CONTRACT
+    )
+
+    record = R5.trade_record(monkeypatch)
+    before = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    monkeypatch.setattr(policy_module, BINDING_GUARD, True)
+    after = _policy(source=_AuthSource()).evaluate(R5.request(record))
+    assert before.decision is INTEGRATION, _text(before)
+    assert after.decision is ACCEPT, (
+        "the guard has no runtime effect; it would be documentation wearing the "
+        "name of a control: " + _text(after)
+    )
+
+
+# ===========================================================================
+# Import provenance -- a mutation run must prove it imported the mutated copy
+# ===========================================================================
+
+
+def test_zz_the_imported_policy_module_is_the_expected_tree():
+    """Guards every mutation result in this matrix.
+
+    PYTHONPATH can lose to another path entry, in which case a mutated tree is
+    never imported and every mutation is scored as 'survived' for the wrong
+    reason.  The runner sets ``AUDIT_EXPECT_SRC_ROOT`` to the disposable copy and
+    this case fails loudly if the imported module came from anywhere else.
+    """
+    actual = pathlib.Path(policy_module.__file__).resolve()
+    expected = os.environ.get("AUDIT_EXPECT_SRC_ROOT", "").strip()
+    root = (
+        pathlib.Path(expected).resolve()
+        if expected
+        else (QUANT_LAB / "src").resolve()
+    )
+    assert root in actual.parents, f"imported {actual}, expected under {root}"
+    expected_sha = os.environ.get("AUDIT_EXPECT_POLICY_SHA256", "").strip()
+    if expected_sha:
+        got = hashlib.sha256(actual.read_bytes()).hexdigest()
+        assert got == expected_sha, f"policy.py hashes {got}, expected {expected_sha}"
