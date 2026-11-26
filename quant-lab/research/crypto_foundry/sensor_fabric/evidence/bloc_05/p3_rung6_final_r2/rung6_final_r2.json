@@ -1,0 +1,306 @@
+{
+  "mission": "SENSOR-B5-P3-R6-FINAL-CLOSEOUT-R3",
+  "directive": "AUTHORIZE_FINAL_CANONICAL_EXECUTION",
+  "disposition": "P3_CANONICAL_GREEN_AWAITING_FINAL_INDEPENDENT_RECONCILIATION",
+  "branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+  "candidates": {
+    "final_repaired": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "final_repaired_subject": "B5-P3-R6: close selected-revision cutoff and typed-refusal leakage",
+    "parent": "21fd7e473a534c38b237729f9474c46bb94267ee",
+    "previous_canonical": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "previous_decision_package": "21fd7e473a534c38b237729f9474c46bb94267ee",
+    "independent_pre_repair_audit": "d6b3f9f83a0cf5bb92f8e37b72e044beeaed6740",
+    "independent_pre_repair_audit_branch": "agent/crypto-sensor-fabric-p3-production-master-audit-r3",
+    "local_remote_equal": true
+  },
+  "freeze_preflight": {
+    "candidate_sha_exact": true,
+    "tracked_tree_clean": true,
+    "authorized_changed_files": [
+      "quant-lab/src/crypto_sensor_fabric/normalization/consumer/policy.py",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py"
+    ],
+    "diff_insertions": 691,
+    "diff_deletions": 42,
+    "approval_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "approval_manifest_git_blob": "7be15e8e56c87a4acea533a7b2382c1f5d5ad2f9",
+    "approval_manifest_byte_identical_to_previous_candidate": true,
+    "integration_state": "INTEGRATION_REQUIRED",
+    "integration_state_unchanged": true,
+    "tracked_python_files": 1111,
+    "tracked_python_src": 157,
+    "tracked_python_tests": 249,
+    "host_configuration": {
+      "workers": 1,
+      "partition_timeout_seconds": 5400,
+      "thread_caps": {
+        "OPENBLAS_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMEXPR_NUM_THREADS": "1"
+      },
+      "four_worker_failure_not_retried": true
+    }
+  },
+  "repairs": {
+    "F4_selected_revision_cutoff": {
+      "defect_reproduced_before_repair": true,
+      "rule": "every selected revision's known_from must be offset-aware and <= cutoff under the existing strict > law; duplicate selected identity refuses; selected-and-excluded overlap refuses; excluded revisions are not ordered",
+      "tracked_controls": 8,
+      "controls_passing": 8,
+      "positive_multi_revision_control_passes": true,
+      "order_independent": true,
+      "exact_cutoff_equality_admissible": true
+    },
+    "F5_typed_refusal_confidentiality": {
+      "defect_reproduced_before_repair": true,
+      "rule": "only RecordVerificationRefusal and AuthorityRefusal members (or their exact values) may appear as a refusal token; anything else becomes a fixed UNSPECIFIED_REFUSAL",
+      "paths_inspected": [
+        "verifier",
+        "RecordVerificationError:PIT",
+        "RecordVerificationError:integration_absent",
+        "RecordVerificationError:other",
+        "SemanticAuthorityRefusal",
+        "_rebind loader",
+        "replay gate UnassessableReplayEvidence",
+        "replay gate other",
+        "custody read",
+        "authority-source derivation"
+      ],
+      "tracked_controls": 7,
+      "controls_passing": 7,
+      "sentinel": "P3-SENTINEL-VALUE-DO-NOT-RELAY",
+      "classifications_preserved": true,
+      "keyboard_interrupt_and_system_exit_propagate": true,
+      "no_logging_substitute": true
+    },
+    "replay_binding_boundary": {
+      "contract": "REPLAY_EVIDENCE_RECORD_BINDING_V1",
+      "guard": "REPLAY_RECORD_BINDING_ESTABLISHED",
+      "guard_value": false,
+      "claims": [
+        "TEMPORAL_ELIGIBILITY",
+        "REVISION_IDENTITY_COMPATIBILITY",
+        "RECORD_PROVIDER_ARTIFACT_BINDING",
+        "AUTHORITY_TO_CONSUME"
+      ],
+      "fully_satisfied_evaluation_terminates": "INTEGRATION_REQUIRED",
+      "schema_invented": false,
+      "i05_rewritten": false,
+      "manifest_modified": false,
+      "accept_branch_exercised_via_test_override": true,
+      "test_override_is_not_production_authorization": true
+    }
+  },
+  "targeted_verification": {
+    "consumer_modules_passed": 177,
+    "adjacent_replay_authority_passed": 194,
+    "governance_scope_trust_passed": 331,
+    "independent_audit_suite_unadjusted": "5 failed, 28 passed",
+    "independent_audit_suite_guard_flipped": "33 passed",
+    "audit_defect_tests_now_pass": [
+      "test_r2_f1_05_extra_selected_revision_after_cutoff_is_bound",
+      "test_r2_f2_02_typed_verifier_refusal_detail_is_withheld"
+    ],
+    "reconciled_pre_guard_positive_controls": [
+      "test_r2_f1_00_control_matching_evidence_reaches_accept",
+      "test_r2_f1_07_same_revision_across_providers_is_unbound",
+      "test_r2_h03_00_control_a_test_root_can_authorize",
+      "test_r2_h05_03_omitted_references_still_read_the_approved_set",
+      "test_r2_h05_05_each_approved_reference_is_read_twice"
+    ],
+    "mutation_controls": {
+      "M-F4": "detected",
+      "M-F5": "detected",
+      "M-BIND": "detected",
+      "mutated_code_committed": false,
+      "worktree_source_mutated": false
+    }
+  },
+  "independent_targeted_acceptance": {
+    "status": "pending",
+    "reattack_sha": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "operator_reconciled_sequencing": true,
+    "claimed": false
+  },
+  "canonical_execution": {
+    "run_id": "p3-r6-final-r3",
+    "universe_recollected": true,
+    "collection": {
+      "count": 4968,
+      "digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+      "unique_count": 4968,
+      "duplicates": 0,
+      "malformed": 0,
+      "collection_errors": [],
+      "partitions": 1,
+      "partition_files": 227,
+      "groups": 13,
+      "delta_vs_previous_candidate": 16,
+      "delta_is_the_new_regression_nodes": true
+    },
+    "started_at": "2026-11-26T12:11:39+00:00",
+    "finished_at": "2026-11-26T12:38:46+00:00",
+    "wall_clock_seconds": 1627,
+    "disposition": "COMPLETE",
+    "assurance": "ANCHORED_COMPLETE",
+    "test_outcome": "GREEN",
+    "counts": {
+      "passed": 4957,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 11
+    },
+    "missing_count": 0,
+    "extra_count": 0,
+    "duplicate_executions": 0,
+    "unique_executed": 4968,
+    "interrupted": false,
+    "unimplemented_partitions": [],
+    "skips": [
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/providers/test_network_smoke_live.py::test_live_production_network_smoke",
+        "reason": "SENSOR_NETWORK_SMOKE not set; live network smoke disabled",
+        "class": "opt_in"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store.py::TestPermissions::test_final_not_world_writable",
+        "reason": "POSIX mode bits do not apply on Windows",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store_namespace.py::TestNameMaxProbe::test_posix_probe_failure_fails_closed",
+        "reason": "platform has no os.pathconf",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_integration_is_explicitly_opt_in",
+        "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN",
+        "class": "opt_in"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_i11_postgres_metadata.py::test_real_postgres_failed_refresh_rolls_back_previous_snapshot",
+        "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN",
+        "class": "opt_in"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_restore_symlinked_destination_component_refused",
+        "reason": "symlink privilege unavailable on this platform",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_i13_export_restore.py::TestSecurityAndResources::test_verify_symlinked_pack_object_refused",
+        "reason": "symlink privilege unavailable on this platform",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_concurrent_publication.py::TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed",
+        "reason": "Windows cannot create symlinks without privilege (1314)",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_i15r2_path_canonicalization.py::TestCaseLaw::test_distinct_posix_directories_are_not_merged",
+        "reason": "Windows filesystem is case-insensitive here",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_json_catalog.py::TestCorruptionFailClosed::test_unreadable_fragment_fails_closed",
+        "reason": "POSIX permission semantics",
+        "class": "platform"
+      },
+      {
+        "node": "quant-lab/tests/crypto_sensor_fabric/storage/test_recovery.py::test_symlink_escape_rejected",
+        "reason": "POSIX symlink semantics required",
+        "class": "platform"
+      }
+    ],
+    "restoration": {
+      "attempted": true,
+      "verified": true,
+      "paths_restored": 11,
+      "guard_prefixes": [
+        "quant-lab/research/crypto_foundry/sensor_fabric/evidence"
+      ],
+      "baseline_files": 468,
+      "tracked_tree_clean_after": true,
+      "dirty_paths_after": [],
+      "untracked_added": []
+    },
+    "environment": {
+      "python": "3.11.9",
+      "pytest": "pytest 9.0.3",
+      "platform": "Windows-10-10.0.26200-SP0",
+      "cpu_count": 8,
+      "free_bytes_before": 45850251264,
+      "free_bytes_after": 45010284544
+    },
+    "hardened_verifier": {
+      "command": "canonical_runner.py verify <bundle>/evidence.json --expect-count 4968 --expect-digest 45c206d6... --require-anchor",
+      "exit_code": 0,
+      "disposition": "COMPLETE",
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN",
+      "external_anchor_count": 4968,
+      "external_anchor_digest_checked": true,
+      "external_anchor_checked": true,
+      "recorded_anchor_checked": true,
+      "anchored": true
+    }
+  },
+  "artifacts": {
+    "bundle_path": ".p3-r6-evidence/final-canonical-r3/bundle/p3-r6-final-r3",
+    "bundle_outside_tracked_worktree": true,
+    "copy_hash_verified_equal_to_source": true,
+    "inventory": {
+      "collection.json": "b8ad4e8e8cc6b5acd167d6f7bad0c196b2db44f17d813e9a8e2694f3f36f3df4",
+      "evidence.json": "5936680f1601da807a478736d3dc163159a91091640ac86974c24c9b0bf9ebbe",
+      "guard_baseline.json": "8929be1370f95525941b96fa1ab1f0c99012e0fd1cb8a7f3d0c9fe051b59124d",
+      "junit_0.xml": "8d037df3199903f9fc5ff1cc24397eb8f504e1d7266dcc89c2588389ea6fa7c4",
+      "partition_0.json": "6ff0dcd93aa5ea8a57f25f8773b1156c96e07bcf0c5a44cafeff8b1646e4844a",
+      "results_0.jsonl": "18a8cea3d966c2a125f065669eb1e731065dfcf6d2b3d221829b86f7e5a05673"
+    },
+    "previous_bundle_preserved": {
+      "path": ".p3-r6-evidence/final-canonical-r3/preserved-4952-bundle-p3-r6-final",
+      "scope": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3 only",
+      "count": 4952,
+      "digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+      "overwritten": false,
+      "reinterpreted": false,
+      "evidence_json_sha256": "e919d886dfaeb1b0c1efb3da8122c0a613694e79e7c6908d5e471a45ea678c1f"
+    },
+    "failed_attempts": {
+      "path": ".p3-r6-evidence/final-canonical-r3/prior-attempts",
+      "directories": [
+        "p3-r6-attempt1-workers4",
+        "p3-r6-attempt2-workers1-timeout900"
+      ],
+      "evidentiary_claim": "none"
+    },
+    "raw_execution_artifacts_committed": false
+  },
+  "governance": {
+    "provider_approvals_added": false,
+    "manifest_activation": false,
+    "custody_source_authority": "OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1 unresolved and unimplemented",
+    "trust_promotion": false,
+    "gate_advancement": false,
+    "bloc_6_advanced": false,
+    "production_merge": false,
+    "self_ratification": false,
+    "publication_changes_production_code_or_canonical_tests": false
+  },
+  "remaining_integration_dependencies": [
+    "REPLAY_EVIDENCE_RECORD_BINDING_V1 (record/provider/kind/artifact identity binding)",
+    "OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1 (custody-source authorization)"
+  ],
+  "readiness": {
+    "canonical_green": true,
+    "F4_closed": true,
+    "F5_closed": true,
+    "binding_guard_executable": true,
+    "independent_reconciliation": "pending",
+    "recommendation": "conditional Rung 6 acceptance at 66200f3cb; authoritative acceptance waits for REPLAY_EVIDENCE_RECORD_BINDING_V1"
+  }
+}
