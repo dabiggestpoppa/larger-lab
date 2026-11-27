@@ -1150,7 +1150,7 @@ WAVE1_DISCLOSED_SHA256 = {
         "359e87f81c91b53c14e1a14e4d8d1e6c605874ea85e73f8f323b041dae49faa8"
     ),
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
-        "3fd78a963d976940b6885f8fb71fab6d83bbff40e8c5d3cf5b8c2841ff45f0b3"
+        "f1f60f700663cc8017dcfa3f6839efa193bd35ab210d077506143fb792da10e3"
     ),
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": (
         "5d41e5ccd13824bf120a1d494c10c9c262e15f9e85be53f82af4e13cafc7e543"
@@ -1170,7 +1170,7 @@ WAVE1_DISCLOSED_EVIDENCE_SHA256 = {
     ),
     "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
     "bloc_05_semantic_validation.json": (
-        "7757542134c285ddfd27311713e033549829833208012ce7e2ff6371c8a72cbe"
+        "6b6c6f658eda43ed5feeb05994e22d64969eea5e8c3b11fdac8b29ac45c95e50"
     ),
 }
 

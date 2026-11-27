@@ -466,7 +466,7 @@
     "src/crypto_sensor_fabric/normalization/common/semantic_registry.py": "40115411fb47e8c66a083a8e4c65ce402beff5feb054266c6a68d4636ae59f38",
     "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": "5177f9c0695cbf5cc1ca859dcbb4fdffe8696feffb07c433a4dea11f5b2050df",
     "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": "359e87f81c91b53c14e1a14e4d8d1e6c605874ea85e73f8f323b041dae49faa8",
-    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "3fd78a963d976940b6885f8fb71fab6d83bbff40e8c5d3cf5b8c2841ff45f0b3",
+    "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": "f1f60f700663cc8017dcfa3f6839efa193bd35ab210d077506143fb792da10e3",
     "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": "5d41e5ccd13824bf120a1d494c10c9c262e15f9e85be53f82af4e13cafc7e543",
     "tests/crypto_sensor_fabric/normalization/test_b5_i09_semantics.py": "92c2d941f01462c18d115c915df50c3e0a4a420c9bc304f5b1dd32af5d91d0fa",
     "tests/crypto_sensor_fabric/normalization/test_b5_i09p2a_authority.py": "cfd2146e0a1f3ad802ff01bd0547016132df0e14b281ca18b28719cb6c182a07"

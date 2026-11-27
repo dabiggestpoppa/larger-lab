@@ -181,13 +181,22 @@ def test_terms_time_identity_packages_are_untouched_by_i08() -> None:
     # and the top-level modules are still refused by name.  The package's exact
     # file set is constrained elsewhere (I05/I10 ``P3_MASTER_EXACT_PATHS``), so
     # this test does not become a directory-wide permission slip.
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1 (operator directive
+    # RATIFY_P3_D1_BOUNDED_IMPLEMENTATION_AND_AUTHORIZE_WAVE1, section 2 and 8):
+    # the preliminary lineage package joins the disclosed delta.  As with the two
+    # disclosures above this amends a live scope-admission rule, not the seal it
+    # was written under: every path admitted before is still admitted, identity/,
+    # terms/, time/ and the top-level modules are still refused by name, and the
+    # lineage package's own exact file set is constrained elsewhere (I05/I10
+    # ``WAVE1_EXACT_PATHS``, I11 ``FROZEN_MODULES``).
     for line in changed_paths:
         assert (
             "/common/" in line
             or "/sensors/" in line
             or "/authority/" in line
             or "/consumer/" in line
-        ), f"non-common/non-sensors/non-authority/non-consumer source change: {line}"
+            or "/lineage/" in line
+        ), f"non-disclosed source change: {line}"
 
 
 def test_no_network_or_provider_import() -> None:
