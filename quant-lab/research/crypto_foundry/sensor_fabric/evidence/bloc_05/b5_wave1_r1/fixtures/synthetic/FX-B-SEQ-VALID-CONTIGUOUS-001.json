@@ -1,0 +1,115 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "2f623bdd5a0c2da1166e3cefb0490add7f23b87025616fe941632da76d35b3ce",
+  "expectation": {
+    "best_ask_after": "61231.0",
+    "best_bid_after": "61229.5",
+    "crossed_book": false,
+    "derived_metrics_allowed": true,
+    "outcome": "RECONSTRUCT_OK",
+    "sequence_discontinuity": false
+  },
+  "fixture_id": "FX-B-SEQ-VALID-CONTIGUOUS-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves reconstruction behaviour only",
+    "proves nothing about any provider's real sequence semantics"
+  ],
+  "native_units": {
+    "level_quantity": "BTC",
+    "price": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "snapshot": {
+      "asks": [
+        [
+          "61231.0",
+          "1.0"
+        ]
+      ],
+      "bids": [
+        [
+          "61230.0",
+          "1.0"
+        ]
+      ],
+      "lastUpdateId": 1000
+    },
+    "updates": [
+      {
+        "U": 1001,
+        "a": [
+          [
+            "61232.0",
+            "0.5"
+          ]
+        ],
+        "b": [
+          [
+            "61230.0",
+            "0.0"
+          ]
+        ],
+        "pu": 1000,
+        "u": 1005
+      },
+      {
+        "U": 1006,
+        "a": [],
+        "b": [
+          [
+            "61229.5",
+            "2.0"
+          ]
+        ],
+        "pu": 1005,
+        "u": 1010
+      }
+    ]
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "A contiguous update chain starting at snapshot lastUpdateId+1 reconstructs a complete book and permits derived metrics.",
+  "semantic_claim_scope": "RECONSTRUCTION_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "bloc_05/04 section 6.2 + bloc_05/07 F21",
+    "endpoint": "constructed sequence model",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "synthetic event time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "E",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

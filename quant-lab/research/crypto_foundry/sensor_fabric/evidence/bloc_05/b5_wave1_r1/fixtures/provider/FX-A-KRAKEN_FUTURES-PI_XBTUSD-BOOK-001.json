@@ -1,0 +1,84 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "93fe2d47081d5777a311c26b550bb34a2ff24761767076534b8a4f58e8aa0be3",
+  "expectation": {
+    "is_full_snapshot": true,
+    "kind": "NORMALIZE",
+    "level_quantity_unit": "CONTRACTS",
+    "sequence_required": true
+  },
+  "fixture_id": "FX-A-KRAKEN_FUTURES-PI_XBTUSD-BOOK-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "PI_XBTUSD",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "payload values are authored",
+    "snapshot vs delta behaviour of the route is not documented here"
+  ],
+  "native_units": {
+    "level_quantity": "CONTRACTS",
+    "price": "USD",
+    "unit_status": "INVERSE_CONTRACT_DENOMINATED"
+  },
+  "payload": {
+    "orderBook": {
+      "asks": [
+        [
+          61231.5,
+          221
+        ]
+      ],
+      "bids": [
+        [
+          61230.5,
+          154
+        ]
+      ]
+    },
+    "result": "success",
+    "seq": 50112233,
+    "serverTime": "2024-03-01T12:00:00.000Z"
+  },
+  "provider": "KRAKEN_FUTURES",
+  "ratified_golden": false,
+  "semantic_claim": "Kraken futures books are sequenced; the sequence is the only safe completeness signal and contract quantities need inverse conversion.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v3/orderbook?symbol=PI_XBTUSD",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#kraken_futures"
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "sequence cursor, not a time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "SEQUENCE",
+    "timestamp_field": "seq",
+    "timezone": "UTC"
+  },
+  "venue": "KRAKEN_FUTURES"
+}

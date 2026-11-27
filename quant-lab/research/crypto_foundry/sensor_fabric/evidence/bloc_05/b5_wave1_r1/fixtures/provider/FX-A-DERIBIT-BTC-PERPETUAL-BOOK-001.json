@@ -1,0 +1,85 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "498e051e1b64daa93fdc188d0b7c1bbff7d5777422fbf7232c96d0033ad15fb3",
+  "expectation": {
+    "is_full_snapshot": true,
+    "kind": "NORMALIZE",
+    "quantity_base": "REQUIRES_INVERSE_FORMULA_AND_PIT_PRICE",
+    "quantity_native_unit": "USD_NOTIONAL_PER_CONTRACT",
+    "usd_scalar_substitution": "REFUSED"
+  },
+  "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "10",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "BTC-PERPETUAL",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "Deribit book levels are USD amounts; exact per-level conversion is contract-specification dependent",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "notional": "USD",
+    "price": "USD",
+    "quantity": "USD_NOTIONAL_PER_CONTRACT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "asks": [
+      [
+        61231.5,
+        221000.0
+      ]
+    ],
+    "bids": [
+      [
+        61230.5,
+        154000.0
+      ]
+    ],
+    "index_price": 61209.8,
+    "instrument_name": "BTC-PERPETUAL",
+    "mark_price": 61230.9,
+    "timestamp": 1709294400123
+  },
+  "provider": "DERIBIT",
+  "ratified_golden": false,
+  "semantic_claim": "On an inverse contract the level quantity is USD notional per contract, so base exposure requires the inverse formula and a PIT reference price.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v2/public/get_order_book",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#deribit"
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "server time of the snapshot",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "timestamp",
+    "timezone": "UTC"
+  },
+  "venue": "DERIBIT"
+}

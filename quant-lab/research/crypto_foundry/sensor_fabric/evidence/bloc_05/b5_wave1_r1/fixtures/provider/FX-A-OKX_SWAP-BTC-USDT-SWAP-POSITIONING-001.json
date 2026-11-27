@@ -1,0 +1,70 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "8699d98472dd02097e27b07fc4280a8683c5f75405a2003318f0415479a8cf06",
+  "expectation": {
+    "equated_with_top_trader_ratio": "REFUSED",
+    "kind": "NORMALIZE",
+    "population_scope": "ALL_ACCOUNTS",
+    "positioning_metric_type": "ACCOUNT_LONG_SHORT_RATIO"
+  },
+  "fixture_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTC-USDT-SWAP",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "population definition is provider-declared only",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "population": "ACCOUNTS",
+    "ratio": "DIMENSIONLESS",
+    "unit_status": "POPULATION_DEFINITION_REQUIRED"
+  },
+  "payload": {
+    "ccy": "BTC",
+    "ratio": "1.8123",
+    "ts": "1709294400000"
+  },
+  "provider": "OKX_SWAP",
+  "ratified_golden": false,
+  "semantic_claim": "OKX's account ratio and Binance's top-trader account ratio are different populations and cannot be equated because both are called 'account ratio'.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_POSITIONING",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v5/rubik/stat/contracts/long-short-account-ratio",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#okx_swap"
+  },
+  "supports_checkpoint": "I15",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": true,
+    "market_available_at_established": false,
+    "meaning": "bucket start",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "ts",
+    "timezone": "UTC"
+  },
+  "venue": "OKX_SWAP"
+}

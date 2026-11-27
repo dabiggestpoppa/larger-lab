@@ -1,0 +1,90 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "69c94ae503ac86831078f87827d6085eede03053c5233d1c5cbc53335cd33c2b",
+  "expectation": {
+    "best_ask": "61231.10",
+    "best_bid": "61230.10",
+    "derived_cross_provider_metric": "REFUSED_AT_T1",
+    "is_full_snapshot": true,
+    "kind": "NORMALIZE",
+    "update_semantics": "FULL_SNAPSHOT"
+  },
+  "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "payload values are authored",
+    "snapshot time not carried by the endpoint"
+  ],
+  "native_units": {
+    "level_quantity": "BTC",
+    "price": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "asks": [
+      [
+        "61231.10",
+        "2.000"
+      ],
+      [
+        "61231.50",
+        "0.750"
+      ]
+    ],
+    "bids": [
+      [
+        "61230.10",
+        "1.500"
+      ],
+      [
+        "61230.00",
+        "0.250"
+      ]
+    ],
+    "lastUpdateId": 1027024
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "A full snapshot is identifiable by lastUpdateId and is the only book state that may be treated as complete without reconstruction.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /fapi/v1/depth",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "FIRST_PARTY_DOCUMENTED_IN_REPO",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm"
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "sequence cursor, not a time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "SEQUENCE",
+    "timestamp_field": "lastUpdateId",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

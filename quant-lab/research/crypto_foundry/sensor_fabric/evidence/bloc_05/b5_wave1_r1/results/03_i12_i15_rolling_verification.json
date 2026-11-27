@@ -1,0 +1,75 @@
+{
+  "entry_points": {
+    "basis": {
+      "error": "No module named 'crypto_sensor_fabric.normalization.sensors.basis'",
+      "importable": false,
+      "module": "crypto_sensor_fabric.normalization.sensors.basis"
+    },
+    "book": {
+      "error": "No module named 'crypto_sensor_fabric.normalization.sensors.book'",
+      "importable": false,
+      "module": "crypto_sensor_fabric.normalization.sensors.book"
+    },
+    "funding": {
+      "error": "No module named 'crypto_sensor_fabric.normalization.sensors.funding'",
+      "importable": false,
+      "module": "crypto_sensor_fabric.normalization.sensors.funding"
+    },
+    "lineage": {
+      "error": "No module named 'crypto_sensor_fabric.normalization.lineage'",
+      "importable": false,
+      "module": "crypto_sensor_fabric.normalization.lineage"
+    },
+    "oi": {
+      "error": "No module named 'crypto_sensor_fabric.normalization.sensors.oi'",
+      "importable": false,
+      "module": "crypto_sensor_fabric.normalization.sensors.oi"
+    },
+    "positioning": {
+      "error": "No module named 'crypto_sensor_fabric.normalization.sensors.positioning'",
+      "importable": false,
+      "module": "crypto_sensor_fabric.normalization.sensors.positioning"
+    }
+  },
+  "i12_oi": {
+    "entry_point_present": false,
+    "fixture_cases_prepared": 7,
+    "no_normalizer_can_be_executed": true,
+    "sequence_contract_ready": true,
+    "state": "BLOCKED_PENDING_IMPLEMENTATION"
+  },
+  "i13_funding": {
+    "entry_point_present": false,
+    "fixture_cases_prepared": 6,
+    "state": "BLOCKED_PENDING_IMPLEMENTATION"
+  },
+  "i14_book": {
+    "entry_point_present": false,
+    "note": "sequence-gap matrix is authored and pending a production entry point",
+    "sequence_gap_matrix_prepared": 8,
+    "state": "BLOCKED_PENDING_IMPLEMENTATION"
+  },
+  "i15_positioning_basis": {
+    "basis_entry_point_present": false,
+    "fixture_cases_prepared": 8,
+    "positioning_entry_point_present": false,
+    "state": "BLOCKED_PENDING_IMPLEMENTATION"
+  },
+  "method": "entry-point import probe + executable substrate controls",
+  "not_reopened": [
+    "P3 acceptance",
+    "I01-I11 accepted behaviour"
+  ],
+  "substrate_controls": {
+    "b5_i08_units_v1_registered_in_config": false,
+    "canonical_side_with_diagnostic_registry": "UNKNOWN",
+    "canonical_side_without_registry": "UNKNOWN",
+    "provisional_side_with_diagnostic_registry": "SELL",
+    "provisional_side_without_registry": null,
+    "semantics_unverified_flag_present": true,
+    "usd_conversion_blocked": true,
+    "usd_unresolved_citation": "B5_I08_UNITS_V1"
+  },
+  "verdict": "NO_I12_I15_CLAIM_ADMISSIBLE",
+  "verdict_reason": "no I12-I15 normalizer exists at the audited head; absence is reported as pending implementation, not as a pass. The substrate controls confirm the blocked-USD and no-authority behaviours those checkpoints must preserve."
+}

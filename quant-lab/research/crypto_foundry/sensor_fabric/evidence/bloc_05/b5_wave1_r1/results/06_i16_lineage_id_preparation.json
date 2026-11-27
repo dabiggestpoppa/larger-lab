@@ -1,0 +1,49 @@
+{
+  "conflicting_source_refs_retained_separately": false,
+  "content_digest_stability": {
+    "first": "b49c1ca9a4f594adbd8825bf86a57559cadd869582713eba497b67ba6993d8b7",
+    "note": "computed externally; the production tree mints no T1 id yet",
+    "second": "b49c1ca9a4f594adbd8825bf86a57559cadd869582713eba497b67ba6993d8b7",
+    "stable": true
+  },
+  "generation_is_caller_passthrough": true,
+  "id_like_fields_found": [
+    "t1_record_id"
+  ],
+  "identical_blob_refs_refused": true,
+  "lineage_completeness": {
+    "acquisition_refs": true,
+    "code_version": "b5-wave1-probe",
+    "config_version": "cfg-b5-wave1",
+    "conversion_lineage_refs": [],
+    "evidence_blob_hashes": true,
+    "lineage_state": "LINEAGE_COMPLETE",
+    "raw_projection_refs": true
+  },
+  "lineage_fields_present": [
+    "acquisition_refs",
+    "code_version",
+    "config_version",
+    "conversion_lineage_refs",
+    "evidence_blob_hashes",
+    "identity_evidence_refs",
+    "raw_projection_refs",
+    "semantic_evidence_refs"
+  ],
+  "lineage_gate_claimable": false,
+  "lineage_gate_reason": "no lineage package, no deterministic T1 id, and only 2 of 8 sensor families implemented; LINEAGE_GATE must not be claimed on a partial sensor-family set",
+  "lineage_package_present": false,
+  "prepared_controls": [
+    "repeated identical inputs -> identical content digest",
+    "execution-order change -> unchanged content digest",
+    "machine-local state change -> unchanged content digest (cross-process repeat run)",
+    "different providers with similar observations -> distinct records",
+    "missing T0 evidence -> input model refuses (min_length=1 refs)",
+    "conflicting source references -> retained separately, never merged",
+    "future revision -> new content digest, prior record immutable by construction",
+    "generation immutability -> enforced only once I18 exists; declared, not claimed"
+  ],
+  "record_has_deterministic_id_field": true,
+  "revision_change_alters_content": true,
+  "state": "BLOCKED_PENDING_IMPLEMENTATION"
+}

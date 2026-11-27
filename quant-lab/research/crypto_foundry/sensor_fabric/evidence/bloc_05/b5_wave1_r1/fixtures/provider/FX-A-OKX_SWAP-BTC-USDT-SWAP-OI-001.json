@@ -1,0 +1,76 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "a1aaae548393e6326cfd6952f14d0d04c8e5e2a20f9cbe588ab596ea21467557",
+  "expectation": {
+    "cross_check_required": "oi * multiplier == oiCcy",
+    "kind": "NORMALIZE",
+    "oi_base": "18234.56",
+    "oi_contracts": "1823456",
+    "oi_usd": "1117000000.00",
+    "single_quantity_collapse": "REFUSED"
+  },
+  "fixture_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTC-USDT-SWAP",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "payload values are authored",
+    "provider-computed oiUsd is a provider claim, not our conversion"
+  ],
+  "native_units": {
+    "oi": "CONTRACTS",
+    "oiCcy": "BTC",
+    "oiUsd": "USD",
+    "unit_status": "THREE_PARALLEL_NATIVE_QUANTITIES"
+  },
+  "payload": {
+    "instId": "BTC-USDT-SWAP",
+    "instType": "SWAP",
+    "oi": "1823456",
+    "oiCcy": "18234.56",
+    "oiUsd": "1117000000.00",
+    "ts": "1709294400123"
+  },
+  "provider": "OKX_SWAP",
+  "ratified_golden": false,
+  "semantic_claim": "OKX publishes three parallel OI quantities; a normalized record must not pick one and discard the other two.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_OPEN_INTEREST",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v5/public/open-interest",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#okx_swap"
+  },
+  "supports_checkpoint": "I12",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "response time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "ts",
+    "timezone": "UTC"
+  },
+  "venue": "OKX_SWAP"
+}

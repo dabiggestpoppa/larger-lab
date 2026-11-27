@@ -1,0 +1,75 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": true,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "bb8ea7fc09378dd8233d4860646e8ce61cc44077f88014df7a8d96508aa10526",
+  "expectation": {
+    "aggregation_scope": "INTERVAL_AGGREGATE",
+    "base_quantity_without_inverse_formula": "REFUSED",
+    "contract_multiplier_unit": "USD_PER_CONTRACT",
+    "kind": "NORMALIZE",
+    "quantity_native_unit": "CONTRACTS"
+  },
+  "fixture_id": "FX-A-KRAKEN_FUTURES-PI_XBTUSD-TRADE-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "PI_XBTUSD",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "the charts route is aggregate-per-bucket, not trade level",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "price": "USD",
+    "quantity": "CONTRACTS",
+    "unit_status": "INVERSE_CONTRACT_DENOMINATED"
+  },
+  "payload": {
+    "buy": 1200,
+    "last": 61234.5,
+    "price": 61234.5,
+    "sell": 800,
+    "time": 1709294400,
+    "trades": 14,
+    "vol": 2000
+  },
+  "provider": "KRAKEN_FUTURES",
+  "ratified_golden": false,
+  "semantic_claim": "Kraken's inverse contract quantity is contracts of 1 USD; treating it as BTC would overstate exposure by three orders of magnitude.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_TRADE",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/charts/v1/trade/PI_XBTUSD/1m",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#kraken_futures"
+  },
+  "supports_checkpoint": "I11",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "trade time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "SECOND",
+    "timestamp_field": "time",
+    "timezone": "UTC"
+  },
+  "venue": "KRAKEN_FUTURES"
+}

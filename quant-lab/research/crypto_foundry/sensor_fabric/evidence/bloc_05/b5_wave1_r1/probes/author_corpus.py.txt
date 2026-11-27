@@ -1,0 +1,2009 @@
+"""SENSOR-B5-WAVE1-R1 - I20 golden-fixture corpus authoring (offline, deterministic).
+
+Writes one JSON file per fixture plus ``corpus_manifest.json`` into
+``<evidence>/fixtures/provider`` and ``<evidence>/fixtures/synthetic``.
+
+Three tiers are kept structurally separate and are NEVER mixed:
+
+    TIER_A_DOCUMENTED_FIELD_SHAPE     provider field vocabulary reproduced from the
+                                      frozen in-repo documentation. Payload VALUES
+                                      are authored, so the tier proves field-shape
+                                      handling only -- never provider semantics.
+    TIER_B_SYNTHETIC_ADVERSARIAL      deliberately hostile constructions. They can
+                                      prove refusal/reconstruction BEHAVIOUR, never
+                                      actual provider semantics.
+    TIER_C_PROVIDER_EVIDENCE_REFERENCED  records that point at provider evidence
+                                      actually recorded in this repository. The
+                                      payload bytes are NOT available offline, so
+                                      these records are unusable as inputs and are
+                                      marked as such.
+
+Every record carries the twelve metadata fields the mission requires. No record is
+ratified golden evidence: ``approval_status`` is ``NOT_REVIEWED`` and
+``ratified_golden`` is false everywhere. Nothing here is a provider approval.
+
+No network, no wall clock, no uuid, no randomness: byte-identical output for
+byte-identical source.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+from pathlib import Path
+
+EVIDENCE = Path(os.environ["B5_WAVE1_EVIDENCE"])
+CORPUS_VERSION = "b5-wave1-r1"
+AUTHORITY_COMMIT = "4bb677f9e0266f4dc48405181696019f359ae49f"
+EVIDENCE_COMMIT = "66200f3cb18ee5cea1483d986e64502f388eeb77"
+DOCS = "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml"
+REGISTRY = "quant-lab/config/crypto_sensor_fabric/provider_registry.yaml"
+
+LINEAR_BTC = {
+    "native_symbol": "BTCUSDT",
+    "canonical_asset": "BTC",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT",
+    "contract_type": "LINEAR_PERPETUAL",
+    "contract_multiplier": "1",
+    "multiplier_unit": "CONTRACTS",
+}
+LINEAR_ETH = dict(LINEAR_BTC, native_symbol="ETHUSDT", canonical_asset="ETH")
+INVERSE_BTC_DERIBIT = {
+    "native_symbol": "BTC-PERPETUAL",
+    "canonical_asset": "BTC",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC",
+    "contract_type": "INVERSE_PERPETUAL",
+    "contract_multiplier": "10",
+    "multiplier_unit": "USD",
+}
+INVERSE_BTC_OKX = {
+    "native_symbol": "BTC-USD-SWAP",
+    "canonical_asset": "BTC",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC",
+    "contract_type": "INVERSE_PERPETUAL",
+    "contract_multiplier": "100",
+    "multiplier_unit": "USD",
+}
+INVERSE_BTC_KRAKEN = {
+    "native_symbol": "PI_XBTUSD",
+    "canonical_asset": "BTC",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC",
+    "contract_type": "INVERSE_PERPETUAL",
+    "contract_multiplier": "1",
+    "multiplier_unit": "USD",
+}
+
+PROVIDER_DOC = {
+    "BINANCE_USDM": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm",
+    "GATE_FUTURES": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#gate_futures",
+    "DERIBIT": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#deribit",
+    "OKX_SWAP": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#okx_swap",
+    "BYBIT_LINEAR": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#bybit_linear",
+    "KRAKEN_FUTURES": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#kraken_futures",
+}
+
+RECORDS: list[dict] = []
+
+
+def _digest(payload: object) -> str:
+    blob = json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(blob.encode("utf-8")).hexdigest()
+
+
+def fx(
+    *,
+    fixture_id: str,
+    tier: str,
+    provider: str,
+    instrument: dict,
+    sensor_family: str,
+    source: dict,
+    native_units: dict,
+    timestamp_semantics: dict,
+    semantic_claim: str,
+    semantic_claim_scope: str,
+    payload: dict,
+    expectation: dict,
+    known_limitations: list[str],
+    supports_checkpoint: str,
+    acquisition: dict | None = None,
+    synthetic: bool = True,
+    checkpoint_executable: bool = False,
+) -> None:
+    RECORDS.append(
+        {
+            "fixture_id": fixture_id,
+            "corpus_version": CORPUS_VERSION,
+            "tier": tier,
+            "synthetic": synthetic,
+            "provider": provider,
+            "venue": provider,
+            "instrument": instrument,
+            "sensor_family": sensor_family,
+            "contract_type": instrument["contract_type"],
+            "source": source,
+            "acquisition_provenance": acquisition
+            or {
+                "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+                "network_calls": 0,
+                "captured_from_provider": False,
+                "authored_by": "second-agent (B5-WAVE1-R1)",
+                "payload_values": "AUTHORED_NOT_CAPTURED",
+            },
+            "native_units": native_units,
+            "timestamp_semantics": timestamp_semantics,
+            "semantic_claim": semantic_claim,
+            "semantic_claim_scope": semantic_claim_scope,
+            "payload": payload,
+            "expectation": expectation,
+            "evidence_digest": _digest(payload),
+            "known_limitations": known_limitations,
+            "approval_status": "NOT_REVIEWED",
+            "ratified_golden": False,
+            "supports_checkpoint": supports_checkpoint,
+            "checkpoint_executable_today": (
+                checkpoint_executable or supports_checkpoint in ("I10", "I11")
+            ),
+        }
+    )
+
+
+def docs(provider: str, endpoint: str, field_confidence: str = "SECONDARY_DOCUMENTED") -> dict:
+    return {
+        "kind": "DOCUMENTED_FIELD_SHAPE",
+        "endpoint": endpoint,
+        "documentation_ref": DOCS,
+        "provider_evidence_ref": PROVIDER_DOC[provider],
+        "evidence_commit": EVIDENCE_COMMIT,
+        "field_name_confidence": field_confidence,
+    }
+
+
+def ts(field: str, meaning: str, precision: str = "MILLISECOND", interval: bool = False) -> dict:
+    return {
+        "timestamp_field": field,
+        "meaning": meaning,
+        "timezone": "UTC",
+        "source_precision": precision,
+        "interval_close_based": interval,
+        "market_available_at_established": False,
+        "pit_status": "NOT_ESTABLISHED",
+    }
+
+
+UNITS_LINEAR = {
+    "price": "USDT",
+    "quantity": "BTC",
+    "notional": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED",
+}
+UNITS_INVERSE_USD = {
+    "price": "USD",
+    "quantity": "USD_NOTIONAL_PER_CONTRACT",
+    "notional": "USD",
+    "unit_status": "DOCUMENTED_UNCERTIFIED",
+}
+
+# ---------------------------------------------------------------------------
+# TIER A - documented field shape (25 records: 6 providers, BTC + ETH,
+# linear + inverse, every required sensor family)
+# ---------------------------------------------------------------------------
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-TRADE-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_TRADE",
+    source=docs("BINANCE_USDM", "GET /fapi/v1/aggTrades", "FIRST_PARTY_DOCUMENTED_IN_REPO"),
+    native_units=UNITS_LINEAR,
+    timestamp_semantics=ts("T", "aggressor trade time"),
+    semantic_claim=(
+        "The documented aggTrade boolean isBuyerMaker is carried verbatim and a "
+        "canonical aggressor side is NOT admitted without an approved I09 mapping."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "e": "aggTrade",
+        "a": 593301,
+        "p": "61234.50",
+        "q": "0.250",
+        "T": 1709294400000,
+        "m": True,
+        "isBuyerMaker": True,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "native_price_preserved": "61234.50",
+        "native_quantity_preserved": "0.250",
+        "canonical_aggressor_side": "UNKNOWN",
+        "provisional_side": "SELL",
+        "notional_usd": "BLOCKED",
+        "flag_required": "SEMANTICS_UNVERIFIED",
+    },
+    known_limitations=[
+        "payload values are authored; this is not a captured Binance response",
+        "isBuyerMaker meaning is secondary documentation, not first-party proven here",
+        "the aggressor mapping is PROVISIONAL in semantic_equivalence.yaml",
+    ],
+    supports_checkpoint="I10",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-TRADE-002",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_TRADE",
+    source=docs("BINANCE_USDM", "GET /fapi/v1/aggTrades", "FIRST_PARTY_DOCUMENTED_IN_REPO"),
+    native_units=UNITS_LINEAR,
+    timestamp_semantics=ts("T", "aggressor trade time"),
+    semantic_claim=(
+        "isBuyerMaker=false is the mirrored case; the provisional reading flips "
+        "while the canonical side remains UNKNOWN. Price direction is never an input."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "e": "aggTrade",
+        "a": 593302,
+        "p": "61235.10",
+        "q": "0.010",
+        "T": 1709294400100,
+        "m": False,
+        "isBuyerMaker": False,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "canonical_aggressor_side": "UNKNOWN",
+        "provisional_side": "BUY",
+        "price_direction_used": False,
+    },
+    known_limitations=["payload values are authored", "no approved mapping exists"],
+    supports_checkpoint="I10",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-TRADE-003",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_TRADE",
+    source=docs("BINANCE_USDM", "GET /fapi/v1/aggTrades"),
+    native_units={
+        "price": "USDT",
+        "quantity": "USDT",
+        "notional": "USDT",
+        "unit_status": "STABLECOIN_QUOTE_UNCONVERTED",
+    },
+    timestamp_semantics=ts("T", "aggressor trade time"),
+    semantic_claim=(
+        "A USDT-quoted native quantity must not acquire a USD twin: no 1 USDT = 1 "
+        "USD assumption is admissible while B5_I08_UNITS_V1 is unadmitted."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "e": "aggTrade",
+        "a": 593303,
+        "p": "61236.00",
+        "q": "15309.00",
+        "T": 1709294400200,
+        "m": True,
+        "isBuyerMaker": True,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "notional_usd": "BLOCKED",
+        "unresolved_citation": "B5_I08_UNITS_V1",
+        "flag_required": "STABLECOIN_CONVERSION_UNAVAILABLE",
+        "usd_parity_assumed": False,
+    },
+    known_limitations=["payload values are authored", "USD conversion methodology unadmitted"],
+    supports_checkpoint="I10",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("BINANCE_USDM", "GET /futures/data/openInterestHist"),
+    native_units={
+        "oi_native": "CONTRACTS_OR_BASE_AMBIGUOUS",
+        "oi_secondary": "USDT",
+        "unit_status": "AMBIGUOUS_BLOCKING",
+    },
+    timestamp_semantics=ts("timestamp", "bucket start of the OI interval", interval=True),
+    semantic_claim=(
+        "OI is a stock/snapshot object and the bucketed response carries two "
+        "different native quantities; a single canonical oi_native would merge them."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "symbol": "BTCUSDT",
+        "sumOpenInterest": "78123.456",
+        "sumOpenInterestValue": "4783920112.55",
+        "timestamp": 1709294400000,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_native_unit": "UNVERIFIED",
+        "flag_required": "OI_UNIT_UNVERIFIED",
+        "snapshot_or_interval": "INTERVAL_LAST_OR_AVERAGE_UNRESOLVED",
+        "oi_usd": "BLOCKED",
+        "invented_single_native": False,
+    },
+    known_limitations=[
+        "documentation does not state whether sumOpenInterest is contracts or base",
+        "bucket aggregation function (last vs average) is not documented",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-ETHUSDT-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_ETH,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("BINANCE_USDM", "GET /futures/data/openInterestHist"),
+    native_units={
+        "oi_native": "CONTRACTS_OR_BASE_AMBIGUOUS",
+        "oi_secondary": "USDT",
+        "unit_status": "AMBIGUOUS_BLOCKING",
+    },
+    timestamp_semantics=ts("timestamp", "bucket start", interval=True),
+    semantic_claim=(
+        "The altcoin instrument reaches the same unit ambiguity as BTC; a "
+        "BTC-only resolution must not be projected onto ETH."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "symbol": "ETHUSDT",
+        "sumOpenInterest": "1204550.12",
+        "sumOpenInterestValue": "3611233444.00",
+        "timestamp": 1709294400000,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_native_unit": "UNVERIFIED",
+        "flag_required": "OI_UNIT_UNVERIFIED",
+        "btc_resolution_projected": False,
+    },
+    known_limitations=["altcoin unit semantics equally unverified", "payload values are authored"],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_FUNDING",
+    source=docs("BINANCE_USDM", "GET /fapi/v1/fundingRate", "FIRST_PARTY_DOCUMENTED_IN_REPO"),
+    native_units={
+        "funding_rate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+        "notional": "USDT",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("fundingTime", "effective funding time; publication precedes it"),
+    semantic_claim=(
+        "The native rate, its interval and its effective time are carried "
+        "separately; no PnL or notional is invented while the units methodology is "
+        "unadmitted."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "symbol": "BTCUSDT",
+        "fundingRate": "0.00010000",
+        "fundingTime": 1709316000000,
+        "markPrice": "61200.12345678",
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "funding_rate_native_preserved": "0.00010000",
+        "predicted_or_realized": "REALIZED",
+        "funding_interval_seconds": 28800,
+        "funding_notional_or_pnl": "REFUSED",
+        "funding_rate_per_8h_simple_equiv": "0.00010000",
+    },
+    known_limitations=[
+        "interval is 8h by provider definition but is not carried in this response",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I13",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-BOOK-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_BOOK_SNAPSHOT",
+    source=docs("BINANCE_USDM", "GET /fapi/v1/depth", "FIRST_PARTY_DOCUMENTED_IN_REPO"),
+    native_units={
+        "price": "USDT",
+        "level_quantity": "BTC",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("lastUpdateId", "sequence cursor, not a time", precision="SEQUENCE"),
+    semantic_claim=(
+        "A full snapshot is identifiable by lastUpdateId and is the only book "
+        "state that may be treated as complete without reconstruction."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "lastUpdateId": 1027024,
+        "bids": [["61230.10", "1.500"], ["61230.00", "0.250"]],
+        "asks": [["61231.10", "2.000"], ["61231.50", "0.750"]],
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "is_full_snapshot": True,
+        "update_semantics": "FULL_SNAPSHOT",
+        "best_bid": "61230.10",
+        "best_ask": "61231.10",
+        "derived_cross_provider_metric": "REFUSED_AT_T1",
+    },
+    known_limitations=["payload values are authored", "snapshot time not carried by the endpoint"],
+    supports_checkpoint="I14",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-BOOK-002",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_BOOK_SNAPSHOT",
+    source=docs("BINANCE_USDM", "WS <symbol>@depth (diff)", "FIRST_PARTY_DOCUMENTED_IN_REPO"),
+    native_units={
+        "price": "USDT",
+        "level_quantity": "BTC",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("E", "event time of the depth update", precision="MILLISECOND"),
+    semantic_claim=(
+        "A diff update is not a book; it carries U/u/pu and may only become a "
+        "complete book through sequence-safe reconstruction."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "e": "depthUpdate",
+        "E": 1709294400123,
+        "U": 1027025,
+        "u": 1027040,
+        "pu": 1027024,
+        "b": [["61230.20", "0.000"], ["61229.90", "3.100"]],
+        "a": [["61231.10", "0.000"], ["61231.80", "1.250"]],
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "is_full_snapshot": False,
+        "update_semantics": "DELTA_UPDATE",
+        "standalone_book_claim": "REFUSED",
+        "requires_sequence_reconstruction": True,
+    },
+    known_limitations=["payload values are authored"],
+    supports_checkpoint="I14",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_POSITIONING",
+    source=docs("BINANCE_USDM", "GET /futures/data/topLongShortAccountRatio"),
+    native_units={
+        "ratio": "DIMENSIONLESS",
+        "population": "TOP_TRADER_ACCOUNTS",
+        "unit_status": "POPULATION_DEFINITION_REQUIRED",
+    },
+    timestamp_semantics=ts("timestamp", "bucket start of the ratio interval", interval=True),
+    semantic_claim=(
+        "The response is an ACCOUNT-population ratio and may not be stored as a "
+        "generic long_short_ratio nor compared with a POSITION-population ratio."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "symbol": "BTCUSDT",
+        "longAccount": "0.6123",
+        "shortAccount": "0.3877",
+        "longShortRatio": "1.5793",
+        "timestamp": 1709294400000,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "positioning_metric_type": "TOP_TRADER_ACCOUNT_RATIO",
+        "population_scope": "TOP_TRADER_ACCOUNTS",
+        "generic_long_short_ratio": "REFUSED",
+        "cross_provider_equivalence": "REFUSED_WITHOUT_POPULATION_MATCH",
+    },
+    known_limitations=[
+        "top-trader population definition is provider-branded and not independently defined",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I15",
+)
+
+fx(
+    fixture_id="FX-A-BINANCE_USDM-BTCUSDT-BASIS-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_BASIS",
+    source=docs("BINANCE_USDM", "GET /fapi/v1/premiumIndex"),
+    native_units={
+        "mark_price": "USDT",
+        "index_price": "USDT",
+        "basis_native": "NOT_PROVIDED",
+        "unit_status": "DERIVED_ONLY",
+    },
+    timestamp_semantics=ts("time", "response time of both prices"),
+    semantic_claim=(
+        "The endpoint publishes two prices, not a basis. Any basis is derived, "
+        "must name MARK vs INDEX explicitly, and cannot be called provider-native."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "symbol": "BTCUSDT",
+        "markPrice": "61234.50",
+        "indexPrice": "61210.00",
+        "lastFundingRate": "0.00010000",
+        "time": 1709294400000,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "basis_value_native": None,
+        "basis_is_provider_native": False,
+        "reference_pair_required": ["MARK_PRICE", "INDEX_PRICE"],
+        "annualization_without_methodology": "REFUSED",
+    },
+    known_limitations=["no provider-native basis field exists on this route", "payload values are authored"],
+    supports_checkpoint="I15",
+)
+
+fx(
+    fixture_id="FX-A-GATE_FUTURES-BTC_USDT-LIQUIDATION-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="GATE_FUTURES",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC_USDT"),
+    sensor_family="MECHANICAL_LIQUIDATION",
+    source=docs("GATE_FUTURES", "GET /futures/USDT/liq_orders or contract_stats interval aggregate"),
+    native_units={
+        "long_liq_usd": "USD",
+        "short_liq_usd": "USD",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("time", "interval start", precision="SECOND", interval=True),
+    semantic_claim=(
+        "long_liq_usd is the POSITION side liquidated, not buy-side aggressor "
+        "flow, and the row is an interval aggregate rather than an event."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "time": 1709294400,
+        "long_liq_usd": "1834000.00",
+        "short_liq_usd": "921500.00",
+        "contract": "BTC_USDT",
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "position_side_mapping": {"long_liq_usd": "LONG", "short_liq_usd": "SHORT"},
+        "aggressor_flow_claim": "REFUSED",
+        "aggregation_scope": "INTERVAL_AGGREGATE",
+        "count_required": True,
+    },
+    known_limitations=[
+        "whether zero-activity intervals are reported is not documented",
+        "USD quote is the provider's own USD claim, not an FX conversion",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I11",
+    checkpoint_executable=True,
+)
+
+fx(
+    fixture_id="FX-A-GATE_FUTURES-ETH_USDT-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="GATE_FUTURES",
+    instrument=dict(LINEAR_ETH, native_symbol="ETH_USDT"),
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("GATE_FUTURES", "GET /futures/USDT/contracts/ETH_USDT"),
+    native_units={
+        "open_interest": "CONTRACTS",
+        "quanto_multiplier": "ETH_PER_CONTRACT",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("none", "current snapshot; no timestamp in the payload", precision="NONE"),
+    semantic_claim=(
+        "Contract-denominated OI is convertible only through the PIT contract "
+        "multiplier; a hard-coded multiplier is inadmissible."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "name": "ETH_USDT",
+        "open_interest": "882134",
+        "quanto_multiplier": "0.01",
+        "mark_price": "2110.55",
+        "last_price": "2110.40",
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_native_unit": "CONTRACTS",
+        "oi_base": "8821.34",
+        "oi_requires_pit_terms": True,
+        "hardcoded_multiplier": "REFUSED",
+        "snapshot_or_interval": "POINT_SNAPSHOT",
+    },
+    known_limitations=["payload values are authored", "OI snapshot time must come from acquisition, not payload"],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-GATE_FUTURES-BTC_USDT-FUNDING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="GATE_FUTURES",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC_USDT"),
+    sensor_family="MECHANICAL_FUNDING",
+    source=docs("GATE_FUTURES", "GET /futures/USDT/funding_rate"),
+    native_units={
+        "funding_rate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+        "funding_interval": "SECONDS",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("t", "funding application time", precision="SECOND"),
+    semantic_claim=(
+        "Gate publishes its interval alongside the rate; the interval is data, "
+        "not an 8h assumption."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={"contract": "BTC_USDT", "t": 1709316000, "r": "0.000085", "funding_interval": 28800},
+    expectation={
+        "kind": "NORMALIZE",
+        "funding_interval_seconds": 28800,
+        "funding_rate_native_preserved": "0.000085",
+        "interval_assumed_8h": False,
+    },
+    known_limitations=["payload values are authored", "field names transcribed from secondary documentation"],
+    supports_checkpoint="I13",
+)
+
+fx(
+    fixture_id="FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_BOOK_SNAPSHOT",
+    source=docs("DERIBIT", "GET /api/v2/public/get_order_book"),
+    native_units=UNITS_INVERSE_USD,
+    timestamp_semantics=ts("timestamp", "server time of the snapshot"),
+    semantic_claim=(
+        "On an inverse contract the level quantity is USD notional per contract, "
+        "so base exposure requires the inverse formula and a PIT reference price."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "timestamp": 1709294400123,
+        "instrument_name": "BTC-PERPETUAL",
+        "bids": [[61230.5, 154000.0]],
+        "asks": [[61231.5, 221000.0]],
+        "mark_price": 61230.9,
+        "index_price": 61209.8,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "quantity_native_unit": "USD_NOTIONAL_PER_CONTRACT",
+        "quantity_base": "REQUIRES_INVERSE_FORMULA_AND_PIT_PRICE",
+        "usd_scalar_substitution": "REFUSED",
+        "is_full_snapshot": True,
+    },
+    known_limitations=[
+        "Deribit book levels are USD amounts; exact per-level conversion is contract-specification dependent",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I14",
+)
+
+fx(
+    fixture_id="FX-A-DERIBIT-BTC-PERPETUAL-TRADE-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_TRADE",
+    source=docs("DERIBIT", "GET /api/v2/public/get_last_trades_by_instrument"),
+    native_units=UNITS_INVERSE_USD,
+    timestamp_semantics=ts("timestamp", "trade time"),
+    semantic_claim=(
+        "Deribit publishes maker/taker liquidation roles as separate flags; those "
+        "roles are richer than a long/short aggregate and must not be collapsed."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "trade_id": "BTC-1234567",
+        "instrument_name": "BTC-PERPETUAL",
+        "timestamp": 1709294400123,
+        "price": 61234.5,
+        "amount": 1200.0,
+        "direction": "sell",
+        "index_price": 61209.8,
+        "mark_price": 61231.0,
+        "liquidation": "M",
+        "tick_direction": 3,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "maker_taker_role": "MAKER_LIQUIDATED",
+        "position_side_liquidated": "UNKNOWN_UNLESS_PROVIDED",
+        "direction_as_position_side": "REFUSED",
+        "amount_unit": "USD_NOTIONAL",
+    },
+    known_limitations=[
+        "the liquidation flag vocabulary is documented but its position-side implication is not",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I11",
+    checkpoint_executable=True,
+)
+
+fx(
+    fixture_id="FX-A-DERIBIT-BTC-PERPETUAL-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("DERIBIT", "GET /api/v2/public/get_book_summary_by_instrument"),
+    native_units={
+        "open_interest": "USD_NOTIONAL",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("none", "current summary; no payload timestamp", precision="NONE"),
+    semantic_claim=(
+        "On an inverse contract a USD-notional OI is native; converting it to base "
+        "is a derived, price-dependent operation that must be recorded as such."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "instrument_name": "BTC-PERPETUAL",
+        "open_interest": 412500000.0,
+        "volume": 120034.5,
+        "mark_price": 61231.0,
+        "underlying_price": 61209.8,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_native_unit": "USD_NOTIONAL",
+        "oi_usd": "NATIVE_PASSTHROUGH_ALLOWED",
+        "oi_base": "REQUIRES_PIT_REFERENCE_PRICE",
+        "usd_scalar_substitution": "REFUSED",
+    },
+    known_limitations=["payload values are authored", "no OI timestamp; snapshot time is acquisition-time"],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-DERIBIT-BTC-PERPETUAL-FUNDING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_FUNDING",
+    source=docs("DERIBIT", "GET /api/v2/public/get_funding_rate_history"),
+    native_units={
+        "funding_rate": "DIMENSIONLESS_FRACTION_PER_8H",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("timestamp", "funding interval boundary"),
+    semantic_claim=(
+        "A history row is realized funding for a closed interval; a separate live "
+        "current-funding figure is indicative and must not overwrite it."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "timestamp": 1709280000000,
+        "index_price": 61209.8,
+        "prev_index_price": 61180.2,
+        "interest_8h": 0.00011234,
+        "interest_1h": 0.00001404,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "predicted_or_realized": "REALIZED",
+        "funding_interval_seconds": 28800,
+        "interest_1h_relabelled_as_8h": "REFUSED",
+        "indicative_overwrites_realized": False,
+    },
+    known_limitations=["payload values are authored", "1h vs 8h field relationship is documented but not independently proven"],
+    supports_checkpoint="I13",
+)
+
+fx(
+    fixture_id="FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="OKX_SWAP",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC-USDT-SWAP"),
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("OKX_SWAP", "GET /api/v5/public/open-interest"),
+    native_units={
+        "oi": "CONTRACTS",
+        "oiCcy": "BTC",
+        "oiUsd": "USD",
+        "unit_status": "THREE_PARALLEL_NATIVE_QUANTITIES",
+    },
+    timestamp_semantics=ts("ts", "response time"),
+    semantic_claim=(
+        "OKX publishes three parallel OI quantities; a normalized record must not "
+        "pick one and discard the other two."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "instId": "BTC-USDT-SWAP",
+        "instType": "SWAP",
+        "oi": "1823456",
+        "oiCcy": "18234.56",
+        "oiUsd": "1117000000.00",
+        "ts": "1709294400123",
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_contracts": "1823456",
+        "oi_base": "18234.56",
+        "oi_usd": "1117000000.00",
+        "single_quantity_collapse": "REFUSED",
+        "cross_check_required": "oi * multiplier == oiCcy",
+    },
+    known_limitations=["payload values are authored", "provider-computed oiUsd is a provider claim, not our conversion"],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="OKX_SWAP",
+    instrument=INVERSE_BTC_OKX,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("OKX_SWAP", "GET /api/v5/public/open-interest"),
+    native_units={
+        "oi": "CONTRACTS",
+        "ctVal": "USD_PER_CONTRACT",
+        "unit_status": "INVERSE_CONTRACT_DENOMINATED",
+    },
+    timestamp_semantics=ts("ts", "response time"),
+    semantic_claim=(
+        "The inverse sibling shares the route but not the unit algebra; the same "
+        "multiplier must not be applied to a linear and an inverse contract."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "instId": "BTC-USD-SWAP",
+        "instType": "SWAP",
+        "oi": "812340",
+        "oiCcy": "13265.20",
+        "oiUsd": "81234000.00",
+        "ctVal": "100",
+        "ts": "1709294400123",
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_native_unit": "CONTRACTS",
+        "contract_multiplier_unit": "USD_PER_CONTRACT",
+        "linear_formula_applied": "REFUSED",
+        "oi_usd": "81234000.00",
+    },
+    known_limitations=["payload values are authored", "inverse exposure conversion needs PIT terms"],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-OKX_SWAP-BTC-USDT-SWAP-BOOK-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="OKX_SWAP",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC-USDT-SWAP"),
+    sensor_family="MECHANICAL_BOOK_SNAPSHOT",
+    source=docs("OKX_SWAP", "GET /api/v5/market/books"),
+    native_units={
+        "price": "USDT",
+        "level_quantity": "CONTRACTS",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("ts", "snapshot time"),
+    semantic_claim=(
+        "OKX books carry seqId and checksum, and level quantity is contracts; a "
+        "checksum mismatch is a reconstruction failure, not a warning."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "code": "0",
+        "data": [
+            {
+                "asks": [["61231.1", "12", "0", "3"]],
+                "bids": [["61230.1", "8", "0", "5"]],
+                "ts": "1709294400123",
+                "checksum": -2010478662,
+                "seqId": 123456789,
+            }
+        ],
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "level_quantity_unit": "CONTRACTS",
+        "checksum_required": True,
+        "checksum_mismatch": "REFUSE_RECONSTRUCTION",
+        "is_full_snapshot": True,
+    },
+    known_limitations=["payload values are authored", "checksum algorithm is provider-defined"],
+    supports_checkpoint="I14",
+)
+
+fx(
+    fixture_id="FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="OKX_SWAP",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC-USDT-SWAP"),
+    sensor_family="MECHANICAL_POSITIONING",
+    source=docs("OKX_SWAP", "GET /api/v5/rubik/stat/contracts/long-short-account-ratio"),
+    native_units={
+        "ratio": "DIMENSIONLESS",
+        "population": "ACCOUNTS",
+        "unit_status": "POPULATION_DEFINITION_REQUIRED",
+    },
+    timestamp_semantics=ts("ts", "bucket start", interval=True),
+    semantic_claim=(
+        "OKX's account ratio and Binance's top-trader account ratio are different "
+        "populations and cannot be equated because both are called 'account ratio'."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={"ccy": "BTC", "ts": "1709294400000", "ratio": "1.8123"},
+    expectation={
+        "kind": "NORMALIZE",
+        "positioning_metric_type": "ACCOUNT_LONG_SHORT_RATIO",
+        "population_scope": "ALL_ACCOUNTS",
+        "equated_with_top_trader_ratio": "REFUSED",
+    },
+    known_limitations=["population definition is provider-declared only", "payload values are authored"],
+    supports_checkpoint="I15",
+)
+
+fx(
+    fixture_id="FX-A-BYBIT_LINEAR-BTCUSDT-FUNDING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BYBIT_LINEAR",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_FUNDING",
+    source=docs("BYBIT_LINEAR", "GET /v5/market/funding/history"),
+    native_units={
+        "fundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("fundingRateTimestamp", "funding effective time"),
+    semantic_claim=(
+        "Bybit changes its funding interval per instrument over time; the interval "
+        "is not a constant and cannot be defaulted to 8h."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "symbol": "BTCUSDT",
+        "category": "linear",
+        "list": [
+            {"symbol": "BTCUSDT", "fundingRate": "0.00012345", "fundingRateTimestamp": "1709316000000"}
+        ],
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "funding_interval_seconds": "REQUIRES_INTERVAL_EVIDENCE_NOT_DEFAULTED",
+        "funding_rate_native_preserved": "0.00012345",
+        "eight_hour_default": "REFUSED",
+    },
+    known_limitations=[
+        "the history route does not return the interval; interval must come from instrument metadata",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I13",
+)
+
+fx(
+    fixture_id="FX-A-BYBIT_LINEAR-ETHUSDT-OI-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="BYBIT_LINEAR",
+    instrument=LINEAR_ETH,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    source=docs("BYBIT_LINEAR", "GET /v5/market/tickers"),
+    native_units={
+        "openInterest": "BASE_ASSET",
+        "openInterestValue": "USDT",
+        "unit_status": "DOCUMENTED_UNCERTIFIED",
+    },
+    timestamp_semantics=ts("time", "ticker time"),
+    semantic_claim=(
+        "A base-denominated OI with a provider-supplied quote value must keep both; "
+        "the quote value is a provider claim, not our conversion."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "category": "linear",
+        "list": [
+            {
+                "symbol": "ETHUSDT",
+                "openInterest": "1204550.12",
+                "openInterestValue": "2541554221.55",
+                "markPrice": "2110.55",
+                "time": "1709294400123",
+            }
+        ],
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "oi_native_unit": "BASE_ASSET",
+        "oi_base": "1204550.12",
+        "oi_quote_is_provider_claim": True,
+        "recomputed_vs_provider_mismatch": "FLAG_NOT_OVERWRITE",
+    },
+    known_limitations=["payload values are authored"],
+    supports_checkpoint="I12",
+)
+
+fx(
+    fixture_id="FX-A-KRAKEN_FUTURES-PI_XBTUSD-TRADE-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="KRAKEN_FUTURES",
+    instrument=INVERSE_BTC_KRAKEN,
+    sensor_family="MECHANICAL_TRADE",
+    source=docs("KRAKEN_FUTURES", "GET /api/charts/v1/trade/PI_XBTUSD/1m"),
+    native_units={
+        "price": "USD",
+        "quantity": "CONTRACTS",
+        "unit_status": "INVERSE_CONTRACT_DENOMINATED",
+    },
+    timestamp_semantics=ts("time", "trade time", precision="SECOND"),
+    semantic_claim=(
+        "Kraken's inverse contract quantity is contracts of 1 USD; treating it as "
+        "BTC would overstate exposure by three orders of magnitude."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "time": 1709294400,
+        "price": 61234.5,
+        "buy": 1200,
+        "sell": 800,
+        "last": 61234.5,
+        "vol": 2000,
+        "trades": 14,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "quantity_native_unit": "CONTRACTS",
+        "contract_multiplier_unit": "USD_PER_CONTRACT",
+        "base_quantity_without_inverse_formula": "REFUSED",
+        "aggregation_scope": "INTERVAL_AGGREGATE",
+    },
+    known_limitations=[
+        "the charts route is aggregate-per-bucket, not trade level",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I11",
+    checkpoint_executable=True,
+)
+
+fx(
+    fixture_id="FX-A-KRAKEN_FUTURES-PI_XBTUSD-BOOK-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="KRAKEN_FUTURES",
+    instrument=INVERSE_BTC_KRAKEN,
+    sensor_family="MECHANICAL_BOOK_SNAPSHOT",
+    source=docs("KRAKEN_FUTURES", "GET /api/v3/orderbook?symbol=PI_XBTUSD"),
+    native_units={
+        "price": "USD",
+        "level_quantity": "CONTRACTS",
+        "unit_status": "INVERSE_CONTRACT_DENOMINATED",
+    },
+    timestamp_semantics=ts("seq", "sequence cursor, not a time", precision="SEQUENCE"),
+    semantic_claim=(
+        "Kraken futures books are sequenced; the sequence is the only safe "
+        "completeness signal and contract quantities need inverse conversion."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "result": "success",
+        "serverTime": "2024-03-01T12:00:00.000Z",
+        "orderBook": {
+            "bids": [[61230.5, 154]],
+            "asks": [[61231.5, 221]],
+        },
+        "seq": 50112233,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "is_full_snapshot": True,
+        "level_quantity_unit": "CONTRACTS",
+        "sequence_required": True,
+    },
+    known_limitations=["payload values are authored", "snapshot vs delta behaviour of the route is not documented here"],
+    supports_checkpoint="I14",
+)
+
+fx(
+    fixture_id="FX-A-KRAKEN_FUTURES-PI_XBTUSD-FUNDING-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="KRAKEN_FUTURES",
+    instrument=INVERSE_BTC_KRAKEN,
+    sensor_family="MECHANICAL_FUNDING",
+    source=docs("KRAKEN_FUTURES", "GET /api/charts/v1/analytics/PI_XBTUSD/funding_rate"),
+    native_units={
+        "relativeFundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+        "unit_status": "INTERVAL_UNDOCUMENTED",
+    },
+    timestamp_semantics=ts("time", "sample time", precision="SECOND", interval=True),
+    semantic_claim=(
+        "Kraken publishes relative funding as a time series whose sampling "
+        "interval is not the funding interval; the two must not be conflated."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "result": "success",
+        "rates": [
+            {"time": 1709294400, "relativeFundingRate": 0.0000125},
+            {"time": 1709298000, "relativeFundingRate": 0.0000131},
+        ],
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "sample_interval_seconds": 3600,
+        "funding_interval_seconds": "UNRESOLVED",
+        "sample_interval_as_funding_interval": "REFUSED",
+    },
+    known_limitations=[
+        "funding interval for this route is not documented in the frozen registry",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I13",
+)
+
+fx(
+    fixture_id="FX-A-DERIBIT-BTC-PERPETUAL-BOOK_METRIC-001",
+    tier="TIER_A_DOCUMENTED_FIELD_SHAPE",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_BOOK_METRIC",
+    source=docs("DERIBIT", "GET /api/v2/public/get_book_summary_by_instrument"),
+    native_units={
+        "bid_price": "USD",
+        "ask_price": "USD",
+        "metric": "NOT_PROVIDED",
+        "unit_status": "NO_NATIVE_METRIC",
+    },
+    timestamp_semantics=ts("none", "current summary", precision="NONE"),
+    semantic_claim=(
+        "No reviewed free route publishes a provider-native spread/depth/imbalance "
+        "with a documented methodology, so a T1 book metric would be FABRIC-defined "
+        "and must carry a registered methodology instead of claiming provider nativity."
+    ),
+    semantic_claim_scope="FIELD_SHAPE_ONLY",
+    payload={
+        "instrument_name": "BTC-PERPETUAL",
+        "bid_price": 61230.5,
+        "ask_price": 61232.5,
+        "mark_price": 61231.0,
+        "volume": 120034.5,
+    },
+    expectation={
+        "kind": "NORMALIZE",
+        "provider_native_metric": "ABSENT",
+        "derived_spread_permitted_at_t1": False,
+        "canonical_metric_requires": ["methodology_id", "lineage", "equivalence_class"],
+        "equivalence_class_if_derived": "NOT_COMPARABLE_AS_PROVIDER_NATIVE",
+    },
+    known_limitations=[
+        "absence is established for the reviewed routes only, not for every CoinGlass/other aggregator",
+        "payload values are authored",
+    ],
+    supports_checkpoint="I14",
+)
+
+# ---------------------------------------------------------------------------
+# TIER C - real provider evidence references (payload unavailable offline)
+# ---------------------------------------------------------------------------
+
+
+def tier_c(
+    *,
+    fixture_id: str,
+    provider: str,
+    instrument: dict,
+    sensor_family: str,
+    evidence_ids: list[str],
+    evidence_level: str,
+    semantic_claim: str,
+    limitation: str,
+) -> None:
+    fx(
+        fixture_id=fixture_id,
+        tier="TIER_C_PROVIDER_EVIDENCE_REFERENCED",
+        provider=provider,
+        instrument=instrument,
+        sensor_family=sensor_family,
+        source={
+            "kind": "PROVIDER_EVIDENCE_REFERENCE",
+            "endpoint": "recorded in bloc_02 capability claims",
+            "documentation_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl",
+            "provider_evidence_ref": PROVIDER_DOC[provider],
+            "evidence_commit": EVIDENCE_COMMIT,
+            "field_name_confidence": "EVIDENCE_RECORDED",
+        },
+        native_units={"unit_status": "NOT_ESTABLISHED_FROM_EVIDENCE"},
+        timestamp_semantics=ts("unknown", "evidence records availability, not timestamp semantics"),
+        semantic_claim=semantic_claim,
+        semantic_claim_scope="PROVIDER_EVIDENCE_EXISTENCE_ONLY",
+        payload={
+            "evidence_ids": evidence_ids,
+            "evidence_level": evidence_level,
+            "payload_available_offline": False,
+        },
+        expectation={
+            "kind": "BLOCKED_PENDING_PAYLOAD",
+            "usable_as_fixture_input": False,
+            "reason": "the recorded evidence is metadata/existence evidence, not captured payload bytes",
+        },
+        acquisition={
+            "method": "PROVIDER_EVIDENCE_REFERENCE",
+            "network_calls": 0,
+            "captured_from_provider": False,
+            "payload_available_offline": False,
+            "evidence_recorded_by": "Bloc 2 probe programme",
+        },
+        known_limitations=[
+            limitation,
+            "cannot be executed as a fixture; requires a first-party captured payload to become TIER_A",
+        ],
+        supports_checkpoint="I20",
+    )
+
+
+tier_c(
+    fixture_id="FX-C-BINANCE_USDM-BTCUSDT-OI-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    evidence_ids=[
+        "binance_usdm_open_interest_btcusdt_RECENT_CONTROL_1h",
+        "binance_usdm_archive_metrics_btcusdt_2021-06-15",
+        "binance_usdm_archive_metrics_btcusdt_2026-06-15",
+    ],
+    evidence_level="E4_MULTI_ERA_VERIFIED",
+    semantic_claim=(
+        "Binance USD-M OI source availability is verified across eras; row "
+        "timestamps and schema were not inspected, so no unit or interval claim "
+        "is supported by this evidence."
+    ),
+    limitation="SOURCE_AVAILABILITY_VERIFIED only - metadata/existence evidence, rows not inspected",
+)
+
+tier_c(
+    fixture_id="FX-C-BINANCE_USDM-BTCUSDT-FUNDING-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_FUNDING",
+    evidence_ids=["binance_usdm_funding_btcusdt_RECENT_CONTROL_1h"],
+    evidence_level="E0_CLAIM_ONLY",
+    semantic_claim=(
+        "A funding route exists, but the recorded capability is a claim-level "
+        "entry with GEO_BLOCKED status; it supports no interval or rate claim."
+    ),
+    limitation="E0_CLAIM_ONLY and capability_status=GEO_BLOCKED; no captured payload",
+)
+
+tier_c(
+    fixture_id="FX-C-DERIBIT-BTC-PERPETUAL-BOOK-001",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_BOOK_SNAPSHOT",
+    evidence_ids=["deribit_book_snapshot_btc_perpetual_live_smoke"],
+    evidence_level="LIVE_PASS_NONEMPTY",
+    semantic_claim=(
+        "A live Deribit book snapshot was fetched with HTTP 200, row_count=1 and a "
+        "recorded raw_content_hash; the payload bytes were not retained, so field "
+        "meaning still requires a captured fixture."
+    ),
+    limitation="raw_content_hash recorded (25ea4221...), payload bytes not retained",
+)
+
+# ---------------------------------------------------------------------------
+# TIER B - synthetic adversarial controls
+# ---------------------------------------------------------------------------
+
+SEQ_BASE = {
+    "instrument": LINEAR_BTC,
+    "provider": "BINANCE_USDM",
+    "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+}
+
+
+def seq(
+    *,
+    fixture_id: str,
+    payload: dict,
+    expectation: dict,
+    claim: str,
+    limitations: list[str] | None = None,
+) -> None:
+    fx(
+        fixture_id=fixture_id,
+        tier="TIER_B_SYNTHETIC_ADVERSARIAL",
+        provider=SEQ_BASE["provider"],
+        instrument=SEQ_BASE["instrument"],
+        sensor_family=SEQ_BASE["sensor_family"],
+        source={
+            "kind": "SYNTHETIC_CONSTRUCTION",
+            "endpoint": "constructed sequence model",
+            "documentation_ref": "bloc_05/04 section 6.2 + bloc_05/07 F21",
+            "provider_evidence_ref": None,
+            "evidence_commit": AUTHORITY_COMMIT,
+            "field_name_confidence": "SYNTHETIC",
+        },
+        native_units={
+            "price": "USDT",
+            "level_quantity": "BTC",
+            "unit_status": "DOCUMENTED_UNCERTIFIED",
+        },
+        timestamp_semantics=ts("E", "synthetic event time", precision="MILLISECOND"),
+        semantic_claim=claim,
+        semantic_claim_scope="RECONSTRUCTION_BEHAVIOUR_ONLY",
+        payload=payload,
+        expectation=expectation,
+        known_limitations=limitations
+        or [
+            "synthetic: proves reconstruction behaviour only",
+            "proves nothing about any provider's real sequence semantics",
+        ],
+        supports_checkpoint="I14",
+    )
+
+
+seq(
+    fixture_id="FX-B-SEQ-VALID-CONTIGUOUS-001",
+    payload={
+        "snapshot": {"lastUpdateId": 1000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 1001, "u": 1005, "pu": 1000, "b": [["61230.0", "0.0"]], "a": [["61232.0", "0.5"]]},
+            {"U": 1006, "u": 1010, "pu": 1005, "b": [["61229.5", "2.0"]], "a": []},
+        ],
+    },
+    expectation={
+        "outcome": "RECONSTRUCT_OK",
+        "sequence_discontinuity": False,
+        "derived_metrics_allowed": True,
+        "best_bid_after": "61229.5",
+        "best_ask_after": "61231.0",
+        "crossed_book": False,
+    },
+    claim="A contiguous update chain starting at snapshot lastUpdateId+1 reconstructs a complete book and permits derived metrics.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-MISSING-001",
+    payload={
+        "snapshot": {"lastUpdateId": 2000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 2001, "u": 2005, "pu": 2000},
+            {"U": 2007, "u": 2010, "pu": 2006},
+        ],
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "BOOK_SEQUENCE_GAP",
+        "reconstruction_complete": False,
+        "derived_metrics_allowed": False,
+        "interpolated_levels": False,
+        "partial_book_published": False,
+    },
+    claim="A missing update (2006 absent) must stop reconstruction; no derived spread, depth or imbalance may be certified.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-DUPLICATE-001",
+    payload={
+        "snapshot": {"lastUpdateId": 3000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 3001, "u": 3005, "pu": 3000},
+            {"U": 3001, "u": 3005, "pu": 3000},
+            {"U": 3006, "u": 3008, "pu": 3005},
+        ],
+    },
+    expectation={
+        "outcome": "IDEMPOTENT_OR_REFUSE",
+        "code": "DUPLICATE_SEQUENCE_RECORD",
+        "double_applied": False,
+        "derived_metrics_allowed_after_duplicate": True,
+        "note": "a duplicate that is bit-identical is re-appliable only if application is idempotent; otherwise refuse",
+    },
+    claim="A duplicate update must never be applied twice, because a re-applied absolute level delta can silently corrupt depth.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-OUT-OF-ORDER-001",
+    payload={
+        "snapshot": {"lastUpdateId": 4000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 4006, "u": 4010, "pu": 4005},
+            {"U": 4001, "u": 4005, "pu": 4000},
+        ],
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "SEQUENCE_DISCONTINUITY",
+        "reordered_silently": False,
+        "derived_metrics_allowed": False,
+    },
+    claim="An out-of-order update cannot be silently reordered: ordering is evidence, not a convenience.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-SNAPSHOT-UPDATE-MISMATCH-001",
+    payload={
+        "snapshot": {"lastUpdateId": 5000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 5004, "u": 5008, "pu": 5003},
+        ],
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "SNAPSHOT_UPDATE_MISMATCH",
+        "reason": "first update does not overlap or continue the snapshot cursor",
+        "derived_metrics_allowed": False,
+    },
+    claim="When the first update neither overlaps nor continues the snapshot, the snapshot is stale for that chain and reconstruction must refuse.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-RESET-001",
+    payload={
+        "snapshot": {"lastUpdateId": 6000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 6001, "u": 6003, "pu": 6000},
+            {"U": 1, "u": 5, "pu": 0},
+        ],
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "SEQUENCE_RESET_REQUIRES_SNAPSHOT",
+        "reset_treated_as_continuation": False,
+        "derived_metrics_allowed": False,
+    },
+    claim="A sequence reset marks a new book epoch; continuing the old reconstruction across it fabricates continuity.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-METRIC-ACROSS-GAP-001",
+    payload={
+        "snapshot": {"lastUpdateId": 7000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 7001, "u": 7005, "pu": 7000},
+            {"U": 7010, "u": 7012, "pu": 7009},
+        ],
+        "requested_metrics": ["SPREAD", "DEPTH_5BPS", "IMBALANCE"],
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "METRIC_ACROSS_GAP_REFUSED",
+        "metrics_refused": ["SPREAD", "DEPTH_5BPS", "IMBALANCE"],
+        "metrics_computed_from_last_valid_book": "REFUSED",
+        "stale_book_served": False,
+    },
+    claim="A metric requested over a gapped chain is not computable; serving the last valid book would date the metric falsely.",
+)
+
+seq(
+    fixture_id="FX-B-SEQ-RECOVERY-SNAPSHOT-001",
+    payload={
+        "snapshot": {"lastUpdateId": 8000, "bids": [["61230.0", "1.0"]], "asks": [["61231.0", "1.0"]]},
+        "updates": [
+            {"U": 8001, "u": 8004, "pu": 8000},
+        ],
+        "gap_observed": {"U": 8005, "u": 8010, "pu": 8012},
+        "recovery_snapshot": {
+            "lastUpdateId": 8020,
+            "bids": [["61229.0", "1.5"]],
+            "asks": [["61232.0", "1.5"]],
+            "authorized": True,
+            "authorization_ref": "operator-fixture-recovery-1",
+        },
+        "updates_after_recovery": [
+            {"U": 8021, "u": 8023, "pu": 8020},
+        ],
+    },
+    expectation={
+        "outcome": "RECONSTRUCT_OK_AFTER_RECOVERY",
+        "pre_gap_book_discarded": True,
+        "epochs": 2,
+        "derived_metrics_allowed": True,
+        "best_bid_after": "61229.0",
+        "unauthorized_recovery": "REFUSED",
+    },
+    claim="Reconstruction may resume only from an authorized recovery snapshot, and the pre-gap book must be discarded rather than stitched.",
+)
+
+
+def adv(
+    *,
+    fixture_id: str,
+    provider: str,
+    instrument: dict,
+    sensor_family: str,
+    claim: str,
+    payload: dict,
+    expectation: dict,
+    checkpoint: str,
+    ref: str,
+    limitations: list[str] | None = None,
+) -> None:
+    fx(
+        fixture_id=fixture_id,
+        tier="TIER_B_SYNTHETIC_ADVERSARIAL",
+        provider=provider,
+        instrument=instrument,
+        sensor_family=sensor_family,
+        source={
+            "kind": "SYNTHETIC_CONSTRUCTION",
+            "endpoint": "constructed adversarial case",
+            "documentation_ref": ref,
+            "provider_evidence_ref": None,
+            "evidence_commit": AUTHORITY_COMMIT,
+            "field_name_confidence": "SYNTHETIC",
+        },
+        native_units={"unit_status": "ADVERSARIAL"},
+        timestamp_semantics=ts("synthetic", "constructed", precision="MILLISECOND"),
+        semantic_claim=claim,
+        semantic_claim_scope="REFUSAL_BEHAVIOUR_ONLY",
+        payload=payload,
+        expectation=expectation,
+        known_limitations=limitations
+        or [
+            "synthetic: proves the refusal contract only",
+            "proves nothing about actual provider semantics",
+        ],
+        supports_checkpoint=checkpoint,
+    )
+
+
+adv(
+    fixture_id="FX-B-OI-UNIT-SUBSTITUTION-001",
+    provider="GATE_FUTURES",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC_USDT"),
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    claim="Contract-denominated OI relabelled as base-denominated must be refused instead of accepted at face value.",
+    payload={"open_interest": "882134", "declared_unit": "BTC", "quanta": "contracts"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "OI_UNIT_UNVERIFIED",
+        "native_value_preserved": True,
+        "relabelled_value": None,
+    },
+    checkpoint="I12",
+    ref="bloc_05/04 section 4.2 + section 16",
+)
+
+adv(
+    fixture_id="FX-B-OI-ZERO-DEFAULTED-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    claim="A missing OI interval must stay NULL with a reason; only a measured, coverage-backed zero may be zero.",
+    payload={"interval": "2024-03-01T12:00Z/12:05Z", "payload": None, "coverage": "SOURCE_GAP"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "NULL_NOT_ZERO",
+        "oi_native_value": None,
+        "missingness_reason": "SOURCE_GAP",
+        "zero_emitted": False,
+    },
+    checkpoint="I12",
+    ref="bloc_05/03 section 14",
+)
+
+adv(
+    fixture_id="FX-B-OI-AGGREGATE-VENUE-ATTRIBUTION-001",
+    provider="COINALYZE",
+    instrument=dict(LINEAR_BTC, native_symbol="BTCUSDT"),
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    claim="A multi-venue aggregate OI must not be assigned to one venue, even when the instrument symbol matches that venue.",
+    payload={"aggregate_open_interest_usd": "4820000000", "venues": ["BINANCE", "OKX", "BYBIT"], "declared_venue": "BINANCE"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "MULTI_VENUE_AGGREGATE_VENUE_UNKNOWN",
+        "venue_attributed": None,
+        "aggregation_scope": "PROVIDER_AGGREGATE",
+    },
+    checkpoint="I12",
+    ref="bloc_05/04 section 4.4",
+)
+
+adv(
+    fixture_id="FX-B-FUNDING-PREDICTED-AS-REALIZED-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_FUNDING",
+    claim="A predicted/indicative funding rate must never occupy the realized slot.",
+    payload={"fundingRate": "0.0002", "predicted_or_realized": "PREDICTED", "claimed_as": "REALIZED"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "PREDICTED_NOT_REALIZED",
+        "realized_field": None,
+        "predicted_field_preserved": "0.0002",
+    },
+    checkpoint="I13",
+    ref="bloc_05/04 section 5.1",
+)
+
+adv(
+    fixture_id="FX-B-FUNDING-INTERVAL-SUBSTITUTION-001",
+    provider="BYBIT_LINEAR",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_FUNDING",
+    claim="A 1h funding rate relabelled as an 8h rate is an 8x overstated cost and must be refused.",
+    payload={"fundingRate": "0.0001", "true_interval_seconds": 3600, "declared_interval_seconds": 28800},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "FUNDING_INTERVAL_UNVERIFIED",
+        "native_value_preserved": "0.0001",
+        "eight_hour_equivalent": None,
+    },
+    checkpoint="I13",
+    ref="bloc_05/04 section 5.1-5.2",
+)
+
+adv(
+    fixture_id="FX-B-FUNDING-RATE-PERCENT-CONFUSION-001",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_FUNDING",
+    claim="0.01 read as 1% instead of 0.01% is a 100x error; the rate unit must be explicit before any comparable output.",
+    payload={"value": "0.01", "unit": "UNKNOWN", "candidate_units": ["PERCENT", "RATE_PER_INTERVAL"]},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "RATE_UNIT_AMBIGUOUS",
+        "comparable_rate_emitted": None,
+        "assumed_unit": None,
+    },
+    checkpoint="I13",
+    ref="bloc_05/03 section 4 + section 13",
+)
+
+adv(
+    fixture_id="FX-B-FUNDING-BPS-CONVERSION-001",
+    provider="OKX_SWAP",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC-USDT-SWAP"),
+    sensor_family="MECHANICAL_FUNDING",
+    claim="1 bp is 0.01% = 0.0001 as a fraction; a bps-to-percent slip silently divides the rate by 100.",
+    payload={"rate_bps": "1.25", "requested_output": "PERCENT", "claimed_percent": "0.0125"},
+    expectation={
+        "outcome": "REFUSE_OR_CORRECT",
+        "code": "BPS_CONVERSION_REFUSED",
+        "correct_percent": "0.0125",
+        "wrong_percent": "1.25",
+        "must_state_convention": True,
+    },
+    checkpoint="I13",
+    ref="bloc_05/03 section 4",
+)
+
+adv(
+    fixture_id="FX-B-FUNDING-FUTURE-INFORMATION-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_FUNDING",
+    claim="A funding row whose market availability is after the replay cutoff must be unavailable, not merely flagged.",
+    payload={
+        "fundingTime": "2024-03-01T16:00:00Z",
+        "market_available_at": "2024-03-01T16:00:30Z",
+        "knowledge_cutoff": "2024-03-01T15:00:00Z",
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "FUTURE_INFORMATION_LEAK",
+        "replay_eligible": False,
+        "value_returned": None,
+    },
+    checkpoint="I13",
+    ref="bloc_05/06 section 13",
+)
+
+adv(
+    fixture_id="FX-B-POSITIONING-POPULATION-SUBSTITUTION-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_POSITIONING",
+    claim="A top-trader ACCOUNT ratio cannot be stored as a generic long_short_ratio or as a POSITION ratio.",
+    payload={"metric": "TOP_TRADER_ACCOUNT_RATIO", "longAccount": "0.61", "shortAccount": "0.39", "declared_as": "GENERIC_LONG_SHORT_RATIO"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "POSITIONING_POPULATION_UNVERIFIED",
+        "canonical_metric_type": "TOP_TRADER_ACCOUNT_RATIO",
+        "population_scope": "TOP_TRADER_ACCOUNTS",
+        "generic_ratio_emitted": None,
+    },
+    checkpoint="I15",
+    ref="bloc_05/04 section 8",
+)
+
+adv(
+    fixture_id="FX-B-POSITIONING-CROSS-PROVIDER-EQUIVALENCE-001",
+    provider="MULTI",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_POSITIONING",
+    claim="Two providers' 'long/short ratio' fields are not equivalent when their populations differ; comparison requires a population match.",
+    payload={
+        "binance": {"type": "TOP_TRADER_ACCOUNT_RATIO", "value": "1.58"},
+        "okx": {"type": "ACCOUNT_LONG_SHORT_RATIO", "value": "1.81"},
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "CROSS_PROVIDER_POSITIONING_NOT_EQUIVALENT",
+        "synthesized_consensus": None,
+        "equivalence_class": "NOT_COMPARABLE",
+    },
+    checkpoint="I15",
+    ref="bloc_05/04 section 8 + section 14",
+)
+
+adv(
+    fixture_id="FX-B-BASIS-REFERENCE-SUBSTITUTION-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_BASIS",
+    claim="Substituting an index price for a mark price changes the measured basis; the reference type must be explicit and preserved.",
+    payload={"mark_price": "61234.5", "index_price": "61210.0", "declared_reference_type": "MARK_PRICE", "value_computed_from": "INDEX_PRICE"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "BASIS_REFERENCE_UNVERIFIED",
+        "reference_price_type": "MISMATCH_REFUSED",
+        "basis_value_emitted": None,
+    },
+    checkpoint="I15",
+    ref="bloc_05/03 section 8 + bloc_05/04 section 9",
+)
+
+adv(
+    fixture_id="FX-B-BASIS-WRONG-INSTRUMENT-001",
+    provider="DERIBIT",
+    instrument=INVERSE_BTC_DERIBIT,
+    sensor_family="MECHANICAL_BASIS",
+    claim="A reference price for a different instrument (ETH) must be refused for a BTC basis even if the timestamp is valid.",
+    payload={"futures_instrument": "BTC-PERPETUAL", "spot_reference_instrument": "ETHUSDT", "spot_price": "2110.5"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "BASIS_REFERENCE_INSTRUMENT_MISMATCH",
+        "basis_value_emitted": None,
+    },
+    checkpoint="I15",
+    ref="bloc_05/04 section 9",
+)
+
+adv(
+    fixture_id="FX-B-BASIS-LATE-REFERENCE-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_BASIS",
+    claim="A reference price that became available after the replay cutoff cannot support a contemporaneous basis.",
+    payload={"reference_price": "61200", "market_available_at": "2024-03-01T12:05:00Z", "knowledge_cutoff": "2024-03-01T12:00:00Z"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "REFERENCE_PRICE_LATE",
+        "basis_value_emitted": None,
+        "replay_eligible": False,
+    },
+    checkpoint="I15",
+    ref="bloc_05/04 section 9 + bloc_05/06 section 13",
+)
+
+adv(
+    fixture_id="FX-B-BASIS-UNIT-MISMATCH-001",
+    provider="OKX_SWAP",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC-USDT-SWAP"),
+    sensor_family="MECHANICAL_BASIS",
+    claim="An annualized basis percentage is not comparable with a raw percentage basis without an explicit transformation and methodology.",
+    payload={"spot": "61200", "futures": "61500", "declared_unit": "ANNUALIZED_PERCENT", "claimed_equivalent_unit": "PERCENT"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "BASIS_UNIT_MISMATCH",
+        "annualization_method": None,
+        "comparable_value_emitted": None,
+    },
+    checkpoint="I15",
+    ref="bloc_05/04 section 9",
+)
+
+adv(
+    fixture_id="FX-B-BASIS-CROSS-VENUE-SYNTHESIS-001",
+    provider="MULTI",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_BASIS",
+    claim="A basis built from one venue's spot and another venue's futures is cross-venue synthesis, forbidden at T1.",
+    payload={"spot_venue": "BINANCE", "futures_venue": "OKX", "spot": "61200", "futures": "61500"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "CROSS_VENUE_SYNTHESIS_REFUSED",
+        "basis_value_emitted": None,
+    },
+    checkpoint="I15",
+    ref="bloc_05/04 section 14",
+)
+
+adv(
+    fixture_id="FX-B-TRADE-AGGRESSOR-FROM-PRICE-DIRECTION-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_TRADE",
+    claim="An aggressor side inferred from a price uptick must be refused even when it agrees with the maker flag.",
+    payload={"price": "61234.5", "previous_price": "61234.0", "inferred_side": "BUY", "native_maker_flag": None},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "AGGRESSOR_SIDE_UNVERIFIED",
+        "canonical_aggressor_side": "UNKNOWN",
+    },
+    checkpoint="I10",
+    ref="bloc_05/04 section 2.1",
+)
+
+adv(
+    fixture_id="FX-B-LIQ-POSITION-EXECUTION-COLLAPSE-001",
+    provider="GATE_FUTURES",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC_USDT"),
+    sensor_family="MECHANICAL_LIQUIDATION",
+    claim="A single generic 'side' field cannot represent position side and execution side at once; the collapse must be refused.",
+    payload={"side": "SELL", "quantity": "120", "quantity_unit": "USDT"},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "LIQUIDATION_POSITION_SIDE_UNVERIFIED",
+        "position_side_liquidated": "UNKNOWN",
+        "execution_side": "UNKNOWN",
+        "collapsed_field_accepted": False,
+    },
+    checkpoint="I11",
+    ref="bloc_05/04 section 3.1",
+)
+
+adv(
+    fixture_id="FX-B-STABLECOIN-1TO1-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_TRADE",
+    claim="1 USDT = 1 USD is a forbidden permanent assumption; the depeg case must stay blocked rather than be converted at parity.",
+    payload={"quote": "USDT", "notional_quote": "1000", "assumed_usd": "1000", "conversion_rate_observation": None},
+    expectation={
+        "outcome": "REFUSE",
+        "code": "STABLECOIN_CONVERSION_UNAVAILABLE",
+        "usd_equivalent": None,
+        "parity_substituted": False,
+    },
+    checkpoint="I10",
+    ref="bloc_05/03 section 9 + bloc_05/06 section 12",
+)
+
+adv(
+    fixture_id="FX-B-IDENTITY-SYMBOL-REUSE-001",
+    provider="GATE_FUTURES",
+    instrument=dict(LINEAR_BTC, native_symbol="BTC_USDT"),
+    sensor_family="MECHANICAL_TRADE",
+    claim="A current contract map projected backwards over a symbol re-listing must fail; symbol reuse cannot collapse two economic contracts.",
+    payload={
+        "symbol": "BTC_USDT",
+        "instance_a": {"multiplier": "0.0001", "valid_to": "2023-06-01T00:00:00Z"},
+        "instance_b": {"multiplier": "0.0001", "valid_from": "2023-09-01T00:00:00Z"},
+        "current_terms_applied_to": "2023-01-15T00:00:00Z",
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "BLOCKED_IDENTITY",
+        "resolved_contract_instance": None,
+        "backward_projected_terms": False,
+    },
+    checkpoint="I03",
+    ref="bloc_05/06 section 4 + G1",
+)
+
+adv(
+    fixture_id="FX-B-TIME-INTERVAL-START-AVAILABILITY-001",
+    provider="BINANCE_USDM",
+    instrument=LINEAR_BTC,
+    sensor_family="MECHANICAL_OPEN_INTEREST",
+    claim="A 5m interval stamped at its start cannot be market-available at the start; claiming so invents look-ahead.",
+    payload={
+        "interval_start": "2024-03-01T12:00:00Z",
+        "interval_end": "2024-03-01T12:05:00Z",
+        "claimed_market_available_at": "2024-03-01T12:00:00Z",
+    },
+    expectation={
+        "outcome": "REFUSE",
+        "code": "BLOCKED_TIME",
+        "earliest_defensible_availability": "2024-03-01T12:05:00Z_OR_LATER",
+        "look_ahead_admitted": False,
+    },
+    checkpoint="I05",
+    ref="bloc_05/06 section 13",
+)
+
+
+def main() -> None:
+    for tier_dir, tier in (
+        ("provider", ("TIER_A_DOCUMENTED_FIELD_SHAPE", "TIER_C_PROVIDER_EVIDENCE_REFERENCED")),
+        ("synthetic", ("TIER_B_SYNTHETIC_ADVERSARIAL",)),
+    ):
+        out = EVIDENCE / "fixtures" / tier_dir
+        out.mkdir(parents=True, exist_ok=True)
+        for record in RECORDS:
+            if record["tier"] not in tier:
+                continue
+            path = out / f"{record['fixture_id']}.json"
+            path.write_text(
+                json.dumps(record, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+                newline="\n",
+            )
+
+    ids = [r["fixture_id"] for r in RECORDS]
+    assert len(ids) == len(set(ids)), "duplicate fixture ids"
+
+    files = []
+    for record in RECORDS:
+        sub = "provider" if record["tier"].startswith(("TIER_A", "TIER_C")) else "synthetic"
+        rel = f"fixtures/{sub}/{record['fixture_id']}.json"
+        data = (EVIDENCE / rel).read_bytes()
+        files.append(
+            {
+                "fixture_id": record["fixture_id"],
+                "path": rel,
+                "sha256": hashlib.sha256(data).hexdigest(),
+                "tier": record["tier"],
+                "provider": record["provider"],
+                "sensor_family": record["sensor_family"],
+                "contract_type": record["contract_type"],
+                "canonical_asset": record["instrument"]["canonical_asset"],
+                "supports_checkpoint": record["supports_checkpoint"],
+                "ratified_golden": False,
+                "approval_status": record["approval_status"],
+            }
+        )
+    files.sort(key=lambda f: f["fixture_id"])
+    aggregate = hashlib.sha256(
+        "".join(f"{f['path']}\0{f['sha256']}\n" for f in files).encode("utf-8")
+    ).hexdigest()
+
+    providers = sorted({r["provider"] for r in RECORDS})
+    manifest = {
+        "corpus_version": CORPUS_VERSION,
+        "authority_commit": AUTHORITY_COMMIT,
+        "evidence_commit": EVIDENCE_COMMIT,
+        "fixture_count": len(RECORDS),
+        "tier_counts": {
+            tier: sum(1 for r in RECORDS if r["tier"] == tier)
+            for tier in (
+                "TIER_A_DOCUMENTED_FIELD_SHAPE",
+                "TIER_B_SYNTHETIC_ADVERSARIAL",
+                "TIER_C_PROVIDER_EVIDENCE_REFERENCED",
+            )
+        },
+        "providers": providers,
+        "provider_count": len([p for p in providers if p != "MULTI"]),
+        "assets": sorted({r["instrument"]["canonical_asset"] for r in RECORDS}),
+        "contract_types": sorted({r["contract_type"] for r in RECORDS}),
+        "sensor_families": sorted({r["sensor_family"] for r in RECORDS}),
+        "ratified_golden_count": 0,
+        "approval_status": "NOT_REVIEWED",
+        "corpus_digest": aggregate,
+        "digest_algorithm": "sha256 over sorted '<path>\\0<sha256>\\n' rows",
+        "files": files,
+    }
+    (EVIDENCE / "fixtures" / "corpus_manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
+    print(json.dumps({k: manifest[k] for k in ("fixture_count", "tier_counts", "provider_count", "corpus_digest")}, indent=2))
+
+
+if __name__ == "__main__":
+    main()

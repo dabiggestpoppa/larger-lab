@@ -1,0 +1,77 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "e9a3ee9a91deb1010d5fb27d07ee6b782c3bb388e4ae4426a1deacdb1cbd4cf0",
+  "expectation": {
+    "kind": "NORMALIZE",
+    "oi_base": "1204550.12",
+    "oi_native_unit": "BASE_ASSET",
+    "oi_quote_is_provider_claim": true,
+    "recomputed_vs_provider_mismatch": "FLAG_NOT_OVERWRITE"
+  },
+  "fixture_id": "FX-A-BYBIT_LINEAR-ETHUSDT-OI-001",
+  "instrument": {
+    "canonical_asset": "ETH",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "ETHUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "payload values are authored"
+  ],
+  "native_units": {
+    "openInterest": "BASE_ASSET",
+    "openInterestValue": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "category": "linear",
+    "list": [
+      {
+        "markPrice": "2110.55",
+        "openInterest": "1204550.12",
+        "openInterestValue": "2541554221.55",
+        "symbol": "ETHUSDT",
+        "time": "1709294400123"
+      }
+    ]
+  },
+  "provider": "BYBIT_LINEAR",
+  "ratified_golden": false,
+  "semantic_claim": "A base-denominated OI with a provider-supplied quote value must keep both; the quote value is a provider claim, not our conversion.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_OPEN_INTEREST",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /v5/market/tickers",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#bybit_linear"
+  },
+  "supports_checkpoint": "I12",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "ticker time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "time",
+    "timezone": "UTC"
+  },
+  "venue": "BYBIT_LINEAR"
+}

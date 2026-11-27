@@ -1,0 +1,78 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "b49ccf917375d5b8c8ccc4d67e34941cf4e85bad629193ba3ddac2225b159159",
+  "expectation": {
+    "canonical_metric_requires": [
+      "methodology_id",
+      "lineage",
+      "equivalence_class"
+    ],
+    "derived_spread_permitted_at_t1": false,
+    "equivalence_class_if_derived": "NOT_COMPARABLE_AS_PROVIDER_NATIVE",
+    "kind": "NORMALIZE",
+    "provider_native_metric": "ABSENT"
+  },
+  "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK_METRIC-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "10",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "BTC-PERPETUAL",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "absence is established for the reviewed routes only, not for every CoinGlass/other aggregator",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "ask_price": "USD",
+    "bid_price": "USD",
+    "metric": "NOT_PROVIDED",
+    "unit_status": "NO_NATIVE_METRIC"
+  },
+  "payload": {
+    "ask_price": 61232.5,
+    "bid_price": 61230.5,
+    "instrument_name": "BTC-PERPETUAL",
+    "mark_price": 61231.0,
+    "volume": 120034.5
+  },
+  "provider": "DERIBIT",
+  "ratified_golden": false,
+  "semantic_claim": "No reviewed free route publishes a provider-native spread/depth/imbalance with a documented methodology, so a T1 book metric would be FABRIC-defined and must carry a registered methodology instead of claiming provider nativity.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_METRIC",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v2/public/get_book_summary_by_instrument",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#deribit"
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "current summary",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "NONE",
+    "timestamp_field": "none",
+    "timezone": "UTC"
+  },
+  "venue": "DERIBIT"
+}

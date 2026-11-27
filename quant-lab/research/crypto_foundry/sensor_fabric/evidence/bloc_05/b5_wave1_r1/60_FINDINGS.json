@@ -1,0 +1,165 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "mission": "SENSOR-B5-WAVE1-INDEPENDENT-AND-GOLDEN-FIXTURES-R1",
+  "target": "B5_WAVE1_INDEPENDENT_VERIFICATION_AND_FIXTURE_PROGRESS",
+  "authority_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+  "accepted_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+  "findings": [
+    {
+      "id": "F1",
+      "checkpoint": "I12",
+      "severity": "material_evidence_dependency",
+      "title": "Binance OI unit and bucket aggregation function are undocumented",
+      "detail": "The frozen route family (futures/data/openInterestHist) returns sumOpenInterest and sumOpenInterestValue per bucket. Neither the unit of sumOpenInterest (contracts vs base) nor the aggregation function (last vs average) is documented in the repository. A normalizer that selects one would invent semantics.",
+      "expected_behaviour": "Emit OI_UNIT_UNVERIFIED with the native values preserved and oi_usd blocked; do not select a single canonical native quantity.",
+      "fixtures": [
+        "FX-A-BINANCE_USDM-BTCUSDT-OI-001",
+        "FX-A-BINANCE_USDM-ETHUSDT-OI-001"
+      ],
+      "owner": "Agent 1 + provider evidence capture",
+      "is_code_defect": false
+    },
+    {
+      "id": "F2",
+      "checkpoint": "I13",
+      "severity": "material_evidence_dependency",
+      "title": "Funding interval is not carried by every reviewed route",
+      "detail": "Bybit funding history does not return the interval; Kraken's analytics route returns a sampled series whose sample interval is not the funding interval. Defaulting either to 8h would produce an interval-substitution error (8x or 1x misstatement).",
+      "expected_behaviour": "Refuse FUNDING_INTERVAL_UNVERIFIED unless interval evidence exists per instrument and time; keep the native rate and effective time.",
+      "fixtures": [
+        "FX-A-BYBIT_LINEAR-BTCUSDT-FUNDING-001",
+        "FX-A-KRAKEN_FUTURES-PI_XBTUSD-FUNDING-001",
+        "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001"
+      ],
+      "owner": "Agent 1 + provider evidence capture",
+      "is_code_defect": false
+    },
+    {
+      "id": "F3",
+      "checkpoint": "I14",
+      "severity": "material_semantic_dependency",
+      "title": "No reviewed free route publishes a provider-native book metric",
+      "detail": "The frozen contract permits provider-native spread/liquidity/slippage metrics as T1 evidence. Across Binance, Gate, Deribit, OKX, Bybit and Kraken free documentation reviewed here, only bid/ask and volume fields are published, from which a metric would be derived. A derived metric must therefore carry a registered methodology and must not claim provider nativity. DEPTH_BPS_RECONSTRUCTION_V1 exists in the methodology registry but is PROVISIONAL and unadmitted.",
+      "expected_behaviour": "Record MECHANICAL_BOOK_METRIC rows as Fabric-defined with methodology and lineage, or refuse them; never label a derived spread as provider-native.",
+      "fixtures": ["FX-A-DERIBIT-BTC-PERPETUAL-BOOK_METRIC-001"],
+      "owner": "Agent 1 (I14) + operator (methodology admission)",
+      "is_code_defect": false
+    },
+    {
+      "id": "F4",
+      "checkpoint": "I15",
+      "severity": "material_semantic_dependency",
+      "title": "No provider-native basis; positioning populations are not interchangeable",
+      "detail": "No reviewed route publishes a basis field, so a basis is always derived and must name MARK vs INDEX. Positioning ratios differ by population (top-trader accounts vs all accounts vs positions), so equal field names do not establish comparability. Cross-venue basis synthesis is forbidden at T1.",
+      "expected_behaviour": "Refuse BASIS_REFERENCE_UNVERIFIED and POSITIONING_POPULATION_UNVERIFIED; refuse cross-venue basis and cross-provider ratio equivalence.",
+      "fixtures": [
+        "FX-A-BINANCE_USDM-BTCUSDT-BASIS-001",
+        "FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001",
+        "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001",
+        "FX-B-BASIS-REFERENCE-SUBSTITUTION-001",
+        "FX-B-POSITIONING-POPULATION-SUBSTITUTION-001"
+      ],
+      "owner": "Agent 1 (I15)",
+      "is_code_defect": false
+    },
+    {
+      "id": "F5",
+      "checkpoint": "I20",
+      "severity": "material_evidence_dependency",
+      "title": "No first-party captured payload bytes are retained in the repository",
+      "detail": "Bloc 2 capability evidence is existence/metadata level (E0_CLAIM_ONLY, E4_MULTI_ERA_VERIFIED, 'SOURCE_AVAILABILITY_VERIFIED only'). Bloc 3 network-smoke evidence records HTTP status, row counts and raw_content_hash but not payload bytes. Therefore no fixture can be a captured provider record, and no fixture in this corpus can be ratified as golden evidence without fabricating the payload.",
+      "expected_behaviour": "Retain one captured payload per (provider, sensor family, instrument) with SHA-256, endpoint, request fingerprint and acquisition time, before I20 ratification.",
+      "fixtures": ["all TIER_A and TIER_C records"],
+      "owner": "Agent 1 + operator (capture retention policy)",
+      "is_code_defect": false
+    },
+    {
+      "id": "F6",
+      "checkpoint": "I16",
+      "severity": "blocking_for_lineage_gate",
+      "title": "No lineage package and no deterministic T1 identity",
+      "detail": "normalization/lineage does not exist, T1 records carry no id field, and normalization_generation is a caller-supplied passthrough. Only 2 of 8 sensor families are implemented.",
+      "expected_behaviour": "Do not claim LINEAGE_GATE. Close it only after I12-I15 publish and a content-addressed id exists.",
+      "fixtures": [],
+      "owner": "Agent 1 (I16)",
+      "is_code_defect": false
+    },
+    {
+      "id": "F7",
+      "checkpoint": "I08",
+      "severity": "observation_positive_control",
+      "title": "B5_I08_UNITS_V1 is absent from the methodology registry, so every *_usd stays blocked",
+      "detail": "The registry holds 9 methodology ids, all PROVISIONAL, and B5_I08_UNITS_V1 is not among them. The executable trade normalizer therefore blocks notional_usd with unresolved_citation=B5_I08_UNITS_V1 and raises UNIT_CONVERSION_BLOCKED plus STABLECOIN_CONVERSION_UNAVAILABLE where a stablecoin quote is present. This matches the documented UNIT_GATE state and is verified as a positive control, not a defect.",
+      "expected_behaviour": "Keep oi_usd and any rate-based USD figure blocked until the operator admits the units methodology.",
+      "fixtures": ["FX-A-BINANCE_USDM-BTCUSDT-TRADE-003", "FX-B-STABLECOIN-1TO1-001"],
+      "owner": "operator (I08 admission)",
+      "is_code_defect": false
+    },
+    {
+      "id": "F8",
+      "checkpoint": "I10/I11",
+      "severity": "positive",
+      "title": "Published families hold every independent control",
+      "detail": "20/20 fixture assertions and 10/10 property controls passed through the real entry points, including native-value survival, no-authority canonical refusal, stablecoin non-parity, position/execution separation, null-not-zero and byte-identical output across hash seeds and timezones.",
+      "expected_behaviour": "Preserve; I12-I15 must inherit these laws.",
+      "fixtures": ["04_i10_i11_fixture_execution.json", "05_i21_property_controls.json"],
+      "owner": "none",
+      "is_code_defect": false
+    },
+    {
+      "id": "F9",
+      "checkpoint": "I14",
+      "severity": "process",
+      "title": "Sequence-gap fixture interface proposed, no block issued",
+      "detail": "The 8-case matrix is normalizer-agnostic and contains no code dependency. Consuming it needs a snapshot cursor, an ordered update list with (U,u,pu) or (seq,prevSeq), and an explicit recovery-snapshot argument with an authorization reference. No Agent 1 process was stopped for documentation work.",
+      "expected_behaviour": "Adopt or adjust the interface when I14 publishes; the expectations are frozen-vocabulary refusals, not new semantics.",
+      "fixtures": ["the eight FX-B-SEQ-* records"],
+      "owner": "none",
+      "is_code_defect": false
+    },
+    {
+      "id": "F10",
+      "checkpoint": "carrier",
+      "severity": "process_self_disclosure",
+      "title": "The audit-r4 carrier's production tree trails the accepted candidate",
+      "detail": "Cutting the Wave 1 branch from a59fa4002 produced a production tree differing from 66200f3cb in nine files: normalization/consumer/custody_authority.py, normalization/consumer/policy.py, and seven P3 consumer/replay test modules. The audit lineage forked before the candidate's F4/F5 repairs, and the audit commits themselves carry only evidence. The probe-relevant modules are identical on both trees.",
+      "expected_behaviour": "Publish evidence on a carrier whose production tree equals the accepted candidate, and disclose the divergence rather than silently correcting it.",
+      "resolution": "Evidence re-based on 96f4cd28e (production tree byte-identical to 66200f3cb) and the harness re-run; all seven result artifacts reproduced byte-for-byte. Prior audit branch preserved unchanged.",
+      "fixtures": [],
+      "owner": "resolved by this package",
+      "is_code_defect": false
+    }
+  ],
+  "deliverable_map": {
+    "fixture_inventory_and_digests": "fixtures/corpus_manifest.json",
+    "actual_provider_coverage": "results/02_corpus_validation.json#coverage",
+    "synthetic_adversarial_fixture_inventory": "fixtures/synthetic/ (28 records)",
+    "independent_i12_i15_results": "results/03_i12_i15_rolling_verification.json",
+    "i16_preparation_results": "results/06_i16_lineage_id_preparation.json",
+    "i21_property_controls": "results/05_i21_property_controls.json",
+    "material_findings_and_repair_requirements": "this file",
+    "remaining_fixture_and_authority_dependencies": "README.md section 10",
+    "coinglass_benchmark": "50_COINGLASS_BENCHMARK.md",
+    "checkpoint_state": "results/01_checkpoint_state.json",
+    "run_summary": "results/07_run_summary.json"
+  },
+  "counts": {
+    "fixtures": 58,
+    "tier_a": 27,
+    "tier_b": 28,
+    "tier_c": 3,
+    "fixtures_pending_i12_i15": 44,
+    "fixture_assertions_passed": 20,
+    "property_controls_passed": 10,
+    "ratified_golden": 0
+  },
+  "non_claims": [
+    "not organizationally independent",
+    "no gate claimed",
+    "no provider semantics established",
+    "no provider approved",
+    "no fixture ratified",
+    "no claim that any I12-I15 behaviour is correct",
+    "no production, test or manifest change"
+  ]
+}

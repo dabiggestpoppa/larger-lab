@@ -1,0 +1,68 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "b99af37b90fc88fb06aa6906006cc1f2c24ed40f6ddd6ba56051fb6f4c6c2de2",
+  "expectation": {
+    "code": "FUNDING_INTERVAL_UNVERIFIED",
+    "eight_hour_equivalent": null,
+    "native_value_preserved": "0.0001",
+    "outcome": "REFUSE"
+  },
+  "fixture_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves the refusal contract only",
+    "proves nothing about actual provider semantics"
+  ],
+  "native_units": {
+    "unit_status": "ADVERSARIAL"
+  },
+  "payload": {
+    "declared_interval_seconds": 28800,
+    "fundingRate": "0.0001",
+    "true_interval_seconds": 3600
+  },
+  "provider": "BYBIT_LINEAR",
+  "ratified_golden": false,
+  "semantic_claim": "A 1h funding rate relabelled as an 8h rate is an 8x overstated cost and must be refused.",
+  "semantic_claim_scope": "REFUSAL_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_FUNDING",
+  "source": {
+    "documentation_ref": "bloc_05/04 section 5.1-5.2",
+    "endpoint": "constructed adversarial case",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I13",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "constructed",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "synthetic",
+    "timezone": "UTC"
+  },
+  "venue": "BYBIT_LINEAR"
+}

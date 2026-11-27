@@ -1,0 +1,166 @@
+{
+  "check_count": 20,
+  "checks": [
+    {
+      "check_id": "FX-A-...-TRADE-001/1",
+      "expected": "61234.50",
+      "law": "native price preserved",
+      "observed": "61234.50",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-001/2",
+      "expected": "0.250",
+      "law": "native quantity preserved",
+      "observed": "0.250",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-001/3",
+      "expected": "UNKNOWN",
+      "law": "canonical aggressor side UNKNOWN",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-001/4",
+      "expected": "SELL",
+      "law": "provisional side SELL under the documented row",
+      "observed": "SELL",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-001/5",
+      "expected": true,
+      "law": "notional_usd blocked",
+      "observed": true,
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-001/6",
+      "expected": [
+        "SEMANTICS_UNVERIFIED"
+      ],
+      "law": "SEMANTICS_UNVERIFIED present",
+      "observed": [
+        "SEMANTICS_UNVERIFIED",
+        "UNIT_CONVERSION_BLOCKED",
+        "LINEAGE_COMPLETE"
+      ],
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-002/1",
+      "expected": "BUY",
+      "law": "mirrored provisional side BUY",
+      "observed": "BUY",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-002/2",
+      "expected": "UNKNOWN",
+      "law": "mirrored canonical side UNKNOWN",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-003/1",
+      "expected": [
+        "STABLECOIN_CONVERSION_UNAVAILABLE"
+      ],
+      "law": "stablecoin USD conversion unavailable flag",
+      "observed": [
+        "SEMANTICS_UNVERIFIED",
+        "UNIT_CONVERSION_BLOCKED",
+        "STABLECOIN_CONVERSION_UNAVAILABLE",
+        "LINEAGE_COMPLETE"
+      ],
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-003/2",
+      "expected": null,
+      "law": "USD twin not emitted",
+      "observed": null,
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-...-TRADE-003/3",
+      "expected": "B5_I08_UNITS_V1",
+      "law": "unresolved citation names the units methodology",
+      "observed": "B5_I08_UNITS_V1",
+      "passed": true
+    },
+    {
+      "check_id": "FX-B-TRADE-AGGRESSOR/1",
+      "expected": "UNKNOWN",
+      "law": "price direction cannot admit a side",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-B-LIQ-COLLAPSE/1",
+      "expected": "UNKNOWN",
+      "law": "collapsed side leaves position UNKNOWN",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-B-LIQ-COLLAPSE/2",
+      "expected": "UNKNOWN",
+      "law": "collapsed side leaves execution UNKNOWN",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-LIQ-SEPARATION/1",
+      "expected": "LONG",
+      "law": "position side preserved provisionally",
+      "observed": "LONG",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-LIQ-SEPARATION/2",
+      "expected": "SELL",
+      "law": "execution side preserved provisionally",
+      "observed": "SELL",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-LIQ-SEPARATION/3",
+      "expected": "UNKNOWN",
+      "law": "canonical position side not promoted",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-LIQ-SEPARATION/4",
+      "expected": "UNKNOWN",
+      "law": "canonical execution side not promoted",
+      "observed": "UNKNOWN",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-LIQ-SEPARATION/5",
+      "expected": "NOT_APPLICABLE",
+      "law": "zero interval state not applicable",
+      "observed": "NOT_APPLICABLE",
+      "passed": true
+    },
+    {
+      "check_id": "FX-A-LIQ-SEPARATION/6",
+      "expected": true,
+      "law": "liquidation_usd blocked",
+      "observed": true,
+      "passed": true
+    }
+  ],
+  "executed_against": [
+    "normalize_trade (I10E1)",
+    "normalize_liquidation (I11F1)"
+  ],
+  "failed": 0,
+  "passed": 20,
+  "scope_note": "only the fixtures whose sensor family has a published entry point were executed; all I12-I15 fixtures remain unexecuted by design",
+  "verdict": "POSITIVE_CONTROLS_HOLD"
+}

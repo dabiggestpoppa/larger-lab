@@ -1,0 +1,27 @@
+{
+  "accepted_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+  "authority_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+  "corpus_digest": "b15278b0696036dbdcce7dafa1fab677ba22daa01ce4c9403ba4eda13aa6295b",
+  "corpus_verdict": "CORPUS_VALID_UNRATIFIED",
+  "fixture_count": 58,
+  "fixtures_ratified": false,
+  "gates_claimed": [],
+  "i10_i11_checks": {
+    "failed": 0,
+    "passed": 20
+  },
+  "i12_i15_verdict": "NO_I12_I15_CLAIM_ADMISSIBLE",
+  "i16_state": "BLOCKED_PENDING_IMPLEMENTATION",
+  "i21_controls": {
+    "determinism_digest": "3cf2ffde4b73100fd63db9e2c610307d50b243e00116cd8f5a3ab96bf523f7a5",
+    "failed": 0,
+    "passed": 10
+  },
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "manifest_modified": false,
+  "mission": "SENSOR-B5-WAVE1-INDEPENDENT-AND-GOLDEN-FIXTURES-R1",
+  "production_source_modified": false,
+  "provider_approved": false,
+  "run_digest": "3beec3bafcfd296e7a26f6706517c053ba9d12d0d91a310ef80697e2b5cd6e0d",
+  "target": "B5_WAVE1_INDEPENDENT_VERIFICATION_AND_FIXTURE_PROGRESS"
+}

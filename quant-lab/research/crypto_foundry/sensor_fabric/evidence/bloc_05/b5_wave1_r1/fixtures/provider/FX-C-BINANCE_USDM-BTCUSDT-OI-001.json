@@ -1,0 +1,71 @@
+{
+  "acquisition_provenance": {
+    "captured_from_provider": false,
+    "evidence_recorded_by": "Bloc 2 probe programme",
+    "method": "PROVIDER_EVIDENCE_REFERENCE",
+    "network_calls": 0,
+    "payload_available_offline": false
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "c2c3bbd58dd6078c5c217c0b6315334351eed8b28ee63aa0128cc158be06e3d5",
+  "expectation": {
+    "kind": "BLOCKED_PENDING_PAYLOAD",
+    "reason": "the recorded evidence is metadata/existence evidence, not captured payload bytes",
+    "usable_as_fixture_input": false
+  },
+  "fixture_id": "FX-C-BINANCE_USDM-BTCUSDT-OI-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "SOURCE_AVAILABILITY_VERIFIED only - metadata/existence evidence, rows not inspected",
+    "cannot be executed as a fixture; requires a first-party captured payload to become TIER_A"
+  ],
+  "native_units": {
+    "unit_status": "NOT_ESTABLISHED_FROM_EVIDENCE"
+  },
+  "payload": {
+    "evidence_ids": [
+      "binance_usdm_open_interest_btcusdt_RECENT_CONTROL_1h",
+      "binance_usdm_archive_metrics_btcusdt_2021-06-15",
+      "binance_usdm_archive_metrics_btcusdt_2026-06-15"
+    ],
+    "evidence_level": "E4_MULTI_ERA_VERIFIED",
+    "payload_available_offline": false
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "Binance USD-M OI source availability is verified across eras; row timestamps and schema were not inspected, so no unit or interval claim is supported by this evidence.",
+  "semantic_claim_scope": "PROVIDER_EVIDENCE_EXISTENCE_ONLY",
+  "sensor_family": "MECHANICAL_OPEN_INTEREST",
+  "source": {
+    "documentation_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl",
+    "endpoint": "recorded in bloc_02 capability claims",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "EVIDENCE_RECORDED",
+    "kind": "PROVIDER_EVIDENCE_REFERENCE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm"
+  },
+  "supports_checkpoint": "I20",
+  "synthetic": true,
+  "tier": "TIER_C_PROVIDER_EVIDENCE_REFERENCED",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "evidence records availability, not timestamp semantics",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "unknown",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

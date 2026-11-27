@@ -1,0 +1,75 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "90b57e7925be7e201dcd9e0e69090a32b25cd75ccb0b66cb32916e306d80b50f",
+  "expectation": {
+    "contract_multiplier_unit": "USD_PER_CONTRACT",
+    "kind": "NORMALIZE",
+    "linear_formula_applied": "REFUSED",
+    "oi_native_unit": "CONTRACTS",
+    "oi_usd": "81234000.00"
+  },
+  "fixture_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "100",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "BTC-USD-SWAP",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "payload values are authored",
+    "inverse exposure conversion needs PIT terms"
+  ],
+  "native_units": {
+    "ctVal": "USD_PER_CONTRACT",
+    "oi": "CONTRACTS",
+    "unit_status": "INVERSE_CONTRACT_DENOMINATED"
+  },
+  "payload": {
+    "ctVal": "100",
+    "instId": "BTC-USD-SWAP",
+    "instType": "SWAP",
+    "oi": "812340",
+    "oiCcy": "13265.20",
+    "oiUsd": "81234000.00",
+    "ts": "1709294400123"
+  },
+  "provider": "OKX_SWAP",
+  "ratified_golden": false,
+  "semantic_claim": "The inverse sibling shares the route but not the unit algebra; the same multiplier must not be applied to a linear and an inverse contract.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_OPEN_INTEREST",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v5/public/open-interest",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#okx_swap"
+  },
+  "supports_checkpoint": "I12",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "response time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "ts",
+    "timezone": "UTC"
+  },
+  "venue": "OKX_SWAP"
+}

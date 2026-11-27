@@ -1,0 +1,92 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "bb9d9f1c784b619d9cabbfde60b94ae21b4222b8ee7af7ffe614faf0ca7934cf",
+  "expectation": {
+    "is_full_snapshot": false,
+    "kind": "NORMALIZE",
+    "requires_sequence_reconstruction": true,
+    "standalone_book_claim": "REFUSED",
+    "update_semantics": "DELTA_UPDATE"
+  },
+  "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-002",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "payload values are authored"
+  ],
+  "native_units": {
+    "level_quantity": "BTC",
+    "price": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "E": 1709294400123,
+    "U": 1027025,
+    "a": [
+      [
+        "61231.10",
+        "0.000"
+      ],
+      [
+        "61231.80",
+        "1.250"
+      ]
+    ],
+    "b": [
+      [
+        "61230.20",
+        "0.000"
+      ],
+      [
+        "61229.90",
+        "3.100"
+      ]
+    ],
+    "e": "depthUpdate",
+    "pu": 1027024,
+    "u": 1027040
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "A diff update is not a book; it carries U/u/pu and may only become a complete book through sequence-safe reconstruction.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "WS <symbol>@depth (diff)",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "FIRST_PARTY_DOCUMENTED_IN_REPO",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm"
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "event time of the depth update",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "E",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

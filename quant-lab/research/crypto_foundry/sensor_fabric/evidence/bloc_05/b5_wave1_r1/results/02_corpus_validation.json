@@ -1,0 +1,62 @@
+{
+  "corpus_digest_matches": true,
+  "corpus_version": "b5-wave1-r1",
+  "coverage": {
+    "all_sensor_families_covered": true,
+    "altcoin_present": true,
+    "assets": [
+      "BTC",
+      "ETH"
+    ],
+    "at_least_three_providers": true,
+    "btc_present": true,
+    "contract_types": [
+      "INVERSE_PERPETUAL",
+      "LINEAR_PERPETUAL"
+    ],
+    "inverse_present": true,
+    "linear_present": true,
+    "missing_sensor_families": [],
+    "provider_count": 7,
+    "providers": [
+      "BINANCE_USDM",
+      "BYBIT_LINEAR",
+      "COINALYZE",
+      "DERIBIT",
+      "GATE_FUTURES",
+      "KRAKEN_FUTURES",
+      "OKX_SWAP"
+    ],
+    "sensor_families": [
+      "MECHANICAL_BASIS",
+      "MECHANICAL_BOOK_METRIC",
+      "MECHANICAL_BOOK_SNAPSHOT",
+      "MECHANICAL_FUNDING",
+      "MECHANICAL_LIQUIDATION",
+      "MECHANICAL_OPEN_INTEREST",
+      "MECHANICAL_POSITIONING",
+      "MECHANICAL_TRADE"
+    ]
+  },
+  "digest_mismatches": [],
+  "fixture_count": 58,
+  "fixtures_executable_against_implemented_entry_points": [
+    "FX-A-BINANCE_USDM-BTCUSDT-TRADE-001",
+    "FX-A-BINANCE_USDM-BTCUSDT-TRADE-002",
+    "FX-A-BINANCE_USDM-BTCUSDT-TRADE-003",
+    "FX-A-DERIBIT-BTC-PERPETUAL-TRADE-001",
+    "FX-A-GATE_FUTURES-BTC_USDT-LIQUIDATION-001",
+    "FX-A-KRAKEN_FUTURES-PI_XBTUSD-TRADE-001"
+  ],
+  "manifest_corpus_digest": "b15278b0696036dbdcce7dafa1fab677ba22daa01ce4c9403ba4eda13aa6295b",
+  "missing_required_metadata": [],
+  "ratified_golden_count": 0,
+  "recomputed_corpus_digest": "b15278b0696036dbdcce7dafa1fab677ba22daa01ce4c9403ba4eda13aa6295b",
+  "tier_counts": {
+    "TIER_A_DOCUMENTED_FIELD_SHAPE": 27,
+    "TIER_B_SYNTHETIC_ADVERSARIAL": 28,
+    "TIER_C_PROVIDER_EVIDENCE_REFERENCED": 3
+  },
+  "tier_law_violations": [],
+  "verdict": "CORPUS_VALID_UNRATIFIED"
+}

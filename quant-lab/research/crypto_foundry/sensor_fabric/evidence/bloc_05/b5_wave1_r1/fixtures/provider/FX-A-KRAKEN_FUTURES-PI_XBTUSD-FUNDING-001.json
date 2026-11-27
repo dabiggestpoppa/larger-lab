@@ -1,0 +1,77 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "c00f15b77c02d8adf314683c1b392c3761821a386365f2b060bb2d8bbc25a0f1",
+  "expectation": {
+    "funding_interval_seconds": "UNRESOLVED",
+    "kind": "NORMALIZE",
+    "sample_interval_as_funding_interval": "REFUSED",
+    "sample_interval_seconds": 3600
+  },
+  "fixture_id": "FX-A-KRAKEN_FUTURES-PI_XBTUSD-FUNDING-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "PI_XBTUSD",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "funding interval for this route is not documented in the frozen registry",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "relativeFundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+    "unit_status": "INTERVAL_UNDOCUMENTED"
+  },
+  "payload": {
+    "rates": [
+      {
+        "relativeFundingRate": 1.25e-05,
+        "time": 1709294400
+      },
+      {
+        "relativeFundingRate": 1.31e-05,
+        "time": 1709298000
+      }
+    ],
+    "result": "success"
+  },
+  "provider": "KRAKEN_FUTURES",
+  "ratified_golden": false,
+  "semantic_claim": "Kraken publishes relative funding as a time series whose sampling interval is not the funding interval; the two must not be conflated.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_FUNDING",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/charts/v1/analytics/PI_XBTUSD/funding_rate",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#kraken_futures"
+  },
+  "supports_checkpoint": "I13",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": true,
+    "market_available_at_established": false,
+    "meaning": "sample time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "SECOND",
+    "timestamp_field": "time",
+    "timezone": "UTC"
+  },
+  "venue": "KRAKEN_FUTURES"
+}

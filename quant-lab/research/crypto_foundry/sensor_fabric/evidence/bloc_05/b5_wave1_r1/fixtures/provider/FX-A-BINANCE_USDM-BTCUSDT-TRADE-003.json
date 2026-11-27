@@ -1,0 +1,76 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": true,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "423862629ef44f5527ce7954226b47be2aaa5c39eb1054e516d9d692c3fa98ca",
+  "expectation": {
+    "flag_required": "STABLECOIN_CONVERSION_UNAVAILABLE",
+    "kind": "NORMALIZE",
+    "notional_usd": "BLOCKED",
+    "unresolved_citation": "B5_I08_UNITS_V1",
+    "usd_parity_assumed": false
+  },
+  "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-TRADE-003",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "payload values are authored",
+    "USD conversion methodology unadmitted"
+  ],
+  "native_units": {
+    "notional": "USDT",
+    "price": "USDT",
+    "quantity": "USDT",
+    "unit_status": "STABLECOIN_QUOTE_UNCONVERTED"
+  },
+  "payload": {
+    "T": 1709294400200,
+    "a": 593303,
+    "e": "aggTrade",
+    "isBuyerMaker": true,
+    "m": true,
+    "p": "61236.00",
+    "q": "15309.00"
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "A USDT-quoted native quantity must not acquire a USD twin: no 1 USDT = 1 USD assumption is admissible while B5_I08_UNITS_V1 is unadmitted.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_TRADE",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /fapi/v1/aggTrades",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm"
+  },
+  "supports_checkpoint": "I10",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "aggressor trade time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "T",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

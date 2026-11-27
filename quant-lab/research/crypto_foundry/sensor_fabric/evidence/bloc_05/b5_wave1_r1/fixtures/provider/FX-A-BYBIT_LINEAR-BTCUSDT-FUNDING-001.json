@@ -1,0 +1,75 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "8ec26f5d3b051a396b4b4397b5d4dbbbae9eefb6eb88747a6a2a67187572f886",
+  "expectation": {
+    "eight_hour_default": "REFUSED",
+    "funding_interval_seconds": "REQUIRES_INTERVAL_EVIDENCE_NOT_DEFAULTED",
+    "funding_rate_native_preserved": "0.00012345",
+    "kind": "NORMALIZE"
+  },
+  "fixture_id": "FX-A-BYBIT_LINEAR-BTCUSDT-FUNDING-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "the history route does not return the interval; interval must come from instrument metadata",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "fundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "category": "linear",
+    "list": [
+      {
+        "fundingRate": "0.00012345",
+        "fundingRateTimestamp": "1709316000000",
+        "symbol": "BTCUSDT"
+      }
+    ],
+    "symbol": "BTCUSDT"
+  },
+  "provider": "BYBIT_LINEAR",
+  "ratified_golden": false,
+  "semantic_claim": "Bybit changes its funding interval per instrument over time; the interval is not a constant and cannot be defaulted to 8h.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_FUNDING",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /v5/market/funding/history",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#bybit_linear"
+  },
+  "supports_checkpoint": "I13",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "funding effective time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "fundingRateTimestamp",
+    "timezone": "UTC"
+  },
+  "venue": "BYBIT_LINEAR"
+}

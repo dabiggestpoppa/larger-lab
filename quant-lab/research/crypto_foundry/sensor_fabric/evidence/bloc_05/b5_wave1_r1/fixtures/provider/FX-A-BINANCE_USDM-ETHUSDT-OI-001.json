@@ -1,0 +1,71 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "5fed816dd226f9c3645f9289744b7571e84b915893330b2f7257afb244732019",
+  "expectation": {
+    "btc_resolution_projected": false,
+    "flag_required": "OI_UNIT_UNVERIFIED",
+    "kind": "NORMALIZE",
+    "oi_native_unit": "UNVERIFIED"
+  },
+  "fixture_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001",
+  "instrument": {
+    "canonical_asset": "ETH",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "ETHUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "altcoin unit semantics equally unverified",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "oi_native": "CONTRACTS_OR_BASE_AMBIGUOUS",
+    "oi_secondary": "USDT",
+    "unit_status": "AMBIGUOUS_BLOCKING"
+  },
+  "payload": {
+    "sumOpenInterest": "1204550.12",
+    "sumOpenInterestValue": "3611233444.00",
+    "symbol": "ETHUSDT",
+    "timestamp": 1709294400000
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "The altcoin instrument reaches the same unit ambiguity as BTC; a BTC-only resolution must not be projected onto ETH.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_OPEN_INTEREST",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /futures/data/openInterestHist",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm"
+  },
+  "supports_checkpoint": "I12",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": true,
+    "market_available_at_established": false,
+    "meaning": "bucket start",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "timestamp",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

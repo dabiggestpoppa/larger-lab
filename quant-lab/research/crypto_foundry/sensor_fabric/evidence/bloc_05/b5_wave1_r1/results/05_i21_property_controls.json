@@ -1,0 +1,118 @@
+{
+  "control_count": 10,
+  "controls": [
+    {
+      "control_id": "P1",
+      "detail": {
+        "digest": "b49c1ca9a4f594adbd8825bf86a57559cadd869582713eba497b67ba6993d8b7"
+      },
+      "law": "identical input yields byte-identical record",
+      "passed": true
+    },
+    {
+      "control_id": "P2",
+      "detail": {
+        "interleaved_digest": "630d15f7bb054b99eab07a0aa56068a759b48bc848305f03b2248773db31c73c",
+        "repeat_digest": "b49c1ca9a4f594adbd8825bf86a57559cadd869582713eba497b67ba6993d8b7"
+      },
+      "law": "execution-order change does not alter a record",
+      "passed": true
+    },
+    {
+      "control_id": "P3",
+      "detail": {
+        "price": "61234.50",
+        "quantity": "0.250"
+      },
+      "law": "native value survival: price and quantity unchanged",
+      "passed": true
+    },
+    {
+      "control_id": "P4",
+      "detail": {
+        "blocked": true,
+        "reason": "CONVERSION_BLOCKED",
+        "value": null
+      },
+      "law": "null is not zero: blocked amounts are None",
+      "passed": true
+    },
+    {
+      "control_id": "P5",
+      "detail": {
+        "declared_indices": [
+          8,
+          10,
+          21
+        ],
+        "flags": [
+          "SEMANTICS_UNVERIFIED",
+          "UNIT_CONVERSION_BLOCKED",
+          "LINEAGE_COMPLETE"
+        ]
+      },
+      "law": "canonical flags are unique and follow the declared canonical order",
+      "passed": true
+    },
+    {
+      "control_id": "P6",
+      "detail": {
+        "binance": "b49c1ca9a4f594adbd8825bf86a57559cadd869582713eba497b67ba6993d8b7",
+        "gate": "c08e782bdcfdd411d19fd5c69d7546a7ec0bbc69399b44e4f6de32c3d40fbed3"
+      },
+      "law": "no cross-venue dedupe: same economics, different venue stays distinct",
+      "passed": true
+    },
+    {
+      "control_id": "P7",
+      "detail": {
+        "diagnostic_registry": "UNKNOWN",
+        "without_registry": "UNKNOWN"
+      },
+      "law": "registry shape is not authority: canonical side UNKNOWN in both cases",
+      "passed": true
+    },
+    {
+      "control_id": "P8",
+      "detail": {
+        "blocked": true,
+        "value": null
+      },
+      "law": "liquidation null is not zero: blocked USD stays None",
+      "passed": true
+    },
+    {
+      "control_id": "P9",
+      "detail": {
+        "liquidation": {
+          "clean": true,
+          "violations": []
+        },
+        "terms_conversion": {
+          "clean": true,
+          "violations": []
+        },
+        "trade": {
+          "clean": true,
+          "violations": []
+        }
+      },
+      "law": "normalizer code is network-free and clock-free",
+      "passed": true
+    },
+    {
+      "control_id": "P10",
+      "detail": {
+        "blocked": true,
+        "value": null
+      },
+      "law": "reversal: a record cannot hold a canonical amount with value None",
+      "passed": true
+    }
+  ],
+  "determinism_digest": "3cf2ffde4b73100fd63db9e2c610307d50b243e00116cd8f5a3ab96bf523f7a5",
+  "failed": 0,
+  "passed": 10,
+  "scope": "properties executable against I10/I11 today; I12-I15 properties are declared, not claimed",
+  "verdict": "PROPERTIES_HOLD"
+}

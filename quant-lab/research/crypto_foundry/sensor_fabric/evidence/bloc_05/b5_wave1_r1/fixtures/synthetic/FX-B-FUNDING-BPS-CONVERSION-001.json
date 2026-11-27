@@ -1,0 +1,69 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "87f9539a6f8919268a760260a528a54e94445d341f7f41549dbb676d0d9925c5",
+  "expectation": {
+    "code": "BPS_CONVERSION_REFUSED",
+    "correct_percent": "0.0125",
+    "must_state_convention": true,
+    "outcome": "REFUSE_OR_CORRECT",
+    "wrong_percent": "1.25"
+  },
+  "fixture_id": "FX-B-FUNDING-BPS-CONVERSION-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTC-USDT-SWAP",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves the refusal contract only",
+    "proves nothing about actual provider semantics"
+  ],
+  "native_units": {
+    "unit_status": "ADVERSARIAL"
+  },
+  "payload": {
+    "claimed_percent": "0.0125",
+    "rate_bps": "1.25",
+    "requested_output": "PERCENT"
+  },
+  "provider": "OKX_SWAP",
+  "ratified_golden": false,
+  "semantic_claim": "1 bp is 0.01% = 0.0001 as a fraction; a bps-to-percent slip silently divides the rate by 100.",
+  "semantic_claim_scope": "REFUSAL_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_FUNDING",
+  "source": {
+    "documentation_ref": "bloc_05/03 section 4",
+    "endpoint": "constructed adversarial case",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I13",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "constructed",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "synthetic",
+    "timezone": "UTC"
+  },
+  "venue": "OKX_SWAP"
+}

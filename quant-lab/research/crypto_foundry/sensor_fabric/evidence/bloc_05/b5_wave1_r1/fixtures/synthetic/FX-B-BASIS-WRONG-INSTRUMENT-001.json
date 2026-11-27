@@ -1,0 +1,67 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "INVERSE_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "6874b069ec322c7a4225272798ccaa04e71da1793201af7fec17ec82e15e771a",
+  "expectation": {
+    "basis_value_emitted": null,
+    "code": "BASIS_REFERENCE_INSTRUMENT_MISMATCH",
+    "outcome": "REFUSE"
+  },
+  "fixture_id": "FX-B-BASIS-WRONG-INSTRUMENT-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "10",
+    "contract_type": "INVERSE_PERPETUAL",
+    "multiplier_unit": "USD",
+    "native_symbol": "BTC-PERPETUAL",
+    "quote_asset": "USD",
+    "settlement_asset": "BTC"
+  },
+  "known_limitations": [
+    "synthetic: proves the refusal contract only",
+    "proves nothing about actual provider semantics"
+  ],
+  "native_units": {
+    "unit_status": "ADVERSARIAL"
+  },
+  "payload": {
+    "futures_instrument": "BTC-PERPETUAL",
+    "spot_price": "2110.5",
+    "spot_reference_instrument": "ETHUSDT"
+  },
+  "provider": "DERIBIT",
+  "ratified_golden": false,
+  "semantic_claim": "A reference price for a different instrument (ETH) must be refused for a BTC basis even if the timestamp is valid.",
+  "semantic_claim_scope": "REFUSAL_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_BASIS",
+  "source": {
+    "documentation_ref": "bloc_05/04 section 9",
+    "endpoint": "constructed adversarial case",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I15",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "constructed",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "synthetic",
+    "timezone": "UTC"
+  },
+  "venue": "DERIBIT"
+}

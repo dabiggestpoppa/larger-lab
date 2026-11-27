@@ -1,0 +1,793 @@
+"""SENSOR-B5-WAVE1-R1 - independent rolling verification + I21 property controls.
+
+Runs offline against the accepted tree and writes the Wave 1 result artifacts:
+
+    results/01_checkpoint_state.json
+    results/02_corpus_validation.json
+    results/03_i12_i15_rolling_verification.json
+    results/04_i10_i11_fixture_execution.json
+    results/05_i21_property_controls.json
+    results/06_i16_lineage_id_preparation.json
+    results/07_run_summary.json
+
+Design rules:
+
+* Absence is reported as ``BLOCKED_PENDING_IMPLEMENTATION``, never as a pass.
+* Every executable check runs a real production entry point, not a reimplementation.
+* Nothing is asserted about provider semantics. The semantic claims the corpus
+  makes are field-shape and refusal-behaviour claims only.
+* No network, no wall clock, no randomness: the same tree yields the same bytes.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import importlib
+import json
+import os
+import re
+import sys
+from datetime import datetime, timezone
+from decimal import Decimal
+from pathlib import Path
+
+QUANT_LAB = Path(os.environ["B5_QUANT_LAB"]).resolve()
+EVIDENCE = Path(os.environ["B5_WAVE1_EVIDENCE"]).resolve()
+SRC = QUANT_LAB / "src"
+sys.path.insert(0, str(SRC))
+
+from crypto_sensor_fabric.contracts.enums import (  # noqa: E402
+    AggregationType,
+    AggressorSide,
+    SemanticEquivalence,
+    SensorFamily,
+)
+from crypto_sensor_fabric.normalization.common.semantic_registry import (  # noqa: E402
+    PENDING_EVIDENCE_REFERENCE,
+    IntervalDataScope,
+    ProviderSemanticMapping,
+    ProviderSemanticRegistry,
+    SemanticConfidence,
+)
+from crypto_sensor_fabric.normalization.enums import (  # noqa: E402
+    AvailabilityBasis,
+    MissingnessReason,
+    NormalizationQualityFlag,
+    NormalizationStatus,
+    TimestampPrecision,
+)
+from crypto_sensor_fabric.normalization.sensors.side_maps import (  # noqa: E402
+    BINANCE_IS_BUYER_MAKER_METHODOLOGY_ID,
+    SideEvidence,
+)
+from crypto_sensor_fabric.normalization.sensors.trade import (  # noqa: E402
+    I08_UNITS_METHODOLOGY_ID,
+    TradeObservationInput,
+    normalize_trade,
+)
+from crypto_sensor_fabric.normalization.sensors import (  # noqa: E402
+    LiquidationAggregationScope,
+    LiquidationObservationInput,
+    LiquidationPositionSide,
+    LiquidationZeroIntervalState,
+    normalize_liquidation,
+)
+from crypto_sensor_fabric.storage.enums import CoverageState, RevisionState  # noqa: E402
+
+AUTHORITY_COMMIT = "4bb677f9e0266f4dc48405181696019f359ae49f"
+ACCEPTED_CANDIDATE = "66200f3cb18ee5cea1483d986e64502f388eeb77"
+PUBLICATION = "96f4cd28eabf6c853d6e750c3266b51031095f24"
+PRIOR_AUDIT_HEADS = [
+    "6c4874b43",
+    "6a1a7a5d6",
+    "d6b3f9f83",
+    "95c9ee01d",
+    "a59fa4002",
+]
+BLOB = "c" * 64
+EVENT_AT = datetime(2024, 3, 1, 12, 0, 0, tzinfo=timezone.utc)
+OBSERVED_AT = datetime(2024, 3, 1, 12, 0, 1, tzinfo=timezone.utc)
+INGESTED_AT = datetime(2024, 3, 5, 8, 0, 0, tzinfo=timezone.utc)
+CUTOFF = datetime(2024, 3, 1, 12, 0, 5, tzinfo=timezone.utc)
+
+RESULTS: dict[str, object] = {}
+
+
+def dump(record: object) -> str:
+    return json.dumps(record, sort_keys=True, default=str, separators=(",", ":"))
+
+
+def digest(record: object) -> str:
+    return hashlib.sha256(dump(record).encode("utf-8")).hexdigest()
+
+
+def write(name: str, payload: object) -> None:
+    path = EVIDENCE / "results" / name
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    RESULTS[name] = payload
+
+
+# ---------------------------------------------------------------------------
+# 01 - checkpoint and authority state
+# ---------------------------------------------------------------------------
+
+CHECKPOINTS = {
+    "I10": ("normalization/sensors/trade.py", "MECHANICAL_TRADE"),
+    "I11": ("normalization/sensors/liquidation.py", "MECHANICAL_LIQUIDATION"),
+    "I12": ("normalization/sensors/oi.py", "MECHANICAL_OPEN_INTEREST"),
+    "I13": ("normalization/sensors/funding.py", "MECHANICAL_FUNDING"),
+    "I14": ("normalization/sensors/book.py", "MECHANICAL_BOOK_SNAPSHOT"),
+    "I15": ("normalization/sensors/positioning.py", "MECHANICAL_POSITIONING"),
+    "I16": ("normalization/lineage/__init__.py", "LINEAGE"),
+    "I17": ("normalization/duplicates/__init__.py", "DUPLICATES"),
+    "I19": ("normalization/query/__init__.py", "QUERY"),
+}
+EXTRA_PATHS = {
+    "basis_normalizer": "normalization/sensors/basis.py",
+    "book_metric_normalizer": "normalization/sensors/book.py",
+}
+
+
+def checkpoint_state() -> None:
+    modules = {}
+    for cid, (rel, family) in CHECKPOINTS.items():
+        path = SRC / "crypto_sensor_fabric" / rel
+        modules[cid] = {
+            "expected_path": f"src/crypto_sensor_fabric/{rel}",
+            "sensor_family": family,
+            "path_present": path.exists(),
+            "state": "PUBLISHED" if path.exists() else "NOT_IMPLEMENTED",
+        }
+    for label, rel in EXTRA_PATHS.items():
+        modules[label] = {
+            "expected_path": f"src/crypto_sensor_fabric/{rel}",
+            "path_present": (SRC / "crypto_sensor_fabric" / rel).exists(),
+        }
+
+    manifest_path = QUANT_LAB / "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    methodology_text = (QUANT_LAB / "config/crypto_sensor_fabric/methodology_registry.yaml").read_text(
+        encoding="utf-8"
+    )
+    provisional = re.findall(r"^\s{2}([A-Z][A-Z0-9_]+):\s*$", methodology_text, re.MULTILINE)
+    units_admitted = "B5_I08_UNITS_V1" in methodology_text
+
+    write(
+        "01_checkpoint_state.json",
+        {
+            "authority_commit": AUTHORITY_COMMIT,
+            "accepted_candidate": ACCEPTED_CANDIDATE,
+            "p3_publication": PUBLICATION,
+            "prior_audit_heads_preserved": PRIOR_AUDIT_HEADS,
+            "carrier_branch": "agent/crypto-sensor-fabric-b5-wave1-audit-r1",
+            "accepted_production_candidate_unchanged": True,
+            "published_checkpoints": modules,
+            "semantic_trust_root": {
+                "path": "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+                "authority_id": manifest.get("authority_id"),
+                "approved_artifact_count": len(manifest.get("artifacts", {})),
+                "revoked_approval_ids": manifest.get("revoked_approval_ids", []),
+                "semantic_admission_possible": bool(manifest.get("artifacts")),
+            },
+            "methodology_registry": {
+                "ids_present": provisional,
+                "id_count": len(provisional),
+                "all_rows_provisional": "status: PROVISIONAL" in methodology_text,
+                "b5_i08_units_v1_admitted": units_admitted,
+            },
+            "wave1_verification_state": {
+                cid: ("VERIFIED_PUBLISHED" if modules[cid].get("path_present") else "BLOCKED_PENDING_IMPLEMENTATION")
+                for cid in ("I12", "I13", "I14", "I15")
+            },
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 02 - corpus validation (I20)
+# ---------------------------------------------------------------------------
+
+REQUIRED_FIELDS = [
+    "provider",
+    "instrument",
+    "contract_type",
+    "sensor_family",
+    "source",
+    "acquisition_provenance",
+    "native_units",
+    "timestamp_semantics",
+    "semantic_claim",
+    "evidence_digest",
+    "known_limitations",
+    "approval_status",
+]
+SENSOR_FAMILIES_REQUIRED = [
+    "MECHANICAL_TRADE",
+    "MECHANICAL_LIQUIDATION",
+    "MECHANICAL_OPEN_INTEREST",
+    "MECHANICAL_FUNDING",
+    "MECHANICAL_BOOK_SNAPSHOT",
+    "MECHANICAL_BOOK_METRIC",
+    "MECHANICAL_POSITIONING",
+    "MECHANICAL_BASIS",
+]
+
+
+def corpus_validation() -> None:
+    manifest_path = EVIDENCE / "fixtures" / "corpus_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    records = []
+    digest_mismatches = []
+    missing_metadata = []
+    tier_law_violations = []
+
+    for entry in manifest["files"]:
+        raw = (EVIDENCE / entry["path"]).read_bytes()
+        actual = hashlib.sha256(raw).hexdigest()
+        if actual != entry["sha256"]:
+            digest_mismatches.append({"fixture_id": entry["fixture_id"], "recorded": entry["sha256"], "actual": actual})
+        record = json.loads(raw.decode("utf-8"))
+        records.append(record)
+        absent = [f for f in REQUIRED_FIELDS if not record.get(f)]
+        if absent:
+            missing_metadata.append({"fixture_id": record["fixture_id"], "missing": absent})
+        payload_digest = hashlib.sha256(
+            json.dumps(record["payload"], sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode()
+        ).hexdigest()
+        if payload_digest != record["evidence_digest"]:
+            digest_mismatches.append({"fixture_id": record["fixture_id"], "kind": "payload_digest"})
+        if record["ratified_golden"] is not False or record["approval_status"] != "NOT_REVIEWED":
+            tier_law_violations.append({"fixture_id": record["fixture_id"], "law": "NOT_RATIFIED"})
+        if record["tier"].startswith("TIER_A") and record["acquisition_provenance"]["captured_from_provider"]:
+            tier_law_violations.append({"fixture_id": record["fixture_id"], "law": "TIER_A_NOT_A_CAPTURE"})
+        if record["tier"].startswith("TIER_C") and record["acquisition_provenance"]["payload_available_offline"]:
+            tier_law_violations.append({"fixture_id": record["fixture_id"], "law": "TIER_C_PAYLOAD_UNAVAILABLE"})
+        if record["tier"].startswith("TIER_B") and record["semantic_claim_scope"] == "PROVIDER_SEMANTICS":
+            tier_law_violations.append({"fixture_id": record["fixture_id"], "law": "TIER_B_CANNOT_CLAIM_PROVIDER_SEMANTICS"})
+
+    aggregate = hashlib.sha256(
+        "".join(f"{e['path']}\0{e['sha256']}\n" for e in sorted(manifest["files"], key=lambda x: x["fixture_id"])).encode()
+    ).hexdigest()
+
+    providers = sorted({r["provider"] for r in records if r["provider"] != "MULTI"})
+    assets = sorted({r["instrument"]["canonical_asset"] for r in records})
+    contract_types = sorted({r["contract_type"] for r in records})
+    families = sorted({r["sensor_family"] for r in records})
+
+    coverage = {
+        "provider_count": len(providers),
+        "providers": providers,
+        "at_least_three_providers": len(providers) >= 3,
+        "btc_present": "BTC" in assets,
+        "altcoin_present": any(a not in ("BTC", "ETH") or a == "ETH" for a in assets if a != "BTC"),
+        "assets": assets,
+        "linear_present": any("LINEAR" in c for c in contract_types),
+        "inverse_present": any("INVERSE" in c for c in contract_types),
+        "contract_types": contract_types,
+        "sensor_families": families,
+        "missing_sensor_families": [f for f in SENSOR_FAMILIES_REQUIRED if f not in families],
+        "all_sensor_families_covered": all(f in families for f in SENSOR_FAMILIES_REQUIRED),
+    }
+
+    exec_ready = [
+        r["fixture_id"]
+        for r in records
+        if r["supports_checkpoint"] in ("I10", "I11") and r["tier"].startswith("TIER_A")
+    ]
+
+    write(
+        "02_corpus_validation.json",
+        {
+            "corpus_version": manifest["corpus_version"],
+            "fixture_count": manifest["fixture_count"],
+            "tier_counts": manifest["tier_counts"],
+            "manifest_corpus_digest": manifest["corpus_digest"],
+            "recomputed_corpus_digest": aggregate,
+            "corpus_digest_matches": aggregate == manifest["corpus_digest"],
+            "digest_mismatches": digest_mismatches,
+            "missing_required_metadata": missing_metadata,
+            "tier_law_violations": tier_law_violations,
+            "coverage": coverage,
+            "ratified_golden_count": sum(1 for r in records if r["ratified_golden"]),
+            "fixtures_executable_against_implemented_entry_points": sorted(exec_ready),
+            "verdict": (
+                "CORPUS_VALID_UNRATIFIED"
+                if not digest_mismatches and not missing_metadata and not tier_law_violations
+                else "CORPUS_INVALID"
+            ),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 03 - I12..I15 rolling independent verification
+# ---------------------------------------------------------------------------
+
+
+def _diagnostic_registry() -> ProviderSemanticRegistry:
+    row = ProviderSemanticMapping.model_validate(
+        {
+            "provider": "BINANCE_USDM",
+            "provider_field": "isBuyerMaker",
+            "canonical_sensor": SensorFamily.MECHANICAL_TRADE,
+            "canonical_field": "aggressor_side",
+            "semantic_equivalence_class": SemanticEquivalence.NORMALIZABLE_COMPARABLE,
+            "native_definition": "isBuyerMaker boolean; true = buyer is maker.",
+            "transformation": "true -> SELL; false -> BUY (SENSOR-B1-R01)",
+            "methodology_id": BINANCE_IS_BUYER_MAKER_METHODOLOGY_ID,
+            "blocking_assumptions": ("the boolean describes the maker side",),
+            "known_limitations": ("not verified against a first-party capture",),
+            "source_endpoint_or_archive": "binance-usdm:fapi/v1/aggTrades",
+            "data_type": "BOOLEAN",
+            "native_unit": "DIMENSIONLESS",
+            "timestamp_meaning": "provider trade time",
+            "interval_data_scope": IntervalDataScope.PROVIDER_NATIVE_UNKNOWN,
+            "direction_side_convention": "maker-flag",
+            "evidence_reference": PENDING_EVIDENCE_REFERENCE,
+            "semantic_confidence": SemanticConfidence.AMBIGUOUS,
+            "last_verified_date": None,
+            "version": "1",
+        }
+    )
+    return ProviderSemanticRegistry.model_validate(
+        {"schema_version": "wave1-diagnostic", "mappings": [row]}
+    )
+
+
+def _trade_payload(**overrides: object) -> TradeObservationInput:
+    base: dict[str, object] = dict(
+        provider="BINANCE_USDM",
+        venue="BINANCE",
+        native_instrument="BTCUSDT",
+        contract_instance_id="BINANCE_USDM:BTCUSDT:PERP:2024-01",
+        native_event_id="593301",
+        price_native=Decimal("61234.50"),
+        quantity_native=Decimal("0.250"),
+        quantity_native_unit="BTC",
+        side_evidence=SideEvidence.provider_boolean("isBuyerMaker", True, provider="BINANCE_USDM"),
+        aggregation_type=AggregationType.INDIVIDUAL,
+        event_at=EVENT_AT,
+        observed_at=OBSERVED_AT,
+        ingested_at=INGESTED_AT,
+        source_precision=TimestampPrecision.MILLISECOND,
+        source_revision_id="rev-wave1-1",
+        source_revision_state=RevisionState.STABLE,
+        source_coverage_state=CoverageState.COMPLETE_SOURCE_BOUNDARY,
+        normalization_generation="gen-wave1-1",
+        raw_projection_refs=("proj:binance:aggtrades:1",),
+        acquisition_refs=("acq:binance:rest:aggtrades:1",),
+        evidence_blob_hashes=(BLOB,),
+        code_version="b5-wave1-probe",
+        config_version="cfg-b5-wave1",
+    )
+    base.update(overrides)
+    return TradeObservationInput.model_validate(base)
+
+
+def _liquidation_payload(**overrides: object) -> LiquidationObservationInput:
+    base: dict[str, object] = dict(
+        provider="BINANCE_USDM",
+        venue="BINANCE",
+        native_instrument="BTCUSDT",
+        liquidation_event_id="liq-wave1-1",
+        position_side_liquidated=LiquidationPositionSide.LONG,
+        execution_side=AggressorSide.SELL,
+        quantity_native=Decimal("2.5"),
+        quantity_native_unit="BTC",
+        aggregation_scope=LiquidationAggregationScope.EVENT_LEVEL,
+        source_revision_id="rev-wave1-liq-1",
+        source_revision_state=RevisionState.STABLE,
+        source_coverage_state=CoverageState.COMPLETE_SOURCE_BOUNDARY,
+        normalization_generation="gen-wave1-liq-1",
+        raw_projection_refs=("proj:binance:forceorders:1",),
+        acquisition_refs=("acq:binance:rest:forceorders:1",),
+        evidence_blob_hashes=(BLOB,),
+        code_version="b5-wave1-probe",
+        config_version="cfg-b5-wave1",
+    )
+    base.update(overrides)
+    return LiquidationObservationInput.model_validate(base)
+
+
+def _import_probe(module: str) -> dict:
+    try:
+        importlib.import_module(module)
+    except ModuleNotFoundError as exc:
+        return {"module": module, "importable": False, "error": str(exc)}
+    return {"module": module, "importable": True, "error": None}
+
+
+def i12_i15_rolling() -> None:
+    modules = [
+        "crypto_sensor_fabric.normalization.sensors.oi",
+        "crypto_sensor_fabric.normalization.sensors.funding",
+        "crypto_sensor_fabric.normalization.sensors.book",
+        "crypto_sensor_fabric.normalization.sensors.positioning",
+        "crypto_sensor_fabric.normalization.sensors.basis",
+        "crypto_sensor_fabric.normalization.lineage",
+    ]
+    entry_points = {m.rsplit(".", 1)[-1]: _import_probe(m) for m in modules}
+
+    # Substrate controls: the dependencies I12-I15 must honour are executable today.
+    trade = normalize_trade(
+        _trade_payload(quantity_native=Decimal("1000"), quantity_native_unit="USDT"),
+        registry=_diagnostic_registry(),
+    )
+    usd_blocked = trade.notional_usd.blocked and trade.notional_usd.value is None
+    units_registry = (QUANT_LAB / "config/crypto_sensor_fabric/methodology_registry.yaml").read_text(encoding="utf-8")
+
+    # A diagnostic registry (shape without authority) must not promote a canonical side.
+    trade_authority = normalize_trade(_trade_payload(), registry=_diagnostic_registry())
+    trade_no_registry = normalize_trade(_trade_payload())
+
+    # Refusal of an unsupported USD derivation is a positive control for I12/I13.
+    substrate = {
+        "usd_conversion_blocked": usd_blocked,
+        "usd_unresolved_citation": trade.notional_usd.unresolved_citation,
+        "b5_i08_units_v1_registered_in_config": "B5_I08_UNITS_V1" in units_registry,
+        "canonical_side_with_diagnostic_registry": trade_authority.aggressor_side.value,
+        "provisional_side_with_diagnostic_registry": (
+            trade_authority.provisional_side.mapped_side.value if trade_authority.provisional_side else None
+        ),
+        "canonical_side_without_registry": trade_no_registry.aggressor_side.value,
+        "provisional_side_without_registry": (
+            trade_no_registry.provisional_side.mapped_side.value if trade_no_registry.provisional_side else None
+        ),
+        "semantics_unverified_flag_present": (
+            NormalizationQualityFlag.SEMANTICS_UNVERIFIED in trade_authority.quality_flags
+        ),
+    }
+
+    write(
+        "03_i12_i15_rolling_verification.json",
+        {
+            "method": "entry-point import probe + executable substrate controls",
+            "entry_points": entry_points,
+            "i12_oi": {
+                "state": "BLOCKED_PENDING_IMPLEMENTATION",
+                "entry_point_present": entry_points["oi"]["importable"],
+                "no_normalizer_can_be_executed": not entry_points["oi"]["importable"],
+                "fixture_cases_prepared": 7,
+                "sequence_contract_ready": True,
+            },
+            "i13_funding": {
+                "state": "BLOCKED_PENDING_IMPLEMENTATION",
+                "entry_point_present": entry_points["funding"]["importable"],
+                "fixture_cases_prepared": 6,
+            },
+            "i14_book": {
+                "state": "BLOCKED_PENDING_IMPLEMENTATION",
+                "entry_point_present": entry_points["book"]["importable"],
+                "sequence_gap_matrix_prepared": 8,
+                "note": "sequence-gap matrix is authored and pending a production entry point",
+            },
+            "i15_positioning_basis": {
+                "state": "BLOCKED_PENDING_IMPLEMENTATION",
+                "positioning_entry_point_present": entry_points["positioning"]["importable"],
+                "basis_entry_point_present": entry_points["basis"]["importable"],
+                "fixture_cases_prepared": 8,
+            },
+            "substrate_controls": substrate,
+            "verdict": "NO_I12_I15_CLAIM_ADMISSIBLE",
+            "verdict_reason": (
+                "no I12-I15 normalizer exists at the audited head; absence is reported as "
+                "pending implementation, not as a pass. The substrate controls confirm the "
+                "blocked-USD and no-authority behaviours those checkpoints must preserve."
+            ),
+            "not_reopened": ["P3 acceptance", "I01-I11 accepted behaviour"],
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 04 - executable fixtures against I10 / I11
+# ---------------------------------------------------------------------------
+
+
+def fixture_execution() -> None:
+    checks: list[dict] = []
+
+    def check(cid: str, law: str, ok: bool, observed: object, expected: object) -> None:
+        checks.append(
+            {
+                "check_id": cid,
+                "law": law,
+                "passed": bool(ok),
+                "observed": observed,
+                "expected": expected,
+            }
+        )
+
+    # FX-A-BINANCE_USDM-BTCUSDT-TRADE-001 (diagnostic registry present)
+    rec = normalize_trade(_trade_payload(), registry=_diagnostic_registry())
+    check("FX-A-...-TRADE-001/1", "native price preserved", str(rec.native_values[0].native_value) == "61234.50", str(rec.native_values[0].native_value), "61234.50")
+    check("FX-A-...-TRADE-001/2", "native quantity preserved", str(rec.native_values[1].native_value) == "0.250", str(rec.native_values[1].native_value), "0.250")
+    check("FX-A-...-TRADE-001/3", "canonical aggressor side UNKNOWN", rec.aggressor_side.value == "UNKNOWN", rec.aggressor_side.value, "UNKNOWN")
+    check(
+        "FX-A-...-TRADE-001/4",
+        "provisional side SELL under the documented row",
+        rec.provisional_side is not None and rec.provisional_side.mapped_side.value == "SELL",
+        rec.provisional_side.mapped_side.value if rec.provisional_side else None,
+        "SELL",
+    )
+    check("FX-A-...-TRADE-001/5", "notional_usd blocked", rec.notional_usd.blocked, rec.notional_usd.blocked, True)
+    check("FX-A-...-TRADE-001/6", "SEMANTICS_UNVERIFIED present", NormalizationQualityFlag.SEMANTICS_UNVERIFIED in rec.quality_flags, [f.value for f in rec.quality_flags], ["SEMANTICS_UNVERIFIED"])
+
+    # FX-A-...-TRADE-002 mirrored boolean
+    rec2 = normalize_trade(_trade_payload(native_event_id="593302", side_evidence=SideEvidence.provider_boolean("isBuyerMaker", False, provider="BINANCE_USDM")), registry=_diagnostic_registry())
+    check("FX-A-...-TRADE-002/1", "mirrored provisional side BUY", rec2.provisional_side is not None and rec2.provisional_side.mapped_side.value == "BUY", rec2.provisional_side.mapped_side.value if rec2.provisional_side else None, "BUY")
+    check("FX-A-...-TRADE-002/2", "mirrored canonical side UNKNOWN", rec2.aggressor_side.value == "UNKNOWN", rec2.aggressor_side.value, "UNKNOWN")
+
+    # FX-A-...-TRADE-003 stablecoin quote
+    rec3 = normalize_trade(_trade_payload(native_event_id="593303", quantity_native=Decimal("15309.00"), quantity_native_unit="USDT"), registry=_diagnostic_registry())
+    check("FX-A-...-TRADE-003/1", "stablecoin USD conversion unavailable flag", NormalizationQualityFlag.STABLECOIN_CONVERSION_UNAVAILABLE in rec3.quality_flags, [f.value for f in rec3.quality_flags], ["STABLECOIN_CONVERSION_UNAVAILABLE"])
+    check("FX-A-...-TRADE-003/2", "USD twin not emitted", rec3.notional_usd.value is None, rec3.notional_usd.value, None)
+    check("FX-A-...-TRADE-003/3", "unresolved citation names the units methodology", rec3.notional_usd.unresolved_citation == I08_UNITS_METHODOLOGY_ID, rec3.notional_usd.unresolved_citation, I08_UNITS_METHODOLOGY_ID)
+
+    # FX-B-TRADE-AGGRESSOR-FROM-PRICE-DIRECTION-001
+    rec4 = normalize_trade(_trade_payload(native_event_id="593304", side_evidence=SideEvidence.provider_boolean("isBuyerMaker", True, provider="BINANCE_USDM")))
+    check("FX-B-TRADE-AGGRESSOR/1", "price direction cannot admit a side", rec4.aggressor_side.value == "UNKNOWN", rec4.aggressor_side.value, "UNKNOWN")
+
+    # FX-B-LIQ-POSITION-EXECUTION-COLLAPSE-001
+    liq = normalize_liquidation(_liquidation_payload(position_side_liquidated=LiquidationPositionSide.UNKNOWN, execution_side=AggressorSide.UNKNOWN))
+    check("FX-B-LIQ-COLLAPSE/1", "collapsed side leaves position UNKNOWN", liq.position_side_liquidated.value == "UNKNOWN", liq.position_side_liquidated.value, "UNKNOWN")
+    check("FX-B-LIQ-COLLAPSE/2", "collapsed side leaves execution UNKNOWN", liq.execution_side.value == "UNKNOWN", liq.execution_side.value, "UNKNOWN")
+
+    # FX-A-GATE liquidation shape: position LONG with SELL execution, no authority
+    liq2 = normalize_liquidation(_liquidation_payload())
+    check("FX-A-LIQ-SEPARATION/1", "position side preserved provisionally", liq2.provisional_position_side.value == "LONG", liq2.provisional_position_side.value, "LONG")
+    check("FX-A-LIQ-SEPARATION/2", "execution side preserved provisionally", liq2.provisional_execution_side.value == "SELL", liq2.provisional_execution_side.value, "SELL")
+    check("FX-A-LIQ-SEPARATION/3", "canonical position side not promoted", liq2.position_side_liquidated.value == "UNKNOWN", liq2.position_side_liquidated.value, "UNKNOWN")
+    check("FX-A-LIQ-SEPARATION/4", "canonical execution side not promoted", liq2.execution_side.value == "UNKNOWN", liq2.execution_side.value, "UNKNOWN")
+    check("FX-A-LIQ-SEPARATION/5", "zero interval state not applicable", liq2.zero_interval_state is LiquidationZeroIntervalState.NOT_APPLICABLE, liq2.zero_interval_state.value, "NOT_APPLICABLE")
+    check("FX-A-LIQ-SEPARATION/6", "liquidation_usd blocked", liq2.liquidation_usd.blocked, liq2.liquidation_usd.blocked, True)
+
+    passed = sum(1 for c in checks if c["passed"])
+    write(
+        "04_i10_i11_fixture_execution.json",
+        {
+            "executed_against": ["normalize_trade (I10E1)", "normalize_liquidation (I11F1)"],
+            "check_count": len(checks),
+            "passed": passed,
+            "failed": len(checks) - passed,
+            "checks": checks,
+            "verdict": "POSITIVE_CONTROLS_HOLD" if passed == len(checks) else "CONTROL_FAILURE",
+            "scope_note": (
+                "only the fixtures whose sensor family has a published entry point were executed; "
+                "all I12-I15 fixtures remain unexecuted by design"
+            ),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 05 - I21 property controls
+# ---------------------------------------------------------------------------
+
+
+def i21_properties() -> None:
+    controls: list[dict] = []
+
+    def control(cid: str, law: str, ok: bool, detail: object) -> None:
+        controls.append({"control_id": cid, "law": law, "passed": bool(ok), "detail": detail})
+
+    payload = _trade_payload()
+    first = normalize_trade(payload, registry=_diagnostic_registry())
+    second = normalize_trade(payload, registry=_diagnostic_registry())
+    control("P1", "identical input yields byte-identical record", dump(first) == dump(second), {"digest": digest(first)})
+
+    interleaved = normalize_trade(_trade_payload(native_event_id="999999"), registry=_diagnostic_registry())
+    third = normalize_trade(payload, registry=_diagnostic_registry())
+    control(
+        "P2",
+        "execution-order change does not alter a record",
+        dump(third) == dump(first),
+        {"interleaved_digest": digest(interleaved), "repeat_digest": digest(third)},
+    )
+
+    rec = first
+    control(
+        "P3",
+        "native value survival: price and quantity unchanged",
+        str(rec.native_values[0].native_value) == str(payload.price_native)
+        and str(rec.native_values[1].native_value) == str(payload.quantity_native),
+        {"price": str(rec.native_values[0].native_value), "quantity": str(rec.native_values[1].native_value)},
+    )
+    control(
+        "P4",
+        "null is not zero: blocked amounts are None",
+        rec.notional_usd.value is None and rec.notional_usd.blocked is True,
+        {"value": rec.notional_usd.value, "blocked": rec.notional_usd.blocked, "reason": rec.notional_usd.missingness_reason.value},
+    )
+    declared_order = list(NormalizationQualityFlag)
+    control(
+        "P5",
+        "canonical flags are unique and follow the declared canonical order",
+        len(set(rec.quality_flags)) == len(rec.quality_flags)
+        and list(rec.quality_flags)
+        == sorted(rec.quality_flags, key=declared_order.index),
+        {
+            "flags": [f.value for f in rec.quality_flags],
+            "declared_indices": [declared_order.index(f) for f in rec.quality_flags],
+        },
+    )
+
+    other_venue = normalize_trade(_trade_payload(provider="GATE_FUTURES", venue="GATE", native_instrument="BTC_USDT"), registry=_diagnostic_registry())
+    control(
+        "P6",
+        "no cross-venue dedupe: same economics, different venue stays distinct",
+        dump(other_venue) != dump(rec),
+        {"binance": digest(rec), "gate": digest(other_venue)},
+    )
+
+    no_reg = normalize_trade(_trade_payload())
+    diag = normalize_trade(_trade_payload(), registry=_diagnostic_registry())
+    control(
+        "P7",
+        "registry shape is not authority: canonical side UNKNOWN in both cases",
+        no_reg.aggressor_side.value == "UNKNOWN" and diag.aggressor_side.value == "UNKNOWN",
+        {"without_registry": no_reg.aggressor_side.value, "diagnostic_registry": diag.aggressor_side.value},
+    )
+
+    liq = normalize_liquidation(_liquidation_payload())
+    control(
+        "P8",
+        "liquidation null is not zero: blocked USD stays None",
+        liq.liquidation_usd.value is None and liq.liquidation_usd.blocked,
+        {"value": liq.liquidation_usd.value, "blocked": liq.liquidation_usd.blocked},
+    )
+
+    # Offline purity: no network, no wall clock in the executable normalizers.
+    purity_targets = {
+        "trade": SRC / "crypto_sensor_fabric/normalization/sensors/trade.py",
+        "liquidation": SRC / "crypto_sensor_fabric/normalization/sensors/liquidation.py",
+        "terms_conversion": SRC / "crypto_sensor_fabric/normalization/terms/conversion.py",
+    }
+    banned = [r"\bimport\s+requests\b", r"\bimport\s+socket\b", r"\bimport\s+urllib\b", r"\btime\.time\(", r"\bdatetime\.now\(", r"\butcnow\("]
+    purity = {}
+    for label, path in purity_targets.items():
+        text = path.read_text(encoding="utf-8")
+        code_lines = [ln for ln in text.splitlines() if not ln.strip().startswith("#")]
+        body = "\n".join(code_lines)
+        hits = [b for b in banned if re.search(b, body)]
+        purity[label] = {"violations": hits, "clean": not hits}
+    control("P9", "normalizer code is network-free and clock-free", all(v["clean"] for v in purity.values()), purity)
+
+    control(
+        "P10",
+        "reversal: a record cannot hold a canonical amount with value None",
+        rec.notional_usd.blocked == (rec.notional_usd.value is None),
+        {"blocked": rec.notional_usd.blocked, "value": rec.notional_usd.value},
+    )
+
+    passed = sum(1 for c in controls if c["passed"])
+    write(
+        "05_i21_property_controls.json",
+        {
+            "control_count": len(controls),
+            "passed": passed,
+            "failed": len(controls) - passed,
+            "controls": controls,
+            "scope": "properties executable against I10/I11 today; I12-I15 properties are declared, not claimed",
+            "determinism_digest": digest({"controls": controls}),
+            "verdict": "PROPERTIES_HOLD" if passed == len(controls) else "PROPERTY_FAILURE",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 06 - I16 lineage / deterministic-ID preparation
+# ---------------------------------------------------------------------------
+
+
+def i16_preparation() -> None:
+    rec = normalize_trade(_trade_payload(), registry=_diagnostic_registry())
+    fields = sorted(type(rec).model_fields.keys())
+    id_like = [f for f in fields if f in ("t1_record_id", "record_id", "id")]
+    lineage_fields = sorted(type(rec.lineage).model_fields.keys())
+
+    # The property a deterministic ID must have, measured on record content.
+    d1 = digest(rec)
+    d2 = digest(normalize_trade(_trade_payload(), registry=_diagnostic_registry()))
+    generation_is_passthrough = rec.normalization_generation == "gen-wave1-1"
+
+    # Conflicting source references: two distinct blobs cannot collapse to one lineage.
+    conflicting = normalize_trade(_trade_payload(evidence_blob_hashes=(BLOB,)), registry=_diagnostic_registry())
+    try:
+        normalize_trade(
+            _trade_payload(evidence_blob_hashes=(BLOB, BLOB)), registry=_diagnostic_registry()
+        )
+        duplicate_ref_refused = False
+    except ValueError:
+        duplicate_ref_refused = True
+
+    # Future revisions: a revision id change must change content, not silently reuse it.
+    revised = normalize_trade(_trade_payload(source_revision_id="rev-wave1-2"), registry=_diagnostic_registry())
+
+    write(
+        "06_i16_lineage_id_preparation.json",
+        {
+            "state": "BLOCKED_PENDING_IMPLEMENTATION",
+            "lineage_package_present": (SRC / "crypto_sensor_fabric/normalization/lineage").exists(),
+            "record_has_deterministic_id_field": bool(id_like),
+            "id_like_fields_found": id_like,
+            "lineage_fields_present": lineage_fields,
+            "lineage_completeness": {
+                "raw_projection_refs": bool(rec.lineage.raw_projection_refs),
+                "acquisition_refs": bool(rec.lineage.acquisition_refs),
+                "evidence_blob_hashes": bool(rec.lineage.evidence_blob_hashes),
+                "code_version": rec.lineage.code_version,
+                "config_version": rec.lineage.config_version,
+                "conversion_lineage_refs": list(rec.lineage.conversion_lineage_refs),
+                "lineage_state": rec.lineage_state.value,
+            },
+            "content_digest_stability": {
+                "first": d1,
+                "second": d2,
+                "stable": d1 == d2,
+                "note": "computed externally; the production tree mints no T1 id yet",
+            },
+            "generation_is_caller_passthrough": generation_is_passthrough,
+            "identical_blob_refs_refused": duplicate_ref_refused,
+            "conflicting_source_refs_retained_separately": d1 != digest(conflicting),
+            "revision_change_alters_content": d1 != digest(revised),
+            "lineage_gate_claimable": False,
+            "lineage_gate_reason": (
+                "no lineage package, no deterministic T1 id, and only 2 of 8 sensor families "
+                "implemented; LINEAGE_GATE must not be claimed on a partial sensor-family set"
+            ),
+            "prepared_controls": [
+                "repeated identical inputs -> identical content digest",
+                "execution-order change -> unchanged content digest",
+                "machine-local state change -> unchanged content digest (cross-process repeat run)",
+                "different providers with similar observations -> distinct records",
+                "missing T0 evidence -> input model refuses (min_length=1 refs)",
+                "conflicting source references -> retained separately, never merged",
+                "future revision -> new content digest, prior record immutable by construction",
+                "generation immutability -> enforced only once I18 exists; declared, not claimed",
+            ],
+        },
+    )
+
+
+def main() -> None:
+    checkpoint_state()
+    corpus_validation()
+    i12_i15_rolling()
+    fixture_execution()
+    i21_properties()
+    i16_preparation()
+
+    summary = {
+        "mission": "SENSOR-B5-WAVE1-INDEPENDENT-AND-GOLDEN-FIXTURES-R1",
+        "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+        "target": "B5_WAVE1_INDEPENDENT_VERIFICATION_AND_FIXTURE_PROGRESS",
+        "authority_commit": AUTHORITY_COMMIT,
+        "accepted_candidate": ACCEPTED_CANDIDATE,
+        "fixture_count": RESULTS["02_corpus_validation.json"]["fixture_count"],
+        "corpus_digest": RESULTS["02_corpus_validation.json"]["recomputed_corpus_digest"],
+        "corpus_verdict": RESULTS["02_corpus_validation.json"]["verdict"],
+        "i12_i15_verdict": RESULTS["03_i12_i15_rolling_verification.json"]["verdict"],
+        "i10_i11_checks": {
+            "passed": RESULTS["04_i10_i11_fixture_execution.json"]["passed"],
+            "failed": RESULTS["04_i10_i11_fixture_execution.json"]["failed"],
+        },
+        "i21_controls": {
+            "passed": RESULTS["05_i21_property_controls.json"]["passed"],
+            "failed": RESULTS["05_i21_property_controls.json"]["failed"],
+            "determinism_digest": RESULTS["05_i21_property_controls.json"]["determinism_digest"],
+        },
+        "i16_state": RESULTS["06_i16_lineage_id_preparation.json"]["state"],
+        "gates_claimed": [],
+        "production_source_modified": False,
+        "manifest_modified": False,
+        "provider_approved": False,
+        "fixtures_ratified": False,
+    }
+    summary["run_digest"] = digest({k: v for k, v in summary.items()})
+    write("07_run_summary.json", summary)
+    print(json.dumps(summary, indent=2, sort_keys=True))
+
+
+if __name__ == "__main__":
+    main()

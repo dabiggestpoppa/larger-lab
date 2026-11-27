@@ -1,0 +1,69 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "1630b8bc33b5767dd89f83e9641279c29499662938fe3d61bbfd2c8ed3ddd20a",
+  "expectation": {
+    "code": "NULL_NOT_ZERO",
+    "missingness_reason": "SOURCE_GAP",
+    "oi_native_value": null,
+    "outcome": "REFUSE",
+    "zero_emitted": false
+  },
+  "fixture_id": "FX-B-OI-ZERO-DEFAULTED-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves the refusal contract only",
+    "proves nothing about actual provider semantics"
+  ],
+  "native_units": {
+    "unit_status": "ADVERSARIAL"
+  },
+  "payload": {
+    "coverage": "SOURCE_GAP",
+    "interval": "2024-03-01T12:00Z/12:05Z",
+    "payload": null
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "A missing OI interval must stay NULL with a reason; only a measured, coverage-backed zero may be zero.",
+  "semantic_claim_scope": "REFUSAL_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_OPEN_INTEREST",
+  "source": {
+    "documentation_ref": "bloc_05/03 section 14",
+    "endpoint": "constructed adversarial case",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I12",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "constructed",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "synthetic",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

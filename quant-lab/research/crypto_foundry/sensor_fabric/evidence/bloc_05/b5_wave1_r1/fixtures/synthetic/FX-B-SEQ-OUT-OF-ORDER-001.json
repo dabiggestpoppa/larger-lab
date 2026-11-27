@@ -1,0 +1,94 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "ea82927ab47674c21435e84a0273b73fd4a67fbd77b13faa386445b1a3f9a176",
+  "expectation": {
+    "code": "SEQUENCE_DISCONTINUITY",
+    "derived_metrics_allowed": false,
+    "outcome": "REFUSE",
+    "reordered_silently": false
+  },
+  "fixture_id": "FX-B-SEQ-OUT-OF-ORDER-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves reconstruction behaviour only",
+    "proves nothing about any provider's real sequence semantics"
+  ],
+  "native_units": {
+    "level_quantity": "BTC",
+    "price": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "snapshot": {
+      "asks": [
+        [
+          "61231.0",
+          "1.0"
+        ]
+      ],
+      "bids": [
+        [
+          "61230.0",
+          "1.0"
+        ]
+      ],
+      "lastUpdateId": 4000
+    },
+    "updates": [
+      {
+        "U": 4006,
+        "pu": 4005,
+        "u": 4010
+      },
+      {
+        "U": 4001,
+        "pu": 4000,
+        "u": 4005
+      }
+    ]
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "An out-of-order update cannot be silently reordered: ordering is evidence, not a convenience.",
+  "semantic_claim_scope": "RECONSTRUCTION_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "bloc_05/04 section 6.2 + bloc_05/07 F21",
+    "endpoint": "constructed sequence model",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "synthetic event time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "E",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

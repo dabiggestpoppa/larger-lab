@@ -1,0 +1,69 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": true,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "0ab3cc4c047de1de5793af2b812b51c8ea77e22b7fb1a22d9b6bd4674f18b423",
+  "expectation": {
+    "code": "STABLECOIN_CONVERSION_UNAVAILABLE",
+    "outcome": "REFUSE",
+    "parity_substituted": false,
+    "usd_equivalent": null
+  },
+  "fixture_id": "FX-B-STABLECOIN-1TO1-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves the refusal contract only",
+    "proves nothing about actual provider semantics"
+  ],
+  "native_units": {
+    "unit_status": "ADVERSARIAL"
+  },
+  "payload": {
+    "assumed_usd": "1000",
+    "conversion_rate_observation": null,
+    "notional_quote": "1000",
+    "quote": "USDT"
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "1 USDT = 1 USD is a forbidden permanent assumption; the depeg case must stay blocked rather than be converted at parity.",
+  "semantic_claim_scope": "REFUSAL_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_TRADE",
+  "source": {
+    "documentation_ref": "bloc_05/03 section 9 + bloc_05/06 section 12",
+    "endpoint": "constructed adversarial case",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I10",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "constructed",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "synthetic",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

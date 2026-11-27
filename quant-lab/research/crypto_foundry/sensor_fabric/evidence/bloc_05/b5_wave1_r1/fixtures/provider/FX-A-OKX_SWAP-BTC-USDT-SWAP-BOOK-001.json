@@ -1,0 +1,92 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "c5f7250c10ffa13741e27a5638abff4602fc4a0d3af36cbd3210e6ea978b3fb5",
+  "expectation": {
+    "checksum_mismatch": "REFUSE_RECONSTRUCTION",
+    "checksum_required": true,
+    "is_full_snapshot": true,
+    "kind": "NORMALIZE",
+    "level_quantity_unit": "CONTRACTS"
+  },
+  "fixture_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-BOOK-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTC-USDT-SWAP",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "payload values are authored",
+    "checksum algorithm is provider-defined"
+  ],
+  "native_units": {
+    "level_quantity": "CONTRACTS",
+    "price": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "code": "0",
+    "data": [
+      {
+        "asks": [
+          [
+            "61231.1",
+            "12",
+            "0",
+            "3"
+          ]
+        ],
+        "bids": [
+          [
+            "61230.1",
+            "8",
+            "0",
+            "5"
+          ]
+        ],
+        "checksum": -2010478662,
+        "seqId": 123456789,
+        "ts": "1709294400123"
+      }
+    ]
+  },
+  "provider": "OKX_SWAP",
+  "ratified_golden": false,
+  "semantic_claim": "OKX books carry seqId and checksum, and level quantity is contracts; a checksum mismatch is a reconstruction failure, not a warning.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /api/v5/market/books",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#okx_swap"
+  },
+  "supports_checkpoint": "I14",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "snapshot time",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "ts",
+    "timezone": "UTC"
+  },
+  "venue": "OKX_SWAP"
+}

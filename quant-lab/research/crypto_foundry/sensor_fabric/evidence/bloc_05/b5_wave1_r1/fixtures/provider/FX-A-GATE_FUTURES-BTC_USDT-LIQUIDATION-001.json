@@ -1,0 +1,76 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": true,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "c9560f481ac6756e440b06b38e5dadb29e99f62123300d0fa54e47b1ab922596",
+  "expectation": {
+    "aggregation_scope": "INTERVAL_AGGREGATE",
+    "aggressor_flow_claim": "REFUSED",
+    "count_required": true,
+    "kind": "NORMALIZE",
+    "position_side_mapping": {
+      "long_liq_usd": "LONG",
+      "short_liq_usd": "SHORT"
+    }
+  },
+  "fixture_id": "FX-A-GATE_FUTURES-BTC_USDT-LIQUIDATION-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTC_USDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "whether zero-activity intervals are reported is not documented",
+    "USD quote is the provider's own USD claim, not an FX conversion",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "long_liq_usd": "USD",
+    "short_liq_usd": "USD",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "contract": "BTC_USDT",
+    "long_liq_usd": "1834000.00",
+    "short_liq_usd": "921500.00",
+    "time": 1709294400
+  },
+  "provider": "GATE_FUTURES",
+  "ratified_golden": false,
+  "semantic_claim": "long_liq_usd is the POSITION side liquidated, not buy-side aggressor flow, and the row is an interval aggregate rather than an event.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_LIQUIDATION",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /futures/USDT/liq_orders or contract_stats interval aggregate",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "SECONDARY_DOCUMENTED",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#gate_futures"
+  },
+  "supports_checkpoint": "I11",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": true,
+    "market_available_at_established": false,
+    "meaning": "interval start",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "SECOND",
+    "timestamp_field": "time",
+    "timezone": "UTC"
+  },
+  "venue": "GATE_FUTURES"
+}

@@ -1,0 +1,73 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "ed6814b5dd855385bb8735e359e8613f8792a2a25ae15e0e243f0254f905f4cc",
+  "expectation": {
+    "funding_interval_seconds": 28800,
+    "funding_notional_or_pnl": "REFUSED",
+    "funding_rate_native_preserved": "0.00010000",
+    "funding_rate_per_8h_simple_equiv": "0.00010000",
+    "kind": "NORMALIZE",
+    "predicted_or_realized": "REALIZED"
+  },
+  "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTCUSDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "interval is 8h by provider definition but is not carried in this response",
+    "payload values are authored"
+  ],
+  "native_units": {
+    "funding_rate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+    "notional": "USDT",
+    "unit_status": "DOCUMENTED_UNCERTIFIED"
+  },
+  "payload": {
+    "fundingRate": "0.00010000",
+    "fundingTime": 1709316000000,
+    "markPrice": "61200.12345678",
+    "symbol": "BTCUSDT"
+  },
+  "provider": "BINANCE_USDM",
+  "ratified_golden": false,
+  "semantic_claim": "The native rate, its interval and its effective time are carried separately; no PnL or notional is invented while the units methodology is unadmitted.",
+  "semantic_claim_scope": "FIELD_SHAPE_ONLY",
+  "sensor_family": "MECHANICAL_FUNDING",
+  "source": {
+    "documentation_ref": "quant-lab/config/crypto_sensor_fabric/live_probe_contracts.yaml",
+    "endpoint": "GET /fapi/v1/fundingRate",
+    "evidence_commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "field_name_confidence": "FIRST_PARTY_DOCUMENTED_IN_REPO",
+    "kind": "DOCUMENTED_FIELD_SHAPE",
+    "provider_evidence_ref": "bloc_02/10_CAPABILITY_CLAIMS.jsonl#binance_usdm"
+  },
+  "supports_checkpoint": "I13",
+  "synthetic": true,
+  "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "effective funding time; publication precedes it",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "fundingTime",
+    "timezone": "UTC"
+  },
+  "venue": "BINANCE_USDM"
+}

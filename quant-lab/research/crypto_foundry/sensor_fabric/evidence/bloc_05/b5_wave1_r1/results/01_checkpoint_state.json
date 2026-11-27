@@ -1,0 +1,107 @@
+{
+  "accepted_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+  "accepted_production_candidate_unchanged": true,
+  "authority_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+  "carrier_branch": "agent/crypto-sensor-fabric-b5-wave1-audit-r1",
+  "methodology_registry": {
+    "all_rows_provisional": true,
+    "b5_i08_units_v1_admitted": false,
+    "id_count": 9,
+    "ids_present": [
+      "OI_CONTRACTS_TO_USD_V1",
+      "OI_USD_NATIVE_PASSTHROUGH_V1",
+      "FUNDING_NATIVE_TO_8H_EQUIV_V1",
+      "LIQ_USD_NATIVE_PROVIDER_V1",
+      "AGGRESSOR_FROM_BUYER_MAKER_BINANCE_V1",
+      "DERIBIT_TRADE_LIQ_TAG_V1",
+      "DEPTH_BPS_RECONSTRUCTION_V1",
+      "PROVIDER_ANALYTICS_PASSTHROUGH_V1",
+      "CVD_SIGNED_NOTIONAL_V1"
+    ]
+  },
+  "p3_publication": "96f4cd28eabf6c853d6e750c3266b51031095f24",
+  "prior_audit_heads_preserved": [
+    "6c4874b43",
+    "6a1a7a5d6",
+    "d6b3f9f83",
+    "95c9ee01d",
+    "a59fa4002"
+  ],
+  "published_checkpoints": {
+    "I10": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/trade.py",
+      "path_present": true,
+      "sensor_family": "MECHANICAL_TRADE",
+      "state": "PUBLISHED"
+    },
+    "I11": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/liquidation.py",
+      "path_present": true,
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "state": "PUBLISHED"
+    },
+    "I12": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/oi.py",
+      "path_present": false,
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "I13": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/funding.py",
+      "path_present": false,
+      "sensor_family": "MECHANICAL_FUNDING",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "I14": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/book.py",
+      "path_present": false,
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "I15": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/positioning.py",
+      "path_present": false,
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "I16": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/lineage/__init__.py",
+      "path_present": false,
+      "sensor_family": "LINEAGE",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "I17": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/duplicates/__init__.py",
+      "path_present": false,
+      "sensor_family": "DUPLICATES",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "I19": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/query/__init__.py",
+      "path_present": false,
+      "sensor_family": "QUERY",
+      "state": "NOT_IMPLEMENTED"
+    },
+    "basis_normalizer": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/basis.py",
+      "path_present": false
+    },
+    "book_metric_normalizer": {
+      "expected_path": "src/crypto_sensor_fabric/normalization/sensors/book.py",
+      "path_present": false
+    }
+  },
+  "semantic_trust_root": {
+    "approved_artifact_count": 0,
+    "authority_id": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+    "path": "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json",
+    "revoked_approval_ids": [],
+    "semantic_admission_possible": false
+  },
+  "wave1_verification_state": {
+    "I12": "BLOCKED_PENDING_IMPLEMENTATION",
+    "I13": "BLOCKED_PENDING_IMPLEMENTATION",
+    "I14": "BLOCKED_PENDING_IMPLEMENTATION",
+    "I15": "BLOCKED_PENDING_IMPLEMENTATION"
+  }
+}

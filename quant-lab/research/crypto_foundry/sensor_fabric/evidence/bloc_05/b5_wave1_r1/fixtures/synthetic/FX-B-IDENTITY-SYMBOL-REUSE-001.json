@@ -1,0 +1,75 @@
+{
+  "acquisition_provenance": {
+    "authored_by": "second-agent (B5-WAVE1-R1)",
+    "captured_from_provider": false,
+    "method": "DOCUMENTED_SHAPE_RECONSTRUCTION",
+    "network_calls": 0,
+    "payload_values": "AUTHORED_NOT_CAPTURED"
+  },
+  "approval_status": "NOT_REVIEWED",
+  "checkpoint_executable_today": false,
+  "contract_type": "LINEAR_PERPETUAL",
+  "corpus_version": "b5-wave1-r1",
+  "evidence_digest": "1955c362bfdea2de8bbd3005fa20069dacd95691ffafed96bd2fcca7a3c24780",
+  "expectation": {
+    "backward_projected_terms": false,
+    "code": "BLOCKED_IDENTITY",
+    "outcome": "REFUSE",
+    "resolved_contract_instance": null
+  },
+  "fixture_id": "FX-B-IDENTITY-SYMBOL-REUSE-001",
+  "instrument": {
+    "canonical_asset": "BTC",
+    "contract_multiplier": "1",
+    "contract_type": "LINEAR_PERPETUAL",
+    "multiplier_unit": "CONTRACTS",
+    "native_symbol": "BTC_USDT",
+    "quote_asset": "USDT",
+    "settlement_asset": "USDT"
+  },
+  "known_limitations": [
+    "synthetic: proves the refusal contract only",
+    "proves nothing about actual provider semantics"
+  ],
+  "native_units": {
+    "unit_status": "ADVERSARIAL"
+  },
+  "payload": {
+    "current_terms_applied_to": "2023-01-15T00:00:00Z",
+    "instance_a": {
+      "multiplier": "0.0001",
+      "valid_to": "2023-06-01T00:00:00Z"
+    },
+    "instance_b": {
+      "multiplier": "0.0001",
+      "valid_from": "2023-09-01T00:00:00Z"
+    },
+    "symbol": "BTC_USDT"
+  },
+  "provider": "GATE_FUTURES",
+  "ratified_golden": false,
+  "semantic_claim": "A current contract map projected backwards over a symbol re-listing must fail; symbol reuse cannot collapse two economic contracts.",
+  "semantic_claim_scope": "REFUSAL_BEHAVIOUR_ONLY",
+  "sensor_family": "MECHANICAL_TRADE",
+  "source": {
+    "documentation_ref": "bloc_05/06 section 4 + G1",
+    "endpoint": "constructed adversarial case",
+    "evidence_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+    "field_name_confidence": "SYNTHETIC",
+    "kind": "SYNTHETIC_CONSTRUCTION",
+    "provider_evidence_ref": null
+  },
+  "supports_checkpoint": "I03",
+  "synthetic": true,
+  "tier": "TIER_B_SYNTHETIC_ADVERSARIAL",
+  "timestamp_semantics": {
+    "interval_close_based": false,
+    "market_available_at_established": false,
+    "meaning": "constructed",
+    "pit_status": "NOT_ESTABLISHED",
+    "source_precision": "MILLISECOND",
+    "timestamp_field": "synthetic",
+    "timezone": "UTC"
+  },
+  "venue": "GATE_FUTURES"
+}
