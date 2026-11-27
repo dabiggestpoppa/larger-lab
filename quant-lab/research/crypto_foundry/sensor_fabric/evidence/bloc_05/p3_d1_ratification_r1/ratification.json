@@ -1,0 +1,115 @@
+{
+  "disposition": "P3_D1_BOUNDED_IMPLEMENTATION_RATIFIED",
+  "directive": "RATIFY_P3_D1_BOUNDED_IMPLEMENTATION_AND_AUTHORIZE_WAVE1",
+  "mission": "SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1",
+  "nature": "operator acceptance record; additive; no production, test, manifest or evidence mutation",
+  "reference_lock": {
+    "repository": "dabiggestpoppa/larger-lab",
+    "production_branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+    "final_production_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "final_canonical_publication": "96f4cd28eabf6c853d6e750c3266b51031095f24",
+    "rung7_closeout": "72173dfc262b67116511078b79307e342075d74d",
+    "independent_targeted_acceptance": "95c9ee01d61bdcefff0d1a379d0af26de7e788df",
+    "final_independent_canonical_reconciliation": "a59fa400241874c6201669e799bfa2d7039019e5",
+    "frozen_planning_authority_branch": "agent/crypto-sensor-fabric-plan",
+    "frozen_planning_authority_commit": "4bb677f9e0266f4dc48405181696019f359ae49f"
+  },
+  "reconciliation_read_before_ratification": {
+    "candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "candidate_tree": "e7f058bb2e315365b19c3933c16745c895e7bb5b",
+    "external_anchor_count": 4968,
+    "external_anchor_digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "independent_recollect_agrees": true,
+    "hardened_verifier_exit_code": 0,
+    "restoration_verified": true,
+    "tree_clean_after": true,
+    "gate_summary": "44/44 RECONCILED_GREEN",
+    "conditions": [
+      "audited work is labelled SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT; this record does not upgrade that label",
+      "reconciler sensitivity finding retained: two tamper classes (standalone collection.json, raw results stream) are invisible to the producer's hardened verifier",
+      "independent canonical gates accepted subject to direct verification of the reconciliation package at a59fa4002"
+    ]
+  },
+  "accepted_scope": [
+    "production data contracts",
+    "policy-owned verification",
+    "bounded custody authority derivation",
+    "PIT and replay controls",
+    "evidence rebinding",
+    "adversarial security",
+    "F4/F5 repairs",
+    "executable unresolved-binding guard",
+    "final independently reconciled canonical execution"
+  ],
+  "canonical_accounting": {
+    "collected": 4968,
+    "executed": 4968,
+    "passed": 4957,
+    "explained_skips": 11,
+    "failed": 0,
+    "errored": 0,
+    "missing": 0,
+    "extra": 0,
+    "duplicates": 0,
+    "collection_digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "skips_explained": {
+      "posix_or_windows_platform": 8,
+      "opt_in_live_or_postgresql": 3
+    },
+    "measured_again_by_this_record": false
+  },
+  "independent_targeted_acceptance": {
+    "controls_passed": 41,
+    "controls_total": 41,
+    "mutations_detected": 3,
+    "mutations_total": 3,
+    "shipped_suite": "177/177",
+    "independent_canonical_gates_passed": 44,
+    "independent_canonical_gates_total": 44,
+    "subject_to_direct_verification_of_reconciliation_package": true
+  },
+  "deferred_not_implemented": {
+    "replay_record_binding_contract": "DEFERRED",
+    "REPLAY_RECORD_BINDING_ESTABLISHED": false,
+    "custody_source_authority_contract": "DEFERRED",
+    "custody_source_authorized": false,
+    "semantic_admission_possible": false
+  },
+  "preserved_invariants": {
+    "INTEGRATION_STATE": "INTEGRATION_REQUIRED",
+    "approval_manifest_artifact_count": 0,
+    "approval_manifest_authority_id": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+    "approval_manifest_blob": "7be15e8e56c87a4acea533a7b2382c1f5d5ad2f9",
+    "approval_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "provider_approved": false,
+    "custody_source_authorization": false,
+    "canonical_execution_assurance": "SERIAL_ONLY",
+    "canonical_workers": 1,
+    "four_worker_configuration": "UNSUPPORTED",
+    "explained_skips": 11
+  },
+  "gates": {
+    "LINEAGE": "NOT_MET",
+    "DUPLICATE_REVISION": "NOT_MET",
+    "GOLDEN_T0_T1": "NOT_MET",
+    "SEMANTIC": "OPEN_BEYOND_TRADE_AND_LIQUIDATION",
+    "UNIT": "B5_I08_UNITS_V1_UNADMITTED"
+  },
+  "authorized_next_step": {
+    "branch": "agent/crypto-sensor-fabric-b5-wave1-r1",
+    "from": "72173dfc262b67116511078b79307e342075d74d",
+    "scope": ["I12", "I13", "I14", "I15", "I16_PRELIMINARY", "I21_ASSOCIATED_CONTROLS"]
+  },
+  "still_unauthorized": [
+    "D2 production merge",
+    "D3 actual source-authority activation",
+    "manifest activation",
+    "provider approval",
+    "custody-source authorization",
+    "B5_I08_UNITS_V1 methodology admission",
+    "I17-I23 implementation",
+    "Bloc 6 advancement",
+    "live trading or capital authority"
+  ],
+  "p3_audit_or_canonical_run_initiated": false
+}
