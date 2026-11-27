@@ -1,0 +1,517 @@
+"""Independent reconciliation of the completed R6 final canonical bundle (r3).
+
+Read-only.  Recomputes every claimed property from raw artifacts and does not
+trust the producer summary: bundle hashes, collection digest, partition and
+result-stream universes, JUnit accounting, skip reasons, candidate binding,
+restoration, publication contents and the hardened verifier with the external
+anchor.  Nothing is written, moved or regenerated.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+from collections import Counter
+from pathlib import Path
+
+CAND = Path(os.environ["AUDIT_QUANT_LAB"]).resolve()
+BUNDLE_ROOT = Path(os.environ["AUDIT_FINAL_BUNDLE_ROOT"]).resolve()
+
+CANDIDATE_SHA = "66200f3cb18ee5cea1483d986e64502f388eeb77"
+CANDIDATE_TREE = "e7f058bb2e315365b19c3933c16745c895e7bb5b"
+PUBLICATION_SHA = "96f4cd28eabf6c853d6e750c3266b51031095f24"
+EXPECT_COUNT = 4968
+EXPECT_DIGEST = "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9"
+EXPECT_PASSED, EXPECT_FAILED, EXPECT_ERRORED, EXPECT_SKIPPED = 4957, 0, 0, 11
+
+# SHA-256 of every bundle artifact, as published in ARTIFACT_INVENTORY.sha256
+# and restated in AGENT2_HANDOFF_R2.md.  Checked against a fresh recomputation.
+EXPECT_FILES = {
+    "collection.json": "b8ad4e8e8cc6b5acd167d6f7bad0c196b2db44f17d813e9a8e2694f3f36f3df4",
+    "evidence.json": "5936680f1601da807a478736d3dc163159a91091640ac86974c24c9b0bf9ebbe",
+    "guard_baseline.json": "8929be1370f95525941b96fa1ab1f0c99012e0fd1cb8a7f3d0c9fe051b59124d",
+    "junit_0.xml": "8d037df3199903f9fc5ff1cc24397eb8f504e1d7266dcc89c2588389ea6fa7c4",
+    "partition_0.json": "6ff0dcd93aa5ea8a57f25f8773b1156c96e07bcf0c5a44cafeff8b1646e4844a",
+    "results_0.jsonl": "18a8cea3d966c2a125f065669eb1e731065dfcf6d2b3d221829b86f7e5a05673",
+}
+
+
+def sha256(path: Path) -> str:
+    h = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
+def digest_nodes(nodes) -> str:
+    return hashlib.sha256("\n".join(sorted(nodes)).encode()).hexdigest()
+
+
+def git(*args: str) -> str:
+    proc = subprocess.run(
+        ["git", *args], cwd=str(CAND), capture_output=True, text=True
+    )
+    return proc.stdout.strip()
+
+
+def module_of(nodeid: str) -> str:
+    path = nodeid.partition("::")[0]
+    if path.endswith(".py"):
+        path = path[: -len(".py")]
+    return path.replace("/", ".")
+
+
+def junit_key(nodeid: str) -> tuple[str, str]:
+    """pytest node id -> JUnit (classname, name), losslessly.
+
+    The two formats disagree only on where a test class is placed: JUnit folds
+    it into ``classname`` (dotted, no ``.py``), pytest folds it into the node
+    path (``module.py::Class::test``).  Both are folded to the identical
+    (class-qualified dotted name, leaf test name) pair so the comparison is an
+    exact identity, parametrisation suffixes included.  Uniqueness of both key
+    sets is asserted, so the comparison cannot silently collapse cases.
+    """
+    path, _, rest = nodeid.partition("::")
+    if path.endswith(".py"):
+        path = path[: -len(".py")]
+    parts = rest.split("::")
+    leaf = parts[-1]
+    qualified = path.replace("/", ".")
+    if len(parts) > 1:
+        qualified = qualified + "." + ".".join(parts[:-1])
+    return (qualified, leaf)
+
+
+def final_outcomes(results_path: Path):
+    outcomes: dict[str, str] = {}
+    dupes: list[str] = []
+    odd: list[dict] = []
+    called: set[str] = set()
+    phases: Counter = Counter()
+    seen_calls: Counter = Counter()
+    with results_path.open(encoding="utf-8") as handle:
+        for line in handle:
+            line = line.strip()
+            if not line:
+                continue
+            row = json.loads(line)
+            node = row.get("nodeid")
+            phases[row.get("record_type") or row.get("when")] += 1
+            if node is None:
+                odd.append(row)
+                continue
+            phase = row.get("when")
+            outcome = str(row.get("outcome"))
+            if phase == "call":
+                called.add(node)
+                seen_calls[node] += 1
+                if seen_calls[node] > 1:
+                    dupes.append(node)
+                outcomes[node] = outcome
+            elif (
+                node not in outcomes
+                and phase in {"setup", "teardown"}
+                and outcome != "passed"
+            ):
+                # a setup-phase skip has no call phase; it is still this node's result
+                outcomes[node] = outcome
+    return outcomes, odd, dupes, called, dict(phases)
+
+
+def reconcile() -> dict:
+    bundle = BUNDLE_ROOT / "p3-r6-final-r3"
+    collection = json.loads((bundle / "collection.json").read_text(encoding="utf-8"))
+    evidence = json.loads((bundle / "evidence.json").read_text(encoding="utf-8"))
+    partition = json.loads((bundle / "partition_0.json").read_text(encoding="utf-8"))
+    recollect = json.loads(
+        (BUNDLE_ROOT.parent / "collection_recollect.json").read_text(encoding="utf-8")
+    )
+    nodes = list(collection["nodes"])
+    modules = {module_of(node) for node in nodes}
+    outcomes, odd, stream_dupes, called, phases = final_outcomes(
+        bundle / "results_0.jsonl"
+    )
+
+    junit = ET.parse(bundle / "junit_0.xml").getroot()
+    suite = junit if junit.tag.endswith("testsuite") else junit.find("testsuite")
+    cases = list(junit.iter("testcase"))
+    skipped = []
+    junit_nodes = set()
+    for case in cases:
+        # JUnit records dotted module paths without the .py suffix.
+        junit_nodes.add(
+            ((case.get("classname", "") or ""), case.get("name", ""))
+        )
+        marker = case.find("skipped")
+        if marker is not None:
+            skipped.append(
+                {
+                    "name": case.get("name"),
+                    "classname": case.get("classname"),
+                    "reason": (marker.get("message") or marker.get("type") or "")[:180],
+                }
+            )
+
+    # The standalone collection.json is a separate artifact from the copy
+    # embedded in evidence.json; nothing upstream reconciles the two, so a
+    # divergence must be surfaced here rather than assumed away.
+    embedded = evidence.get("collection", {})
+    collection_artifact_agrees = {
+        "count": embedded.get("count") == collection["count"],
+        "digest": embedded.get("digest") == collection["digest"],
+        "node_set": set(embedded.get("nodes", [])) == set(nodes),
+    }
+
+    recorded_anchor = evidence["universe_anchor"]
+    # The anchor must be an independent recollection, not a copy of the run.
+    recollect_collection = recollect.get("collection", {})
+    anchor_matches_recollect = (
+        recollect_collection.get("count") == recorded_anchor.get("count")
+        and recollect_collection.get("digest") == recorded_anchor.get("digest")
+    )
+    anchor_matches_running = (
+        recorded_anchor.get("count") == collection["count"]
+        and recorded_anchor.get("digest") == collection["digest"]
+    )
+
+    # Delta against the preserved pre-repair bundle, if present alongside.
+    prior = BUNDLE_ROOT.parent / "preserved-4952-bundle-p3-r6-final" / "collection.json"
+    delta = None
+    if prior.exists():
+        prior_nodes = set(json.loads(prior.read_text(encoding="utf-8"))["nodes"])
+        added = sorted(set(nodes) - prior_nodes)
+        removed = sorted(prior_nodes - set(nodes))
+        delta = {
+            "prior_bundle": str(prior.parent),
+            "prior_count": len(prior_nodes),
+            "added_count": len(added),
+            "added_all_passed": all(outcomes.get(n) == "passed" for n in added),
+            "net_delta": len(added) - len(removed),
+            "net_delta_is_plus_16": len(added) - len(removed) == EXPECT_COUNT - len(prior_nodes),
+            "added": added,
+            "removed_count": len(removed),
+            "removed": removed,
+        }
+
+    publications = git("diff-tree", "--no-commit-id", "--name-only", "-r", PUBLICATION_SHA)
+    pub_paths = [p for p in publications.splitlines() if p.strip()]
+    guarded = [
+        p
+        for p in pub_paths
+        if p.startswith("quant-lab/src/")
+        or p.startswith("quant-lab/tests/")
+        or p.startswith("quant-lab/research/crypto_foundry/sensor_fabric/manifest")
+    ]
+    pub_parent = git("rev-parse", PUBLICATION_SHA + "^")
+
+    counts = Counter(outcomes.values())
+    return {
+        "bundle": str(bundle),
+        "bundle_files": {
+            path.name: {"sha256": sha256(path), "bytes": path.stat().st_size}
+            for path in sorted(bundle.iterdir())
+            if path.is_file()
+        },
+        "bundle_hashes_match_inventory": all(
+            sha256(bundle / name) == digest for name, digest in EXPECT_FILES.items()
+        ),
+        "bundle_extra_files": sorted(
+            {p.name for p in bundle.iterdir() if p.is_file()} - set(EXPECT_FILES)
+        ),
+        "candidate": {
+            "expected_commit": CANDIDATE_SHA,
+            "expected_tree": CANDIDATE_TREE,
+            "recorded_commit": evidence["ownership"].get("commit"),
+            "recorded_commit_ok": evidence["ownership"].get("commit") == CANDIDATE_SHA,
+            "recorded_branch": evidence["ownership"].get("branch"),
+            "live_commit": git("rev-parse", CANDIDATE_SHA),
+            "live_commit_ok": git("rev-parse", CANDIDATE_SHA) == CANDIDATE_SHA,
+            "live_tree": git("rev-parse", CANDIDATE_SHA + "^{tree}"),
+            "live_tree_ok": git("rev-parse", CANDIDATE_SHA + "^{tree}") == CANDIDATE_TREE,
+            "candidate_is_ancestor_of_publication": subprocess.run(
+                ["git", "merge-base", "--is-ancestor", CANDIDATE_SHA, PUBLICATION_SHA],
+                cwd=str(CAND),
+            ).returncode
+            == 0,
+        },
+        "publication": {
+            "sha": PUBLICATION_SHA,
+            "parent": pub_parent,
+            "parent_is_candidate": pub_parent == CANDIDATE_SHA,
+            "files": pub_paths,
+            "file_count": len(pub_paths),
+            "guarded_paths_touched": guarded,
+            "production_or_test_changes": len(guarded),
+        },
+        "collection": {
+            "count": collection["count"],
+            "count_ok": collection["count"] == EXPECT_COUNT,
+            "unique": len(set(nodes)),
+            "nodes_len": len(nodes),
+            "digest_recorded": collection["digest"],
+            "digest_recomputed": digest_nodes(nodes),
+            "digest_ok": digest_nodes(nodes) == collection["digest"],
+            "digest_matches_expected": collection["digest"] == EXPECT_DIGEST,
+            "duplicates": len(collection["duplicates"]),
+            "malformed": collection["malformed_count"],
+            "collection_errors": len(collection["collection_errors"]),
+            "exit_code": collection["exit_code"],
+            "groups": len(collection["groups"]),
+        },
+        "anchor": {
+            "recorded": recorded_anchor,
+            "count_ok": recorded_anchor.get("count") == EXPECT_COUNT,
+            "digest_ok": recorded_anchor.get("digest") == EXPECT_DIGEST,
+            "independent_recollect_matches": anchor_matches_recollect,
+            "recollect_is_run_independent": anchor_matches_running,
+            "standalone_collection_artifact_agrees_with_embedded": collection_artifact_agrees,
+            "recollect_node_set_equals_bundle": set(
+                recollect_collection.get("nodes", [])
+            )
+            == set(nodes),
+            "recollect_exit_code": recollect_collection.get("exit_code"),
+            "recollect_count": recollect_collection.get("count"),
+            "recollect_digest": recollect_collection.get("digest"),
+            "note": (
+                "collection_recollect.json is a separate collection pass stored "
+                "outside the bundle; it is compared to the bundle, not trusted"
+            ),
+        },
+        "partition": {
+            "index": partition["index"],
+            "intended": partition["intended_count"],
+            "intended_ok": partition["intended_count"] == EXPECT_COUNT,
+            "set_equals_collection": set(partition["intended_nodes"]) == set(nodes),
+            "files": len(partition["files"]),
+        },
+        "execution": {
+            "unique_nodes": evidence["execution"]["unique_count"],
+            "node_set_equals_collection": set(outcomes) == set(nodes),
+            "missing": sorted(set(nodes) - set(outcomes))[:25],
+            "missing_count": len(set(nodes) - set(outcomes)),
+            "extra": sorted(set(outcomes) - set(nodes))[:25],
+            "extra_count": len(set(outcomes) - set(nodes)),
+            "counts_recorded": evidence["execution"]["counts"],
+            "counts_recomputed": dict(counts),
+            "duplicate_executions_recorded": len(evidence["execution"]["duplicate_executions"]),
+            "duplicate_executions_observed": len(stream_dupes),
+            "unimplemented_partitions": evidence["execution"]["unimplemented_partitions"],
+            "result_rows_without_node": len(odd),
+            "nodeid_less_rows": odd,
+            "record_type_phases": phases,
+            "nodes_without_call_phase": sorted(set(nodes) - called),
+            "nodes_without_call_phase_outcomes": {
+                n: outcomes.get(n) for n in sorted(set(nodes) - called)
+            },
+            "execution_digest_matches_collection": evidence["execution"].get("digest")
+            == collection["digest"],
+        },
+        "junit": {
+            "tests": int(suite.get("tests", 0)),
+            "failures": int(suite.get("failures", 0)),
+            "errors": int(suite.get("errors", 0)),
+            "skipped": int(suite.get("skipped", 0)),
+            "cases_seen": len(cases),
+            "key_normalization": "(class-qualified dotted name, leaf test name)",
+            "junit_keys_unique": len(junit_nodes) == len(cases),
+            "nodes_keys_unique": len({junit_key(n) for n in nodes}) == len(nodes),
+            "node_set_equals_collection": junit_nodes
+            == {junit_key(n) for n in nodes},
+            "junit_nodes_not_in_collection": sorted(
+                junit_nodes - {junit_key(n) for n in nodes}
+            )[:10],
+            "collection_nodes_not_in_junit": sorted(
+                {junit_key(n) for n in nodes} - junit_nodes
+            )[:10],
+            "skipped_count_matches": int(suite.get("skipped", 0)) == len(skipped),
+            "skipped_detail": skipped,
+        },
+        "verdict": {
+            "disposition": evidence["verdict"].get("disposition"),
+            "assurance": evidence["verdict"].get("assurance"),
+            "test_outcome": evidence["verdict"].get("test_outcome"),
+            "reasons": evidence["verdict"].get("reasons"),
+            "missing_count": evidence["verdict"].get("missing_count"),
+            "extra_count": evidence["verdict"].get("extra_count"),
+            "counts": evidence["verdict"].get("counts"),
+            "ok": (
+                evidence["verdict"].get("assurance") == "ANCHORED_COMPLETE"
+                and evidence["verdict"].get("test_outcome") == "GREEN"
+                and evidence["verdict"].get("missing_count") == 0
+                and evidence["verdict"].get("extra_count") == 0
+            ),
+        },
+        "restoration": {
+            "attempted": evidence["restoration"].get("attempted"),
+            "verified": evidence["restoration"].get("verified"),
+            "failed": evidence["restoration"].get("failed"),
+            "paths": evidence["restoration"].get("paths"),
+        },
+        "tree": {
+            "clean_after": evidence["tree"].get("clean_after"),
+            "dirty_paths": evidence["tree"].get("dirty_paths"),
+            "untracked_added": evidence["tree"].get("untracked_added"),
+        },
+        "interrupted": evidence["interrupted"],
+        "limits": evidence["limits"],
+        "environment": {
+            k: evidence["environment"].get(k)
+            for k in ("python", "pytest", "platform", "cpu_count", "cwd")
+        },
+        "run_window": {
+            "started_at": evidence["started_at"],
+            "finished_at": evidence["finished_at"],
+        },
+        "delta_vs_pre_repair_bundle": delta,
+    }
+
+
+def verify_with_runner() -> dict:
+    bundle = BUNDLE_ROOT / "p3-r6-final-r3"
+    runner = CAND / "research/crypto_foundry/sensor_fabric/scripts/canonical_runner.py"
+    evidence = bundle / "evidence.json"
+    env = dict(os.environ)
+    env["PYTHONPATH"] = str(CAND / "src")
+    proc = subprocess.run(
+        [
+            sys.executable,
+            str(runner),
+            "verify",
+            str(evidence),
+            "--require-anchor",
+            "--expect-count",
+            str(EXPECT_COUNT),
+            "--expect-digest",
+            EXPECT_DIGEST,
+        ],
+        cwd=str(CAND),
+        env=env,
+        capture_output=True,
+        text=True,
+    )
+    try:
+        start = proc.stdout.index("{")
+        parsed = json.loads(proc.stdout[start:])
+    except Exception:
+        parsed = {"raw_tail": (proc.stdout or proc.stderr or "")[-900:]}
+    return {"exit_code": proc.returncode, "result": parsed}
+
+
+def gates(report: dict, verifier: dict) -> dict:
+    v = verifier.get("result", {})
+    checks = {
+        "bundle_hashes_match_inventory": report["bundle_hashes_match_inventory"],
+        "bundle_has_no_extra_artifacts": not report["bundle_extra_files"],
+        "recorded_commit_is_candidate": report["candidate"]["recorded_commit_ok"],
+        "live_candidate_tree_pinned": report["candidate"]["live_tree_ok"],
+        "candidate_ancestor_of_publication": report["candidate"][
+            "candidate_is_ancestor_of_publication"
+        ],
+        "publication_touches_no_source_or_test": report["publication"][
+            "production_or_test_changes"
+        ]
+        == 0,
+        "collection_count_4968": report["collection"]["count_ok"],
+        "collection_digest_recomputes": report["collection"]["digest_ok"],
+        "collection_digest_is_expected": report["collection"]["digest_matches_expected"],
+        "standalone_collection_agrees_with_evidence": all(
+            report["anchor"]["standalone_collection_artifact_agrees_with_embedded"].values()
+        ),
+        "collection_has_no_duplicates": report["collection"]["duplicates"] == 0,
+        "collection_has_no_malformed": report["collection"]["malformed"] == 0,
+        "collection_has_no_errors": report["collection"]["collection_errors"] == 0,
+        "collection_exit_zero": report["collection"]["exit_code"] == 0,
+        "anchor_count_4968": report["anchor"]["count_ok"],
+        "anchor_digest_expected": report["anchor"]["digest_ok"],
+        "anchor_independent_recollect_agrees": report["anchor"][
+            "independent_recollect_matches"
+        ],
+        "partition_set_equals_collection": report["partition"]["set_equals_collection"],
+        "partition_intended_4968": report["partition"]["intended_ok"],
+        "execution_node_set_equals_collection": report["execution"][
+            "node_set_equals_collection"
+        ],
+        "execution_zero_missing": report["execution"]["missing_count"] == 0,
+        "execution_zero_extra": report["execution"]["extra_count"] == 0,
+        "execution_zero_duplicates": report["execution"]["duplicate_executions_observed"]
+        == 0,
+        "execution_counts_expected": {
+            key: report["execution"]["counts_recomputed"].get(key, 0)
+            for key in ("passed", "failed", "errored", "skipped")
+        }
+        == {
+            "passed": EXPECT_PASSED,
+            "failed": EXPECT_FAILED,
+            "errored": EXPECT_ERRORED,
+            "skipped": EXPECT_SKIPPED,
+        },
+        "junit_tests_4968": report["junit"]["tests"] == EXPECT_COUNT,
+        "junit_zero_failures": report["junit"]["failures"] == EXPECT_FAILED,
+        "junit_zero_errors": report["junit"]["errors"] == EXPECT_ERRORED,
+        "junit_skips_11": report["junit"]["skipped"] == EXPECT_SKIPPED,
+        "junit_skip_detail_complete": report["junit"]["skipped_count_matches"],
+        "junit_node_set_equals_collection": report["junit"][
+            "node_set_equals_collection"
+        ],
+        "verdict_anchored_complete_green": report["verdict"]["ok"],
+        "restoration_verified": report["restoration"]["verified"] is True,
+        "tree_clean_after": report["tree"]["clean_after"] is True,
+        "run_not_interrupted": report["interrupted"] is False,
+        "result_has_session_end_record": any(
+            row.get("record_type") == "session_end" for row in report["execution"]["nodeid_less_rows"]
+        ),
+        "session_end_reports_4968": all(
+            row.get("nodes") == EXPECT_COUNT and row.get("exitstatus") == 0
+            for row in report["execution"]["nodeid_less_rows"]
+            if row.get("record_type") == "session_end"
+        ),
+        "verifier_exit_zero": verifier.get("exit_code") == 0,
+        "verifier_disposition_complete": v.get("disposition") == "COMPLETE",
+        "verifier_anchored_complete": v.get("assurance") == "ANCHORED_COMPLETE",
+        "verifier_green": v.get("test_outcome") == "GREEN",
+        "verifier_zero_missing": v.get("missing_count") == 0,
+        "verifier_zero_extra": v.get("extra_count") == 0,
+        "verifier_external_anchor_checked": v.get("reconciliation", {}).get(
+            "external_anchor_checked"
+        )
+        is True,
+        "verifier_counts_agree": v.get("counts")
+        == {
+            "passed": EXPECT_PASSED,
+            "failed": EXPECT_FAILED,
+            "errored": EXPECT_ERRORED,
+            "skipped": EXPECT_SKIPPED,
+        },
+    }
+    failures = [name for name, ok in checks.items() if not ok]
+    return {
+        "checks": checks,
+        "failed": failures,
+        "all_green": not failures,
+        "verdict": "RECONCILED_GREEN" if not failures else "RECONCILIATION_FAILED",
+    }
+
+
+def main() -> int:
+    report = reconcile()
+    verifier = verify_with_runner()
+    outcome = gates(report, verifier)
+    payload = {
+        "candidate_sha": CANDIDATE_SHA,
+        "candidate_tree": CANDIDATE_TREE,
+        "publication_sha": PUBLICATION_SHA,
+        "reconciliation": report,
+        "hardened_verifier": verifier,
+        "gates": outcome,
+    }
+    print(json.dumps(payload, indent=2))
+    return 0 if outcome["all_green"] else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

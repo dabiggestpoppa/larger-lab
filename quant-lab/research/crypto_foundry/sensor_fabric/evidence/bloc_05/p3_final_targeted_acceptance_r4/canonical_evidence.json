@@ -1,107 +1,151 @@
 {
   "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
-  "purpose": "\u00a77 reconciliation attempt against the only canonical bundle present. Establishes whether ANY published canonical evidence covers the repair candidate 66200f3cb.",
-  "bundle": "C:\\Users\\wifik\\Desktop\\larger-lab\\.worktrees\\p3-consumer-rung1\\quant-lab\\research\\crypto_foundry\\sensor_fabric\\evidence\\bloc_05\\canonical_runs\\p3-r6-final",
-  "recorded_commit": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
-  "recorded_branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
-  "repair_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
-  "bundle_matches_repair_candidate": false,
-  "started_at": "2026-11-25T20:14:52+00:00",
-  "finished_at": "2026-11-25T20:40:01+00:00",
-  "repair_committer_date": "2026-11-25T19:14:04-05:00",
-  "collection": {
-    "recorded_count": 4952,
-    "recomputed_count": 4952,
-    "recorded_digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
-    "recomputed_digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
-    "digest_matches": true,
-    "duplicates": [],
-    "malformed": 0
-  },
-  "junit": {
-    "tests": 4952,
-    "failures": 0,
-    "errors": 0,
-    "skipped": 11,
-    "skipped_detail": [
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.providers.test_network_smoke_live::test_live_production_network_smoke",
-        "reason": "SENSOR_NETWORK_SMOKE not set; live network smoke disabled"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store.TestPermissions::test_final_not_world_writable",
-        "reason": "POSIX mode bits do not apply on Windows"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store_namespace.TestNameMaxProbe::test_posix_probe_failure_fails_closed",
-        "reason": "platform has no os.pathconf"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata::test_real_postgres_integration_is_explicitly_opt_in",
-        "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata::test_real_postgres_failed_refresh_rolls_back_previous_snapshot",
-        "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources::test_restore_symlinked_destination_component_refused",
-        "reason": "symlink privilege unavailable on this platform"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources::test_verify_symlinked_pack_object_refused",
-        "reason": "symlink privilege unavailable on this platform"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_concurrent_publication.TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed",
-        "reason": "Windows cannot create symlinks without privilege (1314)"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_path_canonicalization.TestCaseLaw::test_distinct_posix_directories_are_not_merged",
-        "reason": "Windows filesystem is case-insensitive here"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_json_catalog.TestCorruptionFailClosed::test_unreadable_fragment_fails_closed",
-        "reason": "POSIX permission semantics"
-      },
-      {
-        "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_recovery::test_symlink_escape_rejected",
-        "reason": "POSIX symlink semantics required"
-      }
-    ]
-  },
-  "execution": {
-    "counts_recorded": {
-      "passed": 4941,
-      "failed": 0,
-      "errored": 0,
+  "section": "\u00a77 canonical reconciliation \u2014 status record",
+  "status": "CLOSED",
+  "outcome": "RECONCILED_GREEN",
+  "supersedes": "the NOT-ISSUED state of this file at 95c9ee01d. The reasoning that was published then is retained verbatim under prior_attempt; it is not withdrawn, it was correct for the evidence that existed at that time.",
+  "closure": {
+    "bundle": "C:\\Users\\wifik\\Desktop\\larger-lab\\.p3-r6-evidence\\final-canonical-r3\\bundle\\p3-r6-final-r3",
+    "candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "evidence_publication": "96f4cd28eabf6c853d6e750c3266b51031095f24",
+    "count": 4968,
+    "digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "counts": {
+      "passed": 4957,
       "skipped": 11
     },
-    "counts_recomputed": {
-      "passed": 4941,
+    "junit": {
+      "tests": 4968,
+      "failures": 0,
+      "errors": 0,
       "skipped": 11
     },
-    "node_set_equals_collection": true,
-    "duplicate_executions": 0,
-    "unimplemented_partitions": []
+    "missing_extra_duplicate": {
+      "missing": 0,
+      "extra": 0,
+      "duplicates": 0
+    },
+    "restoration_verified": true,
+    "tree_clean_after": true,
+    "verifier": {
+      "exit_code": 0,
+      "disposition": "COMPLETE",
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN"
+    },
+    "independent_gates": "44/44",
+    "detail": "canonical_reconciliation_r3.json"
   },
-  "hardened_verifier": {
-    "command": "canonical_runner.py verify <evidence.json> --require-anchor --expect-count --expect-digest",
-    "exit_code": 0,
-    "assurance": "ANCHORED_COMPLETE",
-    "test_outcome": "GREEN"
-  },
-  "restoration_verified": true,
-  "tree_clean_after": true,
-  "interrupted": false,
-  "repair_present_in_executed_tree": {
-    "F4_whole_selection_sweep": false,
-    "F5_approved_token_helper": false,
-    "F1_executable_binding_guard": false,
-    "F1_terminal_guard_branch": false
-  },
-  "policy_sha256_executed_tree": "ee1b07ee22899f0b050b275e6cdbedd15c21296370791f0f4f7760c3e1c62102",
-  "policy_sha256_repair_head": "cc5d1bb9dc6cd8c901106153cfb81aa638a60bceb3527758b7bf340445f4e24a",
-  "new_canonical_bundle_for_repair_exists": false,
-  "conclusion": "The only bundle present was executed at 868dd3fc, which is an ANCESTOR of the repair commit 66200f3cb, and it contains none of the repair's controls. It is the pre-repair R6 run already reconciled at audit-r2 (identical anchor). Therefore \u00a77 reconciliation FOR THE REPAIR CANNOT BE PERFORMED, and the targeted acceptance is published without claiming it."
+  "retained_limitations": [
+    "Parallel execution: one worker only on this host.",
+    "11 skips: 8 POSIX/Windows semantics, 3 opt-in external runtimes.",
+    "The producer's hardened verifier is insensitive to the standalone collection.json artifact and to the raw results stream (tamper controls T1/T2); \u00a77 was therefore closed with an independent reconciler, not by repeating the verifier verdict."
+  ],
+  "prior_attempt": {
+    "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+    "purpose": "\u00a77 reconciliation attempt against the only canonical bundle present. Establishes whether ANY published canonical evidence covers the repair candidate 66200f3cb.",
+    "bundle": "C:\\Users\\wifik\\Desktop\\larger-lab\\.worktrees\\p3-consumer-rung1\\quant-lab\\research\\crypto_foundry\\sensor_fabric\\evidence\\bloc_05\\canonical_runs\\p3-r6-final",
+    "recorded_commit": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "recorded_branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+    "repair_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "bundle_matches_repair_candidate": false,
+    "started_at": "2026-11-25T20:14:52+00:00",
+    "finished_at": "2026-11-25T20:40:01+00:00",
+    "repair_committer_date": "2026-11-25T19:14:04-05:00",
+    "collection": {
+      "recorded_count": 4952,
+      "recomputed_count": 4952,
+      "recorded_digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+      "recomputed_digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+      "digest_matches": true,
+      "duplicates": [],
+      "malformed": 0
+    },
+    "junit": {
+      "tests": 4952,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 11,
+      "skipped_detail": [
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.providers.test_network_smoke_live::test_live_production_network_smoke",
+          "reason": "SENSOR_NETWORK_SMOKE not set; live network smoke disabled"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store.TestPermissions::test_final_not_world_writable",
+          "reason": "POSIX mode bits do not apply on Windows"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store_namespace.TestNameMaxProbe::test_posix_probe_failure_fails_closed",
+          "reason": "platform has no os.pathconf"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata::test_real_postgres_integration_is_explicitly_opt_in",
+          "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata::test_real_postgres_failed_refresh_rolls_back_previous_snapshot",
+          "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources::test_restore_symlinked_destination_component_refused",
+          "reason": "symlink privilege unavailable on this platform"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources::test_verify_symlinked_pack_object_refused",
+          "reason": "symlink privilege unavailable on this platform"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_concurrent_publication.TestDirectoryCreateRace::test_race_onto_a_symlink_fails_closed",
+          "reason": "Windows cannot create symlinks without privilege (1314)"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_path_canonicalization.TestCaseLaw::test_distinct_posix_directories_are_not_merged",
+          "reason": "Windows filesystem is case-insensitive here"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_json_catalog.TestCorruptionFailClosed::test_unreadable_fragment_fails_closed",
+          "reason": "POSIX permission semantics"
+        },
+        {
+          "node": "quant-lab.tests.crypto_sensor_fabric.storage.test_recovery::test_symlink_escape_rejected",
+          "reason": "POSIX symlink semantics required"
+        }
+      ]
+    },
+    "execution": {
+      "counts_recorded": {
+        "passed": 4941,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "counts_recomputed": {
+        "passed": 4941,
+        "skipped": 11
+      },
+      "node_set_equals_collection": true,
+      "duplicate_executions": 0,
+      "unimplemented_partitions": []
+    },
+    "hardened_verifier": {
+      "command": "canonical_runner.py verify <evidence.json> --require-anchor --expect-count --expect-digest",
+      "exit_code": 0,
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN"
+    },
+    "restoration_verified": true,
+    "tree_clean_after": true,
+    "interrupted": false,
+    "repair_present_in_executed_tree": {
+      "F4_whole_selection_sweep": false,
+      "F5_approved_token_helper": false,
+      "F1_executable_binding_guard": false,
+      "F1_terminal_guard_branch": false
+    },
+    "policy_sha256_executed_tree": "ee1b07ee22899f0b050b275e6cdbedd15c21296370791f0f4f7760c3e1c62102",
+    "policy_sha256_repair_head": "cc5d1bb9dc6cd8c901106153cfb81aa638a60bceb3527758b7bf340445f4e24a",
+    "new_canonical_bundle_for_repair_exists": false,
+    "conclusion": "The only bundle present was executed at 868dd3fc, which is an ANCESTOR of the repair commit 66200f3cb, and it contains none of the repair's controls. It is the pre-repair R6 run already reconciled at audit-r2 (identical anchor). Therefore \u00a77 reconciliation FOR THE REPAIR CANNOT BE PERFORMED, and the targeted acceptance is published without claiming it."
+  }
 }

@@ -1,0 +1,431 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT \u2014 NOT ORGANIZATIONALLY INDEPENDENT",
+  "section": "\u00a77 final canonical reconciliation, additive to audit-r4",
+  "purpose": "Reconcile the completed canonical bundle executed at repair candidate 66200f3cb against its external anchor, independently of the producer's summary, and prove the reconciler has teeth with tamper controls.",
+  "supersedes": "the NOT-ISSUED \u00a79 of the same package at 95c9ee01d, whose only complete bundle was the pre-repair run at 868dd3fc; that finding is retained verbatim in canonical_evidence.json under prior_attempt",
+  "executed_at_utc": {
+    "canonical_run_started": "2026-11-26T12:11:39+00:00",
+    "canonical_run_finished": "2026-11-26T12:38:46+00:00",
+    "reconciliation": "2026-11-26 (this audit, after the bundle completed)"
+  },
+  "candidate": {
+    "commit": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "tree": "e7f058bb2e315365b19c3933c16745c895e7bb5b",
+    "branch": "agent/crypto-sensor-fabric-p3-production-master-r1",
+    "pinned_live": {
+      "commit_matches": true,
+      "tree_matches": true
+    },
+    "recorded_by_run": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "recorded_matches_candidate": true,
+    "ancestor_of_evidence_publication": true
+  },
+  "evidence_publication": {
+    "commit": "96f4cd28eabf6c853d6e750c3266b51031095f24",
+    "parent": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "parent_is_the_tested_candidate": true,
+    "files": [
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/01_FINAL_CANDIDATE_AND_REPAIRS.md",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/02_CANONICAL_EXECUTION_R2.md",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/03_EVIDENCE_HANDOFF_TO_AGENT2.md",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/04_GOVERNANCE_RECONCILIATION.md",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/05_RUNG7_RECOMMENDATION_R1.md",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/README.md",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_rung6_final_r2/rung6_final_r2.json"
+    ],
+    "file_count": 7,
+    "touches_production_source": false,
+    "touches_canonical_tests": false,
+    "touches_manifest": false,
+    "guarded_paths_touched": [],
+    "note": "\u00a77 requires that the evidence publication contain no untested production or canonical-test change: it contains none at all."
+  },
+  "bundle": {
+    "path": "C:\\Users\\wifik\\Desktop\\larger-lab\\.p3-r6-evidence\\final-canonical-r3\\bundle\\p3-r6-final-r3",
+    "storage": "outside the tracked worktree (.p3-r6-evidence/final-canonical-r3/bundle)",
+    "artifacts": {
+      "collection.json": {
+        "sha256": "b8ad4e8e8cc6b5acd167d6f7bad0c196b2db44f17d813e9a8e2694f3f36f3df4",
+        "bytes": 701543
+      },
+      "evidence.json": {
+        "sha256": "5936680f1601da807a478736d3dc163159a91091640ac86974c24c9b0bf9ebbe",
+        "bytes": 2957549
+      },
+      "guard_baseline.json": {
+        "sha256": "8929be1370f95525941b96fa1ab1f0c99012e0fd1cb8a7f3d0c9fe051b59124d",
+        "bytes": 83998
+      },
+      "junit_0.xml": {
+        "sha256": "8d037df3199903f9fc5ff1cc24397eb8f504e1d7266dcc89c2588389ea6fa7c4",
+        "bytes": 860274
+      },
+      "partition_0.json": {
+        "sha256": "6ff0dcd93aa5ea8a57f25f8773b1156c96e07bcf0c5a44cafeff8b1646e4844a",
+        "bytes": 718574
+      },
+      "results_0.jsonl": {
+        "sha256": "18a8cea3d966c2a125f065669eb1e731065dfcf6d2b3d221829b86f7e5a05673",
+        "bytes": 3107638
+      }
+    },
+    "hashes_match_published_inventory": true,
+    "unexpected_artifacts": [],
+    "worker_count": 1,
+    "partition_timeout_seconds": 5400,
+    "environment": {
+      "python": "3.11.9",
+      "pytest": "pytest 9.0.3",
+      "platform": "Windows-10-10.0.26200-SP0",
+      "cpu_count": 8,
+      "cwd": "C:\\Users\\wifik\\Desktop\\larger-lab\\.worktrees\\p3-consumer-rung1"
+    }
+  },
+  "external_anchor": {
+    "count": 4968,
+    "digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "count_expected_4968": true,
+    "digest_expected": true,
+    "independent_recollect_file": ".p3-r6-evidence/final-canonical-r3/collection_recollect.json",
+    "recollect_collected_at": "2026-11-26T12:10:45+00:00",
+    "recollect_bundle_collected_at": "2026-11-26T12:11:39+00:00",
+    "recollect_agrees_on_count_and_digest": true,
+    "recollect_node_set_equals_bundle": true,
+    "recollect_exit_code": 0
+  },
+  "collection": {
+    "count": 4968,
+    "unique": 4968,
+    "digest_recorded": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "digest_recomputed": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "digest_matches_recomputed": true,
+    "digest_matches_expected": true,
+    "duplicates": 0,
+    "malformed": 0,
+    "collection_errors": 0,
+    "exit_code": 0,
+    "groups": 13
+  },
+  "partition": {
+    "index": 0,
+    "intended": 4968,
+    "intended_ok": true,
+    "set_equals_collection": true,
+    "files": 227
+  },
+  "raw_execution": {
+    "node_set_equals_collection": true,
+    "missing_count": 0,
+    "extra_count": 0,
+    "missing_nodes": [],
+    "extra_nodes": [],
+    "counts_recomputed": {
+      "passed": 4957,
+      "skipped": 11
+    },
+    "counts_recorded": {
+      "passed": 4957,
+      "failed": 0,
+      "errored": 0,
+      "skipped": 11
+    },
+    "duplicate_executions_recorded": 0,
+    "duplicate_executions_observed": 0,
+    "unimplemented_partitions": [],
+    "session_end_record": [
+      {
+        "record_type": "session_end",
+        "reports": 14902,
+        "nodes": 4968,
+        "exitstatus": 0
+      }
+    ],
+    "nodes_without_call_phase": {
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_blob_store.py::TestPermissions::test_final_not_world_writable": "skipped",
+      "quant-lab/tests/crypto_sensor_fabric/storage/test_json_catalog.py::TestCorruptionFailClosed::test_unreadable_fragment_fails_closed": "skipped"
+    },
+    "nodes_without_call_phase_note": "two nodes skip during setup, so they emit no call-phase row; their result is taken from the setup phase and is visible in the JUnit skipped count, not silently dropped"
+  },
+  "junit": {
+    "tests": 4968,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 11,
+    "cases_seen": 4968,
+    "node_set_equals_collection": true,
+    "key_normalization": "(class-qualified dotted name, leaf test name)",
+    "junit_keys_unique": true,
+    "collection_keys_unique": true,
+    "skipped_detail": [
+      {
+        "name": "test_live_production_network_smoke",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.providers.test_network_smoke_live",
+        "reason": "SENSOR_NETWORK_SMOKE not set; live network smoke disabled"
+      },
+      {
+        "name": "test_final_not_world_writable",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store.TestPermissions",
+        "reason": "POSIX mode bits do not apply on Windows"
+      },
+      {
+        "name": "test_posix_probe_failure_fails_closed",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_blob_store_namespace.TestNameMaxProbe",
+        "reason": "platform has no os.pathconf"
+      },
+      {
+        "name": "test_real_postgres_integration_is_explicitly_opt_in",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata",
+        "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+      },
+      {
+        "name": "test_real_postgres_failed_refresh_rolls_back_previous_snapshot",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_i11_postgres_metadata",
+        "reason": "real PostgreSQL runtime unavailable; set SENSOR_POSTGRES_TEST_DSN"
+      },
+      {
+        "name": "test_restore_symlinked_destination_component_refused",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources",
+        "reason": "symlink privilege unavailable on this platform"
+      },
+      {
+        "name": "test_verify_symlinked_pack_object_refused",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_i13_export_restore.TestSecurityAndResources",
+        "reason": "symlink privilege unavailable on this platform"
+      },
+      {
+        "name": "test_race_onto_a_symlink_fails_closed",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_concurrent_publication.TestDirectoryCreateRace",
+        "reason": "Windows cannot create symlinks without privilege (1314)"
+      },
+      {
+        "name": "test_distinct_posix_directories_are_not_merged",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_i15r2_path_canonicalization.TestCaseLaw",
+        "reason": "Windows filesystem is case-insensitive here"
+      },
+      {
+        "name": "test_unreadable_fragment_fails_closed",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_json_catalog.TestCorruptionFailClosed",
+        "reason": "POSIX permission semantics"
+      },
+      {
+        "name": "test_symlink_escape_rejected",
+        "classname": "quant-lab.tests.crypto_sensor_fabric.storage.test_recovery",
+        "reason": "POSIX symlink semantics required"
+      }
+    ],
+    "skip_classification": {
+      "posix_or_windows_semantics": 8,
+      "opt_in_external_runtime": 3,
+      "total": 11
+    }
+  },
+  "hardened_verifier": {
+    "command": "canonical_runner.py verify <bundle>/evidence.json --require-anchor --expect-count 4968 --expect-digest 45c206d6\u2026",
+    "exit_code": 0,
+    "result": {
+      "disposition": "COMPLETE",
+      "assurance": "ANCHORED_COMPLETE",
+      "test_outcome": "GREEN",
+      "reasons": [],
+      "missing_nodes": [],
+      "missing_count": 0,
+      "extra_nodes": [],
+      "extra_count": 0,
+      "counts": {
+        "passed": 4957,
+        "failed": 0,
+        "errored": 0,
+        "skipped": 11
+      },
+      "reconciliation": {
+        "recomputed_counts": {
+          "passed": 4957,
+          "failed": 0,
+          "errored": 0,
+          "skipped": 11
+        },
+        "external_anchor_count": 4968,
+        "external_anchor_digest_checked": true,
+        "recorded_anchor_checked": true,
+        "external_anchor_checked": true,
+        "anchored": true
+      }
+    }
+  },
+  "restoration": {
+    "attempted": true,
+    "verified": true,
+    "failed": [],
+    "paths": [
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_ATOMIC_ORDER.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I03R1_NAMESPACE_DURABILITY.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_POINTER_SCHEMA.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R1_PROVENANCE_MATRIX.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04R2_USABLE_PROVENANCE_MATRIX.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_CATALOG_SCHEMAS.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I04_MANIFEST_CONCURRENCY.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15R1_TOCTOU_MATRIX.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_MANIFEST_SCAN_MATRIX.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_RESOURCE_BOUNDS_MATRIX.json",
+      "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I15_SECRET_SAFETY_MATRIX.json"
+    ]
+  },
+  "tree": {
+    "clean_after": true,
+    "dirty_paths": [],
+    "untracked_added": []
+  },
+  "interrupted": false,
+  "repair_coverage_delta": {
+    "prior_pre_repair_bundle_count": 4952,
+    "added_nodes": 17,
+    "removed_nodes": 1,
+    "net_delta": 16,
+    "net_delta_is_the_repairs_16": true,
+    "added_nodes_all_passed": true,
+    "removed": [
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py::test_the_accepting_branch_is_reachable_only_through_the_test_double"
+    ],
+    "added": [
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_policy.py::test_the_accepting_branch_requires_the_record_binding_contract",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f1_the_unresolved_binding_guard_is_executable_and_off",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_a_duplicate_selected_identity_cannot_hide_a_late_entry",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_a_malformed_non_chosen_selected_instant_refuses",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_a_second_selected_revision_known_after_the_cutoff_refuses",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_a_selected_entry_cannot_also_be_excluded",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_a_valid_multi_revision_selection_still_passes",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_an_excluded_future_revision_needs_no_cutoff_instant",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_entry_order_cannot_change_the_decision",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_rebinding.py::test_f4_equivalent_offsets_behave_identically",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_a_formatted_exception_string_is_not_used_as_a_code",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_a_loader_detail_during_rebinding_is_never_relayed",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_a_semantic_authority_detail_is_never_relayed",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_a_typed_verifier_detail_is_never_relayed",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_an_unassessable_replay_message_is_never_relayed",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_no_typed_refusal_code_can_carry_its_detail",
+      "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_p3_consumer_security.py::test_f5_system_exit_still_propagates_from_the_typed_path"
+    ],
+    "removal_is_a_rename_not_a_deletion": "the single removed node is the pre-repair name of a control the repair renamed (test_the_accepting_branch_is_reachable_only_through_the_test_double -> test_the_accepting_branch_requires_the_record_binding_contract), so 4,952 + 17 - 1 = 4,968"
+  },
+  "gate_summary": {
+    "total_gates": 44,
+    "passed": 44,
+    "failed": [],
+    "verdict": "RECONCILED_GREEN",
+    "checks": {
+      "bundle_hashes_match_inventory": true,
+      "bundle_has_no_extra_artifacts": true,
+      "recorded_commit_is_candidate": true,
+      "live_candidate_tree_pinned": true,
+      "candidate_ancestor_of_publication": true,
+      "publication_touches_no_source_or_test": true,
+      "collection_count_4968": true,
+      "collection_digest_recomputes": true,
+      "collection_digest_is_expected": true,
+      "standalone_collection_agrees_with_evidence": true,
+      "collection_has_no_duplicates": true,
+      "collection_has_no_malformed": true,
+      "collection_has_no_errors": true,
+      "collection_exit_zero": true,
+      "anchor_count_4968": true,
+      "anchor_digest_expected": true,
+      "anchor_independent_recollect_agrees": true,
+      "partition_set_equals_collection": true,
+      "partition_intended_4968": true,
+      "execution_node_set_equals_collection": true,
+      "execution_zero_missing": true,
+      "execution_zero_extra": true,
+      "execution_zero_duplicates": true,
+      "execution_counts_expected": true,
+      "junit_tests_4968": true,
+      "junit_zero_failures": true,
+      "junit_zero_errors": true,
+      "junit_skips_11": true,
+      "junit_skip_detail_complete": true,
+      "junit_node_set_equals_collection": true,
+      "verdict_anchored_complete_green": true,
+      "restoration_verified": true,
+      "tree_clean_after": true,
+      "run_not_interrupted": true,
+      "result_has_session_end_record": true,
+      "session_end_reports_4968": true,
+      "verifier_exit_zero": true,
+      "verifier_disposition_complete": true,
+      "verifier_anchored_complete": true,
+      "verifier_green": true,
+      "verifier_zero_missing": true,
+      "verifier_zero_extra": true,
+      "verifier_external_anchor_checked": true,
+      "verifier_counts_agree": true
+    }
+  },
+  "reconciler_sensitivity": {
+    "controls": [
+      {
+        "control": "T1",
+        "tamper": "standalone collection.json loses one passing node and the digest is recomputed so the artifact stays internally self-consistent",
+        "expected_detection": "artifact-vs-evidence and hash pinning must fail",
+        "reconciler_exit_verdict": "RECONCILIATION_FAILED",
+        "reconciler_failed_gates": [
+          "bundle_hashes_match_inventory",
+          "collection_count_4968",
+          "collection_digest_is_expected",
+          "partition_set_equals_collection",
+          "execution_node_set_equals_collection",
+          "execution_zero_extra",
+          "junit_node_set_equals_collection"
+        ],
+        "producer_verifier_exit": 0,
+        "producer_verifier_disposition": "COMPLETE",
+        "producer_verifier_test_outcome": "GREEN",
+        "producer_verifier_reasons": [],
+        "detected_by_reconciler": true,
+        "detected_by_producer_verifier": false
+      },
+      {
+        "control": "T2",
+        "tamper": "one call-phase outcome in results_0.jsonl flipped from passed to failed",
+        "expected_detection": "recomputed counts must diverge from the recorded counts",
+        "reconciler_exit_verdict": "RECONCILIATION_FAILED",
+        "reconciler_failed_gates": [
+          "bundle_hashes_match_inventory",
+          "execution_counts_expected"
+        ],
+        "producer_verifier_exit": 0,
+        "producer_verifier_disposition": "COMPLETE",
+        "producer_verifier_test_outcome": "GREEN",
+        "producer_verifier_reasons": [],
+        "detected_by_reconciler": true,
+        "detected_by_producer_verifier": false
+      },
+      {
+        "control": "T3",
+        "tamper": "evidence.json's embedded collection loses one node (standalone collection.json untouched)",
+        "expected_detection": "standalone-vs-embedded agreement must fail and the producer verifier must refuse coverage",
+        "reconciler_exit_verdict": "RECONCILIATION_FAILED",
+        "reconciler_failed_gates": [
+          "bundle_hashes_match_inventory",
+          "standalone_collection_agrees_with_evidence",
+          "verifier_exit_zero",
+          "verifier_disposition_complete",
+          "verifier_anchored_complete",
+          "verifier_zero_extra"
+        ],
+        "producer_verifier_exit": 1,
+        "producer_verifier_disposition": "INCOMPLETE_COVERAGE",
+        "producer_verifier_test_outcome": "GREEN",
+        "producer_verifier_reasons": [
+          "digest_reconciliation_failed: collection.digest does not match the listed nodes",
+          "digest_reconciliation_failed: external anchor count 4968 != 4967 collected",
+          "digest_reconciliation_failed: external anchor digest does not match the collected nodes",
+          "anchor_required: the bundle is self-consistent but carries no usable external universe anchor, so independent completeness is unproven",
+          "extra_nodes: 1"
+        ],
+        "detected_by_reconciler": true,
+        "detected_by_producer_verifier": true
+      }
+    ],
+    "finding": "Two tamper classes are invisible to the producer's hardened verifier: editing the standalone collection.json (T1) and editing the raw results stream (T2). The verifier reconciles the collection and execution copies embedded in evidence.json, plus JUnit, so an artifact that diverges from that embedded copy is not seen by it. Both were detected here only because this reconciler recomputes each artifact independently and cross-checks them. This is a statement about verifier scope, not about the bundle: every bundle hash matches its published inventory, so the real artifacts are the ones the producer ran."
+  },
+  "conclusion": "The canonical bundle executed at 66200f3cb reconciles green against its external anchor with 44 of 44 independent gates satisfied: 4,968 collected and executed, 4,957 passed, 0 failed, 0 errored, 11 explained skips, 0 missing, 0 extra, 0 duplicate nodes or executions, restoration verified, tree clean, COMPLETE / ANCHORED_COMPLETE / GREEN with the verifier at exit 0. \u00a77 is closed."
+}

@@ -8,22 +8,32 @@ Additive audit-r4 carrier. It is appended to
 those was edited, regenerated or replaced. **No production source was modified
 by this audit.** Every file in this package is written by this auditor.
 
+This carrier was first published at `95c9ee01d` with §9 withheld. Agent 1's
+completed canonical bundle then arrived, so §9 was closed by a follow-up
+commit on the same branch. Nothing in §§1–8 changed: the targeted matrix,
+mutations, guard and blindness findings are preserved exactly as measured.
+
 ---
 
 ## 1. Disposition
 
 ```
-P3_F4_F5_TARGETED_REPAIR_ACCEPTED
+P3_FINAL_INDEPENDENT_TECHNICAL_ACCEPTANCE
+  scopes accepted here:  F4 closure
+                         F5 closure
+                         executable replay-binding guard
+                         targeted mutation accounting
+                         §7 canonical reconciliation for 66200f3cb
 ```
 
 ```
-P3_FINAL_INDEPENDENT_TECHNICAL_ACCEPTANCE
-  scopes accepted here:  F4 closure, F5 closure, executable replay-binding
-                         guard, targeted mutation accounting
-  NOT issued here:       P3_FINAL_CANONICAL_RECONCILIATION for 66200f3cb
-                         — see §9. The claim is not made because the evidence
-                         does not yet exist, not because the run is doubted.
+P3_F4_F5_TARGETED_REPAIR_ACCEPTED
+  issued at 95c9ee01d — unchanged and unwithdrawn
 ```
+
+**Recommended to the operator:** `D1_BOUNDED_IMPLEMENTATION_RATIFICATION`
+within the scopes in §11 and nothing wider. The two deferred integration
+contracts (§10) are acknowledged limitations, not blockers.
 
 | Measured scope | Pre-repair `21fd7e473` | Repair `66200f3cb` |
 | --- | --- | --- |
@@ -33,6 +43,7 @@ P3_FINAL_INDEPENDENT_TECHNICAL_ACCEPTANCE
 | Executable replay-binding guard | absent (documentation only) | **present, runtime-effective, ships off** |
 | Targeted mutations | 2 DETECTED / 1 NOT_APPLICABLE | **3 DETECTED / 0 survived / 0 NOT_APPLICABLE** |
 | Producer's own consumer suite | 161 passed | 177 passed (+16 tracked regressions) |
+| Canonical universe (§7) | 4,952 at `868dd3fc`, pre-repair, own anchor only | **4,968 — 4,957 passed, 0 failed, 11 explained skips, `GREEN`** |
 
 The pre-repair column is the point of this mission's ordering. A pass at a
 later SHA is attributable to a repair only if the counterexample was first
@@ -274,65 +285,82 @@ failures. That gap is the measured blindness.
 
 ---
 
-## 9. Final canonical reconciliation (§7) — **NOT ISSUED**
+## 9. Final canonical reconciliation (§7) — **ISSUED, GREEN**
 
-**The claim is not made, because the evidence does not exist yet.**
+Agent 1's completed bundle arrived after audit-r4 was first published, and
+§9 is now closed against it. The bundle sits at
+`.p3-r6-evidence/final-canonical-r3/bundle/p3-r6-final-r3/`, outside the tracked
+worktree. The evidence publication is `96f4cd28ea`: one additive commit whose
+parent **is** the tested candidate `66200f3cb`, and which touches **no**
+production source, no canonical test and no manifest — 7 Markdown/JSON files,
+929 insertions, 0 deletions. The untested-change requirement of §7 is therefore
+satisfied trivially and verifiably.
 
-At the time this package was written, the only *complete* canonical bundle
-present is `canonical_runs/p3-r6-final`, and it was executed at
-`868dd3fc91b5a38d02742bd3705da0c1d78b66c3` — an **ancestor** of the repair:
-
-| Check | Value |
-| --- | --- |
-| Bundle recorded commit | `868dd3fc91b5a38d02742bd3705da0c1d78b66c3` |
-| Repair candidate | `66200f3cb18ee5cea1483d986e64502f388eeb77` |
-| Bundle ran | `2026-11-25T20:14:52Z → 20:40:01Z` |
-| Repair committed | `2026-11-25T19:14:04-05:00` = `2026-11-26T00:14:04Z` (≈3h34m **after** the run finished) |
-| Repair controls present in the executed tree | `F4 sweep: no · F5 token helper: no · F1 guard: no · F1 terminal branch: no` |
-| `policy.py` sha256 in executed tree | `ee1b07ee22899f0b050b275e6cdbedd15c21296370791f0f4f7760c3e1c62102` |
-
-That bundle nevertheless reconciles **cleanly to its own anchor**, and this is
-recorded so the reader can see it was checked rather than dismissed:
+Every value below was **recomputed by this auditor from the raw artifacts** with
+`reconcile_final_r3.py` (included). The producer's summary was treated as a
+claim to test, not as an input; the producer's own verifier was additionally run
+with `--require-anchor` as a second opinion.
 
 | §7 item | Result |
 | --- | --- |
-| Collection count / recomputed digest | 4,952 / recomputed `f2fc9090…` — **digest matches**, 0 duplicates, 0 malformed |
-| Partition membership | intended set equals collection set |
-| Raw executed node IDs | node set **equals** the collection set; 0 duplicate executions; 0 unimplemented partitions |
-| JUnit accounting | 4,952 tests / 0 failures / 0 errors / 11 skipped |
-| Recomputed counts | 4,941 passed / 11 skipped — equals the recorded counts |
-| Explained skips | 11, each with a stated environment reason (live-network smoke gated by `SENSOR_NETWORK_SMOKE`; POSIX mode bits on Windows; no `os.pathconf`; real PostgreSQL opt-in via `SENSOR_POSTGRES_TEST_DSN`; …) |
-| Hardened verifier with external anchor | `canonical_runner.py verify <evidence.json> --require-anchor --expect-count 4952 --expect-digest f2fc9090…` → **exit 0, `ANCHORED_COMPLETE`, `GREEN`** |
+| Bundle artifact hashes | all **6 of 6** match the published `ARTIFACT_INVENTORY.sha256` and the handoff table |
+| Candidate binding | run recorded `66200f3cb`, tree `e7f058bb2`; live pin re-checked, single commit, **ancestor** of the publication |
+| Collection | **4,968** collected; digest recomputed `45c206d6…` **equals** the external anchor; 0 duplicates, 0 malformed, 0 collection errors, exit 0 |
+| External anchor | 4,968 / `45c206d6…`, and an independent recollection stored outside the bundle (`collection_recollect.json`, 12:10:45Z — one minute **before** the run's own collection at 12:11:39Z) agrees on count, digest **and** node set |
+| Partition membership | intended set **equals** the collection set; 1 partition, 227 files, intended 4,968 |
+| Raw executed node IDs | node set **equals** the collection set — **0 missing, 0 extra**; 0 duplicate executions; 0 unimplemented partitions |
+| JUnit accounting | 4,968 tests / **0 failures** / **0 errors** / **11 skipped**; case universe equals the collection universe under an exact class-qualified key, with both key sets asserted unique |
+| Recomputed counts | **4,957 passed** / 0 failed / 0 errored / 11 skipped — equals the recorded counts |
+| Explained skips | 11, each with a stated environment reason: **8** POSIX/Windows semantics (`POSIX mode bits do not apply on Windows`, `platform has no os.pathconf`, symlink privilege unavailable, case-insensitive filesystem, POSIX permission semantics) and **3** opt-in external runtimes (`SENSOR_NETWORK_SMOKE`, two × `SENSOR_POSTGRES_TEST_DSN`) |
+| Hardened verifier, external anchor | `verify … --require-anchor --expect-count 4968 --expect-digest 45c206d6…` → **exit 0, `COMPLETE` / `ANCHORED_COMPLETE` / `GREEN`**, 0 missing, 0 extra |
 | Restoration | attempted, **verified**, zero failed |
 | Tree clean after | true · interrupted: false |
 
-**Therefore:** this is the *pre-repair* R6 run already reconciled at audit-r2,
-with an identical anchor. It says nothing about `66200f3cb`, and the previous
-**4,952-node count is not inherited** as evidence for the repair.
+Two execution-accounting details were checked rather than assumed. The raw
+stream contains one node-less row, and it is the runner's `session_end` record
+(`reports: 14902, nodes: 4968, exitstatus: 0`) — not a test result. Two nodes
+skip during **setup**, so they emit no call-phase row; their result is taken from
+the setup phase and appears in the JUnit skip count, not silently dropped.
 
-A successor run is **in flight** against the repair at the time of writing, and
-the count is **not** expected to stay 4,952:
+**The count is 4,968, not the previous 4,952.** The delta was measured against
+the preserved pre-repair bundle: 17 nodes added, 1 removed, net **+16**, and all
+17 added nodes **passed**. The single removal is a rename inside the repair
+(`test_the_accepting_branch_is_reachable_only_through_the_test_double` →
+`test_the_accepting_branch_requires_the_record_binding_contract`), visible in the
+repair's own diff, so 4,952 + 17 − 1 = 4,968. The previous count is **not**
+inherited; it is reconciled as a delta.
 
-| In-flight observation | Value |
-| --- | --- |
-| Bundle | `canonical_runs/p3-r6-final-r3` |
-| External collection anchor | **4,968** = 4,952 + **16** (the repair's new tracked tests) |
-| Collection duplicates / malformed | 0 / 0 · collection exit 0 |
-| Partition intended count | 4,968 (set equality not yet asserted — `evidence.json` absent) |
-| Progress at publication | 3,859 of 4,968 unique nodes, **0 failed**, 6 skipped |
-| `evidence.json` | **absent** — the runner writes it last |
+### 9.1 Why the producer's verifier was not sufficient on its own
 
-Because `evidence.json` does not exist, the recomputed digest, JUnit accounting,
-node-set equality, skip explanations, restoration and exit codes for this run
-**cannot be verified yet**, and none of them is asserted here. Per §8 the
-targeted acceptance is published without falsely claiming canonical
-reconciliation. This is not a blocker on Agent 1's execution and does not repeat
-it: no duplicate canonical run was launched by this audit.
+Three tamper controls were run against disposable copies of the bundle. They
+test the **reconciler**, not the producer, and they are reported because a
+reconciler that cannot fail proves nothing:
 
-**To close this section**, the values needed are exactly the §7 list above,
-recomputed from `p3-r6-final-r3` with
-`reconcile_r4.py` (included) and the hardened verifier's `--require-anchor`,
-`--expect-count 4968`, `--expect-digest <recomputed>`.
+| Control | Tamper | Detected by `reconcile_final_r3.py` | Detected by the producer verifier |
+| --- | --- | --- | --- |
+| `T1` | standalone `collection.json` loses one node and its digest is recomputed to stay self-consistent | **yes** — 7 gates failed | **no** — exit 0, `COMPLETE`, `GREEN` |
+| `T2` | one call outcome in `results_0.jsonl` flipped `passed` → `failed` | **yes** — recomputed counts diverge | **no** — exit 0, `COMPLETE`, `GREEN` |
+| `T3` | `evidence.json`'s **embedded** collection loses one node | **yes** | **yes** — exit 1, `INCOMPLETE_COVERAGE`, `digest_reconciliation_failed` |
+
+The producer's verifier reconciles the collection and execution copies embedded
+in `evidence.json` plus JUnit. It does not read the standalone `collection.json`
+artifact and does not recompute outcomes from the raw stream. That is a
+statement about **verifier scope**, not about this bundle: every bundle hash
+matches its published inventory, so the artifacts reconciled here are exactly
+the ones the producer ran. It is also why §7 was closed by an independent
+reconciler rather than by repeating a verifier verdict — a green `verify` alone
+would not have caught `T1` or `T2`.
+
+All 44 gates, the three control transcripts and every recomputed value are in
+`canonical_reconciliation_r3.json`.
+
+### 9.2 What §9 does not claim
+
+It does not claim coverage of either deferred integration contract (§10 items
+1–4), and it does not claim parallel execution: this host ran **one worker** with
+a 5,400 s partition timeout, 27 m 07 s wall clock, Python 3.11.9 / pytest 9.0.3
+on Windows 10.0.26200. No canonical run was launched by this audit; the
+producer's single completed bundle was reconciled once.
 
 ---
 
@@ -355,7 +383,8 @@ Stated as unresolved dependencies, not as security controls.
 4. **`ACCEPT_FIELD_BINDING` is unreachable in production by design.** The
    downstream accepting machinery exists and is exercised only under the
    labelled test-only guard override.
-5. **Canonical reconciliation for `66200f3cb` is outstanding** (§9).
+5. **Canonical reconciliation for `66200f3cb` is closed** (§9). It was
+   outstanding at `95c9ee01d` and is no longer a dependency on anything.
 6. **The temporal sweep's malformed-instant arm is reachable but not exercised
    by this fixture**; the tested path for that case is the H04 schema boundary.
 
@@ -376,9 +405,15 @@ was measured here:
 - **The unresolved replay-binding guard.** Accepted **as a refusal**, i.e. as
   the correct fail-closed terminal behaviour for an unexpressible claim. It is
   not accepted as, and must not be recorded as, replay-binding enforcement.
-- **Blanket acceptance is explicitly withheld** on authoritative
-  `ACCEPT_FIELD_BINDING`, on any claim of complete replay/record binding, and on
-  canonical regression coverage of `66200f3cb` until §9 closes.
+- **Blanket acceptance remains explicitly withheld** on authoritative
+  `ACCEPT_FIELD_BINDING` and on any claim of complete replay/record binding.
+  Canonical regression coverage of `66200f3cb` is now established (§9) and
+  no longer withholds anything.
+
+**Recommendation.** Ratify the D1 bounded production implementation within
+exactly these scopes. Two deferred integration contracts remain acknowledged
+limitations (§10, items 1–4); they bound what the implementation may claim,
+and they do not block bounded implementation acceptance.
 
 No trust promotion, no gate advancement, no provider approval, no custody-source
 activation, no manifest modification, no merge. This is a technical
@@ -420,10 +455,15 @@ python run_mutations_r4.py
 # Observed-outcome table (production default vs labelled override)
 python measure_r4.py
 
-# Canonical reconciliation once evidence.json exists
+# Canonical reconciliation of the completed r3 bundle (§9; 44/44 gates, exit 0)
 AUDIT_QUANT_LAB=<candidate>/quant-lab \
-AUDIT_CANONICAL_RUNS=<candidate>/quant-lab/research/.../canonical_runs \
-python reconcile_r4.py
+AUDIT_FINAL_BUNDLE_ROOT=<evidence>/final-canonical-r3/bundle \
+python reconcile_final_r3.py
+
+# Second opinion, independent of the reconciler
+python research/crypto_foundry/sensor_fabric/scripts/canonical_runner.py verify \
+  <evidence>/final-canonical-r3/bundle/p3-r6-final-r3/evidence.json \
+  --require-anchor --expect-count 4968 --expect-digest 45c206d6…
 ```
 
 ---
@@ -438,7 +478,9 @@ python reconcile_r4.py
 | `observed_outcomes.json` | measured decision / refusal reason / replay status, production default vs labelled override |
 | `intentional_control_changes.json` | the eight §1-driven expectation changes, each with why it is not a regression |
 | `mutation_results.json` | M1/M2/M3 with intended-detector accounting and provenance |
-| `canonical_evidence.json` | §9 — the pre-repair bundle reconciliation and why it is not evidence for the repair |
+| `canonical_evidence.json` | §9 status record: `CLOSED` / `RECONCILED_GREEN`, with the earlier NOT-ISSUED reasoning retained verbatim under `prior_attempt` |
+| `canonical_reconciliation_r3.json` | §9 issued result — all 44 independent gates, recomputed artifacts, anchor, JUnit, skips, delta vs the pre-repair bundle, and the T1/T2/T3 tamper controls |
+| `reconcile_final_r3.py.txt` | the reconciler that produced them (read-only; recomputes every claim) |
 | `shipped_suite_results.json` | producer's suite at the repaired head |
 | `test_f4f5_closure_r4.py.txt` | the independent matrix (non-collected research artifact) |
 | `run_mutations_r4.py.txt` | mutation runner |
