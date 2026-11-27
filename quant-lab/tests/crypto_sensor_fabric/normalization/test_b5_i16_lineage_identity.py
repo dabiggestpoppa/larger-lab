@@ -18,7 +18,6 @@ from pydantic import ValidationError
 from crypto_sensor_fabric.contracts.enums import SensorFamily
 from crypto_sensor_fabric.normalization.enums import LineageState
 from crypto_sensor_fabric.normalization.lineage import (
-    IDENTITY_SCHEMA_VERSION,
     LINEAGE_GATE_CLOSED,
     LINEAGE_GATE_STATE,
     REQUIRED_SENSOR_FAMILIES,

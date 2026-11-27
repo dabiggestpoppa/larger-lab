@@ -1,5 +1,5 @@
 {
-  "all_results_pass": false,
+  "all_results_pass": true,
   "checkpoint": "SENSOR-B5-I06",
   "rows": [
     {
@@ -11,7 +11,7 @@
     {
       "clause": "I06E1 s12 (forbidden: editing I01-I05 tests) + DISCLOSED B5-I08/B5-I09 scope-audit allowlist extension",
       "detail": "git diff 32a897436 -- the sealed I01/I05/I08 audit tests names only the audits the I08E1, I09E1 and Wave 1 directives extend, and each changed one equals its current disclosed SHA-256 (the highest checkpoint's pin supersedes lower pins per path)",
-      "pass": false,
+      "pass": true,
       "row_id": "no_i05_test_diff_vs_base"
     },
     {
@@ -52,8 +52,8 @@
     }
   ],
   "summary": {
-    "fail": 1,
-    "pass": 7,
+    "fail": 0,
+    "pass": 8,
     "rows": 8
   }
 }

@@ -95,7 +95,6 @@ from ..terms.conversion import (
 )
 from ..terms.snapshot import ContractTermsSnapshot
 from .admission import (
-    I04B_METHODOLOGY_ID,
     I08_UNITS_METHODOLOGY_ID,
     SensorFieldAdmission,
     admit_sensor_field,
@@ -437,7 +436,6 @@ def _derived_amounts(
     ``admitted_unit`` is ``None`` when the unit claim was not admitted -- in that
     case nothing is convertible and every derived slot says why.
     """
-    contracts: DerivedAmount | None = None
     base: DerivedAmount | None = None
     quote: DerivedAmount | None = None
 

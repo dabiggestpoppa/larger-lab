@@ -9,7 +9,6 @@ Fixtures are synthetic and labelled; no test certifies a venue.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
 from decimal import Decimal
 
 import pytest
