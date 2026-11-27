@@ -1,0 +1,357 @@
+{
+  "disposition": "B5_WAVE1_SENSOR_IMPLEMENTATION_DELIVERED",
+  "mission": "SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1",
+  "branch": "agent/crypto-sensor-fabric-b5-wave1-r1",
+  "base": "72173dfc262b67116511078b79307e342075d74d",
+  "bloc_5_complete": false,
+  "commit_ladder": [
+    {
+      "step": 0,
+      "commit": "72173dfc262b67116511078b79307e342075d74d",
+      "role": "P3 Rung 7 closeout (branch point)"
+    },
+    {
+      "step": 1,
+      "commit": "e8abe280f",
+      "role": "P3 D1 ratification, fast-forwarded into the Wave 1 branch",
+      "disposition": "P3_D1_BOUNDED_IMPLEMENTATION_RATIFIED"
+    },
+    {
+      "step": 2,
+      "commit": "a07a6f4a8",
+      "role": "Wave 1 implementation: five sensor families, shared admission ladder, preliminary lineage, tests, scope amendments, republished inventories"
+    },
+    {
+      "step": 3,
+      "commit": "36cfd08dd",
+      "role": "governance reconciliation: I08 sealed-tree disclosure, I11R2 recount via UPDATE_I11R2_EVIDENCE, producer republishes, two pins"
+    },
+    {
+      "step": 4,
+      "commit": "d4e7e9fe0",
+      "role": "guard clean: unused import, dead local, three unused test imports"
+    },
+    {
+      "step": 5,
+      "commit": "SELF",
+      "role": "this evidence package (the commit that introduces this directory; a commit cannot contain its own hash)"
+    }
+  ],
+  "delta_summary": {
+    "files_changed": 32,
+    "insertions": 6311,
+    "deletions": 55
+  },
+  "changed_paths": [
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_04/BLOC_04_I11R2_GOVERNANCE_BINDING_AUDIT.json",
+      "insertions": 1,
+      "deletions": 1
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/BLOC_05_I06_SCOPE_AUDIT.json",
+      "insertions": 3,
+      "deletions": 3
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/bloc_05_replay_safety_validation.json",
+      "insertions": 2,
+      "deletions": 2
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/bloc_05_semantic_validation.json",
+      "insertions": 4,
+      "deletions": 4
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/bloc_05_time_validation.json",
+      "insertions": 1,
+      "deletions": 1
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_d1_ratification_r1/PACKAGE.sha256",
+      "insertions": 2,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_d1_ratification_r1/README.md",
+      "insertions": 167,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/p3_d1_ratification_r1/ratification.json",
+      "insertions": 115,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/research/crypto_foundry/sensor_fabric/scripts/b5_i06_replay_safety.py",
+      "insertions": 68,
+      "deletions": 10
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/lineage/__init__.py",
+      "insertions": 271,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/__init__.py",
+      "insertions": 125,
+      "deletions": 14
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/admission.py",
+      "insertions": 344,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/basis.py",
+      "insertions": 408,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/book.py",
+      "insertions": 959,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/funding.py",
+      "insertions": 541,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/oi.py",
+      "insertions": 740,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/positioning.py",
+      "insertions": 336,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/conftest.py",
+      "insertions": 221,
+      "deletions": 1
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+      "insertions": 5,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py",
+      "insertions": 16,
+      "deletions": 1
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+      "insertions": 55,
+      "deletions": 5
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+      "insertions": 12,
+      "deletions": 2
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+      "insertions": 2,
+      "deletions": 1
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py",
+      "insertions": 57,
+      "deletions": 1
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i11_scope_audit.py",
+      "insertions": 16,
+      "deletions": 9
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i12_oi_semantics.py",
+      "insertions": 421,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i13_funding_semantics.py",
+      "insertions": 205,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i14_book_semantics.py",
+      "insertions": 317,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i15_positioning_basis_semantics.py",
+      "insertions": 254,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i16_lineage_identity.py",
+      "insertions": 234,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i21_wave1_controls.py",
+      "insertions": 131,
+      "deletions": 0
+    },
+    {
+      "path": "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_wave1_scope_audit.py",
+      "insertions": 278,
+      "deletions": 0
+    }
+  ],
+  "new_production_modules": {
+    "sensors/admission.py": 344,
+    "sensors/oi.py": 740,
+    "sensors/funding.py": 541,
+    "sensors/book.py": 959,
+    "sensors/positioning.py": 336,
+    "sensors/basis.py": 408,
+    "lineage/__init__.py": 271
+  },
+  "new_test_files": {
+    "test_b5_i12_oi_semantics.py": {
+      "lines": 421,
+      "tests": 25
+    },
+    "test_b5_i13_funding_semantics.py": {
+      "lines": 205,
+      "tests": 12
+    },
+    "test_b5_i14_book_semantics.py": {
+      "lines": 317,
+      "tests": 20
+    },
+    "test_b5_i15_positioning_basis_semantics.py": {
+      "lines": 254,
+      "tests": 20
+    },
+    "test_b5_i16_lineage_identity.py": {
+      "lines": 234,
+      "tests": 19
+    },
+    "test_b5_i21_wave1_controls.py": {
+      "lines": 131,
+      "tests": 17
+    },
+    "test_b5_wave1_scope_audit.py": {
+      "lines": 278,
+      "tests": 16
+    }
+  },
+  "new_tests_total": 129,
+  "implemented_contracts": {
+    "I12": [
+      "open interest normalizer",
+      "six native units",
+      "snapshot and aggregation scope",
+      "measured zero law",
+      "PIT contract terms for contract-denominated observations",
+      "oi_usd always blocked"
+    ],
+    "I13": [
+      "funding normalizer",
+      "realized/predicted/indicative/unknown",
+      "rate vs flow vs PnL",
+      "interval preservation",
+      "FUNDING_NATIVE_TO_8H_EQUIV_V1 SIMPLE_LINEAR equivalence",
+      "no annualization",
+      "no USD amount"
+    ],
+    "I14": [
+      "book snapshot and book metric normalizers",
+      "sequence gap detection",
+      "full-snapshot-only certification",
+      "no metric across an invalid reconstruction"
+    ],
+    "I15a": [
+      "positioning normalizer",
+      "required population scope",
+      "five metric types kept non-interchangeable"
+    ],
+    "I15b": [
+      "basis normalizer",
+      "five typed reference refusals",
+      "approved reference types only",
+      "basis_comparable verdict, no derived bps"
+    ],
+    "I16": [
+      "content-addressed t1 identity",
+      "generation immutability",
+      "completeness assertions",
+      "LINEAGE_GATE_STATE=NOT_CLOSED"
+    ]
+  },
+  "measured_execution": {
+    "normalization_suite": {
+      "passed": 1687,
+      "failed": 0
+    },
+    "contracts_providers_schemas": {
+      "passed": 1159,
+      "skipped": 1
+    },
+    "ruff_new_files": "clean",
+    "ruff_pre_existing_findings": 5,
+    "governance_producers": {
+      "bloc_05_time_validation.json": "86/86",
+      "BLOC_05_I05_SCOPE_AUDIT.json": "7/7",
+      "bloc_05_semantic_validation.json": "35/35 pass, 3 unresolved",
+      "bloc_05_replay_safety_validation.json": "14/14",
+      "BLOC_05_I06_SCOPE_AUDIT.json": "8/8"
+    },
+    "canonical_run_executed": false,
+    "canonical_accounting_note": "no canonical run was launched for this wave and none concurrently with Agent 2; the P3 base accounting (4968/4957/11, digest 45c206d6\u2026) is unchanged and not extended here"
+  },
+  "governance_reconciliation": {
+    "audits_amended": [
+      "test_b5_i01_scope_audit.py",
+      "test_b5_i05_scope_audit.py",
+      "test_b5_i08_scope_audit.py",
+      "test_b5_i09_scope_audit.py",
+      "test_b5_i10_scope_audit.py",
+      "test_b5_i11_scope_audit.py",
+      "test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py"
+    ],
+    "admission_mode": "exact file name",
+    "sealed_historical_artifacts_rewritten": 0,
+    "plan_documents_touched": 0,
+    "recount_mechanism": "UPDATE_I11R2_EVIDENCE=1 (1111 -> 1125)"
+  },
+  "dependencies": {
+    "I08_units_methodology": "UNADMITTED; oi_usd always blocked; unblocked oi_usd is a construction error",
+    "I14_fixtures": "fixture-dependent acceptance RETAINED; synthetic sequences only; Agent 2 corpus not vendored, no provider evidence fabricated",
+    "I16": "PRELIMINARY; LINEAGE_GATE_STATE=NOT_CLOSED; LINEAGE_GATE_CLOSED=False; no T0->T1 assembly",
+    "I21": "PARTIAL; sensor-level controls delivered; end-to-end controls need I17-I19",
+    "shared_admission_helper": "sensors/admission.py; coordination item with Agent 2"
+  },
+  "remaining_gates": {
+    "LINEAGE": "NOT_CLOSED",
+    "DUPLICATE_REVISION": "NOT_MET",
+    "GOLDEN_T0_T1": "NOT_MET",
+    "SEMANTIC": "OPEN_BEYOND_TRADE_AND_LIQUIDATION",
+    "UNIT": "B5_I08_UNITS_V1_UNADMITTED",
+    "REPLAY_RECORD_BINDING": "DEFERRED_TO_I17",
+    "CUSTODY_SOURCE_AUTHORITY": "DEFERRED_TO_I18"
+  },
+  "independent_verification": {
+    "wave1_delta_independently_audited": false,
+    "p3_audit_label_not_inherited": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT"
+  },
+  "hard_stops_observed": [
+    "no provider approval",
+    "no manifest activation",
+    "no custody-source authorization",
+    "no production merge",
+    "no methodology admission",
+    "no invented replay-binding schema",
+    "no invented custody-source authority schema",
+    "no I17-I23 implementation",
+    "no Bloc 6 advancement",
+    "no live trading or capital authority"
+  ]
+}
