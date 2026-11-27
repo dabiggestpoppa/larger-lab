@@ -1,0 +1,244 @@
+{
+  "mission": "SENSOR-B5-P3-R7-FINAL-CLOSEOUT-R1",
+  "role": "Lead Production Engineer",
+  "disposition": "P3_RUNG7_READY_FOR_OPERATOR_RATIFICATION",
+  "disposition_condition": "PENDING_AGENT2_CANONICAL_BUNDLE_RECONCILIATION",
+  "reference_lock": {
+    "final_production_candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "final_production_candidate_tree": "e7f058bb2e315365b19c3933c16745c895e7bb5b",
+    "final_production_candidate_parent": "21fd7e473a534c38b237729f9474c46bb94267ee",
+    "final_canonical_publication": "96f4cd28eabf6c853d6e750c3266b51031095f24",
+    "independent_targeted_acceptance": "95c9ee01d61bdcefff0d1a379d0af26de7e788df",
+    "independent_targeted_acceptance_branch": "agent/crypto-sensor-fabric-p3-production-master-audit-r4",
+    "pre_repair_audit_baseline": "d6b3f9f83a0cf5bb92f8e37b72e044beeaed6740",
+    "previous_canonical_candidate": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+    "branch": "agent/crypto-sensor-fabric-p3-production-master-r1"
+  },
+  "freeze": {
+    "no_further_production_change_authorized": true,
+    "no_canonical_regression_in_this_mission": true,
+    "architecture_not_reopened": true,
+    "deferred_contracts_not_implemented": true,
+    "policy_py_blob_at_candidate": "8456aae69bcb577dff5a13550c3d50764e2c9825",
+    "policy_py_blob_at_publication_head": "8456aae69bcb577dff5a13550c3d50764e2c9825",
+    "production_test_config_diff_candidate_to_head": "empty",
+    "approval_manifest_sha256": "3d707c59fbf1fe96f28b2080811a0da189d2ad5c2859c97faa01a367c7042654",
+    "approval_manifest_git_blob": "7be15e8e56c87a4acea533a7b2382c1f5d5ad2f9",
+    "approval_manifest_artifacts": {},
+    "approval_manifest_revoked_approval_ids": [],
+    "approval_manifest_authority_id": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+    "integration_state": "INTEGRATION_REQUIRED",
+    "integration_state_source": "quant-lab/src/crypto_sensor_fabric/normalization/sensors/verification.py:102",
+    "tracked_python_files_repo": 1111,
+    "tracked_python_src": 157,
+    "tracked_python_tests": 249,
+    "local_remote_equal": true
+  },
+  "canonical_execution": {
+    "run_id": "p3-r6-final-r3",
+    "candidate": "66200f3cb18ee5cea1483d986e64502f388eeb77",
+    "collected": 4968,
+    "executed": 4968,
+    "collection_digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+    "passed": 4957,
+    "failed": 0,
+    "errored": 0,
+    "skipped": 11,
+    "missing_nodes": 0,
+    "extra_nodes": 0,
+    "duplicate_executions": 0,
+    "disposition": "COMPLETE",
+    "assurance": "ANCHORED_COMPLETE",
+    "test_outcome": "GREEN",
+    "started_at": "2026-11-26T12:11:39+00:00",
+    "finished_at": "2026-11-26T12:38:46+00:00",
+    "wall_clock_seconds": 1627,
+    "workers": 1,
+    "partition_timeout_seconds": 5400,
+    "partitions": 1,
+    "collection_files": 227,
+    "groups": 13,
+    "restoration_attempted": true,
+    "restoration_verified": true,
+    "guard_baseline_files_hashed": 468,
+    "restored_or_side_effected_paths": 11,
+    "tracked_tree_clean_after": true,
+    "skips_explained": {
+      "posix_or_windows_platform": 8,
+      "opt_in_live_network_or_postgres": 3
+    },
+    "hardened_verifier": {
+      "exit_code": 0,
+      "require_anchor": true,
+      "expect_count": 4968,
+      "expect_digest": "45c206d6771cf9fbb8f49525fa9dafa263a18a432c981f1d8dbfb8febd6b00c9",
+      "external_anchor_checked": true,
+      "recomputed_counts": { "passed": 4957, "failed": 0, "errored": 0, "skipped": 11 },
+      "junit_independent_totals": { "tests": 4968, "failures": 0, "errors": 0, "skipped": 11 }
+    },
+    "bundle": {
+      "path": ".p3-r6-evidence/final-canonical-r3/bundle/p3-r6-final-r3/",
+      "files": {
+        "collection.json": "b8ad4e8e8cc6b5acd167d6f7bad0c196b2db44f17d813e9a8e2694f3f36f3df4",
+        "evidence.json": "5936680f1601da807a478736d3dc163159a91091640ac86974c24c9b0bf9ebbe",
+        "guard_baseline.json": "8929be1370f95525941b96fa1ab1f0c99012e0fd1cb8a7f3d0c9fe051b59124d",
+        "junit_0.xml": "8d037df3199903f9fc5ff1cc24397eb8f504e1d7266dcc89c2588389ea6fa7c4",
+        "partition_0.json": "6ff0dcd93aa5ea8a57f25f8773b1156c96e07bcf0c5a44cafeff8b1646e4844a",
+        "results_0.jsonl": "18a8cea3d966c2a125f065669eb1e731065dfcf6d2b3d221829b86f7e5a05673"
+      },
+      "hashes_recomputed_at_closeout": true,
+      "hashes_match_recorded_inventory": true
+    },
+    "universe_delta": {
+      "added_node_ids": 17,
+      "removed_node_ids": 1,
+      "net": 16,
+      "removed_is_rename": true,
+      "renamed_from": "test_b5_p3_consumer_policy.py::test_the_accepting_branch_is_reachable_only_through_the_test_double",
+      "renamed_to": "test_b5_p3_consumer_policy.py::test_the_accepting_branch_requires_the_record_binding_contract",
+      "files_with_changed_node_counts": {
+        "test_b5_p3_consumer_rebinding.py": 9,
+        "test_b5_p3_consumer_security.py": 7
+      },
+      "other_files_changed": false,
+      "recomputed_at_closeout": true
+    },
+    "preserved_previous_bundle": {
+      "candidate": "868dd3fc91b5a38d02742bd3705da0c1d78b66c3",
+      "nodes": 4952,
+      "digest": "f2fc909032b3a182bdccd47946af16d4ac179148d3615e60b3e0131c239d1931",
+      "untouched": true
+    }
+  },
+  "independent_targeted_acceptance": {
+    "package": "p3_final_targeted_acceptance_r4",
+    "commit": "95c9ee01d61bdcefff0d1a379d0af26de7e788df",
+    "auditor_label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+    "targeted_matrix": { "collected": 41, "passed": 41, "failed": 0, "errored": 0 },
+    "control_copy_unmutated_green": true,
+    "f4_closed": true,
+    "f5_closed": true,
+    "replay_binding_guard": "ACCEPTED_AS_REFUSAL_NOT_AS_ENFORCEMENT",
+    "mutations": { "total": 3, "detected": 3, "provenance_asserted": true },
+    "producer_consumer_suite": { "total": 177, "passed": 177, "failed": 0, "skipped": 0, "pre_repair_total": 161 },
+    "withheld_by_auditor": [
+      "blanket acceptance of authoritative ACCEPT_FIELD_BINDING",
+      "any claim of complete replay or record binding",
+      "canonical regression coverage of 66200f3cb until reconciliation"
+    ],
+    "canonical_bundle_available_to_auditor_then": false,
+    "canonical_reconciliation_performed_by_auditor": false
+  },
+  "corrections_to_previous_records": [
+    {
+      "record": "p3_rung6_final_r2/README.md and 02_CANONICAL_EXECUTION_R2.md",
+      "previous_wording": "delta is exactly the 16 regression nodes added by the repair and nothing else entered or left the universe",
+      "corrected": "17 node ids added, 1 removed by rename, net +16",
+      "substantive": false,
+      "note": "the removed id is the pre-guard accepting-branch control renamed to require the record binding contract; no control was lost"
+    },
+    {
+      "record": ".p3-r6-evidence/final-canonical-r3/prior-attempts/",
+      "previous_wording": "directory holds failed operational attempts with no evidentiary claim",
+      "corrected": "two failed attempts plus the successful run's original directory, byte-identical to bundle/p3-r6-final-r3/",
+      "substantive": false,
+      "note": "label corrected by codebase README in prior-attempts; no file moved or deleted"
+    }
+  ],
+  "pending_dependencies": [
+    {
+      "id": "AGENT2_CANONICAL_BUNDLE_RECONCILIATION",
+      "state": "PENDING",
+      "subject": "Independent reconciliation of the p3-r6-final-r3 bundle against 66200f3cb",
+      "blocked_by_auditor_at": "95c9ee01d",
+      "reason_then": "no canonical bundle for the repair candidate existed; only the 868dd3fc9 ancestor bundle was present",
+      "now_available": true,
+      "expected_result_if_passed": "recomputed count 4968, digest 45c206d6..., ANCHORED_COMPLETE / GREEN, 4957 passed, 0 failed, 0 errored, 11 skipped, 0 missing, 0 extra",
+      "requires_new_execution": false,
+      "effect_if_failed": "stop, reproduce the defect before any change; any candidate change reopens freeze, recollection and canonical run",
+      "is_only_condition_on_disposition": true
+    }
+  ],
+  "deferred_integration_contracts": [
+    {
+      "id": "REPLAY_EVIDENCE_RECORD_BINDING_V1",
+      "state": "NAMED_GUARDED_NOT_IMPLEMENTED",
+      "flag": "REPLAY_RECORD_BINDING_ESTABLISHED = False",
+      "current_behaviour": "unexpressible identity terminates in INTEGRATION_REQUIRED; replay_status NOT_BOUND is explicit",
+      "missing_dimensions": ["record_id", "provider", "record_kind", "artifact_id", "artifact_evidence_digest"],
+      "required_authority": "I05 replay producer mints a versioned schema; operator approves the schema version",
+      "acceptance_controls": { "positive": 1, "negative": 6 },
+      "parallelizable": true,
+      "implemented_in_this_mission": false
+    },
+    {
+      "id": "OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1",
+      "state": "UNRESOLVED_UNIMPLEMENTED",
+      "current_behaviour": "no AUTHORIZED basis composable from any input; artifact approval is not source authorization",
+      "missing_dimensions": ["source_id", "store", "operating_entity", "record_kinds", "providers", "validity_window", "manifest_sha256"],
+      "required_authority": "separate operator-signed record at manifest authority level; no config, env var or test seam may synthesize it",
+      "acceptance_controls": { "positive": 1, "negative": 7 },
+      "parallelizable": "operator_authored_only",
+      "implemented_in_this_mission": false
+    }
+  ],
+  "remaining_checkpoints": {
+    "source": "bloc_05/07_BLOC_05_FREEZE_MANIFEST.md §10, bloc_05/06 §19",
+    "scope_note": "normalization checkpoints I12-I23; Bloc 4 storage series with overlapping numbers is a separate track and is reused, not renumbered",
+    "implemented_before_this_inventory": ["I01", "I02", "I03", "I04", "I05", "I06", "I07", "I08", "I09", "I10", "I11"],
+    "open": [
+      { "id": "I12", "name": "OI normalizer", "state": "NOT_IMPLEMENTED_CONTRACT_FROZEN_READINESS_ASSESSED", "dependencies": ["I09 ProviderSemanticMapping", "I04B conversion", "I04 PIT terms", "I05 availability/replay", "B5_I08_UNITS_V1 methodology admission for oi_usd", "provider unit-semantics evidence"], "remaining_work": "eight-field envelope, unit-honesty branches, vocabulary mapping, measured-zero-with-coverage, multi-venue aggregate handling, PIT term requirement, refusal surface, I09-backed semantic admission, tests", "acceptance": "I12 scope audit, mechanical inventory republish, canonical run, targeted reattack", "parallel": true },
+      { "id": "I13", "name": "funding normalizer", "state": "NOT_IMPLEMENTED_CONTRACT_FROZEN", "dependencies": ["I05 interval/time", "I08 rate/bps primitives", "I09 admission", "provider funding interval and cap semantics"], "remaining_work": "native/predicted/effective/realized separation, interval length, USD blocked while I08 methodology unadmitted, refusal of flow semantics, tests", "acceptance": "I13 scope audit, inventory republish, canonical run, targeted reattack", "parallel": true },
+      { "id": "I14", "name": "book/book-metric normalizer", "state": "NOT_IMPLEMENTED_CONTRACT_FROZEN", "dependencies": ["book depth source with sequence numbers", "I05 interval/availability", "I09 admission", "I04B notional conversion"], "remaining_work": "snapshot normalizer, sequence-gap fail-closed, derived metrics with methodology and lineage, gap refusal, adversarial gap matrix", "acceptance": "I14 scope audit, inventory republish, canonical run, targeted reattack including sequence-gap matrix", "parallel": "partial_fixture_dependent" },
+      { "id": "I15", "name": "positioning/basis normalizers", "state": "NOT_IMPLEMENTED_CONTRACT_FROZEN", "dependencies": ["I09 admission", "I04B units", "five-type reference price vocabulary", "F24 no cross-venue synthesis"], "remaining_work": "positioning population definition, basis reference identity and units, refusal of type-substituted or late price, refusal of cross-venue synthesis, tests", "acceptance": "I15 scope audit, inventory republish, canonical run, targeted reattack", "parallel": true },
+      { "id": "I16", "name": "lineage + deterministic T1 IDs", "state": "NOT_IMPLEMENTED_GATE_OPEN", "dependencies": ["lineage completeness from all implemented normalizers", "I10/I11 present; I12-I15 for full coverage", "I05 evidence models"], "remaining_work": "lineage graph, content-addressed deterministic IDs, generation immutability law, re-run-identical-IDs property", "acceptance": "LINEAGE_GATE PASS over every implemented T1 row, scope audit, canonical run, targeted reattack", "parallel": "author_yes_gate_after_I12_I15" },
+      { "id": "I17", "name": "duplicate/revision engine", "state": "NOT_IMPLEMENTED_GATE_OPEN", "dependencies": ["I16 deterministic IDs (hard)", "I07 revision policies", "Bloc 4 storage dedupe primitives"], "remaining_work": "hard vs soft duplicate classes, cross-venue non-dedup law, append-only revisions, immutable generations, contradiction refusals", "acceptance": "DUPLICATE_REVISION_GATE PASS, scope audit, canonical run, targeted reattack", "parallel": false },
+      { "id": "I18", "name": "T1 generation writer/manifests/atomic publish", "state": "NOT_IMPLEMENTED_STORAGE_PRIMITIVES_REUSABLE", "dependencies": ["I16", "I17", "reviewed generation-manifest schema", "Bloc 4 blob store/catalog/atomic publish/export-restore"], "remaining_work": "generation writer, manifest hashing and pinning, atomic publish, immutability enforcement, rollback behaviour", "acceptance": "generation reproducibility evidence, storage adversarial tests, scope audit, canonical run, targeted reattack", "parallel": false },
+      { "id": "I19", "name": "canonical T1 query/replay filters", "state": "NOT_IMPLEMENTED_GATE_OPEN", "dependencies": ["I18 generation manifests", "I05/I06 replay eligibility and AS_KNOWN_THEN"], "remaining_work": "canonical query boundary, strict filters, leakage-prohibiting enforcement", "acceptance": "replay/leakage matrix, scope audit, canonical run, targeted reattack", "parallel": false },
+      { "id": "I20", "name": "provider golden semantic fixtures", "state": "NOT_STARTED", "dependencies": ["I09 registry rows", "I10-I15 normalizers", "provider documentation"], "remaining_work": "checksum-pinned offline fixture corpus (3 providers, BTC+alt, linear+inverse, each sensor family)", "acceptance": "fixtures ratified as golden evidence with pinned checksums, operator-visible", "parallel": "author_yes_ratify_after_I12_I15" },
+      { "id": "I21", "name": "PIT/leakage/property/regression tests", "state": "PARTIAL_PER_CHECKPOINT_TESTS_ONLY", "dependencies": ["I10-I15", "I16-I19 for end-to-end properties"], "remaining_work": "PIT/leakage properties, invariant properties, refusal-surface regression corpus", "acceptance": "contributes to TIME/LINEAGE/DUPLICATE_REVISION/replay gates; closes no gate alone", "parallel": true },
+      { "id": "I22", "name": "T0 to T1 golden replay slice and checksum evidence", "state": "NOT_STARTED_GATE_OPEN", "dependencies": ["I18", "I19", "I20", "I21"], "remaining_work": "one checksum-pinned offline end-to-end slice with reproduction instructions", "acceptance": "GOLDEN_T0_T1_GATE PASS, canonical run, independent checksum reproduction", "parallel": false },
+      { "id": "I23", "name": "acceptance report + Bloc 6 handoff", "state": "NOT_STARTED", "dependencies": ["I01-I22"], "remaining_work": "Bloc 5 acceptance report and Bloc 6 handoff in the existing ratification shape", "acceptance": "operator decision; cannot be closed by the producer alone", "parallel": false }
+    ],
+    "gate_state": {
+      "IDENTITY_GATE": "satisfied_by_I01_I04",
+      "TIME_GATE": "satisfied_by_I05_I07",
+      "SEMANTIC_GATE": "trade_liquidation_only_open_for_I12_I15",
+      "UNIT_GATE": "primitives_implemented_B5_I08_UNITS_V1_not_admitted_in_provisional_registry",
+      "LINEAGE_GATE": "not_met_I16",
+      "DUPLICATE_REVISION_GATE": "not_met_I17",
+      "REPLAY_SAFETY_GATE": "gate_implemented_I05_I06_record_binding_deferred",
+      "GOLDEN_T0_T1_GATE": "not_met_I22"
+    },
+    "continuation_waves": [
+      "wave1: I12, I13, I15 parallel; author I16 against I10/I11; start I20; continue I21",
+      "wave2: I14 acceptance with sequence-gap fixtures; close I16; ratify I20",
+      "wave3: I17 then I18 then I19",
+      "wave4: I22 then I23",
+      "parallel lane: REPLAY_EVIDENCE_RECORD_BINDING_V1 then OPERATOR_CUSTODY_SOURCE_AUTHORITY_RECORD_V1"
+    ],
+    "host_constraint": "canonical verification is serial only: 1 worker, 5400 s timeout, ~27 min at 4968 nodes; four workers unsupported"
+  },
+  "governance": {
+    "self_ratification": false,
+    "merge": false,
+    "provider_approval": false,
+    "manifest_activation": false,
+    "custody_source_authorization": false,
+    "trust_promotion": false,
+    "gate_advancement": false,
+    "bloc_6_implementation": false,
+    "further_canonical_execution": false,
+    "production_or_test_change": false,
+    "hard_stops_observed": "all"
+  },
+  "publication": {
+    "nature": "additive evidence only",
+    "files": ["README.md", "01_VERIFIED_CANDIDATE_FREEZE.md", "02_EVIDENCE_HANDOFF_AND_BUNDLE_INTEGRITY.md", "03_INDEPENDENT_TARGETED_ACCEPTANCE.md", "04_RUNG7_ACCEPTANCE_RECORD.md", "05_REMAINING_CHECKPOINT_INVENTORY.md", "rung7_closeout_r1.json"],
+    "production_code_changed": false,
+    "canonical_tests_changed": false,
+    "manifest_changed": false,
+    "previous_packages_modified": false,
+    "requires_local_remote_equality_check": true
+  }
+}
