@@ -129,8 +129,9 @@ def test_i09_and_deferred_modules_are_absent() -> None:
     """After the disclosed I09 extension: only the deliberately deferred
     modules remain absent; a bare module beside the package would shadow the
     authorized subpackage."""
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: ``lineage`` is now
+    # the authorized I16 preliminary surface, so it leaves this deferred tuple.
     for forbidden in STILL_DEFERRED + (
-        "lineage",
         "duplicates",
         "quality",
         "storage",

@@ -921,6 +921,10 @@ DISCLOSED_SRC_PREFIXES = (
     # package.  It sits outside ``common/`` on purpose -- digest verification
     # would violate the ratified I08 purity law inside that pure value layer.
     "quant-lab/src/crypto_sensor_fabric/normalization/authority",
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: the I16 preliminary
+    # deterministic-identity package.  Its EXACT-FILE closure is enforced by the
+    # Wave 1 scope audit, which asserts the package holds exactly one module.
+    "quant-lab/src/crypto_sensor_fabric/normalization/lineage",
 )
 
 I08_DISCLOSED_SHA256 = {
@@ -1122,6 +1126,57 @@ P3_DISCLOSED_EVIDENCE_SHA256 = {
 CURRENT_DISCLOSED_SHA256.update(P3_DISCLOSED_SHA256)
 CURRENT_DISCLOSED_EVIDENCE_SHA256.update(P3_DISCLOSED_EVIDENCE_SHA256)
 
+# ---------------------------------------------------------------------------
+# DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1
+# (operator directive: RATIFY_P3_D1_BOUNDED_IMPLEMENTATION_AND_AUTHORIZE_WAVE1)
+# ---------------------------------------------------------------------------
+#
+# Wave 1 adds the I12-I16 sensor surface under the already-disclosed ``sensors/``
+# prefix plus the new ``lineage/`` package, and it prospectively amends the six
+# scope audits whose allowlists enumerate the authorized surface.  The cascade is
+# the same one every predecessor checkpoint followed: the amended I05 audit
+# re-enters the I05 producer's inventory, so ``bloc_05_time_validation.json`` is
+# regenerated, and the amended I09 audit re-enters the I09 producer's inventory,
+# so ``bloc_05_semantic_validation.json`` is regenerated too.  Both artifacts are
+# re-pinned below at their post-extension bytes together with the six amended
+# audits.  Every predecessor pin above is preserved unmodified, and this merge is
+# last so Wave 1 is operative per path.  No row is weakened: every path outside
+# the disclosed delta keeps its absolute measurement.
+WAVE1_DISCLOSED_SHA256 = {
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py": (
+        "5177f9c0695cbf5cc1ca859dcbb4fdffe8696feffb07c433a4dea11f5b2050df"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py": (
+        "359e87f81c91b53c14e1a14e4d8d1e6c605874ea85e73f8f323b041dae49faa8"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py": (
+        "3fd78a963d976940b6885f8fb71fab6d83bbff40e8c5d3cf5b8c2841ff45f0b3"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py": (
+        "5d41e5ccd13824bf120a1d494c10c9c262e15f9e85be53f82af4e13cafc7e543"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py": (
+        "bf4ee7420ce00755dfa0c360d0847ff6d1ec9d9986a043d4d4f831412cbaddd3"
+    ),
+    "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i11_scope_audit.py": (
+        "b4358b001f50a1846d5475d3f675e836ac1115fcaaa54120ece08fe3c1f54831"
+    ),
+}
+
+WAVE1_DISCLOSED_EVIDENCE_SHA256 = {
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
+    "bloc_05_time_validation.json": (
+        "bc04f58e6c309ec5a713e0f97793e18e789ded697e163a5c514d50afb45c6d41"
+    ),
+    "quant-lab/research/crypto_foundry/sensor_fabric/evidence/bloc_05/"
+    "bloc_05_semantic_validation.json": (
+        "7757542134c285ddfd27311713e033549829833208012ce7e2ff6371c8a72cbe"
+    ),
+}
+
+CURRENT_DISCLOSED_SHA256.update(WAVE1_DISCLOSED_SHA256)
+CURRENT_DISCLOSED_EVIDENCE_SHA256.update(WAVE1_DISCLOSED_EVIDENCE_SHA256)
+
 #: The exact test paths row ``no_i05_test_diff_vs_base`` has always measured.
 I06_SEALED_TEST_PATHS = (
     "quant-lab/tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
@@ -1264,10 +1319,11 @@ def build_scope_payload() -> dict:
             ),
             "detail": (
                 "git status + git diff 32a897436 -- quant-lab/src name only "
-                "normalization/common/, sensors/ and authority/ paths "
-                "(bloc_05/03 s21 required surface) plus the four exact "
-                "normalization/consumer/ files the P3 master directive admits "
-                "by name; every other production path is byte-identical to base"
+                "normalization/common/, sensors/, authority/ and lineage/ paths "
+                "(bloc_05/03 s21 + s2 required surfaces, plus the Wave 1 I16 "
+                "identity package) plus the four exact normalization/consumer/ "
+                "files the P3 master directive admits by name; every other "
+                "production path is byte-identical to base"
             ),
             "pass": _src_delta_is_disclosed(),
         },
@@ -1279,9 +1335,9 @@ def build_scope_payload() -> dict:
             ),
             "detail": (
                 "git diff 32a897436 -- the sealed I01/I05/I08 audit tests names "
-                "only the audits the I08E1 and I09E1 directives extend, and each "
-                "changed one equals its current disclosed SHA-256 (I09 pins "
-                "supersede I08 pins for the twice-amended files)"
+                "only the audits the I08E1, I09E1 and Wave 1 directives extend, "
+                "and each changed one equals its current disclosed SHA-256 (the "
+                "highest checkpoint's pin supersedes lower pins per path)"
             ),
             "pass": _sealed_test_delta_is_disclosed(),
         },
@@ -1308,9 +1364,11 @@ def build_scope_payload() -> dict:
             ),
             "detail": (
                 "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is "
-                "empty except bloc_05_time_validation.json, which equals its "
-                "current disclosed post-extension SHA-256 (its inventory carries "
-                "the amended I05 and I08 audit test hashes)"
+                "empty except the two inventory-carrying artifacts "
+                "(bloc_05_time_validation.json and "
+                "bloc_05_semantic_validation.json), each equal to its current "
+                "disclosed post-extension SHA-256 (their inventories carry the "
+                "amended audit test hashes)"
             ),
             "pass": _sealed_evidence_state_is_disclosed(),
         },

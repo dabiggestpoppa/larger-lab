@@ -70,10 +70,11 @@ def test_sem_a01_common_package_is_exactly_the_frozen_modules() -> None:
 def test_sem_a02_only_deliberately_absent_modules_remain_absent() -> None:
     """Q4 keeps the frozen composite name unexported; 05 §12 keeps missingness
     a reuse, not a fork; the sensor normalizers stay I10+."""
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: ``lineage`` is the
+    # authorized I16 preliminary surface now, so it leaves this deferred tuple.
     for forbidden in (
         "envelope.py",
         "missingness.py",
-        "lineage",
         "duplicates",
         "quality",
         "storage",

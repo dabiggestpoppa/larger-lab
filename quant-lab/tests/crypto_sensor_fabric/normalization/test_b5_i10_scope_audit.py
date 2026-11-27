@@ -44,7 +44,18 @@ I10_BASE_HEAD = "8fc2ba00f849670e4975c843ffba815fe55e53f6"
 #: amendment widens the membership by exactly one named file.
 FROZEN_MODULES = [
     "__init__.py",
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: the Wave 1 modules
+    # are admitted by their exact file names, on the same precedent that admitted
+    # ``liquidation.py`` at I11 and ``verification.py`` at I09P2c. The set stays
+    # EXACT -- a member outside this list is an unapproved surface -- and every
+    # historical entry is preserved verbatim.
+    "admission.py",
+    "basis.py",
+    "book.py",
+    "funding.py",
     "liquidation.py",
+    "oi.py",
+    "positioning.py",
     "side_maps.py",
     "trade.py",
     # DISCLOSED SENSOR-B5-I09P2c: the full-record trusted verification surface
@@ -490,6 +501,46 @@ HISTORICAL_ADMISSION_SAMPLES = (
 )
 
 
+#: DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: the Wave 1 modules,
+#: admitted by EXACT FILE for the reason the P3 grant gives -- a ``sensors/`` or
+#: ``lineage/`` prefix would authorize any module dropped into those directories
+#: under this grant.  Every historical prefix and named exception above is
+#: preserved unmodified.
+WAVE1_EXACT_PATHS = frozenset(
+    {
+        "src/crypto_sensor_fabric/normalization/sensors/__init__.py",
+        "src/crypto_sensor_fabric/normalization/sensors/admission.py",
+        "src/crypto_sensor_fabric/normalization/sensors/oi.py",
+        "src/crypto_sensor_fabric/normalization/sensors/funding.py",
+        "src/crypto_sensor_fabric/normalization/sensors/book.py",
+        "src/crypto_sensor_fabric/normalization/sensors/positioning.py",
+        "src/crypto_sensor_fabric/normalization/sensors/basis.py",
+        "src/crypto_sensor_fabric/normalization/lineage/__init__.py",
+        "tests/crypto_sensor_fabric/normalization/conftest.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i12_oi_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i13_funding_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i14_book_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i15_positioning_basis_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i16_lineage_identity.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i21_wave1_controls.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_wave1_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i11_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/"
+        "test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py",
+    }
+)
+
+#: Generated evidence this wave republishes mechanically.
+WAVE1_EVIDENCE_PREFIX = (
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/b5_wave1_r1/"
+)
+
+
 def _authorized(path: str) -> bool:
     """The admission predicate: historical prefixes, or an exact P3 file.
 
@@ -497,7 +548,12 @@ def _authorized(path: str) -> bool:
     equality test, so ``consumer/models.py.backup`` and ``consumer/rebinding.py``
     are refused even though they live in the authorized directory.
     """
-    return path.startswith(ALLOWED_PREFIXES) or path in P3_MASTER_EXACT_PATHS
+    return (
+        path.startswith(ALLOWED_PREFIXES)
+        or path in P3_MASTER_EXACT_PATHS
+        or path in WAVE1_EXACT_PATHS
+        or path.startswith(WAVE1_EVIDENCE_PREFIX)
+    )
 
 
 

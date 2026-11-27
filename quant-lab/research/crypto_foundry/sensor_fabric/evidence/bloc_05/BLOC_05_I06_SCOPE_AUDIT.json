@@ -4,13 +4,13 @@
   "rows": [
     {
       "clause": "I06E1 s12 (forbidden: editing sealed I01-I05 production) + DISCLOSED B5-I08 extension (operator-authorized)",
-      "detail": "git status + git diff 32a897436 -- quant-lab/src name only normalization/common/, sensors/ and authority/ paths (bloc_05/03 s21 required surface) plus the four exact normalization/consumer/ files the P3 master directive admits by name; every other production path is byte-identical to base",
+      "detail": "git status + git diff 32a897436 -- quant-lab/src name only normalization/common/, sensors/, authority/ and lineage/ paths (bloc_05/03 s21 + s2 required surfaces, plus the Wave 1 I16 identity package) plus the four exact normalization/consumer/ files the P3 master directive admits by name; every other production path is byte-identical to base",
       "pass": true,
       "row_id": "no_production_source_diff_vs_base"
     },
     {
       "clause": "I06E1 s12 (forbidden: editing I01-I05 tests) + DISCLOSED B5-I08/B5-I09 scope-audit allowlist extension",
-      "detail": "git diff 32a897436 -- the sealed I01/I05/I08 audit tests names only the audits the I08E1 and I09E1 directives extend, and each changed one equals its current disclosed SHA-256 (I09 pins supersede I08 pins for the twice-amended files)",
+      "detail": "git diff 32a897436 -- the sealed I01/I05/I08 audit tests names only the audits the I08E1, I09E1 and Wave 1 directives extend, and each changed one equals its current disclosed SHA-256 (the highest checkpoint's pin supersedes lower pins per path)",
       "pass": true,
       "row_id": "no_i05_test_diff_vs_base"
     },
@@ -22,7 +22,7 @@
     },
     {
       "clause": "I06E1 s12 (forbidden: editing prior evidence) + DISCLOSED B5-I08/B5-I09 regeneration of the inventory-carrying I05 artifact",
-      "detail": "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is empty except bloc_05_time_validation.json, which equals its current disclosed post-extension SHA-256 (its inventory carries the amended I05 and I08 audit test hashes)",
+      "detail": "git diff 32a897436 -- the five sealed I05/I06D1 artifacts is empty except the two inventory-carrying artifacts (bloc_05_time_validation.json and bloc_05_semantic_validation.json), each equal to its current disclosed post-extension SHA-256 (their inventories carry the amended audit test hashes)",
       "pass": true,
       "row_id": "prior_checkpoint_evidence_unchanged"
     },

@@ -123,9 +123,10 @@ def test_time_package_is_exactly_the_frozen_seven_modules() -> None:
         # B5-I01 audit's allowlist grew "identity" (I02), "terms" (I04A)
         # and "time" (I05).  "sensors" was operator-authorized at B5-I10
         # (SENSOR-B5-I10E1 directive, bloc_05/03 §2 + bloc_05/06 §18) -- the
-        # same disclosed removal on the same precedent.  Every other subpackage
-        # stays forbidden.
-        "lineage",
+        # same disclosed removal on the same precedent.  ``lineage`` was
+        # operator-authorized at Wave 1 (SENSOR-B5-P3-RATIFICATION-AND-SENSOR-
+        # WAVE1-R1, I16 preliminary) on that same precedent.  Every other
+        # subpackage stays forbidden.
         "duplicates",
         "quality",
         "storage",
@@ -325,7 +326,12 @@ ALLOWED_PREFIXES = (
 )
 
 def _authorized(path: str) -> bool:
-    return path.startswith(ALLOWED_PREFIXES) or path in P3_MASTER_EXACT_PATHS
+    return (
+        path.startswith(ALLOWED_PREFIXES)
+        or path in P3_MASTER_EXACT_PATHS
+        or path in WAVE1_EXACT_PATHS
+        or path.startswith(WAVE1_EVIDENCE_PREFIX)
+    )
 
 
 #: DISCLOSED SENSOR-B5-P3-MASTER-BUILD-R1 (operator directive
@@ -361,6 +367,45 @@ P3_MASTER_EXACT_PATHS = frozenset(
     }
 )
 
+#: DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: the Wave 1 dependent
+#: modules, admitted by EXACT FILE for the reason the P3 grant gives -- a
+#: ``sensors/`` or ``lineage/`` prefix would authorize any module dropped into
+#: those directories under this grant.  Every historical prefix and named
+#: exception above is preserved unmodified.
+WAVE1_EXACT_PATHS = frozenset(
+    {
+        "src/crypto_sensor_fabric/normalization/sensors/__init__.py",
+        "src/crypto_sensor_fabric/normalization/sensors/admission.py",
+        "src/crypto_sensor_fabric/normalization/sensors/oi.py",
+        "src/crypto_sensor_fabric/normalization/sensors/funding.py",
+        "src/crypto_sensor_fabric/normalization/sensors/book.py",
+        "src/crypto_sensor_fabric/normalization/sensors/positioning.py",
+        "src/crypto_sensor_fabric/normalization/sensors/basis.py",
+        "src/crypto_sensor_fabric/normalization/lineage/__init__.py",
+        "tests/crypto_sensor_fabric/normalization/conftest.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i12_oi_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i13_funding_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i14_book_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i15_positioning_basis_semantics.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i16_lineage_identity.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i21_wave1_controls.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_wave1_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i01_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i05_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i08_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i09_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i10_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/test_b5_i11_scope_audit.py",
+        "tests/crypto_sensor_fabric/normalization/"
+        "test_b5_i05_i06_replay_safety/test_b5_i06_replay_safety.py",
+    }
+)
+
+#: Generated evidence this wave republishes mechanically.
+WAVE1_EVIDENCE_PREFIX = (
+    "research/crypto_foundry/sensor_fabric/evidence/bloc_05/b5_wave1_r1/"
+)
+
 #: Historical admission samples: paths the pre-existing prefixes already admit.
 #: The counterexample audit proves the amendment did not narrow them.
 HISTORICAL_ADMISSION_SAMPLES = (
@@ -379,7 +424,12 @@ def _authorized(path: str) -> bool:
     equality test, so ``consumer/models.py.backup`` and ``consumer/rebinding.py``
     are refused even though they live in the authorized directory.
     """
-    return path.startswith(ALLOWED_PREFIXES) or path in P3_MASTER_EXACT_PATHS
+    return (
+        path.startswith(ALLOWED_PREFIXES)
+        or path in P3_MASTER_EXACT_PATHS
+        or path in WAVE1_EXACT_PATHS
+        or path.startswith(WAVE1_EVIDENCE_PREFIX)
+    )
 
 
 

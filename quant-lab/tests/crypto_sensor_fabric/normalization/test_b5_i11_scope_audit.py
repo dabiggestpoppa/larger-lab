@@ -32,7 +32,18 @@ I11_BASE_HEAD = "82e44cf0ed8b8edca42eb4427db4cd6d659dd79a"
 #: The authorized surface: the I10 three plus the disclosed I11 module.
 FROZEN_MODULES = [
     "__init__.py",
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: the Wave 1 modules
+    # are admitted here by their exact file names, on the same precedent that
+    # admitted ``liquidation.py``.  Historical entries are preserved verbatim and
+    # the set stays EXACT, so a member outside this list is still an unapproved
+    # surface.
+    "admission.py",
+    "basis.py",
+    "book.py",
+    "funding.py",
     "liquidation.py",
+    "oi.py",
+    "positioning.py",
     "side_maps.py",
     "trade.py",
     # DISCLOSED SENSOR-B5-I09P2c: the full-record trusted verification surface
@@ -41,15 +52,11 @@ FROZEN_MODULES = [
     "verification.py",
 ]
 
-#: Sensor families that must NOT have a normalizer module yet (I12+).
-UNAUTHORIZED_MODULE_STEMS = [
-    "funding",
-    "open_interest",
-    "positioning",
-    "book",
-    "book_metric",
-    "basis",
-]
+#: Sensor-family module stems that must NOT exist.  Wave 1 implemented every
+#: family in the frozen eight-member set, so this list is deliberately EMPTY: the
+#: guard that remains is the exact ``FROZEN_MODULES`` membership above, and no
+#: later checkpoint has been authorized to add a module at all.
+UNAUTHORIZED_MODULE_STEMS: list[str] = []
 
 
 def _git(*args: str) -> str:

@@ -94,6 +94,10 @@ def test_only_authorized_subpackages_exist() -> None:
     # same reasoning that put the authority loader in its own package at
     # SENSOR-B5-I09P2A.  Membership grows by exactly one NAMED package, so the
     # set stays enumerated and a second new subpackage is still refused.
+    # DISCLOSED SENSOR-B5-P3-RATIFICATION-AND-SENSOR-WAVE1-R1: ``lineage`` is the
+    # I16 preliminary home of deterministic T1 identity, admitted by exactly one
+    # named package on the same precedent.  The set stays enumerated, so a second
+    # new subpackage is still refused.
     allowed = {
         "identity",
         "terms",
@@ -102,6 +106,7 @@ def test_only_authorized_subpackages_exist() -> None:
         "sensors",
         "authority",
         "consumer",
+        "lineage",
     }
     present = {
         entry.name
