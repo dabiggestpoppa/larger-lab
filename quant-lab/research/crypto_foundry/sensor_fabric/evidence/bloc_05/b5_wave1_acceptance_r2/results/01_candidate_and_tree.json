@@ -1,0 +1,65 @@
+{
+  "audited_branch": "agent/crypto-sensor-fabric-b5-wave1-audit-r2",
+  "audited_head": "bc53ada805b8309e6aaf4d31684afb27a2b0e370",
+  "audited_head_equals_candidate": true,
+  "audited_tree_matches_candidate": true,
+  "commit_count_from_squash": "746",
+  "declared_wave1_branch": "agent/crypto-sensor-fabric-b5-wave1-r1",
+  "declared_wave1_candidate": "bc53ada805b8309e6aaf4d31684afb27a2b0e370",
+  "diff_vs_candidate": [],
+  "funding_authority_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "p3_ratification_resolves": "e8abe280f3b64f497756dcad8f5824899112afd4",
+  "prior_audit_carrier_resolves": "02d17222375ea596e937b375b9c5be3dbae9184c",
+  "prior_audit_heads": {
+    "6a1a7a5d6": "6a1a7a5d613ceda2f8ea81d4a0e4a9b953e07769",
+    "6c4874b43": "6c4874b4399883128d4061c607c9ea4da237d6c3",
+    "95c9ee01d": "95c9ee01d61bdcefff0d1a379d0af26de7e788df",
+    "a59fa4002": "a59fa400241874c6201669e799bfa2d7039019e5",
+    "d6b3f9f83": "d6b3f9f83a0cf5bb92f8e37b72e044beeaed6740"
+  },
+  "production_prefix": "quant-lab/src/crypto_sensor_fabric/",
+  "protected_module_digests": {
+    "normalization/lineage/__init__.py": {
+      "lines": 272,
+      "sha256": "9b2fbc98d312c2ad230b107e366bf93d2f380ba97cd7707bf78711ade01ee806"
+    },
+    "normalization/sensors/admission.py": {
+      "lines": 345,
+      "sha256": "4b9f00d3f885a3df7d7444ddd85992f7ed4e01e2b18f2f6f8fe9b63633d0071e"
+    },
+    "normalization/sensors/basis.py": {
+      "lines": 409,
+      "sha256": "5ff7da600978a6431d1f1b1fe22519679a113563f4837fc59b621ce97429b5f5"
+    },
+    "normalization/sensors/book.py": {
+      "lines": 960,
+      "sha256": "657bb461ee1891456a53b2f98a1baa3ae1bd131f05951238192b0ed90d596360"
+    },
+    "normalization/sensors/funding.py": {
+      "lines": 542,
+      "sha256": "8df2d567a1b4afea7c239623405d1551acbcf2fd9c1e86c5470bdd708c9036af"
+    },
+    "normalization/sensors/liquidation.py": {
+      "lines": 1263,
+      "sha256": "21a51a00f7f135f150d2253c32aa11286b9303e0421c6501bf0301d3e8f17f2d"
+    },
+    "normalization/sensors/oi.py": {
+      "lines": 741,
+      "sha256": "131bcd1bbc7a0042bf3dd6d90971baa262ad8c96b27967ba83c8edcdfb9f6409"
+    },
+    "normalization/sensors/positioning.py": {
+      "lines": 337,
+      "sha256": "670abfe0b5a611060eaca6d7b64a36c92eba645c64e9c716fdc951743e126541"
+    },
+    "normalization/sensors/side_maps.py": {
+      "lines": 451,
+      "sha256": "9f8bd96977d92f73cfa1440827d723cfec9eb89bf2365f551c8d11d66da43db0"
+    },
+    "normalization/sensors/trade.py": {
+      "lines": 707,
+      "sha256": "e30fba613c2b5496fd55bbb1525b6f503c766f5810d2205f5c04ee671785cd6e"
+    }
+  },
+  "verdict": "AUDITED_TREE_IS_THE_CANDIDATE"
+}

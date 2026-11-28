@@ -1,0 +1,53 @@
+"""Write the corpus link record from the verified provenance artifact."""
+
+import json
+import pathlib
+import sys
+
+EVIDENCE = pathlib.Path(sys.argv[1])
+prov = json.loads((EVIDENCE / "results" / "02_corpus_provenance.json").read_text(encoding="utf-8"))
+
+link = {
+    "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+    "purpose": (
+        "Links this additive evidence directory to the previously published corpus so the "
+        "58 fixtures are consumed, not copied or re-authored. No fixture was edited, "
+        "re-tiered or re-approved by this audit."
+    ),
+    "previous_corpus": {
+        "package_dir": "evidence/bloc_05/b5_wave1_r1",
+        "carrier_branch": "agent/crypto-sensor-fabric-b5-wave1-audit-r1",
+        "carrier_commit": "02d17222375ea596e937b375b9c5be3dbae9184c",
+        "corpus_version": prov["corpus_version"],
+        "file_count": prov["file_count"],
+        "corpus_digest": prov["declared_corpus_digest"],
+        "digest_algorithm": (
+            "sha256 over rows sorted by fixture_id, each '<path>\\0<sha256>\\n'"
+        ),
+    },
+    "this_audit": {
+        "package_dir": "evidence/bloc_05/b5_wave1_acceptance_r2",
+        "collision_note": (
+            "the implementation branch and the prior audit carrier both use "
+            "evidence/bloc_05/b5_wave1_r1/; neither README nor inventory is overwritten here"
+        ),
+    },
+    "verification": {
+        "files_verified": prov["file_count"],
+        "all_per_file_digests_match": prov["all_digests_match"],
+        "corpus_digest_recomputed": prov["recomputed_corpus_digest"],
+        "corpus_digest_reproduced_exactly": prov["corpus_digest_matches"],
+        "any_fixture_ratified": prov["any_ratified_golden"],
+        "any_fixture_captured_from_provider": prov["any_captured_from_provider"],
+    },
+    "tier_counts_preserved": prov["tier_counts"],
+    "readiness_statement": (
+        "All 58 fixtures remain NOT_REVIEWED and ratified_golden=false. Captured first-party "
+        "payloads were acquired for three of eight families (see CAPTURED_EVIDENCE_MANIFEST.json) "
+        "but no fixture was promoted on the strength of them: a capture proves what a provider "
+        "returned at one instant, not what the field means."
+    ),
+}
+target = EVIDENCE / "CORPUS_LINK.json"
+target.write_text(json.dumps(link, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+print(f"wrote {target}")

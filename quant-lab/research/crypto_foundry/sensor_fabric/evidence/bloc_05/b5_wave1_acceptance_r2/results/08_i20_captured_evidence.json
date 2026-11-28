@@ -1,0 +1,549 @@
+{
+  "access_policy": {
+    "access_control_circumvention": "prohibited",
+    "authenticated_endpoints": "prohibited",
+    "captured_here": "documented public unauthenticated market-data endpoints only",
+    "paid_subscriptions": "prohibited",
+    "trading_endpoints": "prohibited",
+    "user_agent": "b5-wave1-second-agent-audit/1.0 (research; public market data only)"
+  },
+  "assets_captured": [
+    "BTC",
+    "ETH"
+  ],
+  "attempt_count": 13,
+  "captured_count": 13,
+  "contract_types_captured": [
+    "INVERSE_PERPETUAL",
+    "LINEAR_PERPETUAL"
+  ],
+  "coverage_assessment": {
+    "assets_met": true,
+    "assets_required": "BTC and ETH (or another supported alt)",
+    "contract_types_met": true,
+    "contract_types_required": "linear and inverse",
+    "families_absent": {
+      "MECHANICAL_BASIS": "no captured endpoint publishes a provider-native basis field; every basis is derived, and deriving one is not authorized",
+      "MECHANICAL_LIQUIDATION": "no documented free event-level liquidation endpoint is published by the captured venues",
+      "MECHANICAL_POSITIONING": "the only venue publishing a documented top-trader ratio family returned HTTP 451 (jurisdictional block) and a second returned HTTP 403; no lawful free access was available",
+      "MECHANICAL_TRADE": "not captured in this slice; trade semantics were already exercised offline in r1"
+    },
+    "families_captured": [
+      "MECHANICAL_BOOK_SNAPSHOT",
+      "MECHANICAL_FUNDING",
+      "MECHANICAL_OPEN_INTEREST"
+    ],
+    "families_required": "where genuinely available",
+    "providers_met": true,
+    "providers_required": "three or more"
+  },
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "manifest_digest": "9d3027a7721519f52e016f85cffae30434d00f434002982b14f9ef71455e85b5",
+  "manifest_path": "C:\\tmp\\b5r2\\captured_manifest.json",
+  "providers_captured": [
+    "DERIBIT",
+    "GATE_FUTURES",
+    "KRAKEN_FUTURES",
+    "OKX_SWAP"
+  ],
+  "raw_digests_reverified": true,
+  "raw_storage": {
+    "kind": "EXTERNAL_APPROVED_EVIDENCE_STORAGE",
+    "path": "C:\\tmp\\b5r2\\raw",
+    "repo_policy": "raw bytes are NOT committed; only this manifest and its checksums are"
+  },
+  "readiness_impact": {
+    "reason": "a capture proves what the provider returned at one instant; it does not prove what the field means, and no fixture was promoted",
+    "tier_A_fixtures_still_not_ratified": true,
+    "what_the_captures_do_support": [
+      "OKX publishes oi, oiCcy and oiUsd together and they are arithmetically separable, which confirms the r1 Tier-A claim that one canonical oi_native would merge three distinct quantities",
+      "OKX fundingTime is a FUTURE settlement instant relative to ts, and nextFundingRate is an empty string that must not be coerced to zero",
+      "Kraken publishes two funding fields differing by ~the index price, so one is not a per-interval fraction; the payload does not say which",
+      "Kraken returns orderbook bids WORST-FIRST (measured: 1147 levels, first element 1, best bid 59900), so a best-first consumer must reverse",
+      "Gate carries funding_interval and quanto_multiplier as contract metadata, so the interval is available for that venue only",
+      "Deribit reports open interest as a USD notional, a different native unit from a contract count"
+    ]
+  },
+  "records": [
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-OKX-OI-BTC-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.okx.com/docs-v5/en/ (Public Data REST - GET /api/v5/public/open-interest)",
+      "family": "MECHANICAL_OPEN_INTEREST",
+      "http_status": 200,
+      "instrument": "BTC-USDT-SWAP",
+      "limitations": [
+        "contract face value / multiplier is NOT in the payload, so converting oi to oiCcy requires contract terms",
+        "the three-field relationship is measured arithmetically, not documented in this capture",
+        "one sample: proves field shape, proves nothing about revisions or backfill"
+      ],
+      "measured": {
+        "oi": "3203165.05000001496",
+        "oiCcy": "32031.6505000001496",
+        "oiUsd_over_oiCcy": "59930.5",
+        "oi_equals_oiCcy": false,
+        "oi_over_oiCcy": "1E+2"
+      },
+      "native_units": {
+        "oi": "CONTRACT_COUNT (MEASURED: oi != oiCcy and oi/oiCcy is not asset-constant)",
+        "oiCcy": "BASE_ASSET_QUANTITY (MEASURED: oiCcy * oiUsd/oiCcy = oiUsd)",
+        "oiUsd": "USD_NOTIONAL (MEASURED: oiUsd/oiCcy equals the contemporaneous price)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "OKX_SWAP",
+      "raw_sha256": "37f2497349f1af0941bca58f21e409cd291d9d76504b1637f0cd07b3dd1c919e",
+      "semantic_claim": "Three separate native quantities (contract count, base-coin quantity, USD notional) are published for one observation, so a single canonical oi_native would merge three different measurements.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "scope": "point-in-time snapshot; no interval window is published",
+        "ts": "provider response time (ms epoch string)"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-OKX-OI-BTC-INVERSE-001",
+      "contract_type": "INVERSE_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.okx.com/docs-v5/en/ (Public Data REST - GET /api/v5/public/open-interest)",
+      "family": "MECHANICAL_OPEN_INTEREST",
+      "http_status": 200,
+      "instrument": "BTC-USD-SWAP",
+      "limitations": [
+        "contract face value is not in the payload",
+        "one sample"
+      ],
+      "measured": {
+        "oi": "6790244.00000000067",
+        "oiCcy": "11335.1718243462072275",
+        "oiUsd_over_oiCcy": "59904.20000000000000021124514",
+        "oi_equals_oiCcy": false,
+        "oi_over_oiCcy": "599.0420000000000000021124514"
+      },
+      "native_units": {
+        "oi": "CONTRACT_COUNT (MEASURED)",
+        "oiCcy": "BASE_ASSET_QUANTITY (MEASURED)",
+        "oiUsd": "USD_NOTIONAL (MEASURED)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "OKX_SWAP",
+      "raw_sha256": "9f3f5e7686b2b380e4ea5baeb2e3180453c01ef6bbe7090580a6ad8772170fc8",
+      "semantic_claim": "On an inverse swap the same three fields appear but oi/oiCcy is a different constant than on the linear swap, so the ratio is contract-type dependent and a contract count is not a coin quantity.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "scope": "point-in-time snapshot",
+        "ts": "provider response time (ms epoch string)"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "ETH",
+      "capture_id": "CAP-OKX-OI-ETH-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.okx.com/docs-v5/en/ (Public Data REST - GET /api/v5/public/open-interest)",
+      "family": "MECHANICAL_OPEN_INTEREST",
+      "http_status": 200,
+      "instrument": "ETH-USDT-SWAP",
+      "limitations": [
+        "one sample"
+      ],
+      "measured": {
+        "oi": "6730635.900000014",
+        "oiCcy": "673063.5900000014",
+        "oiUsd_over_oiCcy": "1663.07",
+        "oi_equals_oiCcy": false,
+        "oi_over_oiCcy": "1E+1"
+      },
+      "native_units": {
+        "oi": "CONTRACT_COUNT (MEASURED)",
+        "oiCcy": "BASE_ASSET_QUANTITY (MEASURED)",
+        "oiUsd": "USD_NOTIONAL (MEASURED)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "OKX_SWAP",
+      "raw_sha256": "203b43b10e9ff4cb952c91057c78cc63ebba544c78a5ee0cb75de3fd276ac06f",
+      "semantic_claim": "The three-quantity shape is not BTC-specific.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "scope": "point-in-time snapshot",
+        "ts": "provider response time (ms epoch string)"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-OKX-FUNDING-BTC-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.okx.com/docs-v5/en/ (Public Data REST - GET /api/v5/public/funding-rate)",
+      "family": "MECHANICAL_FUNDING",
+      "http_status": 200,
+      "instrument": "BTC-USDT-SWAP",
+      "limitations": [
+        "the funding interval in seconds is NOT in the payload; it must come from contract terms",
+        "nextFundingRate was empty in this capture and must not be coerced to 0",
+        "one sample"
+      ],
+      "measured": {
+        "fundingTime": "1795852800000",
+        "funding_time_after_ts": true,
+        "nextFundingRate_is_empty_string": true,
+        "nextFundingRate_raw": "",
+        "ts": "1795825623668"
+      },
+      "native_units": {
+        "fundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL (DECLARED: decimal ratio)",
+        "nextFundingRate": "DECLARED_PREDICTED_SLOT, EMPTY_STRING_IN_THIS_CAPTURE"
+      },
+      "outcome": "CAPTURED",
+      "provider": "OKX_SWAP",
+      "raw_sha256": "1509ea09584ca17892da8dc3af504f806300d44b06d18e5993a88c3a411ac8ae",
+      "semantic_claim": "fundingTime is a FUTURE settlement instant relative to ts, so a reader that treats it as the time the rate became known back-dates or forward-dates the observation; and nextFundingRate is an empty string, which is not zero.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "fundingTime": "the NEXT settlement instant of the CURRENT period (ms epoch), i.e. AFTER ts",
+        "prevFundingTime": "previous settlement instant",
+        "scope": "current period only; this is not a funding history row",
+        "ts": "provider response time"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "ETH",
+      "capture_id": "CAP-OKX-FUNDING-ETH-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.okx.com/docs-v5/en/ (Public Data REST - GET /api/v5/public/funding-rate)",
+      "family": "MECHANICAL_FUNDING",
+      "http_status": 200,
+      "instrument": "ETH-USDT-SWAP",
+      "limitations": [
+        "interval not in payload",
+        "one sample"
+      ],
+      "measured": {
+        "fundingTime": "1795852800000",
+        "funding_time_after_ts": true,
+        "nextFundingRate_is_empty_string": true,
+        "nextFundingRate_raw": "",
+        "ts": "1795825623727"
+      },
+      "native_units": {
+        "fundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+        "nextFundingRate": "EMPTY_STRING_IN_THIS_CAPTURE"
+      },
+      "outcome": "CAPTURED",
+      "provider": "OKX_SWAP",
+      "raw_sha256": "ebc9425cb596e6f1a87e34eb9a4257cb12da98a08b426bdfc3f0ba009e46ac68",
+      "semantic_claim": "The future-settlement convention and the empty predicted slot are not BTC-specific.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "fundingTime": "next settlement of the current period (ms epoch), after ts",
+        "scope": "current period",
+        "ts": "response time"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-OKX-BOOK-BTC-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.okx.com/docs-v5/en/ (Market Data REST - GET /api/v5/market/books)",
+      "family": "MECHANICAL_BOOK_SNAPSHOT",
+      "http_status": 200,
+      "instrument": "BTC-USDT-SWAP",
+      "limitations": [
+        "sz=5 is partial depth",
+        "level quantity unit is declared, not separable inside the payload",
+        "one sample"
+      ],
+      "measured": {
+        "ask_levels": 5,
+        "best_ask": "59930.6",
+        "best_bid": "59930.5",
+        "bid_levels": 5,
+        "book_ordered": true,
+        "book_uncrossed": true,
+        "level_arity": [
+          4
+        ]
+      },
+      "native_units": {
+        "levels[0]": "QUOTE_PRICE",
+        "levels[1]": "CONTRACT_COUNT (DECLARED for swaps; not separable inside this payload)",
+        "levels[2]": "LIQUIDATION_ORDER_COUNT (provider-specific)",
+        "levels[3]": "LEVEL_ORDER_COUNT"
+      },
+      "outcome": "CAPTURED",
+      "provider": "OKX_SWAP",
+      "raw_sha256": "a552f246372f8938871ef32604eabdbcbadfe72e9040ead1d6c536c9aa8e928d",
+      "semantic_claim": "A REST book is a bounded snapshot with its own sequence id and a level schema longer than price/size, so it cannot certify a full-depth book and level[1] is not base coin.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "scope": "bounded top-of-book snapshot, NOT full depth",
+        "seqId": "provider sequence id of this snapshot",
+        "ts": "provider assembly time (ms epoch string)"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-DERIBIT-BOOK-BTC-INVERSE-001",
+      "contract_type": "INVERSE_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://docs.deribit.com/ (Public - GET /public/get_order_book)",
+      "family": "MECHANICAL_BOOK_SNAPSHOT",
+      "http_status": 200,
+      "instrument": "BTC-PERPETUAL",
+      "limitations": [
+        "depth=5 is partial",
+        "per-level notional-to-contract relationship depends on contract specification",
+        "one sample"
+      ],
+      "measured": {
+        "ask_levels": 5,
+        "best_ask": "59897.5",
+        "best_bid": "59897.0",
+        "bid_levels": 5,
+        "book_ordered": true,
+        "book_uncrossed": true,
+        "has_change_id": true
+      },
+      "native_units": {
+        "bids/asks[0]": "USD_PRICE",
+        "bids/asks[1]": "USD_NOTIONAL_PER_CONTRACT (DECLARED for inverse)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "DERIBIT",
+      "raw_sha256": "1ce8360f6af18339a99a162669a402266bb34c8fa08614e260b4c03bbcd467f2",
+      "semantic_claim": "On an inverse perpetual the level amount is a USD notional, and the snapshot carries a change_id that a later chain would have to continue from.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "change_id": "provider change sequence",
+        "scope": "snapshot at the requested depth",
+        "timestamp": "provider server time (ms epoch)"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "ETH",
+      "capture_id": "CAP-DERIBIT-BOOK-ETH-INVERSE-001",
+      "contract_type": "INVERSE_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://docs.deribit.com/ (Public - GET /public/get_order_book)",
+      "family": "MECHANICAL_BOOK_SNAPSHOT",
+      "http_status": 200,
+      "instrument": "ETH-PERPETUAL",
+      "limitations": [
+        "depth=5 is partial",
+        "one sample"
+      ],
+      "measured": {
+        "ask_levels": 5,
+        "best_ask": "1662.1",
+        "best_bid": "1662.05",
+        "bid_levels": 5,
+        "book_ordered": true,
+        "book_uncrossed": true,
+        "has_change_id": true
+      },
+      "native_units": {
+        "bids/asks[0]": "USD_PRICE",
+        "bids/asks[1]": "USD_NOTIONAL_PER_CONTRACT"
+      },
+      "outcome": "CAPTURED",
+      "provider": "DERIBIT",
+      "raw_sha256": "dc958b23e8a53b4d3afccee1dfaf480e7a804a7946f4b3f5205737a8341846f7",
+      "semantic_claim": "The inverse-notional level shape is not BTC-specific.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "change_id": "provider change sequence",
+        "scope": "snapshot at requested depth",
+        "timestamp": "provider server time (ms epoch)"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-DERIBIT-OI-BTC-INVERSE-001",
+      "contract_type": "INVERSE_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://docs.deribit.com/ (Public - GET /public/get_book_summary_by_instrument)",
+      "family": "MECHANICAL_OPEN_INTEREST",
+      "http_status": 200,
+      "instrument": "BTC-PERPETUAL",
+      "limitations": [
+        "the notional is provider-computed; it is not a base-coin exposure",
+        "one sample"
+      ],
+      "measured": {
+        "open_interest": "817904980",
+        "open_interest_over_mark": "13655.22983436686048326764538"
+      },
+      "native_units": {
+        "open_interest": "USD_NOTIONAL (DECLARED for inverse; MEASURED: open_interest/mark_price is a plausible coin quantity)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "DERIBIT",
+      "raw_sha256": "8d0e33b2f201f7d5e84270ac2c9bb5ec9e7a403844dfa53391f04012ed7c0e77",
+      "semantic_claim": "Deribit publishes open interest already denominated in USD, a different native unit from a contract count, so the two cannot share one canonical slot.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "creation_timestamp": "summary creation time (ms epoch)",
+        "scope": "current summary"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-GATE-FUNDING-BTC-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.gate.io/docs/developers/apiv4/ (Futures - GET /futures/{settle}/contracts/{contract})",
+      "family": "MECHANICAL_FUNDING",
+      "http_status": 200,
+      "instrument": "BTC_USDT",
+      "limitations": [
+        "this document is contract metadata, so a capture is not a funding observation with an event time",
+        "one sample"
+      ],
+      "measured": {
+        "funding_interval": 28800,
+        "quanto_multiplier": "0.0001"
+      },
+      "native_units": {
+        "funding_interval": "SECONDS (28800 on this contract)",
+        "funding_rate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+        "quanto_multiplier": "CONTRACT_SIZE_IN_BASE_ASSET"
+      },
+      "outcome": "CAPTURED",
+      "provider": "GATE_FUTURES",
+      "raw_sha256": "0de13f14ab30b94ebad1b1e8208ba164317c904c7964b546a4f4c1bedbb55650",
+      "semantic_claim": "Gate publishes the funding interval and the contract multiplier as contract metadata in the same document as the rate, so the interval is available for a linear contract here while several other venues do not publish it at all.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "funding_next_apply": "epoch SECONDS of the next settlement",
+        "scope": "contract specification, not a per-observation history row"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-GATE-OI-BTC-LINEAR-001",
+      "contract_type": "LINEAR_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://www.gate.io/docs/developers/apiv4/ (Futures - GET /futures/{settle}/tickers)",
+      "family": "MECHANICAL_OPEN_INTEREST",
+      "http_status": 200,
+      "instrument": "BTC_USDT",
+      "limitations": [
+        "total_size must be scaled by quanto_multiplier from the contract document to reach a coin quantity",
+        "the ticker carries no event time",
+        "one sample"
+      ],
+      "measured": {
+        "total_size": "634706556"
+      },
+      "native_units": {
+        "mark_price/index_price": "USDT",
+        "total_size": "CONTRACT_COUNT (MEASURED: total_size * quanto_multiplier is a plausible coin quantity)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "GATE_FUTURES",
+      "raw_sha256": "6294de05b3242dca706be99bffb38c7105741f22ab36ca491ebe5dd7f8ed9359",
+      "semantic_claim": "Gate's open interest lives on the ticker document under total_size as a contract count, while the contract document (a different endpoint) carries the multiplier needed to interpret it.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "scope": "ticker state; the ticker document carries no per-observation event time"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-KRAKEN-FUNDING-BTC-INVERSE-001",
+      "contract_type": "INVERSE_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://docs.kraken.com/api/docs/futures-api/ (GET /derivatives/api/v3/tickers; ?symbol= filter returned an empty list, so the multiplexed document is captured whole)",
+      "family": "MECHANICAL_FUNDING",
+      "http_status": 200,
+      "instrument": "PF_XBTUSD",
+      "limitations": [
+        "the two funding fields' conventions are NOT established by this capture",
+        "the response multiplexes every listed instrument, so isolation is a local step",
+        "funding interval is not carried",
+        "one sample"
+      ],
+      "measured": {
+        "fundingRate": "0.04439133684998005",
+        "isolated_symbol": "PF_XBTUSD",
+        "magnitude_ratio": "59864.25000000000640564595883",
+        "multiplexed_ticker_count": 205,
+        "relativeFundingRate": "7.41533333333E-7"
+      },
+      "native_units": {
+        "fundingRate": "MAGNITUDE_DIFFERS_FROM_relativeFundingRate_BY_~6e4 (convention NOT determined from this capture)",
+        "markPrice/indexPrice": "USD",
+        "openInterest": "CONTRACT_COUNT (inverse: USD face per contract)",
+        "relativeFundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL"
+      },
+      "outcome": "CAPTURED",
+      "provider": "KRAKEN_FUTURES",
+      "raw_sha256": "fff56b563fd37f15e61ab5f9f126044631f7f65bc8be56a184d49d19b716e3e6",
+      "semantic_claim": "Kraken publishes TWO funding fields whose magnitudes differ by four orders, so at least one of them is not a per-interval fraction; the payload does not say which convention either uses. Both mark and index price are also present, so a reader must not attribute either price by position.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "lastTime": "provider last update time (ISO-8601, nanosecond precision)",
+        "scope": "current ticker state"
+      },
+      "validation": "OK"
+    },
+    {
+      "asset": "BTC",
+      "capture_id": "CAP-KRAKEN-BOOK-BTC-INVERSE-001",
+      "contract_type": "INVERSE_PERPETUAL",
+      "digest_reverified": true,
+      "docs": "https://docs.kraken.com/api/docs/futures-api/ (GET /derivatives/api/v3/orderbook)",
+      "family": "MECHANICAL_BOOK_SNAPSHOT",
+      "http_status": 200,
+      "instrument": "PF_XBTUSD",
+      "limitations": [
+        "snapshot only, no incremental chain",
+        "quantity unit is declared, not separable inside the payload",
+        "bids arrive ascending, so a best-first consumer must reverse them",
+        "one sample"
+      ],
+      "measured": {
+        "ask_levels": 1550,
+        "bid_levels": 1147,
+        "bids_ascending_worst_first": true,
+        "bids_first_element": "1",
+        "bids_max_price": "59900",
+        "first_element_is_best_bid": false,
+        "first_element_overstates_depth": "59900"
+      },
+      "native_units": {
+        "bids/asks[0]": "USD_PRICE",
+        "bids/asks[1]": "CONTRACT_COUNT (inverse: USD face)"
+      },
+      "outcome": "CAPTURED",
+      "provider": "KRAKEN_FUTURES",
+      "raw_sha256": "0083fdbfb79681e1b9a003dd52f1420eb92b9dc3b5413f7b1944db7778b3560b",
+      "semantic_claim": "A Kraken orderbook snapshot is available on the live PF_ symbol but not the retired PI_ symbol, and its bids are published WORST-FIRST (ascending price), so bids[0] is the deepest bid rather than the best one.",
+      "size_reverified": true,
+      "timestamp_semantics": {
+        "scope": "snapshot; no per-level timestamp is carried"
+      },
+      "validation": "OK"
+    }
+  ],
+  "sensor_families_captured": [
+    "MECHANICAL_BOOK_SNAPSHOT",
+    "MECHANICAL_FUNDING",
+    "MECHANICAL_OPEN_INTEREST"
+  ],
+  "verdict": "CAPTURED_EVIDENCE_ACQUIRED_NOT_RATIFIED"
+}

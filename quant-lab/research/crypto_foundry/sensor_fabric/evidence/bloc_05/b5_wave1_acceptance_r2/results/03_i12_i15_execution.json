@@ -1,0 +1,1586 @@
+{
+  "check_count": 114,
+  "checks_failed": 0,
+  "checks_passed": 114,
+  "entry_points": {
+    "I12": "normalize_open_interest",
+    "I13": "normalize_funding",
+    "I14": "normalize_book_snapshot",
+    "I15": "normalize_positioning + normalize_basis"
+  },
+  "fixture_count": 58,
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "per_fixture": [
+    {
+      "adaptation_notes": [
+        "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis would be derived by this audit, which is not authorized"
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-BASIS-001",
+      "sensor_family": "MECHANICAL_BASIS",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis would be derived by this audit, which is not authorized"
+      ],
+      "fixture_id": "FX-B-BASIS-CROSS-VENUE-SYNTHESIS-001",
+      "sensor_family": "MECHANICAL_BASIS",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis would be derived by this audit, which is not authorized"
+      ],
+      "fixture_id": "FX-B-BASIS-LATE-REFERENCE-001",
+      "sensor_family": "MECHANICAL_BASIS",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis would be derived by this audit, which is not authorized"
+      ],
+      "fixture_id": "FX-B-BASIS-REFERENCE-SUBSTITUTION-001",
+      "sensor_family": "MECHANICAL_BASIS",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis would be derived by this audit, which is not authorized"
+      ],
+      "fixture_id": "FX-B-BASIS-UNIT-MISMATCH-001",
+      "sensor_family": "MECHANICAL_BASIS",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis would be derived by this audit, which is not authorized"
+      ],
+      "fixture_id": "FX-B-BASIS-WRONG-INSTRUMENT-001",
+      "sensor_family": "MECHANICAL_BASIS",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK_METRIC-001",
+      "sensor_family": "MECHANICAL_BOOK_METRIC",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "adaptation_notes": [],
+      "checks": [
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "UNKNOWN_SEQUENCE"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-001/book-best-bid-is-first-level",
+          "expected": "61230.10",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.10",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked",
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_SEQUENCE_IN_PAYLOAD"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-002/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "UNKNOWN_SEQUENCE"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-002/book-best-bid-is-first-level",
+          "expected": "61230.20",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.20",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-002/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-002/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked",
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-BOOK-002",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_SEQUENCE_IN_PAYLOAD"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "UNKNOWN_SEQUENCE"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001/book-best-bid-is-first-level",
+          "expected": "61230.5",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.5",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-BOOK-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_LEVELS_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-KRAKEN_FUTURES-PI_XBTUSD-BOOK-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_LEVELS_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-BOOK-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=3001..u=3005 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-DUPLICATE-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-DUPLICATE-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-DUPLICATE-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-DUPLICATE-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-DUPLICATE-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=7001..u=7005 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-METRIC-ACROSS-GAP-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-METRIC-ACROSS-GAP-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-METRIC-ACROSS-GAP-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-METRIC-ACROSS-GAP-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-METRIC-ACROSS-GAP-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=2001..u=2005 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-MISSING-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-MISSING-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-MISSING-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-MISSING-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-MISSING-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=4006..u=4010 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-OUT-OF-ORDER-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-OUT-OF-ORDER-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-OUT-OF-ORDER-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-OUT-OF-ORDER-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-OUT-OF-ORDER-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=8001..u=8004 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-RECOVERY-SNAPSHOT-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-RECOVERY-SNAPSHOT-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-RECOVERY-SNAPSHOT-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-RECOVERY-SNAPSHOT-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-RECOVERY-SNAPSHOT-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=6001..u=6003 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-RESET-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-RESET-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-RESET-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-RESET-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-RESET-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=5004..u=5008 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-SNAPSHOT-UPDATE-MISMATCH-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-SNAPSHOT-UPDATE-MISMATCH-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-SNAPSHOT-UPDATE-MISMATCH-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-SNAPSHOT-UPDATE-MISMATCH-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-SNAPSHOT-UPDATE-MISMATCH-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans U=1001..u=1005 but classify_sequence compares one token, so a contiguous range is indistinguishable from a gap",
+        "SEQUENCE_CHAIN_PRESENT: only the first update is consumable through the single-snapshot entry point"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-SEQ-VALID-CONTIGUOUS-001/book-certification-requires-contiguity",
+          "expected": "certified <=> full and contiguous",
+          "law": "certification requires a full snapshot over a contiguous sequence",
+          "observed": {
+            "certified": false,
+            "full": true,
+            "sequence": "GAP_DETECTED"
+          },
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-VALID-CONTIGUOUS-001/book-best-bid-is-first-level",
+          "expected": "61230.0",
+          "law": "best_bid is the first canonical bid level",
+          "observed": "61230.0",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-VALID-CONTIGUOUS-001/book-depth-not-claimed",
+          "expected": false,
+          "law": "a bounded snapshot is not full depth",
+          "observed": false,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-SEQ-VALID-CONTIGUOUS-001/book-no-base-without-terms",
+          "expected": "all absent-or-blocked",
+          "law": "no level yields a numeric base quantity without terms or authority",
+          "observed": [
+            "blocked",
+            "blocked"
+          ],
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-SEQ-VALID-CONTIGUOUS-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I14",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "NO_LEVELS_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-C-DERIBIT-BTC-PERPETUAL-BOOK-001",
+      "sensor_family": "MECHANICAL_BOOK_SNAPSHOT",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [],
+      "checks": [
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001/fund-native-preserved",
+          "expected": "0.00010000",
+          "law": "the native rate is carried verbatim",
+          "observed": "0.00010000",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001/fund-kind-preserved",
+          "expected": "REALIZED",
+          "law": "realized and predicted stay distinct",
+          "observed": "REALIZED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001/fund-no-notional",
+          "expected": "no notional/PnL slot",
+          "law": "no funding notional or PnL field exists on the record",
+          "observed": [],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001/fund-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root promotes the rate unit (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-FUNDING-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I13",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-BYBIT_LINEAR-BTCUSDT-FUNDING-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-FUNDING-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-GATE_FUTURES-BTC_USDT-FUNDING-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-KRAKEN_FUTURES-PI_XBTUSD-FUNDING-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-FUNDING-BPS-CONVERSION-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-FUNDING-FUTURE-INFORMATION-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "INTERVAL_NOT_IN_PAYLOAD: comparable equivalents must refuse"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001/fund-native-preserved",
+          "expected": "0.0001",
+          "law": "the native rate is carried verbatim",
+          "observed": "0.0001",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001/fund-kind-preserved",
+          "expected": "UNKNOWN",
+          "law": "realized and predicted stay distinct",
+          "observed": "UNKNOWN",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001/fund-no-default-8h",
+          "expected": null,
+          "law": "an absent interval does not default to 8h",
+          "observed": null,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001/fund-equivs-blocked",
+          "expected": "absent-or-blocked",
+          "law": "comparable equivalents are refused without an interval",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001/fund-no-notional",
+          "expected": "no notional/PnL slot",
+          "law": "no funding notional or PnL field exists on the record",
+          "observed": [],
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001/fund-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root promotes the rate unit (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-FUNDING-INTERVAL-SUBSTITUTION-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I13",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "INTERVAL_NOT_IN_PAYLOAD: comparable equivalents must refuse"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001/fund-native-preserved",
+          "expected": "0.0002",
+          "law": "the native rate is carried verbatim",
+          "observed": "0.0002",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001/fund-kind-preserved",
+          "expected": "UNKNOWN",
+          "law": "realized and predicted stay distinct",
+          "observed": "UNKNOWN",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001/fund-no-default-8h",
+          "expected": null,
+          "law": "an absent interval does not default to 8h",
+          "observed": null,
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001/fund-equivs-blocked",
+          "expected": "absent-or-blocked",
+          "law": "comparable equivalents are refused without an interval",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001/fund-no-notional",
+          "expected": "no notional/PnL slot",
+          "law": "no funding notional or PnL field exists on the record",
+          "observed": [],
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001/fund-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root promotes the rate unit (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-FUNDING-PREDICTED-AS-REALIZED-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I13",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-FUNDING-RATE-PERCENT-CONFUSION-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-C-BINANCE_USDM-BTCUSDT-FUNDING-001",
+      "sensor_family": "MECHANICAL_FUNDING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-GATE_FUTURES-BTC_USDT-LIQUIDATION-001",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-B-LIQ-POSITION-EXECUTION-COLLAPSE-001",
+      "sensor_family": "MECHANICAL_LIQUIDATION",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "adaptation_notes": [
+        "EXPECTATION_UNIT_UNVERIFIED_NOT_IN_FROZEN_VOCABULARY",
+        "AGGREGATION_FUNCTION_UNREPRESENTABLE: frozen scope vocabulary has INTERVAL_LAST/AVERAGE but no 'unresolved which' state",
+        "TWO_NATIVE_QUANTITIES_IN_ONE_PAYLOAD: the adapter must choose one"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "EXPECTATION_UNIT_UNVERIFIED_NOT_IN_FROZEN_VOCABULARY",
+        "TWO_NATIVE_QUANTITIES_IN_ONE_PAYLOAD: the adapter must choose one"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-ETHUSDT-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_OI_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-A-BYBIT_LINEAR-ETHUSDT-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "EXPECTATION_UNIT_USD_NOTIONAL_NOT_IN_FROZEN_VOCABULARY"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [],
+      "checks": [
+        {
+          "check_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-GATE_FUTURES-ETH_USDT-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "THREE_NATIVE_QUANTITIES_IN_ONE_PAYLOAD: oi/oiCcy/oiUsd"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-OKX_SWAP-BTC-USD-SWAP-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "EXPECTATION_UNIT_None_NOT_IN_FROZEN_VOCABULARY",
+        "THREE_NATIVE_QUANTITIES_IN_ONE_PAYLOAD: oi/oiCcy/oiUsd"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_OI_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-OI-AGGREGATE-VENUE-ATTRIBUTION-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "EXPECTATION_UNIT_None_NOT_IN_FROZEN_VOCABULARY"
+      ],
+      "checks": [
+        {
+          "check_id": "FX-B-OI-UNIT-SUBSTITUTION-001/oi-no-registry-refused",
+          "expected": "NO_REGISTRY",
+          "law": "without a registry no unit is promoted",
+          "observed": "NO_REGISTRY",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-OI-UNIT-SUBSTITUTION-001/oi-native-unit-unverified",
+          "expected": "UNVERIFIED",
+          "law": "the reading is not promoted to the canonical slot",
+          "observed": "UNVERIFIED",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-OI-UNIT-SUBSTITUTION-001/oi-usd-never-minted",
+          "expected": "absent-or-blocked",
+          "law": "oi_usd is absent or a typed absence, never a number",
+          "observed": "blocked",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-OI-UNIT-SUBSTITUTION-001/oi-flags-canonical",
+          "expected": "declaration-order, deduplicated",
+          "law": "quality flags are canonical and duplicate-free",
+          "observed": [
+            "SEMANTICS_UNVERIFIED",
+            "UNIT_CONVERSION_BLOCKED",
+            "LINEAGE_COMPLETE"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-OI-UNIT-SUBSTITUTION-001/oi-authority-admits",
+          "expected": "admitted",
+          "law": "a trusted root DOES promote the same row (mechanism works)",
+          "observed": "admitted",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-OI-UNIT-SUBSTITUTION-001/oi-admitted-still-no-usd",
+          "expected": "absent-or-blocked",
+          "law": "even an admitted unit does not mint oi_usd",
+          "observed": "blocked",
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-OI-UNIT-SUBSTITUTION-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I12",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_OI_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-OI-ZERO-DEFAULTED-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_OI_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-TIME-INTERVAL-START-AVAILABILITY-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_OI_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-C-BINANCE_USDM-BTCUSDT-OI-001",
+      "sensor_family": "MECHANICAL_OPEN_INTEREST",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [],
+      "checks": [
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001/pos-population-carried",
+          "expected": "TOP_TRADER_ACCOUNTS",
+          "law": "population scope is carried verbatim",
+          "observed": "TOP_TRADER_ACCOUNTS",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001/pos-no-generic-ratio",
+          "expected": "no generic ratio",
+          "law": "no generic long_short_ratio slot exists",
+          "observed": [
+            "canonical_metric_family",
+            "contract_instance_id",
+            "denominator_definition",
+            "lineage",
+            "lineage_state",
+            "missingness_reason",
+            "native_event_id",
+            "native_instrument",
+            "native_sequence_id",
+            "native_values",
+            "normalization_generation",
+            "normalization_status",
+            "numerator_definition",
+            "population_scope",
+            "population_size",
+            "positioning_metric_type",
+            "provider",
+            "provider_instrument_id",
+            "provider_methodology_ref",
+            "provider_metric_name",
+            "quality",
+            "quality_flags",
+            "quarantine_evidence_refs",
+            "quarantine_reason",
+            "quarantine_remediation",
+            "semantic_equivalence",
+            "sensor_family",
+            "source_coverage_state",
+            "source_granularity",
+            "source_revision_id",
+            "source_revision_state",
+            "supersedes_t1_record_id",
+            "t1_record_id",
+            "time",
+            "value_native",
+            "value_unit",
+            "venue",
+            "versions"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001/pos-value-verbatim",
+          "expected": "1.5793",
+          "law": "the native ratio is carried verbatim",
+          "observed": "1.5793",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001/pos-canonical-family-absent",
+          "expected": null,
+          "law": "an undeclared-population ratio claims no canonical family",
+          "observed": null,
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-POSITIONING-001",
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I15",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [],
+      "checks": [
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001/pos-population-carried",
+          "expected": "ALL_ACCOUNTS",
+          "law": "population scope is carried verbatim",
+          "observed": "ALL_ACCOUNTS",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001/pos-no-generic-ratio",
+          "expected": "no generic ratio",
+          "law": "no generic long_short_ratio slot exists",
+          "observed": [
+            "canonical_metric_family",
+            "contract_instance_id",
+            "denominator_definition",
+            "lineage",
+            "lineage_state",
+            "missingness_reason",
+            "native_event_id",
+            "native_instrument",
+            "native_sequence_id",
+            "native_values",
+            "normalization_generation",
+            "normalization_status",
+            "numerator_definition",
+            "population_scope",
+            "population_size",
+            "positioning_metric_type",
+            "provider",
+            "provider_instrument_id",
+            "provider_methodology_ref",
+            "provider_metric_name",
+            "quality",
+            "quality_flags",
+            "quarantine_evidence_refs",
+            "quarantine_reason",
+            "quarantine_remediation",
+            "semantic_equivalence",
+            "sensor_family",
+            "source_coverage_state",
+            "source_granularity",
+            "source_revision_id",
+            "source_revision_state",
+            "supersedes_t1_record_id",
+            "t1_record_id",
+            "time",
+            "value_native",
+            "value_unit",
+            "venue",
+            "versions"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001/pos-value-verbatim",
+          "expected": "1.8123",
+          "law": "the native ratio is carried verbatim",
+          "observed": "1.8123",
+          "passed": true
+        },
+        {
+          "check_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001/pos-canonical-family-absent",
+          "expected": null,
+          "law": "an undeclared-population ratio claims no canonical family",
+          "observed": null,
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-A-OKX_SWAP-BTC-USDT-SWAP-POSITIONING-001",
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I15",
+      "tier": "TIER_A_DOCUMENTED_FIELD_SHAPE"
+    },
+    {
+      "adaptation_notes": [
+        "NO_NATIVE_POSITIONING_FIELD_IN_PAYLOAD"
+      ],
+      "fixture_id": "FX-B-POSITIONING-CROSS-PROVIDER-EQUIVALENCE-001",
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "status": "FIXTURE_ADAPTATION_REQUIRED"
+    },
+    {
+      "adaptation_notes": [],
+      "checks": [
+        {
+          "check_id": "FX-B-POSITIONING-POPULATION-SUBSTITUTION-001/pos-population-carried",
+          "expected": "TOP_TRADER_ACCOUNTS",
+          "law": "population scope is carried verbatim",
+          "observed": "TOP_TRADER_ACCOUNTS",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-POSITIONING-POPULATION-SUBSTITUTION-001/pos-no-generic-ratio",
+          "expected": "no generic ratio",
+          "law": "no generic long_short_ratio slot exists",
+          "observed": [
+            "canonical_metric_family",
+            "contract_instance_id",
+            "denominator_definition",
+            "lineage",
+            "lineage_state",
+            "missingness_reason",
+            "native_event_id",
+            "native_instrument",
+            "native_sequence_id",
+            "native_values",
+            "normalization_generation",
+            "normalization_status",
+            "numerator_definition",
+            "population_scope",
+            "population_size",
+            "positioning_metric_type",
+            "provider",
+            "provider_instrument_id",
+            "provider_methodology_ref",
+            "provider_metric_name",
+            "quality",
+            "quality_flags",
+            "quarantine_evidence_refs",
+            "quarantine_reason",
+            "quarantine_remediation",
+            "semantic_equivalence",
+            "sensor_family",
+            "source_coverage_state",
+            "source_granularity",
+            "source_revision_id",
+            "source_revision_state",
+            "supersedes_t1_record_id",
+            "t1_record_id",
+            "time",
+            "value_native",
+            "value_unit",
+            "venue",
+            "versions"
+          ],
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-POSITIONING-POPULATION-SUBSTITUTION-001/pos-value-verbatim",
+          "expected": "0.61",
+          "law": "the native ratio is carried verbatim",
+          "observed": "0.61",
+          "passed": true
+        },
+        {
+          "check_id": "FX-B-POSITIONING-POPULATION-SUBSTITUTION-001/pos-canonical-family-absent",
+          "expected": null,
+          "law": "an undeclared-population ratio claims no canonical family",
+          "observed": null,
+          "passed": true
+        }
+      ],
+      "fixture_id": "FX-B-POSITIONING-POPULATION-SUBSTITUTION-001",
+      "sensor_family": "MECHANICAL_POSITIONING",
+      "status": "EXECUTED_PASS",
+      "supports_checkpoint": "I15",
+      "tier": "TIER_B_SYNTHETIC_ADVERSARIAL"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-TRADE-001",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-TRADE-002",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-BINANCE_USDM-BTCUSDT-TRADE-003",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-DERIBIT-BTC-PERPETUAL-TRADE-001",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-A-KRAKEN_FUTURES-PI_XBTUSD-TRADE-001",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-B-IDENTITY-SYMBOL-REUSE-001",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-B-STABLECOIN-1TO1-001",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    },
+    {
+      "detail": "no published entry point for this family",
+      "fixture_id": "FX-B-TRADE-AGGRESSOR-FROM-PRICE-DIRECTION-001",
+      "sensor_family": "MECHANICAL_TRADE",
+      "status": "UNSUPPORTED_SENSOR_FAMILY"
+    }
+  ],
+  "status_counts": {
+    "adapted_with_notes": 18,
+    "executed_failed": 0,
+    "executed_passed": 24,
+    "fixture_adaptation_required": 23,
+    "refused_as_expected": 0,
+    "unsupported_sensor_family": 11
+  },
+  "verdict": "NO_FAILED_EXECUTED_FIXTURE"
+}

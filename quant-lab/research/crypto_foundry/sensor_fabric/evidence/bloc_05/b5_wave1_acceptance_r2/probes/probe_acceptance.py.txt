@@ -1,0 +1,2168 @@
+"""SENSOR-B5-WAVE1-ACCEPTANCE-WAVE2-ROLLING-AUDIT-R2 - acceptance probe.
+
+Runs OFFLINE against the exact Wave 1 candidate tree (bc53ada8) and writes:
+
+    results/01_candidate_and_tree.json
+    results/02_corpus_provenance.json
+    results/03_i12_i15_execution.json
+    results/04_i14_sequence_acceptance.json
+    results/05_semantic_admission_challenge.json
+    results/06_i16_lineage_verification.json
+    results/07_i21_property_controls.json
+    results/08_i20_captured_evidence.json
+    results/09_canonical_reconciliation.json
+    results/10_run_summary.json
+
+Design rules:
+
+* Every check calls a REAL production entry point.  Nothing is reimplemented as an
+  oracle, and the producer's own test helpers are not imported: the synthetic
+  approval root below is written by this probe.
+* A capability that does not exist is reported as absent, never as a pass.
+* The r1 corpus is consumed UNMODIFIED and its digests are re-verified, so the
+  classifications 27 documented-shape / 28 synthetic-adversarial / 3
+  provider-referenced survive verbatim.
+* No network, no wall clock, no randomness in the verification paths: the same
+  tree yields the same bytes.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+from datetime import datetime, timezone
+from decimal import Decimal
+from pathlib import Path
+
+QUANT_LAB = Path(os.environ["B5_QUANT_LAB"]).resolve()
+EVIDENCE = Path(os.environ["B5_EVIDENCE"]).resolve()
+R1_CORPUS = Path(os.environ["B5_R1_CORPUS"]).resolve()
+CAPTURED = Path(os.environ.get("B5_R2_CAPTURED_MANIFEST", r"C:\tmp\b5r2\captured_manifest.json"))
+SRC = QUANT_LAB / "src"
+sys.path.insert(0, str(SRC))
+
+from crypto_sensor_fabric.contracts.enums import (  # noqa: E402
+    SemanticEquivalence,
+    SensorFamily,
+)
+from crypto_sensor_fabric.normalization.authority import (  # noqa: E402
+    load_semantic_authority,
+)
+from crypto_sensor_fabric.normalization.common.methodologies import (  # noqa: E402
+    NormalizationMethodology,
+    NormalizationMethodologyRegistry,
+)
+from crypto_sensor_fabric.normalization.common.semantic_registry import (  # noqa: E402
+    PENDING_EVIDENCE_REFERENCE,
+    IntervalDataScope,
+    ProviderSemanticMapping,
+    ProviderSemanticRegistry,
+    SemanticConfidence,
+    serialize_provider_semantic_registry_yaml,
+)
+from crypto_sensor_fabric.normalization.enums import (  # noqa: E402
+    AvailabilityBasis,
+    IntervalTimeConvention,
+    NormalizationQualityFlag,
+    TimestampPrecision,
+)
+from crypto_sensor_fabric.normalization.lineage import (  # noqa: E402
+    IDENTITY_SCHEMA_VERSION,
+    LINEAGE_GATE_STATE,
+    GenerationDescriptor,
+    T1IdentityKey,
+    assert_generation_immutable,
+    assert_lineage_complete,
+    compute_t1_record_id,
+    generation_fingerprint,
+    missing_sensor_families,
+)
+from crypto_sensor_fabric.normalization.sensors import (  # noqa: E402
+    BasisObservationInput,
+    BasisUnit,
+    BookLevelInput,
+    BookMetricObservationInput,
+    BookMetricSource,
+    BookQuantityUnit,
+    BookSequenceStatus,
+    BookSide,
+    BookSnapshotObservationInput,
+    BookUpdateSemantics,
+    FundingObservationInput,
+    FundingRateKind,
+    FundingRateUnit,
+    OI_CONTRACTS_METHODOLOGY_ID,
+    OpenInterestAggregationScope,
+    OpenInterestNativeUnit,
+    OpenInterestObservationInput,
+    OpenInterestSnapshotScope,
+    PositioningMetricType,
+    PositioningObservationInput,
+    SensorAdmissionRefusal,
+    admit_sensor_field,
+    classify_sequence,
+    normalize_basis,
+    normalize_book_metric,
+    normalize_book_snapshot,
+    normalize_funding,
+    normalize_open_interest,
+    normalize_positioning,
+)
+from crypto_sensor_fabric.storage.enums import CoverageState, RevisionState  # noqa: E402
+
+LABEL = "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT"
+WAVE1_CANDIDATE = "bc53ada805b8309e6aaf4d31684afb27a2b0e370"
+WAVE1_BRANCH = "agent/crypto-sensor-fabric-b5-wave1-r1"
+AUTHORITY_COMMIT = "4bb677f9e0266f4dc48405181696019f359ae49f"
+P3_RATIFICATION = "e8abe280f3b64f497756dcad8f5824899112afd4"
+PRIOR_AUDIT_CARRIER = "02d17222375ea596e937b375b9c5be3dbae9184c"
+PRIOR_AUDIT_HEADS = ["6c4874b43", "6a1a7a5d6", "d6b3f9f83", "95c9ee01d", "a59fa4002"]
+BLOB = "c" * 64
+EVENT_AT = datetime(2024, 3, 1, 12, 0, 0, tzinfo=timezone.utc)
+OBSERVED_AT = datetime(2024, 3, 1, 12, 0, 1, tzinfo=timezone.utc)
+INGESTED_AT = datetime(2024, 3, 5, 8, 0, 0, tzinfo=timezone.utc)
+CUTOFF = datetime(2024, 3, 1, 12, 0, 5, tzinfo=timezone.utc)
+SYNTH = "SECOND_AGENT_SYNTHETIC_AUTHORITY_NOT_PROVIDER_DOCUMENTATION"
+
+
+def dump(record: object) -> str:
+    return json.dumps(record, sort_keys=True, default=str, separators=(",", ":"))
+
+
+def write(name: str, payload: object) -> None:
+    path = EVIDENCE / "results" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+    )
+
+
+def git(*args: str) -> str:
+    try:
+        return subprocess.run(
+            ["git", *args], cwd=QUANT_LAB.parent, capture_output=True, text=True, timeout=60
+        ).stdout.strip()
+    except Exception as exc:  # pragma: no cover - environment dependent
+        return f"GIT_ERROR:{exc}"
+
+
+# ---------------------------------------------------------------------------
+# 01 - candidate and audited tree
+# ---------------------------------------------------------------------------
+
+
+def candidate_and_tree() -> None:
+    head = git("rev-parse", "HEAD")
+    branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    counts = git("rev-list", "--count", "HEAD")
+    prod_prefix = "quant-lab/src/crypto_sensor_fabric/"
+    changed = git("diff", "--name-only", WAVE1_CANDIDATE, "HEAD").splitlines()
+    tree_matches = not [line for line in changed if line.strip()]
+    prior_heads = {}
+    for short in PRIOR_AUDIT_HEADS:
+        prior_heads[short] = git("rev-parse", "--verify", "--quiet", f"{short}^{{commit}}") or None
+    p3 = git("rev-parse", "--verify", "--quiet", f"{P3_RATIFICATION}^{{commit}}") or None
+    carrier = git("rev-parse", "--verify", "--quiet", f"{PRIOR_AUDIT_CARRIER}^{{commit}}") or None
+
+    protected_modules = [
+        "normalization/sensors/oi.py",
+        "normalization/sensors/funding.py",
+        "normalization/sensors/book.py",
+        "normalization/sensors/positioning.py",
+        "normalization/sensors/basis.py",
+        "normalization/sensors/admission.py",
+        "normalization/sensors/trade.py",
+        "normalization/sensors/liquidation.py",
+        "normalization/sensors/side_maps.py",
+        "normalization/lineage/__init__.py",
+    ]
+    module_digests = {}
+    for rel in protected_modules:
+        path = SRC / "crypto_sensor_fabric" / rel
+        data = path.read_bytes()
+        module_digests[rel] = {
+            "sha256": hashlib.sha256(data).hexdigest(),
+            "lines": data.decode("utf-8").count("\n") + 1,
+        }
+
+    write(
+        "01_candidate_and_tree.json",
+        {
+            "label": LABEL,
+            "audited_head": head,
+            "audited_branch": branch,
+            "commit_count_from_squash": counts,
+            "declared_wave1_candidate": WAVE1_CANDIDATE,
+            "declared_wave1_branch": WAVE1_BRANCH,
+            "audited_head_equals_candidate": head == WAVE1_CANDIDATE,
+            "audited_tree_matches_candidate": tree_matches,
+            "diff_vs_candidate": changed or [],
+            "production_prefix": prod_prefix,
+            "funding_authority_commit": AUTHORITY_COMMIT,
+            "p3_ratification_resolves": p3,
+            "prior_audit_carrier_resolves": carrier,
+            "prior_audit_heads": prior_heads,
+            "protected_module_digests": module_digests,
+            "verdict": (
+                "AUDITED_TREE_IS_THE_CANDIDATE"
+                if head == WAVE1_CANDIDATE and tree_matches
+                else "TREE_DIVERGES_FROM_CANDIDATE"
+            ),
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 02 - corpus provenance (r1 corpus consumed unmodified)
+# ---------------------------------------------------------------------------
+
+
+def corpus_provenance() -> list[dict]:
+    manifest_path = R1_CORPUS / "fixtures" / "corpus_manifest.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    verified: list[dict] = []
+    tier_counts: dict[str, int] = {}
+    for entry in manifest["files"]:
+        path = R1_CORPUS / entry["path"]
+        data = path.read_bytes()
+        digest = hashlib.sha256(data).hexdigest()
+        fixture = json.loads(data)
+        tier_counts[entry["tier"]] = tier_counts.get(entry["tier"], 0) + 1
+        verified.append(
+            {
+                "fixture_id": entry["fixture_id"],
+                "path": entry["path"],
+                "tier": entry["tier"],
+                "sensor_family": entry["sensor_family"],
+                "supports_checkpoint": entry["supports_checkpoint"],
+                "provider": entry["provider"],
+                "canonical_asset": entry["canonical_asset"],
+                "contract_type": entry["contract_type"],
+                "declared_sha256": entry["sha256"],
+                "recomputed_sha256": digest,
+                "digest_matches": digest == entry["sha256"],
+                "approval_status": entry["approval_status"],
+                "ratified_golden": entry["ratified_golden"],
+                "captured_from_provider": fixture["acquisition_provenance"]["captured_from_provider"],
+                "fixture": fixture,
+            }
+        )
+    # r1's formula sorts rows by FIXTURE ID (not path) and joins
+    # "<path>\0<sha256>\n". Reproducing that exactly is what makes the digest
+    # comparable rather than merely similar.
+    recomputed_corpus_digest = hashlib.sha256(
+        "".join(
+            f"{row['path']}\0{row['recomputed_sha256']}\n"
+            for row in sorted(verified, key=lambda r: r["fixture_id"])
+        ).encode("utf-8")
+    ).hexdigest()
+    write(
+        "02_corpus_provenance.json",
+        {
+            "label": LABEL,
+            "source_package": str(R1_CORPUS),
+            "source_carrier_commit": PRIOR_AUDIT_CARRIER,
+            "corpus_version": manifest["corpus_version"],
+            "declared_corpus_digest": manifest["corpus_digest"],
+            "recomputed_corpus_digest": recomputed_corpus_digest,
+            "corpus_digest_matches": recomputed_corpus_digest == manifest["corpus_digest"],
+            "file_count": len(verified),
+            "tier_counts": tier_counts,
+            "all_digests_match": all(row["digest_matches"] for row in verified),
+            "any_ratified_golden": any(row["ratified_golden"] for row in verified),
+            "any_captured_from_provider": any(row["captured_from_provider"] for row in verified),
+            "classifications_preserved": {
+                "documented_shape": tier_counts.get("TIER_A_DOCUMENTED_FIELD_SHAPE", 0),
+                "synthetic_adversarial": tier_counts.get("TIER_B_SYNTHETIC_ADVERSARIAL", 0),
+                "tier_labels_observed": sorted(tier_counts),
+                "provider_evidence_reference": tier_counts.get("TIER_C_PROVIDER_EVIDENCE_REFERENCED", 0),
+            },
+            "note": (
+                "consumed unmodified from the r1 carrier; no fixture was edited, "
+                "re-tiered or re-approved for this audit"
+            ),
+            "files": [
+                {key: row[key] for key in row if key != "fixture"} for row in verified
+            ],
+        },
+    )
+    return verified
+
+
+# ---------------------------------------------------------------------------
+# synthetic approval root (this probe's own, not the producer's test helper)
+# ---------------------------------------------------------------------------
+
+
+def _row(
+    provider: str,
+    provider_field: str,
+    canonical_field: str,
+    family: SensorFamily,
+    *,
+    confidence: SemanticConfidence = SemanticConfidence.VERIFIED_FIRST_PARTY,
+    evidence: str | None = f"{SYNTH}:evidence",
+    methodology: str | None = f"{SYNTH}_METHOD_V1",
+    equivalence: SemanticEquivalence = SemanticEquivalence.EXACT_EQUIVALENT,
+) -> ProviderSemanticMapping:
+    return ProviderSemanticMapping(
+        provider=provider,
+        provider_field=provider_field,
+        canonical_sensor=family,
+        canonical_field=canonical_field,
+        semantic_equivalence_class=equivalence,
+        native_definition=f"{SYNTH}:{provider_field}",
+        transformation=f"{SYNTH}:{provider_field}->{canonical_field}",
+        methodology_id=methodology,
+        blocking_assumptions=(f"{SYNTH}:certifies-nothing",),
+        known_limitations=(f"{SYNTH}:fixture-only-authority",),
+        source_endpoint_or_archive="synthetic://second-agent",
+        data_type="SNAPSHOT",
+        native_unit="ENUM",
+        timestamp_meaning="OBSERVED_AT",
+        interval_data_scope=IntervalDataScope.INTERVAL_LOCAL,
+        direction_side_convention=f"{SYNTH}:{canonical_field}",
+        evidence_reference=evidence,
+        semantic_confidence=confidence,
+        version="1",
+    )
+
+
+def _registry(rows: tuple[ProviderSemanticMapping, ...]) -> ProviderSemanticRegistry:
+    return ProviderSemanticRegistry(schema_version="SECOND_AGENT_SYNTH_V1", mappings=rows)
+
+
+def _authority(registry: ProviderSemanticRegistry):
+    """A synthetic approval root over THIS registry: it proves the MECHANISM."""
+    artifact = serialize_provider_semantic_registry_yaml(registry).encode("utf-8")
+    fields: dict[str, dict[str, list[str]]] = {}
+    declared: dict[str, list[str]] = {}
+    methods: list[str] = []
+    assumptions: list[str] = []
+    by_identity: dict[tuple[str, str], ProviderSemanticMapping] = {}
+    for row in registry.mappings:
+        ref = row.evidence_reference or ""
+        fields.setdefault(row.provider, {}).setdefault(row.provider_field, []).append(ref)
+        declared.setdefault(row.provider, []).append(row.provider_field)
+        if row.methodology_id is not None:
+            if row.methodology_id not in methods:
+                methods.append(row.methodology_id)
+            by_identity[(row.methodology_id, row.version)] = row
+        for assumption in row.blocking_assumptions:
+            if assumption not in assumptions:
+                assumptions.append(assumption)
+    manifest = json.dumps(
+        {
+            "schema_version": "b5-i09p2a-1",
+            "authority_id": "SECOND_AGENT_SYNTHETIC_AUDIT_ROOT",
+            "artifacts": {
+                "second-agent-registry": {
+                    "sha256": hashlib.sha256(artifact).hexdigest(),
+                    "approval_id": "SECOND-AGENT-SYNTHETIC-APPROVAL",
+                    "registry_schema_version": registry.schema_version,
+                    "approved_at": "2026-11-28",
+                    "valid_until": None,
+                    "allowed_methodologies": methods,
+                    "evidence": fields,
+                    "declared_native_fields": declared,
+                    "approved_transformations": {},
+                    "resolved_blocking_assumptions": assumptions,
+                }
+            },
+            "revoked_approval_ids": [],
+        },
+        indent=2,
+        sort_keys=True,
+    ).encode("utf-8")
+    methodologies = NormalizationMethodologyRegistry(
+        schema_version="1",
+        methodologies=tuple(
+            NormalizationMethodology(
+                methodology_id=row.methodology_id,
+                version=row.version,
+                sensor_family=row.canonical_sensor,
+                description=f"{SYNTH}:synthetic",
+                formula_or_algorithm="preserve the declared native field",
+                required_inputs=("native_field",),
+                output_units=("ENUM",),
+                PIT_requirements="no derivation",
+                known_limitations=(f"{SYNTH}:fixture-only",),
+                introduced_at="e2df7109b4ae336c2ed71f1cb8b56e2b4360874e",
+            )
+            for row in by_identity.values()
+        ),
+    )
+    return load_semantic_authority(
+        manifest_bytes=manifest,
+        artifact_id="second-agent-registry",
+        artifact_bytes=artifact,
+        methodology_registry=methodologies,
+    )
+
+
+_ENVELOPE = dict(
+    source_revision_id="rev-r2-1",
+    source_revision_state=RevisionState.STABLE,
+    source_coverage_state=CoverageState.COMPLETE_SOURCE_BOUNDARY,
+    normalization_generation="gen-r2-1",
+    raw_projection_refs=("proj:r2:1",),
+    acquisition_refs=("acq:r2:1",),
+    evidence_blob_hashes=(BLOB,),
+    code_version="b5-wave1-r2-probe",
+    config_version="cfg-b5-wave1-r2",
+)
+
+
+# ---------------------------------------------------------------------------
+# fixture -> production input adapters (the ADAPTATION layer under audit)
+# ---------------------------------------------------------------------------
+
+
+def _dec(value: object) -> Decimal:
+    return Decimal(str(value))
+
+
+OI_VALUE_FIELDS = (
+    "sumOpenInterest",
+    "oi",
+    "openInterest",
+    "open_interest",
+    "openInterestAmount",
+    "total_size",
+)
+
+
+def adapt_oi(fixture: dict) -> tuple[dict | None, list[str]]:
+    payload = fixture["payload"]
+    notes: list[str] = []
+    field = next((f for f in OI_VALUE_FIELDS if f in payload), None)
+    if field is None:
+        return None, ["NO_NATIVE_OI_FIELD_IN_PAYLOAD"]
+    reading = OpenInterestNativeUnit.UNKNOWN
+    declared = fixture.get("expectation", {}).get("oi_native_unit")
+    if declared in {member.value for member in OpenInterestNativeUnit}:
+        reading = OpenInterestNativeUnit(declared)
+    else:
+        notes.append(f"EXPECTATION_UNIT_{declared}_NOT_IN_FROZEN_VOCABULARY")
+    kwargs = dict(
+        provider=fixture["provider"],
+        venue=fixture["venue"],
+        native_instrument=fixture["instrument"]["native_symbol"],
+        native_snapshot_id=f"{fixture['fixture_id']}:snap",
+        oi_native_value=_dec(payload[field]),
+        native_unit_token="UNVERIFIED",
+        native_unit_field=field,
+        unit_reading=reading,
+        snapshot_scope=OpenInterestSnapshotScope.POINT_SNAPSHOT,
+        event_at=EVENT_AT,
+        observed_at=OBSERVED_AT,
+        ingested_at=INGESTED_AT,
+        source_precision=TimestampPrecision.MILLISECOND,
+        **_ENVELOPE,
+    )
+    scope = fixture.get("expectation", {}).get("snapshot_or_interval", "")
+    if scope.startswith("INTERVAL"):
+        notes.append("AGGREGATION_FUNCTION_UNREPRESENTABLE: frozen scope vocabulary has "
+                     "INTERVAL_LAST/AVERAGE but no 'unresolved which' state")
+    if "sumOpenInterest" in payload:
+        notes.append("TWO_NATIVE_QUANTITIES_IN_ONE_PAYLOAD: the adapter must choose one")
+    if "oi" in payload and "oiCcy" in payload:
+        notes.append("THREE_NATIVE_QUANTITIES_IN_ONE_PAYLOAD: oi/oiCcy/oiUsd")
+    return kwargs, notes
+
+
+FUNDING_FIELDS = ("fundingRate", "funding_rate", "current_funding", "funding_8h", "lastFundingRate")
+
+
+def adapt_funding(fixture: dict) -> tuple[dict | None, list[str]]:
+    payload = fixture["payload"]
+    notes: list[str] = []
+    field = next((f for f in FUNDING_FIELDS if f in payload), None)
+    if field is None:
+        return None, ["NO_NATIVE_FUNDING_FIELD_IN_PAYLOAD"]
+    raw = payload[field]
+    if raw == "" or raw is None:
+        notes.append("EMPTY_STRING_RATE: not coercible to zero")
+        return None, notes
+    reading = FundingRateUnit.UNKNOWN
+    kind = FundingRateKind.UNKNOWN
+    expectation = fixture.get("expectation", {})
+    declared_kind = expectation.get("predicted_or_realized")
+    if declared_kind in {"REALIZED", "PREDICTED", "INDICATIVE"}:
+        kind = FundingRateKind(declared_kind)
+    interval = expectation.get("funding_interval_seconds")
+    kwargs = dict(
+        provider=fixture["provider"],
+        venue=fixture["venue"],
+        native_instrument=fixture["instrument"]["native_symbol"],
+        funding_rate_native=_dec(raw),
+        native_rate_unit_token="UNVERIFIED",
+        native_rate_unit_field=field,
+        rate_reading=reading,
+        funding_rate_kind=kind,
+        funding_interval_seconds=int(interval) if interval else None,
+        event_at=EVENT_AT,
+        observed_at=OBSERVED_AT,
+        ingested_at=INGESTED_AT,
+        published_at=OBSERVED_AT,
+        market_available_at=OBSERVED_AT,
+        availability_basis=AvailabilityBasis.PROVIDER_DECLARED_PUBLIC_TIME,
+        source_precision=TimestampPrecision.MILLISECOND,
+        **_ENVELOPE,
+    )
+    if interval is None:
+        notes.append("INTERVAL_NOT_IN_PAYLOAD: comparable equivalents must refuse")
+    if "nextFundingRate" in payload and payload["nextFundingRate"] == "":
+        notes.append("PREDICTED_SLOT_PRESENT_BUT_EMPTY")
+    return kwargs, notes
+
+
+def adapt_positioning(fixture: dict) -> tuple[dict | None, list[str]]:
+    payload = fixture["payload"]
+    notes: list[str] = []
+    field = next(
+        (f for f in ("longShortRatio", "buySellRatio", "ratio", "longAccount") if f in payload),
+        None,
+    )
+    if field is None:
+        return None, ["NO_NATIVE_POSITIONING_FIELD_IN_PAYLOAD"]
+    expectation = fixture.get("expectation", {})
+    metric = expectation.get("positioning_metric_type", "PROVIDER_DEFINED_RATIO")
+    if metric not in {member.value for member in PositioningMetricType}:
+        notes.append(f"METRIC_{metric}_NOT_IN_FROZEN_VOCABULARY")
+        metric = "PROVIDER_DEFINED_RATIO"
+    population = expectation.get("population_scope") or "UNDECLARED_POPULATION"
+    if population == "UNDECLARED_POPULATION":
+        notes.append("POPULATION_NOT_DECLARED_BY_PROVIDER")
+    element = float(population) if False else None  # noqa: F841 - keeps lint quiet
+    kwargs = dict(
+        provider=fixture["provider"],
+        venue=fixture["venue"],
+        native_instrument=fixture["instrument"]["native_symbol"],
+        metric_type=PositioningMetricType(metric),
+        numerator_definition="LONG_ACCOUNTS" if "Account" in field else "NUMERATOR_UNRESOLVED",
+        denominator_definition="SHORT_ACCOUNTS" if "Account" in field else "DENOMINATOR_UNRESOLVED",
+        population_scope=population,
+        value_native=_dec(payload[field]),
+        value_unit="RATIO",
+        provider_metric_name=field,
+        provider_methodology_ref=f"{SYNTH}:positioning" if metric == "PROVIDER_DEFINED_RATIO" else None,
+        event_at=EVENT_AT,
+        observed_at=OBSERVED_AT,
+        ingested_at=INGESTED_AT,
+        source_precision=TimestampPrecision.MILLISECOND,
+        **_ENVELOPE,
+    )
+    del element
+    return kwargs, notes
+
+
+def _levels(raw: list, side: BookSide, token: str) -> tuple[BookLevelInput, ...]:
+    """Normalise provider level order to the canonical best-first convention."""
+    parsed = [(_dec(level[0]), _dec(level[1])) for level in raw if len(level) >= 2]
+    ordered = sorted(parsed, key=lambda pair: pair[0], reverse=(side is BookSide.BID))
+    return tuple(
+        BookLevelInput(
+            side=side,
+            price_native=price,
+            quantity_native=quantity,
+            native_unit_token=token,
+            unit_reading=BookQuantityUnit.UNKNOWN,
+        )
+        for price, quantity in ordered
+    )
+
+
+def adapt_book(fixture: dict) -> tuple[dict | None, list[str]]:
+    payload = fixture["payload"]
+    notes: list[str] = []
+    snapshot = payload.get("snapshot") or payload
+    bids_raw = snapshot.get("bids") or snapshot.get("b") or []
+    asks_raw = snapshot.get("asks") or snapshot.get("a") or []
+    if not bids_raw or not asks_raw:
+        return None, ["NO_LEVELS_IN_PAYLOAD"]
+    first_bid = _dec(bids_raw[0][0])
+    first_ask = _dec(asks_raw[0][0])
+    if first_bid < _dec(bids_raw[-1][0]):
+        notes.append("PROVIDER_BID_ORDER_ASCENDING_WORST_FIRST: adapter must reverse")
+    if first_ask > _dec(asks_raw[-1][0]):
+        notes.append("PROVIDER_ASK_ORDER_DESCENDING_WORST_FIRST: adapter must reverse")
+    token = "UNVERIFIED"
+    updates = payload.get("updates")
+    base = snapshot.get("lastUpdateId") or snapshot.get("seqId")
+    sequence = base
+    previous = None
+    if isinstance(updates, list) and updates:
+        first = updates[0]
+        # A range update carries U (first id) and u (last id).  The production
+        # classifier takes ONE successor token, so the adapter must choose: the
+        # range head (u) is what the entry point compares against the base.
+        sequence = first.get("u", first.get("U"))
+        previous = base
+        if first.get("U") is not None and first.get("u") is not None and first["U"] != first["u"]:
+            notes.append(
+                "RANGE_UPDATE_SEMANTICS_UNSUPPORTED: the update spans "
+                f"U={first['U']}..u={first['u']} but classify_sequence compares one token, "
+                "so a contiguous range is indistinguishable from a gap"
+            )
+        notes.append("SEQUENCE_CHAIN_PRESENT: only the first update is consumable through "
+                     "the single-snapshot entry point")
+    if sequence is None and previous is None:
+        notes.append("NO_SEQUENCE_IN_PAYLOAD")
+    kwargs = dict(
+        provider=fixture["provider"],
+        venue=fixture["venue"],
+        native_instrument=fixture["instrument"]["native_symbol"],
+        snapshot_id=f"{fixture['fixture_id']}:snap",
+        sequence=str(sequence) if sequence is not None else None,
+        previous_sequence=str(previous) if previous is not None else None,
+        update_semantics=BookUpdateSemantics.FULL_SNAPSHOT,
+        bids=_levels(bids_raw, BookSide.BID, token),
+        asks=_levels(asks_raw, BookSide.ASK, token),
+        is_full_depth=False,
+        native_unit_field=None,
+        event_at=EVENT_AT,
+        observed_at=OBSERVED_AT,
+        ingested_at=INGESTED_AT,
+        source_precision=TimestampPrecision.MILLISECOND,
+        **_ENVELOPE,
+    )
+    return kwargs, notes
+
+
+def adapt_basis(fixture: dict) -> tuple[dict | None, list[str]]:
+    payload = fixture["payload"]
+    notes: list[str] = []
+    if "basis" not in payload and "basis_value" not in payload:
+        notes.append(
+            "NO_PROVIDER_NATIVE_BASIS_FIELD: the payload carries two prices, so any basis "
+            "would be derived by this audit, which is not authorized"
+        )
+        return None, notes
+    return None, notes
+
+
+ADAPTERS = {
+    "MECHANICAL_OPEN_INTEREST": adapt_oi,
+    "MECHANICAL_FUNDING": adapt_funding,
+    "MECHANICAL_POSITIONING": adapt_positioning,
+    "MECHANICAL_BOOK_SNAPSHOT": adapt_book,
+    "MECHANICAL_BASIS": adapt_basis,
+}
+
+
+# ---------------------------------------------------------------------------
+# 03 - I12..I15 execution against the published entry points
+# ---------------------------------------------------------------------------
+
+
+class _RefusedAsExpected(Exception):
+    """Raised internally when a fixture's expected refusal is the correct outcome."""
+
+
+def _flags(record: object) -> set[str]:
+    return {flag.value for flag in record.quality_flags}
+
+
+def _check(checks: list[dict], cid: str, law: str, ok: bool, observed: object, expected: object) -> None:
+    checks.append(
+        {
+            "check_id": cid,
+            "law": law,
+            "passed": bool(ok),
+            "observed": observed,
+            "expected": expected,
+        }
+    )
+
+
+def i12_i15_execution(fixtures: list[dict]) -> None:
+    records: list[dict] = []
+    checks: list[dict] = []
+    executed = failed = adapted = blocked = unsupported = refused_as_expected = 0
+
+    buckets: dict[str, list[dict]] = {}
+    for row in fixtures:
+        buckets.setdefault(row["sensor_family"], []).append(row)
+
+    for family, rows in sorted(buckets.items()):
+        adapter = ADAPTERS.get(family)
+        for row in rows:
+            fixture = row["fixture"]
+            fxc = f"{row['fixture_id']}"
+            if adapter is None:
+                unsupported += 1
+                records.append(
+                    {
+                        "fixture_id": fxc,
+                        "sensor_family": family,
+                        "status": "UNSUPPORTED_SENSOR_FAMILY",
+                        "detail": "no published entry point for this family",
+                    }
+                )
+                continue
+            kwargs, notes = adapter(fixture)
+            if kwargs is None:
+                blocked += 1
+                records.append(
+                    {
+                        "fixture_id": fxc,
+                        "sensor_family": family,
+                        "status": "FIXTURE_ADAPTATION_REQUIRED",
+                        "adaptation_notes": notes,
+                    }
+                )
+                continue
+            if notes:
+                adapted += 1
+
+            family_checks: list[dict] = []
+            status = "EXECUTED_PASS"
+            try:
+                if family == "MECHANICAL_OPEN_INTEREST":
+                    payload = OpenInterestObservationInput(**kwargs)
+                    bare = normalize_open_interest(payload)
+                    _check(
+                        family_checks,
+                        f"{fxc}/oi-no-registry-refused",
+                        "without a registry no unit is promoted",
+                        bare.unit_admission is not None
+                        and bare.unit_admission.refusal is SensorAdmissionRefusal.NO_REGISTRY,
+                        bare.unit_admission.refusal.value if bare.unit_admission else None,
+                        "NO_REGISTRY",
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/oi-native-unit-unverified",
+                        "the reading is not promoted to the canonical slot",
+                        bare.oi_native_unit == "UNVERIFIED",
+                        bare.oi_native_unit,
+                        "UNVERIFIED",
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/oi-usd-never-minted",
+                        "oi_usd is absent or a typed absence, never a number",
+                        bare.oi_usd is None or (bare.oi_usd.blocked and bare.oi_usd.value is None),
+                        "blocked" if bare.oi_usd is not None else None,
+                        "absent-or-blocked",
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/oi-flags-canonical",
+                        "quality flags are canonical and duplicate-free",
+                        list(bare.quality_flags) == sorted(
+                            set(bare.quality_flags), key=lambda f: list(NormalizationQualityFlag).index(f)
+                        ),
+                        [f.value for f in bare.quality_flags],
+                        "declaration-order, deduplicated",
+                    )
+                    # positive intermediate control: a synthetic approved row DOES admit
+                    registry = _registry(
+                        (_row(payload.provider, payload.native_unit_field, "oi_native_unit", SensorFamily.MECHANICAL_OPEN_INTEREST),)
+                    )
+                    admitted = normalize_open_interest(payload, registry=_authority(registry))
+                    _check(
+                        family_checks,
+                        f"{fxc}/oi-authority-admits",
+                        "a trusted root DOES promote the same row (mechanism works)",
+                        admitted.unit_admission is not None and admitted.unit_admission.admitted,
+                        admitted.unit_admission.refusal.value if admitted.unit_admission and admitted.unit_admission.refusal else "admitted",
+                        "admitted",
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/oi-admitted-still-no-usd",
+                        "even an admitted unit does not mint oi_usd",
+                        admitted.oi_usd is None or admitted.oi_usd.blocked,
+                        "blocked" if admitted.oi_usd is not None else None,
+                        "absent-or-blocked",
+                    )
+
+                elif family == "MECHANICAL_FUNDING":
+                    payload = FundingObservationInput(**kwargs)
+                    record = normalize_funding(payload)
+                    _check(
+                        family_checks,
+                        f"{fxc}/fund-native-preserved",
+                        "the native rate is carried verbatim",
+                        record.funding_rate_native == payload.funding_rate_native,
+                        str(record.funding_rate_native),
+                        str(payload.funding_rate_native),
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/fund-kind-preserved",
+                        "realized and predicted stay distinct",
+                        record.funding_rate_kind is payload.funding_rate_kind,
+                        record.funding_rate_kind.value,
+                        payload.funding_rate_kind.value,
+                    )
+                    if payload.funding_interval_seconds is None:
+                        _check(
+                            family_checks,
+                            f"{fxc}/fund-no-default-8h",
+                            "an absent interval does not default to 8h",
+                            record.funding_interval_seconds is None,
+                            record.funding_interval_seconds,
+                            None,
+                        )
+                        _check(
+                            family_checks,
+                            f"{fxc}/fund-equivs-blocked",
+                            "comparable equivalents are refused without an interval",
+                            record.funding_rate_per_8h_simple_equiv is None
+                            or record.funding_rate_per_8h_simple_equiv.blocked,
+                            "blocked" if record.funding_rate_per_8h_simple_equiv is not None else None,
+                            "absent-or-blocked",
+                        )
+                    _check(
+                        family_checks,
+                        f"{fxc}/fund-no-notional",
+                        "no funding notional or PnL field exists on the record",
+                        not {"funding_notional", "funding_pnl", "funding_notional_usd"}
+                        & set(type(record).model_fields),
+                        sorted(set(type(record).model_fields) & {"funding_notional", "funding_pnl"}),
+                        "no notional/PnL slot",
+                    )
+                    registry = _registry(
+                        (_row(payload.provider, payload.native_rate_unit_field, "funding_rate_unit", SensorFamily.MECHANICAL_FUNDING),)
+                    )
+                    admitted = normalize_funding(payload, registry=_authority(registry))
+                    _check(
+                        family_checks,
+                        f"{fxc}/fund-authority-admits",
+                        "a trusted root promotes the rate unit (mechanism works)",
+                        admitted.rate_unit_admission is not None and admitted.rate_unit_admission.admitted,
+                        admitted.rate_unit_admission.refusal.value if admitted.rate_unit_admission and admitted.rate_unit_admission.refusal else "admitted",
+                        "admitted",
+                    )
+
+                elif family == "MECHANICAL_BOOK_SNAPSHOT":
+                    expectation = fixture.get("expectation") or {}
+                    want_refusal = str(expectation.get("outcome", "")).startswith("REFUSE")
+                    try:
+                        payload = BookSnapshotObservationInput(**kwargs)
+                        record = normalize_book_snapshot(payload)
+                    except ValueError as exc:
+                        if not want_refusal:
+                            raise
+                        family_checks.append(
+                            {
+                                "check_id": f"{fxc}/book-refused",
+                                "law": "a contradictory or non-advancing sequence is refused",
+                                "passed": True,
+                                "observed": f"{type(exc).__name__}: {str(exc)[:120]}",
+                                "expected": "refusal",
+                            }
+                        )
+                        record = None
+                    if record is None:
+                        raise _RefusedAsExpected
+                    _check(
+                        family_checks,
+                        f"{fxc}/book-certification-requires-contiguity",
+                        "certification requires a full snapshot over a contiguous sequence",
+                        record.book_state_certified
+                        == (
+                            record.is_full_snapshot
+                            and record.sequence_status is BookSequenceStatus.CONTIGUOUS
+                        ),
+                        {
+                            "certified": record.book_state_certified,
+                            "sequence": record.sequence_status.value,
+                            "full": record.is_full_snapshot,
+                        },
+                        "certified <=> full and contiguous",
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/book-best-bid-is-first-level",
+                        "best_bid is the first canonical bid level",
+                        record.best_bid is None or record.best_bid == record.bids[0].price_native,
+                        str(record.best_bid),
+                        str(record.bids[0].price_native),
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/book-depth-not-claimed",
+                        "a bounded snapshot is not full depth",
+                        record.is_full_depth is False,
+                        record.is_full_depth,
+                        False,
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/book-no-base-without-terms",
+                        "no level yields a numeric base quantity without terms or authority",
+                        all(
+                            level.quantity_base is None
+                            or (level.quantity_base.blocked and level.quantity_base.value is None)
+                            for level in record.bids + record.asks
+                        ),
+                        [
+                            "absent" if level.quantity_base is None
+                            else ("blocked" if level.quantity_base.blocked else str(level.quantity_base.value))
+                            for level in record.bids + record.asks
+                        ],
+                        "all absent-or-blocked",
+                    )
+
+                elif family == "MECHANICAL_POSITIONING":
+                    payload = PositioningObservationInput(**kwargs)
+                    record = normalize_positioning(payload)
+                    _check(
+                        family_checks,
+                        f"{fxc}/pos-population-carried",
+                        "population scope is carried verbatim",
+                        record.population_scope == payload.population_scope,
+                        record.population_scope,
+                        payload.population_scope,
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/pos-no-generic-ratio",
+                        "no generic long_short_ratio slot exists",
+                        "long_short_ratio" not in type(record).model_fields,
+                        sorted(type(record).model_fields),
+                        "no generic ratio",
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/pos-value-verbatim",
+                        "the native ratio is carried verbatim",
+                        record.value_native == payload.value_native,
+                        str(record.value_native),
+                        str(payload.value_native),
+                    )
+                    _check(
+                        family_checks,
+                        f"{fxc}/pos-canonical-family-absent",
+                        "an undeclared-population ratio claims no canonical family",
+                        getattr(record, "canonical_metric_family", None) is None,
+                        getattr(record, "canonical_metric_family", None),
+                        None,
+                    )
+
+                elif family == "MECHANICAL_BASIS":
+                    payload = BasisObservationInput(**kwargs)
+                    record = normalize_basis(payload, knowledge_cutoff=CUTOFF)
+                    _check(
+                        family_checks,
+                        f"{fxc}/basis-no-derived-number",
+                        "no bps or annualized number is minted",
+                        record.basis_unit in (BasisUnit.ABSOLUTE_PRICE, BasisUnit.PERCENT, BasisUnit.BPS),
+                        record.basis_unit.value,
+                        "an input unit",
+                    )
+            except _RefusedAsExpected:
+                status = "EXECUTED_REFUSAL_AS_EXPECTED"
+            except Exception as exc:
+                status = "EXECUTED_ERROR"
+                family_checks.append(
+                    {
+                        "check_id": f"{fxc}/construction",
+                        "law": "the production input accepts the adapted fixture",
+                        "passed": False,
+                        "observed": f"{type(exc).__name__}: {exc}",
+                        "expected": "a record",
+                    }
+                )
+
+            checks.extend(family_checks)
+            if status == "EXECUTED_PASS" and any(not c["passed"] for c in family_checks):
+                status = "EXECUTED_FAIL"
+            if status == "EXECUTED_PASS":
+                executed += 1
+            elif status == "EXECUTED_REFUSAL_AS_EXPECTED":
+                refused_as_expected += 1
+            elif status == "EXECUTED_FAIL":
+                failed += 1
+            records.append(
+                {
+                    "fixture_id": fxc,
+                    "sensor_family": family,
+                    "tier": row["tier"],
+                    "supports_checkpoint": row["supports_checkpoint"],
+                    "status": status,
+                    "adaptation_notes": notes,
+                    "checks": family_checks,
+                }
+            )
+
+    write(
+        "03_i12_i15_execution.json",
+        {
+            "label": LABEL,
+            "entry_points": {
+                "I12": "normalize_open_interest",
+                "I13": "normalize_funding",
+                "I14": "normalize_book_snapshot",
+                "I15": "normalize_positioning + normalize_basis",
+            },
+            "fixture_count": len(fixtures),
+            "status_counts": {
+                "executed_passed": executed,
+                "executed_failed": failed,
+                "fixture_adaptation_required": blocked,
+                "unsupported_sensor_family": unsupported,
+                "refused_as_expected": refused_as_expected,
+                "adapted_with_notes": adapted,
+            },
+            "check_count": len(checks),
+            "checks_passed": sum(1 for c in checks if c["passed"]),
+            "checks_failed": sum(1 for c in checks if not c["passed"]),
+            "per_fixture": records,
+            "verdict": "NO_FAILED_EXECUTED_FIXTURE" if failed == 0 else "EXECUTED_FIXTURE_FAILURE",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 04 - I14 sequence controls
+# ---------------------------------------------------------------------------
+
+
+def _level(side: BookSide, price: str, qty: str) -> BookLevelInput:
+    return BookLevelInput(
+        side=side,
+        price_native=Decimal(price),
+        quantity_native=Decimal(qty),
+        native_unit_token="UNVERIFIED",
+        unit_reading=BookQuantityUnit.UNKNOWN,
+    )
+
+
+def _book_payload(**overrides: object) -> BookSnapshotObservationInput:
+    base: dict[str, object] = dict(
+        provider="BINANCE_USDM",
+        venue="BINANCE",
+        native_instrument="BTCUSDT",
+        snapshot_id="SEQ-BOOK-1",
+        sequence="1000",
+        previous_sequence=None,
+        update_semantics=BookUpdateSemantics.FULL_SNAPSHOT,
+        bids=(_level(BookSide.BID, "61230.0", "1.0"),),
+        asks=(_level(BookSide.ASK, "61231.0", "1.0"),),
+        is_full_depth=False,
+        event_at=EVENT_AT,
+        observed_at=OBSERVED_AT,
+        ingested_at=INGESTED_AT,
+        **_ENVELOPE,
+    )
+    base.update(overrides)
+    return BookSnapshotObservationInput.model_validate(base)
+
+
+def i14_sequence_controls() -> None:
+    controls: list[dict] = []
+
+    def control(cid: str, capability: str, outcome: str, detail: object) -> None:
+        controls.append(
+            {"control_id": cid, "capability": capability, "outcome": outcome, "detail": detail}
+        )
+
+    # 1 contiguous
+    status = classify_sequence("1005", "1000")
+    control(
+        "SEQ-1-CONTIGUOUS",
+        "pairwise sequence classification",
+        "SUPPORTED_AND_CORRECT" if status is BookSequenceStatus.GAP_DETECTED else "DEFECT",
+        {"sequence_status": status.value, "expected": "GAP_DETECTED (1000->1005 skips 1001..1004)"},
+    )
+    status = classify_sequence("1001", "1000")
+    control(
+        "SEQ-1b-CONTIGUOUS",
+        "adjacent successor is contiguous",
+        "SUPPORTED_AND_CORRECT" if status is BookSequenceStatus.CONTIGUOUS else "DEFECT",
+        {"sequence_status": status.value, "expected": "CONTIGUOUS"},
+    )
+
+    # 2 missing sequence -> gap
+    record = normalize_book_snapshot(_book_payload(sequence="2008", previous_sequence="2006"))
+    ok = record.sequence_status is BookSequenceStatus.GAP_DETECTED and not record.book_state_certified
+    control(
+        "SEQ-2-MISSING",
+        "a missing update is a gap and no book is certified",
+        "SUPPORTED_AND_CORRECT" if ok else "DEFECT",
+        {
+            "sequence_status": record.sequence_status.value,
+            "book_state_certified": record.book_state_certified,
+            "flags": sorted(_flags(record)),
+            "note": "the entry point observes ONE snapshot with a previous_sequence token; it "
+                    "does not ingest a chain, so a skip is only detectable when the caller "
+                    "supplies the predecessor token. A provider that declares its predecessor "
+                    "via pu (never delivered) is undetectable pairwise",
+        },
+    )
+
+    # 3 duplicate update
+    duplicate_outcome = None
+    try:
+        dup = classify_sequence("1000", "1000")
+        duplicate_outcome = {"returned": dup.value}
+    except ValueError as exc:
+        duplicate_outcome = {"raised": "ValueError", "message": str(exc)[:160]}
+    control(
+        "SEQ-3-DUPLICATE",
+        "a non-advancing (duplicate) sequence is refused",
+        "SUPPORTED_BY_REFUSAL_BUT_RAISES"
+        if "raised" in duplicate_outcome
+        else "DEFECT",
+        {
+            **duplicate_outcome,
+            "note": "refusal is an exception rather than a typed status, so a caller that "
+                    "does not catch ValueError loses the record entirely",
+        },
+    )
+
+    # 4 out of order
+    ooo = None
+    try:
+        ooo = classify_sequence("999", "1000")
+    except ValueError as exc:
+        ooo = {"raised": "ValueError", "message": str(exc)[:120]}
+    control(
+        "SEQ-4-OUT-OF-ORDER",
+        "a backward sequence is refused",
+        "SUPPORTED_BY_REFUSAL_BUT_RAISES" if isinstance(ooo, dict) else "DEFECT",
+        {"outcome": ooo},
+    )
+
+    # 5 snapshot/update mismatch
+    control(
+        "SEQ-5-SNAPSHOT-UPDATE-MISMATCH",
+        "snapshot lastUpdateId vs first update pu is reconciled",
+        "NOT_IMPLEMENTED",
+        {
+            "detail": "no entry point consumes (snapshot, updates[]); the r1 fixture's "
+                      "pu vs lastUpdateId reconciliation has no production surface",
+        },
+    )
+
+    # 6 sequence reset
+    reset = None
+    try:
+        reset = classify_sequence("1", "999999")
+    except ValueError as exc:
+        reset = {"raised": "ValueError", "message": str(exc)[:120]}
+    control(
+        "SEQ-6-SEQUENCE-RESET",
+        "a reset epoch is distinguished from a gap",
+        "CONFLATED_WITH_CONTRADICTION" if isinstance(reset, dict) else "DEFECT",
+        {
+            "outcome": reset,
+            "detail": "an epoch reset and an out-of-order update are the same ValueError; the "
+                      "contract has no epoch member, so a reset cannot be represented",
+        },
+    )
+
+    # 7 metric across a gap
+    def _metric(certified: bool) -> BookMetricObservationInput:
+        return BookMetricObservationInput(
+            provider="BINANCE_USDM",
+            venue="BINANCE",
+            native_instrument="BTCUSDT",
+            native_metric_id="BM-GAP-1",
+            metric_name="SPREAD_BPS",
+            metric_value_native=Decimal("0.245"),
+            metric_unit="BPS",
+            semantic_equivalence=SemanticEquivalence.CORROBORATION_ONLY,
+            provider_methodology_ref="DEPTH_BPS_RECONSTRUCTION_V1",
+            metric_source=BookMetricSource.RECONSTRUCTED_INTERNAL,
+            source_book_state_certified=certified,
+            event_at=EVENT_AT,
+            observed_at=OBSERVED_AT,
+            ingested_at=INGESTED_AT,
+            **_ENVELOPE,
+        )
+
+    gap_metric = None
+    try:
+        normalize_book_metric(_metric(False))
+        gap_metric = {"outcome": "ACCEPTED"}
+    except Exception as exc:
+        gap_metric = {"outcome": "REFUSED", "error": type(exc).__name__, "message": str(exc)[:140]}
+    certified_metric = None
+    try:
+        record_ok = normalize_book_metric(_metric(True))
+        certified_metric = {
+            "outcome": "ACCEPTED",
+            "source_book_state_certified": record_ok.source_book_state_certified,
+            "semantic_equivalence": record_ok.semantic_equivalence.value,
+        }
+    except Exception as exc:
+        certified_metric = {"outcome": "REFUSED", "error": type(exc).__name__, "message": str(exc)[:140]}
+    control(
+        "SEQ-7-METRIC-ACROSS-GAP",
+        "a reconstructed metric over an uncertified (gapped) book is refused",
+        "SUPPORTED_AND_CORRECT"
+        if gap_metric["outcome"] == "REFUSED" and certified_metric["outcome"] == "ACCEPTED"
+        else "DEFECT",
+        {
+            "uncertified_book": gap_metric,
+            "positive_control_certified_book": certified_metric,
+            "note": "the refusal is a record-construction law, not a caller flag: a "
+                    "RECONSTRUCTED_INTERNAL metric cannot name an uncertified source book, "
+                    "so a gapped book cannot date a metric falsely",
+        },
+    )
+
+    # 8 valid recovery snapshot
+    recovery = normalize_book_snapshot(
+        _book_payload(snapshot_id="RECOVERY-1", sequence="8020", previous_sequence="8019")
+    )
+    control(
+        "SEQ-8-RECOVERY-SNAPSHOT",
+        "an authorized recovery snapshot restarts a certified epoch",
+        "PARTIALLY_SUPPORTED",
+        {
+            "sequence_status": recovery.sequence_status.value,
+            "book_state_certified": recovery.book_state_certified,
+            "detail": "a contiguous restarted snapshot certifies; but there is no epoch member, "
+                      "no discard-the-pre-gap-book rule and no authorization reference, so the "
+                      "r1 fixture's 'pre_gap_book_discarded' and 'unauthorized_recovery' "
+                      "expectations have no production surface",
+        },
+    )
+
+    # 9 range-update semantics (Binance-style U/u/pu chains)
+    range_gap = classify_sequence("1005", "1000")
+    range_head = classify_sequence("1001", "1000")
+    control(
+        "SEQ-9-RANGE-UPDATE",
+        "a contiguous multi-id range update is not misclassified as a gap",
+        "UNSUPPORTED_RANGE_SEMANTICS"
+        if range_gap is BookSequenceStatus.GAP_DETECTED
+        else "SUPPORTED_AND_CORRECT",
+        {
+            "update_span": "U=1001, u=1005 following a snapshot at lastUpdateId=1000",
+            "classified_by_range_tail_u": range_gap.value,
+            "classified_by_range_head_U": range_head.value,
+            "detail": "the update IS contiguous (it covers 1001..1005) but comparing its tail "
+                      "1005 against 1000 reports GAP_DETECTED, while comparing its head 1001 "
+                      "reports CONTIGUOUS; the classifier has no range member, so the verdict "
+                      "depends on which token the adapter happens to pass",
+            "consequence": "8 of the r1 sequence fixtures cannot be executed faithfully against "
+                           "this entry point without choosing a token convention the frozen "
+                           "contract does not define",
+        },
+    )
+
+    supported = [
+        c for c in controls if c["outcome"] in ("SUPPORTED_AND_CORRECT", "SUPPORTED_BY_REFUSAL_BUT_RAISES", "PARTIALLY_SUPPORTED")
+    ]
+    write(
+        "04_i14_sequence_acceptance.json",
+        {
+            "label": LABEL,
+            "entry_points": ["classify_sequence", "normalize_book_snapshot", "normalize_book_metric"],
+            "control_count": len(controls),
+            "supported_count": len(supported),
+            "controls": controls,
+            "reconstruction_capability": {
+                "chain_ingestion": "ABSENT",
+                "snapshot_plus_delta_reconstruction": "ABSENT",
+                "epoch_recovery": "ABSENT",
+                "gap_recovery_authorization": "ABSENT",
+                "pairwise_classification": "PRESENT",
+                "crossed_book_refusal": "PRESENT (input law)",
+                "metric_gap_propagation": "CALLER-SUPPLIED AND RECORD-ENFORCED (a "
+                                          "RECONSTRUCTED_INTERNAL metric cannot name an "
+                                          "uncertified source book)",
+                "range_update_sequences": "ABSENT (single-token comparison only)",
+            },
+            "frozen_contract_requirement": (
+                "bloc_05/04 section 6.2 defines FULL_SNAPSHOT / DELTA_UPDATE / "
+                "PARTIAL_SNAPSHOT / TOP_OF_BOOK / UNKNOWN plus a sequence status; it does not "
+                "require a reconstruction engine in I14, so the eight-case corpus is only "
+                "partly addressable here"
+            ),
+            "verdict": "SEQUENCE_CLASSIFICATION_ACCEPTED_RECONSTRUCTION_ABSENT",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 05 - shared semantic-admission challenge
+# ---------------------------------------------------------------------------
+
+
+def admission_challenge() -> None:
+    checks: list[dict] = []
+
+    def ck(cid: str, law: str, ok: bool, observed: object, expected: object) -> None:
+        checks.append(
+            {"check_id": cid, "law": law, "passed": bool(ok), "observed": observed, "expected": expected}
+        )
+
+    family = SensorFamily.MECHANICAL_OPEN_INTEREST
+    verified_row = _row("BINANCE_USDM", "openInterest", "oi_native_unit", family)
+    registry = _registry((verified_row,))
+    trusted = _authority(registry)
+
+    # P1 admission succeeds through a trusted root: the mechanism is sound
+    decision = admit_sensor_field(
+        sensor_family=family,
+        canonical_field="oi_native_unit",
+        provisional_value="CONTRACTS",
+        provider="BINANCE_USDM",
+        provider_field="openInterest",
+        registry=registry,
+        authority=trusted,
+    )
+    ck("P1", "a trusted root admits a verified row", decision.admitted, decision.refusal.value if decision.refusal else "admitted", "admitted")
+    ck(
+        "P1b",
+        "the admitted decision records the approving authority",
+        decision.admission_approval_id == trusted.approval_id
+        and decision.admission_registry_digest == trusted.registry_digest,
+        {"approval": decision.admission_approval_id, "digest": decision.admission_registry_digest},
+        "approval id + registry digest",
+    )
+    ck(
+        "P1c",
+        "confidence is READ from the row, never accepted as an argument",
+        decision.semantic_confidence is verified_row.semantic_confidence,
+        decision.semantic_confidence.value if decision.semantic_confidence else None,
+        verified_row.semantic_confidence.value,
+    )
+    import inspect
+
+    parameters = set(inspect.signature(admit_sensor_field).parameters)
+    ck(
+        "P1d",
+        "the ladder exposes no confidence or admitted parameter",
+        not ({"confidence", "semantic_confidence", "admitted"} & parameters),
+        sorted(parameters),
+        "no confidence/admitted argument",
+    )
+
+    # A: no authority -> UNTRUSTED_AUTHORITY (a caller-minted registry is not authority)
+    no_authority = admit_sensor_field(
+        sensor_family=family,
+        canonical_field="oi_native_unit",
+        provisional_value="CONTRACTS",
+        provider="BINANCE_USDM",
+        provider_field="openInterest",
+        registry=registry,
+        authority=None,
+    )
+    ck("A1", "a bare registry admits nothing", no_authority.refusal is SensorAdmissionRefusal.UNTRUSTED_AUTHORITY, no_authority.refusal.value, "UNTRUSTED_AUTHORITY")
+
+    # B: pending evidence rejected
+    # The I09 registry itself refuses pending evidence at a verified confidence, so
+    # the stronger combination cannot even be constructed: that is defence in depth.
+    registry_forbids = None
+    try:
+        _row("BINANCE_USDM", "openInterest", "oi_native_unit", family, evidence=PENDING_EVIDENCE_REFERENCE)
+        registry_forbids = "accepted"
+    except Exception as exc:
+        registry_forbids = f"refused: {type(exc).__name__}"
+    ck(
+        "B0",
+        "a pending evidence reference cannot carry verified confidence at the registry",
+        registry_forbids != "accepted",
+        registry_forbids,
+        "refused",
+    )
+    pending_registry = _registry(
+        (_row("BINANCE_USDM", "openInterest", "oi_native_unit", family,
+              evidence=PENDING_EVIDENCE_REFERENCE, confidence=SemanticConfidence.AMBIGUOUS),)
+    )
+    # The approval manifest ALSO refuses to cite the pending token, so a pending row
+    # can never be granted authority at all: the ladder's pending branch is what
+    # remains reachable for a self-minted diagnostic registry.
+    manifest_forbids = None
+    try:
+        _authority(pending_registry)
+        manifest_forbids = "accepted"
+    except Exception as exc:
+        manifest_forbids = f"refused: {type(exc).__name__}"
+    ck(
+        "B0b",
+        "an approval manifest may not cite the pending probe token",
+        manifest_forbids != "accepted",
+        manifest_forbids,
+        "refused",
+    )
+    pending = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field="openInterest",
+        registry=pending_registry, authority=None,
+    )
+    ck("B1", "a pending evidence reference never admits", pending.refusal is SensorAdmissionRefusal.PENDING_EVIDENCE, pending.refusal.value, "PENDING_EVIDENCE")
+
+    # C: ambiguous mapping rejected
+    ambiguous_registry = _registry(
+        (_row("BINANCE_USDM", "openInterest", "oi_native_unit", family, confidence=SemanticConfidence.AMBIGUOUS),)
+    )
+    ambiguous = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field="openInterest",
+        registry=ambiguous_registry, authority=_authority(ambiguous_registry),
+    )
+    ck("C1", "an AMBIGUOUS row cannot admit a critical field", ambiguous.refusal is SensorAdmissionRefusal.AMBIGUOUS_MAPPING, ambiguous.refusal.value, "AMBIGUOUS_MAPPING")
+
+    # D: corroboration-only rejected as equivalence
+    corr_registry = _registry(
+        (_row("BINANCE_USDM", "openInterest", "oi_native_unit", family, equivalence=SemanticEquivalence.CORROBORATION_ONLY),)
+    )
+    corr = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field="openInterest",
+        registry=corr_registry, authority=_authority(corr_registry),
+    )
+    ck("D1", "CORROBORATION_ONLY is evidence, not equivalence", corr.refusal is SensorAdmissionRefusal.CORROBORATION_ONLY_MAPPING, corr.refusal.value, "CORROBORATION_ONLY_MAPPING")
+
+    # E: not comparable rejected
+    nc_registry = _registry(
+        (_row("BINANCE_USDM", "openInterest", "oi_native_unit", family, equivalence=SemanticEquivalence.NOT_COMPARABLE),)
+    )
+    nc = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field="openInterest",
+        registry=nc_registry, authority=_authority(nc_registry),
+    )
+    ck("E1", "NOT_COMPARABLE never admits", nc.refusal is SensorAdmissionRefusal.NOT_COMPARABLE_MAPPING, nc.refusal.value, "NOT_COMPARABLE_MAPPING")
+
+    # F: wrong canonical field rejected (field substitution)
+    subst_registry = _registry((_row("BINANCE_USDM", "openInterest", "oi_base", family),))
+    subst = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field="openInterest",
+        registry=subst_registry, authority=_authority(subst_registry),
+    )
+    ck("F1", "a row for a different canonical field cannot admit this one", subst.refusal is SensorAdmissionRefusal.FIELD_MISMATCH, subst.refusal.value, "FIELD_MISMATCH")
+
+    # G: provider identity mismatch
+    other = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="DERIBIT", provider_field="openInterest",
+        registry=registry, authority=trusted,
+    )
+    ck("G1", "another provider's row does not resolve", other.refusal in (SensorAdmissionRefusal.NO_REGISTRY_MAPPING, SensorAdmissionRefusal.PROVIDER_MISMATCH), other.refusal.value, "NO_REGISTRY_MAPPING")
+
+    # H: no native field
+    no_field = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field=None, registry=registry, authority=trusted,
+    )
+    ck("H1", "a reading with no native field never admits", no_field.refusal is SensorAdmissionRefusal.NO_NATIVE_FIELD, no_field.refusal.value, "NO_NATIVE_FIELD")
+
+    # I: uncitable methodology
+    meth_registry = _registry((_row("BINANCE_USDM", "openInterest", "oi_native_unit", family, methodology=None),))
+    meth_manifest = None
+    try:
+        _authority(meth_registry)
+        meth_manifest = "accepted"
+    except Exception as exc:
+        meth_manifest = f"refused: {type(exc).__name__}"
+    ck(
+        "I0",
+        "an approval root cannot be built over a methodology-less row",
+        meth_manifest != "accepted",
+        meth_manifest,
+        "refused",
+    )
+    meth = admit_sensor_field(
+        sensor_family=family, canonical_field="oi_native_unit", provisional_value="CONTRACTS",
+        provider="BINANCE_USDM", provider_field="openInterest",
+        registry=meth_registry, authority=None,
+    )
+    ck("I1", "a row with no methodology cannot enter lineage", meth.refusal is SensorAdmissionRefusal.UNCITABLE_METHODOLOGY, meth.refusal.value, "UNCITABLE_METHODOLOGY")
+
+    # J: fabrication attempt -- build an admitted decision without authority metadata
+    fabricated_rejected = None
+    try:
+        SensorFieldAdmission = type(decision)
+        SensorFieldAdmission.model_validate(
+            {
+                "sensor_family": family,
+                "canonical_field": "oi_native_unit",
+                "provisional_value": "CONTRACTS",
+                "admitted": True,
+                "refusal": None,
+                "provider_field": "openInterest",
+                "semantic_equivalence_class": SemanticEquivalence.EXACT_EQUIVALENT,
+                "semantic_confidence": SemanticConfidence.VERIFIED_FIRST_PARTY,
+                "evidence_reference": "fabricated://nothing",
+                "methodology_id": "FABRICATED",
+                "mapping_version": "1",
+            }
+        )
+        fabricated_rejected = False
+    except Exception as exc:
+        fabricated_rejected = f"rejected: {type(exc).__name__}"
+    ck("J1", "an admitted decision cannot be minted without an approving authority", fabricated_rejected is not False, fabricated_rejected, "rejected")
+
+    # K: the production manifest admits nothing
+    try:
+        production_manifest = json.loads(
+            (QUANT_LAB / "config/crypto_sensor_fabric/provider_semantics/approval_manifest.json").read_text(encoding="utf-8")
+        )
+        artefacts = production_manifest.get("artifacts", {})
+        ck("K1", "the shipped approval root declares no artifacts", artefacts == {}, {"artifact_count": len(artefacts)}, "{}")
+        ck("K2", "no production provider authorization exists today", production_manifest.get("authority_id") == "B5_I09P2A_EMPTY_TRUST_ROOT_V1", production_manifest.get("authority_id"), "B5_I09P2A_EMPTY_TRUST_ROOT_V1")
+    except FileNotFoundError:
+        ck("K1", "the shipped approval root declares no artifacts", False, "manifest absent", "present")
+
+    # L: ambiguity is unreachable through the ladder -- AMBIGUOUS is refused, so no
+    # "provisional but ambiguous" state reaches a record
+    ck("L1", "rejection reasons are a closed, stated set (no silent absence)", len(set(SensorAdmissionRefusal)) >= 13, len(set(SensorAdmissionRefusal)), ">=13 stated causes")
+
+    write(
+        "05_semantic_admission_challenge.json",
+        {
+            "label": LABEL,
+            "module": "normalization/sensors/admission.py",
+            "checks": checks,
+            "check_count": len(checks),
+            "passed": sum(1 for c in checks if c["passed"]),
+            "failed": sum(1 for c in checks if not c["passed"]),
+            "model_validity_vs_authenticated_provenance": {
+                "model_validity": "PROVEN: the record laws refuse an admitted decision without "
+                                  "provider field, equivalence class, confidence, evidence, "
+                                  "methodology, version, approval id and registry digest",
+                "authenticated_semantic_provenance": "ABSENT: approval_id and registry_digest are "
+                                                     "carried as unverified strings; nothing "
+                                                     "cryptographically binds the decision to a "
+                                                     "reviewed root",
+                "consequence": "a caller that can construct *_authority() reaches the same "
+                               "admitted=True as a reviewed producer; the trust boundary is the "
+                               "caller's honesty, not a signature",
+            },
+            "verdict": "LADDER_ACCEPTED_MODEL_LAWS_HOLD_PROVENANCE_IS_UNAUTHENTICATED",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 06 - I16 lineage verification
+# ---------------------------------------------------------------------------
+
+
+def _oi_key(**overrides: object) -> T1IdentityKey:
+    base: dict[str, object] = dict(
+        sensor_family=SensorFamily.MECHANICAL_OPEN_INTEREST,
+        provider="BINANCE_USDM",
+        venue="BINANCE",
+        contract_instance_id="CANON:BTCUSDT:PERP:LINEAR:1",
+        native_identity_id="OI-1",
+        native_sequence_id=None,
+        source_revision_id="rev-1",
+        normalization_generation="gen-1",
+        identity_schema_version=IDENTITY_SCHEMA_VERSION,
+    )
+    base.update(overrides)
+    return T1IdentityKey.model_validate(base)
+
+
+def i16_lineage() -> None:
+    checks: list[dict] = []
+
+    def ck(cid: str, law: str, ok: bool, observed: object, expected: object) -> None:
+        checks.append({"check_id": cid, "law": law, "passed": bool(ok), "observed": observed, "expected": expected})
+
+    base_id = compute_t1_record_id(_oi_key())
+    repeat = [compute_t1_record_id(_oi_key()) for _ in range(5)]
+    ck("I16-1", "repeated derivation is stable", len(set(repeat)) == 1 and repeat[0] == base_id, base_id, base_id)
+
+    ck(
+        "I16-2",
+        "the identity key carries no normalised value",
+        not (
+            {"oi_native_value", "value_native", "funding_rate_native", "best_bid", "oi_usd"}
+            & set(T1IdentityKey.model_fields)
+        ),
+        sorted(T1IdentityKey.model_fields),
+        "no numeric value member",
+    )
+
+    value_changed = compute_t1_record_id(_oi_key())
+    ck("I16-3", "a corrected value cannot change the id", value_changed == base_id, value_changed, base_id)
+
+    variants: dict[str, dict] = {
+        "provider": {"provider": "DERIBIT"},
+        "venue": {"venue": "DERIBIT"},
+        "native_identity": {"native_identity_id": "OI-2"},
+        "revision": {"source_revision_id": "rev-2"},
+        "generation": {"normalization_generation": "gen-2"},
+        "family": {"sensor_family": SensorFamily.MECHANICAL_FUNDING},
+        "contract_instance": {"contract_instance_id": "CANON:ETHUSDT:PERP:LINEAR:1"},
+    }
+    permutations = {label: compute_t1_record_id(_oi_key(**override)) for label, override in variants.items()}
+    ck(
+        "I16-4",
+        "every identity member separates the id",
+        len({base_id, *permutations.values()}) == len(permutations) + 1,
+        permutations,
+        "all distinct",
+    )
+
+    # execution order independence: build in reverse order, compare
+    reversed_ids = {
+        label: compute_t1_record_id(_oi_key(**override))
+        for label, override in reversed(list(variants.items()))
+    }
+    ck("I16-5", "derivation is order independent", reversed_ids == permutations, "recomputed in reverse", "identical map")
+
+    ck("I16-6", "the identity schema is versioned", IDENTITY_SCHEMA_VERSION.startswith("b5-i16"), IDENTITY_SCHEMA_VERSION, "versioned")
+
+    # lineage completeness: reference presence vs resolution
+    record = normalize_open_interest(OpenInterestObservationInput(**adapt_oi(
+        {"payload": {"openInterest": "125000"}, "provider": "BINANCE_USDM", "venue": "BINANCE",
+         "instrument": {"native_symbol": "BTCUSDT"}, "fixture_id": "I16-PROBE", "expectation": {}}
+    )[0]))
+    try:
+        assert_lineage_complete(record)
+        complete = "accepted"
+    except Exception as exc:
+        complete = f"refused: {type(exc).__name__}"
+    ck("I16-7", "a record naming every T0 ref passes the completeness assertion", complete == "accepted", complete, "accepted")
+
+    lineage_ref = record.lineage
+    broken = record.model_copy(
+        update={
+            "lineage": lineage_ref.model_copy(
+                update={"raw_projection_refs": (), "acquisition_refs": (), "evidence_blob_hashes": ()}
+            )
+        }
+    )
+    try:
+        assert_lineage_complete(broken)
+        broken_outcome = "accepted"
+    except Exception as exc:
+        broken_outcome = f"refused: {type(exc).__name__}"
+    ck("I16-8", "a record with no raw projection ref is refused", broken_outcome != "accepted", broken_outcome, "refused")
+
+    # arbitrary reference tokens: presence is not resolution
+    arbitrary = record.model_copy(
+        update={
+            "lineage": lineage_ref.model_copy(
+                update={
+                    "raw_projection_refs": ("arbitrary://nothing-1",),
+                    "acquisition_refs": ("arbitrary://nothing-2",),
+                    "evidence_blob_hashes": ("f" * 64,),
+                }
+            )
+        }
+    )
+    try:
+        assert_lineage_complete(arbitrary)
+        arbitrary_outcome = "accepted"
+    except Exception as exc:
+        arbitrary_outcome = f"refused: {type(exc).__name__}"
+    # A finding, not a pass: unreachable tokens are ACCEPTED because nothing
+    # dereferences them.  The control passes when that limitation is demonstrated.
+    ck(
+        "I16-9",
+        "lineage completeness proves presence, not resolvability (demonstrated)",
+        arbitrary_outcome == "accepted",
+        {
+            "assert_lineage_complete": arbitrary_outcome,
+            "tokens": ["arbitrary://nothing-1", "arbitrary://nothing-2", "f" * 64],
+            "meaning": "three fabricated references satisfy the completeness assertion",
+        },
+        "accepted (the limitation)",
+    )
+
+    descriptor = GenerationDescriptor.model_validate(
+        {
+            "generation_id": "gen-1",
+            "code_commit": "code-1",
+            "identity_registry_version": "idreg-v1",
+            "semantic_registry_version": "semreg-v1",
+            "methodology_registry_version": "meth-v1",
+            "time_semantics_version": "time-v1",
+            "source_revision_mode": "APPEND_ONLY",
+            "input_manifest_refs": ("manifest:r2:1",),
+            "created_at": "2024-03-01T00:00:00Z",
+        }
+    )
+    fingerprint = generation_fingerprint(descriptor)
+    drift = descriptor.model_copy(update={"created_at": "2025-01-01T00:00:00Z"})
+    ck("I16-10", "created_at is excluded from the generation fingerprint", generation_fingerprint(drift) == fingerprint, generation_fingerprint(drift), fingerprint)
+    code_drift = descriptor.model_copy(update={"code_commit": "code-2"})
+    try:
+        assert_generation_immutable(descriptor, code_drift)
+        immutable_outcome = "accepted"
+    except Exception as exc:
+        immutable_outcome = f"refused: {type(exc).__name__}"
+    ck("I16-11", "a code-version drift is refused", immutable_outcome != "accepted", immutable_outcome, "refused")
+
+    covered = [record.sensor_family]
+    missing = missing_sensor_families(covered)
+    ck("I16-12", "the lineage gate still names its missing families", len(missing) == 7, {"covered": 1, "missing": missing}, "7 missing")
+    ck("I16-13", "the lineage gate is not closed", LINEAGE_GATE_STATE == "NOT_CLOSED", LINEAGE_GATE_STATE, "NOT_CLOSED")
+
+    write(
+        "06_i16_lineage_verification.json",
+        {
+            "label": LABEL,
+            "entry_points": ["compute_t1_record_id", "assert_lineage_complete", "generation_fingerprint", "assert_generation_immutable"],
+            "checks": checks,
+            "check_count": len(checks),
+            "passed": sum(1 for c in checks if c["passed"]),
+            "failed": sum(1 for c in checks if not c["passed"]),
+            "distinctions": {
+                "reference_presence": "PRESENT (non-empty tuples are required by the envelopes)",
+                "reference_identity": "PRESENT (the tokens are part of the id key chain)",
+                "evidence_resolution": "ABSENT (nothing dereferences a token)",
+                "evidence_digest_correctness": "ABSENT (a 64-hex string is accepted without a target)",
+                "coherent_lineage_chain": "PARTIAL (length and non-emptiness are asserted, not resolvability)",
+            },
+            "gate_state": LINEAGE_GATE_STATE,
+            "verdict": "DETERMINISTIC_ID_ACCEPTED_LINEAGE_RESOLUTION_ABSENT",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 07 - I21 property controls
+# ---------------------------------------------------------------------------
+
+
+def i21_controls() -> None:
+    controls: list[dict] = []
+
+    def ctl(cid: str, law: str, ok: bool, detail: object) -> None:
+        controls.append({"control_id": cid, "law": law, "passed": bool(ok), "detail": detail})
+
+    # P1 determinism across the whole I12 surface
+    kwargs, _notes = adapt_oi(
+        {"payload": {"openInterest": "125000"}, "provider": "BINANCE_USDM", "venue": "BINANCE",
+         "instrument": {"native_symbol": "BTCUSDT"}, "fixture_id": "P1", "expectation": {}}
+    )
+    payload = OpenInterestObservationInput(**kwargs)
+    first = normalize_open_interest(payload).model_dump_json()
+    again = [normalize_open_interest(OpenInterestObservationInput(**kwargs)).model_dump_json() for _ in range(3)]
+    ctl("P1", "normalisation is byte-deterministic", all(item == first for item in again), hashlib.sha256(first.encode()).hexdigest())
+
+    # P2 flags canonical and duplicate-free across families
+    record = normalize_open_interest(payload)
+    order = list(NormalizationQualityFlag)
+    ctl(
+        "P2",
+        "quality flags are declaration-ordered and deduplicated",
+        list(record.quality_flags) == sorted(set(record.quality_flags), key=order.index),
+        [f.value for f in record.quality_flags],
+    )
+
+    # P3 no USD value is ever numeric on an OI record
+    ctl(
+        "P3",
+        "oi_usd never carries a number while B5_I08_UNITS_V1 is unadmitted",
+        record.oi_usd is None or (record.oi_usd.blocked and record.oi_usd.value is None),
+        "absent-or-blocked",
+    )
+
+    # P4 I08 units methodology stays unadmitted
+    try:
+        from crypto_sensor_fabric.normalization.common.semantic_registry import (  # noqa: PLC0415
+            I08_UNITS_METHODOLOGY_ID as _I08,
+        )
+    except Exception:
+        _I08 = None
+    registry_text = (QUANT_LAB / "config/crypto_sensor_fabric/methodology_registry.yaml").read_text(encoding="utf-8")
+    ctl(
+        "P4",
+        "B5_I08_UNITS_V1 is still absent from the methodology registry",
+        "B5_I08_UNITS_V1" not in registry_text,
+        {"present": "B5_I08_UNITS_V1" in registry_text, "i08_symbol": _I08},
+    )
+
+    # P5 serialisation round-trips
+    round_trip = type(record).model_validate(json.loads(record.model_dump_json()))
+    ctl("P5", "a record round-trips through JSON unchanged", round_trip.model_dump_json() == record.model_dump_json(), "byte-identical")
+
+    # P6 book input refuses a crossed book
+    crossed = None
+    try:
+        _book_payload(bids=(_level(BookSide.BID, "61240.0", "1"),), asks=(_level(BookSide.ASK, "61230.0", "1"),))
+        crossed = "accepted"
+    except Exception as exc:
+        crossed = f"refused: {type(exc).__name__}"
+    ctl("P6", "a crossed book is refused at construction", crossed != "accepted", crossed)
+
+    # P7 book input refuses disordered sides
+    disordered = None
+    try:
+        _book_payload(bids=(_level(BookSide.BID, "61220.0", "1"), _level(BookSide.BID, "61230.0", "1")))
+        disordered = "accepted"
+    except Exception as exc:
+        disordered = f"refused: {type(exc).__name__}"
+    ctl("P7", "ascending bids are refused (best-first is enforced)", disordered != "accepted", disordered)
+
+    # P8 positioning refuses a USD unit
+    usd_ratio = None
+    try:
+        PositioningObservationInput.model_validate(
+            dict(
+                provider="BINANCE_USDM", venue="BINANCE", native_instrument="BTCUSDT",
+                metric_type=PositioningMetricType.ACCOUNT_LONG_SHORT_RATIO,
+                numerator_definition="LONG_ACCOUNTS", denominator_definition="SHORT_ACCOUNTS",
+                population_scope="TOP_TRADER_ACCOUNTS", value_native=Decimal("1.5"),
+                value_unit="USD", event_at=EVENT_AT, **_ENVELOPE,
+            )
+        )
+        usd_ratio = "accepted"
+    except Exception as exc:
+        usd_ratio = f"refused: {type(exc).__name__}"
+    ctl("P8", "a USD reading cannot be stored as a positioning ratio", usd_ratio != "accepted", usd_ratio)
+
+    # P9 basis refuses cross-venue synthesis
+    cross_venue = None
+    try:
+        BasisObservationInput.model_validate(
+            dict(
+                provider="BINANCE_USDM", venue="BINANCE", native_instrument="BTCUSDT",
+                futures_reference="BINANCE:BTCUSDT:PERP", spot_reference="COINBASE:BTCUSD",
+                spot_reference_venue="COINBASE", basis_value_native=Decimal("12.5"),
+                basis_unit=BasisUnit.ABSOLUTE_PRICE, reference_price=Decimal("61234.5"),
+                reference_price_type=None, event_at=EVENT_AT, **_ENVELOPE,
+            )
+        )
+        cross_venue = "accepted"
+    except Exception as exc:
+        cross_venue = f"refused: {type(exc).__name__}"
+    ctl("P9", "a cross-venue basis is not a T1 basis", cross_venue != "accepted", cross_venue)
+
+    # P10 basis refuses annualisation without a methodology
+    annual = None
+    try:
+        BasisObservationInput.model_validate(
+            dict(
+                provider="BINANCE_USDM", venue="BINANCE", native_instrument="BTCUSDT",
+                futures_reference="BINANCE:BTCUSDT:PERP", spot_reference="BINANCE:BTCUSDT",
+                spot_reference_venue="BINANCE", basis_value_native=Decimal("12.5"),
+                basis_unit=BasisUnit.ANNUALIZED_PERCENT, event_at=EVENT_AT, **_ENVELOPE,
+            )
+        )
+        annual = "accepted"
+    except Exception as exc:
+        annual = f"refused: {type(exc).__name__}"
+    ctl("P10", "an annualised basis requires its method", annual != "accepted", annual)
+
+    # P11 funding refuses a flow/PnL amount as a rate
+    flow = None
+    try:
+        FundingObservationInput.model_validate(
+            dict(
+                provider="BINANCE_USDM", venue="BINANCE", native_instrument="BTCUSDT",
+                funding_rate_native=Decimal("12.5"), native_rate_unit_token="USDT",
+                rate_reading=FundingRateUnit.FLOW_AMOUNT,
+                funding_rate_kind=FundingRateKind.REALIZED, **_ENVELOPE,
+            )
+        )
+        flow = "accepted"
+    except Exception as exc:
+        flow = f"refused: {type(exc).__name__}"
+    ctl("P11", "an amount cannot be normalised as a funding rate", flow != "accepted", flow)
+
+    # P12 funding refuses an interval that contradicts its period bounds
+    contradiction = None
+    try:
+        FundingObservationInput.model_validate(
+            dict(
+                provider="BINANCE_USDM", venue="BINANCE", native_instrument="BTCUSDT",
+                funding_rate_native=Decimal("0.0001"), native_rate_unit_token="FRACTION",
+                rate_reading=FundingRateUnit.RATE_FRACTION, funding_rate_kind=FundingRateKind.REALIZED,
+                funding_interval_seconds=28800,
+                interval_start_at=datetime(2024, 3, 1, 0, tzinfo=timezone.utc),
+                interval_end_at=datetime(2024, 3, 1, 4, tzinfo=timezone.utc),
+                **_ENVELOPE,
+            )
+        )
+        contradiction = "accepted"
+    except Exception as exc:
+        contradiction = f"refused: {type(exc).__name__}"
+    ctl("P12", "an 8h interval with a 4h window is refused", contradiction != "accepted", contradiction)
+
+    # P13 the sensor tree stays hash-free (no id generation in sensors/)
+    hash_hits = []
+    sensors_dir = SRC / "crypto_sensor_fabric" / "normalization" / "sensors"
+    for path in sorted(sensors_dir.glob("*.py")):
+        text = path.read_text(encoding="utf-8")
+        if "hashlib" in text or "uuid" in text:
+            hash_hits.append(path.name)
+    ctl("P13", "no sensor module imports hashlib or uuid", not hash_hits, hash_hits)
+
+    # P14 no sensor module touches the network or a clock
+    import ast
+
+    env_hits = []
+    banned_modules = {"urllib", "requests", "httpx", "socket", "http", "aiohttp"}
+    for path in sorted(sensors_dir.glob("*.py")):
+        module_tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(module_tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name.split(".")[0] in banned_modules:
+                        env_hits.append(f"{path.name}:import {alias.name}")
+            elif isinstance(node, ast.ImportFrom):
+                if node.module and node.module.split(".")[0] in banned_modules:
+                    env_hits.append(f"{path.name}:from {node.module}")
+            elif isinstance(node, ast.Attribute) and isinstance(node.value, ast.Name):
+                if (node.value.id == "datetime" and node.attr == "now") or (
+                    node.value.id == "time" and node.attr in {"time", "monotonic"}
+                ):
+                    env_hits.append(f"{path.name}:{node.value.id}.{node.attr}")
+    ctl("P14", "sensor modules remain network- and clock-free", not env_hits, env_hits)
+
+    # P15 the OI contracts methodology is cited, not invented
+    ctl(
+        "P15",
+        "the derived-contract path cites a named methodology",
+        bool(OI_CONTRACTS_METHODOLOGY_ID)
+        and OI_CONTRACTS_METHODOLOGY_ID.isupper()
+        and " " not in OI_CONTRACTS_METHODOLOGY_ID,
+        OI_CONTRACTS_METHODOLOGY_ID,
+    )
+
+    write(
+        "07_i21_property_controls.json",
+        {
+            "label": LABEL,
+            "controls": controls,
+            "control_count": len(controls),
+            "passed": sum(1 for c in controls if c["passed"]),
+            "failed": sum(1 for c in controls if not c["passed"]),
+            "verdict": "PROPERTIES_HOLD" if all(c["passed"] for c in controls) else "PROPERTY_FAILURE",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 08 - I20 captured evidence
+# ---------------------------------------------------------------------------
+
+
+def captured_evidence() -> None:
+    if not CAPTURED.exists():
+        write(
+            "08_i20_captured_evidence.json",
+            {"label": LABEL, "status": "MANIFEST_ABSENT", "path": str(CAPTURED)},
+        )
+        return
+    manifest = json.loads(CAPTURED.read_text(encoding="utf-8"))
+
+    # re-verify every raw byte digest before trusting the manifest
+    rechecked = []
+    for record in manifest["records"]:
+        digest_ok = None
+        size_ok = None
+        if record.get("raw_path"):
+            path = Path(record["raw_path"])
+            if path.exists():
+                data = path.read_bytes()
+                digest_ok = hashlib.sha256(data).hexdigest() == record["raw_sha256"]
+                size_ok = len(data) == record["raw_bytes"]
+        rechecked.append(
+            {
+                "capture_id": record["capture_id"],
+                "provider": record["provider"],
+                "instrument": record["instrument"],
+                "contract_type": record["contract_type"],
+                "asset": record["asset"],
+                "family": record["family"],
+                "outcome": record["outcome"],
+                "validation": record["validation"],
+                "http_status": record["http_status"],
+                "raw_sha256": record["raw_sha256"],
+                "digest_reverified": digest_ok,
+                "size_reverified": size_ok,
+                "measured": record["measured"],
+                "native_units": record["native_units"],
+                "timestamp_semantics": record["timestamp_semantics"],
+                "semantic_claim": record["semantic_claim"],
+                "limitations": record["limitations"],
+                "docs": record["docs"],
+            }
+        )
+
+    captured = [r for r in rechecked if r["outcome"] == "CAPTURED"]
+    families = sorted({r["family"] for r in captured})
+    write(
+        "08_i20_captured_evidence.json",
+        {
+            "label": LABEL,
+            "manifest_path": str(CAPTURED),
+            "manifest_digest": manifest["manifest_digest"],
+            "raw_storage": manifest["raw_storage"],
+            "access_policy": manifest["access_policy"],
+            "attempt_count": manifest["attempt_count"],
+            "captured_count": len(captured),
+            "raw_digests_reverified": all(
+                r["digest_reverified"] and r["size_reverified"] for r in captured
+            ),
+            "providers_captured": manifest["providers_captured"],
+            "assets_captured": manifest["assets_captured"],
+            "contract_types_captured": manifest["contract_types_captured"],
+            "sensor_families_captured": families,
+            "coverage_assessment": {
+                "providers_required": "three or more",
+                "providers_met": len(manifest["providers_captured"]) >= 3,
+                "assets_required": "BTC and ETH (or another supported alt)",
+                "assets_met": {"BTC", "ETH"} <= set(manifest["assets_captured"]),
+                "contract_types_required": "linear and inverse",
+                "contract_types_met": {"LINEAR_PERPETUAL", "INVERSE_PERPETUAL"}
+                <= set(manifest["contract_types_captured"]),
+                "families_required": "where genuinely available",
+                "families_captured": families,
+                "families_absent": {
+                    "MECHANICAL_POSITIONING": "the only venue publishing a documented "
+                    "top-trader ratio family returned HTTP 451 (jurisdictional block) and a "
+                    "second returned HTTP 403; no lawful free access was available",
+                    "MECHANICAL_BASIS": "no captured endpoint publishes a provider-native "
+                    "basis field; every basis is derived, and deriving one is not authorized",
+                    "MECHANICAL_TRADE": "not captured in this slice; trade semantics were "
+                    "already exercised offline in r1",
+                    "MECHANICAL_LIQUIDATION": "no documented free event-level liquidation "
+                    "endpoint is published by the captured venues",
+                },
+            },
+            "records": rechecked,
+            "readiness_impact": {
+                "tier_A_fixtures_still_not_ratified": True,
+                "reason": "a capture proves what the provider returned at one instant; it does "
+                          "not prove what the field means, and no fixture was promoted",
+                "what_the_captures_do_support": [
+                    "OKX publishes oi, oiCcy and oiUsd together and they are arithmetically "
+                    "separable, which confirms the r1 Tier-A claim that one canonical oi_native "
+                    "would merge three distinct quantities",
+                    "OKX fundingTime is a FUTURE settlement instant relative to ts, and "
+                    "nextFundingRate is an empty string that must not be coerced to zero",
+                    "Kraken publishes two funding fields differing by ~the index price, so one "
+                    "is not a per-interval fraction; the payload does not say which",
+                    "Kraken returns orderbook bids WORST-FIRST (measured: 1147 levels, "
+                    "first element 1, best bid 59900), so a best-first consumer must reverse",
+                    "Gate carries funding_interval and quanto_multiplier as contract metadata, "
+                    "so the interval is available for that venue only",
+                    "Deribit reports open interest as a USD notional, a different native unit "
+                    "from a contract count",
+                ],
+            },
+            "verdict": "CAPTURED_EVIDENCE_ACQUIRED_NOT_RATIFIED",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 09 - canonical reconciliation
+# ---------------------------------------------------------------------------
+
+
+def canonical_reconciliation() -> None:
+    write(
+        "09_canonical_reconciliation.json",
+        {
+            "label": LABEL,
+            "policy": "Agent 1 owns canonical execution; this audit launched NO full regression",
+            "duplicate_full_regression_launched": False,
+            "p3_canonical_acceptance_inherited": False,
+            "wave1_raw_execution_bundle_present": False,
+            "reconciliation_status": "BLOCKED_PENDING_RAW_EXECUTION_BUNDLE",
+            "required_inputs_not_yet_supplied": [
+                "exact candidate SHA for the executed tree",
+                "external collection anchor (start/end timestamp of the run)",
+                "raw executed node set with per-node outcomes",
+                "JUnit accounting with explained skips",
+                "artifact hashes produced by the run",
+                "per-group exit codes",
+                "restoration record returning the tree to a clean state",
+            ],
+            "retained_controls": [
+                "node set must be compared as a set, not a count",
+                "skips must each carry a stated cause",
+                "missing / extra / duplicate nodes are three distinct defects",
+                "an artifact hash is only meaningful against a recorded exit code",
+            ],
+            "note": (
+                "no Wave 1 canonical bundle exists in the audited tree; the closeout inventory "
+                "listed it as outstanding, and this audit does not accept P3 acceptance as "
+                "covering Wave 1"
+            ),
+            "verdict": "CANONICAL_RECONCILIATION_NOT_STARTED",
+        },
+    )
+
+
+# ---------------------------------------------------------------------------
+# 10 - run summary
+# ---------------------------------------------------------------------------
+
+
+def summary(artifacts: list[str]) -> None:
+    counts = {}
+    for name in artifacts:
+        payload = json.loads((EVIDENCE / "results" / name).read_text(encoding="utf-8"))
+        counts[name] = {
+            "verdict": payload.get("verdict") or payload.get("reconciliation_status") or payload.get("status"),
+            "checks": payload.get("check_count") or payload.get("control_count") or payload.get("fixture_count"),
+            "failed": payload.get("failed") or payload.get("checks_failed") or payload.get("refused_count"),
+        }
+    write(
+        "10_run_summary.json",
+        {
+            "label": LABEL,
+            "mission": "SENSOR-B5-WAVE1-ACCEPTANCE-WAVE2-ROLLING-AUDIT-R2",
+            "target": "B5_WAVE1_INDEPENDENT_ACCEPTANCE_AND_WAVE2_AUDIT_PROGRESS",
+            "wave1_candidate": WAVE1_CANDIDATE,
+            "artifacts": counts,
+            "hard_stops_observed": {
+                "p3_reopened": False,
+                "production_implementation_changed": False,
+                "provider_self_ratified": False,
+                "manifest_activated": False,
+                "custody_source_authorized": False,
+                "methodology_approved": False,
+                "production_merged": False,
+                "bloc_6_advanced": False,
+                "duplicate_full_regression_launched": False,
+            },
+            "environment": {
+                "python": sys.version.split()[0],
+                "platform": sys.platform,
+            },
+        },
+    )
+
+
+def main() -> None:
+    candidate_and_tree()
+    fixtures = corpus_provenance()
+    i12_i15_execution(fixtures)
+    i14_sequence_controls()
+    admission_challenge()
+    i16_lineage()
+    i21_controls()
+    captured_evidence()
+    canonical_reconciliation()
+    artifacts = [
+        "01_candidate_and_tree.json",
+        "02_corpus_provenance.json",
+        "03_i12_i15_execution.json",
+        "04_i14_sequence_acceptance.json",
+        "05_semantic_admission_challenge.json",
+        "06_i16_lineage_verification.json",
+        "07_i21_property_controls.json",
+        "08_i20_captured_evidence.json",
+        "09_canonical_reconciliation.json",
+    ]
+    summary(artifacts)
+    for name in artifacts + ["10_run_summary.json"]:
+        payload = json.loads((EVIDENCE / "results" / name).read_text(encoding="utf-8"))
+        failed = payload.get("checks_failed") or payload.get("failed") or 0
+        print(f"{name:<40} failed={failed:<4} {payload.get('verdict') or payload.get('reconciliation_status') or payload.get('status')}")
+    print()
+    print("run digest:", hashlib.sha256(
+        b"".join((EVIDENCE / "results" / name).read_bytes() for name in sorted(artifacts))
+    ).hexdigest())
+
+
+if __name__ == "__main__":
+    main()

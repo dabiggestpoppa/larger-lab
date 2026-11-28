@@ -1,0 +1,31 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "previous_corpus": {
+    "carrier_branch": "agent/crypto-sensor-fabric-b5-wave1-audit-r1",
+    "carrier_commit": "02d17222375ea596e937b375b9c5be3dbae9184c",
+    "corpus_digest": "b15278b0696036dbdcce7dafa1fab677ba22daa01ce4c9403ba4eda13aa6295b",
+    "corpus_version": "b5-wave1-r1",
+    "digest_algorithm": "sha256 over rows sorted by fixture_id, each '<path>\\0<sha256>\\n'",
+    "file_count": 58,
+    "package_dir": "evidence/bloc_05/b5_wave1_r1"
+  },
+  "purpose": "Links this additive evidence directory to the previously published corpus so the 58 fixtures are consumed, not copied or re-authored. No fixture was edited, re-tiered or re-approved by this audit.",
+  "readiness_statement": "All 58 fixtures remain NOT_REVIEWED and ratified_golden=false. Captured first-party payloads were acquired for three of eight families (see CAPTURED_EVIDENCE_MANIFEST.json) but no fixture was promoted on the strength of them: a capture proves what a provider returned at one instant, not what the field means.",
+  "this_audit": {
+    "collision_note": "the implementation branch and the prior audit carrier both use evidence/bloc_05/b5_wave1_r1/; neither README nor inventory is overwritten here",
+    "package_dir": "evidence/bloc_05/b5_wave1_acceptance_r2"
+  },
+  "tier_counts_preserved": {
+    "TIER_A_DOCUMENTED_FIELD_SHAPE": 27,
+    "TIER_B_SYNTHETIC_ADVERSARIAL": 28,
+    "TIER_C_PROVIDER_EVIDENCE_REFERENCED": 3
+  },
+  "verification": {
+    "all_per_file_digests_match": true,
+    "any_fixture_captured_from_provider": false,
+    "any_fixture_ratified": false,
+    "corpus_digest_recomputed": "b15278b0696036dbdcce7dafa1fab677ba22daa01ce4c9403ba4eda13aa6295b",
+    "corpus_digest_reproduced_exactly": true,
+    "files_verified": 58
+  }
+}

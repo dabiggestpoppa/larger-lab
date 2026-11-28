@@ -1,0 +1,169 @@
+{
+  "check_count": 20,
+  "checks": [
+    {
+      "check_id": "P1",
+      "expected": "admitted",
+      "law": "a trusted root admits a verified row",
+      "observed": "admitted",
+      "passed": true
+    },
+    {
+      "check_id": "P1b",
+      "expected": "approval id + registry digest",
+      "law": "the admitted decision records the approving authority",
+      "observed": {
+        "approval": "SECOND-AGENT-SYNTHETIC-APPROVAL",
+        "digest": "d747aed21be5574e819e533f0f041ed01e1052835b59d453a124399389957481"
+      },
+      "passed": true
+    },
+    {
+      "check_id": "P1c",
+      "expected": "VERIFIED_FIRST_PARTY",
+      "law": "confidence is READ from the row, never accepted as an argument",
+      "observed": "VERIFIED_FIRST_PARTY",
+      "passed": true
+    },
+    {
+      "check_id": "P1d",
+      "expected": "no confidence/admitted argument",
+      "law": "the ladder exposes no confidence or admitted parameter",
+      "observed": [
+        "authority",
+        "canonical_field",
+        "contradiction",
+        "provider",
+        "provider_field",
+        "provisional_value",
+        "registry",
+        "sensor_family"
+      ],
+      "passed": true
+    },
+    {
+      "check_id": "A1",
+      "expected": "UNTRUSTED_AUTHORITY",
+      "law": "a bare registry admits nothing",
+      "observed": "UNTRUSTED_AUTHORITY",
+      "passed": true
+    },
+    {
+      "check_id": "B0",
+      "expected": "refused",
+      "law": "a pending evidence reference cannot carry verified confidence at the registry",
+      "observed": "refused: ValidationError",
+      "passed": true
+    },
+    {
+      "check_id": "B0b",
+      "expected": "refused",
+      "law": "an approval manifest may not cite the pending probe token",
+      "observed": "refused: SemanticAuthorityRefusal",
+      "passed": true
+    },
+    {
+      "check_id": "B1",
+      "expected": "PENDING_EVIDENCE",
+      "law": "a pending evidence reference never admits",
+      "observed": "PENDING_EVIDENCE",
+      "passed": true
+    },
+    {
+      "check_id": "C1",
+      "expected": "AMBIGUOUS_MAPPING",
+      "law": "an AMBIGUOUS row cannot admit a critical field",
+      "observed": "AMBIGUOUS_MAPPING",
+      "passed": true
+    },
+    {
+      "check_id": "D1",
+      "expected": "CORROBORATION_ONLY_MAPPING",
+      "law": "CORROBORATION_ONLY is evidence, not equivalence",
+      "observed": "CORROBORATION_ONLY_MAPPING",
+      "passed": true
+    },
+    {
+      "check_id": "E1",
+      "expected": "NOT_COMPARABLE_MAPPING",
+      "law": "NOT_COMPARABLE never admits",
+      "observed": "NOT_COMPARABLE_MAPPING",
+      "passed": true
+    },
+    {
+      "check_id": "F1",
+      "expected": "FIELD_MISMATCH",
+      "law": "a row for a different canonical field cannot admit this one",
+      "observed": "FIELD_MISMATCH",
+      "passed": true
+    },
+    {
+      "check_id": "G1",
+      "expected": "NO_REGISTRY_MAPPING",
+      "law": "another provider's row does not resolve",
+      "observed": "NO_REGISTRY_MAPPING",
+      "passed": true
+    },
+    {
+      "check_id": "H1",
+      "expected": "NO_NATIVE_FIELD",
+      "law": "a reading with no native field never admits",
+      "observed": "NO_NATIVE_FIELD",
+      "passed": true
+    },
+    {
+      "check_id": "I0",
+      "expected": "refused",
+      "law": "an approval root cannot be built over a methodology-less row",
+      "observed": "refused: SemanticAuthorityRefusal",
+      "passed": true
+    },
+    {
+      "check_id": "I1",
+      "expected": "UNCITABLE_METHODOLOGY",
+      "law": "a row with no methodology cannot enter lineage",
+      "observed": "UNCITABLE_METHODOLOGY",
+      "passed": true
+    },
+    {
+      "check_id": "J1",
+      "expected": "rejected",
+      "law": "an admitted decision cannot be minted without an approving authority",
+      "observed": "rejected: ValidationError",
+      "passed": true
+    },
+    {
+      "check_id": "K1",
+      "expected": "{}",
+      "law": "the shipped approval root declares no artifacts",
+      "observed": {
+        "artifact_count": 0
+      },
+      "passed": true
+    },
+    {
+      "check_id": "K2",
+      "expected": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+      "law": "no production provider authorization exists today",
+      "observed": "B5_I09P2A_EMPTY_TRUST_ROOT_V1",
+      "passed": true
+    },
+    {
+      "check_id": "L1",
+      "expected": ">=13 stated causes",
+      "law": "rejection reasons are a closed, stated set (no silent absence)",
+      "observed": 13,
+      "passed": true
+    }
+  ],
+  "failed": 0,
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "model_validity_vs_authenticated_provenance": {
+    "authenticated_semantic_provenance": "ABSENT: approval_id and registry_digest are carried as unverified strings; nothing cryptographically binds the decision to a reviewed root",
+    "consequence": "a caller that can construct *_authority() reaches the same admitted=True as a reviewed producer; the trust boundary is the caller's honesty, not a signature",
+    "model_validity": "PROVEN: the record laws refuse an admitted decision without provider field, equivalence class, confidence, evidence, methodology, version, approval id and registry digest"
+  },
+  "module": "normalization/sensors/admission.py",
+  "passed": 20,
+  "verdict": "LADDER_ACCEPTED_MODEL_LAWS_HOLD_PROVENANCE_IS_UNAUTHENTICATED"
+}

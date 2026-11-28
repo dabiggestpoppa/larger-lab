@@ -1,0 +1,233 @@
+{
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "mission": "SENSOR-B5-WAVE1-ACCEPTANCE-WAVE2-ROLLING-AUDIT-R2",
+  "target": "B5_WAVE1_INDEPENDENT_ACCEPTANCE_AND_WAVE2_AUDIT_PROGRESS",
+  "audited_candidate": "bc53ada805b8309e6aaf4d31684afb27a2b0e370",
+  "classification_taxonomy": {
+    "candidate_interface_gap": "a defect or an unresolvable ambiguity in the published production interface",
+    "candidate_defect": "published code that does not do what its own contract says",
+    "contract_gap": "the frozen contract cannot express a real evidence state",
+    "missing_authority": "the correct outcome is blocked because no approval exists",
+    "unavailable_data": "no lawful free access, or no such field exists",
+    "deferred_integration": "not yet published, so nothing to verify",
+    "resolved": "handled inside this audit",
+    "audit_side_mismatch": "a defect in this audit's own expectations, corrected and disclosed"
+  },
+  "findings": [
+    {
+      "id": "F1",
+      "title": "A contiguous U/u range update is classified as a gap",
+      "class": "candidate_interface_gap",
+      "severity": "high",
+      "detail": "classify_sequence takes one successor token. For a Binance-style update spanning U=1001..u=1005 after a snapshot at lastUpdateId=1000, passing the range tail gives GAP_DETECTED while passing the range head gives CONTIGUOUS. The same contiguous chain therefore yields opposite verdicts depending on the adapter's token convention, and the frozen contract does not define which token to pass.",
+      "measured": {
+        "classify_sequence('1005','1000')": "GAP_DETECTED",
+        "classify_sequence('1001','1000')": "CONTIGUOUS"
+      },
+      "affected_fixtures": 8,
+      "evidence": "results/04_i14_sequence_acceptance.json#SEQ-9-RANGE-UPDATE"
+    },
+    {
+      "id": "F2",
+      "title": "Sequence contradictions are refused by exception, and a reset is indistinguishable from an out-of-order update",
+      "class": "candidate_interface_gap",
+      "severity": "medium",
+      "detail": "A duplicate (1000->1000) and a backward (1000->999) sequence both raise ValueError. Refusal is correct, but it is an exception rather than a typed BookSequenceStatus, so a caller that does not catch ValueError loses the record entirely instead of recording a stated cause. An epoch reset (999999->1) is the same ValueError: there is no epoch member, so a legitimate reset cannot be represented.",
+      "evidence": "results/04_i14_sequence_acceptance.json#SEQ-3-DUPLICATE, #SEQ-4-OUT-OF-ORDER, #SEQ-6-SEQUENCE-RESET"
+    },
+    {
+      "id": "F3",
+      "title": "No chain ingestion, reconstruction engine or epoch-recovery authorization exists",
+      "class": "contract_gap",
+      "severity": "medium",
+      "detail": "book.py offers one-snapshot normalisation plus pairwise classification. There is no surface that consumes (snapshot, updates[]), no snapshot/update-id reconciliation, no epoch member, no discard-the-pre-gap-book rule and no authorization reference for a recovery snapshot. bloc_05/04 section 6.2 does not require a reconstruction engine in I14, so this is a scope boundary, not an omission: 7 of 10 sequence capabilities are supportable and 3 are not.",
+      "evidence": "results/04_i14_sequence_acceptance.json#reconstruction_capability"
+    },
+    {
+      "id": "F4",
+      "title": "Canonical book input requires best-first ordering while a documented provider returns bids worst-first",
+      "class": "deferred_integration",
+      "severity": "medium",
+      "detail": "BookSnapshotObservationInput requires strictly descending bids and refuses anything else, which is correct. Kraken's futures orderbook returns 1147 bid levels in ASCENDING order (first element 1, best bid 59900), so any adapter must reverse them. No such adapter exists in the candidate tree, and a consumer that takes bids[0] as the best bid is off by the whole price range.",
+      "measured": {
+        "provider": "KRAKEN_FUTURES",
+        "instrument": "PF_XBTUSD",
+        "bid_levels": 1147,
+        "bids_first_element": "1",
+        "bids_best": "59900",
+        "ordering": "ASCENDING_WORST_FIRST"
+      },
+      "evidence": "CAPTURED_EVIDENCE_MANIFEST.json#CAP-KRAKEN-BOOK-BTC-INVERSE-001"
+    },
+    {
+      "id": "F5",
+      "title": "The frozen OI scope vocabulary cannot express 'bucket aggregation unresolved'",
+      "class": "contract_gap",
+      "severity": "medium",
+      "detail": "OpenInterestSnapshotScope offers INTERVAL_LAST and INTERVAL_AVERAGE but no state meaning 'the provider does not document which'. A provider that publishes an interval statistic without naming its aggregation function must therefore be mis-scoped as one of the two, or refused. The r1 corpus recorded this state as INTERVAL_LAST_OR_AVERAGE_UNRESOLVED, which is not a member of the enum.",
+      "evidence": "results/03_i12_i15_execution.json#AGGREGATION_FUNCTION_UNREPRESENTABLE"
+    },
+    {
+      "id": "F6",
+      "title": "Lineage completeness proves reference presence, not resolvability",
+      "class": "candidate_defect",
+      "severity": "high",
+      "detail": "assert_lineage_complete reads the record's self-declared lineage descriptor and checks only non-emptiness. Three fabricated references (arbitrary://nothing-1, arbitrary://nothing-2, and 64 'f' characters) satisfy it. Reference presence, reference identity, evidence resolution, correct evidence digest and a coherent chain are five separate claims; only the first two are established. Deterministic identity itself is sound and was independently accepted.",
+      "measured": {
+        "assert_lineage_complete(fabricated refs)": "accepted",
+        "deterministic_id_checks_passed": 13,
+        "lineage_gate_state": "NOT_CLOSED",
+        "missing_sensor_families": 7
+      },
+      "evidence": "results/06_i16_lineage_verification.json#I16-9"
+    },
+    {
+      "id": "F7",
+      "title": "Positioning is jurisdictionally blocked and basis has no provider-native field",
+      "class": "unavailable_data",
+      "severity": "medium",
+      "detail": "Of eight sensor families, three were captured. Positioning returned HTTP 451 (jurisdictional block) from the only venue with a documented top-trader ratio family and HTTP 403 from a second; no lawful free access existed and no payload was fabricated. No captured endpoint publishes a provider-native basis, and deriving one is not authorized. Trade and liquidation were out of this slice.",
+      "measured": {
+        "families_captured": 3,
+        "families_absent": 5,
+        "http_451_provider": "BINANCE_USDM",
+        "http_403_provider": "BYBIT_LINEAR"
+      },
+      "evidence": "results/08_i20_captured_evidence.json#coverage_assessment"
+    },
+    {
+      "id": "F8",
+      "title": "The shipped approval root is empty, so no semantic admission is possible today",
+      "class": "missing_authority",
+      "severity": "informational",
+      "detail": "The production manifest is B5_I09P2A_EMPTY_TRUST_ROOT_V1 with artifacts {}, and B5_I08_UNITS_V1 is absent from the methodology registry. Every fixture therefore executed without authority by design, and every *_usd remains blocked. The admission MECHANISM was proven separately with a self-minted synthetic root, so a blanket refusal cannot masquerade as a pass.",
+      "evidence": "results/05_semantic_admission_challenge.json#K1, #P1"
+    },
+    {
+      "id": "F9",
+      "title": "An admitted decision carries an unverified approval id and digest",
+      "class": "candidate_interface_gap",
+      "severity": "medium",
+      "detail": "Model validity is proven: an admitted field must name provider field, equivalence class, confidence, evidence reference, methodology, mapping version, approval id and registry digest, and the model refuses a hand-built admitted decision. But admission_approval_id and admission_registry_digest are carried as unverified strings. A caller that can construct a SemanticAuthority reaches admitted=True exactly as a reviewed producer does, so the trust boundary is caller honesty plus procedure rather than a signature. This is the published I09 P2a trust model, not a Wave 1 regression.",
+      "evidence": "results/05_semantic_admission_challenge.json#model_validity_vs_authenticated_provenance"
+    },
+    {
+      "id": "F10",
+      "title": "Canonical reconciliation has no bundle to verify",
+      "class": "deferred_integration",
+      "severity": "informational",
+      "detail": "Agent 1 owns canonical execution and no Wave 1 raw execution bundle exists. This audit launched no full regression and does not inherit P3 canonical acceptance as covering Wave 1.",
+      "evidence": "results/09_canonical_reconciliation.json"
+    },
+    {
+      "id": "F11",
+      "title": "Wave 2 has no published checkpoint to audit",
+      "class": "deferred_integration",
+      "severity": "informational",
+      "detail": "agent/crypto-sensor-fabric-b5-wave2-r1 does not exist. I17, I18 and I19 have nothing to verify. The only Wave 2-adjacent artefact is the preliminary I16 module, audited in section 5 of the README, which states its own incompleteness. The I21 controls developed here are ready to be re-pointed as those checkpoints land.",
+      "evidence": "README.md section 9"
+    },
+    {
+      "id": "F12",
+      "title": "Evidence namespace collision resolved by an additive directory",
+      "class": "resolved",
+      "severity": "informational",
+      "detail": "Both the implementation and the audit carrier used evidence/bloc_05/b5_wave1_r1/. Neither is overwritten: this audit publishes to bloc_05/b5_wave1_acceptance_r2/ and records the prior corpus path and its exact original digests in CORPUS_LINK.json. The corpus digest was reproduced exactly from the unmodified r1 files.",
+      "evidence": "CORPUS_LINK.json"
+    },
+    {
+      "id": "F13",
+      "title": "Five r1 expectation tokens are not members of the frozen enums",
+      "class": "audit_side_mismatch",
+      "severity": "low",
+      "detail": "The r1 corpus records expectations such as OI_UNIT_UNVERIFIED and oi_native_unit=UNVERIFIED / USD_NOTIONAL, which are prose rather than enum members of OpenInterestNativeUnit. The fixtures remain valid evidence; their expectation keys are descriptive. Disclosed so the mismatch cannot be read as an implementation defect.",
+      "evidence": "results/03_i12_i15_execution.json#adaptation_notes"
+    },
+    {
+      "id": "F14",
+      "title": "An HTTP 200 is not a capture",
+      "class": "audit_side_mismatch",
+      "severity": "low",
+      "detail": "The first acquisition attempt recorded Kraken's retired PI_XBTUSD orderbook as captured because the status was 200; the body was {\"result\":\"error\",\"error\":\"marketUnavailable\"}. Every payload is now validated against its provider envelope before it counts, and the live symbol is PF_XBTUSD. Disclosed because the correction changed the capture set.",
+      "evidence": "probes/acquire_i20.py.txt, CAPTURED_EVIDENCE_MANIFEST.json#access_policy"
+    }
+  ],
+  "captured_evidence_facts": [
+    {
+      "id": "C1",
+      "fact": "OKX publishes three separable OI quantities for one observation",
+      "measured": {
+        "BTC-USDT-SWAP": {"oi_over_oiCcy": "100", "oiUsd_over_oiCcy": "59941"},
+        "ETH-USDT-SWAP": {"oi_over_oiCcy": "10", "oiUsd_over_oiCcy": "1663.37"},
+        "BTC-USD-SWAP": {"oi_over_oiCcy": "599.08", "oiUsd_over_oiCcy": "59908.3"}
+      },
+      "supports": "confirms the r1 Tier-A claim that a single canonical oi_native would merge three distinct measurements",
+      "ratified": false
+    },
+    {
+      "id": "C2",
+      "fact": "OKX fundingTime is a future settlement instant relative to ts, and nextFundingRate is an empty string",
+      "measured": {"fundingTime": "1795852800000", "ts": "1795825623668", "nextFundingRate": ""},
+      "supports": "a future-dated settlement instant must not be read as the time the rate became known; an empty string is not zero",
+      "ratified": false
+    },
+    {
+      "id": "C3",
+      "fact": "Kraken publishes two funding fields differing by approximately the index price",
+      "measured": {
+        "fundingRate": "0.04439133684998005",
+        "relativeFundingRate": "7.41533333333e-07",
+        "magnitude_ratio": "59864.25",
+        "contemporaneous_index_price": "59892.03"
+      },
+      "supports": "one of the two fields is not a per-interval fraction, but the payload does not say which convention either uses; this audit does not invent it",
+      "ratified": false
+    },
+    {
+      "id": "C4",
+      "fact": "Deribit reports open interest as a USD notional",
+      "measured": {"open_interest": "817904980", "open_interest_over_mark": "13653.15"},
+      "supports": "a USD-notional OI is a different native unit from a contract count",
+      "ratified": false
+    },
+    {
+      "id": "C5",
+      "fact": "Gate publishes funding_interval and quanto_multiplier as contract metadata, and OI as total_size on a different endpoint",
+      "measured": {"funding_interval": 28800, "quanto_multiplier": "0.0001", "total_size": "634712786"},
+      "supports": "the funding interval is available for this venue only, and OI lives on /tickers while its scale factor lives on /contracts",
+      "ratified": false
+    }
+  ],
+  "deliverable_map": {
+    "results/01_candidate_and_tree.json": "audited tree identity and per-module digests",
+    "results/02_corpus_provenance.json": "r1 corpus re-verification, unmodified",
+    "results/03_i12_i15_execution.json": "per-fixture execution against the real entry points",
+    "results/04_i14_sequence_acceptance.json": "ten sequence controls and the capability matrix",
+    "results/05_semantic_admission_challenge.json": "twenty admission checks plus the trust distinction",
+    "results/06_i16_lineage_verification.json": "thirteen lineage and identity checks",
+    "results/07_i21_property_controls.json": "fifteen end-to-end properties",
+    "results/08_i20_captured_evidence.json": "captured-evidence inventory and coverage assessment",
+    "results/09_canonical_reconciliation.json": "reconciliation status and retained controls",
+    "results/10_run_summary.json": "run summary and hard-stop attestations",
+    "CAPTURED_EVIDENCE_MANIFEST.json": "compact capture manifest (raw bytes held externally)",
+    "CORPUS_LINK.json": "link to the preserved r1 corpus with exact original digests",
+    "probes/": "reproducible acquisition, compaction and acceptance sources"
+  },
+  "counts": {
+    "fixtures_total": 58,
+    "fixtures_executed_passed": 24,
+    "fixtures_executed_failed": 0,
+    "fixtures_adaptation_required": 23,
+    "fixtures_unsupported_family": 11,
+    "assertions_executed": 114,
+    "assertions_passed": 114,
+    "sequence_controls": 10,
+    "sequence_supported": 7,
+    "admission_checks": 20,
+    "lineage_checks": 13,
+    "property_controls": 15,
+    "captures_attempted": 13,
+    "captures_accepted": 13,
+    "providers_captured": 4
+  }
+}

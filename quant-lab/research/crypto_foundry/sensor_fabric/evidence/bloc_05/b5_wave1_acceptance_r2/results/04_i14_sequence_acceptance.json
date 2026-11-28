@@ -1,0 +1,140 @@
+{
+  "control_count": 10,
+  "controls": [
+    {
+      "capability": "pairwise sequence classification",
+      "control_id": "SEQ-1-CONTIGUOUS",
+      "detail": {
+        "expected": "GAP_DETECTED (1000->1005 skips 1001..1004)",
+        "sequence_status": "GAP_DETECTED"
+      },
+      "outcome": "SUPPORTED_AND_CORRECT"
+    },
+    {
+      "capability": "adjacent successor is contiguous",
+      "control_id": "SEQ-1b-CONTIGUOUS",
+      "detail": {
+        "expected": "CONTIGUOUS",
+        "sequence_status": "CONTIGUOUS"
+      },
+      "outcome": "SUPPORTED_AND_CORRECT"
+    },
+    {
+      "capability": "a missing update is a gap and no book is certified",
+      "control_id": "SEQ-2-MISSING",
+      "detail": {
+        "book_state_certified": false,
+        "flags": [
+          "BOOK_DEPTH_UNKNOWN",
+          "BOOK_SEQUENCE_GAP",
+          "LINEAGE_COMPLETE",
+          "SEMANTICS_UNVERIFIED",
+          "UNIT_CONVERSION_BLOCKED"
+        ],
+        "note": "the entry point observes ONE snapshot with a previous_sequence token; it does not ingest a chain, so a skip is only detectable when the caller supplies the predecessor token. A provider that declares its predecessor via pu (never delivered) is undetectable pairwise",
+        "sequence_status": "GAP_DETECTED"
+      },
+      "outcome": "SUPPORTED_AND_CORRECT"
+    },
+    {
+      "capability": "a non-advancing (duplicate) sequence is refused",
+      "control_id": "SEQ-3-DUPLICATE",
+      "detail": {
+        "message": "provider sequence did not advance (1000 -> 1000): a non-increasing sequence contradicts the update itself",
+        "note": "refusal is an exception rather than a typed status, so a caller that does not catch ValueError loses the record entirely",
+        "raised": "ValueError"
+      },
+      "outcome": "SUPPORTED_BY_REFUSAL_BUT_RAISES"
+    },
+    {
+      "capability": "a backward sequence is refused",
+      "control_id": "SEQ-4-OUT-OF-ORDER",
+      "detail": {
+        "outcome": {
+          "message": "provider sequence did not advance (1000 -> 999): a non-increasing sequence contradicts the update itself",
+          "raised": "ValueError"
+        }
+      },
+      "outcome": "SUPPORTED_BY_REFUSAL_BUT_RAISES"
+    },
+    {
+      "capability": "snapshot lastUpdateId vs first update pu is reconciled",
+      "control_id": "SEQ-5-SNAPSHOT-UPDATE-MISMATCH",
+      "detail": {
+        "detail": "no entry point consumes (snapshot, updates[]); the r1 fixture's pu vs lastUpdateId reconciliation has no production surface"
+      },
+      "outcome": "NOT_IMPLEMENTED"
+    },
+    {
+      "capability": "a reset epoch is distinguished from a gap",
+      "control_id": "SEQ-6-SEQUENCE-RESET",
+      "detail": {
+        "detail": "an epoch reset and an out-of-order update are the same ValueError; the contract has no epoch member, so a reset cannot be represented",
+        "outcome": {
+          "message": "provider sequence did not advance (999999 -> 1): a non-increasing sequence contradicts the update itself",
+          "raised": "ValueError"
+        }
+      },
+      "outcome": "CONFLATED_WITH_CONTRADICTION"
+    },
+    {
+      "capability": "a reconstructed metric over an uncertified (gapped) book is refused",
+      "control_id": "SEQ-7-METRIC-ACROSS-GAP",
+      "detail": {
+        "note": "the refusal is a record-construction law, not a caller flag: a RECONSTRUCTED_INTERNAL metric cannot name an uncertified source book, so a gapped book cannot date a metric falsely",
+        "positive_control_certified_book": {
+          "outcome": "ACCEPTED",
+          "semantic_equivalence": "CORROBORATION_ONLY",
+          "source_book_state_certified": true
+        },
+        "uncertified_book": {
+          "error": "ValidationError",
+          "message": "1 validation error for T1BookMetricRecord\n  Value error, a reconstructed metric may not be certified from an uncertified book state (04 sect",
+          "outcome": "REFUSED"
+        }
+      },
+      "outcome": "SUPPORTED_AND_CORRECT"
+    },
+    {
+      "capability": "an authorized recovery snapshot restarts a certified epoch",
+      "control_id": "SEQ-8-RECOVERY-SNAPSHOT",
+      "detail": {
+        "book_state_certified": true,
+        "detail": "a contiguous restarted snapshot certifies; but there is no epoch member, no discard-the-pre-gap-book rule and no authorization reference, so the r1 fixture's 'pre_gap_book_discarded' and 'unauthorized_recovery' expectations have no production surface",
+        "sequence_status": "CONTIGUOUS"
+      },
+      "outcome": "PARTIALLY_SUPPORTED"
+    },
+    {
+      "capability": "a contiguous multi-id range update is not misclassified as a gap",
+      "control_id": "SEQ-9-RANGE-UPDATE",
+      "detail": {
+        "classified_by_range_head_U": "CONTIGUOUS",
+        "classified_by_range_tail_u": "GAP_DETECTED",
+        "consequence": "8 of the r1 sequence fixtures cannot be executed faithfully against this entry point without choosing a token convention the frozen contract does not define",
+        "detail": "the update IS contiguous (it covers 1001..1005) but comparing its tail 1005 against 1000 reports GAP_DETECTED, while comparing its head 1001 reports CONTIGUOUS; the classifier has no range member, so the verdict depends on which token the adapter happens to pass",
+        "update_span": "U=1001, u=1005 following a snapshot at lastUpdateId=1000"
+      },
+      "outcome": "UNSUPPORTED_RANGE_SEMANTICS"
+    }
+  ],
+  "entry_points": [
+    "classify_sequence",
+    "normalize_book_snapshot",
+    "normalize_book_metric"
+  ],
+  "frozen_contract_requirement": "bloc_05/04 section 6.2 defines FULL_SNAPSHOT / DELTA_UPDATE / PARTIAL_SNAPSHOT / TOP_OF_BOOK / UNKNOWN plus a sequence status; it does not require a reconstruction engine in I14, so the eight-case corpus is only partly addressable here",
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "reconstruction_capability": {
+    "chain_ingestion": "ABSENT",
+    "crossed_book_refusal": "PRESENT (input law)",
+    "epoch_recovery": "ABSENT",
+    "gap_recovery_authorization": "ABSENT",
+    "metric_gap_propagation": "CALLER-SUPPLIED AND RECORD-ENFORCED (a RECONSTRUCTED_INTERNAL metric cannot name an uncertified source book)",
+    "pairwise_classification": "PRESENT",
+    "range_update_sequences": "ABSENT (single-token comparison only)",
+    "snapshot_plus_delta_reconstruction": "ABSENT"
+  },
+  "supported_count": 7,
+  "verdict": "SEQUENCE_CLASSIFICATION_ACCEPTED_RECONSTRUCTION_ABSENT"
+}

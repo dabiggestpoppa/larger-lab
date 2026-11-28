@@ -1,0 +1,106 @@
+{
+  "control_count": 15,
+  "controls": [
+    {
+      "control_id": "P1",
+      "detail": "0c23143ee4c186e7482d0bc1183ba0dcf07d8d49a34dc792e8007dd39caa5186",
+      "law": "normalisation is byte-deterministic",
+      "passed": true
+    },
+    {
+      "control_id": "P2",
+      "detail": [
+        "SEMANTICS_UNVERIFIED",
+        "UNIT_CONVERSION_BLOCKED",
+        "LINEAGE_COMPLETE"
+      ],
+      "law": "quality flags are declaration-ordered and deduplicated",
+      "passed": true
+    },
+    {
+      "control_id": "P3",
+      "detail": "absent-or-blocked",
+      "law": "oi_usd never carries a number while B5_I08_UNITS_V1 is unadmitted",
+      "passed": true
+    },
+    {
+      "control_id": "P4",
+      "detail": {
+        "i08_symbol": null,
+        "present": false
+      },
+      "law": "B5_I08_UNITS_V1 is still absent from the methodology registry",
+      "passed": true
+    },
+    {
+      "control_id": "P5",
+      "detail": "byte-identical",
+      "law": "a record round-trips through JSON unchanged",
+      "passed": true
+    },
+    {
+      "control_id": "P6",
+      "detail": "refused: ValidationError",
+      "law": "a crossed book is refused at construction",
+      "passed": true
+    },
+    {
+      "control_id": "P7",
+      "detail": "refused: ValidationError",
+      "law": "ascending bids are refused (best-first is enforced)",
+      "passed": true
+    },
+    {
+      "control_id": "P8",
+      "detail": "refused: ValidationError",
+      "law": "a USD reading cannot be stored as a positioning ratio",
+      "passed": true
+    },
+    {
+      "control_id": "P9",
+      "detail": "refused: ValidationError",
+      "law": "a cross-venue basis is not a T1 basis",
+      "passed": true
+    },
+    {
+      "control_id": "P10",
+      "detail": "refused: ValidationError",
+      "law": "an annualised basis requires its method",
+      "passed": true
+    },
+    {
+      "control_id": "P11",
+      "detail": "refused: ValidationError",
+      "law": "an amount cannot be normalised as a funding rate",
+      "passed": true
+    },
+    {
+      "control_id": "P12",
+      "detail": "refused: ValidationError",
+      "law": "an 8h interval with a 4h window is refused",
+      "passed": true
+    },
+    {
+      "control_id": "P13",
+      "detail": [],
+      "law": "no sensor module imports hashlib or uuid",
+      "passed": true
+    },
+    {
+      "control_id": "P14",
+      "detail": [],
+      "law": "sensor modules remain network- and clock-free",
+      "passed": true
+    },
+    {
+      "control_id": "P15",
+      "detail": "OI_CONTRACTS_TO_USD_V1",
+      "law": "the derived-contract path cites a named methodology",
+      "passed": true
+    }
+  ],
+  "failed": 0,
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "passed": 15,
+  "verdict": "PROPERTIES_HOLD"
+}

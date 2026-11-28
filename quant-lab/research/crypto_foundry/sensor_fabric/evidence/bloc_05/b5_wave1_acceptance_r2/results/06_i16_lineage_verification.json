@@ -1,0 +1,151 @@
+{
+  "check_count": 13,
+  "checks": [
+    {
+      "check_id": "I16-1",
+      "expected": "t1:f56dd5182765e28e5378ef40d39beef44d1707a356aab0d91a333e269bf4b9ce",
+      "law": "repeated derivation is stable",
+      "observed": "t1:f56dd5182765e28e5378ef40d39beef44d1707a356aab0d91a333e269bf4b9ce",
+      "passed": true
+    },
+    {
+      "check_id": "I16-2",
+      "expected": "no numeric value member",
+      "law": "the identity key carries no normalised value",
+      "observed": [
+        "contract_instance_id",
+        "identity_schema_version",
+        "native_identity_id",
+        "native_sequence_id",
+        "normalization_generation",
+        "provider",
+        "sensor_family",
+        "source_revision_id",
+        "venue"
+      ],
+      "passed": true
+    },
+    {
+      "check_id": "I16-3",
+      "expected": "t1:f56dd5182765e28e5378ef40d39beef44d1707a356aab0d91a333e269bf4b9ce",
+      "law": "a corrected value cannot change the id",
+      "observed": "t1:f56dd5182765e28e5378ef40d39beef44d1707a356aab0d91a333e269bf4b9ce",
+      "passed": true
+    },
+    {
+      "check_id": "I16-4",
+      "expected": "all distinct",
+      "law": "every identity member separates the id",
+      "observed": {
+        "contract_instance": "t1:22ed252f6725f76f066ec886fcc128ee3e46080ad8f60029da3ec543a9add86d",
+        "family": "t1:c95c8193ff8d7975b2095eebf74032cbce218a45bf13b744ee370ffde198cc5b",
+        "generation": "t1:eff945de0773fdad6290850be0ca530d9f6547b38255e2be56318465a40df32b",
+        "native_identity": "t1:cdf0291590df18c9a8a196adea17cc68e2ccab17a79315e7ddebd8df05b80443",
+        "provider": "t1:efa18828a2cadf07baa4c9633151fbdad41d7fd6fcd8e3929168e298afb58280",
+        "revision": "t1:574e06f56d360b5b2a723673415c39a299b36e7e7ef6789c873b453aa3e235c6",
+        "venue": "t1:b5d6dcd2982c103aced7b368f2d2016faf5ab376624538edb09949a643675640"
+      },
+      "passed": true
+    },
+    {
+      "check_id": "I16-5",
+      "expected": "identical map",
+      "law": "derivation is order independent",
+      "observed": "recomputed in reverse",
+      "passed": true
+    },
+    {
+      "check_id": "I16-6",
+      "expected": "versioned",
+      "law": "the identity schema is versioned",
+      "observed": "b5-i16-t1-identity-1",
+      "passed": true
+    },
+    {
+      "check_id": "I16-7",
+      "expected": "accepted",
+      "law": "a record naming every T0 ref passes the completeness assertion",
+      "observed": "accepted",
+      "passed": true
+    },
+    {
+      "check_id": "I16-8",
+      "expected": "refused",
+      "law": "a record with no raw projection ref is refused",
+      "observed": "refused: IncompleteLineageError",
+      "passed": true
+    },
+    {
+      "check_id": "I16-9",
+      "expected": "accepted (the limitation)",
+      "law": "lineage completeness proves presence, not resolvability (demonstrated)",
+      "observed": {
+        "assert_lineage_complete": "accepted",
+        "meaning": "three fabricated references satisfy the completeness assertion",
+        "tokens": [
+          "arbitrary://nothing-1",
+          "arbitrary://nothing-2",
+          "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check_id": "I16-10",
+      "expected": "424000af0fc5d039e37da68b6ef5da1bcb2c3fdb71a3ce2690ebff7562cc6c85",
+      "law": "created_at is excluded from the generation fingerprint",
+      "observed": "424000af0fc5d039e37da68b6ef5da1bcb2c3fdb71a3ce2690ebff7562cc6c85",
+      "passed": true
+    },
+    {
+      "check_id": "I16-11",
+      "expected": "refused",
+      "law": "a code-version drift is refused",
+      "observed": "refused: GenerationImmutableViolation",
+      "passed": true
+    },
+    {
+      "check_id": "I16-12",
+      "expected": "7 missing",
+      "law": "the lineage gate still names its missing families",
+      "observed": {
+        "covered": 1,
+        "missing": [
+          "MECHANICAL_TRADE",
+          "MECHANICAL_LIQUIDATION",
+          "MECHANICAL_FUNDING",
+          "MECHANICAL_BOOK_SNAPSHOT",
+          "MECHANICAL_BOOK_METRIC",
+          "MECHANICAL_POSITIONING",
+          "MECHANICAL_BASIS"
+        ]
+      },
+      "passed": true
+    },
+    {
+      "check_id": "I16-13",
+      "expected": "NOT_CLOSED",
+      "law": "the lineage gate is not closed",
+      "observed": "NOT_CLOSED",
+      "passed": true
+    }
+  ],
+  "distinctions": {
+    "coherent_lineage_chain": "PARTIAL (length and non-emptiness are asserted, not resolvability)",
+    "evidence_digest_correctness": "ABSENT (a 64-hex string is accepted without a target)",
+    "evidence_resolution": "ABSENT (nothing dereferences a token)",
+    "reference_identity": "PRESENT (the tokens are part of the id key chain)",
+    "reference_presence": "PRESENT (non-empty tuples are required by the envelopes)"
+  },
+  "entry_points": [
+    "compute_t1_record_id",
+    "assert_lineage_complete",
+    "generation_fingerprint",
+    "assert_generation_immutable"
+  ],
+  "failed": 0,
+  "gate_state": "NOT_CLOSED",
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "passed": 13,
+  "verdict": "DETERMINISTIC_ID_ACCEPTED_LINEAGE_RESOLUTION_ABSENT"
+}

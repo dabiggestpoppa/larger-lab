@@ -1,0 +1,25 @@
+{
+  "duplicate_full_regression_launched": false,
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "note": "no Wave 1 canonical bundle exists in the audited tree; the closeout inventory listed it as outstanding, and this audit does not accept P3 acceptance as covering Wave 1",
+  "p3_canonical_acceptance_inherited": false,
+  "policy": "Agent 1 owns canonical execution; this audit launched NO full regression",
+  "reconciliation_status": "BLOCKED_PENDING_RAW_EXECUTION_BUNDLE",
+  "required_inputs_not_yet_supplied": [
+    "exact candidate SHA for the executed tree",
+    "external collection anchor (start/end timestamp of the run)",
+    "raw executed node set with per-node outcomes",
+    "JUnit accounting with explained skips",
+    "artifact hashes produced by the run",
+    "per-group exit codes",
+    "restoration record returning the tree to a clean state"
+  ],
+  "retained_controls": [
+    "node set must be compared as a set, not a count",
+    "skips must each carry a stated cause",
+    "missing / extra / duplicate nodes are three distinct defects",
+    "an artifact hash is only meaningful against a recorded exit code"
+  ],
+  "verdict": "CANONICAL_RECONCILIATION_NOT_STARTED",
+  "wave1_raw_execution_bundle_present": false
+}

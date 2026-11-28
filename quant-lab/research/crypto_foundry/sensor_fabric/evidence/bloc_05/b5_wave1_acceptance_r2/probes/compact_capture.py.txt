@@ -1,0 +1,64 @@
+"""Compact the external capture manifest for the repository.
+
+Git keeps the manifest, the checksums and the reproduction record; the raw bytes
+stay in external approved evidence storage.  Every raw payload body (the
+provider's own levels, values and rows) is stripped here, while every digest,
+endpoint, parameter, timestamp, unit claim and measured fact is retained.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import sys
+from pathlib import Path
+
+SOURCE = Path(r"C:\tmp\b5r2\captured_manifest.json")
+TARGET = Path(sys.argv[1])
+
+manifest = json.loads(SOURCE.read_text(encoding="utf-8"))
+
+STrip = {"isolated"}  # the raw provider view: retained externally, never committed
+
+records = []
+for record in manifest["records"]:
+    compact = {}
+    for key, value in record.items():
+        if key in STrip:
+            continue
+        compact[key] = value
+    compact["raw_retained_externally"] = record.get("raw_path")
+    records.append(compact)
+
+payload = {
+    "schema": "b5-wave1-r2-captured-evidence-manifest-compact-1",
+    "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+    "note": (
+        "COMPACT manifest. Raw provider payload bodies are NOT in the repository; they are "
+        "retained in external approved evidence storage and addressed by sha256. The full "
+        "external manifest is digested below."
+    ),
+    "authority_commit": manifest["authority_commit"],
+    "wave1_candidate": manifest["wave1_candidate"],
+    "capture_date_utc": manifest["capture_date_utc"],
+    "external_manifest": {
+        "path": str(SOURCE),
+        "sha256": hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
+        "manifest_digest": manifest["manifest_digest"],
+    },
+    "raw_storage": manifest["raw_storage"],
+    "access_policy": manifest["access_policy"],
+    "attempt_count": manifest["attempt_count"],
+    "captured_count": manifest["captured_count"],
+    "refused_count": manifest["refused_count"],
+    "providers_captured": manifest["providers_captured"],
+    "assets_captured": manifest["assets_captured"],
+    "contract_types_captured": manifest["contract_types_captured"],
+    "sensor_families_captured": manifest["sensor_families_captured"],
+    "records": records,
+}
+TARGET.parent.mkdir(parents=True, exist_ok=True)
+TARGET.write_text(
+    json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n"
+)
+print(f"wrote {TARGET} size={TARGET.stat().st_size} bytes records={len(records)}")

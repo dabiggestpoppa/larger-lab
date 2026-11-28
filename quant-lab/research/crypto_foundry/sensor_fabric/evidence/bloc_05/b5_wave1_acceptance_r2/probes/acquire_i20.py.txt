@@ -1,0 +1,650 @@
+"""SENSOR-B5-WAVE1-R2 - I20 first-party captured-payload acquisition (v2).
+
+Lawful, documented, FREE, unauthenticated PUBLIC market-data endpoints only.
+
+Prohibited and enforced by construction:
+  * no trading/order endpoints,
+  * no authenticated account endpoints,
+  * no subscription or paid tier,
+  * no access-control circumvention (no proxy, no geo-masquerade, no spoofed origin),
+  * no scraping of a UI product.
+
+v2 corrections over the first attempt, each found by inspecting the bytes:
+  * an HTTP 200 is NOT a capture: Kraken answered ``result: "error"`` inside a 200,
+    so every payload is now validated against its provider envelope;
+  * ``PI_XBTUSD`` is dead (``marketUnavailable``); Kraken's live perpetual is
+    ``PF_XBTUSD``, and the ``?symbol=`` filter on /tickers returns an empty list,
+    so the multiplexed document is captured whole and the record isolated here;
+  * Gate's ``/contracts`` payload carries no open interest and DOES carry
+    ``funding_interval``; open interest is ``total_size`` on ``/tickers``.
+
+Native-unit claims are recorded as MEASURED (arithmetically separable inside the
+capture) or DECLARED (payload field names / provider documentation), never merged.
+
+Raw bytes are written OUTSIDE the repository. Git keeps the manifest + checksums.
+Nothing here ratifies provider semantics.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import urllib.error
+import urllib.request
+from datetime import datetime, timezone
+from decimal import Decimal, InvalidOperation
+from pathlib import Path
+
+RAW_DIR = Path(os.environ.get("B5_R2_RAW_DIR", r"C:\tmp\b5r2\raw"))
+MANIFEST = Path(os.environ.get("B5_R2_MANIFEST", r"C:\tmp\b5r2\captured_manifest.json"))
+USER_AGENT = "b5-wave1-second-agent-audit/1.0 (research; public market data only)"
+TIMEOUT = 30
+
+OKX_DOC = "https://www.okx.com/docs-v5/en/"
+DERIBIT_DOC = "https://docs.deribit.com/"
+GATE_DOC = "https://www.gate.io/docs/developers/apiv4/"
+KRAKEN_DOC = "https://docs.kraken.com/api/docs/futures-api/"
+
+TARGETS: tuple[dict[str, object], ...] = (
+    # ---------------------------------------------------------------- OKX OI
+    {
+        "capture_id": "CAP-OKX-OI-BTC-LINEAR-001",
+        "provider": "OKX_SWAP",
+        "venue": "OKX",
+        "instrument": "BTC-USDT-SWAP",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_OPEN_INTEREST",
+        "url": "https://www.okx.com/api/v5/public/open-interest?instId=BTC-USDT-SWAP",
+        "params": {"instId": "BTC-USDT-SWAP"},
+        "docs": OKX_DOC + " (Public Data REST - GET /api/v5/public/open-interest)",
+        "envelope": "OKX_CODE",
+        "isolate": None,
+        "native_units": {
+            "oi": "CONTRACT_COUNT (MEASURED: oi != oiCcy and oi/oiCcy is not asset-constant)",
+            "oiCcy": "BASE_ASSET_QUANTITY (MEASURED: oiCcy * oiUsd/oiCcy = oiUsd)",
+            "oiUsd": "USD_NOTIONAL (MEASURED: oiUsd/oiCcy equals the contemporaneous price)",
+        },
+        "timestamp_semantics": {
+            "ts": "provider response time (ms epoch string)",
+            "scope": "point-in-time snapshot; no interval window is published",
+        },
+        "semantic_claim": (
+            "Three separate native quantities (contract count, base-coin quantity, USD notional) "
+            "are published for one observation, so a single canonical oi_native would merge "
+            "three different measurements."
+        ),
+        "limitations": [
+            "contract face value / multiplier is NOT in the payload, so converting oi to oiCcy requires contract terms",
+            "the three-field relationship is measured arithmetically, not documented in this capture",
+            "one sample: proves field shape, proves nothing about revisions or backfill",
+        ],
+        "measured_checks": ("oi_vs_oi_ccy", "oi_usd_vs_oi_ccy", "oi_is_not_oi_ccy"),
+    },
+    {
+        "capture_id": "CAP-OKX-OI-BTC-INVERSE-001",
+        "provider": "OKX_SWAP",
+        "venue": "OKX",
+        "instrument": "BTC-USD-SWAP",
+        "contract_type": "INVERSE_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_OPEN_INTEREST",
+        "url": "https://www.okx.com/api/v5/public/open-interest?instId=BTC-USD-SWAP",
+        "params": {"instId": "BTC-USD-SWAP"},
+        "docs": OKX_DOC + " (Public Data REST - GET /api/v5/public/open-interest)",
+        "envelope": "OKX_CODE",
+        "isolate": None,
+        "native_units": {
+            "oi": "CONTRACT_COUNT (MEASURED)",
+            "oiCcy": "BASE_ASSET_QUANTITY (MEASURED)",
+            "oiUsd": "USD_NOTIONAL (MEASURED)",
+        },
+        "timestamp_semantics": {"ts": "provider response time (ms epoch string)", "scope": "point-in-time snapshot"},
+        "semantic_claim": (
+            "On an inverse swap the same three fields appear but oi/oiCcy is a different "
+            "constant than on the linear swap, so the ratio is contract-type dependent and "
+            "a contract count is not a coin quantity."
+        ),
+        "limitations": [
+            "contract face value is not in the payload",
+            "one sample",
+        ],
+        "measured_checks": ("oi_vs_oi_ccy", "oi_usd_vs_oi_ccy", "oi_is_not_oi_ccy"),
+    },
+    {
+        "capture_id": "CAP-OKX-OI-ETH-LINEAR-001",
+        "provider": "OKX_SWAP",
+        "venue": "OKX",
+        "instrument": "ETH-USDT-SWAP",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "ETH",
+        "family": "MECHANICAL_OPEN_INTEREST",
+        "url": "https://www.okx.com/api/v5/public/open-interest?instId=ETH-USDT-SWAP",
+        "params": {"instId": "ETH-USDT-SWAP"},
+        "docs": OKX_DOC + " (Public Data REST - GET /api/v5/public/open-interest)",
+        "envelope": "OKX_CODE",
+        "isolate": None,
+        "native_units": {"oi": "CONTRACT_COUNT (MEASURED)", "oiCcy": "BASE_ASSET_QUANTITY (MEASURED)", "oiUsd": "USD_NOTIONAL (MEASURED)"},
+        "timestamp_semantics": {"ts": "provider response time (ms epoch string)", "scope": "point-in-time snapshot"},
+        "semantic_claim": "The three-quantity shape is not BTC-specific.",
+        "limitations": ["one sample"],
+        "measured_checks": ("oi_vs_oi_ccy", "oi_usd_vs_oi_ccy", "oi_is_not_oi_ccy"),
+    },
+    # ----------------------------------------------------------- OKX funding
+    {
+        "capture_id": "CAP-OKX-FUNDING-BTC-LINEAR-001",
+        "provider": "OKX_SWAP",
+        "venue": "OKX",
+        "instrument": "BTC-USDT-SWAP",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_FUNDING",
+        "url": "https://www.okx.com/api/v5/public/funding-rate?instId=BTC-USDT-SWAP",
+        "params": {"instId": "BTC-USDT-SWAP"},
+        "docs": OKX_DOC + " (Public Data REST - GET /api/v5/public/funding-rate)",
+        "envelope": "OKX_CODE",
+        "isolate": None,
+        "native_units": {
+            "fundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL (DECLARED: decimal ratio)",
+            "nextFundingRate": "DECLARED_PREDICTED_SLOT, EMPTY_STRING_IN_THIS_CAPTURE",
+        },
+        "timestamp_semantics": {
+            "fundingTime": "the NEXT settlement instant of the CURRENT period (ms epoch), i.e. AFTER ts",
+            "prevFundingTime": "previous settlement instant",
+            "ts": "provider response time",
+            "scope": "current period only; this is not a funding history row",
+        },
+        "semantic_claim": (
+            "fundingTime is a FUTURE settlement instant relative to ts, so a reader that treats "
+            "it as the time the rate became known back-dates or forward-dates the observation; "
+            "and nextFundingRate is an empty string, which is not zero."
+        ),
+        "limitations": [
+            "the funding interval in seconds is NOT in the payload; it must come from contract terms",
+            "nextFundingRate was empty in this capture and must not be coerced to 0",
+            "one sample",
+        ],
+        "measured_checks": ("funding_time_is_after_ts", "next_rate_empty_not_zero"),
+    },
+    {
+        "capture_id": "CAP-OKX-FUNDING-ETH-LINEAR-001",
+        "provider": "OKX_SWAP",
+        "venue": "OKX",
+        "instrument": "ETH-USDT-SWAP",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "ETH",
+        "family": "MECHANICAL_FUNDING",
+        "url": "https://www.okx.com/api/v5/public/funding-rate?instId=ETH-USDT-SWAP",
+        "params": {"instId": "ETH-USDT-SWAP"},
+        "docs": OKX_DOC + " (Public Data REST - GET /api/v5/public/funding-rate)",
+        "envelope": "OKX_CODE",
+        "isolate": None,
+        "native_units": {"fundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL", "nextFundingRate": "EMPTY_STRING_IN_THIS_CAPTURE"},
+        "timestamp_semantics": {"fundingTime": "next settlement of the current period (ms epoch), after ts", "ts": "response time", "scope": "current period"},
+        "semantic_claim": "The future-settlement convention and the empty predicted slot are not BTC-specific.",
+        "limitations": ["interval not in payload", "one sample"],
+        "measured_checks": ("funding_time_is_after_ts", "next_rate_empty_not_zero"),
+    },
+    # -------------------------------------------------------------- OKX book
+    {
+        "capture_id": "CAP-OKX-BOOK-BTC-LINEAR-001",
+        "provider": "OKX_SWAP",
+        "venue": "OKX",
+        "instrument": "BTC-USDT-SWAP",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_BOOK_SNAPSHOT",
+        "url": "https://www.okx.com/api/v5/market/books?instId=BTC-USDT-SWAP&sz=5",
+        "params": {"instId": "BTC-USDT-SWAP", "sz": "5"},
+        "docs": OKX_DOC + " (Market Data REST - GET /api/v5/market/books)",
+        "envelope": "OKX_CODE",
+        "isolate": None,
+        "native_units": {
+            "levels[0]": "QUOTE_PRICE",
+            "levels[1]": "CONTRACT_COUNT (DECLARED for swaps; not separable inside this payload)",
+            "levels[2]": "LIQUIDATION_ORDER_COUNT (provider-specific)",
+            "levels[3]": "LEVEL_ORDER_COUNT",
+        },
+        "timestamp_semantics": {"ts": "provider assembly time (ms epoch string)", "seqId": "provider sequence id of this snapshot", "scope": "bounded top-of-book snapshot, NOT full depth"},
+        "semantic_claim": "A REST book is a bounded snapshot with its own sequence id and a level schema longer than price/size, so it cannot certify a full-depth book and level[1] is not base coin.",
+        "limitations": ["sz=5 is partial depth", "level quantity unit is declared, not separable inside the payload", "one sample"],
+        "measured_checks": ("book_ordered", "book_uncrossed", "level_tuple_longer_than_two"),
+    },
+    # ----------------------------------------------------------- Deribit book
+    {
+        "capture_id": "CAP-DERIBIT-BOOK-BTC-INVERSE-001",
+        "provider": "DERIBIT",
+        "venue": "DERIBIT",
+        "instrument": "BTC-PERPETUAL",
+        "contract_type": "INVERSE_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_BOOK_SNAPSHOT",
+        "url": "https://www.deribit.com/api/v2/public/get_order_book?instrument_name=BTC-PERPETUAL&depth=5",
+        "params": {"instrument_name": "BTC-PERPETUAL", "depth": "5"},
+        "docs": DERIBIT_DOC + " (Public - GET /public/get_order_book)",
+        "envelope": "DERIBIT_JSONRPC",
+        "isolate": None,
+        "native_units": {"bids/asks[0]": "USD_PRICE", "bids/asks[1]": "USD_NOTIONAL_PER_CONTRACT (DECLARED for inverse)"},
+        "timestamp_semantics": {"timestamp": "provider server time (ms epoch)", "change_id": "provider change sequence", "scope": "snapshot at the requested depth"},
+        "semantic_claim": "On an inverse perpetual the level amount is a USD notional, and the snapshot carries a change_id that a later chain would have to continue from.",
+        "limitations": ["depth=5 is partial", "per-level notional-to-contract relationship depends on contract specification", "one sample"],
+        "measured_checks": ("book_ordered", "book_uncrossed", "has_change_id"),
+    },
+    {
+        "capture_id": "CAP-DERIBIT-BOOK-ETH-INVERSE-001",
+        "provider": "DERIBIT",
+        "venue": "DERIBIT",
+        "instrument": "ETH-PERPETUAL",
+        "contract_type": "INVERSE_PERPETUAL",
+        "asset": "ETH",
+        "family": "MECHANICAL_BOOK_SNAPSHOT",
+        "url": "https://www.deribit.com/api/v2/public/get_order_book?instrument_name=ETH-PERPETUAL&depth=5",
+        "params": {"instrument_name": "ETH-PERPETUAL", "depth": "5"},
+        "docs": DERIBIT_DOC + " (Public - GET /public/get_order_book)",
+        "envelope": "DERIBIT_JSONRPC",
+        "isolate": None,
+        "native_units": {"bids/asks[0]": "USD_PRICE", "bids/asks[1]": "USD_NOTIONAL_PER_CONTRACT"},
+        "timestamp_semantics": {"timestamp": "provider server time (ms epoch)", "change_id": "provider change sequence", "scope": "snapshot at requested depth"},
+        "semantic_claim": "The inverse-notional level shape is not BTC-specific.",
+        "limitations": ["depth=5 is partial", "one sample"],
+        "measured_checks": ("book_ordered", "book_uncrossed", "has_change_id"),
+    },
+    # -------------------------------------------------------- Deribit OI (USD)
+    {
+        "capture_id": "CAP-DERIBIT-OI-BTC-INVERSE-001",
+        "provider": "DERIBIT",
+        "venue": "DERIBIT",
+        "instrument": "BTC-PERPETUAL",
+        "contract_type": "INVERSE_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_OPEN_INTEREST",
+        "url": "https://www.deribit.com/api/v2/public/get_book_summary_by_instrument?instrument_name=BTC-PERPETUAL",
+        "params": {"instrument_name": "BTC-PERPETUAL"},
+        "docs": DERIBIT_DOC + " (Public - GET /public/get_book_summary_by_instrument)",
+        "envelope": "DERIBIT_JSONRPC",
+        "isolate": None,
+        "native_units": {"open_interest": "USD_NOTIONAL (DECLARED for inverse; MEASURED: open_interest/mark_price is a plausible coin quantity)"},
+        "timestamp_semantics": {"creation_timestamp": "summary creation time (ms epoch)", "scope": "current summary"},
+        "semantic_claim": "Deribit publishes open interest already denominated in USD, a different native unit from a contract count, so the two cannot share one canonical slot.",
+        "limitations": ["the notional is provider-computed; it is not a base-coin exposure", "one sample"],
+        "measured_checks": ("oi_usd_implies_coin",),
+    },
+    # ------------------------------------------------------------- Gate
+    {
+        "capture_id": "CAP-GATE-FUNDING-BTC-LINEAR-001",
+        "provider": "GATE_FUTURES",
+        "venue": "GATE",
+        "instrument": "BTC_USDT",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_FUNDING",
+        "url": "https://api.gateio.ws/api/v4/futures/usdt/contracts/BTC_USDT",
+        "params": {"settle": "usdt", "contract": "BTC_USDT"},
+        "docs": GATE_DOC + " (Futures - GET /futures/{settle}/contracts/{contract})",
+        "envelope": "GATE_OBJECT",
+        "isolate": None,
+        "native_units": {
+            "funding_rate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+            "funding_interval": "SECONDS (28800 on this contract)",
+            "quanto_multiplier": "CONTRACT_SIZE_IN_BASE_ASSET",
+        },
+        "timestamp_semantics": {"funding_next_apply": "epoch SECONDS of the next settlement", "scope": "contract specification, not a per-observation history row"},
+        "semantic_claim": "Gate publishes the funding interval and the contract multiplier as contract metadata in the same document as the rate, so the interval is available for a linear contract here while several other venues do not publish it at all.",
+        "limitations": ["this document is contract metadata, so a capture is not a funding observation with an event time", "one sample"],
+        "measured_checks": ("gate_interval_present", "gate_multiplier_present"),
+    },
+    {
+        "capture_id": "CAP-GATE-OI-BTC-LINEAR-001",
+        "provider": "GATE_FUTURES",
+        "venue": "GATE",
+        "instrument": "BTC_USDT",
+        "contract_type": "LINEAR_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_OPEN_INTEREST",
+        "url": "https://api.gateio.ws/api/v4/futures/usdt/tickers?contract=BTC_USDT",
+        "params": {"settle": "usdt", "contract": "BTC_USDT"},
+        "docs": GATE_DOC + " (Futures - GET /futures/{settle}/tickers)",
+        "envelope": "GATE_LIST",
+        "isolate": "contract",
+        "native_units": {"total_size": "CONTRACT_COUNT (MEASURED: total_size * quanto_multiplier is a plausible coin quantity)", "mark_price/index_price": "USDT"},
+        "timestamp_semantics": {"scope": "ticker state; the ticker document carries no per-observation event time"},
+        "semantic_claim": "Gate's open interest lives on the ticker document under total_size as a contract count, while the contract document (a different endpoint) carries the multiplier needed to interpret it.",
+        "limitations": ["total_size must be scaled by quanto_multiplier from the contract document to reach a coin quantity", "the ticker carries no event time", "one sample"],
+        "measured_checks": ("gate_total_size_present",),
+    },
+    # ------------------------------------------------------------- Kraken
+    {
+        "capture_id": "CAP-KRAKEN-FUNDING-BTC-INVERSE-001",
+        "provider": "KRAKEN_FUTURES",
+        "venue": "KRAKEN",
+        "instrument": "PF_XBTUSD",
+        "contract_type": "INVERSE_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_FUNDING",
+        "url": "https://futures.kraken.com/derivatives/api/v3/tickers",
+        "params": {},
+        "docs": KRAKEN_DOC + " (GET /derivatives/api/v3/tickers; ?symbol= filter returned an empty list, so the multiplexed document is captured whole)",
+        "envelope": "KRAKEN_RESULT",
+        "isolate": ("tickers", "symbol", "PF_XBTUSD"),
+        "native_units": {
+            "fundingRate": "MAGNITUDE_DIFFERS_FROM_relativeFundingRate_BY_~6e4 (convention NOT determined from this capture)",
+            "relativeFundingRate": "DIMENSIONLESS_FRACTION_PER_INTERVAL",
+            "openInterest": "CONTRACT_COUNT (inverse: USD face per contract)",
+            "markPrice/indexPrice": "USD",
+        },
+        "timestamp_semantics": {"lastTime": "provider last update time (ISO-8601, nanosecond precision)", "scope": "current ticker state"},
+        "semantic_claim": "Kraken publishes TWO funding fields whose magnitudes differ by four orders, so at least one of them is not a per-interval fraction; the payload does not say which convention either uses. Both mark and index price are also present, so a reader must not attribute either price by position.",
+        "limitations": [
+            "the two funding fields' conventions are NOT established by this capture",
+            "the response multiplexes every listed instrument, so isolation is a local step",
+            "funding interval is not carried",
+            "one sample",
+        ],
+        "measured_checks": ("kraken_two_funding_fields_disagree", "kraken_isolation"),
+    },
+    {
+        "capture_id": "CAP-KRAKEN-BOOK-BTC-INVERSE-001",
+        "provider": "KRAKEN_FUTURES",
+        "venue": "KRAKEN",
+        "instrument": "PF_XBTUSD",
+        "contract_type": "INVERSE_PERPETUAL",
+        "asset": "BTC",
+        "family": "MECHANICAL_BOOK_SNAPSHOT",
+        "url": "https://futures.kraken.com/derivatives/api/v3/orderbook?symbol=PF_XBTUSD",
+        "params": {"symbol": "PF_XBTUSD"},
+        "docs": KRAKEN_DOC + " (GET /derivatives/api/v3/orderbook)",
+        "envelope": "KRAKEN_RESULT",
+        "isolate": None,
+        "view_path": ("orderBook",),
+        "native_units": {"bids/asks[0]": "USD_PRICE", "bids/asks[1]": "CONTRACT_COUNT (inverse: USD face)"},
+        "timestamp_semantics": {"scope": "snapshot; no per-level timestamp is carried"},
+        "semantic_claim": (
+            "A Kraken orderbook snapshot is available on the live PF_ symbol but not the retired "
+            "PI_ symbol, and its bids are published WORST-FIRST (ascending price), so bids[0] is "
+            "the deepest bid rather than the best one."
+        ),
+        "limitations": [
+            "snapshot only, no incremental chain",
+            "quantity unit is declared, not separable inside the payload",
+            "bids arrive ascending, so a best-first consumer must reverse them",
+            "one sample",
+        ],
+        "measured_checks": ("kraken_bid_ordering", "book_uncrossed"),
+    },
+)
+
+
+def _decimal(value: object) -> Decimal | None:
+    try:
+        return Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+
+
+def _validate(envelope: str, payload: object) -> tuple[str, object]:
+    """Return (status, isolated_view).  A 200 with an error envelope is not a capture."""
+    if envelope == "OKX_CODE":
+        if not isinstance(payload, dict):
+            return "PAYLOAD_NOT_OBJECT", None
+        if str(payload.get("code")) != "0" or not payload.get("data"):
+            return f"PROVIDER_ERROR_ENVELOPE(code={payload.get('code')})", None
+        return "OK", payload["data"][0]
+    if envelope == "DERIBIT_JSONRPC":
+        if not isinstance(payload, dict):
+            return "PAYLOAD_NOT_OBJECT", None
+        if "error" in payload:
+            return f"PROVIDER_ERROR_ENVELOPE({payload['error']})", None
+        result = payload.get("result")
+        if isinstance(result, list):
+            result = result[0] if result else None
+        return ("OK", result) if result else ("EMPTY_RESULT", None)
+    if envelope == "GATE_OBJECT":
+        return ("OK", payload) if isinstance(payload, dict) and "name" in payload else ("UNEXPECTED_SHAPE", None)
+    if envelope == "GATE_LIST":
+        if isinstance(payload, list) and payload:
+            return "OK", payload[0]
+        return "UNEXPECTED_SHAPE", None
+    if envelope == "KRAKEN_RESULT":
+        if not isinstance(payload, dict):
+            return "PAYLOAD_NOT_OBJECT", None
+        if payload.get("result") != "success":
+            return f"PROVIDER_ERROR_ENVELOPE({payload.get('error') or payload.get('result')})", None
+        return "OK", payload
+    return "UNKNOWN_ENVELOPE", None
+
+
+def _measured(checks: tuple[str, ...], view: object, whole: object) -> dict:
+    """Arithmetic facts read out of the capture.  No provider semantics are assumed."""
+    out: dict[str, object] = {}
+    v = view if isinstance(view, dict) else {}
+
+    if "oi_vs_oi_ccy" in checks or "oi_is_not_oi_ccy" in checks:
+        oi, ccy = _decimal(v.get("oi")), _decimal(v.get("oiCcy"))
+        out["oi"] = str(oi)
+        out["oiCcy"] = str(ccy)
+        out["oi_over_oiCcy"] = str(oi / ccy) if oi and ccy else None
+        out["oi_equals_oiCcy"] = (oi == ccy) if oi is not None and ccy is not None else None
+
+    if "oi_usd_vs_oi_ccy" in checks:
+        usd, ccy = _decimal(v.get("oiUsd")), _decimal(v.get("oiCcy"))
+        out["oiUsd_over_oiCcy"] = str(usd / ccy) if usd and ccy else None
+
+    if "funding_time_is_after_ts" in checks:
+        ft, ts = _decimal(v.get("fundingTime")), _decimal(v.get("ts"))
+        out["fundingTime"] = str(ft)
+        out["ts"] = str(ts)
+        out["funding_time_after_ts"] = bool(ft and ts and ft > ts)
+
+    if "next_rate_empty_not_zero" in checks:
+        nxt = v.get("nextFundingRate")
+        out["nextFundingRate_raw"] = nxt
+        out["nextFundingRate_is_empty_string"] = nxt == ""
+
+    if "oi_usd_implies_coin" in checks:
+        oi_usd, mark = _decimal(v.get("open_interest")), _decimal(v.get("mark_price"))
+        out["open_interest"] = str(oi_usd)
+        out["open_interest_over_mark"] = str(oi_usd / mark) if oi_usd and mark else None
+
+    if "gate_interval_present" in checks:
+        out["funding_interval"] = v.get("funding_interval")
+    if "gate_multiplier_present" in checks:
+        out["quanto_multiplier"] = v.get("quanto_multiplier")
+    if "gate_total_size_present" in checks:
+        out["total_size"] = v.get("total_size")
+
+    if "kraken_two_funding_fields_disagree" in checks:
+        fr, rel = _decimal(v.get("fundingRate")), _decimal(v.get("relativeFundingRate"))
+        out["fundingRate"] = str(fr)
+        out["relativeFundingRate"] = str(rel)
+        out["magnitude_ratio"] = str(fr / rel) if fr and rel else None
+
+    if "kraken_isolation" in checks:
+        tickers = whole.get("tickers") if isinstance(whole, dict) else None
+        out["multiplexed_ticker_count"] = len(tickers) if isinstance(tickers, list) else None
+        out["isolated_symbol"] = v.get("symbol")
+
+    if "kraken_bid_ordering" in checks:
+        bids, asks = v.get("bids") or [], v.get("asks") or []
+        prices = [_decimal(level[0]) for level in bids]
+        out["bid_levels"] = len(bids)
+        out["ask_levels"] = len(asks)
+        out["bids_ascending_worst_first"] = all(
+            prices[i] < prices[i + 1] for i in range(len(prices) - 1)
+        )
+        out["bids_first_element"] = str(prices[0])
+        out["bids_max_price"] = str(max(prices))
+        out["first_element_is_best_bid"] = prices[0] == max(prices)
+        out["first_element_overstates_depth"] = str(max(prices) / prices[0])
+        return out
+
+    if any(c.startswith("book") or c == "has_change_id" or c == "level_tuple_longer_than_two" for c in checks):
+        bids = v.get("bids") or []
+        asks = v.get("asks") or []
+        out["bid_levels"] = len(bids)
+        out["ask_levels"] = len(asks)
+        if bids and asks:
+            out["book_ordered"] = all(
+                _decimal(bids[i][0]) >= _decimal(bids[i + 1][0]) for i in range(len(bids) - 1)
+            ) and all(
+                _decimal(asks[i][0]) <= _decimal(asks[i + 1][0]) for i in range(len(asks) - 1)
+            )
+            out["book_uncrossed"] = _decimal(bids[0][0]) < _decimal(asks[0][0])
+            out["best_bid"] = str(bids[0][0])
+            out["best_ask"] = str(asks[0][0])
+        if "has_change_id" in checks:
+            out["has_change_id"] = "change_id" in v
+        if "level_tuple_longer_than_two" in checks:
+            out["level_arity"] = sorted({len(level) for level in list(bids) + list(asks)})
+    return out
+
+
+def _fetch(target: dict) -> dict:
+    request = urllib.request.Request(
+        str(target["url"]),
+        headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
+    )
+    acquired_at = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+            status = int(response.status)
+            body = response.read()
+            ctype = response.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as exc:
+        body = exc.read() if exc.fp is not None else b""
+        status = int(exc.code)
+        ctype = exc.headers.get("Content-Type", "") if exc.headers else ""
+    except Exception as exc:
+        return {
+            "acquired_at": acquired_at,
+            "http_status": None,
+            "outcome": "TRANSPORT_FAILURE",
+            "error": f"{type(exc).__name__}: {exc}",
+            "raw_path": None,
+            "raw_sha256": None,
+            "raw_bytes": 0,
+            "validation": "NOT_ATTEMPTED",
+            "isolated": None,
+            "measured": {},
+        }
+
+    digest = hashlib.sha256(body).hexdigest()
+    RAW_DIR.mkdir(parents=True, exist_ok=True)
+    path = RAW_DIR / f"{target['capture_id']}.json"
+    path.write_bytes(body)
+
+    if status != 200:
+        validation, view = f"HTTP_{status}", None
+    else:
+        try:
+            payload = json.loads(body)
+        except Exception as exc:
+            validation, view, payload = f"UNPARSEABLE({type(exc).__name__})", None, None
+        else:
+            validation, view = _validate(str(target["envelope"]), payload)
+            if validation == "OK" and target.get("view_path") and isinstance(view, dict):
+                for key in target["view_path"]:
+                    view = view.get(key) if isinstance(view, dict) else None
+                if not isinstance(view, dict):
+                    validation = f"VIEW_PATH_MISSING({'.'.join(target['view_path'])})"
+
+            if validation == "OK" and target.get("isolate"):
+                isolation = target["isolate"]
+                if isinstance(isolation, str):
+                    # The query parameter already isolated the row; only prove it.
+                    want = str((target.get("params") or {}).get(isolation, ""))
+                    if not isinstance(view, dict) or str(view.get(isolation)) != want:
+                        validation = f"ISOLATION_MISSING({isolation}={want})"
+                else:
+                    container, key, want = isolation
+                    rows = payload.get(container) if isinstance(payload, dict) else None
+                    view = next((r for r in (rows or []) if r.get(key) == want), None)
+                    if view is None:
+                        validation = f"ISOLATION_MISSING({want})"
+
+    measured = _measured(target.get("measured_checks", ()), view, json.loads(body) if status == 200 and body[:1] in (b"{", b"[") else None)
+    captured = validation == "OK"
+    return {
+        "acquired_at": acquired_at,
+        "http_status": status,
+        "content_type": ctype,
+        "outcome": "CAPTURED" if captured else "PROVIDER_REFUSED_OR_UNUSABLE",
+        "validation": validation,
+        "error": None,
+        "raw_path": str(path),
+        "raw_sha256": digest,
+        "raw_bytes": len(body),
+        "isolated": view,
+        "measured": measured,
+    }
+
+
+def main() -> None:
+    records: list[dict] = []
+    for target in TARGETS:
+        result = _fetch(target)
+        record = {k: v for k, v in target.items() if k != "isolate"}
+        record.update(result)
+        record["access_classification"] = "PUBLIC_UNAUTHENTICATED_DOCUMENTED_FREE"
+        record["ratified_golden"] = False
+        record["approval_status"] = "NOT_REVIEWED"
+        record["first_party_capture"] = result["outcome"] == "CAPTURED"
+        records.append(record)
+        print(f"{record['capture_id']:<40} {str(record['http_status']):>4} {record['outcome']:<26} {record['validation'][:40]}")
+
+    captured = [r for r in records if r["first_party_capture"]]
+    manifest = {
+        "schema": "b5-wave1-r2-captured-evidence-2",
+        "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+        "authority_commit": "4bb677f9e0266f4dc48405181696019f359ae49f",
+        "wave1_candidate": "bc53ada805b8309e6aaf4d31684afb27a2b0e370",
+        "raw_storage": {
+            "kind": "EXTERNAL_APPROVED_EVIDENCE_STORAGE",
+            "path": str(RAW_DIR),
+            "repo_policy": "raw bytes are NOT committed; only this manifest and its checksums are",
+        },
+        "access_policy": {
+            "trading_endpoints": "prohibited",
+            "authenticated_endpoints": "prohibited",
+            "paid_subscriptions": "prohibited",
+            "access_control_circumvention": "prohibited",
+            "user_agent": USER_AGENT,
+            "captured_here": "documented public unauthenticated market-data endpoints only",
+        },
+        "capture_date_utc": datetime.now(timezone.utc).date().isoformat(),
+        "attempt_count": len(records),
+        "captured_count": len(captured),
+        "refused_count": len(records) - len(captured),
+        "providers_captured": sorted({r["provider"] for r in captured}),
+        "assets_captured": sorted({r["asset"] for r in captured}),
+        "contract_types_captured": sorted({r["contract_type"] for r in captured}),
+        "sensor_families_captured": sorted({r["family"] for r in captured}),
+        "records": records,
+    }
+    manifest["manifest_digest"] = hashlib.sha256(
+        json.dumps(
+            [
+                {
+                    "capture_id": r.get("capture_id"),
+                    "raw_sha256": r.get("raw_sha256"),
+                    "validation": r.get("validation"),
+                    "outcome": r.get("outcome"),
+                }
+                for r in records
+            ],
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+    ).hexdigest()
+    MANIFEST.parent.mkdir(parents=True, exist_ok=True)
+    MANIFEST.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8", newline="\n")
+    print()
+    print(f"captured={len(captured)}/{len(records)}")
+    print(f"providers={manifest['providers_captured']}")
+    print(f"assets={manifest['assets_captured']} contracts={manifest['contract_types_captured']}")
+    print(f"families={manifest['sensor_families_captured']}")
+    print(f"digest={manifest['manifest_digest']}")
+
+
+if __name__ == "__main__":
+    main()

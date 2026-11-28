@@ -1,0 +1,68 @@
+{
+  "artifacts": {
+    "01_candidate_and_tree.json": {
+      "checks": null,
+      "failed": null,
+      "verdict": "AUDITED_TREE_IS_THE_CANDIDATE"
+    },
+    "02_corpus_provenance.json": {
+      "checks": null,
+      "failed": null,
+      "verdict": null
+    },
+    "03_i12_i15_execution.json": {
+      "checks": 114,
+      "failed": null,
+      "verdict": "NO_FAILED_EXECUTED_FIXTURE"
+    },
+    "04_i14_sequence_acceptance.json": {
+      "checks": 10,
+      "failed": null,
+      "verdict": "SEQUENCE_CLASSIFICATION_ACCEPTED_RECONSTRUCTION_ABSENT"
+    },
+    "05_semantic_admission_challenge.json": {
+      "checks": 20,
+      "failed": null,
+      "verdict": "LADDER_ACCEPTED_MODEL_LAWS_HOLD_PROVENANCE_IS_UNAUTHENTICATED"
+    },
+    "06_i16_lineage_verification.json": {
+      "checks": 13,
+      "failed": null,
+      "verdict": "DETERMINISTIC_ID_ACCEPTED_LINEAGE_RESOLUTION_ABSENT"
+    },
+    "07_i21_property_controls.json": {
+      "checks": 15,
+      "failed": null,
+      "verdict": "PROPERTIES_HOLD"
+    },
+    "08_i20_captured_evidence.json": {
+      "checks": null,
+      "failed": null,
+      "verdict": "CAPTURED_EVIDENCE_ACQUIRED_NOT_RATIFIED"
+    },
+    "09_canonical_reconciliation.json": {
+      "checks": null,
+      "failed": null,
+      "verdict": "CANONICAL_RECONCILIATION_NOT_STARTED"
+    }
+  },
+  "environment": {
+    "platform": "win32",
+    "python": "3.11.9"
+  },
+  "hard_stops_observed": {
+    "bloc_6_advanced": false,
+    "custody_source_authorized": false,
+    "duplicate_full_regression_launched": false,
+    "manifest_activated": false,
+    "methodology_approved": false,
+    "p3_reopened": false,
+    "production_implementation_changed": false,
+    "production_merged": false,
+    "provider_self_ratified": false
+  },
+  "label": "SECOND-AGENT TECHNICAL AUDIT - NOT ORGANIZATIONALLY INDEPENDENT",
+  "mission": "SENSOR-B5-WAVE1-ACCEPTANCE-WAVE2-ROLLING-AUDIT-R2",
+  "target": "B5_WAVE1_INDEPENDENT_ACCEPTANCE_AND_WAVE2_AUDIT_PROGRESS",
+  "wave1_candidate": "bc53ada805b8309e6aaf4d31684afb27a2b0e370"
+}
